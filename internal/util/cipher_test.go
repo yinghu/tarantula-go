@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestEncrypt(t *testing.T) {
+func TestCipher(t *testing.T) {
 	cipher := Cipher{Ksz: 32}
 	err := cipher.AesGcm()
 	if err != nil {

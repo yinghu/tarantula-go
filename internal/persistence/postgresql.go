@@ -2,68 +2,89 @@ package persistence
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-const DATABASE_URL = "postgres://postgres:password@192.168.1.7:5432/homing_agent"
-//var Pool pgxpool.Pool
-var Message string;
-func init(){
-	fmt.Printf("Init app %s\n","postgrsql")
-	Message = "test me"
+const DATABASE_URL = "postgres://postgres:password@192.168.1.7:5432/tarantula_user"
+
+type Next func(row pgx.Rows) error
+type Tx func (tx pgx.Tx) error
+
+type Postgresql struct {
+	Pool      *pgxpool.Pool
+	Connected bool
+	Url       string
 }
 
-func Pool() error{
-	pool, err := pgxpool.New(context.Background(),DATABASE_URL)
+func (p *Postgresql) Create() error {
+	pool, err := pgxpool.New(context.Background(), p.Url)
 	if err != nil {
 		return err
 	}
-	defer pool.Close()
-	fmt.Printf("pooled %s\n","tested")
-	rows, err := pool.Query(context.Background(), "SELECT name, host FROM agents")
+	p.Pool = pool
+	p.Connected = true
+	return nil
+}
+
+func (p *Postgresql) Query(next Next, query string, values ...any) error {
+	conn, err := p.Pool.Acquire(context.Background())
+	if err != nil {
+		return err
+	}
+	defer conn.Release()
+	rows, err := conn.Query(context.Background(), query, values...)
 	if err != nil {
 		return err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var name string
-		var host string
-		err := rows.Scan(&name, &host)
-		if err != nil {
-			return err
+		if next(rows) != nil {
+			break
 		}
-		fmt.Printf("Data loaded %s >> %s\n", name, host)
 	}
 	return nil
 }
 
-
-func Start() error {
-	conn, err := pgx.Connect(context.Background(), DATABASE_URL)
+func (p *Postgresql) Exec(query string, values ...any) (int64, error) {
+	conn, err := p.Pool.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Failed to connection")
+		return 0, err
+	}
+	defer conn.Release()
+	tag, err := conn.Exec(context.Background(), query, values...)
+	if err != nil {
+		return 0, err
+	}
+	return tag.RowsAffected(), nil
+}
+
+func (p *Postgresql) Txn(tx Tx) error{
+	conn, err := p.Pool.Acquire(context.Background())
+	if err != nil {
 		return err
 	}
-	defer conn.Close(context.Background())
-	fmt.Printf("connnected %s\n", conn.Config().Host)
-	rows, err := conn.Query(context.Background(), "SELECT name, host FROM agents")
-	if err != nil {
+	defer conn.Release()
+	ptx, err := conn.BeginTx(context.TODO(),pgx.TxOptions{})
+	if err != nil{
 		return err
 	}
-	defer rows.Close()
-	fmt.Printf("query %s\n", conn.Config().User)
-
-	for rows.Next() {
-		var name string
-		var host string
-		err := rows.Scan(&name, &host)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("Data loaded %s >> %s\n", name, host)
-	}
+	er := tx(ptx)
+	defer func() {
+        if er != nil {
+            ptx.Rollback(context.TODO())
+        } else {
+            ptx.Commit(context.TODO())
+        }
+    }()
+	
 	return nil
+}
+
+func (p *Postgresql) Close() {
+	if !p.Connected {
+		return
+	}
+	p.Pool.Close()
 }
