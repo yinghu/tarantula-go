@@ -86,8 +86,5 @@ func (j *Jwt) Verify(token string, jp JwtProcess) error {
 	if err != nil{
 		return err
 	}
-	//fmt.Println(th)
-	//fmt.Println(tp)
-	//fmt.Println(parts[2])
 	return nil
 }
