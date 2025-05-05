@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"hash"
 	"strings"
 )
@@ -26,13 +25,17 @@ type JwtPayload struct {
 type Jwt struct {
 	Mac hash.Hash
 	Alg string
+	Ksz int16
 }
 
 type JwtProcess func(*JwtHeader, *JwtPayload) error
 
 func (j *Jwt) HMac() {
-	key := make([]byte, 64)
+	key := make([]byte,j.Ksz)
 	rand.Read(key)
+	j.Mac = hmac.New(sha256.New, key)
+}
+func (j *Jwt) HMacFromKey(key []byte) {
 	j.Mac = hmac.New(sha256.New, key)
 }
 
@@ -77,9 +80,12 @@ func (j *Jwt) Verify(token string, jp JwtProcess) error {
 	json.Unmarshal(h, &th)
 	tp := JwtPayload{}
 	json.Unmarshal(p, &tp)
-	jp(&th, &tp)
-	fmt.Println(th)
-	fmt.Println(tp)
-	fmt.Println(parts[2])
+	err := jp(&th, &tp)
+	if err != nil{
+		return err
+	}
+	//fmt.Println(th)
+	//fmt.Println(tp)
+	//fmt.Println(parts[2])
 	return nil
 }
