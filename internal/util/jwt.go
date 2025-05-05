@@ -36,6 +36,8 @@ func (j *Jwt) HMac() {
 	j.Mac = hmac.New(sha256.New, key)
 }
 func (j *Jwt) HMacFromKey(key []byte) {
+	
+	
 	j.Mac = hmac.New(sha256.New, key)
 }
 
