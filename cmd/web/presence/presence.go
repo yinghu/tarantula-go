@@ -9,23 +9,31 @@ import (
 	"runtime"
 	"runtime/debug"
 	"syscall"
-	"time"
+	//"time"
 
 	"gameclustering.com/internal/auth"
 )
 
-func debugging(f http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-		defer func() {
-			log.Println(r.URL.Path, time.Since(start))
-		}()
-		f(w, r)
-	}
-}
+var service auth.Service
+
+//func debugging(f http.HandlerFunc) http.HandlerFunc {
+	//return func(w http.ResponseWriter, r *http.Request) {
+		//start := time.Now()
+		//defer func() {
+			//log.Println(r.URL.Path, time.Since(start))
+		//}()
+		//f(w, r)
+	//}
+//}
 
 func bootstrap(host string) {
-	http.Handle("/auth", http.HandlerFunc(debugging(auth.AuthHandler)))
+	service = auth.Service{}
+	err := service.Start()
+	if err != nil {
+		panic(err)
+	}
+	//http.Handle("/auth", http.HandlerFunc(debugging(auth.AuthHandler)))
+	http.Handle("/auth",&service)
 	log.Fatal(http.ListenAndServe(host, nil))
 }
 
@@ -40,6 +48,7 @@ func main() {
 	debug.PrintStack()
 	buf := make([]byte, 1<<16)
 	runtime.Stack(buf, true)
+	service.Shutdown()
 	fmt.Printf("%s", buf)
 	fmt.Println("Exit : ", s)
 }
