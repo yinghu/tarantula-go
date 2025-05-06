@@ -2,30 +2,43 @@ package auth
 
 import (
 	//"encoding/json"
+
 	"fmt"
 	"net/http"
 
 	"gameclustering.com/internal/persistence"
-	//"gameclustering.com/internal/util"
+	"gameclustering.com/internal/util"
 )
 
-type Login struct{
-	Name string
-	Hash string
+type Login struct {
+	Name     string `json:"name"`
+	Hash     string `json:"password"`
 	SystemId int64
 }
 
 type Service struct {
-	Sql persistence.Postgresql
+	Sql     persistence.Postgresql
+	Sfk     util.Snowflake
+	Tkn     util.Jwt
+	Ciph    util.Cipher
 	Started bool
 }
 
 func (s *Service) Start() error {
 	sql := persistence.Postgresql{Url: "postgres://postgres:password@192.168.1.7:5432/tarantula_user"}
 	err := sql.Create()
-	if err != nil{
+	if err != nil {
 		return err
 	}
+	s.Sfk = util.Snowflake{NodeId: 1, EpochStart: util.EpochMillisecondsFromMidnight(2020, 1, 1), LastTimestamp: -1, Sequence: 0}
+	s.Tkn = util.Jwt{Alg: "SHS256"}
+	s.Tkn.HMac()
+	ci := util.Cipher{Ksz: 32}
+	er := ci.AesGcm()
+	if er != nil {
+		return er
+	}
+	s.Ciph = ci
 	s.Started = true
 	return nil
 }
@@ -34,12 +47,12 @@ func (s *Service) Shutdown() {
 	fmt.Printf("Auth service shut down\n")
 }
 
-func (s *Service) Register(login Login) error{
-	
+func (s *Service) Register(login Login) error {
+
 	return nil
 }
 
-func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request){
+func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("test"))
 }
