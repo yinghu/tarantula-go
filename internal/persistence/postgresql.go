@@ -10,7 +10,7 @@ import (
 const DATABASE_URL = "postgres://postgres:password@192.168.1.7:5432/tarantula_user"
 
 type Next func(row pgx.Rows) error
-type Tx func (tx pgx.Tx) error
+type Transaction func (tx pgx.Tx) error
 
 type Postgresql struct {
 	Pool      *pgxpool.Pool
@@ -60,22 +60,22 @@ func (p *Postgresql) Exec(query string, values ...any) (int64, error) {
 	return tag.RowsAffected(), nil
 }
 
-func (p *Postgresql) Txn(tx Tx) error{
+func (p *Postgresql) Txn(tx Transaction) error{
 	conn, err := p.Pool.Acquire(context.Background())
 	if err != nil {
 		return err
 	}
 	defer conn.Release()
-	ptx, err := conn.BeginTx(context.TODO(),pgx.TxOptions{})
+	ptx, err := conn.BeginTx(context.Background(),pgx.TxOptions{})
 	if err != nil{
 		return err
 	}
 	er := tx(ptx)
 	defer func() {
         if er != nil {
-            ptx.Rollback(context.TODO())
+            ptx.Rollback(context.Background())
         } else {
-            ptx.Commit(context.TODO())
+            ptx.Commit(context.Background())
         }
     }()
 	
