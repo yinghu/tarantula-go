@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	//"runtime"
-	//"runtime/debug"
+	"runtime"
+	"runtime/debug"
 	"syscall"
 
 	//"time"
@@ -46,10 +46,10 @@ func main() {
 	s := <-sigs
 	signal.Stop(sigs)
 	close(sigs)
-	//debug.PrintStack()
-	//buf := make([]byte, 1<<16)
-	//runtime.Stack(buf, true)
+	debug.PrintStack()
+	buf := make([]byte, 1<<16)
+	runtime.Stack(buf, true)
 	service.Shutdown()
-	//fmt.Printf("%s", buf)
+	fmt.Printf("%s", buf)
 	fmt.Println("Exit : ", s)
 }
