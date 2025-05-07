@@ -1,10 +1,20 @@
 package auth
 
 import (
-	"fmt"
+	//"fmt"
 	"testing"
 )
 
 func TestAuth(t *testing.T) {
-	fmt.Printf("%d", 100)
+	service := Service{}
+	err := service.Start()
+	if err != nil {
+		t.Errorf("Service error %s", err.Error())
+	}
+	defer service.Shutdown()
+	login := Login{Name: "foo100", Hash: "ppp", SystemId: 2, ReferenceId: 1}
+	er := service.Register(&login)
+	if er != nil {
+		t.Errorf("Register error %s", er.Error())
+	}
 }

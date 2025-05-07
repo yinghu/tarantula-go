@@ -6,10 +6,13 @@ replace gameclustering.com/internal/auth => ../../../internal/auth
 
 replace gameclustering.com/internal/persistence => ../../../internal/persistence
 
+replace gameclustering.com/internal/util => ../../../internal/util
+
 require gameclustering.com/internal/auth v0.0.0-00010101000000-000000000000
 
 require (
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000 // indirect
+	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgx/v5 v5.7.4 // indirect

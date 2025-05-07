@@ -6,9 +6,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"runtime"
-	"runtime/debug"
+	//"runtime"
+	//"runtime/debug"
 	"syscall"
+
 	//"time"
 
 	"gameclustering.com/internal/auth"
@@ -17,13 +18,13 @@ import (
 var service auth.Service
 
 //func debugging(f http.HandlerFunc) http.HandlerFunc {
-	//return func(w http.ResponseWriter, r *http.Request) {
-		//start := time.Now()
-		//defer func() {
-			//log.Println(r.URL.Path, time.Since(start))
-		//}()
-		//f(w, r)
-	//}
+//return func(w http.ResponseWriter, r *http.Request) {
+//start := time.Now()
+//defer func() {
+//log.Println(r.URL.Path, time.Since(start))
+//}()
+//f(w, r)
+//}
 //}
 
 func bootstrap(host string) {
@@ -33,7 +34,7 @@ func bootstrap(host string) {
 		panic(err)
 	}
 	//http.Handle("/auth", http.HandlerFunc(debugging(auth.AuthHandler)))
-	http.Handle("/auth",&service)
+	http.Handle("/auth", &service)
 	log.Fatal(http.ListenAndServe(host, nil))
 }
 
@@ -45,10 +46,10 @@ func main() {
 	s := <-sigs
 	signal.Stop(sigs)
 	close(sigs)
-	debug.PrintStack()
-	buf := make([]byte, 1<<16)
-	runtime.Stack(buf, true)
+	//debug.PrintStack()
+	//buf := make([]byte, 1<<16)
+	//runtime.Stack(buf, true)
 	service.Shutdown()
-	fmt.Printf("%s", buf)
+	//fmt.Printf("%s", buf)
 	fmt.Println("Exit : ", s)
 }
