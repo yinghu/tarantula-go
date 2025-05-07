@@ -8,19 +8,26 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
-func Link() error {
+type Cluster struct {
+	Group     string
+	Endpoints []string
+	Timeout   time.Duration
+}
+
+func (c *Cluster) Watch() error {
 	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{"192.168.1.7:2379"},
-		DialTimeout: 5 * time.Second,
+		Endpoints:   c.Endpoints,
+		DialTimeout: c.Timeout,
 	})
 	if err != nil {
 		return err
 	}
 	defer cli.Close()
-	rch := cli.Watch(context.Background(), "foo")
+	rch := cli.Watch(context.Background(), c.Group, clientv3.WithPrefix())
 	for wresp := range rch {
 		for _, ev := range wresp.Events {
 			fmt.Printf("%s %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
+			cli.Close()
 		}
 	}
 	return nil
