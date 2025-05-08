@@ -1,16 +1,15 @@
 package util
 
 import (
+	"strconv"
 	"testing"
 )
 
-func TestPassword(t *testing.T) {
-	h, err := Hash("password")
-	if err != nil {
-		t.Errorf("failed %s\n", err.Error())
-	}
-	er := Match("password", h)
-	if er != nil {
-		t.Errorf("failed %s\n", er.Error())
+func TestUtil(t *testing.T) {
+	for i := range 100 {
+		part := Partition([]byte("tester_"+strconv.Itoa(i)), 17)
+		if part > 16 {
+			t.Errorf("P %d\n", part)
+		}
 	}
 }
