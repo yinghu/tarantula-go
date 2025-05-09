@@ -11,6 +11,7 @@ import (
 )
 
 type Node struct {
+	Name         string `json:"name"`
 	HttpEndpoint string `json:"http"`
 	TcpEndpoint  string `json:"tcp"`
 }
@@ -31,6 +32,7 @@ func (c *Cluster) Join() error {
 		return err
 	}
 	defer cli.Close()
+	
 	tik := time.NewTicker(5 * time.Second)
 	quit := make(chan bool)
 	nd, _ := json.Marshal(c.Local)
