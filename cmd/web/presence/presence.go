@@ -6,13 +6,11 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"runtime"
-	"runtime/debug"
+	"sync"
 	"syscall"
 
-	//"time"
-
 	"gameclustering.com/internal/auth"
+	"gameclustering.com/internal/cluster"
 )
 
 var service auth.Service
@@ -39,17 +37,23 @@ func bootstrap(host string) {
 }
 
 func main() {
-	go bootstrap(":8080")
-	fmt.Println("Started : ")
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	s := <-sigs
-	signal.Stop(sigs)
-	close(sigs)
-	debug.PrintStack()
-	buf := make([]byte, 1<<16)
-	runtime.Stack(buf, true)
-	service.Shutdown()
-	fmt.Printf("%s", buf)
-	fmt.Println("Exit : ", s)
+	c := cluster.Etc{Quit: make(chan bool), Group: "tarantula", EtcdEndpoints: []string{"192.168.1.7:2379"}, Local: cluster.Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"}}
+	c.Started = sync.WaitGroup{}
+	c.Started.Add(1)
+	go func() {
+		c.Started.Wait()
+		bootstrap(":8080")
+	}()
+	go func() {
+		c.Started.Wait()
+		fmt.Println("Started : ")
+		sigs := make(chan os.Signal, 1)
+		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+		<-sigs
+		signal.Stop(sigs)
+		c.Quit <- true
+		close(sigs)
+		service.Shutdown()
+	}()
+	c.Join()
 }

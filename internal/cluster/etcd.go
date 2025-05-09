@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -16,31 +17,47 @@ type Node struct {
 	TcpEndpoint  string `json:"tcp"`
 }
 
-type Cluster struct {
+type Etc struct {
+	Quit          chan bool
+	Started       sync.WaitGroup
 	Group         string
 	EtcdEndpoints []string
-	Timeout       time.Duration
 	Local         Node
 }
 
-func (c *Cluster) Join() error {
+func New(){
+	
+}
+
+func (c *Etc) Join() error {
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   c.EtcdEndpoints,
-		DialTimeout: c.Timeout,
+		DialTimeout: 5*time.Second,
 	})
 	if err != nil {
 		return err
 	}
 	defer cli.Close()
-	
-	tik := time.NewTicker(5 * time.Second)
-	quit := make(chan bool)
 	nd, _ := json.Marshal(c.Local)
-	fmt.Printf("NODE : %q\n", nd)
 	go func() {
+		tik := time.NewTicker(2 * time.Second)
+		defer tik.Stop()
+		for c := range 5 {
+			t := <-tik.C
+			fmt.Printf("Ticker : %d %v\n", c, t)
+			if c == 0 {
+				cli.Put(context.Background(), "tarantula#join", string(nd))
+			}
+		}
+		c.Started.Done()
+	}()
+	go func() {
+		c.Started.Wait() //blocked
+		tik := time.NewTicker(2 * time.Second)
 		for {
 			select {
-			case <-quit:
+			case <-c.Quit:
+				cli.Close()
 				return
 			case t := <-tik.C:
 				fmt.Printf("Ticker : %v\n", t)
@@ -53,12 +70,9 @@ func (c *Cluster) Join() error {
 		for _, ev := range wresp.Events {
 			fmt.Printf("%s %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
 			cmds := strings.Split(string(ev.Kv.Key), "#")
-			if cmds[1] == "quit" {
-				cli.Close()
-				quit <- true
-			}
+			fmt.Printf("Watching key : %s\n", cmds[1])
 		}
 	}
-	tik.Stop()
+	fmt.Printf("Cluster shut down\n")
 	return nil
 }
