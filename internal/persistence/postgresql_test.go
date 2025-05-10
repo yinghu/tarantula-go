@@ -16,7 +16,7 @@ func doNext(rows pgx.Rows) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Data loaded %s >> %s\n", name, hash)
+	//fmt.Printf("Data loaded %s >> %s\n", name, hash)
 	return nil
 }
 
