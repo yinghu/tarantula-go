@@ -24,6 +24,7 @@ var service auth.Service
 //}
 //}
 
+
 func bootstrap(host string) {
 	service = auth.Service{}
 	err := service.Start()
