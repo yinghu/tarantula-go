@@ -30,7 +30,7 @@ type Service struct {
 }
 
 func (s *Service) Start() error {
-	s.Sfk = util.Snowflake{NodeId: 1, EpochStart: util.EpochMillisecondsFromMidnight(2020, 1, 1), LastTimestamp: -1, Sequence: 0}
+	s.Sfk = util.NewSnowflake(1,util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.Tkn = util.Jwt{Alg: "SHS256"}
 	s.Tkn.HMac()
 	ci := util.Cipher{Ksz: 32}

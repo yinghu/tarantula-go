@@ -6,7 +6,7 @@ import (
 )
 
 func TestSmoke(t *testing.T) {
-	sfk := Snowflake{NodeId: 1, EpochStart: EpochMillisecondsFromMidnight(2020, 1, 1), LastTimestamp: -1, Sequence: 0}
+	sfk := NewSnowflake(1,EpochMillisecondsFromMidnight(2020, 1, 1))
 	var wait sync.WaitGroup
 	const loop = 100
 	const round = 10000

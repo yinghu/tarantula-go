@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 
 	"gameclustering.com/internal/auth"
@@ -37,9 +36,7 @@ func bootstrap(host string) {
 }
 
 func main() {
-	c := cluster.Etc{Quit: make(chan bool), Group: "tarantula", EtcdEndpoints: []string{"192.168.1.7:2379"}, Local: cluster.Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"}}
-	c.Started = sync.WaitGroup{}
-	c.Started.Add(1)
+	c := cluster.NewEtc("tarantula",[]string{"192.168.1.7:2379"},cluster.Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"})
 	go func() {
 		c.Started.Wait()
 		bootstrap(":8080")

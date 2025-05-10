@@ -19,20 +19,30 @@ type Node struct {
 
 type Etc struct {
 	Quit          chan bool
-	Started       sync.WaitGroup
+	Started       *sync.WaitGroup
 	Group         string
 	EtcdEndpoints []string
 	Local         Node
+	lock          *sync.Mutex
+	partitions    map[uint32]string
+	cluster       map[string]Node
 }
 
-func New(){
-	
+func NewEtc(group string, etcEndpoints []string, local Node) Etc {
+	etc := Etc{Group: group, EtcdEndpoints: etcEndpoints, Local: local}
+	etc.lock = &sync.Mutex{}
+	etc.partitions = make(map[uint32]string)
+	etc.cluster = make(map[string]Node)
+	etc.Quit = make(chan bool)
+	etc.Started = &sync.WaitGroup{}
+	etc.Started.Add(1)
+	return etc
 }
 
 func (c *Etc) Join() error {
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   c.EtcdEndpoints,
-		DialTimeout: 5*time.Second,
+		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {
 		return err
@@ -43,8 +53,8 @@ func (c *Etc) Join() error {
 		tik := time.NewTicker(2 * time.Second)
 		defer tik.Stop()
 		for c := range 5 {
-			t := <-tik.C
-			fmt.Printf("Ticker : %d %v\n", c, t)
+			<-tik.C
+			//fmt.Printf("Ticker : %d %v\n", c, t)
 			if c == 0 {
 				cli.Put(context.Background(), "tarantula#join", string(nd))
 			}
@@ -53,24 +63,47 @@ func (c *Etc) Join() error {
 	}()
 	go func() {
 		c.Started.Wait() //blocked
-		tik := time.NewTicker(2 * time.Second)
+		tik := time.NewTicker(1 * time.Second)
 		for {
 			select {
 			case <-c.Quit:
 				cli.Close()
 				return
-			case t := <-tik.C:
-				fmt.Printf("Ticker : %v\n", t)
-				cli.Put(context.Background(), "tarantula#ping", string(nd))
+			case <-tik.C:
+				//fmt.Printf("Ticker : %v\n", t)
+				cli.Put(context.Background(), "tarantula#ping", c.Local.Name)
 			}
 		}
 	}()
 	wch := cli.Watch(context.Background(), c.Group, clientv3.WithPrefix())
 	for wresp := range wch { //blocked
 		for _, ev := range wresp.Events {
-			fmt.Printf("%s %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
+			//fmt.Printf("%s %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
 			cmds := strings.Split(string(ev.Kv.Key), "#")
-			fmt.Printf("Watching key : %s\n", cmds[1])
+			//fmt.Printf("Watching key : %s\n", cmds[1])
+			switch cmds[1] {
+			case "ping":
+				rnm := string(ev.Kv.Value)
+				if rnm != c.Local.Name {
+					fmt.Println("Ping from [" + rnm + "][" + c.Local.Name + "]")
+				}
+			case "join":
+				var rnd Node
+				err := json.Unmarshal(ev.Kv.Value, &rnd)
+				if err == nil {
+					fmt.Printf("Join from [%v]\n", rnd)
+					cli.Put(context.Background(),"tarantula#joined",string(nd))
+				}
+			case "joined":
+				var rnd Node
+				err := json.Unmarshal(ev.Kv.Value, &rnd)
+				if err == nil {
+					fmt.Printf("Joined from [%v]\n", rnd)
+				}
+			}
+			//c.lock.Lock()
+			//JOIN
+			//c.lock.Unlock()
 		}
 	}
 	fmt.Printf("Cluster shut down\n")

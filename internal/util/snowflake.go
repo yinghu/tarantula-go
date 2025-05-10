@@ -17,31 +17,37 @@ type Snowflake struct {
 	NodeId     int64
 	EpochStart int64
 
-	LastTimestamp int64
-	Sequence      int64
+	lastTimestamp int64
+	sequence      int64
 
-	Lock sync.Mutex
+	lock *sync.Mutex
+}
+
+func NewSnowflake(nodeId int64, epochStart int64) Snowflake {
+	sfk := Snowflake{NodeId: nodeId, EpochStart: epochStart, lastTimestamp: -1, sequence: 0}
+	sfk.lock = &sync.Mutex{}
+	return sfk
 }
 
 func (s *Snowflake) Id() (int64, error) {
-	s.Lock.Lock()
-	defer s.Lock.Unlock()
+	s.lock.Lock()
+	defer s.lock.Unlock()
 	currentTimestamp := time.Now().UnixMilli() - s.EpochStart
-	if currentTimestamp < s.LastTimestamp {
+	if currentTimestamp < s.lastTimestamp {
 		return -1, errors.New("wrong system clock setting")
 	}
-	if currentTimestamp == s.LastTimestamp {
-		s.Sequence = (s.Sequence + 1) & MAX_SEQUENCE
-		if s.Sequence == 0 {
-			for currentTimestamp == s.LastTimestamp {
+	if currentTimestamp == s.lastTimestamp {
+		s.sequence = (s.sequence + 1) & MAX_SEQUENCE
+		if s.sequence == 0 {
+			for currentTimestamp == s.lastTimestamp {
 				currentTimestamp = time.Now().UnixMilli() - s.EpochStart
 			}
 		}
 	} else {
-		s.Sequence = 0
+		s.sequence = 0
 	}
-	s.LastTimestamp = currentTimestamp
-	id := currentTimestamp<<(BITS_OF_NODE_NUMBER+BITS_OF_SEQUENCE) | (s.NodeId << BITS_OF_SEQUENCE) | s.Sequence
+	s.lastTimestamp = currentTimestamp
+	id := currentTimestamp<<(BITS_OF_NODE_NUMBER+BITS_OF_SEQUENCE) | (s.NodeId << BITS_OF_SEQUENCE) | s.sequence
 	return id, nil
 }
 
