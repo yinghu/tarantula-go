@@ -24,7 +24,6 @@ var service auth.Service
 //}
 //}
 
-
 func bootstrap(host string) {
 	service = auth.Service{}
 	err := service.Start()
@@ -37,9 +36,12 @@ func bootstrap(host string) {
 }
 
 func main() {
-	c := cluster.NewEtc("tarantula",[]string{"192.168.1.7:2379"},cluster.Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"})
+	c := cluster.NewEtc("presence", []string{"192.168.1.7:2379"}, cluster.Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"})
 	go func() {
 		c.Started.Wait()
+		for v := range c.View() {
+			fmt.Printf("View :%v\n", v)
+		}
 		bootstrap(":8080")
 	}()
 	go func() {

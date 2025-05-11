@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"iter"
+	"maps"
 	"strings"
 	"sync"
 	"time"
@@ -52,11 +54,11 @@ func (c *Etc) Join() error {
 	go func() {
 		tik := time.NewTicker(2 * time.Second)
 		defer tik.Stop()
-		for c := range 5 {
+		for r := range 5 {
 			<-tik.C
 			//fmt.Printf("Ticker : %d %v\n", c, t)
-			if c == 0 {
-				cli.Put(context.Background(), "tarantula#join", string(nd))
+			if r == 0 {
+				cli.Put(context.Background(), c.Group+"#join", string(nd))
 			}
 		}
 		c.Started.Done()
@@ -71,7 +73,7 @@ func (c *Etc) Join() error {
 				return
 			case <-tik.C:
 				//fmt.Printf("Ticker : %v\n", t)
-				cli.Put(context.Background(), "tarantula#ping", c.Local.Name)
+				cli.Put(context.Background(), c.Group+"#ping", c.Local.Name)
 			}
 		}
 	}()
@@ -92,20 +94,27 @@ func (c *Etc) Join() error {
 				err := json.Unmarshal(ev.Kv.Value, &rnd)
 				if err == nil {
 					fmt.Printf("Join from [%v]\n", rnd)
-					cli.Put(context.Background(),"tarantula#joined",string(nd))
+					cli.Put(context.Background(), c.Group+"#joined", string(nd))
 				}
 			case "joined":
 				var rnd Node
 				err := json.Unmarshal(ev.Kv.Value, &rnd)
 				if err == nil {
 					fmt.Printf("Joined from [%v]\n", rnd)
+					c.lock.Lock()
+					c.cluster[rnd.Name] = rnd
+					//JOIN
+					c.lock.Unlock()
 				}
 			}
-			//c.lock.Lock()
-			//JOIN
-			//c.lock.Unlock()
 		}
 	}
 	fmt.Printf("Cluster shut down\n")
 	return nil
+}
+
+func (c *Etc) View() iter.Seq[Node] {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	return maps.Values(c.cluster)
 }
