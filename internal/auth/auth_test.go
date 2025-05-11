@@ -6,7 +6,7 @@ import (
 )
 
 func TestAuth(t *testing.T) {
-	service := Service{}
+	service := Service{NodeId: 1, DatabaseURL: "postgres://postgres:password@192.168.1.7:5432/tarantula_user"}
 	err := service.Start()
 	if err != nil {
 		t.Errorf("Service error %s", err.Error())

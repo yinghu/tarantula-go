@@ -25,7 +25,7 @@ var service auth.Service
 //}
 
 func bootstrap(host string) {
-	service = auth.Service{}
+	service = auth.Service{NodeId: 1, DatabaseURL: "postgres://postgres:password@192.168.1.7:5432/tarantula_user"}
 	err := service.Start()
 	if err != nil {
 		panic(err)
