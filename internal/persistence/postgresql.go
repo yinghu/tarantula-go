@@ -7,7 +7,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-const DATABASE_URL = "postgres://postgres:password@192.168.1.7:5432/tarantula_user"
 
 type Next func(row pgx.Rows) error
 type Transaction func (tx pgx.Tx) error

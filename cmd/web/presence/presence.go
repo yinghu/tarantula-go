@@ -38,8 +38,8 @@ func bootstrap(f conf.Env) {
 
 func main() {
 	f := conf.Env{}
-	f.Load()
-	c := cluster.NewEtc("presence", []string{"192.168.1.7:2379"}, cluster.Node{Name: f.NodeName, HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"})
+	f.Load("/etc/tarantula/presence-conf.json")
+	c := cluster.NewEtc(f.GroupName, f.EtcdEndpoints, cluster.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.TcpEndpoint})
 	go func() {
 		c.Started.Wait()
 		for v := range c.View() {
