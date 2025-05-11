@@ -3,11 +3,15 @@ package auth
 import (
 	//"fmt"
 	"testing"
+
+	"gameclustering.com/internal/conf"
 )
 
 func TestAuth(t *testing.T) {
-	service := Service{NodeId: 1, DatabaseURL: "postgres://postgres:password@192.168.1.7:5432/tarantula_user"}
-	err := service.Start()
+	service := Service{}
+	f := conf.Env{}
+	f.Load()
+	err := service.Start(f)
 	if err != nil {
 		t.Errorf("Service error %s", err.Error())
 	}

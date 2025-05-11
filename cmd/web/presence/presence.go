@@ -10,6 +10,7 @@ import (
 
 	"gameclustering.com/internal/auth"
 	"gameclustering.com/internal/cluster"
+	"gameclustering.com/internal/conf"
 )
 
 var service auth.Service
@@ -24,25 +25,27 @@ var service auth.Service
 //}
 //}
 
-func bootstrap(host string) {
-	service = auth.Service{NodeId: 1, DatabaseURL: "postgres://postgres:password@192.168.1.7:5432/tarantula_user"}
-	err := service.Start()
+func bootstrap(f conf.Env) {
+	service = auth.Service{}
+	err := service.Start(f)
 	if err != nil {
 		panic(err)
 	}
 	//http.Handle("/auth", http.HandlerFunc(debugging(auth.AuthHandler)))
 	http.Handle("/auth", &service)
-	log.Fatal(http.ListenAndServe(host, nil))
+	log.Fatal(http.ListenAndServe(f.HttpEndpoint, nil))
 }
 
 func main() {
-	c := cluster.NewEtc("presence", []string{"192.168.1.7:2379"}, cluster.Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"})
+	f := conf.Env{}
+	f.Load()
+	c := cluster.NewEtc("presence", []string{"192.168.1.7:2379"}, cluster.Node{Name: f.NodeName, HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"})
 	go func() {
 		c.Started.Wait()
 		for v := range c.View() {
 			fmt.Printf("View :%v\n", v)
 		}
-		bootstrap(":8080")
+		bootstrap(f)
 	}()
 	go func() {
 		c.Started.Wait()

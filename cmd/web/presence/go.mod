@@ -10,9 +10,12 @@ replace gameclustering.com/internal/util => ../../../internal/util
 
 replace gameclustering.com/internal/cluster => ../../../internal/cluster
 
+replace gameclustering.com/internal/conf => ../../../internal/conf
+
 require (
 	gameclustering.com/internal/auth v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/cluster v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/conf v0.0.0-00010101000000-000000000000
 )
 
 require (

@@ -7,6 +7,7 @@ import (
 
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
+	"gameclustering.com/internal/conf"
 )
 
 type Chunk struct {
@@ -22,17 +23,15 @@ type Login struct {
 }
 
 type Service struct {
-	Sql     persistence.Postgresql
-	Sfk     util.Snowflake
-	Tkn     util.Jwt
-	Ciph    util.Cipher
-	Started bool
-	NodeId uint64
-	DatabaseURL string
+	Sql         persistence.Postgresql
+	Sfk         util.Snowflake
+	Tkn         util.Jwt
+	Ciph        util.Cipher
+	Started     bool
 }
 
-func (s *Service) Start() error {
-	s.Sfk = util.NewSnowflake(int64(s.NodeId),util.EpochMillisecondsFromMidnight(2020, 1, 1))
+func (s *Service) Start(env conf.Env) error {
+	s.Sfk = util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.Tkn = util.Jwt{Alg: "SHS256"}
 	s.Tkn.HMac()
 	ci := util.Cipher{Ksz: 32}
@@ -41,7 +40,7 @@ func (s *Service) Start() error {
 		return er
 	}
 	s.Ciph = ci
-	sql := persistence.Postgresql{Url:s.DatabaseURL}
+	sql := persistence.Postgresql{Url: env.DatabaseURL}
 	err := sql.Create()
 	if err != nil {
 		return err
@@ -82,7 +81,7 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("success"))
 		}
 	case "onLogin":
-		
+
 	default:
 		w.Write([]byte("not supported"))
 	}
