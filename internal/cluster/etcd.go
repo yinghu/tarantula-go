@@ -80,7 +80,11 @@ func (c *Etc) Join() error {
 					pct = 5
 					c.lock.Lock()
 					for n := range c.cluster {
-						fmt.Printf("Check ping timeout %d %v\n", *c.cluster[n].pingCount, p)
+						if n != c.Local.Name {
+							cn := c.cluster[n]
+							fmt.Printf("Check ping timeout %d %s %v\n", *cn.pingCount, cn.Name, p)
+							*c.cluster[n].pingCount = 3
+						}
 					}
 					c.lock.Unlock()
 				}
@@ -96,7 +100,7 @@ func (c *Etc) Join() error {
 				rnm := string(ev.Kv.Value)
 				if rnm != c.Local.Name {
 					c.lock.Lock()
-					fmt.Println("Ping from [" + rnm + "][" + c.Local.Name + "]")
+					//fmt.Println("Ping from [" + rnm + "][" + c.Local.Name + "]")
 					v, exist := c.cluster[rnm]
 					if exist {
 						*v.pingCount--
