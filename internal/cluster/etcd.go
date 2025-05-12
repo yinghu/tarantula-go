@@ -53,13 +53,15 @@ func (c *Etc) Join() error {
 	defer cli.Close()
 	nd, _ := json.Marshal(c.Local)
 	go func() {
-		tik := time.NewTicker(2 * time.Second)
+		tik := time.NewTicker(1 * time.Second)
 		defer tik.Stop()
-		for r := range 5 {
+		for r := range 7 {
 			w := <-tik.C
 			fmt.Printf("Waiting for member joining : %v\n", w)
 			if r == 0 {
 				cli.Put(context.Background(), c.Group+"#join", string(nd))
+			} else {
+				cli.Put(context.Background(), c.Group+"#ping", string(nd))
 			}
 		}
 		c.Started.Done()
@@ -77,16 +79,16 @@ func (c *Etc) Join() error {
 				cli.Put(context.Background(), c.Group+"#ping", c.Local.Name)
 				pct--
 				if pct == 0 {
-					pct = 6
+					pct = 5
 					c.lock.Lock()
 					for n := range c.cluster {
 						if n != c.Local.Name {
 							cn := c.cluster[n]
-							if *cn.pingCount == 12 {
+							if *cn.pingCount == 3 {
 								fmt.Printf("Node timeout %d %s %v\n", *cn.pingCount, cn.Name, p)
 								delete(c.cluster, n)
 							} else {
-								*c.cluster[n].pingCount += 6
+								*c.cluster[n].pingCount = 3
 							}
 						}
 					}
@@ -125,7 +127,7 @@ func (c *Etc) Join() error {
 					if !joined {
 						fmt.Printf("Node [%s] has joined\n", rnd.Name)
 						rnd.pingCount = new(int8)
-						*rnd.pingCount = 0
+						*rnd.pingCount = 3
 						c.cluster[rnd.Name] = rnd
 					}
 					c.lock.Unlock()
