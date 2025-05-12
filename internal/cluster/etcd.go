@@ -127,7 +127,7 @@ func (c *Etc) Join() error {
 					if !joined {
 						fmt.Printf("Node [%s] has joined\n", rnd.Name)
 						rnd.pingCount = new(int8)
-						*rnd.pingCount = 3
+						*rnd.pingCount = 0
 						c.cluster[rnd.Name] = rnd
 					}
 					c.lock.Unlock()
