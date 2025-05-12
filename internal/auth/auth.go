@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -64,13 +65,23 @@ func (s *Service) Register(login *Login) error {
 	return s.SaveLogin(login)
 }
 
+func (s *Service) VerifyToken(token string) error {
+	return s.Tkn.Verify(token, func(h *util.JwtHeader, p *util.JwtPayload) error {
+		t := time.UnixMilli(p.Exp).UTC()
+		if t.Before(time.Now().UTC()) {
+			return errors.New("token expired")
+		}
+		return nil
+	})
+}
+
 func (s *Service) Login(login *Login) (string, error) {
 	pwd := login.Hash
 	err := s.LoadLogin(login)
 	if err != nil {
 		return "", err
 	}
-	fmt.Printf("Hash %s >> %d\n", login.Hash, login.SystemId)
+	//fmt.Printf("Hash %s >> %d\n", login.Hash, login.SystemId)
 	er := util.Match(pwd, login.Hash)
 	if er != nil {
 		return "", er
@@ -90,6 +101,7 @@ func (s *Service) Login(login *Login) (string, error) {
 
 func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	action := r.Header.Get("Tarantula-action")
+	token := r.Header.Get("Tarantula-token")
 	defer func() {
 		r.Body.Close()
 	}()
@@ -112,6 +124,13 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(err.Error()))
 		} else {
 			w.Write([]byte(tk))
+		}
+	case "onPassword":
+		err := s.VerifyToken(token)
+		if err != nil {
+			w.Write([]byte("bad token"))
+		} else {
+			w.Write([]byte(token))
 		}
 	default:
 		w.Write([]byte("not supported"))
