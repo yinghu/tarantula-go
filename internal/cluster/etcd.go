@@ -77,16 +77,16 @@ func (c *Etc) Join() error {
 				cli.Put(context.Background(), c.Group+"#ping", c.Local.Name)
 				pct--
 				if pct == 0 {
-					pct = 5
+					pct = 6
 					c.lock.Lock()
 					for n := range c.cluster {
 						if n != c.Local.Name {
 							cn := c.cluster[n]
-							if *cn.pingCount == 3 {
+							if *cn.pingCount == 12 {
 								fmt.Printf("Node timeout %d %s %v\n", *cn.pingCount, cn.Name, p)
 								delete(c.cluster, n)
 							} else {
-								*c.cluster[n].pingCount = 3
+								*c.cluster[n].pingCount += 6
 							}
 						}
 					}
@@ -114,18 +114,20 @@ func (c *Etc) Join() error {
 				var rnd Node
 				err := json.Unmarshal(ev.Kv.Value, &rnd)
 				if err == nil {
-					fmt.Printf("Join from [%v]\n", rnd)
 					cli.Put(context.Background(), c.Group+"#joined", string(nd))
 				}
 			case "joined":
 				var rnd Node
 				err := json.Unmarshal(ev.Kv.Value, &rnd)
 				if err == nil {
-					fmt.Printf("Joined from [%v]\n", rnd)
 					c.lock.Lock()
-					rnd.pingCount = new(int8)
-					*rnd.pingCount = 0
-					c.cluster[rnd.Name] = rnd
+					_, joined := c.cluster[rnd.Name]
+					if !joined {
+						fmt.Printf("Node [%s] has joined\n", rnd.Name)
+						rnd.pingCount = new(int8)
+						*rnd.pingCount = 0
+						c.cluster[rnd.Name] = rnd
+					}
 					c.lock.Unlock()
 				}
 			}
