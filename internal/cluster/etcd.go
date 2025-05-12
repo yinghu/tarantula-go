@@ -27,14 +27,12 @@ type Etc struct {
 	EtcdEndpoints []string
 	Local         Node
 	lock          *sync.Mutex
-	//partitions    map[uint32]string
 	cluster map[string]Node
 }
 
 func NewEtc(group string, etcEndpoints []string, local Node) Etc {
 	etc := Etc{Group: group, EtcdEndpoints: etcEndpoints, Local: local}
 	etc.lock = &sync.Mutex{}
-	//etc.partitions = make(map[uint32]string)
 	etc.cluster = make(map[string]Node)
 	etc.Quit = make(chan bool)
 	etc.Started = &sync.WaitGroup{}

@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
+	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
-	"gameclustering.com/internal/conf"
 )
 
 type Chunk struct {
@@ -23,11 +24,11 @@ type Login struct {
 }
 
 type Service struct {
-	Sql         persistence.Postgresql
-	Sfk         util.Snowflake
-	Tkn         util.Jwt
-	Ciph        util.Cipher
-	Started     bool
+	Sql     persistence.Postgresql
+	Sfk     util.Snowflake
+	Tkn     util.Jwt
+	Ciph    util.Cipher
+	Started bool
 }
 
 func (s *Service) Start(env conf.Env) error {
@@ -60,8 +61,31 @@ func (s *Service) Register(login *Login) error {
 	login.SystemId = id
 	hash, _ := util.Hash(login.Hash)
 	login.Hash = hash
-	s.Sql.Exec("INSERT INTO login (name,hash,system_id,reference_id) VALUES($1,$2,$3,$4)", login.Name, login.Hash, login.SystemId, login.ReferenceId)
-	return nil
+	return s.SaveLogin(login)
+}
+
+func (s *Service) Login(login *Login) (string, error) {
+	pwd := login.Hash
+	err := s.LoadLogin(login)
+	if err != nil {
+		return "", err
+	}
+	fmt.Printf("Hash %s >> %d\n", login.Hash, login.SystemId)
+	er := util.Match(pwd, login.Hash)
+	if er != nil {
+		return "", er
+	}
+	tk, trr := s.Tkn.Token(func(h *util.JwtHeader, p *util.JwtPayload) error {
+		h.Kid = "kid"
+		p.Aud = "player"
+		exp := time.Now().Add(time.Hour * 24).UTC()
+		p.Exp = exp.UnixMilli()
+		return nil
+	})
+	if trr != nil {
+		return "", trr
+	}
+	return tk, nil
 }
 
 func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -81,7 +105,14 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("success"))
 		}
 	case "onLogin":
-
+		var login Login
+		json.NewDecoder(r.Body).Decode(&login)
+		tk, err := s.Login(&login)
+		if err != nil {
+			w.Write([]byte(err.Error()))
+		} else {
+			w.Write([]byte(tk))
+		}
 	default:
 		w.Write([]byte("not supported"))
 	}
