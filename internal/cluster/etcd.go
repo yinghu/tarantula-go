@@ -124,7 +124,7 @@ func (c *Etc) Join() error {
 					fmt.Printf("Joined from [%v]\n", rnd)
 					c.lock.Lock()
 					rnd.pingCount = new(int8)
-					*rnd.pingCount = 3
+					*rnd.pingCount = 0
 					c.cluster[rnd.Name] = rnd
 					c.lock.Unlock()
 				}
