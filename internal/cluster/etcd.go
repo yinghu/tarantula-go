@@ -17,7 +17,7 @@ type Node struct {
 	Name         string `json:"name"`
 	HttpEndpoint string `json:"http"`
 	TcpEndpoint  string `json:"tcp"`
-	pingCount    int8   `json:"-"`
+	pingCount    *int8  `json:"-"`
 }
 
 type Etc struct {
@@ -99,7 +99,7 @@ func (c *Etc) Join() error {
 					fmt.Println("Ping from [" + rnm + "][" + c.Local.Name + "]")
 					v, exist := c.cluster[rnm]
 					if exist {
-						v.pingCount--
+						*v.pingCount--
 					}
 					c.lock.Unlock()
 				}
@@ -116,7 +116,7 @@ func (c *Etc) Join() error {
 				if err == nil {
 					fmt.Printf("Joined from [%v]\n", rnd)
 					c.lock.Lock()
-					rnd.pingCount = 3
+					*rnd.pingCount = 3
 					c.cluster[rnd.Name] = rnd
 					c.lock.Unlock()
 				}
