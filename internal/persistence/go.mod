@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/dgraph-io/ristretto/v2 v2.2.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
