@@ -17,6 +17,7 @@ type Node struct {
 	Name         string `json:"name"`
 	HttpEndpoint string `json:"http"`
 	TcpEndpoint  string `json:"tcp"`
+	pingCount    int8   `json:"-"`
 }
 
 type Etc struct {
@@ -26,14 +27,14 @@ type Etc struct {
 	EtcdEndpoints []string
 	Local         Node
 	lock          *sync.Mutex
-	partitions    map[uint32]string
-	cluster       map[string]Node
+	//partitions    map[uint32]string
+	cluster map[string]Node
 }
 
 func NewEtc(group string, etcEndpoints []string, local Node) Etc {
 	etc := Etc{Group: group, EtcdEndpoints: etcEndpoints, Local: local}
 	etc.lock = &sync.Mutex{}
-	etc.partitions = make(map[uint32]string)
+	//etc.partitions = make(map[uint32]string)
 	etc.cluster = make(map[string]Node)
 	etc.Quit = make(chan bool)
 	etc.Started = &sync.WaitGroup{}
@@ -55,8 +56,8 @@ func (c *Etc) Join() error {
 		tik := time.NewTicker(2 * time.Second)
 		defer tik.Stop()
 		for r := range 5 {
-			<-tik.C
-			//fmt.Printf("Ticker : %d %v\n", c, t)
+			w := <-tik.C
+			fmt.Printf("Waiting for member joining : %v\n", w)
 			if r == 0 {
 				cli.Put(context.Background(), c.Group+"#join", string(nd))
 			}
@@ -66,28 +67,41 @@ func (c *Etc) Join() error {
 	go func() {
 		c.Started.Wait() //blocked
 		tik := time.NewTicker(1 * time.Second)
+		pct := 5
 		for {
 			select {
 			case <-c.Quit:
 				cli.Close()
 				return
-			case <-tik.C:
-				//fmt.Printf("Ticker : %v\n", t)
+			case p := <-tik.C:
 				cli.Put(context.Background(), c.Group+"#ping", c.Local.Name)
+				pct--
+				if pct == 0 {
+					pct = 5
+					c.lock.Lock()
+					for n := range c.cluster {
+						fmt.Printf("Check ping timeout %d %v\n", c.cluster[n].pingCount, p)
+					}
+					c.lock.Unlock()
+				}
 			}
 		}
 	}()
 	wch := cli.Watch(context.Background(), c.Group, clientv3.WithPrefix())
 	for wresp := range wch { //blocked
 		for _, ev := range wresp.Events {
-			//fmt.Printf("%s %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
 			cmds := strings.Split(string(ev.Kv.Key), "#")
-			//fmt.Printf("Watching key : %s\n", cmds[1])
 			switch cmds[1] {
 			case "ping":
 				rnm := string(ev.Kv.Value)
 				if rnm != c.Local.Name {
+					c.lock.Lock()
 					fmt.Println("Ping from [" + rnm + "][" + c.Local.Name + "]")
+					v, exist := c.cluster[rnm]
+					if exist {
+						v.pingCount--
+					}
+					c.lock.Unlock()
 				}
 			case "join":
 				var rnd Node
@@ -102,8 +116,8 @@ func (c *Etc) Join() error {
 				if err == nil {
 					fmt.Printf("Joined from [%v]\n", rnd)
 					c.lock.Lock()
+					rnd.pingCount = 3
 					c.cluster[rnd.Name] = rnd
-					//JOIN
 					c.lock.Unlock()
 				}
 			}
