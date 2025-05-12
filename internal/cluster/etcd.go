@@ -80,7 +80,7 @@ func (c *Etc) Join() error {
 					pct = 5
 					c.lock.Lock()
 					for n := range c.cluster {
-						fmt.Printf("Check ping timeout %d %v\n", c.cluster[n].pingCount, p)
+						fmt.Printf("Check ping timeout %d %v\n", *c.cluster[n].pingCount, p)
 					}
 					c.lock.Unlock()
 				}
@@ -116,6 +116,7 @@ func (c *Etc) Join() error {
 				if err == nil {
 					fmt.Printf("Joined from [%v]\n", rnd)
 					c.lock.Lock()
+					rnd.pingCount = new(int8)
 					*rnd.pingCount = 3
 					c.cluster[rnd.Name] = rnd
 					c.lock.Unlock()
