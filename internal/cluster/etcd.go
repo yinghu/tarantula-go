@@ -119,7 +119,7 @@ func (c *Etc) Join() error {
 			case "join":
 				var rnd Node
 				err := json.Unmarshal(ev.Kv.Value, &rnd)
-				if err == nil {
+				if err == nil && rnd.Name == c.Local.Name {
 					cli.Put(context.Background(), c.Group+"#joined", string(nd))
 				}
 			case "joined":
