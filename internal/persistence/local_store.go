@@ -8,6 +8,13 @@ import (
 	badger "github.com/dgraph-io/badger/v4"
 )
 
+type Persistentable interface {
+	Write(value buffer.ByteBuffer) error
+	WriteKey(key buffer.ByteBuffer) error
+	Read(value buffer.ByteBuffer) error
+	ReadKey(key buffer.ByteBuffer) error
+}
+
 type LocalStore struct {
 	InMemory bool
 	Path     string
