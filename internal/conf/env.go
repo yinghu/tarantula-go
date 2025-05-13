@@ -8,7 +8,7 @@ import (
 
 type Env struct {
 	GroupName       string   `json:"GroupName"`
-	PartitionNumber uint16   `json:"PartitionNumber"`
+	PartitionNumber int      `json:"PartitionNumber"`
 	NodeName        string   `json:"NodeName"`
 	NodeId          int64    `json:"NodeId"`
 	HttpEndpoint    string   `json:"HttpEndpoint"`
@@ -26,7 +26,7 @@ func (f *Env) Load(fn string) error {
 	data, _ := io.ReadAll(conf)
 	json.Unmarshal(data, f)
 	if f.PartitionNumber == 0 {
-		f.PartitionNumber = 271
+		f.PartitionNumber = 5
 	}
 	//f.GroupName = "presence"
 	//f.NodeName = "a01"
