@@ -111,6 +111,7 @@ func (c *Etc) Join() error {
 					v, exist := c.cluster[rnm]
 					if exist {
 						*v.pingCount--
+						fmt.Printf("PING COUNT %d\n", *v.pingCount)
 					}
 					c.lock.Unlock()
 				}
