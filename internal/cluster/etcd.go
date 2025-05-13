@@ -21,19 +21,22 @@ type Node struct {
 }
 
 type Etc struct {
-	Quit          chan bool
-	Started       *sync.WaitGroup
-	Group         string
-	EtcdEndpoints []string
-	Local         Node
-	lock          *sync.Mutex
-	cluster map[string]Node
+	Quit            chan bool
+	Started         *sync.WaitGroup
+	Group           string
+	PartitionNumber uint16
+	EtcdEndpoints   []string
+	Local           Node
+	lock            *sync.Mutex
+	cluster         map[string]Node
+	partition       []string
 }
 
-func NewEtc(group string, etcEndpoints []string, local Node) Etc {
-	etc := Etc{Group: group, EtcdEndpoints: etcEndpoints, Local: local}
+func NewEtc(group string, partitionNumber uint16, etcEndpoints []string, local Node) Etc {
+	etc := Etc{Group: group, PartitionNumber: partitionNumber, EtcdEndpoints: etcEndpoints, Local: local}
 	etc.lock = &sync.Mutex{}
 	etc.cluster = make(map[string]Node)
+	etc.partition = make([]string, partitionNumber)
 	etc.Quit = make(chan bool)
 	etc.Started = &sync.WaitGroup{}
 	etc.Started.Add(1)
@@ -85,6 +88,7 @@ func (c *Etc) Join() error {
 							if *cn.pingCount == 3 {
 								fmt.Printf("Node timeout %d %s %v\n", *cn.pingCount, cn.Name, p)
 								delete(c.cluster, n)
+								c.group()
 							} else {
 								*c.cluster[n].pingCount = 3
 							}
@@ -127,6 +131,7 @@ func (c *Etc) Join() error {
 						rnd.pingCount = new(int8)
 						*rnd.pingCount = 0
 						c.cluster[rnd.Name] = rnd
+						c.group()
 					}
 					c.lock.Unlock()
 				}
@@ -141,4 +146,8 @@ func (c *Etc) View() iter.Seq[Node] {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	return maps.Values(c.cluster)
+}
+
+func (c *Etc) group() {
+	fmt.Printf("Cluster grouping %d\n", len(c.cluster))
 }
