@@ -2,9 +2,12 @@ module gameclustering.com/internal/cluster
 
 go 1.24.2
 
-replace gameclustering.com/internal/util => ../internal/util
+replace gameclustering.com/internal/util => ../util
 
-require go.etcd.io/etcd/client/v3 v3.5.21
+require (
+	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
+	go.etcd.io/etcd/client/v3 v3.5.21
+)
 
 require (
 	github.com/coreos/go-semver v0.3.0 // indirect
@@ -16,9 +19,10 @@ require (
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.17.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/net v0.38.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 	google.golang.org/genproto v0.0.0-20230822172742-b8732ec3820d // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20230822172742-b8732ec3820d // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230822172742-b8732ec3820d // indirect

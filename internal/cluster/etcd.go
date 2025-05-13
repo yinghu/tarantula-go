@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"gameclustering.com/internal/util"
 	clientv3 "go.etcd.io/etcd/client/v3"
-	//"gameclustering.com/internal/util"
 )
 
 type Node struct {
@@ -158,8 +158,11 @@ func (c *Etc) View() iter.Seq[Node] {
 	return maps.Values(c.cluster)
 }
 
-func (c *Etc) Partition(key []byte) {
-	//util.Partition
+func (c *Etc) Partition(key []byte) Node {
+	p := util.Partition(key, uint32(c.PartitionNumber))
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	return c.cluster[c.partition[p]]
 }
 
 func (c *Etc) group() {
