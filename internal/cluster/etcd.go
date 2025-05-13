@@ -90,6 +90,7 @@ func (c *Etc) Join() error {
 								delete(c.cluster, n)
 								c.group()
 							} else {
+								fmt.Printf("RESET PING COUNT %d\n", *c.cluster[n].pingCount)
 								*c.cluster[n].pingCount = 3
 							}
 						}
