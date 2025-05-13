@@ -18,6 +18,7 @@ type Node struct {
 	HttpEndpoint string `json:"http"`
 	TcpEndpoint  string `json:"tcp"`
 	pingCount    *int8  `json:"-"`
+	timeoutCount *uint8 `json:"-"`
 }
 
 type Etc struct {
@@ -85,13 +86,17 @@ func (c *Etc) Join() error {
 					for n := range c.cluster {
 						if n != c.Local.Name {
 							cn := c.cluster[n]
-							if *cn.pingCount == 3 {
-								fmt.Printf("Node timeout %d %s %v\n", *cn.pingCount, cn.Name, p)
+							if *cn.timeoutCount == 3 {
+								fmt.Printf("Node timeout %d %d %s %v\n", *cn.pingCount, *cn.timeoutCount, cn.Name, p)
 								delete(c.cluster, n)
 								c.group()
 							} else {
-								fmt.Printf("RESET PING COUNT %d\n", *c.cluster[n].pingCount)
-								*c.cluster[n].pingCount = 3
+								if *cn.pingCount == 3 {
+									*cn.timeoutCount++
+								} else {
+									*cn.timeoutCount = 0
+									*c.cluster[n].pingCount = 3
+								}
 							}
 						}
 					}
@@ -112,14 +117,13 @@ func (c *Etc) Join() error {
 					v, exist := c.cluster[rnm]
 					if exist {
 						*v.pingCount--
-						fmt.Printf("PING COUNT %d\n", *v.pingCount)
 					}
 					c.lock.Unlock()
 				}
 			case "join":
 				var rnd Node
 				err := json.Unmarshal(ev.Kv.Value, &rnd)
-				if err == nil && rnd.Name == c.Local.Name {
+				if err == nil {
 					cli.Put(context.Background(), c.Group+"#joined", string(nd))
 				}
 			case "joined":
@@ -131,7 +135,9 @@ func (c *Etc) Join() error {
 					if !joined {
 						fmt.Printf("Node [%s] has joined\n", rnd.Name)
 						rnd.pingCount = new(int8)
+						rnd.timeoutCount = new(uint8)
 						*rnd.pingCount = 0
+						*rnd.timeoutCount = 0
 						c.cluster[rnd.Name] = rnd
 						c.group()
 					}
