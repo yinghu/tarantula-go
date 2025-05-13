@@ -2,6 +2,8 @@ module gameclustering.com/internal/cluster
 
 go 1.24.2
 
+replace gameclustering.com/internal/util => ../internal/util
+
 require go.etcd.io/etcd/client/v3 v3.5.21
 
 require (

@@ -28,12 +28,6 @@ func (f *Env) Load(fn string) error {
 	if f.PartitionNumber == 0 {
 		f.PartitionNumber = 5
 	}
-	//f.GroupName = "presence"
-	//f.NodeName = "a01"
-	//f.NodeId = 1
-	//f.HttpEndpoint = "192.168.1.4:8080"
-	//f.DatabaseURL = "postgres://postgres:password@192.168.1.7:5432/tarantula_user"
-	//f.EtcdEndpoints = []string{"192.168.1.7:2379"}
-	//f.TcpEndpoint = "tcp://192.168.1.4:5000"
+
 	return nil
 }
