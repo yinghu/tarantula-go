@@ -9,10 +9,10 @@ import (
 )
 
 type Persistentable interface {
-	Write(value buffer.ByteBuffer) error
-	WriteKey(key buffer.ByteBuffer) error
-	Read(value buffer.ByteBuffer) error
-	ReadKey(key buffer.ByteBuffer) error
+	Write(value *buffer.ByteBuffer) error
+	WriteKey(key *buffer.ByteBuffer) error
+	Read(value *buffer.ByteBuffer) error
+	ReadKey(key *buffer.ByteBuffer) error
 }
 
 type LocalStore struct {
@@ -21,7 +21,30 @@ type LocalStore struct {
 	Db       *badger.DB
 }
 
-func (s *LocalStore) Set(key buffer.ByteBuffer, value buffer.ByteBuffer) error {
+func (s *LocalStore) Save(t Persistentable) error {
+	key := buffer.NewByteBuffer(100)
+	value := buffer.NewByteBuffer(200)
+	t.WriteKey(key)
+	t.Write(value)
+	key.Flip()
+	value.Flip()
+	fmt.Printf("RMV :%d\n", value.Remaining())
+	return s.Set(key, value)
+}
+
+func (s *LocalStore) Load(t Persistentable) error {
+	key := buffer.NewByteBuffer(100)
+	t.WriteKey(key)
+	key.Flip()
+	value, err := s.Get(key)
+	if err != nil {
+		return err
+	}
+	t.Read(value)
+	return nil
+}
+
+func (s *LocalStore) Set(key *buffer.ByteBuffer, value *buffer.ByteBuffer) error {
 	if key.Remaining() == 0 || value.Remaining() == 0 {
 		return errors.New("bad key/value")
 	}
@@ -35,11 +58,12 @@ func (s *LocalStore) Set(key buffer.ByteBuffer, value buffer.ByteBuffer) error {
 	})
 }
 
-func (s *LocalStore) Get(key buffer.ByteBuffer) (buffer.ByteBuffer, error) {
+func (s *LocalStore) Get(key *buffer.ByteBuffer) (*buffer.ByteBuffer, error) {
 	if key.Remaining() == 0 {
 		return key, errors.New("bad key/value")
 	}
-	s.Db.View(func(txn *badger.Txn) error {
+	value := buffer.NewByteBuffer(200)
+	err := s.Db.View(func(txn *badger.Txn) error {
 		k := make([]byte, key.Remaining())
 		key.GetBytes(k, 0, key.Remaining())
 		item, err := txn.Get(k)
@@ -47,12 +71,17 @@ func (s *LocalStore) Get(key buffer.ByteBuffer) (buffer.ByteBuffer, error) {
 			return err
 		}
 		item.Value(func(val []byte) error {
-			fmt.Printf("GET : %s\n", val)
+			fmt.Printf("GET : %d\n", len(val))
+			value.PutBytes(val, 0, len(val))
+			value.Flip()
 			return nil
 		})
 		return nil
 	})
-	return key, nil
+	if err != nil {
+		return key, err
+	}
+	return value, nil
 }
 
 func (s *LocalStore) Open() error {
