@@ -2,17 +2,15 @@ package persistence
 
 import (
 	"errors"
-	"fmt"
 
-	buffer "github.com/0xc0d/encoding/bytebuffer"
 	badger "github.com/dgraph-io/badger/v4"
 )
 
 type Persistentable interface {
-	Write(value *buffer.ByteBuffer) error
-	WriteKey(key *buffer.ByteBuffer) error
-	Read(value *buffer.ByteBuffer) error
-	ReadKey(key *buffer.ByteBuffer) error
+	Write(value *BufferProxy) error
+	WriteKey(key *BufferProxy) error
+	Read(value *BufferProxy) error
+	ReadKey(key *BufferProxy) error
 }
 
 type LocalStore struct {
@@ -22,66 +20,67 @@ type LocalStore struct {
 }
 
 func (s *LocalStore) Save(t Persistentable) error {
-	key := buffer.NewByteBuffer(100)
-	value := buffer.NewByteBuffer(200)
-	t.WriteKey(key)
-	t.Write(value)
+
+	key := BufferProxy{}
+	key.NewProxy(100)
+	value := BufferProxy{}
+	value.NewProxy(200)
+	t.WriteKey(&key)
+	t.Write(&value)
 	key.Flip()
 	value.Flip()
-	fmt.Printf("RMV :%d\n", value.Remaining())
-	return s.Set(key, value)
+	return s.Set(&key, &value)
+	//return nil
 }
 
 func (s *LocalStore) Load(t Persistentable) error {
-	key := buffer.NewByteBuffer(100)
-	t.WriteKey(key)
+	key := BufferProxy{}
+	key.NewProxy(100)
+	t.WriteKey(&key)
 	key.Flip()
-	value, err := s.Get(key)
+	value := BufferProxy{}
+	value.NewProxy(200)
+	err := s.Get(&key, &value)
 	if err != nil {
 		return err
 	}
-	t.Read(value)
+	t.Read(&value)
 	return nil
 }
 
-func (s *LocalStore) Set(key *buffer.ByteBuffer, value *buffer.ByteBuffer) error {
+func (s *LocalStore) Set(key *BufferProxy, value *BufferProxy) error {
 	if key.Remaining() == 0 || value.Remaining() == 0 {
 		return errors.New("bad key/value")
 	}
 
 	return s.Db.Update(func(txn *badger.Txn) error {
-		k := make([]byte, key.Remaining())
-		v := make([]byte, value.Remaining())
-		key.GetBytes(k, 0, key.Remaining())
-		value.GetBytes(v, 0, value.Remaining())
+		k, _ := key.Array()
+		v, _ := value.Array()
 		return txn.Set(k, v)
 	})
 }
 
-func (s *LocalStore) Get(key *buffer.ByteBuffer) (*buffer.ByteBuffer, error) {
+func (s *LocalStore) Get(key *BufferProxy, value *BufferProxy) error {
 	if key.Remaining() == 0 {
-		return key, errors.New("bad key/value")
+		return errors.New("bad key/value")
 	}
-	value := buffer.NewByteBuffer(200)
 	err := s.Db.View(func(txn *badger.Txn) error {
-		k := make([]byte, key.Remaining())
-		key.GetBytes(k, 0, key.Remaining())
+		k, _ := key.Array()
 		item, err := txn.Get(k)
 		if err != nil {
 			return err
 		}
 		item.Value(func(val []byte) error {
-			fmt.Printf("GET : %d\n", len(val))
-			value.PutBytes(val, 0, len(val))
+			value.Write(val)
 			value.Flip()
 			return nil
 		})
 		return nil
 	})
 	if err != nil {
-		return key, err
+		return err
 	}
-	return value, nil
+	return nil
 }
 
 func (s *LocalStore) Open() error {
