@@ -14,32 +14,33 @@ type Persistentable interface {
 }
 
 type LocalStore struct {
-	InMemory bool
-	Path     string
-	Db       *badger.DB
+	InMemory  bool
+	Path      string
+	Db        *badger.DB
+	KeySize   int
+	ValueSize int
 }
 
 func (s *LocalStore) Save(t Persistentable) error {
 
 	key := BufferProxy{}
-	key.NewProxy(100)
+	key.NewProxy(s.KeySize)
 	value := BufferProxy{}
-	value.NewProxy(200)
+	value.NewProxy(s.ValueSize)
 	t.WriteKey(&key)
 	t.Write(&value)
 	key.Flip()
 	value.Flip()
 	return s.Set(&key, &value)
-	//return nil
 }
 
 func (s *LocalStore) Load(t Persistentable) error {
 	key := BufferProxy{}
-	key.NewProxy(100)
+	key.NewProxy(s.KeySize)
 	t.WriteKey(&key)
 	key.Flip()
 	value := BufferProxy{}
-	value.NewProxy(200)
+	value.NewProxy(s.ValueSize)
 	err := s.Get(&key, &value)
 	if err != nil {
 		return err
@@ -54,8 +55,8 @@ func (s *LocalStore) Set(key *BufferProxy, value *BufferProxy) error {
 	}
 
 	return s.Db.Update(func(txn *badger.Txn) error {
-		k, _ := key.Array()
-		v, _ := value.Array()
+		k, _ := key.Read()
+		v, _ := value.Read()
 		return txn.Set(k, v)
 	})
 }
@@ -65,7 +66,7 @@ func (s *LocalStore) Get(key *BufferProxy, value *BufferProxy) error {
 		return errors.New("bad key/value")
 	}
 	err := s.Db.View(func(txn *badger.Txn) error {
-		k, _ := key.Array()
+		k, _ := key.Read()
 		item, err := txn.Get(k)
 		if err != nil {
 			return err
