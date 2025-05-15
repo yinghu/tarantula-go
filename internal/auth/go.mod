@@ -8,6 +8,8 @@ replace gameclustering.com/internal/persistence => ../persistence
 
 replace gameclustering.com/internal/conf => ../conf
 
+replace gameclustering.com/internal/event => ../event
+
 require (
 	gameclustering.com/internal/conf v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000

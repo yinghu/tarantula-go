@@ -38,6 +38,7 @@ func (s *Sample) Read(value *BufferProxy) error {
 }
 
 func (s *Sample) ReadKey(value *BufferProxy) error {
+	s.Id = value.ReadInt64()
 	return nil
 }
 
@@ -48,7 +49,7 @@ func TestLocalStore(t *testing.T) {
 		t.Errorf("Local store error %s", err.Error())
 	}
 	defer local.Close()
-	sample := Sample{Id: 200, Name: "yinghu", Address: "19809 150TH", Age: 9, Validated: true,Pay: 100}
+	sample := Sample{Id: 200, Name: "yinghu", Address: "19809 150TH", Age: 9, Validated: true, Pay: 100}
 	local.Save(&sample)
 	load := Sample{Id: 100}
 	local.Load(&load)

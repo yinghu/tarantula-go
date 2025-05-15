@@ -41,3 +41,8 @@ func (s *Endpoint) Open() error {
 	}
 	return nil
 }
+
+func (s *Endpoint) Publish(event Event) error{
+	
+	return nil
+}
