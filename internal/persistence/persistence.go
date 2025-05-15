@@ -6,3 +6,22 @@ type Persistentable interface {
 	Read(value *BufferProxy) error
 	ReadKey(key *BufferProxy) error
 }
+
+type PersistentableObj struct {
+}
+
+func (s *PersistentableObj) Write(value *BufferProxy) error {
+	return nil
+}
+
+func (s *PersistentableObj) WriteKey(value *BufferProxy) error {
+	return nil
+}
+
+func (s *PersistentableObj) Read(value *BufferProxy) error {
+	return nil
+}
+
+func (s *PersistentableObj) ReadKey(value *BufferProxy) error {
+	return nil
+}

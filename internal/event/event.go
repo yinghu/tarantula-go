@@ -1,10 +1,11 @@
 package event
-import(
+
+import (
 	"gameclustering.com/internal/persistence"
 )
 
 type Event interface {
-	OnTopic() bool
-	OnChan() chan []byte
+	Topic() bool
+	Send() error
 	persistence.Persistentable
 }
