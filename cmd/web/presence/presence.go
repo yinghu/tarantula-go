@@ -9,15 +9,14 @@ import (
 	"syscall"
 	"time"
 
-	"gameclustering.com/internal/auth"
 	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/metrics"
 )
 
-var service auth.Service
+var service Service
 
-func debugging(s *auth.Service) http.HandlerFunc {
+func debugging(s *Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		action := r.Header.Get("Tarantula-action")
@@ -31,7 +30,7 @@ func debugging(s *auth.Service) http.HandlerFunc {
 }
 
 func bootstrap(f conf.Env, c *cluster.Etc) {
-	service = auth.Service{Cluster: c}
+	service = Service{Cluster: c}
 	err := service.Start(f)
 	if err != nil {
 		panic(err)
