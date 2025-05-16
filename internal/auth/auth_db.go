@@ -3,6 +3,7 @@ package auth
 import (
 	"errors"
 
+	"gameclustering.com/internal/metrics"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -34,6 +35,17 @@ func (s *Service) LoadLogin(login *Login) error {
 	}
 	if login.SystemId == 0 {
 		return errors.New("login not existed")
+	}
+	return nil
+}
+
+func (s *Service) SaveMetrics(metrics *metrics.Metrics) error {
+	inserted, err := s.Sql.Exec("INSERT INTO metrics (path,req_timed,node) VALUES($1,$2,$3)", metrics.Path, metrics.ReqTimed, metrics.Node)
+	if err != nil {
+		return err
+	}
+	if inserted == 0 {
+		return errors.New("metrics cannot be saved")
 	}
 	return nil
 }

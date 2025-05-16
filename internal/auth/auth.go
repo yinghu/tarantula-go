@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
@@ -14,6 +15,7 @@ import (
 )
 
 type Service struct {
+	Cluster *cluster.Etc
 	Sql     persistence.Postgresql
 	Sfk     util.Snowflake
 	Tkn     util.Jwt
@@ -97,7 +99,7 @@ func (s *Service) Login(login *Login) {
 		login.Listener <- event.Chunk{Remaining: false, Data: errorMessage(trr.Error(), INVALID_TOKEN_CODE)}
 		return
 	}
-	session := OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk}
+	session := OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk, Home: s.Cluster.Local.HttpEndpoint}
 	login.Listener <- event.Chunk{Remaining: false, Data: util.ToJson(session)}
 }
 

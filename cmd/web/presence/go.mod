@@ -14,10 +14,13 @@ replace gameclustering.com/internal/conf => ../../../internal/conf
 
 replace gameclustering.com/internal/event => ../../../internal/event
 
+replace gameclustering.com/internal/metrics => ../../../internal/metrics
+
 require (
 	gameclustering.com/internal/auth v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/cluster v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/conf v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000
 )
 
 require (

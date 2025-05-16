@@ -7,45 +7,49 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"gameclustering.com/internal/auth"
 	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
+	"gameclustering.com/internal/metrics"
 )
 
 var service auth.Service
 
-//func debugging(f http.HandlerFunc) http.HandlerFunc {
-//return func(w http.ResponseWriter, r *http.Request) {
-//start := time.Now()
-//defer func() {
-//log.Println(r.URL.Path, time.Since(start))
-//}()
-//f(w, r)
-//}
-//}
+func debugging(s *auth.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		action := r.Header.Get("Tarantula-action")
+		defer func() {
+			dur := time.Since(start)
+			ms := metrics.Metrics{Path: r.URL.Path + "/" + action, ReqTimed: dur.Milliseconds(), Node: s.Cluster.Local.Name}
+			s.SaveMetrics(&ms)
+		}()
+		s.ServeHTTP(w, r)
+	}
+}
 
-func bootstrap(f conf.Env) {
-	service = auth.Service{}
+func bootstrap(f conf.Env, c *cluster.Etc) {
+	service = auth.Service{Cluster: c}
 	err := service.Start(f)
 	if err != nil {
 		panic(err)
 	}
-	//http.Handle("/auth", http.HandlerFunc(debugging(auth.AuthHandler)))
-	http.Handle("/auth", &service)
+	http.Handle("/auth", http.HandlerFunc(debugging(&service)))
 	log.Fatal(http.ListenAndServe(f.HttpEndpoint, nil))
 }
 
 func main() {
 	f := conf.Env{}
 	f.Load("/etc/tarantula/presence-conf.json")
-	c := cluster.NewEtc(f.GroupName,f.PartitionNumber,f.EtcdEndpoints, cluster.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.TcpEndpoint})
+	c := cluster.NewEtc(f.GroupName, f.PartitionNumber, f.EtcdEndpoints, cluster.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.TcpEndpoint})
 	go func() {
 		c.Started.Wait()
 		for v := range c.View() {
 			fmt.Printf("View :%v\n", v)
 		}
-		bootstrap(f)
+		bootstrap(f, &c)
 	}()
 	go func() {
 		c.Started.Wait()
