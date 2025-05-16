@@ -38,10 +38,6 @@ func (s *sample) Read(value *BufferProxy) error {
 	return nil
 }
 
-//func (s *Sample) ReadKey(value *BufferProxy) error {
-//s.Id = value.ReadInt64()
-//return nil
-//}
 
 func TestLocalStore(t *testing.T) {
 	local := LocalStore{InMemory: false, Path: "/home/yinghu/local", KeySize: 100, ValueSize: 200}
