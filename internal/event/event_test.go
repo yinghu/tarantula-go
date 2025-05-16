@@ -18,9 +18,8 @@ func (s *sampleEvent) Topic() bool {
 	return s.topic
 }
 
-func (s *sampleEvent) Streaming(c Chunk) error {
+func (s *sampleEvent) Streaming(c Chunk) {
 	s.listener <- c
-	return nil
 }
 
 func TestEndpoint(t *testing.T) {

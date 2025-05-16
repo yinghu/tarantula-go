@@ -11,7 +11,7 @@ type Chunk struct {
 
 type Event interface {
 	Topic() bool
-	Streaming(c Chunk) error
+	Streaming(c Chunk)
 	persistence.Persistentable
 }
 
@@ -24,7 +24,6 @@ func (s *EventObj) Topic() bool {
 	return s.topic
 }
 
-func (s *EventObj) Streaming(c Chunk) error {
+func (s *EventObj) Streaming(c Chunk) {
 	s.Listener <- c
-	return nil
 }
