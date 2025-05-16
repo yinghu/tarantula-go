@@ -53,8 +53,6 @@ func (s *Service) Register(login *Login) {
 	login.Hash = hash
 	err := s.SaveLogin(login)
 	if err != nil {
-		login.Listener <- event.Chunk{Remaining: true, Data: []byte(err.Error())}
-		login.Listener <- event.Chunk{Remaining: true, Data: []byte(err.Error())}
 		login.Listener <- event.Chunk{Remaining: false, Data: []byte(err.Error())}
 		return
 	}
