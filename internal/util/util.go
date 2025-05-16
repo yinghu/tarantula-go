@@ -1,6 +1,7 @@
 package util
 
 import (
+	"encoding/json"
 	"hash/fnv"
 	"time"
 )
@@ -14,4 +15,12 @@ func Partition(key []byte, pnumber uint32) uint32 {
 	hash := fnv.New32()
 	hash.Write(key)
 	return hash.Sum32() % pnumber
+}
+
+func ToJson(obj any) []byte {
+	data, err := json.Marshal(obj)
+	if err != nil {
+		return []byte("{}")
+	}
+	return data
 }

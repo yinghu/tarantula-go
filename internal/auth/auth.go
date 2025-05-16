@@ -53,10 +53,10 @@ func (s *Service) Register(login *Login) {
 	login.Hash = hash
 	err := s.SaveLogin(login)
 	if err != nil {
-		login.Listener <- event.Chunk{Remaining: false, Data: []byte(err.Error())}
+		login.Listener <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), DB_OP_ERR_CODE)}
 		return
 	}
-	login.Listener <- event.Chunk{Remaining: false, Data: []byte("Registered")}
+	login.Listener <- event.Chunk{Remaining: false, Data: successMessage("registered")}
 }
 
 func (s *Service) VerifyToken(token string, listener chan event.Chunk) {
@@ -68,22 +68,22 @@ func (s *Service) VerifyToken(token string, listener chan event.Chunk) {
 		return nil
 	})
 	if err != nil {
-		listener <- event.Chunk{Remaining: false, Data: []byte(err.Error())}
+		listener <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), INVALID_TOKEN_CODE)}
 		return
 	}
-	listener <- event.Chunk{Remaining: false, Data: []byte("passed")}
+	listener <- event.Chunk{Remaining: false, Data: successMessage("passed")}
 }
 
 func (s *Service) Login(login *Login) {
 	pwd := login.Hash
 	err := s.LoadLogin(login)
 	if err != nil {
-		login.Listener <- event.Chunk{Remaining: false, Data: []byte(err.Error())}
+		login.Listener <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), DB_OP_ERR_CODE)}
 		return
 	}
 	er := util.Match(pwd, login.Hash)
 	if er != nil {
-		login.Listener <- event.Chunk{Remaining: false, Data: []byte(er.Error())}
+		login.Listener <- event.Chunk{Remaining: false, Data: errorMessage(er.Error(), WRONG_PASS_CODE)}
 		return
 	}
 	tk, trr := s.Tkn.Token(func(h *util.JwtHeader, p *util.JwtPayload) error {
@@ -94,10 +94,11 @@ func (s *Service) Login(login *Login) {
 		return nil
 	})
 	if trr != nil {
-		login.Listener <- event.Chunk{Remaining: false, Data: []byte(trr.Error())}
+		login.Listener <- event.Chunk{Remaining: false, Data: errorMessage(trr.Error(), INVALID_TOKEN_CODE)}
 		return
 	}
-	login.Listener <- event.Chunk{Remaining: false, Data: []byte(tk)}
+	session := OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk}
+	login.Listener <- event.Chunk{Remaining: false, Data: util.ToJson(session)}
 }
 
 func notsupport(listener chan event.Chunk) {
