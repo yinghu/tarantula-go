@@ -8,16 +8,10 @@ import (
 	"time"
 
 	"gameclustering.com/internal/conf"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
 )
-
-type Login struct {
-	Name        string `json:"login"`
-	Hash        string `json:"password"`
-	ReferenceId int32  `json:"referenceId"`
-	SystemId    int64
-}
 
 type Service struct {
 	Sql     persistence.Postgresql
@@ -52,34 +46,48 @@ func (s *Service) Shutdown() {
 	fmt.Printf("Auth service shut down\n")
 }
 
-func (s *Service) Register(login *Login) error {
+func (s *Service) Register(login *Login) {
 	id, _ := s.Sfk.Id()
 	login.SystemId = id
 	hash, _ := util.Hash(login.Hash)
 	login.Hash = hash
-	return s.SaveLogin(login)
+	err := s.SaveLogin(login)
+	if err != nil {
+		login.Listener <- event.Chunk{Remaining: true, Data: []byte(err.Error())}
+		login.Listener <- event.Chunk{Remaining: true, Data: []byte(err.Error())}
+		login.Listener <- event.Chunk{Remaining: false, Data: []byte(err.Error())}
+		return
+	}
+	login.Listener <- event.Chunk{Remaining: false, Data: []byte("Registered")}
 }
 
-func (s *Service) VerifyToken(token string) error {
-	return s.Tkn.Verify(token, func(h *util.JwtHeader, p *util.JwtPayload) error {
+func (s *Service) VerifyToken(token string, listener chan event.Chunk) {
+	err := s.Tkn.Verify(token, func(h *util.JwtHeader, p *util.JwtPayload) error {
 		t := time.UnixMilli(p.Exp).UTC()
 		if t.Before(time.Now().UTC()) {
 			return errors.New("token expired")
 		}
 		return nil
 	})
+	if err != nil {
+		listener <- event.Chunk{Remaining: false, Data: []byte(err.Error())}
+		return
+	}
+	listener <- event.Chunk{Remaining: false, Data: []byte("passed")}
 }
 
-func (s *Service) Login(login *Login) (string, error) {
+func (s *Service) Login(login *Login) {
 	pwd := login.Hash
 	err := s.LoadLogin(login)
 	if err != nil {
-		return "", err
+		login.Listener <- event.Chunk{Remaining: false, Data: []byte("not supported")}
+		return
 	}
 	//fmt.Printf("Hash %s >> %d\n", login.Hash, login.SystemId)
 	er := util.Match(pwd, login.Hash)
 	if er != nil {
-		return "", er
+		login.Listener <- event.Chunk{Remaining: false, Data: []byte("not supported")}
+		return
 	}
 	tk, trr := s.Tkn.Token(func(h *util.JwtHeader, p *util.JwtPayload) error {
 		h.Kid = "kid"
@@ -89,15 +97,22 @@ func (s *Service) Login(login *Login) (string, error) {
 		return nil
 	})
 	if trr != nil {
-		return "", trr
+		login.Listener <- event.Chunk{Remaining: false, Data: []byte("not supported")}
+		return
 	}
-	return tk, nil
+	login.Listener <- event.Chunk{Remaining: false, Data: []byte(tk)}
+}
+
+func notsupport(listener chan event.Chunk) {
+	listener <- event.Chunk{Remaining: false, Data: []byte("not supported")}
 }
 
 func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	action := r.Header.Get("Tarantula-action")
 	token := r.Header.Get("Tarantula-token")
+	listener := make(chan event.Chunk)
 	defer func() {
+		close(listener)
 		r.Body.Close()
 	}()
 	w.WriteHeader(http.StatusOK)
@@ -105,29 +120,25 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "onRegister":
 		var login Login
 		json.NewDecoder(r.Body).Decode(&login)
-		err := s.Register(&login)
-		if err != nil {
-			w.Write([]byte(err.Error()))
-		} else {
-			w.Write([]byte("success"))
-		}
+		login.EventObj.Listener = listener
+		go s.Register(&login)
+
 	case "onLogin":
 		var login Login
+		login.EventObj.Listener = listener
 		json.NewDecoder(r.Body).Decode(&login)
-		tk, err := s.Login(&login)
-		if err != nil {
-			w.Write([]byte(err.Error()))
-		} else {
-			w.Write([]byte(tk))
-		}
+		go s.Login(&login)
+
 	case "onPassword":
-		err := s.VerifyToken(token)
-		if err != nil {
-			w.Write([]byte("bad token"))
-		} else {
-			w.Write([]byte(token))
-		}
+		go s.VerifyToken(token, listener)
+
 	default:
-		w.Write([]byte("not supported"))
+		go notsupport(listener)
+	}
+	for c := range listener {
+		w.Write(c.Data)
+		if !c.Remaining {
+			break
+		}
 	}
 }

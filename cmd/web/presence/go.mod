@@ -12,6 +12,8 @@ replace gameclustering.com/internal/cluster => ../../../internal/cluster
 
 replace gameclustering.com/internal/conf => ../../../internal/conf
 
+replace gameclustering.com/internal/event => ../../../internal/event
+
 require (
 	gameclustering.com/internal/auth v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/cluster v0.0.0-00010101000000-000000000000
@@ -19,6 +21,7 @@ require (
 )
 
 require (
+	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect

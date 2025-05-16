@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"gameclustering.com/internal/conf"
+	"gameclustering.com/internal/event"
 )
 
 func TestAuth(t *testing.T) {
@@ -16,9 +17,12 @@ func TestAuth(t *testing.T) {
 		t.Errorf("Service error %s", err.Error())
 	}
 	defer service.Shutdown()
-	login := Login{Name: "foo100", Hash: "ppp", SystemId: 2, ReferenceId: 1}
-	er := service.Register(&login)
-	if er != nil {
-		t.Errorf("Register error %s", er.Error())
+	login := Login{Name: "foo1003", Hash: "ppp", SystemId: 10, ReferenceId: 1}
+	login.Listener = make(chan event.Chunk)
+	go service.Register(&login)
+	for c := range login.Listener {
+		if !c.Remaining {
+			break
+		}
 	}
 }
