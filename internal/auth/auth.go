@@ -80,13 +80,13 @@ func (s *Service) Login(login *Login) {
 	pwd := login.Hash
 	err := s.LoadLogin(login)
 	if err != nil {
-		login.Listener <- event.Chunk{Remaining: false, Data: []byte("not supported")}
+		login.Listener <- event.Chunk{Remaining: false, Data: []byte(err.Error())}
 		return
 	}
 	//fmt.Printf("Hash %s >> %d\n", login.Hash, login.SystemId)
 	er := util.Match(pwd, login.Hash)
 	if er != nil {
-		login.Listener <- event.Chunk{Remaining: false, Data: []byte("not supported")}
+		login.Listener <- event.Chunk{Remaining: false, Data: []byte(er.Error())}
 		return
 	}
 	tk, trr := s.Tkn.Token(func(h *util.JwtHeader, p *util.JwtPayload) error {
@@ -97,7 +97,7 @@ func (s *Service) Login(login *Login) {
 		return nil
 	})
 	if trr != nil {
-		login.Listener <- event.Chunk{Remaining: false, Data: []byte("not supported")}
+		login.Listener <- event.Chunk{Remaining: false, Data: []byte(trr.Error())}
 		return
 	}
 	login.Listener <- event.Chunk{Remaining: false, Data: []byte(tk)}
