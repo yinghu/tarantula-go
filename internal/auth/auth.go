@@ -1,4 +1,3 @@
-
 package auth
 
 import (
@@ -12,11 +11,6 @@ import (
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
 )
-
-type Chunk struct {
-	Remaining bool
-	Data      []byte
-}
 
 type Login struct {
 	Name        string `json:"login"`

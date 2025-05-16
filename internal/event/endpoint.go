@@ -12,14 +12,14 @@ type Endpoint struct {
 
 func handleClient(client net.Conn) {
 	defer client.Close()
-	buf := make([]byte,1024)
+	buf := make([]byte, 1024)
 	//for{
-		n,err := client.Read(buf)
-		if err!= nil{
-			return
-		}
-		client.Write(buf[:n])
-		//break
+	n, err := client.Read(buf)
+	if err != nil {
+		return
+	}
+	client.Write(buf[:n])
+	//break
 	//}
 }
 
@@ -42,7 +42,9 @@ func (s *Endpoint) Open() error {
 	return nil
 }
 
-func (s *Endpoint) Publish(event Event) error{
-	
+func (s *Endpoint) Publish(event Event) error {
+	event.Streaming(Chunk{true, []byte("hellop")})
+	event.Streaming(Chunk{true, []byte("hellop")})
+	event.Streaming(Chunk{false, []byte("hellop")})
 	return nil
 }
