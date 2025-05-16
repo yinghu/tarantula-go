@@ -81,7 +81,6 @@ func (s *Service) Login(login *Login) {
 		login.Listener <- event.Chunk{Remaining: false, Data: []byte(err.Error())}
 		return
 	}
-	//fmt.Printf("Hash %s >> %d\n", login.Hash, login.SystemId)
 	er := util.Match(pwd, login.Hash)
 	if er != nil {
 		login.Listener <- event.Chunk{Remaining: false, Data: []byte(er.Error())}

@@ -1,7 +1,6 @@
 package auth
 
 import (
-	//"fmt"
 	"testing"
 
 	"gameclustering.com/internal/conf"
@@ -19,6 +18,10 @@ func TestAuth(t *testing.T) {
 	defer service.Shutdown()
 	login := Login{Name: "foo1003", Hash: "ppp", SystemId: 10, ReferenceId: 1}
 	login.Listener = make(chan event.Chunk)
+	login.Topic = false
+	if login.OnTopic() {
+		t.Errorf("login topic error %v", login.OnTopic())
+	}
 	go service.Register(&login)
 	for c := range login.Listener {
 		if !c.Remaining {

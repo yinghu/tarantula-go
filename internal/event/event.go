@@ -10,18 +10,18 @@ type Chunk struct {
 }
 
 type Event interface {
-	Topic() bool
+	OnTopic() bool
 	Streaming(c Chunk)
 	persistence.Persistentable
 }
 
 type EventObj struct {
-	topic    bool
+	Topic    bool
 	Listener chan Chunk
 }
 
-func (s *EventObj) Topic() bool {
-	return s.topic
+func (s *EventObj) OnTopic() bool {
+	return s.Topic
 }
 
 func (s *EventObj) Streaming(c Chunk) {

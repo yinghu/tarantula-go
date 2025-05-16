@@ -14,7 +14,7 @@ type sampleEvent struct {
 	persistence.PersistentableObj
 }
 
-func (s *sampleEvent) Topic() bool {
+func (s *sampleEvent) OnTopic() bool {
 	return s.topic
 }
 
