@@ -9,6 +9,10 @@ type Chunk struct {
 	Data      []byte
 }
 
+type EventFactory interface {
+	Create(classId int) Event
+}
+
 type Event interface {
 	OnTopic() bool
 	Streaming(c Chunk)

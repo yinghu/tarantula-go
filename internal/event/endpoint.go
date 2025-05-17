@@ -4,45 +4,49 @@ import (
 	"fmt"
 	"net"
 	"strings"
-
-	"gameclustering.com/internal/persistence"
 )
 
 type Endpoint struct {
 	tcpEndpoint string
+	listener    net.Listener
 }
 
-func handleClient(client net.Conn) {
-	defer client.Close()
-	buf := make([]byte, 8)
-	n, err := client.Read(buf)
+func (s *Endpoint) handleClient(client net.Conn) {
+	defer func() {
+		client.Close()
+		s.Close()
+	}()
+	reader := SocketReader{Socket: client, Buffer: make([]byte, 1024)}
+	fid, _ := reader.ReadInt32()
+	cid, _ := reader.ReadInt32()
+	tik, err := reader.ReadString()
 	if err != nil {
-		//break
-		return
+		fmt.Printf("Err %s\n", err.Error())
 	}
-	buffer := persistence.BufferProxy{}
-	buffer.NewProxy(100)
-	buffer.Write(buf[:])
-	buffer.Flip()
-	fmt.Printf("HS %d : %d : %d\n", n, buffer.ReadInt32(), buffer.ReadInt32())
+	fmt.Printf("HS %d : %d : %s\n", fid, cid, tik)
 }
 
 func (s *Endpoint) Open() error {
 	parts := strings.Split(s.tcpEndpoint, "://")
 	fmt.Printf("Endpoint %s %s\n", parts[0], parts[1])
-	listener, err := net.Listen(parts[0], parts[1])
+	server, err := net.Listen(parts[0], parts[1])
 	if err != nil {
 		return err
 	}
-	defer listener.Close()
+	s.listener = server
 	for {
-		client, er := listener.Accept()
+		client, er := s.listener.Accept()
 		if er != nil {
 			fmt.Printf("Error :%s\n", er.Error())
 			break
 		}
-		go handleClient(client)
+		go s.handleClient(client)
 	}
+	fmt.Println("Server closed")
+	return nil
+}
+func (s *Endpoint) Close() error {
+	s.listener.Close()
 	return nil
 }
 
