@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 	"strings"
+
+	"gameclustering.com/internal/persistence"
 )
 
 type Endpoint struct {
@@ -12,15 +14,17 @@ type Endpoint struct {
 
 func handleClient(client net.Conn) {
 	defer client.Close()
-	buf := make([]byte, 1024)
-	//for{
+	buf := make([]byte, 8)
 	n, err := client.Read(buf)
 	if err != nil {
+		//break
 		return
 	}
-	client.Write(buf[:n])
-	//break
-	//}
+	buffer := persistence.BufferProxy{}
+	buffer.NewProxy(100)
+	buffer.Write(buf[:])
+	buffer.Flip()
+	fmt.Printf("HS %d : %d : %d\n", n, buffer.ReadInt32(), buffer.ReadInt32())
 }
 
 func (s *Endpoint) Open() error {
@@ -37,7 +41,7 @@ func (s *Endpoint) Open() error {
 			fmt.Printf("Error :%s\n", er.Error())
 			break
 		}
-		handleClient(client)
+		go handleClient(client)
 	}
 	return nil
 }

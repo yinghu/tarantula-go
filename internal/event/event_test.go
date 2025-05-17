@@ -34,4 +34,5 @@ func TestEndpoint(t *testing.T) {
 			break
 		}
 	}
+	tcp.Open()
 }

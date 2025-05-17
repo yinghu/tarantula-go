@@ -30,7 +30,7 @@ func doTransaction(tx pgx.Tx) error {
 	return nil
 }
 func TestPool(t *testing.T) {
-	pool := Postgresql{Url: "postgres://postgres:password@192.168.1.7:5432/tarantula_user"}
+	pool := Postgresql{Url: "postgres://postgres:password@192.168.1.7:5432/tarantula_presence"}
 	err := pool.Create()
 	defer pool.Close()
 	if err != nil {
