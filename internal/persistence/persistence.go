@@ -5,48 +5,48 @@ type PersistentableFactory interface {
 }
 
 type DataBuffer interface {
-	WriteBool(data bool)
+	WriteBool(data bool) error
 
-	WriteComplex64(data complex64)
+	WriteComplex64(data complex64) error
 
-	WriteComplex128(data complex128)
+	WriteComplex128(data complex128) error
 
-	WriteFloat64(data float64)
+	WriteFloat64(data float64) error
 
-	WriteFloat32(data float32)
+	WriteFloat32(data float32) error
 
-	WriteInt64(data int64)
+	WriteInt64(data int64) error
 
-	WriteInt32(data int32)
+	WriteInt32(data int32) error
 
-	WriteInt16(data int16)
+	WriteInt16(data int16) error
 
-	WriteInt8(data int8)
+	WriteInt8(data int8) error
 
-	WriteString(data string)
+	WriteString(data string) error
 
-	ReadInt32() int32
+	ReadInt32() (int32, error)
 
-	ReadInt64() int64
+	ReadInt64() (int64, error)
 
-	ReadFloat32() float32
+	ReadFloat32() (float32, error)
 
-	ReadFloat64() float64
+	ReadFloat64() (float64, error)
 
-	ReadInt16() int16
+	ReadInt16() (int16, error)
 
-	ReadInt8() int8
+	ReadInt8() (int8, error)
 
-	ReadComplex64() complex64
+	ReadComplex64() (complex64, error)
 
-	ReadComplex128() complex128
+	ReadComplex128() (complex128, error)
 
-	ReadString() string
+	ReadString() (string, error)
 
-	ReadBool() bool
+	ReadBool() (bool, error)
 	Read() ([]byte, error)
 
-	Write(data []byte)
+	Write(data []byte) error
 	Remaining() int
 
 	Flip() error

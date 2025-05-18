@@ -69,9 +69,9 @@ func (p *Postgresql) Txn(tx Transaction) error{
 	if err != nil{
 		return err
 	}
-	er := tx(ptx)
+	err = tx(ptx)
 	defer func() {
-        if er != nil {
+        if err != nil {
             ptx.Rollback(context.Background())
         } else {
             ptx.Commit(context.Background())

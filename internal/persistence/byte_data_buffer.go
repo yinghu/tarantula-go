@@ -16,142 +16,228 @@ func (s *BufferProxy) NewProxy(size int) {
 	s.data.SetOrder(binary.BigEndian)
 }
 
-func (s *BufferProxy) WriteBool(data bool) {
+func (s *BufferProxy) WriteBool(data bool) error {
 	if data {
-		s.data.Put(byte(1))
-	} else {
-		s.data.Put(byte(0))
+		return s.data.Put(byte(1))
 	}
+	return s.data.Put(byte(0))
 }
 
-func (s *BufferProxy) WriteComplex64(data complex64) {
+func (s *BufferProxy) WriteComplex64(data complex64) error {
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, data)
-	s.data.PutBytes(buf.Bytes(), 0, buf.Len())
+	err := binary.Write(buf, binary.BigEndian, data)
+	if err != nil {
+		return err
+	}
+	return s.data.PutBytes(buf.Bytes(), 0, buf.Len())
 }
 
-func (s *BufferProxy) WriteComplex128(data complex128) {
+func (s *BufferProxy) WriteComplex128(data complex128) error {
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, data)
-	s.data.PutBytes(buf.Bytes(), 0, buf.Len())
+	err := binary.Write(buf, binary.BigEndian, data)
+	if err != nil {
+		return err
+	}
+	return s.data.PutBytes(buf.Bytes(), 0, buf.Len())
 }
 
-func (s *BufferProxy) WriteFloat64(data float64) {
+func (s *BufferProxy) WriteFloat64(data float64) error {
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, data)
-	s.data.PutBytes(buf.Bytes(), 0, buf.Len())
+	err := binary.Write(buf, binary.BigEndian, data)
+	if err != nil {
+		return err
+	}
+	return s.data.PutBytes(buf.Bytes(), 0, buf.Len())
 }
 
-func (s *BufferProxy) WriteFloat32(data float32) {
+func (s *BufferProxy) WriteFloat32(data float32) error {
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, data)
-	s.data.PutBytes(buf.Bytes(), 0, buf.Len())
+	err := binary.Write(buf, binary.BigEndian, data)
+	if err != nil {
+		return err
+	}
+	return s.data.PutBytes(buf.Bytes(), 0, buf.Len())
 }
 
-func (s *BufferProxy) WriteInt64(data int64) {
+func (s *BufferProxy) WriteInt64(data int64) error {
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, data)
-	s.data.PutBytes(buf.Bytes(), 0, buf.Len())
+	err := binary.Write(buf, binary.BigEndian, data)
+	if err != nil {
+		return err
+	}
+	return s.data.PutBytes(buf.Bytes(), 0, buf.Len())
 }
 
-func (s *BufferProxy) WriteInt32(data int32) {
+func (s *BufferProxy) WriteInt32(data int32) error {
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, data)
-	s.data.PutBytes(buf.Bytes(), 0, buf.Len())
+	err := binary.Write(buf, binary.BigEndian, data)
+	if err != nil {
+		return err
+	}
+	return s.data.PutBytes(buf.Bytes(), 0, buf.Len())
+
 }
 
-func (s *BufferProxy) WriteInt16(data int16) {
+func (s *BufferProxy) WriteInt16(data int16) error {
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, data)
-	s.data.PutBytes(buf.Bytes(), 0, buf.Len())
+	err := binary.Write(buf, binary.BigEndian, data)
+	if err != nil {
+		return err
+	}
+	return s.data.PutBytes(buf.Bytes(), 0, buf.Len())
 }
 
-func (s *BufferProxy) WriteInt8(data int8) {
+func (s *BufferProxy) WriteInt8(data int8) error {
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.BigEndian, data)
-	s.data.PutBytes(buf.Bytes(), 0, buf.Len())
+	err := binary.Write(buf, binary.BigEndian, data)
+	if err != nil {
+		return err
+	}
+	return s.data.PutBytes(buf.Bytes(), 0, buf.Len())
+
 }
 
-func (s *BufferProxy) WriteString(data string) {
+func (s *BufferProxy) WriteString(data string) error {
 	slen := len(data)
-	s.WriteInt32(int32(slen))
-	s.data.PutBytes([]byte(data), 0, slen)
+	err := s.WriteInt32(int32(slen))
+	if err != nil {
+		return err
+	}
+	return s.data.PutBytes([]byte(data), 0, slen)
+
 }
 
-func (s *BufferProxy) ReadInt32() int32 {
+func (s *BufferProxy) ReadInt32() (int32, error) {
 	buf := make([]byte, 4)
-	s.data.GetBytes(buf, 0, 4)
+	err := s.data.GetBytes(buf, 0, 4)
+	if err != nil {
+		return 0, err
+	}
 	var v int32
-	binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
-	return v
+	err = binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
+	if err != nil {
+		return 0, err
+	}
+	return v, nil
 }
 
-func (s *BufferProxy) ReadInt64() int64 {
+func (s *BufferProxy) ReadInt64() (int64, error) {
 	buf := make([]byte, 8)
-	s.data.GetBytes(buf, 0, 8)
+	err := s.data.GetBytes(buf, 0, 8)
+	if err != nil {
+		return 0, err
+	}
 	var v int64
-	binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
-	return v
+	err = binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
+	if err != nil {
+		return 0, err
+	}
+	return v, nil
 }
 
-func (s *BufferProxy) ReadFloat32() float32 {
+func (s *BufferProxy) ReadFloat32() (float32, error) {
 	buf := make([]byte, 4)
-	s.data.GetBytes(buf, 0, 4)
+	err := s.data.GetBytes(buf, 0, 4)
+	if err != nil {
+		return 0, err
+	}
 	var v float32
-	binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
-	return v
+	err = binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
+	if err != nil {
+		return 0, err
+	}
+	return v, nil
 }
 
-func (s *BufferProxy) ReadFloat64() float64 {
+func (s *BufferProxy) ReadFloat64() (float64, error) {
 	buf := make([]byte, 8)
-	s.data.GetBytes(buf, 0, 8)
+	err := s.data.GetBytes(buf, 0, 8)
+	if err != nil {
+		return 0, err
+	}
 	var v float64
-	binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
-	return v
+	err = binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
+	if err != nil {
+		return 0, err
+	}
+	return v, nil
 }
 
-func (s *BufferProxy) ReadInt16() int16 {
+func (s *BufferProxy) ReadInt16() (int16, error) {
 	buf := make([]byte, 2)
-	s.data.GetBytes(buf, 0, 2)
+	err := s.data.GetBytes(buf, 0, 2)
+	if err != nil {
+		return 0, err
+	}
 	var v int16
-	binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
-	return v
+	err = binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
+	if err != nil {
+		return 0, err
+	}
+	return v, nil
 }
 
-func (s *BufferProxy) ReadInt8() int8 {
+func (s *BufferProxy) ReadInt8() (int8, error) {
 	buf := make([]byte, 1)
-	s.data.GetBytes(buf, 0, 1)
+	err := s.data.GetBytes(buf, 0, 1)
+	if err != nil {
+		return 0, err
+	}
 	var v int8
-	binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
-	return v
+	err = binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
+	if err != nil {
+		return 0, err
+	}
+	return v, nil
 }
 
-func (s *BufferProxy) ReadComplex64() complex64 {
+func (s *BufferProxy) ReadComplex64() (complex64, error) {
 	buf := make([]byte, 8)
-	s.data.GetBytes(buf, 0, 8)
+	err := s.data.GetBytes(buf, 0, 8)
+	if err != nil {
+		return 0, err
+	}
 	var v complex64
-	binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
-	return v
+	err = binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
+	if err != nil {
+		return 0, err
+	}
+	return v, nil
 }
 
-func (s *BufferProxy) ReadComplex128() complex128 {
+func (s *BufferProxy) ReadComplex128() (complex128, error) {
 	buf := make([]byte, 16)
-	s.data.GetBytes(buf, 0, 16)
+	err := s.data.GetBytes(buf, 0, 16)
+	if err != nil {
+		return 0, err
+	}
 	var v complex128
-	binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
-	return v
+	err = binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
+	if err != nil {
+		return 0, err
+	}
+	return v, nil
 }
 
-func (s *BufferProxy) ReadString() string {
-	len := s.ReadInt32()
+func (s *BufferProxy) ReadString() (string, error) {
+	len, err := s.ReadInt32()
+	if err != nil {
+		return "", err
+	}
 	buf := make([]byte, len)
-	s.data.GetBytes(buf, 0, int(len))
-	return string(buf)
+	err = s.data.GetBytes(buf, 0, int(len))
+	if err != nil {
+		return "", err
+	}
+	return string(buf), nil
 }
 
-func (s *BufferProxy) ReadBool() bool {
-	b, _ := s.data.Get()
-	return int(b) == 1
+func (s *BufferProxy) ReadBool() (bool, error) {
+	b, err := s.data.Get()
+	if err != nil {
+		return false, err
+	}
+	return int(b) == 1, nil
 }
 func (s *BufferProxy) Read() ([]byte, error) {
 	len := s.data.Remaining()
@@ -163,8 +249,8 @@ func (s *BufferProxy) Read() ([]byte, error) {
 	return k, nil
 }
 
-func (s *BufferProxy) Write(data []byte) {
-	s.data.PutBytes(data, 0, len(data))
+func (s *BufferProxy) Write(data []byte) error {
+	return s.data.PutBytes(data, 0, len(data))
 }
 
 func (s *BufferProxy) Remaining() int {

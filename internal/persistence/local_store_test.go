@@ -30,11 +30,11 @@ func (s *sample) WriteKey(value DataBuffer) error {
 }
 
 func (s *sample) Read(value DataBuffer) error {
-	s.Age = value.ReadInt32()
-	s.Name = value.ReadString()
-	s.Address = value.ReadString()
-	s.Validated = value.ReadBool()
-	s.Pay = value.ReadComplex64()
+	//s.Age = value.ReadInt32()
+	//s.Name = value.ReadString()
+	//s.Address = value.ReadString()
+	//s.Validated = value.ReadBool()
+	//s.Pay = value.ReadComplex64()
 	return nil
 }
 
