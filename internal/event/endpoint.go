@@ -68,9 +68,3 @@ func (s *Endpoint) Close() error {
 	return nil
 }
 
-func (s *Endpoint) Publish(event Event) error {
-	event.Streaming(Chunk{true, []byte("hellop")})
-	event.Streaming(Chunk{true, []byte("hellop")})
-	event.Streaming(Chunk{false, []byte("hellop")})
-	return nil
-}
