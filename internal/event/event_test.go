@@ -15,10 +15,17 @@ func (s *sampleFactory) Create(classId int) Event {
 }
 
 type sampleEvent struct {
-	name     string
-	topic    bool
+	name  string
+	topic bool
 	//listener chan Chunk
 	core.PersistentableObj
+}
+
+func (s *sampleEvent) Read(buffer core.DataBuffer) error {
+	a, _ := buffer.ReadInt32()
+	b, _ := buffer.ReadInt32()
+	fmt.Printf("Reading from buffer %d, %d\n", a, b)
+	return nil
 }
 
 func (s *sampleEvent) OnTopic() bool {
