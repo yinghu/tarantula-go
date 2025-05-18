@@ -40,12 +40,12 @@ func (s *Service) Start(env conf.Env) error {
 	}
 	s.Sql = sql
 	s.Started = true
-	fmt.Printf("Auth service started\n")
+	fmt.Printf("Presence service started\n")
 	return nil
 }
 func (s *Service) Shutdown() {
 	s.Sql.Close()
-	fmt.Printf("Auth service shut down\n")
+	fmt.Printf("Presence service shut down\n")
 }
 
 func (s *Service) Register(login *Login) {
