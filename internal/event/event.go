@@ -15,19 +15,26 @@ type EventFactory interface {
 
 type Event interface {
 	OnTopic() bool
-	Streaming(c Chunk)
+	Inbound(buff core.DataBuffer)
+	Outbound(buff core.DataBuffer)
 	core.Persistentable
 }
 
 type EventObj struct {
 	Topic    bool
 	Listener chan Chunk
+	core.PersistentableObj
 }
 
 func (s *EventObj) OnTopic() bool {
 	return s.Topic
 }
 
-func (s *EventObj) Streaming(c Chunk) {
-	s.Listener <- c
+
+func (s *EventObj) Inbound(buff core.DataBuffer) {
+
+}
+
+func (s *EventObj) Outbound(buff core.DataBuffer) {
+
 }

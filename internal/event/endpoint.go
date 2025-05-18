@@ -29,22 +29,8 @@ func (s *Endpoint) handleClient(client net.Conn) {
 		return
 	}
 	fmt.Printf("Event : %d %s\n", cid, tik)
-	e.Read(&socket)
-	for {
-		sz, err := socket.ReadInt32()
-		if err != nil || sz == 0 {
-			e.Streaming(Chunk{true, []byte{0}})
-			break
-		}
-		pd, err := socket.Read(int(sz))
-		if err != nil {
-			e.Streaming(Chunk{true, []byte{0}})
-			break
-		}
-		e.Streaming(Chunk{false, pd})
-	}
-	socket.WriteInt32(100)
-	socket.WriteString("Bye")
+	e.Inbound(&socket)
+	e.Outbound(&socket)
 }
 
 func (s *Endpoint) Open() error {
