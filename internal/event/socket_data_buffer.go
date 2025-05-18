@@ -47,7 +47,7 @@ func (s *SocketBuffer) ReadString() (string, error) {
 	return string(s.Buffer[:sz]), nil
 }
 
-func (s *SocketBuffer) Read(size int32) ([]byte, error) {
+func (s *SocketBuffer) Read(size int) ([]byte, error) {
 	n, err := s.Socket.Read(s.Buffer[:size])
 	if err != nil {
 		return []byte{0}, err

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"gameclustering.com/internal/persistence"
+	"gameclustering.com/internal/core"
 )
 
 type sampleFactory struct {
@@ -18,7 +18,7 @@ type sampleEvent struct {
 	name     string
 	topic    bool
 	//listener chan Chunk
-	persistence.PersistentableObj
+	core.PersistentableObj
 }
 
 func (s *sampleEvent) OnTopic() bool {

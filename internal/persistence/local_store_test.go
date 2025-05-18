@@ -14,7 +14,7 @@ type sample struct {
 	Address   string
 	Validated bool
 	Pay       complex64
-	PersistentableObj
+	core.PersistentableObj
 }
 
 func (s *sample) Write(value core.DataBuffer) error {

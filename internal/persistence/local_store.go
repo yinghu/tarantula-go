@@ -3,6 +3,8 @@ package persistence
 import (
 	"errors"
 
+	"gameclustering.com/internal/core"
+
 	badger "github.com/dgraph-io/badger/v4"
 )
 
@@ -14,7 +16,7 @@ type LocalStore struct {
 	ValueSize int
 }
 
-func (s *LocalStore) Save(t Persistentable) error {
+func (s *LocalStore) Save(t core.Persistentable) error {
 
 	key := BufferProxy{}
 	key.NewProxy(s.KeySize)
@@ -27,7 +29,7 @@ func (s *LocalStore) Save(t Persistentable) error {
 	return s.Set(&key, &value)
 }
 
-func (s *LocalStore) Load(t Persistentable) error {
+func (s *LocalStore) Load(t core.Persistentable) error {
 	key := BufferProxy{}
 	key.NewProxy(s.KeySize)
 	t.WriteKey(&key)

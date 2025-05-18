@@ -1,7 +1,7 @@
 package event
 
 import (
-	"gameclustering.com/internal/persistence"
+	"gameclustering.com/internal/core"
 )
 
 type Chunk struct {
@@ -16,7 +16,7 @@ type EventFactory interface {
 type Event interface {
 	OnTopic() bool
 	Streaming(c Chunk)
-	persistence.Persistentable
+	core.Persistentable
 }
 
 type EventObj struct {

@@ -52,14 +52,6 @@ type DataBuffer interface {
 
 type DataBufferHook struct{}
 
-func (s *DataBufferHook) Remaining() int {
-	return 0
-}
-
-func (s *DataBufferHook) Flip() error {
-	return nil
-}
-
 func (s *DataBufferHook) WriteBool(data bool) error {
 	return nil
 }
@@ -71,7 +63,7 @@ func (s *DataBufferHook) WriteComplex128(data complex128) error {
 	return nil
 }
 func (s *DataBufferHook) WriteFloat64(data float64) error {
-	
+
 	return nil
 }
 
@@ -143,4 +135,12 @@ func (s *DataBufferHook) ReadString() (string, error) {
 
 func (s *DataBufferHook) Read(sz int) ([]byte, error) {
 	return []byte{0}, nil
+}
+
+func (s *DataBufferHook) Remaining() int {
+	return 0
+}
+
+func (s *DataBufferHook) Flip() error {
+	return nil
 }

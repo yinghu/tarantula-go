@@ -1,7 +1,6 @@
 package event
 
 import (
-
 	"fmt"
 	"net"
 	"strings"
@@ -30,14 +29,14 @@ func (s *Endpoint) handleClient(client net.Conn) {
 		return
 	}
 	fmt.Printf("Event : %d %s\n", cid, tik)
-	//e.Read(socket)
+	//e.Read(&socket)
 	for {
 		sz, err := socket.ReadInt32()
 		if err != nil || sz == 0 {
 			e.Streaming(Chunk{true, []byte{0}})
 			break
 		}
-		pd, err := socket.Read(sz)
+		pd, err := socket.Read(int(sz))
 		if err != nil {
 			e.Streaming(Chunk{true, []byte{0}})
 			break
@@ -70,4 +69,3 @@ func (s *Endpoint) Close() error {
 	s.listener.Close()
 	return nil
 }
-
