@@ -6,14 +6,17 @@ import (
 	"errors"
 	"fmt"
 	"net"
+
+	"gameclustering.com/internal/core"
 )
 
-type SocketReader struct {
+type SocketBuffer struct {
 	Socket net.Conn
 	Buffer []byte
+	core.DataBufferHook
 }
 
-func (s *SocketReader) ReadInt32() (int32, error) {
+func (s *SocketBuffer) ReadInt32() (int32, error) {
 	n, err := s.Socket.Read(s.Buffer[:4])
 	if err != nil {
 		return 0, err
@@ -28,7 +31,7 @@ func (s *SocketReader) ReadInt32() (int32, error) {
 	}
 	return v, nil
 }
-func (s *SocketReader) ReadString() (string, error) {
+func (s *SocketBuffer) ReadString() (string, error) {
 	sz, err := s.ReadInt32()
 	if err != nil {
 		return "", err
@@ -44,7 +47,7 @@ func (s *SocketReader) ReadString() (string, error) {
 	return string(s.Buffer[:sz]), nil
 }
 
-func (s *SocketReader) ReadBytes(size int32) ([]byte, error) {
+func (s *SocketBuffer) Read(size int32) ([]byte, error) {
 	n, err := s.Socket.Read(s.Buffer[:size])
 	if err != nil {
 		return []byte{0}, err

@@ -2,7 +2,10 @@ module gameclustering.com/internal/persistence
 
 go 1.24.2
 
+replace gameclustering.com/internal/core => ../core
+
 require (
+	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
 	github.com/0xc0d/encoding v0.1.0
 	github.com/dgraph-io/badger/v4 v4.7.0
 	github.com/jackc/pgx/v5 v5.7.4

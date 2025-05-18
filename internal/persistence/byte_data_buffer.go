@@ -239,7 +239,7 @@ func (s *BufferProxy) ReadBool() (bool, error) {
 	}
 	return int(b) == 1, nil
 }
-func (s *BufferProxy) Read() ([]byte, error) {
+func (s *BufferProxy) Read(sz int) ([]byte, error) {
 	len := s.data.Remaining()
 	k := make([]byte, len)
 	err := s.data.GetBytes(k, 0, len)

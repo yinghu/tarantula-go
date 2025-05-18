@@ -6,7 +6,6 @@ import (
 	badger "github.com/dgraph-io/badger/v4"
 )
 
-
 type LocalStore struct {
 	InMemory  bool
 	Path      string
@@ -49,8 +48,8 @@ func (s *LocalStore) Set(key *BufferProxy, value *BufferProxy) error {
 	}
 
 	return s.Db.Update(func(txn *badger.Txn) error {
-		k, _ := key.Read()
-		v, _ := value.Read()
+		k, _ := key.Read(0)
+		v, _ := value.Read(0)
 		return txn.Set(k, v)
 	})
 }
@@ -60,7 +59,7 @@ func (s *LocalStore) Get(key *BufferProxy, value *BufferProxy) error {
 		return errors.New("bad key/value")
 	}
 	err := s.Db.View(func(txn *badger.Txn) error {
-		k, _ := key.Read()
+		k, _ := key.Read(0)
 		item, err := txn.Get(k)
 		if err != nil {
 			return err

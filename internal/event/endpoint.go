@@ -17,33 +17,34 @@ func (s *Endpoint) handleClient(client net.Conn) {
 	defer func() {
 		client.Close()
 	}()
-	reader := SocketReader{Socket: client, Buffer: make([]byte, 1024)}
-	cid, err := reader.ReadInt32()
+	socket := SocketBuffer{Socket: client, Buffer: make([]byte, 1024)}
+	cid, err := socket.ReadInt32()
 	if err != nil {
 		fmt.Printf("Error on read cid %s\n", err.Error())
 		return
 	}
 	e := s.Factory.Create(int(cid))
-	tik, err := reader.ReadString()
+	tik, err := socket.ReadString()
 	if err != nil {
 		fmt.Printf("Err %s\n", err.Error())
 		return
 	}
 	fmt.Printf("Event : %d %s\n", cid, tik)
-	//e.Write(reader)
+	//e.Read(socket)
 	for {
-		sz, err := reader.ReadInt32()
+		sz, err := socket.ReadInt32()
 		if err != nil || sz == 0 {
 			e.Streaming(Chunk{true, []byte{0}})
 			break
 		}
-		pd, err := reader.ReadBytes(sz)
+		pd, err := socket.Read(sz)
 		if err != nil {
 			e.Streaming(Chunk{true, []byte{0}})
 			break
 		}
 		e.Streaming(Chunk{false, pd})
 	}
+
 }
 
 func (s *Endpoint) Open() error {

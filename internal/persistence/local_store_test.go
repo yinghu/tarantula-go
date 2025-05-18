@@ -3,6 +3,8 @@ package persistence
 import (
 	"fmt"
 	"testing"
+
+	"gameclustering.com/internal/core"
 )
 
 type sample struct {
@@ -15,7 +17,7 @@ type sample struct {
 	PersistentableObj
 }
 
-func (s *sample) Write(value DataBuffer) error {
+func (s *sample) Write(value core.DataBuffer) error {
 	value.WriteInt32(s.Age)
 	value.WriteString(s.Name)
 	value.WriteString(s.Address)
@@ -24,12 +26,12 @@ func (s *sample) Write(value DataBuffer) error {
 	return nil
 }
 
-func (s *sample) WriteKey(value DataBuffer) error {
+func (s *sample) WriteKey(value core.DataBuffer) error {
 	value.WriteInt64(s.Id)
 	return nil
 }
 
-func (s *sample) Read(value DataBuffer) error {
+func (s *sample) Read(value core.DataBuffer) error {
 	//s.Age = value.ReadInt32()
 	//s.Name = value.ReadString()
 	//s.Address = value.ReadString()
