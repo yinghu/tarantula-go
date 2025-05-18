@@ -2,6 +2,6 @@ package main
 
 import "fmt"
 
-func main() {
+func Start() {
 	fmt.Printf("Tournament is running %s\n", "ss")
 }
