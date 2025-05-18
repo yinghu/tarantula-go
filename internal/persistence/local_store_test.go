@@ -15,7 +15,7 @@ type sample struct {
 	PersistentableObj
 }
 
-func (s *sample) Write(value *BufferProxy) error {
+func (s *sample) Write(value DataBuffer) error {
 	value.WriteInt32(s.Age)
 	value.WriteString(s.Name)
 	value.WriteString(s.Address)
@@ -24,12 +24,12 @@ func (s *sample) Write(value *BufferProxy) error {
 	return nil
 }
 
-func (s *sample) WriteKey(value *BufferProxy) error {
+func (s *sample) WriteKey(value DataBuffer) error {
 	value.WriteInt64(s.Id)
 	return nil
 }
 
-func (s *sample) Read(value *BufferProxy) error {
+func (s *sample) Read(value DataBuffer) error {
 	s.Age = value.ReadInt32()
 	s.Name = value.ReadString()
 	s.Address = value.ReadString()
@@ -37,7 +37,6 @@ func (s *sample) Read(value *BufferProxy) error {
 	s.Pay = value.ReadComplex64()
 	return nil
 }
-
 
 func TestLocalStore(t *testing.T) {
 	local := LocalStore{InMemory: false, Path: "/home/yinghu/local", KeySize: 100, ValueSize: 200}

@@ -1,6 +1,7 @@
 package event
 
 import (
+
 	"fmt"
 	"net"
 	"strings"
@@ -29,6 +30,7 @@ func (s *Endpoint) handleClient(client net.Conn) {
 		return
 	}
 	fmt.Printf("Event : %d %s\n", cid, tik)
+	//e.Write(reader)
 	for {
 		sz, err := reader.ReadInt32()
 		if err != nil || sz == 0 {
