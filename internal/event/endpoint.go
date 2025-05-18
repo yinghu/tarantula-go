@@ -7,27 +7,45 @@ import (
 )
 
 type Endpoint struct {
-	tcpEndpoint string
+	TcpEndpoint string
+	Factory     EventFactory
 	listener    net.Listener
 }
 
 func (s *Endpoint) handleClient(client net.Conn) {
 	defer func() {
 		client.Close()
-		s.Close()
 	}()
 	reader := SocketReader{Socket: client, Buffer: make([]byte, 1024)}
-	fid, _ := reader.ReadInt32()
-	cid, _ := reader.ReadInt32()
+	cid, err := reader.ReadInt32()
+	if err != nil {
+		fmt.Printf("Error on read cid %s\n", err.Error())
+		return
+	}
+	e := s.Factory.Create(int(cid))
 	tik, err := reader.ReadString()
 	if err != nil {
 		fmt.Printf("Err %s\n", err.Error())
+		return
 	}
-	fmt.Printf("HS %d : %d : %s\n", fid, cid, tik)
+	fmt.Printf("Event : %d %s\n", cid, tik)
+	for {
+		sz, err := reader.ReadInt32()
+		if err != nil || sz == 0 {
+			e.Streaming(Chunk{true, []byte{0}})
+			break
+		}
+		pd, err := reader.ReadBytes(sz)
+		if err != nil {
+			e.Streaming(Chunk{true, []byte{0}})
+			break
+		}
+		e.Streaming(Chunk{false, pd})
+	}
 }
 
 func (s *Endpoint) Open() error {
-	parts := strings.Split(s.tcpEndpoint, "://")
+	parts := strings.Split(s.TcpEndpoint, "://")
 	fmt.Printf("Endpoint %s %s\n", parts[0], parts[1])
 	server, err := net.Listen(parts[0], parts[1])
 	if err != nil {
@@ -35,9 +53,9 @@ func (s *Endpoint) Open() error {
 	}
 	s.listener = server
 	for {
-		client, er := s.listener.Accept()
-		if er != nil {
-			fmt.Printf("Error :%s\n", er.Error())
+		client, err := s.listener.Accept()
+		if err != nil {
+			fmt.Printf("Error :%s\n", err.Error())
 			break
 		}
 		go s.handleClient(client)

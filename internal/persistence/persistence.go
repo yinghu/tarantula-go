@@ -1,11 +1,14 @@
 package persistence
 
+type PersistentableFactory interface {
+	Create(classId int) Persistentable
+}
+
 type Persistentable interface {
 	Write(value *BufferProxy) error
 	WriteKey(key *BufferProxy) error
 	Read(value *BufferProxy) error
 	ReadKey(key *BufferProxy) error
-	FactoryId() int
 	ClassId() int
 	Revision() int64
 }
@@ -30,10 +33,6 @@ func (s *PersistentableObj) Read(value *BufferProxy) error {
 
 func (s *PersistentableObj) ReadKey(value *BufferProxy) error {
 	return nil
-}
-
-func (s *PersistentableObj) FactoryId() int {
-	return s.Fid
 }
 
 func (s *PersistentableObj) ClassId() int {
