@@ -43,7 +43,8 @@ func (s *Endpoint) handleClient(client net.Conn) {
 		}
 		e.Streaming(Chunk{false, pd})
 	}
-
+	socket.WriteInt32(100)
+	socket.WriteString("Bye")
 }
 
 func (s *Endpoint) Open() error {
