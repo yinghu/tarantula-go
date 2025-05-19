@@ -9,16 +9,16 @@ import (
 	badger "github.com/dgraph-io/badger/v4"
 )
 
-type LocalStore struct {
-	InMemory  bool 
+type Cache struct {
+	InMemory  bool
 	Path      string
 	Db        *badger.DB
-	Sfk       util.Snowflake
+	Sfk       *util.Snowflake
 	KeySize   int
 	ValueSize int
 }
 
-func (s *LocalStore) Save(t core.Persistentable) error {
+func (s *Cache) Save(t core.Persistentable) error {
 
 	key := BufferProxy{}
 	key.NewProxy(s.KeySize)
@@ -31,7 +31,7 @@ func (s *LocalStore) Save(t core.Persistentable) error {
 	return s.Set(&key, &value)
 }
 
-func (s *LocalStore) New(t core.Persistentable) error {
+func (s *Cache) New(t core.Persistentable) error {
 
 	key := BufferProxy{}
 	key.NewProxy(s.KeySize)
@@ -44,7 +44,7 @@ func (s *LocalStore) New(t core.Persistentable) error {
 	return s.SetNew(&key, &value)
 }
 
-func (s *LocalStore) Load(t core.Persistentable) error {
+func (s *Cache) Load(t core.Persistentable) error {
 	key := BufferProxy{}
 	key.NewProxy(s.KeySize)
 	t.WriteKey(&key)
@@ -59,7 +59,7 @@ func (s *LocalStore) Load(t core.Persistentable) error {
 	return nil
 }
 
-func (s *LocalStore) SetNew(key *BufferProxy, value *BufferProxy) error {
+func (s *Cache) SetNew(key *BufferProxy, value *BufferProxy) error {
 	if key.Remaining() == 0 || value.Remaining() == 0 {
 		return errors.New("bad key/value")
 	}
@@ -72,7 +72,7 @@ func (s *LocalStore) SetNew(key *BufferProxy, value *BufferProxy) error {
 	})
 }
 
-func (s *LocalStore) Set(key *BufferProxy, value *BufferProxy) error {
+func (s *Cache) Set(key *BufferProxy, value *BufferProxy) error {
 	if key.Remaining() == 0 || value.Remaining() == 0 {
 		return errors.New("bad key/value")
 	}
@@ -84,7 +84,7 @@ func (s *LocalStore) Set(key *BufferProxy, value *BufferProxy) error {
 	})
 }
 
-func (s *LocalStore) Get(key *BufferProxy, value *BufferProxy) error {
+func (s *Cache) Get(key *BufferProxy, value *BufferProxy) error {
 	if key.Remaining() == 0 {
 		return errors.New("bad key/value")
 	}
@@ -107,7 +107,7 @@ func (s *LocalStore) Get(key *BufferProxy, value *BufferProxy) error {
 	return nil
 }
 
-func (s *LocalStore) Open() error {
+func (s *Cache) Open() error {
 	var opt badger.Options
 	if s.InMemory {
 		opt = badger.DefaultOptions("").WithInMemory(true)
@@ -122,6 +122,6 @@ func (s *LocalStore) Open() error {
 	return nil
 }
 
-func (s *LocalStore) Close() {
+func (s *Cache) Close() {
 	s.Db.Close()
 }

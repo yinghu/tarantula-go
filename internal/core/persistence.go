@@ -1,7 +1,5 @@
 package core
 
-
-
 type PersistentableFactory interface {
 	Create(classId int) Persistentable
 }
@@ -43,4 +41,8 @@ func (s *PersistentableObj) ClassId() int {
 
 func (s *PersistentableObj) Revision() int64 {
 	return s.Rev
+}
+
+type DataStore interface {
+	Load(p Persistentable) error
 }

@@ -15,12 +15,13 @@ import (
 )
 
 type Service struct {
-	Cluster *cluster.Etc
-	Sql     persistence.Postgresql
-	Sfk     util.Snowflake
-	Tkn     util.Jwt
-	Ciph    util.Cipher
-	Started bool
+	Cluster   *cluster.Etc
+	Sql       persistence.Postgresql
+	Sfk       util.Snowflake
+	Tkn       util.Jwt
+	Ciph      util.Cipher
+	Publisher event.EventService
+	Started   bool
 }
 
 func (s *Service) Start(env conf.Env) error {
@@ -28,17 +29,18 @@ func (s *Service) Start(env conf.Env) error {
 	s.Tkn = util.Jwt{Alg: "SHS256"}
 	s.Tkn.HMac()
 	ci := util.Cipher{Ksz: 32}
-	er := ci.AesGcm()
-	if er != nil {
-		return er
+	err := ci.AesGcm()
+	if err != nil {
+		return err
 	}
 	s.Ciph = ci
-	sql := persistence.Postgresql{Url: env.DatabaseURL}
-	err := sql.Create()
+	sql := persistence.Postgresql{Url: env.Pgs.DatabaseURL}
+	err = sql.Create()
 	if err != nil {
 		return err
 	}
 	s.Sql = sql
+
 	s.Started = true
 	fmt.Printf("Presence service started\n")
 	return nil
@@ -47,6 +49,8 @@ func (s *Service) Shutdown() {
 	s.Sql.Close()
 	fmt.Printf("Presence service shut down\n")
 }
+
+
 
 func (s *Service) Register(login *Login) {
 	id, _ := s.Sfk.Id()
@@ -59,6 +63,7 @@ func (s *Service) Register(login *Login) {
 		return
 	}
 	login.Listener <- event.Chunk{Remaining: false, Data: successMessage("registered")}
+	//go s.Publisher.Publish(login)
 }
 
 func (s *Service) VerifyToken(token string, listener chan event.Chunk) {

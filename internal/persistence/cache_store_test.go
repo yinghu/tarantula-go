@@ -61,7 +61,7 @@ func (s *sample) Read(value core.DataBuffer) error {
 }
 
 func TestLocalStore(t *testing.T) {
-	local := LocalStore{InMemory: false, Path: "/home/yinghu/local", KeySize: 100, ValueSize: 200}
+	local := Cache{InMemory: false, Path: "/home/yinghu/local", KeySize: 100, ValueSize: 200}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("Local store error %s", err.Error())
