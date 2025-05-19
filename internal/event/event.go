@@ -20,6 +20,10 @@ type Event interface {
 	core.Persistentable
 }
 
+type EventService interface {
+	Publish(e Event) error
+}
+
 type EventObj struct {
 	Topic    bool
 	Listener chan Chunk
@@ -29,7 +33,6 @@ type EventObj struct {
 func (s *EventObj) OnTopic() bool {
 	return s.Topic
 }
-
 
 func (s *EventObj) Inbound(buff core.DataBuffer) {
 
