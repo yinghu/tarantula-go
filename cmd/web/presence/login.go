@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gameclustering.com/internal/core"
+	//"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
 )
@@ -31,8 +31,12 @@ type Login struct {
 	ReferenceId int32  `json:"referenceId"`
 	SystemId    int64
 
-	event.EventObj         //Event default
-	core.PersistentableObj // Persistentable default
+	event.EventObj //Event default
+	//core.PersistentableObj // Persistentable default
+}
+
+func (s *Login) ClassId() int {
+	return 10
 }
 
 func errorMessage(msg string, code int) []byte {

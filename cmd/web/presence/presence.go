@@ -15,13 +15,12 @@ import (
 )
 
 type Service struct {
-	Cluster   *cluster.Etc
-	Sql       persistence.Postgresql
-	Sfk       util.Snowflake
-	Tkn       util.Jwt
-	Ciph      util.Cipher
-	Publisher event.EventService
-	Started   bool
+	Cluster *cluster.Etc
+	Sql     persistence.Postgresql
+	Sfk     util.Snowflake
+	Tkn     util.Jwt
+	Ciph    util.Cipher
+	Started bool
 }
 
 func (s *Service) Start(env conf.Env) error {
@@ -50,7 +49,17 @@ func (s *Service) Shutdown() {
 	fmt.Printf("Presence service shut down\n")
 }
 
+func (s *Service) Publish(e event.Event) error {
+	for v := range s.Cluster.View() {
+		if v.Name != s.Cluster.Local.Name {
+			go func() {
+				fmt.Printf("View :%v\n", v)
 
+			}()
+		}
+	}
+	return nil
+}
 
 func (s *Service) Register(login *Login) {
 	id, _ := s.Sfk.Id()
@@ -63,7 +72,7 @@ func (s *Service) Register(login *Login) {
 		return
 	}
 	login.Listener <- event.Chunk{Remaining: false, Data: successMessage("registered")}
-	//go s.Publisher.Publish(login)
+	s.Publish(login)
 }
 
 func (s *Service) VerifyToken(token string, listener chan event.Chunk) {
