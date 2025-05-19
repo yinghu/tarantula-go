@@ -32,11 +32,31 @@ func (s *sample) WriteKey(value core.DataBuffer) error {
 }
 
 func (s *sample) Read(value core.DataBuffer) error {
-	//s.Age = value.ReadInt32()
-	//s.Name = value.ReadString()
-	//s.Address = value.ReadString()
-	//s.Validated = value.ReadBool()
-	//s.Pay = value.ReadComplex64()
+	age, err := value.ReadInt32()
+	if err != nil {
+		return err
+	}
+	s.Age = age
+	name, err := value.ReadString()
+	if err != nil {
+		return err
+	}
+	s.Name = name
+	address, err := value.ReadString()
+	if err != nil {
+		return err
+	}
+	s.Address = address
+	validated, err := value.ReadBool()
+	if err != nil {
+		return err
+	}
+	s.Validated = validated
+	pay, err := value.ReadComplex64()
+	if err != nil {
+		return err
+	}
+	s.Pay = pay
 	return nil
 }
 
@@ -47,8 +67,11 @@ func TestLocalStore(t *testing.T) {
 		t.Errorf("Local store error %s", err.Error())
 	}
 	defer local.Close()
-	sample1 := sample{Id: 200, Name: "yinghu", Address: "19809 150TH", Age: 9, Validated: true, Pay: 100}
-	local.Save(&sample1)
+	sample1 := sample{Id: 200, Name: "yinghu12389", Address: "19809 150TH", Age: 9, Validated: true, Pay: 100}
+	err = local.New(&sample1)
+	if err!=nil{
+		fmt.Printf("NO SAVE %s\n",err.Error())
+	}
 	load := sample{Id: 100}
 	local.Load(&load)
 	fmt.Printf("DATA :%v\n", load)

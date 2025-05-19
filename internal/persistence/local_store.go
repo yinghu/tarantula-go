@@ -4,14 +4,16 @@ import (
 	"errors"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/util"
 
 	badger "github.com/dgraph-io/badger/v4"
 )
 
 type LocalStore struct {
-	InMemory  bool
+	InMemory  bool 
 	Path      string
 	Db        *badger.DB
+	Sfk       util.Snowflake
 	KeySize   int
 	ValueSize int
 }
@@ -29,6 +31,19 @@ func (s *LocalStore) Save(t core.Persistentable) error {
 	return s.Set(&key, &value)
 }
 
+func (s *LocalStore) New(t core.Persistentable) error {
+
+	key := BufferProxy{}
+	key.NewProxy(s.KeySize)
+	value := BufferProxy{}
+	value.NewProxy(s.ValueSize)
+	t.WriteKey(&key)
+	t.Write(&value)
+	key.Flip()
+	value.Flip()
+	return s.SetNew(&key, &value)
+}
+
 func (s *LocalStore) Load(t core.Persistentable) error {
 	key := BufferProxy{}
 	key.NewProxy(s.KeySize)
@@ -42,6 +57,19 @@ func (s *LocalStore) Load(t core.Persistentable) error {
 	}
 	t.Read(&value)
 	return nil
+}
+
+func (s *LocalStore) SetNew(key *BufferProxy, value *BufferProxy) error {
+	if key.Remaining() == 0 || value.Remaining() == 0 {
+		return errors.New("bad key/value")
+	}
+
+	return s.Db.Update(func(txn *badger.Txn) error {
+		k, _ := key.Read(0)
+		v, _ := value.Read(0)
+		e := badger.NewEntry(k, v)
+		return txn.SetEntry(e)
+	})
 }
 
 func (s *LocalStore) Set(key *BufferProxy, value *BufferProxy) error {
