@@ -87,6 +87,12 @@ func (s *Login) Outbound(buff core.DataBuffer) {
 	buff.WriteInt32(0)
 }
 
+func (s *Login) OnEvent(buff core.DataBuffer) {
+	r, _ := buff.ReadInt32()
+	x, _ := buff.ReadString()
+	fmt.Printf("%d %s\n", r, x)
+}
+
 func (s *Login) streaming(c event.Chunk) {
 	fmt.Printf("REV : %s\n", string(c.Data))
 	//s.listener <- c

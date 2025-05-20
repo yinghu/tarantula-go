@@ -1,7 +1,6 @@
 package event
 
 import (
-	"fmt"
 	"net"
 	"strings"
 )
@@ -22,8 +21,6 @@ func (s *SocketPublisher) Publish(e Event) error {
 	buffer.WriteInt32(int32(e.ClassId()))
 	buffer.WriteString("ticket")
 	e.Outbound(&buffer)
-	r, _ := buffer.ReadInt32()
-	x, _ := buffer.ReadString()
-	fmt.Printf("%d %s\n", r, x)
+	e.OnEvent(&buffer)
 	return nil
 }
