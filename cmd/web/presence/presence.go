@@ -64,7 +64,7 @@ func (s *Service) Publish(e event.Event) error {
 				}
 				defer conn.Close()
 				buffer := event.SocketBuffer{Socket: conn, Buffer: make([]byte, 1024)}
-				buffer.WriteInt32(int32(e.ClassId()))
+				buffer.WriteInt(e.ClassId())
 				buffer.WriteString("hello")
 				e.Write(&buffer)
 				buffer.WriteInt32(0)
