@@ -47,6 +47,12 @@ func (s *Login) Read(buffer core.DataBuffer) error {
 	return nil
 }
 
+func (s *Login) Write(buffer core.DataBuffer) error {
+	buffer.WriteInt32(100)
+	buffer.WriteInt32(200)
+	return nil
+}
+
 func (s *Login) Inbound(buff core.DataBuffer) {
 	s.Read(buff)
 	for {
