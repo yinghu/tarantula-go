@@ -64,9 +64,9 @@ func main() {
 		<-sigs
 		signal.Stop(sigs)
 		c.Quit <- true
-		close(sigs)
-		e.Close()
 		service.Shutdown()
+		e.Close()
+		close(sigs)
 	}()
 	c.Join()
 }
