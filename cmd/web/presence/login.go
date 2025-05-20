@@ -65,6 +65,7 @@ func (s *Login) Inbound(buff core.DataBuffer) {
 			s.streaming(event.Chunk{Remaining: true, Data: []byte{0}})
 			break
 		}
+		fmt.Printf("Pending data %d\n", sz)
 		pd, err := buff.Read(int(sz))
 		if err != nil {
 			s.streaming(event.Chunk{Remaining: true, Data: []byte{0}})
