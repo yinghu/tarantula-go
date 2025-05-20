@@ -4,10 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net"
-
 	"net/http"
-	"strings"
 	"time"
 
 	"gameclustering.com/internal/cluster"
@@ -57,20 +54,8 @@ func (s *Service) Publish(e event.Event) error {
 		if v.Name != s.Cluster.Local.Name {
 			go func() {
 				fmt.Printf("View :%v\n", v)
-				parts := strings.Split(v.TcpEndpoint, "://")
-				conn, err := net.Dial(parts[0], parts[1])
-				if err != nil {
-					return
-				}
-				defer conn.Close()
-				buffer := event.SocketBuffer{Socket: conn, Buffer: make([]byte, 1024)}
-				buffer.WriteInt(e.ClassId())
-				buffer.WriteString("hello")
-				e.Write(&buffer)
-				buffer.WriteInt32(0)
-				r, _ := buffer.ReadInt32()
-				s, _ := buffer.ReadString()
-				fmt.Printf("Ret %d %s\n", r, s)
+				pub := event.SocketPublisher{Remote: v.TcpEndpoint, BufferSize: 1024}
+				pub.Publish(e)
 			}()
 		}
 	}

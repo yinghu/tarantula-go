@@ -1,20 +1,29 @@
 package event
 
-import "net"
+import (
+	"fmt"
+	"net"
+	"strings"
+)
 
 type SocketPublisher struct {
-	Proto      string
 	Remote     string
 	BufferSize int
 }
 
 func (s *SocketPublisher) Publish(e Event) error {
-	conn, err := net.Dial(s.Proto, s.Remote)
+	parts := strings.Split(s.Remote, "://")
+	conn, err := net.Dial(parts[0], parts[1])
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
 	buffer := SocketBuffer{Socket: conn, Buffer: make([]byte, s.BufferSize)}
 	buffer.WriteInt(e.ClassId())
+	buffer.WriteString("ticket")
+	e.Outbound(&buffer)
+	r, _ := buffer.ReadInt()
+	x, _ := buffer.ReadString()
+	fmt.Printf("%d %s\n", r, x)
 	return nil
 }

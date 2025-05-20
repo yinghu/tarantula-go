@@ -30,7 +30,6 @@ func (s *Endpoint) handleClient(client net.Conn) {
 	}
 	fmt.Printf("Event : %d %s\n", cid, tik)
 	e.Inbound(&socket)
-	e.Outbound(&socket)
 }
 
 func (s *Endpoint) Open() error {

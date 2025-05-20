@@ -56,7 +56,7 @@ func (s *Login) Write(buffer core.DataBuffer) error {
 func (s *Login) Inbound(buff core.DataBuffer) {
 	s.Read(buff)
 	for {
-		sz, err := buff.ReadInt32()
+		sz, err := buff.ReadInt()
 		if err != nil {
 			s.streaming(event.Chunk{Remaining:true, Data:[]byte{0}})
 			break
@@ -65,18 +65,24 @@ func (s *Login) Inbound(buff core.DataBuffer) {
 			s.streaming(event.Chunk{Remaining:true, Data:[]byte{0}})
 			break
 		}
-		pd, err := buff.Read(int(sz))
+		pd, err := buff.Read(sz)
 		if err != nil {
 			s.streaming(event.Chunk{Remaining:true, Data:[]byte{0}})
 			break
 		}
 		s.streaming(event.Chunk{Remaining:true, Data:pd})
 	}
+	buff.WriteInt(100)
+	buff.WriteString("bye")
 }
 
 func (s *Login) Outbound(buff core.DataBuffer) {
-	buff.WriteInt32(100)
-	buff.WriteString("Bye")
+	s.Write(buff)
+	buff.WriteInt(12)
+	buff.Write([]byte("login passed"))
+	buff.WriteInt(12)
+	buff.Write([]byte("login passed"))
+	buff.WriteInt(0)
 }
 
 func (s *Login) streaming(c event.Chunk) {
