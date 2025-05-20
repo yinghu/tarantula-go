@@ -48,37 +48,6 @@ func (s *SocketBuffer) WriteInt32(data int32) error {
 	return nil
 }
 
-func (s *SocketBuffer) ReadInt() (int, error) {
-	n, err := s.Socket.Read(s.Buffer[:4])
-	if err != nil {
-		return 0, err
-	}
-	if n != 4 {
-		return 0, errors.New("less than 4 bytes")
-	}
-	buf := bytes.NewBuffer(s.Buffer[:4])
-	var v int
-	if binary.Read(buf, binary.BigEndian, &v) != nil {
-		return 0, errors.New("wrong data convert")
-	}
-	return v, nil
-}
-
-func (s *SocketBuffer) WriteInt(data int) error {
-	buf := new(bytes.Buffer)
-	err := binary.Write(buf, binary.BigEndian, data)
-	if err != nil {
-		return err
-	}
-	n, err := s.Socket.Write(buf.Bytes())
-	if err != nil {
-		return err
-	}
-	if n != 4 {
-		return errors.New("less than 4 bytes")
-	}
-	return nil
-}
 
 func (s *SocketBuffer) ReadString() (string, error) {
 	sz, err := s.ReadInt32()

@@ -19,10 +19,10 @@ func (s *SocketPublisher) Publish(e Event) error {
 	}
 	defer conn.Close()
 	buffer := SocketBuffer{Socket: conn, Buffer: make([]byte, s.BufferSize)}
-	buffer.WriteInt(e.ClassId())
+	buffer.WriteInt32(int32(e.ClassId()))
 	buffer.WriteString("ticket")
 	e.Outbound(&buffer)
-	r, _ := buffer.ReadInt()
+	r, _ := buffer.ReadInt32()
 	x, _ := buffer.ReadString()
 	fmt.Printf("%d %s\n", r, x)
 	return nil

@@ -17,12 +17,12 @@ func (s *Endpoint) handleClient(client net.Conn) {
 		client.Close()
 	}()
 	socket := SocketBuffer{Socket: client, Buffer: make([]byte, 1024)}
-	cid, err := socket.ReadInt()
+	cid, err := socket.ReadInt32()
 	if err != nil {
 		fmt.Printf("Error on read cid %s\n", err.Error())
 		return
 	}
-	e := s.Factory.Create(cid)
+	e := s.Factory.Create(int(cid))
 	tik, err := socket.ReadString()
 	if err != nil {
 		fmt.Printf("Err %s\n", err.Error())
