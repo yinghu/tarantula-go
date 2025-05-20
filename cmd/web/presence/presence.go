@@ -62,11 +62,15 @@ func (s *Service) Publish(e event.Event) error {
 				if err != nil {
 					return
 				}
+				defer conn.Close()
 				buffer := event.SocketBuffer{Socket: conn, Buffer: make([]byte, 1024)}
 				buffer.WriteInt32(int32(e.ClassId()))
 				buffer.WriteString("hello")
 				e.Write(&buffer)
 				buffer.WriteInt32(0)
+				r, _ := buffer.ReadInt32()
+				s, _ := buffer.ReadString()
+				fmt.Printf("Ret %d %s\n", r, s)
 			}()
 		}
 	}
