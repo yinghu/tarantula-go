@@ -1,6 +1,7 @@
 package event
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -25,10 +26,13 @@ func (s *Endpoint) handleClient(client net.Conn) {
 	e := s.Factory.Create(int(cid))
 	tik, err := socket.ReadString()
 	if err != nil {
-		fmt.Printf("Err %s\n", err.Error())
+		e.OnError(err)
 		return
 	}
-	fmt.Printf("Event : %d %s\n", cid, tik)
+	if tik != "ticket" {
+		e.OnError(errors.New("invalid ticket"))
+		return
+	}
 	e.Inbound(&socket)
 }
 
@@ -55,6 +59,3 @@ func (s *Endpoint) Close() error {
 	s.listener.Close()
 	return nil
 }
-
-
-

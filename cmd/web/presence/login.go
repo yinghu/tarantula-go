@@ -109,3 +109,7 @@ func successMessage(msg string) []byte {
 	m := OnSession{Message: msg, Successful: true}
 	return util.ToJson(m)
 }
+
+func (s *Login) OnError(err error) {
+	fmt.Printf("On error %s\n", err.Error())
+}

@@ -17,13 +17,12 @@ type Event interface {
 	OnTopic() bool
 	Inbound(buff core.DataBuffer)
 	Outbound(buff core.DataBuffer)
+	OnError(err error)
 	core.Persistentable
 }
 
-
-
 type EventService interface {
-	Publish(e Event) error
+	Publish(e Event)
 }
 
 type EventObj struct {
@@ -41,5 +40,9 @@ func (s *EventObj) Inbound(buff core.DataBuffer) {
 }
 
 func (s *EventObj) Outbound(buff core.DataBuffer) {
+
+}
+
+func (s *EventObj) OnError(err error) {
 
 }
