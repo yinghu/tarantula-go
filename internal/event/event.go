@@ -18,12 +18,9 @@ type Event interface {
 	Inbound(buff core.DataBuffer)
 	Outbound(buff core.DataBuffer)
 	core.Persistentable
-	EventListener
 }
 
-type EventListener interface {
-	OnEvent(buff core.DataBuffer)
-}
+
 
 type EventService interface {
 	Publish(e Event) error
@@ -44,9 +41,5 @@ func (s *EventObj) Inbound(buff core.DataBuffer) {
 }
 
 func (s *EventObj) Outbound(buff core.DataBuffer) {
-
-}
-
-func (s *EventObj) OnEvent(buff core.DataBuffer) {
 
 }

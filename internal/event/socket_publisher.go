@@ -21,6 +21,5 @@ func (s *SocketPublisher) Publish(e Event) error {
 	buffer.WriteInt32(int32(e.ClassId()))
 	buffer.WriteString("ticket")
 	e.Outbound(&buffer)
-	e.OnEvent(&buffer)
 	return nil
 }

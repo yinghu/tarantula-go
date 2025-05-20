@@ -85,6 +85,9 @@ func (s *Login) Outbound(buff core.DataBuffer) {
 	buff.WriteInt32(12)
 	buff.Write([]byte("login passed"))
 	buff.WriteInt32(0)
+	r, _ := buff.ReadInt32()
+	x, _ := buff.ReadString()
+	fmt.Printf("%d %s\n", r, x)
 }
 
 func (s *Login) OnEvent(buff core.DataBuffer) {
