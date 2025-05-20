@@ -11,6 +11,7 @@ import (
 
 	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/metrics"
 )
 
@@ -43,6 +44,7 @@ func main() {
 	f := conf.Env{}
 	f.Load("/etc/tarantula/presence-conf.json")
 	c := cluster.NewEtc(f.GroupName, f.PartitionNumber, f.EtcdEndpoints, cluster.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.TcpEndpoint})
+	e := event.Endpoint{TcpEndpoint: f.TcpEndpoint, Factory: &PresenceFactory{}}
 	go func() {
 		c.Started.Wait()
 		for v := range c.View() {
@@ -52,13 +54,18 @@ func main() {
 	}()
 	go func() {
 		c.Started.Wait()
-		fmt.Println("Started : ")
+		e.Open()
+	}()
+	go func() {
+		c.Started.Wait()
+		fmt.Println("Wating for signal to exit ...")
 		sigs := make(chan os.Signal, 1)
 		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 		<-sigs
 		signal.Stop(sigs)
 		c.Quit <- true
 		close(sigs)
+		e.Close()
 		service.Shutdown()
 	}()
 	c.Join()
