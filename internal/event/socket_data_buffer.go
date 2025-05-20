@@ -48,7 +48,6 @@ func (s *SocketBuffer) WriteInt32(data int32) error {
 	return nil
 }
 
-
 func (s *SocketBuffer) ReadString() (string, error) {
 	sz, err := s.ReadInt32()
 	if err != nil {
@@ -75,7 +74,7 @@ func (s *SocketBuffer) WriteString(data string) error {
 	if err != nil {
 		return err
 	}
-	if n != int(sz) {
+	if n != sz {
 		msg := fmt.Sprintf("size not matched %d : %d", n, sz)
 		return errors.New(msg)
 	}
@@ -87,9 +86,22 @@ func (s *SocketBuffer) Read(size int) ([]byte, error) {
 	if err != nil {
 		return []byte{0}, err
 	}
-	if n != int(size) {
+	if n != size {
 		msg := fmt.Sprintf("size not matched %d :%d", n, size)
 		return []byte{0}, errors.New(msg)
 	}
 	return s.Buffer[:n], nil
+}
+
+func (s *SocketBuffer) Write(data []byte) error {
+	sz := len(data)
+	n, err := s.Socket.Write(data)
+	if err != nil {
+		return err
+	}
+	if sz != n {
+		msg := fmt.Sprintf("size not matched %d :%d", n, sz)
+		return errors.New(msg)
+	}
+	return nil
 }
