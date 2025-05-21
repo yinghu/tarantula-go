@@ -21,11 +21,6 @@ func (s *Login) ClassId() int {
 }
 
 func (s *Login) Read(buffer core.DataBuffer) error {
-	name, err := buffer.ReadString()
-	if err != nil {
-		return err
-	}
-	s.Name = name
 	hash, err := buffer.ReadString()
 	if err != nil {
 		return err
@@ -45,16 +40,30 @@ func (s *Login) Read(buffer core.DataBuffer) error {
 }
 
 func (s *Login) Write(buffer core.DataBuffer) error {
-	buffer.WriteString(s.Name)
 	buffer.WriteString(s.Hash)
 	buffer.WriteInt32(s.ReferenceId)
 	buffer.WriteInt64(s.SystemId)
 	return nil
 }
 
+func (s *Login) ReadKey(buffer core.DataBuffer) error {
+	name, err := buffer.ReadString()
+	if err != nil {
+		return err
+	}
+	s.Name = name
+	return nil
+}
+
+func (s *Login) WriteKey(buffer core.DataBuffer) error {
+	buffer.WriteString(s.Name)
+	return nil
+}
+
 func (s *Login) Inbound(buff core.DataBuffer) {
+	s.ReadKey(buff)
 	s.Read(buff)
-	fmt.Printf("Login : %v\n", s)
+	fmt.Printf("Login : %s %s %d %d\n", s.Name, s.Hash, s.ReferenceId, s.SystemId)
 	for {
 		sz, err := buff.ReadInt32()
 		if err != nil {
@@ -79,6 +88,7 @@ func (s *Login) Inbound(buff core.DataBuffer) {
 }
 
 func (s *Login) Outbound(buff core.DataBuffer) {
+	s.WriteKey(buff)
 	s.Write(buff)
 	buff.WriteInt32(12)
 	buff.Write([]byte("login passed"))
