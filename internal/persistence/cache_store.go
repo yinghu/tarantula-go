@@ -19,7 +19,6 @@ type Cache struct {
 }
 
 func (s *Cache) Save(t core.Persistentable) error {
-
 	key := BufferProxy{}
 	key.NewProxy(s.KeySize)
 	value := BufferProxy{}
@@ -32,7 +31,6 @@ func (s *Cache) Save(t core.Persistentable) error {
 }
 
 func (s *Cache) New(t core.Persistentable) error {
-
 	key := BufferProxy{}
 	key.NewProxy(s.KeySize)
 	value := BufferProxy{}

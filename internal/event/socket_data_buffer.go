@@ -16,6 +16,70 @@ type SocketBuffer struct {
 	core.DataBufferHook
 }
 
+func (s *SocketBuffer) ReadInt8() (int8, error) {
+	n, err := s.Socket.Read(s.Buffer[:1])
+	if err != nil {
+		return 0, err
+	}
+	if n != 1 {
+		return 0, errors.New("less than 1 bytes")
+	}
+	buf := bytes.NewBuffer(s.Buffer[:4])
+	var v int8
+	if binary.Read(buf, binary.BigEndian, &v) != nil {
+		return 0, errors.New("wrong data convert")
+	}
+	return v, nil
+}
+
+func (s *SocketBuffer) WriteInt8(data int8) error {
+	buf := new(bytes.Buffer)
+	err := binary.Write(buf, binary.BigEndian, data)
+	if err != nil {
+		return err
+	}
+	n, err := s.Socket.Write(buf.Bytes())
+	if err != nil {
+		return err
+	}
+	if n != 1 {
+		return errors.New("less than 1 bytes")
+	}
+	return nil
+}
+
+func (s *SocketBuffer) ReadInt16() (int16, error) {
+	n, err := s.Socket.Read(s.Buffer[:2])
+	if err != nil {
+		return 0, err
+	}
+	if n != 2 {
+		return 0, errors.New("less than 2 bytes")
+	}
+	buf := bytes.NewBuffer(s.Buffer[:2])
+	var v int16
+	if binary.Read(buf, binary.BigEndian, &v) != nil {
+		return 0, errors.New("wrong data convert")
+	}
+	return v, nil
+}
+
+func (s *SocketBuffer) WriteInt16(data int16) error {
+	buf := new(bytes.Buffer)
+	err := binary.Write(buf, binary.BigEndian, data)
+	if err != nil {
+		return err
+	}
+	n, err := s.Socket.Write(buf.Bytes())
+	if err != nil {
+		return err
+	}
+	if n != 4 {
+		return errors.New("less than 2 bytes")
+	}
+	return nil
+}
+
 func (s *SocketBuffer) ReadInt32() (int32, error) {
 	n, err := s.Socket.Read(s.Buffer[:4])
 	if err != nil {

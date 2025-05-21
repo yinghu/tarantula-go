@@ -63,7 +63,6 @@ func (s *Login) WriteKey(buffer core.DataBuffer) error {
 func (s *Login) Inbound(buff core.DataBuffer) {
 	s.ReadKey(buff)
 	s.Read(buff)
-	//fmt.Printf("Login : %s %s %d %d\n", s.Name, s.Hash, s.ReferenceId, s.SystemId)
 	for {
 		sz, err := buff.ReadInt32()
 		if err != nil {
@@ -74,10 +73,9 @@ func (s *Login) Inbound(buff core.DataBuffer) {
 			s.streaming(event.Chunk{Remaining: true, Data: []byte{0}})
 			break
 		}
-		//fmt.Printf("Pending data %d\n", sz)
+	
 		pd, err := buff.Read(int(sz))
 		if err != nil {
-			//fmt.Printf("Read err %s\n", err.Error())
 			s.streaming(event.Chunk{Remaining: true, Data: []byte{0}})
 			break
 		}
@@ -98,13 +96,11 @@ func (s *Login) Outbound(buff core.DataBuffer) {
 	buff.WriteInt32(0)
 	buff.ReadInt32()
 	buff.ReadString()
-	//fmt.Printf("%d %s\n", r, x)
+
 }
 
 
 func (s *Login) streaming(c event.Chunk) {
-	//fmt.Printf("REV : %s\n", string(c.Data))
-	//s.listener <- c
 }
 
 func (s *Login) OnError(err error) {

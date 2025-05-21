@@ -32,7 +32,6 @@ func (s *Service) Create(classId int) event.Event {
 }
 
 func (s *Service) OnEvent(e event.Event) {
-	//fmt.Printf("Event %v\n", e)
 	err := s.Ds.Save(e)
 	if err != nil {
 		fmt.Printf("No save %s\n", err.Error())
@@ -75,7 +74,6 @@ func (s *Service) Publish(e event.Event) error {
 	for v := range s.Cluster.View() {
 		if v.Name != s.Cluster.Local.Name {
 			go func() {
-				//fmt.Printf("View :%v\n", v)
 				pub := event.SocketPublisher{Remote: v.TcpEndpoint, BufferSize: 1024}
 				pub.Publish(e)
 			}()
