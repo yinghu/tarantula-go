@@ -32,7 +32,7 @@ func (s *Service) Create(classId int) event.Event {
 }
 
 func (s *Service) OnEvent(e event.Event) {
-	fmt.Printf("Event %v\n", e)
+	//fmt.Printf("Event %v\n", e)
 	err := s.Ds.Save(e)
 	if err != nil {
 		fmt.Printf("No save %s\n", err.Error())
