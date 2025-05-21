@@ -5,27 +5,7 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
-	"gameclustering.com/internal/util"
 )
-
-const (
-	DB_OP_ERR_CODE int = 500100
-
-	WRONG_PASS_CODE    int    = 400100
-	WRONG_PASS_MSG     string = "wrong user/password"
-	INVALID_TOKEN_CODE int    = 400101
-	INVALID_TOKEN_MSG  string = "invalid token"
-)
-
-type OnSession struct {
-	Successful bool   `json:"successful"`
-	ErrorCode  int    `json:"errorCode"`
-	Message    string `json:"message"`
-	SystemId   int64  `json:"systemId"`
-	Stub       int64  `json:"stub"`
-	Token      string `json:"token"`
-	Home       string `json:"home"`
-}
 
 type Login struct {
 	Name        string `json:"login"`
@@ -41,20 +21,40 @@ func (s *Login) ClassId() int {
 }
 
 func (s *Login) Read(buffer core.DataBuffer) error {
-	a, _ := buffer.ReadInt32()
-	b, _ := buffer.ReadInt32()
-	fmt.Printf("Reading from buffer %d, %d\n", a, b)
+	name, err := buffer.ReadString()
+	if err != nil {
+		return err
+	}
+	s.Name = name
+	hash, err := buffer.ReadString()
+	if err != nil {
+		return err
+	}
+	s.Hash = hash
+	refId, err := buffer.ReadInt32()
+	if err != nil {
+		return err
+	}
+	s.ReferenceId = refId
+	sysId, err := buffer.ReadInt64()
+	if err != nil {
+		return err
+	}
+	s.SystemId = sysId
 	return nil
 }
 
 func (s *Login) Write(buffer core.DataBuffer) error {
-	buffer.WriteInt32(100)
-	buffer.WriteInt32(200)
+	buffer.WriteString(s.Name)
+	buffer.WriteString(s.Hash)
+	buffer.WriteInt32(s.ReferenceId)
+	buffer.WriteInt64(s.SystemId)
 	return nil
 }
 
 func (s *Login) Inbound(buff core.DataBuffer) {
 	s.Read(buff)
+	fmt.Printf("Login : %v\n", s)
 	for {
 		sz, err := buff.ReadInt32()
 		if err != nil {
@@ -99,15 +99,6 @@ func (s *Login) OnEvent(buff core.DataBuffer) {
 func (s *Login) streaming(c event.Chunk) {
 	fmt.Printf("REV : %s\n", string(c.Data))
 	//s.listener <- c
-}
-
-func errorMessage(msg string, code int) []byte {
-	m := OnSession{Message: msg, ErrorCode: code}
-	return util.ToJson(m)
-}
-func successMessage(msg string) []byte {
-	m := OnSession{Message: msg, Successful: true}
-	return util.ToJson(m)
 }
 
 func (s *Login) OnError(err error) {
