@@ -9,7 +9,7 @@ import (
 
 type Endpoint struct {
 	TcpEndpoint string
-	Factory     EventFactory
+	Service     EventService
 	listener    net.Listener
 }
 
@@ -23,7 +23,7 @@ func (s *Endpoint) handleClient(client net.Conn) {
 		fmt.Printf("Error on read cid %s\n", err.Error())
 		return
 	}
-	e := s.Factory.Create(int(cid))
+	e := s.Service.Create(int(cid))
 	tik, err := socket.ReadString()
 	if err != nil {
 		e.OnError(err)

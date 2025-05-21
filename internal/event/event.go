@@ -9,8 +9,13 @@ type Chunk struct {
 	Data      []byte
 }
 
-type EventFactory interface {
+type EventListener interface {
+	OnEvent(e Event)
+}
+
+type EventService interface {
 	Create(classId int) Event
+	EventListener
 }
 
 type Event interface {
@@ -19,15 +24,17 @@ type Event interface {
 	Outbound(buff core.DataBuffer)
 	OnError(err error)
 	core.Persistentable
+	Listener() EventListener
 }
 
-type EventService interface {
+type EventPublisher interface {
 	Publish(e Event)
 }
 
 type EventObj struct {
-	Topic    bool
-	Listener chan Chunk
+	Topic bool
+	Cc    chan Chunk
+	Cb    EventListener
 	core.PersistentableObj
 }
 
@@ -45,4 +52,8 @@ func (s *EventObj) Outbound(buff core.DataBuffer) {
 
 func (s *EventObj) OnError(err error) {
 
+}
+
+func (s *EventObj) Listener() EventListener {
+	return s.Cb
 }

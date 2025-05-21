@@ -24,7 +24,14 @@ type Service struct {
 }
 
 func (s *Service) Create(classId int) event.Event {
-	return &Login{}
+	login := Login{}
+	login.Cb = s
+	return &login
+}
+
+func (s *Service) OnEvent(e event.Event) {
+	fmt.Printf("Event %v\n", e)
+	//&sampleEvent{name: "sample", topic: false}
 }
 
 func (s *Service) Start(env conf.Env) error {
@@ -73,10 +80,10 @@ func (s *Service) Register(login *Login) {
 	login.Hash = hash
 	err := s.SaveLogin(login)
 	if err != nil {
-		login.Listener <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), DB_OP_ERR_CODE)}
+		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), DB_OP_ERR_CODE)}
 		return
 	}
-	login.Listener <- event.Chunk{Remaining: false, Data: successMessage("registered")}
+	login.Cc <- event.Chunk{Remaining: false, Data: successMessage("registered")}
 	s.Publish(login)
 }
 
@@ -99,12 +106,12 @@ func (s *Service) Login(login *Login) {
 	pwd := login.Hash
 	err := s.LoadLogin(login)
 	if err != nil {
-		login.Listener <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), DB_OP_ERR_CODE)}
+		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), DB_OP_ERR_CODE)}
 		return
 	}
 	er := util.Match(pwd, login.Hash)
 	if er != nil {
-		login.Listener <- event.Chunk{Remaining: false, Data: errorMessage(er.Error(), WRONG_PASS_CODE)}
+		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(er.Error(), WRONG_PASS_CODE)}
 		return
 	}
 	tk, trr := s.Tkn.Token(func(h *util.JwtHeader, p *util.JwtPayload) error {
@@ -115,11 +122,11 @@ func (s *Service) Login(login *Login) {
 		return nil
 	})
 	if trr != nil {
-		login.Listener <- event.Chunk{Remaining: false, Data: errorMessage(trr.Error(), INVALID_TOKEN_CODE)}
+		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(trr.Error(), INVALID_TOKEN_CODE)}
 		return
 	}
 	session := OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk, Home: s.Cluster.Local.HttpEndpoint}
-	login.Listener <- event.Chunk{Remaining: false, Data: util.ToJson(session)}
+	login.Cc <- event.Chunk{Remaining: false, Data: util.ToJson(session)}
 }
 
 func notsupport(listener chan event.Chunk) {
@@ -139,12 +146,12 @@ func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "onRegister":
 		var login Login
 		json.NewDecoder(r.Body).Decode(&login)
-		login.EventObj.Listener = listener
+		login.EventObj.Cc = listener
 		go s.Register(&login)
 
 	case "onLogin":
 		var login Login
-		login.EventObj.Listener = listener
+		login.EventObj.Cc = listener
 		json.NewDecoder(r.Body).Decode(&login)
 		go s.Login(&login)
 

@@ -85,6 +85,7 @@ func (s *Login) Inbound(buff core.DataBuffer) {
 	}
 	buff.WriteInt32(100)
 	buff.WriteString("bye")
+	s.Listener().OnEvent(s)
 }
 
 func (s *Login) Outbound(buff core.DataBuffer) {
