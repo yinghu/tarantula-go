@@ -1,7 +1,6 @@
 package main
 
 import (
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
 )
 
@@ -24,12 +23,6 @@ type OnSession struct {
 	Home       string `json:"home"`
 }
 
-type PresenceFactory struct {
-}
-
-func (s *PresenceFactory) Create(classId int) event.Event {
-	return &Login{}
-}
 
 func errorMessage(msg string, code int) []byte {
 	m := OnSession{Message: msg, ErrorCode: code}

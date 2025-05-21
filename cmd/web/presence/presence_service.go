@@ -23,6 +23,10 @@ type Service struct {
 	Started bool
 }
 
+func (s *Service) Create(classId int) event.Event {
+	return &Login{}
+}
+
 func (s *Service) Start(env conf.Env) error {
 	s.Sfk = util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.Tkn = util.Jwt{Alg: "SHS256"}
