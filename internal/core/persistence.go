@@ -45,4 +45,5 @@ func (s *PersistentableObj) Revision() int64 {
 
 type DataStore interface {
 	Load(p Persistentable) error
+	Save(p Persistentable) error
 }

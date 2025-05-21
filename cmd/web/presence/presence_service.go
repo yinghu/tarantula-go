@@ -9,6 +9,7 @@ import (
 
 	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
@@ -20,6 +21,7 @@ type Service struct {
 	Sfk     util.Snowflake
 	Tkn     util.Jwt
 	Ciph    util.Cipher
+	Ds      core.DataStore
 	Started bool
 }
 
@@ -31,7 +33,10 @@ func (s *Service) Create(classId int) event.Event {
 
 func (s *Service) OnEvent(e event.Event) {
 	fmt.Printf("Event %v\n", e)
-	//&sampleEvent{name: "sample", topic: false}
+	err := s.Ds.Save(e)
+	if err != nil {
+		fmt.Printf("No save %s\n", err.Error())
+	}
 }
 
 func (s *Service) Start(env conf.Env) error {
@@ -50,7 +55,8 @@ func (s *Service) Start(env conf.Env) error {
 		return err
 	}
 	s.Sql = sql
-
+	ds := persistence.Cache{InMemory: env.Bdg.InMemory, Path: env.Bdg.Path, Sfk: &s.Sfk, KeySize: env.Bdg.KeySize, ValueSize: env.Bdg.ValueSize}
+	s.Ds = &ds
 	s.Started = true
 	fmt.Printf("Presence service started\n")
 	return nil
