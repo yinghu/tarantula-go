@@ -56,6 +56,10 @@ func (s *Service) Start(env conf.Env) error {
 	}
 	s.Sql = sql
 	ds := persistence.Cache{InMemory: env.Bdg.InMemory, Path: env.Bdg.Path, Sfk: &s.Sfk, KeySize: env.Bdg.KeySize, ValueSize: env.Bdg.ValueSize}
+	err = ds.Open()
+	if err != nil {
+		return err
+	}
 	s.Ds = &ds
 	s.Started = true
 	fmt.Printf("Presence service started\n")
@@ -63,6 +67,7 @@ func (s *Service) Start(env conf.Env) error {
 }
 func (s *Service) Shutdown() {
 	s.Sql.Close()
+	s.Ds.Close()
 	fmt.Printf("Presence service shut down\n")
 }
 
