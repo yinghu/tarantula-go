@@ -43,6 +43,10 @@ func (s *PersistentableObj) Revision() int64 {
 	return s.Rev
 }
 
+type DataStoreFactory interface {
+	Create(name string) (DataStore, error)
+}
+
 type DataStore interface {
 	Load(p Persistentable) error
 	Save(p Persistentable) error

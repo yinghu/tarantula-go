@@ -19,7 +19,7 @@ type Service struct {
 	Cluster *cluster.Etc
 	Sql     persistence.Postgresql
 	Sfk     util.Snowflake
-	Tkn     util.Jwt
+	Tkn     util.JwtHMac
 	Ciph    util.Cipher
 	Ds      core.DataStore
 	Started bool
@@ -40,7 +40,7 @@ func (s *Service) OnEvent(e event.Event) {
 
 func (s *Service) Start(env conf.Env) error {
 	s.Sfk = util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
-	s.Tkn = util.Jwt{Alg: "SHS256"}
+	s.Tkn = util.JwtHMac{Alg: "SHS256"}
 	s.Tkn.HMac()
 	ci := util.Cipher{Ksz: 32}
 	err := ci.AesGcm()
@@ -97,7 +97,7 @@ func (s *Service) Register(login *Login) {
 }
 
 func (s *Service) VerifyToken(token string, listener chan event.Chunk) {
-	err := s.Tkn.Verify(token, func(h *util.JwtHeader, p *util.JwtPayload) error {
+	err := s.Tkn.Verify(token, func(h *core.JwtHeader, p *core.JwtPayload) error {
 		t := time.UnixMilli(p.Exp).UTC()
 		if t.Before(time.Now().UTC()) {
 			return errors.New("token expired")
@@ -123,7 +123,7 @@ func (s *Service) Login(login *Login) {
 		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(er.Error(), WRONG_PASS_CODE)}
 		return
 	}
-	tk, trr := s.Tkn.Token(func(h *util.JwtHeader, p *util.JwtPayload) error {
+	tk, trr := s.Tkn.Token(func(h *core.JwtHeader, p *core.JwtPayload) error {
 		h.Kid = "kid"
 		p.Aud = "player"
 		exp := time.Now().Add(time.Hour * 24).UTC()

@@ -9,44 +9,32 @@ import (
 	"errors"
 	"hash"
 	"strings"
+
+	"gameclustering.com/internal/core"
 )
 
-type JwtHeader struct {
-	Alg string `json:"alg"`
-	Typ string `json:"typ"`
-	Kid string `json:"kid"`
-}
-
-type JwtPayload struct {
-	Aud string `json:"aud"`
-	Exp int64 `json:"exp"`
-}
-
-type Jwt struct {
+type JwtHMac struct {
 	Mac hash.Hash
 	Alg string
 	Ksz int16
 }
 
-type JwtProcess func(*JwtHeader, *JwtPayload) error
-
-func (j *Jwt) HMac() {
-	key := make([]byte,j.Ksz)
+func (j *JwtHMac) HMac() {
+	key := make([]byte, j.Ksz)
 	rand.Read(key)
 	j.Mac = hmac.New(sha256.New, key)
 }
-func (j *Jwt) HMacFromKey(key []byte) {
-	
-	
+func (j *JwtHMac) HMacFromKey(key []byte) {
+
 	j.Mac = hmac.New(sha256.New, key)
 }
 
-func (j *Jwt) Token(jp JwtProcess) (string, error) {
-	h := JwtHeader{Alg: j.Alg, Typ: "JWT"}
-	p := JwtPayload{}
+func (j *JwtHMac) Token(jp core.JwtProcess) (string, error) {
+	h := core.JwtHeader{Alg: j.Alg, Typ: "JWT"}
+	p := core.JwtPayload{}
 	err := jp(&h, &p)
-	if err !=nil {
-		return "",err
+	if err != nil {
+		return "", err
 	}
 	var sb strings.Builder
 	hd, _ := json.Marshal(h)
@@ -62,7 +50,7 @@ func (j *Jwt) Token(jp JwtProcess) (string, error) {
 	return sb.String(), nil
 }
 
-func (j *Jwt) Verify(token string, jp JwtProcess) error {
+func (j *JwtHMac) Verify(token string, jp core.JwtProcess) error {
 	parts := strings.Split(token, ".")
 	var sb strings.Builder
 	sb.WriteString(parts[0])
@@ -78,12 +66,12 @@ func (j *Jwt) Verify(token string, jp JwtProcess) error {
 	h, _ := base64.URLEncoding.DecodeString(parts[0])
 	p, _ := base64.URLEncoding.DecodeString(parts[1])
 
-	th := JwtHeader{}
+	th := core.JwtHeader{}
 	json.Unmarshal(h, &th)
-	tp := JwtPayload{}
+	tp := core.JwtPayload{}
 	json.Unmarshal(p, &tp)
 	err := jp(&th, &tp)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	return nil
