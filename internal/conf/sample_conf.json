@@ -5,6 +5,7 @@
 	"NodeId"     :   1,
 	"HttpEndpoint":  "192.168.1.4:8080",
 	"TcpEndpoint"  : "tcp://192.168.1.4:5000",
+	"TcpReadBufferSize": 1024,
 	"EtcdEndpoints": ["192.168.1.7:2379"],
 	"Sql":{
 		"DatabaseURL"  : "postgres://postgres:password@192.168.1.7:5432/tarantula_presence"	
