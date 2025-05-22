@@ -281,7 +281,7 @@ func (s *SocketBuffer) ReadComplex128() (complex128, error) {
 	if err != nil {
 		return 0, err
 	}
-	if n != 8 {
+	if n != 16 {
 		return 0, errors.New("less than 16 bytes")
 	}
 	buf := bytes.NewBuffer(s.Buffer[:16])

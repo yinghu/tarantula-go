@@ -41,6 +41,15 @@ func (s *sample) WriteKey(value core.DataBuffer) error {
 	return nil
 }
 
+func (s *sample) ReadKey(value core.DataBuffer) error {
+	id, err := value.ReadInt64()
+	if err != nil {
+		return err
+	}
+	s.Id = id
+	return nil
+}
+
 func (s *sample) Read(value core.DataBuffer) error {
 	i64, err := value.ReadInt64()
 	if err != nil {
