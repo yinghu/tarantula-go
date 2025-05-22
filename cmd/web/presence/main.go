@@ -23,7 +23,7 @@ func debugging(s *Service) http.HandlerFunc {
 		action := r.Header.Get("Tarantula-action")
 		defer func() {
 			dur := time.Since(start)
-			ms := metrics.Metrics{Path: r.URL.Path + "/" + action, ReqTimed: dur.Milliseconds(), Node: s.Cluster.Local.Name}
+			ms := metrics.ReqMetrics{Path: r.URL.Path + "/" + action, ReqTimed: dur.Milliseconds(), Node: s.Cluster.Local.Name}
 			s.SaveMetrics(&ms)
 		}()
 		s.ServeHTTP(w, r)

@@ -1,6 +1,6 @@
 package metrics
 
-type Metrics struct {
+type ReqMetrics struct {
 	Path     string
 	ReqTimed int64
 	Node     string

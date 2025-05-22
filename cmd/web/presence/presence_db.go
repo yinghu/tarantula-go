@@ -39,7 +39,7 @@ func (s *Service) LoadLogin(login *Login) error {
 	return nil
 }
 
-func (s *Service) SaveMetrics(metrics *metrics.Metrics) error {
+func (s *Service) SaveMetrics(metrics *metrics.ReqMetrics) error {
 	inserted, err := s.Sql.Exec("INSERT INTO metrics (path,req_timed,node) VALUES($1,$2,$3)", metrics.Path, metrics.ReqTimed, metrics.Node)
 	if err != nil {
 		return err
