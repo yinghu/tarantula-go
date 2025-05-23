@@ -85,7 +85,7 @@ func (s *Service) Publish(e event.Event) error {
 func (s *Service) Register(login *Login) {
 	id, _ := s.Sfk.Id()
 	login.SystemId = id
-	hash, _ := util.Hash(login.Hash)
+	hash, _ := util.HashPassword(login.Hash)
 	login.Hash = hash
 	err := s.SaveLogin(login)
 	if err != nil {
@@ -118,20 +118,20 @@ func (s *Service) Login(login *Login) {
 		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), DB_OP_ERR_CODE)}
 		return
 	}
-	er := util.Match(pwd, login.Hash)
-	if er != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(er.Error(), WRONG_PASS_CODE)}
+	err = util.ValidatePassword(pwd, login.Hash)
+	if err != nil {
+		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), WRONG_PASS_CODE)}
 		return
 	}
-	tk, trr := s.Tkn.Token(func(h *core.JwtHeader, p *core.JwtPayload) error {
+	tk, err := s.Tkn.Token(func(h *core.JwtHeader, p *core.JwtPayload) error {
 		h.Kid = "kid"
 		p.Aud = "player"
 		exp := time.Now().Add(time.Hour * 24).UTC()
 		p.Exp = exp.UnixMilli()
 		return nil
 	})
-	if trr != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(trr.Error(), INVALID_TOKEN_CODE)}
+	if err != nil {
+		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), INVALID_TOKEN_CODE)}
 		return
 	}
 	session := OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk, Home: s.Cluster.Local.HttpEndpoint}

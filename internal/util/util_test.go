@@ -5,11 +5,11 @@ import (
 )
 
 func TestPassword(t *testing.T) {
-	h, err := Hash("password")
+	h, err := HashPassword("password")
 	if err != nil {
 		t.Errorf("failed %s\n", err.Error())
 	}
-	er := Match("password", h)
+	er := ValidatePassword("password", h)
 	if er != nil {
 		t.Errorf("failed %s\n", er.Error())
 	}
