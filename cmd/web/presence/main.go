@@ -36,7 +36,7 @@ func bootstrap(f conf.Env, c *cluster.Etc) {
 	if err != nil {
 		panic(err)
 	}
-	http.Handle("/auth", http.HandlerFunc(debugging(&service)))
+	http.Handle("/presence", http.HandlerFunc(debugging(&service)))
 	log.Fatal(http.ListenAndServe(f.HttpEndpoint, nil))
 }
 
