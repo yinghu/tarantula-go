@@ -15,7 +15,7 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-type Service struct {
+type PresenceService struct {
 	Cluster *cluster.Etc
 	Sql     persistence.Postgresql
 	Sfk     util.Snowflake
@@ -25,20 +25,20 @@ type Service struct {
 	Started bool
 }
 
-func (s *Service) Create(classId int) event.Event {
+func (s *PresenceService) Create(classId int) event.Event {
 	login := Login{}
 	login.Cb = s
 	return &login
 }
 
-func (s *Service) OnEvent(e event.Event) {
+func (s *PresenceService) OnEvent(e event.Event) {
 	err := s.Ds.Save(e)
 	if err != nil {
 		fmt.Printf("No save %s\n", err.Error())
 	}
 }
 
-func (s *Service) Start(env conf.Env) error {
+func (s *PresenceService) Start(env conf.Env) error {
 	s.Sfk = util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.Tkn = util.JwtHMac{Alg: "SHS256"}
 	s.Tkn.HMac()
@@ -64,13 +64,13 @@ func (s *Service) Start(env conf.Env) error {
 	fmt.Printf("Presence service started\n")
 	return nil
 }
-func (s *Service) Shutdown() {
+func (s *PresenceService) Shutdown() {
 	s.Sql.Close()
 	s.Ds.Close()
 	fmt.Printf("Presence service shut down\n")
 }
 
-func (s *Service) Publish(e event.Event) error {
+func (s *PresenceService) Publish(e event.Event) error {
 	for v := range s.Cluster.View() {
 		if v.Name != s.Cluster.Local.Name {
 			go func() {
@@ -82,7 +82,7 @@ func (s *Service) Publish(e event.Event) error {
 	return nil
 }
 
-func (s *Service) Register(login *Login) {
+func (s *PresenceService) Register(login *Login) {
 	id, _ := s.Sfk.Id()
 	login.SystemId = id
 	hash, _ := util.HashPassword(login.Hash)
@@ -96,7 +96,7 @@ func (s *Service) Register(login *Login) {
 	s.Publish(login)
 }
 
-func (s *Service) VerifyToken(token string, listener chan event.Chunk) {
+func (s *PresenceService) VerifyToken(token string, listener chan event.Chunk) {
 	err := s.Tkn.Verify(token, func(h *core.JwtHeader, p *core.JwtPayload) error {
 		t := time.UnixMilli(p.Exp).UTC()
 		if t.Before(time.Now().UTC()) {
@@ -111,7 +111,7 @@ func (s *Service) VerifyToken(token string, listener chan event.Chunk) {
 	listener <- event.Chunk{Remaining: false, Data: successMessage("passed")}
 }
 
-func (s *Service) Login(login *Login) {
+func (s *PresenceService) Login(login *Login) {
 	pwd := login.Hash
 	err := s.LoadLogin(login)
 	if err != nil {
@@ -142,7 +142,7 @@ func notsupport(listener chan event.Chunk) {
 	listener <- event.Chunk{Remaining: false, Data: []byte("not supported")}
 }
 
-func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *PresenceService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	action := r.Header.Get("Tarantula-action")
 	token := r.Header.Get("Tarantula-token")
 	listener := make(chan event.Chunk)

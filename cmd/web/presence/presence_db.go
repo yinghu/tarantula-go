@@ -7,7 +7,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (s *Service) SaveLogin(login *Login) error {
+func (s *PresenceService) SaveLogin(login *Login) error {
 	inserted, err := s.Sql.Exec("INSERT INTO login (name,hash,system_id,reference_id) VALUES($1,$2,$3,$4)", login.Name, login.Hash, login.SystemId, login.ReferenceId)
 	if err != nil {
 		return err
@@ -18,7 +18,7 @@ func (s *Service) SaveLogin(login *Login) error {
 	return nil
 }
 
-func (s *Service) LoadLogin(login *Login) error {
+func (s *PresenceService) LoadLogin(login *Login) error {
 	err := s.Sql.Query(func(rows pgx.Rows) error {
 		var hash string
 		var systemId int64
@@ -39,7 +39,7 @@ func (s *Service) LoadLogin(login *Login) error {
 	return nil
 }
 
-func (s *Service) SaveMetrics(metrics *metrics.ReqMetrics) error {
+func (s *PresenceService) SaveMetrics(metrics *metrics.ReqMetrics) error {
 	inserted, err := s.Sql.Exec("INSERT INTO metrics (path,req_timed,node) VALUES($1,$2,$3)", metrics.Path, metrics.ReqTimed, metrics.Node)
 	if err != nil {
 		return err

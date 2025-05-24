@@ -15,9 +15,9 @@ import (
 	"gameclustering.com/internal/metrics"
 )
 
-var service Service
+var service PresenceService
 
-func debugging(s *Service) http.HandlerFunc {
+func logging(s *PresenceService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		action := r.Header.Get("Tarantula-action")
@@ -31,12 +31,12 @@ func debugging(s *Service) http.HandlerFunc {
 }
 
 func bootstrap(f conf.Env, c *cluster.Etc) {
-	service = Service{Cluster: c}
+	service = PresenceService{Cluster: c}
 	err := service.Start(f)
 	if err != nil {
 		panic(err)
 	}
-	http.Handle("/presence", http.HandlerFunc(debugging(&service)))
+	http.Handle("/presence", http.HandlerFunc(logging(&service)))
 	log.Fatal(http.ListenAndServe(f.HttpEndpoint, nil))
 }
 

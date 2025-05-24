@@ -10,7 +10,7 @@ import (
 )
 
 func TestAuth(t *testing.T) {
-	service := Service{}
+	service := PresenceService{}
 	f := conf.Env{}
 	f.Load("/etc/tarantula/presence-conf.json")
 	err := service.Start(f)
