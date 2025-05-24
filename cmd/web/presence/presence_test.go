@@ -13,7 +13,7 @@ func TestAuth(t *testing.T) {
 	service := PresenceService{}
 	f := conf.Env{}
 	f.Load("/etc/tarantula/presence-conf.json")
-	err := service.Start(f)
+	err := service.Start(f, nil)
 	if err != nil {
 		t.Errorf("Service error %s", err.Error())
 	}

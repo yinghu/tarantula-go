@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/metrics"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
 )
@@ -38,7 +40,12 @@ func (s *PresenceService) OnEvent(e event.Event) {
 	}
 }
 
-func (s *PresenceService) Start(env conf.Env) error {
+func (s *PresenceService) Config() string {
+	return "/etc/tarantula/presence-conf.json"
+}
+
+func (s *PresenceService) Start(env conf.Env, c *cluster.Etc) error {
+	s.Cluster = c
 	s.Sfk = util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.Tkn = util.JwtHMac{Alg: "SHS256"}
 	s.Tkn.HMac()
@@ -62,6 +69,8 @@ func (s *PresenceService) Start(env conf.Env) error {
 	s.Ds = &ds
 	s.Started = true
 	fmt.Printf("Presence service started\n")
+	http.Handle("/presence", http.HandlerFunc(logging(s)))
+	log.Fatal(http.ListenAndServe(env.HttpEndpoint, nil))
 	return nil
 }
 func (s *PresenceService) Shutdown() {
@@ -175,5 +184,18 @@ func (s *PresenceService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if !c.Remaining {
 			break
 		}
+	}
+}
+
+func logging(s *PresenceService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		action := r.Header.Get("Tarantula-action")
+		defer func() {
+			dur := time.Since(start)
+			ms := metrics.ReqMetrics{Path: r.URL.Path + "/" + action, ReqTimed: dur.Milliseconds(), Node: s.Cluster.Local.Name}
+			s.SaveMetrics(&ms)
+		}()
+		s.ServeHTTP(w, r)
 	}
 }

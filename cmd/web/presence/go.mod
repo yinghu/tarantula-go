@@ -16,9 +16,13 @@ replace gameclustering.com/internal/core => ../../../internal/core
 
 replace gameclustering.com/internal/metrics => ../../../internal/metrics
 
+replace gameclustering.com/internal/bootstrap => ../../../internal/bootstrap
+
 require (
+	gameclustering.com/internal/bootstrap v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/cluster v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/conf v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000
@@ -27,7 +31,6 @@ require (
 )
 
 require (
-	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
