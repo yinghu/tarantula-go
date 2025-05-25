@@ -83,7 +83,19 @@ func (s *PresenceService) Shutdown() {
 }
 
 func (s *PresenceService) Publish(e event.Event) error {
-	s.Ds.Save(e)
+	err := s.Ds.Save(e)
+	if err != nil {
+		fmt.Printf("Cache Error %s\n", err.Error())
+	}
+	v, ok := e.(*event.Login)
+	if ok {
+		fmt.Printf("LOGIN %s\n", v.Name)
+	}
+	load := event.Login{Name: v.Name}
+	err = s.Ds.Load(&load)
+	if err == nil {
+		fmt.Printf("LOADED %d\n", load.SystemId)
+	}
 	for v := range s.Cluster.View() {
 		if v.Name != s.Cluster.Local().Name {
 			go func() {
