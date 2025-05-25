@@ -21,9 +21,9 @@ func AppBootstrap(service TarantulaService) {
 		for v := range c.View() {
 			fmt.Printf("View :%v\n", v)
 		}
-		err := service.Start(f,&c)
-		if err!=nil{
-			fmt.Printf("Error %s\n",err.Error())
+		err := service.Start(f, &c)
+		if err != nil {
+			fmt.Printf("Error %s\n", err.Error())
 		}
 	}()
 	go func() {
@@ -36,10 +36,10 @@ func AppBootstrap(service TarantulaService) {
 		sigs := make(chan os.Signal, 1)
 		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 		<-sigs
-		signal.Stop(sigs)
-		c.Quit <- true
 		service.Shutdown()
+		c.Quit <- true
 		e.Close()
+		signal.Stop(sigs)
 		close(sigs)
 	}()
 	c.Join()

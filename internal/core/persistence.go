@@ -50,5 +50,5 @@ type DataStoreFactory interface {
 type DataStore interface {
 	Load(p Persistentable) error
 	Save(p Persistentable) error
-	Close()
+	Close() error
 }

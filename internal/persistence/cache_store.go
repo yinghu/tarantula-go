@@ -120,6 +120,8 @@ func (s *Cache) Open() error {
 	return nil
 }
 
-func (s *Cache) Close() {
-	s.Db.Close()
+func (s *Cache) Close() error {
+	s.Db.Sync()
+	return s.Db.Close()
+
 }

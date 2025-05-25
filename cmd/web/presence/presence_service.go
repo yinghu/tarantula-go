@@ -75,11 +75,15 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 }
 func (s *PresenceService) Shutdown() {
 	s.Sql.Close()
-	s.Ds.Close()
+	err := s.Ds.Close()
+	if err != nil {
+		fmt.Printf("Error %s\n", err.Error())
+	}
 	fmt.Printf("Presence service shut down\n")
 }
 
 func (s *PresenceService) Publish(e event.Event) error {
+	s.Ds.Save(e)
 	for v := range s.Cluster.View() {
 		if v.Name != s.Cluster.Local().Name {
 			go func() {
