@@ -19,7 +19,7 @@ import (
 
 type PresenceService struct {
 	Cluster cluster.Cluster
-	Sql     persistence.Postgresql
+	sql     persistence.Postgresql
 	Sfk     util.Snowflake
 	Tkn     util.JwtHMac
 	Ciph    util.Cipher
@@ -60,7 +60,7 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	if err != nil {
 		return err
 	}
-	s.Sql = sql
+	s.sql = sql
 	ds := persistence.Cache{InMemory: env.Bdg.InMemory, Path: env.Bdg.Path, Sfk: &s.Sfk, KeySize: env.Bdg.KeySize, ValueSize: env.Bdg.ValueSize}
 	err = ds.Open()
 	if err != nil {
@@ -74,7 +74,7 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	return nil
 }
 func (s *PresenceService) Shutdown() {
-	s.Sql.Close()
+	s.sql.Close()
 	err := s.Ds.Close()
 	if err != nil {
 		fmt.Printf("Error %s\n", err.Error())

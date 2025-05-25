@@ -61,7 +61,7 @@ func (c *Etc) Join() error {
 		defer tik.Stop()
 		for r := range 7 {
 			w := <-tik.C
-			fmt.Printf("Waiting for member joining : %v\n", w)
+			fmt.Printf("Waiting for member joining [%s]: %v\n", c.Group, w)
 			if r == 0 {
 				cli.Put(context.Background(), c.Group+"#join", string(nd))
 			} else {
@@ -148,7 +148,7 @@ func (c *Etc) Join() error {
 			}
 		}
 	}
-	fmt.Printf("Cluster shut down\n")
+	fmt.Printf("Cluster shut down [%s]\n", c.Group)
 	return nil
 }
 func (c *Etc) Local() Node {
