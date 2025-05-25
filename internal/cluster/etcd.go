@@ -29,14 +29,14 @@ type Etc struct {
 	Group           string
 	partitionNumber int
 	EtcdEndpoints   []string
-	Local           Node
+	local           Node
 	lock            *sync.Mutex
 	cluster         map[string]Node
 	partition       []string
 }
 
 func NewEtc(group string, pNumber int, etcEndpoints []string, local Node) Etc {
-	etc := Etc{Group: group, partitionNumber: pNumber, EtcdEndpoints: etcEndpoints, Local: local}
+	etc := Etc{Group: group, partitionNumber: pNumber, EtcdEndpoints: etcEndpoints, local: local}
 	etc.lock = &sync.Mutex{}
 	etc.cluster = make(map[string]Node)
 	etc.partition = make([]string, pNumber)
@@ -55,7 +55,7 @@ func (c *Etc) Join() error {
 		return err
 	}
 	defer cli.Close()
-	nd, _ := json.Marshal(c.Local)
+	nd, _ := json.Marshal(c.local)
 	go func() {
 		tik := time.NewTicker(1 * time.Second)
 		defer tik.Stop()
@@ -80,13 +80,13 @@ func (c *Etc) Join() error {
 				cli.Close()
 				return
 			case p := <-tik.C:
-				cli.Put(context.Background(), c.Group+"#ping", c.Local.Name)
+				cli.Put(context.Background(), c.Group+"#ping", c.local.Name)
 				pct--
 				if pct == 0 {
 					pct = 5
 					c.lock.Lock()
 					for n := range c.cluster {
-						if n != c.Local.Name {
+						if n != c.local.Name {
 							cn := c.cluster[n]
 							if *cn.timeoutCount == 3 {
 								fmt.Printf("Node timeout %d %d %s %v\n", *cn.pingCount, *cn.timeoutCount, cn.Name, p)
@@ -114,7 +114,7 @@ func (c *Etc) Join() error {
 			switch cmds[1] {
 			case "ping":
 				rnm := string(ev.Kv.Value)
-				if rnm != c.Local.Name {
+				if rnm != c.local.Name {
 					c.lock.Lock()
 					v, exist := c.cluster[rnm]
 					if exist {
@@ -151,7 +151,9 @@ func (c *Etc) Join() error {
 	fmt.Printf("Cluster shut down\n")
 	return nil
 }
-
+func (c *Etc) Local() Node {
+	return c.local
+}
 func (c *Etc) View() iter.Seq[Node] {
 	c.lock.Lock()
 	defer c.lock.Unlock()

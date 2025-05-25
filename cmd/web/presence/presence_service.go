@@ -18,7 +18,7 @@ import (
 )
 
 type PresenceService struct {
-	Cluster *cluster.Etc
+	Cluster cluster.Cluster
 	Sql     persistence.Postgresql
 	Sfk     util.Snowflake
 	Tkn     util.JwtHMac
@@ -44,7 +44,7 @@ func (s *PresenceService) Config() string {
 	return "/etc/tarantula/presence-conf.json"
 }
 
-func (s *PresenceService) Start(env conf.Env, c *cluster.Etc) error {
+func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	s.Cluster = c
 	s.Sfk = util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.Tkn = util.JwtHMac{Alg: "SHS256"}
@@ -81,7 +81,7 @@ func (s *PresenceService) Shutdown() {
 
 func (s *PresenceService) Publish(e event.Event) error {
 	for v := range s.Cluster.View() {
-		if v.Name != s.Cluster.Local.Name {
+		if v.Name != s.Cluster.Local().Name {
 			go func() {
 				pub := event.SocketPublisher{Remote: v.TcpEndpoint, BufferSize: 1024}
 				pub.Publish(e)
@@ -143,7 +143,7 @@ func (s *PresenceService) Login(login *Login) {
 		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), INVALID_TOKEN_CODE)}
 		return
 	}
-	session := OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk, Home: s.Cluster.Local.HttpEndpoint}
+	session := OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk, Home: s.Cluster.Local().HttpEndpoint}
 	login.Cc <- event.Chunk{Remaining: false, Data: util.ToJson(session)}
 }
 
@@ -193,7 +193,7 @@ func logging(s *PresenceService) http.HandlerFunc {
 		action := r.Header.Get("Tarantula-action")
 		defer func() {
 			dur := time.Since(start)
-			ms := metrics.ReqMetrics{Path: r.URL.Path + "/" + action, ReqTimed: dur.Milliseconds(), Node: s.Cluster.Local.Name}
+			ms := metrics.ReqMetrics{Path: r.URL.Path + "/" + action, ReqTimed: dur.Milliseconds(), Node: s.Cluster.Local().Name}
 			s.SaveMetrics(&ms)
 		}()
 		s.ServeHTTP(w, r)

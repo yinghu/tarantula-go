@@ -8,7 +8,7 @@ import (
 
 type TarantulaService interface {
 	Config() string
-	Start(f conf.Env, c *cluster.Etc) error
+	Start(f conf.Env, c cluster.Cluster) error
 	Shutdown()
 	event.EventService
 }

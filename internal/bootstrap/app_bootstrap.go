@@ -21,7 +21,7 @@ func AppBootstrap(service TarantulaService) {
 		for v := range c.View() {
 			fmt.Printf("View :%v\n", v)
 		}
-		err := service.Start(f, &c)
+		err := service.Start(f,&c)
 		if err!=nil{
 			fmt.Printf("Error %s\n",err.Error())
 		}
