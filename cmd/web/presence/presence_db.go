@@ -3,11 +3,12 @@ package main
 import (
 	"errors"
 
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/metrics"
 	"github.com/jackc/pgx/v5"
 )
 
-func (s *PresenceService) SaveLogin(login *Login) error {
+func (s *PresenceService) SaveLogin(login *event.Login) error {
 	inserted, err := s.Sql.Exec("INSERT INTO login (name,hash,system_id,reference_id) VALUES($1,$2,$3,$4)", login.Name, login.Hash, login.SystemId, login.ReferenceId)
 	if err != nil {
 		return err
@@ -18,7 +19,7 @@ func (s *PresenceService) SaveLogin(login *Login) error {
 	return nil
 }
 
-func (s *PresenceService) LoadLogin(login *Login) error {
+func (s *PresenceService) LoadLogin(login *event.Login) error {
 	err := s.Sql.Query(func(rows pgx.Rows) error {
 		var hash string
 		var systemId int64

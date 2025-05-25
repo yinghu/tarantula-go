@@ -1,5 +1,11 @@
 package main
 
+import (
+	"gameclustering.com/internal/bootstrap"
+)
+
 func main() {
-	Start()
+
+	bootstrap.AppBootstrap(&AdminService{})
+
 }

@@ -28,7 +28,7 @@ type PresenceService struct {
 }
 
 func (s *PresenceService) Create(classId int) event.Event {
-	login := Login{}
+	login := event.Login{}
 	login.Cb = s
 	return &login
 }
@@ -95,7 +95,7 @@ func (s *PresenceService) Publish(e event.Event) error {
 	return nil
 }
 
-func (s *PresenceService) Register(login *Login) {
+func (s *PresenceService) Register(login *event.Login) {
 	id, _ := s.Sfk.Id()
 	login.SystemId = id
 	hash, _ := util.HashPassword(login.Hash)
@@ -124,7 +124,7 @@ func (s *PresenceService) VerifyToken(token string, listener chan event.Chunk) {
 	listener <- event.Chunk{Remaining: false, Data: successMessage("passed")}
 }
 
-func (s *PresenceService) Login(login *Login) {
+func (s *PresenceService) Login(login *event.Login) {
 	pwd := login.Hash
 	err := s.LoadLogin(login)
 	if err != nil {
@@ -166,13 +166,13 @@ func (s *PresenceService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	switch action {
 	case "onRegister":
-		var login Login
+		var login event.Login
 		json.NewDecoder(r.Body).Decode(&login)
 		login.EventObj.Cc = listener
 		go s.Register(&login)
 
 	case "onLogin":
-		var login Login
+		var login event.Login
 		login.EventObj.Cc = listener
 		json.NewDecoder(r.Body).Decode(&login)
 		go s.Login(&login)

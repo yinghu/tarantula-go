@@ -1,10 +1,9 @@
-package main
+package event
 
 import (
 	"fmt"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 )
 
 type Login struct {
@@ -13,7 +12,7 @@ type Login struct {
 	ReferenceId int32  `json:"referenceId"`
 	SystemId    int64
 
-	event.EventObj //Event default
+	EventObj //Event default
 }
 
 func (s *Login) ClassId() int {
@@ -66,20 +65,20 @@ func (s *Login) Inbound(buff core.DataBuffer) {
 	for {
 		sz, err := buff.ReadInt32()
 		if err != nil {
-			s.streaming(event.Chunk{Remaining: true, Data: []byte{0}})
+			s.streaming(Chunk{Remaining: true, Data: []byte{0}})
 			break
 		}
 		if sz == 0 {
-			s.streaming(event.Chunk{Remaining: true, Data: []byte{0}})
+			s.streaming(Chunk{Remaining: true, Data: []byte{0}})
 			break
 		}
 	
 		pd, err := buff.Read(int(sz))
 		if err != nil {
-			s.streaming(event.Chunk{Remaining: true, Data: []byte{0}})
+			s.streaming(Chunk{Remaining: true, Data: []byte{0}})
 			break
 		}
-		s.streaming(event.Chunk{Remaining: true, Data: pd})
+		s.streaming(Chunk{Remaining: true, Data: pd})
 	}
 	buff.WriteInt32(100)
 	buff.WriteString("bye")
@@ -100,7 +99,7 @@ func (s *Login) Outbound(buff core.DataBuffer) {
 }
 
 
-func (s *Login) streaming(c event.Chunk) {
+func (s *Login) streaming(c Chunk) {
 }
 
 func (s *Login) OnError(err error) {
