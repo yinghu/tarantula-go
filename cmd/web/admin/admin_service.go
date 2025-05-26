@@ -16,7 +16,7 @@ import (
 	//"gameclustering.com/internal/event"
 	//"gameclustering.com/internal/metrics"
 	"gameclustering.com/internal/persistence"
-	//"gameclustering.com/internal/util"
+	"gameclustering.com/internal/util"
 )
 
 type AdminService struct {
@@ -36,7 +36,14 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 		return err
 	}
 	s.sql = sql
-	//http.Handle("/admin", http.HandlerFunc(logging(s)))
+	hash, err := util.HashPassword("password")
+	if err != nil {
+		return err
+	}
+	err = s.SaveLogin(&event.Login{Name: "root", Hash: hash})
+	if err != nil {
+		fmt.Printf("Root already existed %s\n", err.Error())
+	}
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
 		if path == "/" || path == "/index.html" {

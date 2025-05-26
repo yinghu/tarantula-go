@@ -18,18 +18,28 @@
     <script src="tarantula.admin.js"></script>
     <title>iCodeSoftware</title>
 </head>
-<body>
-<h1 class="tx-roboto">Tarantula Go Admin H1</h1>
-<h1>Tarantula Go Admin H1</h1>
-<h2 class="tx-oswald">Tarantula Go Admin H2</h2>
-<h3 class="tx-sofia">Tarantula Go Admin H3</h3>
-<h3>Tarantula Go Admin H3</h3>
-<p class="w3-xxxlarge tx-oswald">Tarantula Go Admin</p>
-<span>LOGIN<i class="material-symbols-outlined">login</i></span>
-<span>LOGOUT<i class="material-symbols-outlined">logout</i></span>
-<span>DELETE<i class="material-symbols-outlined">delete</i></span>
+<body onload="_ready()">
+    <div>
+        <div class="w3-display-container w3-green tx-content-120">
+            <div class="w3-display-topright w3-padding">
+                <span id="tx-menu-open"><i class="material-symbols-outlined tx-white-icon-24">login</i></span>
+                <!-- TO DO popup menu 100% width-->            
+            </div>
+            <div class="w3-display-topleft w3-padding">
+                <span><i class="material-symbols-outlined tx-orange-icon-32">stacks</i></span>
+                <span class="tx-margin-left-8 tx-text-32">Tarantula Go</span>
+            </div>
+            <!--
+            <div class="w3-display-bottomright w3-padding"><span id='tx-sign-up' class='w3-tag w3-green w3-round w3-border w3-border-white tx-text-12 tx-padding-button'>SIGN UP</span></div>
+            -->
+        </div>
+    </div>
+    <div id="tx-dashboard" class="tx-modal w3-animate-zoom"></div>
 <script>
-    console.log(Admin.hello());    
+    function _ready(){
+        console.log(Admin.hello());
+        console.log(Admin.login())
+    }    
 </script>
 </body>
 </html>
