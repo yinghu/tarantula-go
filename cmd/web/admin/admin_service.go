@@ -46,18 +46,23 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 				return
 			}
 			defer f.Close()
+			w.Header().Set("Content-Type", "text/html")
+			w.WriteHeader(http.StatusOK)
 			io.Copy(w, f)
 			return
 		}
 		ext := filepath.Ext(path)
 		fmt.Printf("Ext %s , %s\n", ext, "web"+path)
 		if ext == ".css" {
+
 			f, err := os.Open("web" + path)
 			if err != nil {
 				w.Write([]byte("no page"))
 				return
 			}
 			defer f.Close()
+			w.Header().Set("Content-Type", "text/css")
+			w.WriteHeader(http.StatusOK)
 			io.Copy(w, f)
 			return
 		}
@@ -68,6 +73,8 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 				return
 			}
 			defer f.Close()
+			w.Header().Set("Content-Type", "text/javascript")
+			w.WriteHeader(http.StatusOK)
 			io.Copy(w, f)
 			return
 		}
@@ -78,6 +85,8 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 				return
 			}
 			defer f.Close()
+			w.Header().Set("Content-Type", "text/css")
+			w.WriteHeader(http.StatusOK)
 			io.Copy(w, f)
 			return
 		}
