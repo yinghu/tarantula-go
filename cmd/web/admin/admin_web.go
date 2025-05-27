@@ -9,6 +9,7 @@ import (
 )
 
 func handleWeb(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	path := r.URL.Path
 	if path == "/" || path == "/index.html" {
 		f, err := os.Open("web/index.html")
