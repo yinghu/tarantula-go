@@ -113,9 +113,6 @@ func (s *sampleEvent) Read(value core.DataBuffer) error {
 	return nil
 }
 
-func (s *sampleEvent) OnTopic() bool {
-	return s.Topic
-}
 
 func (s *sampleEvent) streaming(c Chunk) {
 	fmt.Printf("REV : %s\n", string(c.Data))

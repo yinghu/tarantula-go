@@ -19,7 +19,6 @@ type EventService interface {
 }
 
 type Event interface {
-	OnTopic() bool
 	Inbound(buff core.DataBuffer)
 	Outbound(buff core.DataBuffer)
 	OnError(err error)
@@ -32,15 +31,11 @@ type EventPublisher interface {
 }
 
 type EventObj struct {
-	Topic bool
 	Cc    chan Chunk
 	Cb    EventListener
 	core.PersistentableObj
 }
 
-func (s *EventObj) OnTopic() bool {
-	return s.Topic
-}
 
 func (s *EventObj) Inbound(buff core.DataBuffer) {
 

@@ -20,10 +20,6 @@ func TestAuth(t *testing.T) {
 	defer service.Shutdown()
 	login := event.Login{Name: "foo1003", Hash: "ppp", SystemId: 10, ReferenceId: 1}
 	login.Cc = make(chan event.Chunk)
-	login.Topic = false
-	if login.OnTopic() {
-		t.Errorf("login topic error %v", login.OnTopic())
-	}
 	go service.Register(&login)
 	for c := range login.Cc {
 		if !c.Remaining {

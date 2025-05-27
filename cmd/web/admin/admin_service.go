@@ -62,3 +62,23 @@ func (s *AdminService) Create(classId int) event.Event {
 func (s *AdminService) OnEvent(e event.Event) {
 
 }
+
+
+
+func (s *AdminService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	//action := r.Header.Get("Tarantula-action")
+	//token := r.Header.Get("Tarantula-token")
+	listener := make(chan event.Chunk)
+	defer func() {
+		close(listener)
+		r.Body.Close()
+	}()
+	w.WriteHeader(http.StatusOK)
+	
+	for c := range listener {
+		w.Write(c.Data)
+		if !c.Remaining {
+			break
+		}
+	}
+}
