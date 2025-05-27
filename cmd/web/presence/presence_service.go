@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -107,61 +106,6 @@ func (s *PresenceService) Publish(e event.Event) error {
 	return nil
 }
 
-func (s *PresenceService) Register(login *event.Login) {
-	id, _ := s.Sfk.Id()
-	login.SystemId = id
-	hash, _ := util.HashPassword(login.Hash)
-	login.Hash = hash
-	err := s.SaveLogin(login)
-	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), DB_OP_ERR_CODE)}
-		return
-	}
-	login.Cc <- event.Chunk{Remaining: false, Data: successMessage("registered")}
-	s.Publish(login)
-}
-
-func (s *PresenceService) VerifyToken(token string, listener chan event.Chunk) {
-	err := s.Tkn.Verify(token, func(h *core.JwtHeader, p *core.JwtPayload) error {
-		t := time.UnixMilli(p.Exp).UTC()
-		if t.Before(time.Now().UTC()) {
-			return errors.New("token expired")
-		}
-		return nil
-	})
-	if err != nil {
-		listener <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), INVALID_TOKEN_CODE)}
-		return
-	}
-	listener <- event.Chunk{Remaining: false, Data: successMessage("passed")}
-}
-
-func (s *PresenceService) Login(login *event.Login) {
-	pwd := login.Hash
-	err := s.LoadLogin(login)
-	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), DB_OP_ERR_CODE)}
-		return
-	}
-	err = util.ValidatePassword(pwd, login.Hash)
-	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), WRONG_PASS_CODE)}
-		return
-	}
-	tk, err := s.Tkn.Token(func(h *core.JwtHeader, p *core.JwtPayload) error {
-		h.Kid = "kid"
-		p.Aud = "player"
-		exp := time.Now().Add(time.Hour * 24).UTC()
-		p.Exp = exp.UnixMilli()
-		return nil
-	})
-	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), INVALID_TOKEN_CODE)}
-		return
-	}
-	session := OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk, Home: s.Cluster.Local().HttpEndpoint}
-	login.Cc <- event.Chunk{Remaining: false, Data: util.ToJson(session)}
-}
 
 func notsupport(listener chan event.Chunk) {
 	listener <- event.Chunk{Remaining: false, Data: []byte("not supported")}

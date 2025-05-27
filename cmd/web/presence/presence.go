@@ -1,6 +1,7 @@
 package main
 
 import (
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/util"
 )
 
@@ -23,7 +24,6 @@ type OnSession struct {
 	Home       string `json:"home"`
 }
 
-
 func errorMessage(msg string, code int) []byte {
 	m := OnSession{Message: msg, ErrorCode: code}
 	return util.ToJson(m)
@@ -31,4 +31,10 @@ func errorMessage(msg string, code int) []byte {
 func successMessage(msg string) []byte {
 	m := OnSession{Message: msg, Successful: true}
 	return util.ToJson(m)
+}
+
+func main() {
+
+	bootstrap.AppBootstrap(&PresenceService{})
+
 }
