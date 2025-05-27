@@ -1,7 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"gameclustering.com/internal/bootstrap"
+)
 
-func Start() {
-	fmt.Printf("Tournament is running %s\n", "ss")
+func main() {
+
+	bootstrap.AppBootstrap(&AdminService{})
+
 }
+
