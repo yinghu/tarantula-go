@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/util"
 
 	badger "github.com/dgraph-io/badger/v4"
 )
@@ -13,7 +12,7 @@ type Cache struct {
 	InMemory  bool
 	Path      string
 	Db        *badger.DB
-	Sfk       *util.Snowflake
+	Seq       core.Sequence
 	KeySize   int
 	ValueSize int
 }

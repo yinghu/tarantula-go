@@ -19,8 +19,8 @@ import (
 type PresenceService struct {
 	Cluster cluster.Cluster
 	sql     persistence.Postgresql
-	Sfk     util.Snowflake
-	Tkn     util.JwtHMac
+	Seq     core.Sequence
+	Tkn     core.Jwt
 	Ciph    util.Cipher
 	Ds      core.DataStore
 	Started bool
@@ -45,9 +45,11 @@ func (s *PresenceService) Config() string {
 
 func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	s.Cluster = c
-	s.Sfk = util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
-	s.Tkn = util.JwtHMac{Alg: "SHS256"}
-	s.Tkn.HMac()
+	sfk := util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
+	s.Seq = &sfk
+	tkn := util.JwtHMac{Alg: "SHS256"}
+	tkn.HMac()
+	s.Tkn = &tkn
 	ci := util.Cipher{Ksz: 32}
 	err := ci.AesGcm()
 	if err != nil {
@@ -60,7 +62,7 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 		return err
 	}
 	s.sql = sql
-	ds := persistence.Cache{InMemory: env.Bdg.InMemory, Path: env.Bdg.Path, Sfk: &s.Sfk, KeySize: env.Bdg.KeySize, ValueSize: env.Bdg.ValueSize}
+	ds := persistence.Cache{InMemory: env.Bdg.InMemory, Path: env.Bdg.Path, Seq: s.Seq, KeySize: env.Bdg.KeySize, ValueSize: env.Bdg.ValueSize}
 	err = ds.Open()
 	if err != nil {
 		return err
@@ -105,7 +107,6 @@ func (s *PresenceService) Publish(e event.Event) error {
 	}
 	return nil
 }
-
 
 func notsupport(listener chan event.Chunk) {
 	listener <- event.Chunk{Remaining: false, Data: []byte("not supported")}

@@ -6,7 +6,7 @@ import (
 )
 
 func (s *PresenceService) Register(login *event.Login) {
-	id, _ := s.Sfk.Id()
+	id, _ := s.Seq.Id()
 	login.SystemId = id
 	hash, _ := util.HashPassword(login.Hash)
 	login.Hash = hash
