@@ -9,7 +9,7 @@ import (
 	"gameclustering.com/internal/metrics"
 )
 
-type TarantulaService interface {
+type TarantulaContext interface {
 	Config() string
 	Start(f conf.Env, c cluster.Cluster) error
 	Shutdown()
@@ -17,8 +17,7 @@ type TarantulaService interface {
 }
 
 type TarantulaApp interface {
-	metrics.MetricsService
+	Metrics() metrics.MetricsService
 	Cluster() cluster.Cluster
 	http.Handler
-
 }

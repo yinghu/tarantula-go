@@ -18,9 +18,9 @@ import (
 )
 
 type AdminService struct {
-	Cluster cluster.Cluster
-	sql     persistence.Postgresql
-	Metr      metrics.MetricsService
+	cls  cluster.Cluster
+	sql  persistence.Postgresql
+	Metr metrics.MetricsService
 }
 
 func (s *AdminService) Config() string {
@@ -28,7 +28,7 @@ func (s *AdminService) Config() string {
 }
 
 func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
-	s.Cluster = c
+	s.cls = c
 	sql := persistence.Postgresql{Url: f.Pgs.DatabaseURL}
 	err := sql.Create()
 	if err != nil {
@@ -47,9 +47,16 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	}
 	http.HandleFunc("/", handleWeb)
 
-	//http.Handle("/admin",logging(&AdminLogin{AdminService: s}))
+	http.Handle("/admin",logging(&AdminLogin{AdminService: s}))
 	log.Fatal(http.ListenAndServe(f.HttpEndpoint, nil))
 	return nil
+}
+
+func (s *AdminService) Metrics() metrics.MetricsService {
+	return s.Metr
+}
+func (s *AdminService) Cluster() cluster.Cluster {
+	return s.cls
 }
 
 func (s *AdminService) Shutdown() {
@@ -70,9 +77,9 @@ func logging(s bootstrap.TarantulaApp) http.HandlerFunc {
 		start := time.Now()
 		defer func() {
 			dur := time.Since(start)
-			ms := metrics.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node:s.Cluster().Local().Name}
-			s.WebRequest(ms)
+			ms := metrics.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.Cluster().Local().Name}
+			s.Metrics().WebRequest(ms)
 		}()
-		s.ServeHTTP(w,r)
+		s.ServeHTTP(w, r)
 	}
 }
