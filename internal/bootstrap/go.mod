@@ -20,6 +20,7 @@ require (
 	gameclustering.com/internal/cluster v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/conf v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000
 )
 
 require (

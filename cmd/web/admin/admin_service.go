@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/event"
 
-	//"gameclustering.com/internal/core"
+	"gameclustering.com/internal/bootstrap"
 	//"gameclustering.com/internal/event"
 	"gameclustering.com/internal/metrics"
 	"gameclustering.com/internal/persistence"
@@ -46,7 +47,7 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	}
 	http.HandleFunc("/", handleWeb)
 
-	http.Handle("/admin",logging(&AdminLogin{AdminService: s}))
+	//http.Handle("/admin",logging(&AdminLogin{AdminService: s}))
 	log.Fatal(http.ListenAndServe(f.HttpEndpoint, nil))
 	return nil
 }
@@ -62,4 +63,16 @@ func (s *AdminService) Create(classId int) event.Event {
 
 func (s *AdminService) OnEvent(e event.Event) {
 
+}
+
+func logging(s bootstrap.TarantulaApp) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		defer func() {
+			dur := time.Since(start)
+			ms := metrics.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node:s.Cluster().Local().Name}
+			s.WebRequest(ms)
+		}()
+		s.ServeHTTP(w,r)
+	}
 }
