@@ -7,6 +7,7 @@ import (
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
+	"gameclustering.com/internal/core"
 )
 
 func TestAuth(t *testing.T) {
@@ -26,7 +27,7 @@ func TestAuth(t *testing.T) {
 			break
 		}
 	}
-	ses := OnSession{Message: WRONG_PASS_MSG, ErrorCode: WRONG_PASS_CODE}
+	ses := core.OnSession{Message: WRONG_PASS_MSG, ErrorCode: WRONG_PASS_CODE}
 	ser := util.ToJson(ses)
 	fmt.Printf("JSON :%s\n", string(ser))
 }

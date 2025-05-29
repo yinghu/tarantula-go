@@ -2,13 +2,16 @@ package bootstrap
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/metrics"
 )
 
 func AppBootstrap(service TarantulaContext) {
@@ -43,4 +46,16 @@ func AppBootstrap(service TarantulaContext) {
 		close(sigs)
 	}()
 	c.Join()
+}
+
+func Logging(s TarantulaApp) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		defer func() {
+			dur := time.Since(start)
+			ms := metrics.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.Cluster().Local().Name}
+			s.Metrics().WebRequest(ms)
+		}()
+		s.ServeHTTP(w, r)
+	}
 }

@@ -31,6 +31,6 @@ func (s *PresenceService) Login(login *event.Login) {
 		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), INVALID_TOKEN_CODE)}
 		return
 	}
-	session := OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk, Home: s.Cluster.Local().HttpEndpoint}
+	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk, Home: s.Cluster.Local().HttpEndpoint}
 	login.Cc <- event.Chunk{Remaining: false, Data: util.ToJson(session)}
 }

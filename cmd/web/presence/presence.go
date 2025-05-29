@@ -3,6 +3,7 @@ package main
 import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/util"
+	"gameclustering.com/internal/core"
 )
 
 const (
@@ -14,22 +15,13 @@ const (
 	INVALID_TOKEN_MSG  string = "invalid token"
 )
 
-type OnSession struct {
-	Successful bool   `json:"successful"`
-	ErrorCode  int    `json:"errorCode"`
-	Message    string `json:"message"`
-	SystemId   int64  `json:"systemId"`
-	Stub       int64  `json:"stub"`
-	Token      string `json:"token"`
-	Home       string `json:"home"`
-}
 
 func errorMessage(msg string, code int) []byte {
-	m := OnSession{Message: msg, ErrorCode: code}
+	m := core.OnSession{Message: msg, ErrorCode: code}
 	return util.ToJson(m)
 }
 func successMessage(msg string) []byte {
-	m := OnSession{Message: msg, Successful: true}
+	m := core.OnSession{Message: msg, Successful: true}
 	return util.ToJson(m)
 }
 
