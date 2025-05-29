@@ -6,9 +6,11 @@ replace gameclustering.com/internal/core => ../core
 
 replace gameclustering.com/internal/util => ../util
 
+replace gameclustering.com/internal/metrics => ../metrics
+
 require (
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
-	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000
 	github.com/0xc0d/encoding v0.1.0
 	github.com/dgraph-io/badger/v4 v4.7.0
 	github.com/jackc/pgx/v5 v5.7.4

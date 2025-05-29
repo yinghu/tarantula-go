@@ -39,3 +39,4 @@ func (s *AdminService) LoadLogin(login *event.Login) error {
 	return nil
 }
 
+

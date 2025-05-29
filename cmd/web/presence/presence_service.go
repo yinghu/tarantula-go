@@ -70,7 +70,7 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	s.Ds = &ds
 	s.Started = true
 	fmt.Printf("Presence service started\n")
-	http.Handle("/presence", http.HandlerFunc(logging(s)))
+	http.Handle("/presence",logging(s))
 	log.Fatal(http.ListenAndServe(env.HttpEndpoint, nil))
 	return nil
 }

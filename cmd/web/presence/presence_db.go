@@ -41,7 +41,7 @@ func (s *PresenceService) LoadLogin(login *event.Login) error {
 }
 
 func (s *PresenceService) SaveMetrics(metrics *metrics.ReqMetrics) error {
-	inserted, err := s.sql.Exec("INSERT INTO metrics (path,req_timed,node) VALUES($1,$2,$3)", metrics.Path, metrics.ReqTimed, metrics.Node)
+	inserted, err := s.sql.Exec("INSERT INTO req_metrics (path,req_timed,node) VALUES($1,$2,$3)", metrics.Path, metrics.ReqTimed, metrics.Node)
 	if err != nil {
 		return err
 	}

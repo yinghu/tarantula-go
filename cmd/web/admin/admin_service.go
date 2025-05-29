@@ -11,7 +11,7 @@ import (
 
 	//"gameclustering.com/internal/core"
 	//"gameclustering.com/internal/event"
-	//"gameclustering.com/internal/metrics"
+	"gameclustering.com/internal/metrics"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
 )
@@ -19,6 +19,7 @@ import (
 type AdminService struct {
 	Cluster cluster.Cluster
 	sql     persistence.Postgresql
+	Metr      metrics.MetricsService
 }
 
 func (s *AdminService) Config() string {
@@ -33,6 +34,8 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 		return err
 	}
 	s.sql = sql
+	ms := persistence.MetricsDB{Sql: &sql}
+	s.Metr = &ms
 	hash, err := util.HashPassword("password")
 	if err != nil {
 		return err
@@ -43,7 +46,7 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	}
 	http.HandleFunc("/", handleWeb)
 
-	http.Handle("/admin",&AdminLogin{AdminService: s})
+	http.Handle("/admin",logging(&AdminLogin{AdminService: s}))
 	log.Fatal(http.ListenAndServe(f.HttpEndpoint, nil))
 	return nil
 }
@@ -60,4 +63,3 @@ func (s *AdminService) Create(classId int) event.Event {
 func (s *AdminService) OnEvent(e event.Event) {
 
 }
-
