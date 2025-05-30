@@ -20,7 +20,7 @@ type AdminService struct {
 	cls  cluster.Cluster
 	sql  persistence.Postgresql
 	Metr metrics.MetricsService
-	Tkn  core.Jwt
+	Auth core.Authenticator
 }
 
 func (s *AdminService) Config() string {
@@ -40,9 +40,9 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 
 	tkn := util.JwtHMac{Alg: "SHS256"}
 	tkn.HMac()
-	s.Tkn = &tkn
+	s.Auth = &bootstrap.AuthManager{Tkn: &tkn}
 
-	hash, err := util.HashPassword("password")
+	hash, err := s.Auth.HashPassword("password")
 	if err != nil {
 		return err
 	}

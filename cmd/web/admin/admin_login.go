@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -31,19 +30,13 @@ func (s *AdminLogin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Write(util.ToJson(session))
 		return
 	}
-	err = util.ValidatePassword(pwd, login.Hash)
+	err = s.Auth.ValidatePassword(pwd, login.Hash)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	tk, err := s.Tkn.Token(func(h *core.JwtHeader, p *core.JwtPayload) error {
-		h.Kid = "kid"
-		p.Aud = "player"
-		exp := time.Now().Add(time.Hour * 24).UTC()
-		p.Exp = exp.UnixMilli()
-		return nil
-	})
+	tk, err := s.Auth.CreateToken(login.SystemId, login.SystemId)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
