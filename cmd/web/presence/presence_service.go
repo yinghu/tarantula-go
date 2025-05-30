@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
@@ -14,7 +15,6 @@ import (
 	"gameclustering.com/internal/metrics"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
-	"gameclustering.com/internal/bootstrap"
 )
 
 type PresenceService struct {
@@ -22,8 +22,6 @@ type PresenceService struct {
 	sql     persistence.Postgresql
 	Seq     core.Sequence
 	Auth    core.Authenticator
-	//Tkn     core.Jwt
-	Ciph    util.Cipher
 	Ds      core.DataStore
 	Started bool
 }
@@ -51,14 +49,14 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	s.Seq = &sfk
 	tkn := util.JwtHMac{Alg: "SHS256"}
 	tkn.HMac()
-	//s.Tkn = &tkn
-	s.Auth = &bootstrap.AuthManager{Tkn: &tkn}
+
 	ci := util.Cipher{Ksz: 32}
 	err := ci.AesGcm()
 	if err != nil {
 		return err
 	}
-	s.Ciph = ci
+
+	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cip: &ci, Kid: "presence"}
 	sql := persistence.Postgresql{Url: env.Pgs.DatabaseURL}
 	err = sql.Create()
 	if err != nil {
