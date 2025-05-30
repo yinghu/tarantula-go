@@ -13,6 +13,7 @@ import (
 
 	"gameclustering.com/internal/util"
 	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.etcd.io/etcd/client/v3/concurrency"
 )
 
 type Node struct {
@@ -182,4 +183,26 @@ func (c *Etc) group() {
 		c.partition[p] = nds[i]
 		fmt.Printf("Partition %d %s %d\n", i, nds[i], p)
 	}
+}
+
+func (c *Etc) Transaction(t Exec) error {
+	cli, err := clientv3.New(clientv3.Config{
+		Endpoints:   c.EtcdEndpoints,
+		DialTimeout: 5 * time.Second,
+	})
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+	session, err := concurrency.NewSession(cli)
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+	mutex := concurrency.NewMutex(session, c.Group)
+	ctx := context.Background()
+	mutex.Lock(ctx)
+	defer mutex.Unlock(ctx)
+	t(&EtcdClient{cli: cli})
+	return nil
 }
