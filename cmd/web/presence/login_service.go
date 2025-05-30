@@ -1,8 +1,6 @@
 package main
 
 import (
-	"time"
-
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
@@ -20,13 +18,7 @@ func (s *PresenceService) Login(login *event.Login) {
 		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), WRONG_PASS_CODE)}
 		return
 	}
-	tk, err := s.Tkn.Token(func(h *core.JwtHeader, p *core.JwtPayload) error {
-		h.Kid = "kid"
-		p.Aud = "player"
-		exp := time.Now().Add(time.Hour * 24).UTC()
-		p.Exp = exp.UnixMilli()
-		return nil
-	})
+	tk, err := s.Auth.CreateToken(login.SystemId, login.SystemId)
 	if err != nil {
 		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), INVALID_TOKEN_CODE)}
 		return

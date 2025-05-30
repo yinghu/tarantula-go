@@ -50,7 +50,6 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	if err != nil {
 		fmt.Printf("Root already existed %s\n", err.Error())
 	}
-	http.Handle("/", bootstrap.Logging(&AdminWeb{AdminService: s}))
 
 	http.Handle("/admin/login", bootstrap.Logging(&AdminLogin{AdminService: s}))
 	log.Fatal(http.ListenAndServe(f.HttpEndpoint, nil))

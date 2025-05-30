@@ -14,13 +14,15 @@ import (
 	"gameclustering.com/internal/metrics"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
+	"gameclustering.com/internal/bootstrap"
 )
 
 type PresenceService struct {
 	Cluster cluster.Cluster
 	sql     persistence.Postgresql
 	Seq     core.Sequence
-	Tkn     core.Jwt
+	Auth    core.Authenticator
+	//Tkn     core.Jwt
 	Ciph    util.Cipher
 	Ds      core.DataStore
 	Started bool
@@ -49,7 +51,8 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	s.Seq = &sfk
 	tkn := util.JwtHMac{Alg: "SHS256"}
 	tkn.HMac()
-	s.Tkn = &tkn
+	//s.Tkn = &tkn
+	s.Auth = &bootstrap.AuthManager{Tkn: &tkn}
 	ci := util.Cipher{Ksz: 32}
 	err := ci.AesGcm()
 	if err != nil {
@@ -70,7 +73,7 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	s.Ds = &ds
 	s.Started = true
 	fmt.Printf("Presence service started\n")
-	http.Handle("/presence",logging(s))
+	http.Handle("/presence", logging(s))
 	log.Fatal(http.ListenAndServe(env.HttpEndpoint, nil))
 	return nil
 }
