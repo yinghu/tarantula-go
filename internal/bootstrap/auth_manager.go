@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -11,9 +12,10 @@ import (
 )
 
 type AuthManager struct {
-	Kid string
-	Tkn core.Jwt
-	Cip *util.Cipher
+	DurHours int
+	Kid      string
+	Tkn      core.Jwt
+	Cip      *util.Cipher
 }
 
 func (s *AuthManager) HashPassword(password string) (string, error) {
@@ -25,34 +27,47 @@ func (s *AuthManager) ValidatePassword(password string, hash string) error {
 func (s *AuthManager) CreateToken(systemId int64, stub int64) (string, error) {
 	return s.Tkn.Token(func(h *core.JwtHeader, p *core.JwtPayload) error {
 		h.Kid = s.Kid
-		exp := time.Now().Add(time.Hour * 24).UTC()
+		exp := time.Now().Add(time.Hour * time.Duration(s.DurHours)).UTC()
 		p.Exp = exp.UnixMilli()
 		aud := fmt.Sprintf("%d.%d.%d", systemId, stub, p.Exp)
 		p.Aud = s.Cip.Encrypt(aud)
-		fmt.Printf("%s\n", p.Aud)
 		return nil
 	})
 }
-func (s *AuthManager) ValidateToken(token string) error {
-	return s.Tkn.Verify(token, func(jh *core.JwtHeader, jp *core.JwtPayload) error {
+func (s *AuthManager) ValidateToken(token string) (core.OnSession, error) {
+	session := core.OnSession{Successful: false}
+	err := s.Tkn.Verify(token, func(jh *core.JwtHeader, jp *core.JwtPayload) error {
 		aud, err := s.Cip.Decrypt(jp.Aud)
 		if err != nil {
 			return err
 		}
 		parts := strings.Split(aud, ".")
-		sysId, err := strconv.ParseUint(parts[0], 10, 64)
+		sysId, err := strconv.ParseInt(parts[0], 10, 64)
 		if err != nil {
 			return err
 		}
-		stub, err := strconv.ParseUint(parts[1], 10, 64)
+		stub, err := strconv.ParseInt(parts[1], 10, 64)
 		if err != nil {
 			return err
 		}
-		exp, err := strconv.ParseUint(parts[2], 10, 64)
+		exp, err := strconv.ParseInt(parts[2], 10, 64)
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%s, %s, %d, %d, %d\n", aud, jh.Kid, sysId, stub, exp)
+		if exp != jp.Exp {
+			return errors.New("invalid timestamp")
+		}
+		tm := time.UnixMilli(exp)
+		if tm.UTC().Before(time.Now().UTC()) {
+			return errors.New("token timeout")
+		}
+		session.SystemId = sysId
+		session.Stub = stub
+		session.Successful = true
 		return nil
 	})
+	if err!=nil{
+		return session,err
+	}
+	return session,nil
 }

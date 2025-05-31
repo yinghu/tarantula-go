@@ -5,7 +5,7 @@ import (
 )
 
 func (s *PresenceService) VerifyToken(token string, listener chan event.Chunk) {
-	err := s.Auth.ValidateToken(token)
+	_ , err := s.Auth.ValidateToken(token)
 	if err != nil {
 		listener <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), INVALID_TOKEN_CODE)}
 		return

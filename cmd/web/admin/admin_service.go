@@ -47,7 +47,7 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 		return err
 	}
 
-	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cip: &ci,Kid: "admin"}
+	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cip: &ci,Kid: "admin",DurHours: 24}
 
 	hash, err := s.Auth.HashPassword("password")
 	if err != nil {

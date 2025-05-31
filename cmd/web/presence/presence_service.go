@@ -56,7 +56,7 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 		return err
 	}
 
-	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cip: &ci, Kid: "presence"}
+	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cip: &ci, Kid: "presence", DurHours: 24}
 	sql := persistence.Postgresql{Url: env.Pgs.DatabaseURL}
 	err = sql.Create()
 	if err != nil {

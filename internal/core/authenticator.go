@@ -4,7 +4,7 @@ type Authenticator interface {
 	HashPassword(password string) (string, error)
 	ValidatePassword(password string, hash string) error
 	CreateToken(systemId int64, stub int64) (string, error)
-	ValidateToken(token string) error
+	ValidateToken(token string) (OnSession,error)
 }
 
 type OnSession struct {
