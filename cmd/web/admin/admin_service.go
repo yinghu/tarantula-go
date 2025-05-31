@@ -47,7 +47,7 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 		return err
 	}
 
-	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cip: &ci,Kid: "admin",DurHours: 24}
+	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cip: &ci, Kid: "admin", DurHours: 24}
 
 	hash, err := s.Auth.HashPassword("password")
 	if err != nil {
@@ -57,7 +57,7 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	if err != nil {
 		fmt.Printf("Root already existed %s\n", err.Error())
 	}
-
+	http.Handle("/admin/password", bootstrap.Logging(&AdminChangePwd{AdminService: s}))
 	http.Handle("/admin/login", bootstrap.Logging(&AdminLogin{AdminService: s}))
 	log.Fatal(http.ListenAndServe(f.HttpEndpoint, nil))
 	return nil
@@ -68,6 +68,9 @@ func (s *AdminService) Metrics() metrics.MetricsService {
 }
 func (s *AdminService) Cluster() cluster.Cluster {
 	return s.cls
+}
+func (s *AdminService) Authenticator() core.Authenticator {
+	return s.Auth
 }
 
 func (s *AdminService) Shutdown() {

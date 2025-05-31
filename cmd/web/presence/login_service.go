@@ -18,7 +18,7 @@ func (s *PresenceService) Login(login *event.Login) {
 		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), WRONG_PASS_CODE)}
 		return
 	}
-	tk, err := s.Auth.CreateToken(login.SystemId, login.SystemId)
+	tk, err := s.Auth.CreateToken(login.SystemId, login.SystemId,0)
 	if err != nil {
 		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), INVALID_TOKEN_CODE)}
 		return

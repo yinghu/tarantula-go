@@ -16,7 +16,7 @@ func TestAuthManager(t *testing.T) {
 		t.Errorf("Error%s", err.Error())
 	}
 	auth := AuthManager{Tkn: &tkn, Cip: &ci, Kid: "presence",DurHours: 24}
-	tk, err := auth.CreateToken(100, 120)
+	tk, err := auth.CreateToken(100, 120,1)
 	if err != nil {
 		t.Errorf("Error%s", err.Error())
 	}
@@ -26,6 +26,10 @@ func TestAuthManager(t *testing.T) {
 	}
 	if session.SystemId != 100 {
 		t.Errorf("Error SystemId%d", session.SystemId)
+	}
+
+	if session.AccessControl != 1 {
+		t.Errorf("Error Access%d", session.AccessControl)
 	}
 
 	if session.Stub != 120 {

@@ -5,6 +5,7 @@ import (
 
 	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/metrics"
 )
@@ -19,5 +20,7 @@ type TarantulaContext interface {
 type TarantulaApp interface {
 	Metrics() metrics.MetricsService
 	Cluster() cluster.Cluster
+	Authenticator() core.Authenticator
+	AccessControl() int32
 	http.Handler
 }

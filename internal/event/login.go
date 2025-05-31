@@ -7,12 +7,12 @@ import (
 )
 
 type Login struct {
-	Name        string `json:"login"`
-	Hash        string `json:"password"`
-	ReferenceId int32  `json:"referenceId"`
-	SystemId    int64
-
-	EventObj //Event default
+	Name          string `json:"login"`
+	Hash          string `json:"password"`
+	ReferenceId   int32  `json:"referenceId"`
+	SystemId      int64
+	AccessControl int32
+	EventObj      //Event default
 }
 
 func (s *Login) ClassId() int {
@@ -72,7 +72,7 @@ func (s *Login) Inbound(buff core.DataBuffer) {
 			s.streaming(Chunk{Remaining: true, Data: []byte{0}})
 			break
 		}
-	
+
 		pd, err := buff.Read(int(sz))
 		if err != nil {
 			s.streaming(Chunk{Remaining: true, Data: []byte{0}})
@@ -97,7 +97,6 @@ func (s *Login) Outbound(buff core.DataBuffer) {
 	buff.ReadString()
 
 }
-
 
 func (s *Login) streaming(c Chunk) {
 }

@@ -24,12 +24,12 @@ func (s *AuthManager) HashPassword(password string) (string, error) {
 func (s *AuthManager) ValidatePassword(password string, hash string) error {
 	return util.ValidatePassword(password, hash)
 }
-func (s *AuthManager) CreateToken(systemId int64, stub int64) (string, error) {
+func (s *AuthManager) CreateToken(systemId int64, stub int64, accessControl int32) (string, error) {
 	return s.Tkn.Token(func(h *core.JwtHeader, p *core.JwtPayload) error {
 		h.Kid = s.Kid
 		exp := time.Now().Add(time.Hour * time.Duration(s.DurHours)).UTC()
 		p.Exp = exp.UnixMilli()
-		aud := fmt.Sprintf("%d.%d.%d", systemId, stub, p.Exp)
+		aud := fmt.Sprintf("%d.%d.%d.%d", systemId, stub, accessControl, p.Exp)
 		p.Aud = s.Cip.Encrypt(aud)
 		return nil
 	})
@@ -50,7 +50,11 @@ func (s *AuthManager) ValidateToken(token string) (core.OnSession, error) {
 		if err != nil {
 			return err
 		}
-		exp, err := strconv.ParseInt(parts[2], 10, 64)
+		acc, err := strconv.ParseInt(parts[2], 10, 32)
+		if err != nil {
+			return err
+		}
+		exp, err := strconv.ParseInt(parts[3], 10, 64)
 		if err != nil {
 			return err
 		}
@@ -63,11 +67,12 @@ func (s *AuthManager) ValidateToken(token string) (core.OnSession, error) {
 		}
 		session.SystemId = sysId
 		session.Stub = stub
+		session.AccessControl = int32(acc)
 		session.Successful = true
 		return nil
 	})
-	if err!=nil{
-		return session,err
+	if err != nil {
+		return session, err
 	}
-	return session,nil
+	return session, nil
 }

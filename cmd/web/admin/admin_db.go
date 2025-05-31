@@ -22,14 +22,16 @@ func (s *AdminService) LoadLogin(login *event.Login) error {
 	err := s.sql.Query(func(rows pgx.Rows) error {
 		var hash string
 		var systemId int64
-		err := rows.Scan(&hash, &systemId)
+		var accessControl int32
+		err := rows.Scan(&hash, &systemId, &accessControl)
 		if err != nil {
 			return err
 		}
 		login.Hash = hash
 		login.SystemId = systemId
+		login.AccessControl = accessControl
 		return nil
-	}, "SELECT hash,id FROM login WHERE name=$1", login.Name)
+	}, "SELECT hash,id,access_control FROM login WHERE name=$1", login.Name)
 	if err != nil {
 		return err
 	}
@@ -38,5 +40,3 @@ func (s *AdminService) LoadLogin(login *event.Login) error {
 	}
 	return nil
 }
-
-
