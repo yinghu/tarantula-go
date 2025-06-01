@@ -40,3 +40,14 @@ func (s *AdminService) LoadLogin(login *event.Login) error {
 	}
 	return nil
 }
+
+func (s *AdminService) UpdatePassword(login *event.Login) error {
+	updated, err := s.sql.Exec("UPDATE login SET hash = $1 WHERE name = $2", login.Hash, login.Name)
+	if err != nil {
+		return err
+	}
+	if updated == 0 {
+		return errors.New("password cannot be saved")
+	}
+	return nil
+}

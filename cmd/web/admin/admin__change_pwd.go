@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	
+
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -33,18 +33,19 @@ func (s *AdminChangePwd) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Write(util.ToJson(session))
 		return
 	}
-	err = s.Auth.ValidatePassword(pwd, login.Hash)
+	hash, err := s.Auth.HashPassword(pwd)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	tk, err := s.Auth.CreateToken(login.SystemId, login.SystemId, 1)
+	login.Hash = hash
+	err = s.UpdatePassword(&login)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk, Home: s.Cluster().Local().HttpEndpoint}
+	session := core.OnSession{Successful: true, Message: "password changed"}
 	w.Write(util.ToJson(session))
 }
