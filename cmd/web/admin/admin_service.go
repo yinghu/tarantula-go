@@ -37,15 +37,43 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	s.sql = sql
 	ms := persistence.MetricsDB{Sql: &sql}
 	s.Metr = &ms
-	c.Atomic(func(ctx cluster.Ctx) error {
-		//jkey,err := ctx.Get("")
+	
+	tkn := util.JwtHMac{Alg: "SHS256",Ksz: 32}
+	ci := util.Aes{Ksz: 32}
+	err = c.Atomic(func(ctx cluster.Ctx) error {
+		jsk, err := ctx.Get(core.JWT_KEY_NAME)
+		if err != nil {
+			fmt.Println("Create new jwt key")
+			nkey := util.Key(tkn.Ksz)
+			ctx.Put(core.JWT_KEY_NAME, util.KeyToBase64(nkey))
+			tkn.HMacFromKey(nkey)
+			return nil
+		}
+		jk, err := util.KeyFromBase64(jsk)
+		if err != nil {
+			return err
+		}
+		tkn.HMacFromKey(jk)
 		return nil
 	})
-	tkn := util.JwtHMac{Alg: "SHS256"}
-	tkn.HMac()
-
-	ci := util.Aes{Ksz: 32}
-	err = ci.AesGcm()
+	if err != nil {
+		return err
+	}
+	err = c.Atomic(func(ctx cluster.Ctx) error {
+		csk, err := ctx.Get(core.CIPHER_KEY_NAME)
+		if err != nil {
+			fmt.Println("Create new cipher key")
+			ckey := util.Key(ci.Ksz)
+			ctx.Put(core.CIPHER_KEY_NAME, util.KeyToBase64(ckey))
+			ci.AesGcmFromKey(ckey)
+		}
+		ck, err := util.KeyFromBase64(csk)
+		if err != nil {
+			return err
+		}
+		ci.AesGcmFromKey(ck)
+		return nil
+	})
 	if err != nil {
 		return err
 	}
