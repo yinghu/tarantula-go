@@ -1,6 +1,7 @@
 package util
 
 import (
+	"encoding/base64"
 	"testing"
 )
 
@@ -19,5 +20,17 @@ func TestPartition(t *testing.T) {
 	p := Partition([]byte("hellp"),5)
 	if p>5 {
 		t.Errorf("falied partition %d\n",p)
+	}
+}
+
+func TestKey(t *testing.T) {
+	skey := KeyToBase64(Key(32))
+	bkey,err := KeyFromBase64(skey)
+	if err!= nil{
+		t.Errorf("bad format key %s\n",err.Error())
+	}
+	ckey := base64.StdEncoding.EncodeToString(bkey)
+	if skey != ckey{
+		t.Errorf("key not same %s %s \n",skey,ckey)
 	}
 }

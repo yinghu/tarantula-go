@@ -16,7 +16,6 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-
 type AdminService struct {
 	cls  cluster.Cluster
 	sql  persistence.Postgresql
@@ -38,7 +37,10 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	s.sql = sql
 	ms := persistence.MetricsDB{Sql: &sql}
 	s.Metr = &ms
-
+	c.Atomic(func(ctx cluster.Ctx) error {
+		//jkey,err := ctx.Get("")
+		return nil
+	})
 	tkn := util.JwtHMac{Alg: "SHS256"}
 	tkn.HMac()
 

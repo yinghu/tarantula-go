@@ -6,6 +6,8 @@ import (
 	"slices"
 	"testing"
 	"time"
+
+	"gameclustering.com/internal/util"
 )
 
 func TestPartition(t *testing.T) {
@@ -45,17 +47,18 @@ func TestCluster(t *testing.T) {
 
 func TestTransaction(t *testing.T) {
 	c := NewEtc("tarantula", 3, []string{"192.168.1.7:2379"}, Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"})
-	c.Atomic(func(c Ctx) {
-		k := "k"
-		v := "v1"
+	c.Atomic(func(c Ctx) error{
+		k := "jwkkey"
+		v := util.KeyToBase64(util.Key(32))
 		err := c.Put(k, v)
 		if err != nil {
 			t.Errorf("Put error %s", err.Error())
-			return
+			return err
 		}
 		gv, err := c.Get(k)
 		if err != nil {
 			t.Errorf("Get error %s", err.Error())
+			return err
 		}
 		if gv != v {
 			t.Errorf("value not same error %s", gv)
@@ -68,6 +71,6 @@ func TestTransaction(t *testing.T) {
 		if err == nil {
 			t.Errorf("Get error %s", dv)
 		}
-
+		return nil
 	})
 }

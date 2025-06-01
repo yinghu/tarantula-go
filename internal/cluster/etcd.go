@@ -111,6 +111,7 @@ func (c *Etc) Join() error {
 	wch := cli.Watch(context.Background(), c.Group, clientv3.WithPrefix())
 	for wresp := range wch { //blocked
 		for _, ev := range wresp.Events {
+			//fmt.Printf("Orignal %s\n", string(ev.Kv.Key))
 			cmds := strings.Split(string(ev.Kv.Key), "#")
 			switch cmds[1] {
 			case "ping":
@@ -146,6 +147,8 @@ func (c *Etc) Join() error {
 					}
 					c.lock.Unlock()
 				}
+			default:
+				fmt.Printf("unwatch key %s\n", cmds[1])
 			}
 		}
 	}
@@ -199,10 +202,9 @@ func (c *Etc) Atomic(t Exec) error {
 		return err
 	}
 	defer session.Close()
-	mutex := concurrency.NewMutex(session, c.Group)
+	mutex := concurrency.NewMutex(session, c.Group+"#lock")
 	ctx := context.Background()
 	mutex.Lock(ctx)
 	defer mutex.Unlock(ctx)
-	t(&EtcdClient{cli: cli})
-	return nil
+	return t(&EtcdClient{cli: cli, prefix: c.Group})
 }

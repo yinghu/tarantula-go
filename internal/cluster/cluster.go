@@ -10,7 +10,7 @@ type Ctx interface {
 	Del(key string) error
 }
 
-type Exec func(ctx Ctx)
+type Exec func(ctx Ctx) error
 
 type Cluster interface {
 	Local() Node

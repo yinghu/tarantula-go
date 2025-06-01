@@ -1,6 +1,8 @@
 package util
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"hash/fnv"
 	"time"
@@ -23,4 +25,18 @@ func ToJson(obj any) []byte {
 		return []byte("{}")
 	}
 	return data
+}
+
+func Key(size int16) []byte {
+	key := make([]byte, size)
+	rand.Read(key)
+	return key
+}
+
+func KeyToBase64(key []byte) string {
+	return base64.StdEncoding.EncodeToString(key)
+}
+
+func KeyFromBase64(key string) ([]byte, error) {
+	return base64.StdEncoding.DecodeString(key)
 }

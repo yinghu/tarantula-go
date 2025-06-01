@@ -29,6 +29,7 @@ func AppBootstrap(service TarantulaContext) {
 		}
 		err := service.Start(f, &c)
 		if err != nil {
+			//panic(err)
 			fmt.Printf("Error %s\n", err.Error())
 		}
 	}()
