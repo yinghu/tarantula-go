@@ -16,5 +16,5 @@ type Cluster interface {
 	Local() Node
 	View() iter.Seq[Node]
 	Partition(key []byte) Node
-	Transaction(t Exec) error
+	Atomic(t Exec) error
 }

@@ -45,7 +45,7 @@ func TestCluster(t *testing.T) {
 
 func TestTransaction(t *testing.T) {
 	c := NewEtc("tarantula", 3, []string{"192.168.1.7:2379"}, Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"})
-	c.Transaction(func(c Ctx) {
+	c.Atomic(func(c Ctx) {
 		k := "k"
 		v := "v1"
 		err := c.Put(k, v)

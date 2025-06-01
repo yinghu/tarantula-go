@@ -185,7 +185,7 @@ func (c *Etc) group() {
 	}
 }
 
-func (c *Etc) Transaction(t Exec) error {
+func (c *Etc) Atomic(t Exec) error {
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   c.EtcdEndpoints,
 		DialTimeout: 5 * time.Second,
