@@ -24,6 +24,7 @@ func (j *JwtHMac) HMac() {
 	rand.Read(key)
 	j.Mac = hmac.New(sha256.New, key)
 }
+
 func (j *JwtHMac) HMacFromKey(key []byte) {
 
 	j.Mac = hmac.New(sha256.New, key)

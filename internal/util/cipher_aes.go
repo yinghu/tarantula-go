@@ -28,6 +28,19 @@ func (g *Aes) AesGcm() error {
 	return nil
 }
 
+func (g *Aes) AesGcmFromKey(key []byte) error {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return err
+	}
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return err
+	}
+	g.Gcm = gcm
+	return nil
+}
+
 func (g *Aes) Encrypt(clearText string) string {
 	nonce := make([]byte, g.Gcm.NonceSize())
 	rand.Read(nonce)
@@ -36,9 +49,9 @@ func (g *Aes) Encrypt(clearText string) string {
 }
 
 func (g *Aes) Decrypt(cipherText string) (string, error) {
-	pendingText,err := hex.DecodeString(cipherText)
-	if err !=nil{
-		return cipherText,err
+	pendingText, err := hex.DecodeString(cipherText)
+	if err != nil {
+		return cipherText, err
 	}
 	clearText, err := g.Gcm.Open(nil, pendingText[:g.Gcm.NonceSize()], pendingText[g.Gcm.NonceSize():], nil)
 	if err != nil {

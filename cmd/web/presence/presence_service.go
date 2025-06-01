@@ -58,6 +58,10 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	s.cls = c
 	sfk := util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.Seq = &sfk
+	c.Atomic(func(ctx cluster.Ctx) {
+		//ctx.Get()
+				
+	})
 	tkn := util.JwtHMac{Alg: "SHS256"}
 	tkn.HMac()
 

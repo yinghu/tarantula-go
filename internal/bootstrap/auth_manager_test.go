@@ -1,22 +1,28 @@
 package bootstrap
 
 import (
+	"crypto/rand"
 	"testing"
 
 	"gameclustering.com/internal/util"
 )
 
 func TestAuthManager(t *testing.T) {
+
 	tkn := util.JwtHMac{Alg: "SHS256"}
-	tkn.HMac()
+	key := make([]byte, tkn.Ksz)
+	rand.Read(key)
+	tkn.HMacFromKey(key)
 
 	ci := util.Aes{Ksz: 32}
-	err := ci.AesGcm()
+	ckey := make([]byte, ci.Ksz)
+	rand.Read(ckey)
+	err := ci.AesGcmFromKey(ckey)
 	if err != nil {
 		t.Errorf("Error%s", err.Error())
 	}
-	auth := AuthManager{Tkn: &tkn, Cipher: &ci, Kid: "presence",DurHours: 24}
-	tk, err := auth.CreateToken(100, 120,1)
+	auth := AuthManager{Tkn: &tkn, Cipher: &ci, Kid: "presence", DurHours: 24}
+	tk, err := auth.CreateToken(100, 120, 1)
 	if err != nil {
 		t.Errorf("Error%s", err.Error())
 	}
