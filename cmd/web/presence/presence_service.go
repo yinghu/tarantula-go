@@ -1,11 +1,11 @@
 package main
 
 import (
-	"encoding/json"
+	
 	"fmt"
 	"log"
 	"net/http"
-	"time"
+	
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/cluster"
@@ -18,7 +18,8 @@ import (
 )
 
 type PresenceService struct {
-	Cluster cluster.Cluster
+	cls     cluster.Cluster
+	Metr    metrics.MetricsService
 	sql     persistence.Postgresql
 	Seq     core.Sequence
 	Auth    core.Authenticator
@@ -43,8 +44,18 @@ func (s *PresenceService) Config() string {
 	return "/etc/tarantula/presence-conf.json"
 }
 
+func (s *PresenceService) Metrics() metrics.MetricsService {
+	return s.Metr
+}
+func (s *PresenceService) Cluster() cluster.Cluster {
+	return s.cls
+}
+func (s *PresenceService) Authenticator() core.Authenticator {
+	return s.Auth
+}
+
 func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
-	s.Cluster = c
+	s.cls = c
 	sfk := util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.Seq = &sfk
 	tkn := util.JwtHMac{Alg: "SHS256"}
@@ -69,9 +80,13 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 		return err
 	}
 	s.Ds = &ds
+	ms := persistence.MetricsDB{Sql: &sql}
+	s.Metr = &ms
+
 	s.Started = true
 	fmt.Printf("Presence service started\n")
-	http.Handle("/presence", logging(s))
+	http.Handle("/presence/register", bootstrap.Logging(&PresenceRegister{PresenceService: s}))
+	http.Handle("/presence/login", bootstrap.Logging(&PresenceLogin{PresenceService: s}))
 	log.Fatal(http.ListenAndServe(env.HttpEndpoint, nil))
 	return nil
 }
@@ -98,8 +113,8 @@ func (s *PresenceService) Publish(e event.Event) error {
 	if err == nil {
 		fmt.Printf("LOADED %d\n", load.SystemId)
 	}
-	for v := range s.Cluster.View() {
-		if v.Name != s.Cluster.Local().Name {
+	for v := range s.cls.View() {
+		if v.Name != s.cls.Local().Name {
 			go func() {
 				pub := event.SocketPublisher{Remote: v.TcpEndpoint, BufferSize: 1024}
 				pub.Publish(e)
@@ -109,55 +124,3 @@ func (s *PresenceService) Publish(e event.Event) error {
 	return nil
 }
 
-func notsupport(listener chan event.Chunk) {
-	listener <- event.Chunk{Remaining: false, Data: []byte("not supported")}
-}
-
-func (s *PresenceService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	action := r.Header.Get("Tarantula-action")
-	token := r.Header.Get("Tarantula-token")
-	listener := make(chan event.Chunk)
-	defer func() {
-		close(listener)
-		r.Body.Close()
-	}()
-	w.WriteHeader(http.StatusOK)
-	switch action {
-	case "onRegister":
-		var login event.Login
-		json.NewDecoder(r.Body).Decode(&login)
-		login.EventObj.Cc = listener
-		go s.Register(&login)
-
-	case "onLogin":
-		var login event.Login
-		login.EventObj.Cc = listener
-		json.NewDecoder(r.Body).Decode(&login)
-		go s.Login(&login)
-
-	case "onPassword":
-		go s.VerifyToken(token, listener)
-
-	default:
-		go notsupport(listener)
-	}
-	for c := range listener {
-		w.Write(c.Data)
-		if !c.Remaining {
-			break
-		}
-	}
-}
-
-func logging(s *PresenceService) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-		action := r.Header.Get("Tarantula-action")
-		defer func() {
-			dur := time.Since(start)
-			ms := metrics.ReqMetrics{Path: r.URL.Path + "/" + action, ReqTimed: dur.Milliseconds(), Node: s.Cluster.Local().Name}
-			s.SaveMetrics(&ms)
-		}()
-		s.ServeHTTP(w, r)
-	}
-}

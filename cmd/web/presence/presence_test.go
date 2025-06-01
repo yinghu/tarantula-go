@@ -21,7 +21,8 @@ func TestAuth(t *testing.T) {
 	defer service.Shutdown()
 	login := event.Login{Name: "foo1003", Hash: "ppp", SystemId: 10, ReferenceId: 1}
 	login.Cc = make(chan event.Chunk)
-	go service.Register(&login)
+	reg := PresenceRegister{&service}
+	go reg.Register(&login)
 	for c := range login.Cc {
 		if !c.Remaining {
 			break
