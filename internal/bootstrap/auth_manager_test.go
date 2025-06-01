@@ -10,12 +10,12 @@ func TestAuthManager(t *testing.T) {
 	tkn := util.JwtHMac{Alg: "SHS256"}
 	tkn.HMac()
 
-	ci := util.Cipher{Ksz: 32}
+	ci := util.Aes{Ksz: 32}
 	err := ci.AesGcm()
 	if err != nil {
 		t.Errorf("Error%s", err.Error())
 	}
-	auth := AuthManager{Tkn: &tkn, Cip: &ci, Kid: "presence",DurHours: 24}
+	auth := AuthManager{Tkn: &tkn, Cipher: &ci, Kid: "presence",DurHours: 24}
 	tk, err := auth.CreateToken(100, 120,1)
 	if err != nil {
 		t.Errorf("Error%s", err.Error())

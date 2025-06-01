@@ -42,13 +42,13 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	tkn := util.JwtHMac{Alg: "SHS256"}
 	tkn.HMac()
 
-	ci := util.Cipher{Ksz: 32}
+	ci := util.Aes{Ksz: 32}
 	err = ci.AesGcm()
 	if err != nil {
 		return err
 	}
 
-	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cip: &ci, Kid: "admin", DurHours: 24}
+	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cipher: &ci, Kid: "admin", DurHours: 24}
 
 	hash, err := s.Auth.HashPassword("password")
 	if err != nil {

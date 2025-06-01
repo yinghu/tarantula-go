@@ -8,12 +8,12 @@ import (
 	"encoding/hex"
 )
 
-type Cipher struct {
+type Aes struct {
 	Gcm cipher.AEAD
 	Ksz int16
 }
 
-func (g *Cipher) AesGcm() error {
+func (g *Aes) AesGcm() error {
 	key := make([]byte, g.Ksz)
 	rand.Read(key)
 	block, err := aes.NewCipher(key)
@@ -28,14 +28,14 @@ func (g *Cipher) AesGcm() error {
 	return nil
 }
 
-func (g *Cipher) Encrypt(clearText string) string {
+func (g *Aes) Encrypt(clearText string) string {
 	nonce := make([]byte, g.Gcm.NonceSize())
 	rand.Read(nonce)
 	cipherText := g.Gcm.Seal(nonce, nonce, []byte(clearText), nil)
 	return hex.EncodeToString(cipherText)
 }
 
-func (g *Cipher) Decrypt(cipherText string) (string, error) {
+func (g *Aes) Decrypt(cipherText string) (string, error) {
 	pendingText,err := hex.DecodeString(cipherText)
 	if err !=nil{
 		return cipherText,err

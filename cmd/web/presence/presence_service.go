@@ -50,13 +50,13 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	tkn := util.JwtHMac{Alg: "SHS256"}
 	tkn.HMac()
 
-	ci := util.Cipher{Ksz: 32}
+	ci := util.Aes{Ksz: 32}
 	err := ci.AesGcm()
 	if err != nil {
 		return err
 	}
 
-	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cip: &ci, Kid: "presence", DurHours: 24}
+	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cipher: &ci, Kid: "presence", DurHours: 24}
 	sql := persistence.Postgresql{Url: env.Pgs.DatabaseURL}
 	err = sql.Create()
 	if err != nil {

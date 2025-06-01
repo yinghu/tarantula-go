@@ -15,7 +15,7 @@ type AuthManager struct {
 	DurHours int
 	Kid      string
 	Tkn      core.Jwt
-	Cip      *util.Cipher
+	Cipher      *util.Aes
 }
 
 func (s *AuthManager) HashPassword(password string) (string, error) {
@@ -30,14 +30,14 @@ func (s *AuthManager) CreateToken(systemId int64, stub int64, accessControl int3
 		exp := time.Now().Add(time.Hour * time.Duration(s.DurHours)).UTC()
 		p.Exp = exp.UnixMilli()
 		aud := fmt.Sprintf("%d.%d.%d.%d", systemId, stub, accessControl, p.Exp)
-		p.Aud = s.Cip.Encrypt(aud)
+		p.Aud = s.Cipher.Encrypt(aud)
 		return nil
 	})
 }
 func (s *AuthManager) ValidateToken(token string) (core.OnSession, error) {
 	session := core.OnSession{Successful: false}
 	err := s.Tkn.Verify(token, func(jh *core.JwtHeader, jp *core.JwtPayload) error {
-		aud, err := s.Cip.Decrypt(jp.Aud)
+		aud, err := s.Cipher.Decrypt(jp.Aud)
 		if err != nil {
 			return err
 		}

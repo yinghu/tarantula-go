@@ -5,7 +5,7 @@ import (
 )
 
 func TestCipher(t *testing.T) {
-	cipher := Cipher{Ksz: 32}
+	cipher := Aes{Ksz: 32}
 	err := cipher.AesGcm()
 	if err != nil {
 		t.Errorf("failed %s\n", err.Error())
