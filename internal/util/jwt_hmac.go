@@ -52,6 +52,9 @@ func (j *JwtHMac) Token(jp core.JwtProcess) (string, error) {
 
 func (j *JwtHMac) Verify(token string, jp core.JwtProcess) error {
 	parts := strings.Split(token, ".")
+	if len(parts) != 3 {
+		return errors.New("bad token format")
+	}
 	var sb strings.Builder
 	sb.WriteString(parts[0])
 	sb.WriteString(".")

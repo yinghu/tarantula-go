@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
@@ -11,7 +12,6 @@ import (
 
 type AdminLogin struct {
 	*AdminService
-	accessControl int32
 }
 
 func (s *AdminLogin) Login(login *event.Login) error {
@@ -19,7 +19,7 @@ func (s *AdminLogin) Login(login *event.Login) error {
 	return nil
 }
 func (s *AdminLogin) AccessControl() int32 {
-	return s.accessControl
+	return bootstrap.PUBLIC_ACCESS_CONTROL
 }
 func (s *AdminLogin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()

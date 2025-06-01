@@ -5,13 +5,16 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
 	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/metrics"
+	"gameclustering.com/internal/util"
 )
 
 func AppBootstrap(service TarantulaContext) {
@@ -48,6 +51,17 @@ func AppBootstrap(service TarantulaContext) {
 	c.Join()
 }
 
+func invalidToken(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	session := core.OnSession{Successful: false, Message: "invalid token"}
+	w.Write(util.ToJson(session))
+}
+func illegalAccess(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	session := core.OnSession{Successful: false, Message: "illegal access"}
+	w.Write(util.ToJson(session))
+}
+
 func Logging(s TarantulaApp) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
@@ -56,6 +70,25 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			ms := metrics.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.Cluster().Local().Name}
 			s.Metrics().WebRequest(ms)
 		}()
+		if s.AccessControl() == PUBLIC_ACCESS_CONTROL {
+			s.ServeHTTP(w, r)
+			return
+		}
+		tkn := r.Header.Get("Authorization")
+		parts := strings.Split(tkn, " ")
+		if len(parts) != 2 {
+			invalidToken(w, r)
+			return
+		}
+		session, err := s.Authenticator().ValidateToken(parts[1])
+		if err != nil {
+			invalidToken(w, r)
+			return
+		}
+		if session.AccessControl < s.AccessControl() {
+			illegalAccess(w, r)
+			return
+		}
 		s.ServeHTTP(w, r)
 	}
 }

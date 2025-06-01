@@ -16,6 +16,7 @@ import (
 	"gameclustering.com/internal/util"
 )
 
+
 type AdminService struct {
 	cls  cluster.Cluster
 	sql  persistence.Postgresql

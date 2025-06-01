@@ -2,10 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"strings"
-
+	
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
@@ -13,7 +12,6 @@ import (
 
 type AdminChangePwd struct {
 	*AdminService
-	accessControl int32
 }
 
 func (s AdminChangePwd) Login(login *event.Login) error {
@@ -21,22 +19,14 @@ func (s AdminChangePwd) Login(login *event.Login) error {
 	return nil
 }
 func (s *AdminChangePwd) AccessControl() int32 {
-	return s.accessControl
+	return bootstrap.PROTECTED_ACCESS_CONTROL
 }
 func (s *AdminChangePwd) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	tkn := r.Header.Get("Authorization")
-	fmt.Printf("TX : %s\n", tkn)
-	parts := strings.Split(tkn, " ")
-	sess, err := s.Auth.ValidateToken(parts[1])
-	if err != nil {
-		fmt.Printf("Err : %s\n", err.Error())
-	}
-	fmt.Printf("Sess: %d\n", sess.SystemId)
 	var login event.Login
 	json.NewDecoder(r.Body).Decode(&login)
 	pwd := login.Hash
-	err = s.LoadLogin(&login)
+	err := s.LoadLogin(&login)
 	w.WriteHeader(http.StatusOK)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}

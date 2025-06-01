@@ -10,6 +10,11 @@ import (
 	"gameclustering.com/internal/metrics"
 )
 
+const (
+	PUBLIC_ACCESS_CONTROL    int32 = 0
+	PROTECTED_ACCESS_CONTROL int32 = 1
+)
+
 type TarantulaContext interface {
 	Config() string
 	Start(f conf.Env, c cluster.Cluster) error
