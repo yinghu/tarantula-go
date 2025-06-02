@@ -37,9 +37,9 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	s.sql = sql
 	ms := persistence.MetricsDB{Sql: &sql}
 	s.Metr = &ms
-	
-	tkn := util.JwtHMac{Alg: "SHS256",Ksz: 32}
-	ci := util.Aes{Ksz: 32}
+
+	tkn := util.JwtHMac{Alg: "SHS256", Ksz: core.JWT_KEY_SIZE}
+	ci := util.Aes{Ksz: core.CIPHER_KEY_SIZE}
 	err = c.Atomic(func(ctx cluster.Ctx) error {
 		jsk, err := ctx.Get(core.JWT_KEY_NAME)
 		if err != nil {
@@ -78,7 +78,7 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 		return err
 	}
 
-	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cipher: &ci, Kid: "admin", DurHours: 24}
+	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cipher: &ci, Kid: "admin"}
 
 	hash, err := s.Auth.HashPassword("password")
 	if err != nil {

@@ -21,7 +21,7 @@ func TestAuthManager(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error%s", err.Error())
 	}
-	auth := AuthManager{Tkn: &tkn, Cipher: &ci, Kid: "presence", DurHours: 24}
+	auth := AuthManager{Tkn: &tkn, Cipher: &ci, Kid: "presence"}
 	tk, err := auth.CreateToken(100, 120, 1)
 	if err != nil {
 		t.Errorf("Error%s", err.Error())

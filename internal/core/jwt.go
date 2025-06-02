@@ -6,7 +6,10 @@ type JwtHeader struct {
 	Kid string `json:"kid"`
 }
 
-const JWT_KEY_NAME string = "jwtkey"
+const (
+	JWT_KEY_NAME    string = "jwtkey"
+	JWT_KEY_SIZE int16  = 32
+)
 
 type JwtPayload struct {
 	Aud string `json:"aud"`

@@ -57,8 +57,8 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	sfk := util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.Seq = &sfk
 
-	tkn := util.JwtHMac{Alg: "SHS256", Ksz: 32}
-	ci := util.Aes{Ksz: 32}
+	tkn := util.JwtHMac{Alg: "SHS256", Ksz: core.JWT_KEY_SIZE}
+	ci := util.Aes{Ksz: core.CIPHER_KEY_SIZE}
 	err := c.Atomic(func(ctx cluster.Ctx) error {
 		jsk, err := ctx.Get(core.JWT_KEY_NAME)
 		if err != nil {
@@ -96,7 +96,7 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	if err != nil {
 		return err
 	}
-	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cipher: &ci, Kid: "presence", DurHours: 24}
+	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cipher: &ci, Kid: "presence"}
 	sql := persistence.Postgresql{Url: env.Pgs.DatabaseURL}
 	err = sql.Create()
 	if err != nil {

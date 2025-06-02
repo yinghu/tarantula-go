@@ -11,11 +11,13 @@ import (
 	"gameclustering.com/internal/util"
 )
 
+const TOKEN_TIME_OUT_HOURS int = 24
+
 type AuthManager struct {
-	DurHours int
+	
 	Kid      string
 	Tkn      core.Jwt
-	Cipher      *util.Aes
+	Cipher   *util.Aes
 }
 
 func (s *AuthManager) HashPassword(password string) (string, error) {
@@ -27,7 +29,7 @@ func (s *AuthManager) ValidatePassword(password string, hash string) error {
 func (s *AuthManager) CreateToken(systemId int64, stub int64, accessControl int32) (string, error) {
 	return s.Tkn.Token(func(h *core.JwtHeader, p *core.JwtPayload) error {
 		h.Kid = s.Kid
-		exp := time.Now().Add(time.Hour * time.Duration(s.DurHours)).UTC()
+		exp := time.Now().Add(time.Hour * time.Duration(TOKEN_TIME_OUT_HOURS)).UTC()
 		p.Exp = exp.UnixMilli()
 		aud := fmt.Sprintf("%d.%d.%d.%d", systemId, stub, accessControl, p.Exp)
 		p.Aud = s.Cipher.Encrypt(aud)
