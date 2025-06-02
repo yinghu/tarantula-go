@@ -10,17 +10,14 @@ import (
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
-	"gameclustering.com/internal/metrics"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
 )
 
 type PresenceService struct {
-	cls     cluster.Cluster
-	Metr    metrics.MetricsService
+	bootstrap.AppManager
 	sql     persistence.Postgresql
 	Seq     core.Sequence
-	Auth    core.Authenticator
 	Ds      core.DataStore
 	Started bool
 }
@@ -42,18 +39,9 @@ func (s *PresenceService) Config() string {
 	return "/etc/tarantula/presence-conf.json"
 }
 
-func (s *PresenceService) Metrics() metrics.MetricsService {
-	return s.Metr
-}
-func (s *PresenceService) Cluster() cluster.Cluster {
-	return s.cls
-}
-func (s *PresenceService) Authenticator() core.Authenticator {
-	return s.Auth
-}
 
 func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
-	s.cls = c
+	s.Cls = c
 	sfk := util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.Seq = &sfk
 
@@ -142,8 +130,8 @@ func (s *PresenceService) Publish(e event.Event) error {
 	if err == nil {
 		fmt.Printf("LOADED %d\n", load.SystemId)
 	}
-	for v := range s.cls.View() {
-		if v.Name != s.cls.Local().Name {
+	for v := range s.Cls.View() {
+		if v.Name != s.Cls.Local().Name {
 			go func() {
 				pub := event.SocketPublisher{Remote: v.TcpEndpoint, BufferSize: 1024}
 				pub.Publish(e)

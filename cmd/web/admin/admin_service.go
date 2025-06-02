@@ -11,16 +11,13 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/metrics"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
 )
 
 type AdminService struct {
-	cls  cluster.Cluster
+	bootstrap.AppManager
 	sql  persistence.Postgresql
-	Metr metrics.MetricsService
-	Auth core.Authenticator
 }
 
 func (s *AdminService) Config() string {
@@ -28,7 +25,7 @@ func (s *AdminService) Config() string {
 }
 
 func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
-	s.cls = c
+	s.Cls = c
 	sql := persistence.Postgresql{Url: f.Pgs.DatabaseURL}
 	err := sql.Create()
 	if err != nil {
@@ -94,15 +91,6 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	return nil
 }
 
-func (s *AdminService) Metrics() metrics.MetricsService {
-	return s.Metr
-}
-func (s *AdminService) Cluster() cluster.Cluster {
-	return s.cls
-}
-func (s *AdminService) Authenticator() core.Authenticator {
-	return s.Auth
-}
 
 func (s *AdminService) Shutdown() {
 	s.sql.Close()
