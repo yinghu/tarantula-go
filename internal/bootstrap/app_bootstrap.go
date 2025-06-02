@@ -21,6 +21,7 @@ func AppBootstrap(service TarantulaContext) {
 	f := conf.Env{}
 	f.Load(service.Config())
 	c := cluster.NewEtc(f.GroupName, f.PartitionNumber, f.EtcdEndpoints, cluster.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.TcpEndpoint})
+	c.Kyl = service
 	e := event.Endpoint{TcpEndpoint: f.TcpEndpoint, Service: service, ReadBufferSize: f.TcpReadBufferSize}
 	go func() {
 		c.Started.Wait()

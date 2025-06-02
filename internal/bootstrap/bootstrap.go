@@ -20,6 +20,7 @@ type TarantulaContext interface {
 	Start(f conf.Env, c cluster.Cluster) error
 	Shutdown()
 	event.EventService
+	cluster.KeyListener
 }
 
 type TarantulaApp interface {

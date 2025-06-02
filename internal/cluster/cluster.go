@@ -18,3 +18,7 @@ type Cluster interface {
 	Partition(key []byte) Node
 	Atomic(t Exec) error
 }
+
+type KeyListener interface {
+	Updated(key string, value string)
+}

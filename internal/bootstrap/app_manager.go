@@ -93,3 +93,7 @@ func (s *AppManager) Create(classId int) event.Event {
 func (s *AppManager) OnEvent(e event.Event) {
 
 }
+
+func (s *AppManager) Updated(key string,value string) {
+	fmt.Printf("Key updated %s %s\n", key,value)
+}

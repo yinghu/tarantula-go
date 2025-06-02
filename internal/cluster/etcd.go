@@ -25,6 +25,7 @@ type Node struct {
 }
 
 type Etc struct {
+	Kyl             KeyListener
 	Quit            chan bool
 	Started         *sync.WaitGroup
 	Group           string
@@ -148,7 +149,7 @@ func (c *Etc) Join() error {
 					c.lock.Unlock()
 				}
 			default:
-				fmt.Printf("unwatch key %s\n", cmds[1])
+				c.Kyl.Updated(cmds[1], string(ev.Kv.Value))
 			}
 		}
 	}
