@@ -6,6 +6,7 @@ import (
 	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/metrics"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
@@ -83,4 +84,12 @@ func (s *AppManager) Start(f conf.Env, c cluster.Cluster) error {
 
 func (s *AppManager) Shutdown() {
 	s.Sql.Close()
+}
+
+func (s *AppManager) Create(classId int) event.Event {
+	return &event.Login{}
+}
+
+func (s *AppManager) OnEvent(e event.Event) {
+
 }

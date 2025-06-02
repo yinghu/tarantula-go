@@ -35,11 +35,3 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	log.Fatal(http.ListenAndServe(f.HttpEndpoint, nil))
 	return nil
 }
-
-func (s *AdminService) Create(classId int) event.Event {
-	return &event.Login{}
-}
-
-func (s *AdminService) OnEvent(e event.Event) {
-
-}
