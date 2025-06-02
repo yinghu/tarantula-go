@@ -26,12 +26,12 @@ func (s *PresenceRegister) Register(login *event.Login) {
 	login.Hash = hash
 	err := s.SaveLogin(login)
 	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), DB_OP_ERR_CODE)}
+		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), DB_OP_ERR_CODE)}
 		return
 	}
 	tk, err := s.Auth.CreateToken(login.SystemId, login.SystemId, login.AccessControl)
 	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), INVALID_TOKEN_CODE)}
+		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), INVALID_TOKEN_CODE)}
 		return
 	}
 	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk, Home: s.Cls.Local().HttpEndpoint}

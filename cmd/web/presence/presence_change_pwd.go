@@ -13,8 +13,24 @@ type PresenceChangePwd struct {
 }
 
 func (s *PresenceChangePwd) chnagePwd(login *event.Login) {
-
-	login.Cc <- event.Chunk{Remaining: false, Data: successMessage("password changed")}
+	pwd := login.Hash
+	err := s.LoadLogin(login)
+	if err != nil {
+		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), DB_OP_ERR_CODE)}
+		return
+	}
+	hash, err := s.Auth.HashPassword(pwd)
+	if err != nil {
+		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), DB_OP_ERR_CODE)}
+		return
+	}
+	login.Hash = hash
+	err = s.UpdatePassword(login)
+	if err != nil {
+		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), DB_OP_ERR_CODE)}
+		return
+	}
+	login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.SuccessMessage("password changed")}
 }
 
 func (s *PresenceChangePwd) AccessControl() int32 {
