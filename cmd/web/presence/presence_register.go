@@ -5,7 +5,9 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/util"
 )
 
 type PresenceRegister struct {
@@ -19,6 +21,7 @@ func (s *PresenceRegister) AccessControl() int32 {
 func (s *PresenceRegister) Register(login *event.Login) {
 	id, _ := s.Seq.Id()
 	login.SystemId = id
+	login.AccessControl = bootstrap.PROTECTED_ACCESS_CONTROL
 	hash, _ := s.Auth.HashPassword(login.Hash)
 	login.Hash = hash
 	err := s.SaveLogin(login)
@@ -26,7 +29,13 @@ func (s *PresenceRegister) Register(login *event.Login) {
 		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), DB_OP_ERR_CODE)}
 		return
 	}
-	login.Cc <- event.Chunk{Remaining: false, Data: successMessage("registered")}
+	tk, err := s.Auth.CreateToken(login.SystemId, login.SystemId, login.AccessControl)
+	if err != nil {
+		login.Cc <- event.Chunk{Remaining: false, Data: errorMessage(err.Error(), INVALID_TOKEN_CODE)}
+		return
+	}
+	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk, Home: s.Cls.Local().HttpEndpoint}
+	login.Cc <- event.Chunk{Remaining: false, Data: util.ToJson(session)}
 	s.Publish(login)
 }
 

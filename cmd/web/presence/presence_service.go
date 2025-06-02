@@ -39,7 +39,6 @@ func (s *PresenceService) Config() string {
 	return "/etc/tarantula/presence-conf.json"
 }
 
-
 func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	s.Cls = c
 	sfk := util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
@@ -104,6 +103,7 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	fmt.Printf("Presence service started\n")
 	http.Handle("/presence/register", bootstrap.Logging(&PresenceRegister{PresenceService: s}))
 	http.Handle("/presence/login", bootstrap.Logging(&PresenceLogin{PresenceService: s}))
+	http.Handle("/presence/password", bootstrap.Logging(&PresenceChangePwd{PresenceService: s}))
 	log.Fatal(http.ListenAndServe(env.HttpEndpoint, nil))
 	return nil
 }
