@@ -8,7 +8,7 @@ import (
 )
 
 func (s *PresenceService) SaveLogin(login *event.Login) error {
-	inserted, err := s.sql.Exec("INSERT INTO login (name,hash,system_id,reference_id) VALUES($1,$2,$3,$4)", login.Name, login.Hash, login.SystemId, login.ReferenceId)
+	inserted, err := s.Sql.Exec("INSERT INTO login (name,hash,system_id,reference_id) VALUES($1,$2,$3,$4)", login.Name, login.Hash, login.SystemId, login.ReferenceId)
 	if err != nil {
 		return err
 	}
@@ -19,7 +19,7 @@ func (s *PresenceService) SaveLogin(login *event.Login) error {
 }
 
 func (s *PresenceService) LoadLogin(login *event.Login) error {
-	err := s.sql.Query(func(rows pgx.Rows) error {
+	err := s.Sql.Query(func(rows pgx.Rows) error {
 		var hash string
 		var systemId int64
 		var accessControl int32

@@ -16,7 +16,6 @@ import (
 
 type PresenceService struct {
 	bootstrap.AppManager
-	sql     persistence.Postgresql
 	Seq     core.Sequence
 	Ds      core.DataStore
 	Started bool
@@ -40,65 +39,18 @@ func (s *PresenceService) Config() string {
 }
 
 func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
-	s.Cls = c
+	err := s.AppManager.Start(env, c)
+	if err != nil {
+		return err
+	}
 	sfk := util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.Seq = &sfk
-
-	tkn := util.JwtHMac{Alg: "SHS256", Ksz: core.JWT_KEY_SIZE}
-	ci := util.Aes{Ksz: core.CIPHER_KEY_SIZE}
-	err := c.Atomic(func(ctx cluster.Ctx) error {
-		jsk, err := ctx.Get(core.JWT_KEY_NAME)
-		if err != nil {
-			fmt.Println("Create new jwt key")
-			nkey := util.Key(tkn.Ksz)
-			ctx.Put(core.JWT_KEY_NAME, util.KeyToBase64(nkey))
-			tkn.HMacFromKey(nkey)
-			return nil
-		}
-		jk, err := util.KeyFromBase64(jsk)
-		if err != nil {
-			return err
-		}
-		tkn.HMacFromKey(jk)
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-	err = c.Atomic(func(ctx cluster.Ctx) error {
-		csk, err := ctx.Get(core.CIPHER_KEY_NAME)
-		if err != nil {
-			fmt.Println("Create new cipher key")
-			ckey := util.Key(ci.Ksz)
-			ctx.Put(core.CIPHER_KEY_NAME, util.KeyToBase64(ckey))
-			ci.AesGcmFromKey(ckey)
-		}
-		ck, err := util.KeyFromBase64(csk)
-		if err != nil {
-			return err
-		}
-		ci.AesGcmFromKey(ck)
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-	s.Auth = &bootstrap.AuthManager{Tkn: &tkn, Cipher: &ci, Kid: "presence"}
-	sql := persistence.Postgresql{Url: env.Pgs.DatabaseURL}
-	err = sql.Create()
-	if err != nil {
-		return err
-	}
-	s.sql = sql
 	ds := persistence.Cache{InMemory: env.Bdg.InMemory, Path: env.Bdg.Path, Seq: s.Seq, KeySize: env.Bdg.KeySize, ValueSize: env.Bdg.ValueSize}
 	err = ds.Open()
 	if err != nil {
 		return err
 	}
 	s.Ds = &ds
-	ms := persistence.MetricsDB{Sql: &sql}
-	s.Metr = &ms
-
 	s.Started = true
 	fmt.Printf("Presence service started\n")
 	http.Handle("/presence/register", bootstrap.Logging(&PresenceRegister{PresenceService: s}))
@@ -108,12 +60,13 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	return nil
 }
 func (s *PresenceService) Shutdown() {
-	s.sql.Close()
+	s.AppManager.Shutdown()
 	err := s.Ds.Close()
 	if err != nil {
 		fmt.Printf("Error %s\n", err.Error())
 	}
 	fmt.Printf("Presence service shut down\n")
+
 }
 
 func (s *PresenceService) Publish(e event.Event) error {

@@ -8,7 +8,7 @@ import (
 )
 
 func (s *AdminService) SaveLogin(login *event.Login) error {
-	inserted, err := s.sql.Exec("INSERT INTO login (name,hash) VALUES($1,$2)", login.Name, login.Hash)
+	inserted, err := s.Sql.Exec("INSERT INTO login (name,hash) VALUES($1,$2)", login.Name, login.Hash)
 	if err != nil {
 		return err
 	}
@@ -19,7 +19,7 @@ func (s *AdminService) SaveLogin(login *event.Login) error {
 }
 
 func (s *AdminService) LoadLogin(login *event.Login) error {
-	err := s.sql.Query(func(rows pgx.Rows) error {
+	err := s.Sql.Query(func(rows pgx.Rows) error {
 		var hash string
 		var systemId int64
 		var accessControl int32
@@ -42,7 +42,7 @@ func (s *AdminService) LoadLogin(login *event.Login) error {
 }
 
 func (s *AdminService) UpdatePassword(login *event.Login) error {
-	updated, err := s.sql.Exec("UPDATE login SET hash = $1 WHERE name = $2", login.Hash, login.Name)
+	updated, err := s.Sql.Exec("UPDATE login SET hash = $1 WHERE name = $2", login.Hash, login.Name)
 	if err != nil {
 		return err
 	}
