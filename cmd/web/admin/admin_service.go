@@ -30,8 +30,10 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	if err != nil {
 		fmt.Printf("Root already existed %s\n", err.Error())
 	}
+	http.Handle("/admin/confignode", bootstrap.Logging(&SudoConfigNode{AdminService: s}))
 	http.Handle("/admin/password", bootstrap.Logging(&AdminChangePwd{AdminService: s}))
 	http.Handle("/admin/login", bootstrap.Logging(&AdminLogin{AdminService: s}))
-	log.Fatal(http.ListenAndServe(f.HttpEndpoint, nil))
+	fmt.Printf("Admin service started %s\n", f.HttpBinding)
+	log.Fatal(http.ListenAndServe(f.HttpBinding, nil))
 	return nil
 }

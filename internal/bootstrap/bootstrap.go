@@ -13,6 +13,8 @@ import (
 const (
 	PUBLIC_ACCESS_CONTROL    int32 = 0
 	PROTECTED_ACCESS_CONTROL int32 = 1
+	ADMIN_ACCESS_CONTROL     int32 = 6
+	SUDO_ACCESS_CONTROL      int32 = 100
 )
 
 type TarantulaContext interface {

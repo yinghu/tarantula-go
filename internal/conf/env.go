@@ -22,6 +22,7 @@ type Env struct {
 	PartitionNumber   int        `json:"PartitionNumber"`
 	NodeName          string     `json:"NodeName"`
 	NodeId            int64      `json:"NodeId"`
+	HttpBinding       string     `json:"HttpBinding"`
 	HttpEndpoint      string     `json:"HttpEndpoint"`
 	TcpEndpoint       string     `json:"TcpEndpoint"`
 	TcpReadBufferSize int        `json:"TcpReadBufferSize"`
@@ -43,6 +44,9 @@ func (f *Env) Load(fn string) error {
 	}
 	if f.TcpReadBufferSize == 0 {
 		f.TcpReadBufferSize = 1024
+	}
+	if f.HttpBinding == "" {
+		f.HttpBinding = ":8080"
 	}
 
 	return nil

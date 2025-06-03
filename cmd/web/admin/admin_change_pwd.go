@@ -14,10 +14,6 @@ type AdminChangePwd struct {
 	*AdminService
 }
 
-func (s AdminChangePwd) Login(login *event.Login) error {
-
-	return nil
-}
 func (s *AdminChangePwd) AccessControl() int32 {
 	return bootstrap.PROTECTED_ACCESS_CONTROL
 }

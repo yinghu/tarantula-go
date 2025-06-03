@@ -10,14 +10,14 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-type AdminLogin struct {
+type SudoConfigNode struct {
 	*AdminService
 }
 
-func (s *AdminLogin) AccessControl() int32 {
-	return bootstrap.PUBLIC_ACCESS_CONTROL
+func (s *SudoConfigNode) AccessControl() int32 {
+	return bootstrap.SUDO_ACCESS_CONTROL
 }
-func (s *AdminLogin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *SudoConfigNode) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var login event.Login
 	json.NewDecoder(r.Body).Decode(&login)
@@ -29,18 +29,19 @@ func (s *AdminLogin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Write(util.ToJson(session))
 		return
 	}
-	err = s.Auth.ValidatePassword(pwd, login.Hash)
+	hash, err := s.Auth.HashPassword(pwd)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	tk, err := s.Auth.CreateToken(login.SystemId, login.SystemId, login.AccessControl)
+	login.Hash = hash
+	err = s.UpdatePassword(&login)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk, Home: s.Cluster().Local().HttpEndpoint}
+	session := core.OnSession{Successful: true, Message: "password changed"}
 	w.Write(util.ToJson(session))
 }
