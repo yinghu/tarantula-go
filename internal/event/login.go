@@ -11,8 +11,8 @@ type Login struct {
 	Hash          string `json:"password"`
 	ReferenceId   int32  `json:"referenceId"`
 	SystemId      int64
-	AccessControl int32
-	EventObj      //Event default
+	AccessControl int32 `json:"accessControl"`
+	EventObj            //Event default
 }
 
 func (s *Login) ClassId() int {
