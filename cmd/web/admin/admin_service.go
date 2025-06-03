@@ -30,6 +30,7 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	if err != nil {
 		fmt.Printf("Root already existed %s\n", err.Error())
 	}
+	http.Handle("/admin/addlogin", bootstrap.Logging(&SudoAddLogin{AdminService: s}))
 	http.Handle("/admin/confignode", bootstrap.Logging(&SudoConfigNode{AdminService: s}))
 	http.Handle("/admin/password", bootstrap.Logging(&AdminChangePwd{AdminService: s}))
 	http.Handle("/admin/login", bootstrap.Logging(&AdminLogin{AdminService: s}))

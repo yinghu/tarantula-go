@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/cluster"
+	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/util"
 )
 
@@ -19,29 +19,10 @@ func (s *SudoConfigNode) AccessControl() int32 {
 }
 func (s *SudoConfigNode) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var login event.Login
-	json.NewDecoder(r.Body).Decode(&login)
-	pwd := login.Hash
-	err := s.LoadLogin(&login)
-	w.WriteHeader(http.StatusOK)
-	if err != nil {
-		session := core.OnSession{Successful: false, Message: err.Error()}
-		w.Write(util.ToJson(session))
-		return
-	}
-	hash, err := s.Auth.HashPassword(pwd)
-	if err != nil {
-		session := core.OnSession{Successful: false, Message: err.Error()}
-		w.Write(util.ToJson(session))
-		return
-	}
-	login.Hash = hash
-	err = s.UpdatePassword(&login)
-	if err != nil {
-		session := core.OnSession{Successful: false, Message: err.Error()}
-		w.Write(util.ToJson(session))
-		return
-	}
-	session := core.OnSession{Successful: true, Message: "password changed"}
-	w.Write(util.ToJson(session))
+	var conf conf.Env
+	json.NewDecoder(r.Body).Decode(&conf)
+	s.Cluster().AtomicWithPrefix(conf.GroupName, func(ctx cluster.Ctx) error {
+		return ctx.Put(conf.NodeName, string(util.ToJson(conf)))
+	})
+	w.Write(util.ToJson(conf))
 }

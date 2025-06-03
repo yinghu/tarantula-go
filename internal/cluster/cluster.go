@@ -17,6 +17,7 @@ type Cluster interface {
 	View() iter.Seq[Node]
 	Partition(key []byte) Node
 	Atomic(t Exec) error
+	AtomicWithPrefix(prefix string,t Exec) error
 }
 
 type KeyListener interface {

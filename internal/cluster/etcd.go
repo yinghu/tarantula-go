@@ -190,6 +190,10 @@ func (c *Etc) group() {
 }
 
 func (c *Etc) Atomic(t Exec) error {
+	return c.AtomicWithPrefix(c.Group, t)
+}
+
+func (c *Etc) AtomicWithPrefix(prefix string, t Exec) error {
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   c.EtcdEndpoints,
 		DialTimeout: 5 * time.Second,
@@ -203,9 +207,9 @@ func (c *Etc) Atomic(t Exec) error {
 		return err
 	}
 	defer session.Close()
-	mutex := concurrency.NewMutex(session, c.Group+"#lock")
+	mutex := concurrency.NewMutex(session, prefix+"#lock")
 	ctx := context.Background()
 	mutex.Lock(ctx)
 	defer mutex.Unlock(ctx)
-	return t(&EtcdClient{cli: cli, prefix: c.Group})
+	return t(&EtcdClient{cli: cli, prefix: prefix})
 }
