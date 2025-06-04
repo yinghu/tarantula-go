@@ -3,6 +3,7 @@
 	"PartitionNumber":271,
 	"NodeName" :   "a01",
 	"NodeId"     :   1,
+	"HttpBinding":  ":8080",
 	"HttpEndpoint":  "192.168.1.4:8080",
 	"TcpEndpoint"  : "tcp://192.168.1.4:5000",
 	"TcpReadBufferSize": 1024,
