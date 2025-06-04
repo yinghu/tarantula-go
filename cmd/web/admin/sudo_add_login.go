@@ -15,33 +15,34 @@ type SudoAddLogin struct {
 }
 
 func (s *SudoAddLogin) AccessControl() int32 {
-	return bootstrap.PROTECTED_ACCESS_CONTROL
+	return bootstrap.SUDO_ACCESS_CONTROL
 }
 func (s *SudoAddLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var login event.Login
 	json.NewDecoder(r.Body).Decode(&login)
-	pwd := login.Hash
-	err := s.LoadLogin(&login)
+	if login.AccessControl > rs.AccessControl {
+		session := core.OnSession{Successful: false, Message: "over permission"}
+		w.Write(util.ToJson(session))
+		return
+	}
+	if login.AccessControl <= 0 {
+		login.AccessControl = bootstrap.PROTECTED_ACCESS_CONTROL
+	}
+	hash, err := s.Auth.HashPassword(login.Hash)
+	if err != nil {
+		session := core.OnSession{Successful: false, Message: err.Error()}
+		w.Write(util.ToJson(session))
+		return
+	}
 	w.WriteHeader(http.StatusOK)
-	if err != nil {
-		session := core.OnSession{Successful: false, Message: err.Error()}
-		w.Write(util.ToJson(session))
-		return
-	}
-	hash, err := s.Auth.HashPassword(pwd)
-	if err != nil {
-		session := core.OnSession{Successful: false, Message: err.Error()}
-		w.Write(util.ToJson(session))
-		return
-	}
 	login.Hash = hash
-	err = s.UpdatePassword(&login)
+	err = s.SaveLogin(&login)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	session := core.OnSession{Successful: true, Message: "password changed"}
+	session := core.OnSession{Successful: true, Message: "new login added"}
 	w.Write(util.ToJson(session))
 }
