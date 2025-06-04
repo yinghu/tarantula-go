@@ -26,7 +26,7 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	if err != nil {
 		return err
 	}
-	err = s.SaveLogin(&event.Login{Name: "root", Hash: hash})
+	err = s.SaveLogin(&event.Login{Name: "root", Hash: hash, AccessControl: bootstrap.SUDO_ACCESS_CONTROL})
 	if err != nil {
 		fmt.Printf("Root already existed %s\n", err.Error())
 	}

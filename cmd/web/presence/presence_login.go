@@ -39,7 +39,7 @@ func (s *PresenceLogin) Login(login *event.Login) {
 	login.Cc <- event.Chunk{Remaining: false, Data: util.ToJson(session)}
 }
 
-func (s *PresenceLogin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *PresenceLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	listener := make(chan event.Chunk)
 	defer func() {
 		close(listener)

@@ -39,7 +39,7 @@ func (s *PresenceRegister) Register(login *event.Login) {
 	s.Publish(login)
 }
 
-func (s *PresenceRegister) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *PresenceRegister) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	listener := make(chan event.Chunk)
 	defer func() {
 		close(listener)

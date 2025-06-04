@@ -8,7 +8,7 @@ import (
 )
 
 func (s *AdminService) SaveLogin(login *event.Login) error {
-	inserted, err := s.Sql.Exec("INSERT INTO login (name,hash) VALUES($1,$2)", login.Name, login.Hash)
+	inserted, err := s.Sql.Exec("INSERT INTO login (name,hash,access_control) VALUES($1,$2,$3)", login.Name, login.Hash, login.AccessControl)
 	if err != nil {
 		return err
 	}

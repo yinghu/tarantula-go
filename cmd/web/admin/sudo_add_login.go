@@ -17,7 +17,7 @@ type SudoAddLogin struct {
 func (s *SudoAddLogin) AccessControl() int32 {
 	return bootstrap.PROTECTED_ACCESS_CONTROL
 }
-func (s *SudoAddLogin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *SudoAddLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var login event.Login
 	json.NewDecoder(r.Body).Decode(&login)

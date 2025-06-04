@@ -30,5 +30,5 @@ type TarantulaApp interface {
 	Cluster() cluster.Cluster
 	Authenticator() core.Authenticator
 	AccessControl() int32
-	http.Handler
+	Request(sesion core.OnSession, w http.ResponseWriter, r *http.Request)
 }

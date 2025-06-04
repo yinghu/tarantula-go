@@ -17,7 +17,7 @@ type AdminLogin struct {
 func (s *AdminLogin) AccessControl() int32 {
 	return bootstrap.PUBLIC_ACCESS_CONTROL
 }
-func (s *AdminLogin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *AdminLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var login event.Login
 	json.NewDecoder(r.Body).Decode(&login)

@@ -7,6 +7,7 @@ import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 )
 
@@ -17,7 +18,7 @@ type SudoConfigNode struct {
 func (s *SudoConfigNode) AccessControl() int32 {
 	return bootstrap.SUDO_ACCESS_CONTROL
 }
-func (s *SudoConfigNode) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *SudoConfigNode) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var conf conf.Env
 	json.NewDecoder(r.Body).Decode(&conf)

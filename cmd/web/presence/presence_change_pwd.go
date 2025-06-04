@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
 
@@ -37,7 +38,7 @@ func (s *PresenceChangePwd) AccessControl() int32 {
 	return bootstrap.PROTECTED_ACCESS_CONTROL
 }
 
-func (s *PresenceChangePwd) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *PresenceChangePwd) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	listener := make(chan event.Chunk)
 	defer func() {
 		close(listener)

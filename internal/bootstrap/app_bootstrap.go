@@ -73,7 +73,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			s.Metrics().WebRequest(ms)
 		}()
 		if s.AccessControl() == PUBLIC_ACCESS_CONTROL {
-			s.ServeHTTP(w, r)
+			s.Request(core.OnSession{},w, r)
 			return
 		}
 		tkn := r.Header.Get("Authorization")
@@ -91,6 +91,6 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			illegalAccess(w, r)
 			return
 		}
-		s.ServeHTTP(w, r)
+		s.Request(session,w, r)
 	}
 }
