@@ -17,18 +17,18 @@ func (s *PresenceChangePwd) chnagePwd(login *event.Login) {
 	pwd := login.Hash
 	err := s.LoadLogin(login)
 	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), DB_OP_ERR_CODE)}
+		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
 		return
 	}
 	hash, err := s.Auth.HashPassword(pwd)
 	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), DB_OP_ERR_CODE)}
+		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
 		return
 	}
 	login.Hash = hash
 	err = s.UpdatePassword(login)
 	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), DB_OP_ERR_CODE)}
+		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
 		return
 	}
 	login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.SuccessMessage("password changed")}

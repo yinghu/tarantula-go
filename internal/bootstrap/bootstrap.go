@@ -17,6 +17,14 @@ const (
 	SUDO_ACCESS_CONTROL      int32 = 100
 )
 
+const (
+	DB_OP_ERR_CODE     int    = 500100
+	WRONG_PASS_CODE    int    = 400100
+	WRONG_PASS_MSG     string = "wrong user/password"
+	INVALID_TOKEN_CODE int    = 400101
+	INVALID_TOKEN_MSG  string = "invalid token"
+)
+
 type TarantulaContext interface {
 	Config() string
 	Start(f conf.Env, c cluster.Cluster) error
