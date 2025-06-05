@@ -20,8 +20,8 @@ type Cluster interface {
 	Local() Node
 	View() iter.Seq[Node]
 	Partition(key []byte) Node
-	Atomic(t Exec) error
-	AtomicWithPrefix(prefix string, t Exec) error
+	//Atomic(t Exec) error
+	Atomic(prefix string, t Exec) error
 }
 
 type KeyListener interface {

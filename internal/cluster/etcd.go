@@ -188,11 +188,12 @@ func (c *Etc) group() {
 	}
 }
 
-func (c *Etc) Atomic(t Exec) error {
-	return c.AtomicWithPrefix(c.Group, t)
-}
-
-func (c *Etc) AtomicWithPrefix(prefix string, t Exec) error {
+func (c *Etc) Atomic(prefix string, t Exec) error {
+	if prefix == "" {
+		prefix = c.Group
+		fmt.Printf("Reset Lock prefix %s\n", prefix)
+	}
+	fmt.Printf("Lock prefix %s\n", prefix)
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   c.EtcdEndpoints,
 		DialTimeout: 5 * time.Second,

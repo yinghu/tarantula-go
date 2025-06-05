@@ -33,7 +33,7 @@ func (s *AppManager) Start(f conf.Env, c cluster.Cluster) error {
 	s.Cls = c
 	tkn := util.JwtHMac{Alg: "SHS256", Ksz: core.JWT_KEY_SIZE}
 	ci := util.Aes{Ksz: core.CIPHER_KEY_SIZE}
-	err := c.Atomic(func(ctx cluster.Ctx) error {
+	err := c.Atomic(f.Presence, func(ctx cluster.Ctx) error {
 		jsk, err := ctx.Get(core.JWT_KEY_NAME)
 		if err != nil {
 			fmt.Println("Create new jwt key")
@@ -52,7 +52,7 @@ func (s *AppManager) Start(f conf.Env, c cluster.Cluster) error {
 	if err != nil {
 		return err
 	}
-	err = c.Atomic(func(ctx cluster.Ctx) error {
+	err = c.Atomic(f.Presence, func(ctx cluster.Ctx) error {
 		csk, err := ctx.Get(core.CIPHER_KEY_NAME)
 		if err != nil {
 			fmt.Println("Create new cipher key")
@@ -94,6 +94,6 @@ func (s *AppManager) OnEvent(e event.Event) {
 
 }
 
-func (s *AppManager) Updated(key string,value string) {
-	fmt.Printf("Key updated %s %s\n", key,value)
+func (s *AppManager) Updated(key string, value string) {
+	fmt.Printf("Key updated %s %s\n", key, value)
 }

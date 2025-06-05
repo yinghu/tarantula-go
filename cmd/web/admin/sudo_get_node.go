@@ -20,7 +20,7 @@ func (s *AdminGetNode) Request(rs core.OnSession, w http.ResponseWriter, r *http
 	group := r.PathValue("group")
 	node := r.PathValue("name")
 	var value string
-	err := s.Cluster().AtomicWithPrefix(group, func(ctx cluster.Ctx) error {
+	err := s.Cluster().Atomic(group, func(ctx cluster.Ctx) error {
 		val, err := ctx.Get(node)
 		if err != nil {
 			return err

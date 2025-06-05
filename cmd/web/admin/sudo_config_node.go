@@ -22,7 +22,7 @@ func (s *SudoConfigNode) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 	defer r.Body.Close()
 	var conf conf.Env
 	json.NewDecoder(r.Body).Decode(&conf)
-	s.Cluster().AtomicWithPrefix(conf.GroupName, func(ctx cluster.Ctx) error {
+	s.Cluster().Atomic(conf.GroupName, func(ctx cluster.Ctx) error {
 		return ctx.Put(conf.NodeName, string(util.ToJson(conf)))
 	})
 	w.Write(util.ToJson(conf))
