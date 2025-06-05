@@ -7,9 +7,12 @@ import (
 	"strings"
 )
 
+const (
+	TCP_READ_BUFFER_SIZE int = 1024
+)
+
 type Endpoint struct {
 	TcpEndpoint    string
-	ReadBufferSize int
 	Service        EventService
 	listener       net.Listener
 }
@@ -18,7 +21,7 @@ func (s *Endpoint) handleClient(client net.Conn) {
 	defer func() {
 		client.Close()
 	}()
-	socket := SocketBuffer{Socket: client, Buffer: make([]byte, s.ReadBufferSize)}
+	socket := SocketBuffer{Socket: client, Buffer: make([]byte,TCP_READ_BUFFER_SIZE)}
 	cid, err := socket.ReadInt32()
 	if err != nil {
 		fmt.Printf("Error on read cid %s\n", err.Error())

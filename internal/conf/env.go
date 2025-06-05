@@ -11,24 +11,20 @@ type Sql struct {
 }
 
 type LocalStore struct {
-	InMemory  bool   `json:"InMemory"`
-	Path      string `json:"Path"`
-	KeySize   int    `json:"KeySize"`
-	ValueSize int    `json:"ValueSize"`
+	InMemory bool   `json:"InMemory"`
+	Path     string `json:"Path"`
 }
 
 type Env struct {
-	GroupName         string     `json:"GroupName"`
-	PartitionNumber   int        `json:"PartitionNumber"`
-	NodeName          string     `json:"NodeName"`
-	NodeId            int64      `json:"NodeId"`
-	HttpBinding       string     `json:"HttpBinding"`
-	HttpEndpoint      string     `json:"HttpEndpoint"`
-	TcpEndpoint       string     `json:"TcpEndpoint"`
-	TcpReadBufferSize int        `json:"TcpReadBufferSize"`
-	EtcdEndpoints     []string   `json:"EtcdEndpoints"`
-	Pgs               Sql        `json:"Sql"`
-	Bdg               LocalStore `json:"LocalStore"`
+	GroupName       string     `json:"GroupName"`
+	NodeName        string     `json:"NodeName"`
+	NodeId          int64      `json:"NodeId"`
+	HttpBinding     string     `json:"HttpBinding"`
+	HttpEndpoint    string     `json:"HttpEndpoint"`
+	TcpEndpoint     string     `json:"TcpEndpoint"`
+	EtcdEndpoints   []string   `json:"EtcdEndpoints"`
+	Pgs             Sql        `json:"Sql"`
+	Bdg             LocalStore `json:"LocalStore"`
 }
 
 func (f *Env) Load(fn string) error {
@@ -39,12 +35,6 @@ func (f *Env) Load(fn string) error {
 	defer conf.Close()
 	data, _ := io.ReadAll(conf)
 	json.Unmarshal(data, f)
-	if f.PartitionNumber == 0 {
-		f.PartitionNumber = 5
-	}
-	if f.TcpReadBufferSize == 0 {
-		f.TcpReadBufferSize = 1024
-	}
 	if f.HttpBinding == "" {
 		f.HttpBinding = ":8080"
 	}

@@ -8,20 +8,23 @@ import (
 	badger "github.com/dgraph-io/badger/v4"
 )
 
+const (
+	BDG_KEY_SIZE   int = 200
+	BDG_VALUE_SIZE int = 1800
+)
+
 type Cache struct {
 	InMemory  bool
 	Path      string
 	Db        *badger.DB
 	Seq       core.Sequence
-	KeySize   int
-	ValueSize int
 }
 
 func (s *Cache) Save(t core.Persistentable) error {
 	key := BufferProxy{}
-	key.NewProxy(s.KeySize)
+	key.NewProxy(BDG_KEY_SIZE)
 	value := BufferProxy{}
-	value.NewProxy(s.ValueSize)
+	value.NewProxy(BDG_VALUE_SIZE)
 	t.WriteKey(&key)
 	t.Write(&value)
 	key.Flip()
@@ -31,9 +34,9 @@ func (s *Cache) Save(t core.Persistentable) error {
 
 func (s *Cache) New(t core.Persistentable) error {
 	key := BufferProxy{}
-	key.NewProxy(s.KeySize)
+	key.NewProxy(BDG_KEY_SIZE)
 	value := BufferProxy{}
-	value.NewProxy(s.ValueSize)
+	value.NewProxy(BDG_VALUE_SIZE)
 	t.WriteKey(&key)
 	t.Write(&value)
 	key.Flip()
@@ -43,11 +46,11 @@ func (s *Cache) New(t core.Persistentable) error {
 
 func (s *Cache) Load(t core.Persistentable) error {
 	key := BufferProxy{}
-	key.NewProxy(s.KeySize)
+	key.NewProxy(BDG_KEY_SIZE)
 	t.WriteKey(&key)
 	key.Flip()
 	value := BufferProxy{}
-	value.NewProxy(s.ValueSize)
+	value.NewProxy(BDG_VALUE_SIZE)
 	err := s.Get(&key, &value)
 	if err != nil {
 		return err

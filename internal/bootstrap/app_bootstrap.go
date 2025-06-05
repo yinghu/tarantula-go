@@ -19,10 +19,14 @@ import (
 
 func AppBootstrap(service TarantulaContext) {
 	f := conf.Env{}
-	f.Load(service.Config())
-	c := cluster.NewEtc(f.GroupName, f.PartitionNumber, f.EtcdEndpoints, cluster.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.TcpEndpoint})
+	err := f.Load(service.Config())
+	if err != nil {
+		fmt.Printf("Config not existed %s\n", err.Error())
+		return
+	}
+	c := cluster.NewEtc(f.GroupName,f.EtcdEndpoints, cluster.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.TcpEndpoint})
 	c.Kyl = service
-	e := event.Endpoint{TcpEndpoint: f.TcpEndpoint, Service: service, ReadBufferSize: f.TcpReadBufferSize}
+	e := event.Endpoint{TcpEndpoint: f.TcpEndpoint, Service: service}
 	go func() {
 		c.Started.Wait()
 		for v := range c.View() {
@@ -73,7 +77,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			s.Metrics().WebRequest(ms)
 		}()
 		if s.AccessControl() == PUBLIC_ACCESS_CONTROL {
-			s.Request(core.OnSession{},w, r)
+			s.Request(core.OnSession{}, w, r)
 			return
 		}
 		tkn := r.Header.Get("Authorization")
@@ -91,6 +95,6 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			illegalAccess(w, r)
 			return
 		}
-		s.Request(session,w, r)
+		s.Request(session, w, r)
 	}
 }

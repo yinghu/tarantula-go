@@ -155,7 +155,7 @@ func (s *sampleEvent) Outbound(buff core.DataBuffer) {
 }
 
 func TestEndpoint(t *testing.T) {
-	tcp := Endpoint{TcpEndpoint: "tcp://localhost:5000", Service: &sampleFactory{}, ReadBufferSize: 1024}
+	tcp := Endpoint{TcpEndpoint: "tcp://localhost:5000", Service: &sampleFactory{}}
 	go tcp.Open()
 
 	W.Add(1)

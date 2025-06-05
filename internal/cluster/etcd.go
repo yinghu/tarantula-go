@@ -29,7 +29,6 @@ type Etc struct {
 	Quit            chan bool
 	Started         *sync.WaitGroup
 	Group           string
-	partitionNumber int
 	EtcdEndpoints   []string
 	local           Node
 	lock            *sync.Mutex
@@ -37,11 +36,11 @@ type Etc struct {
 	partition       []string
 }
 
-func NewEtc(group string, pNumber int, etcEndpoints []string, local Node) Etc {
-	etc := Etc{Group: group, partitionNumber: pNumber, EtcdEndpoints: etcEndpoints, local: local}
+func NewEtc(group string, etcEndpoints []string, local Node) Etc {
+	etc := Etc{Group: group, EtcdEndpoints: etcEndpoints, local: local}
 	etc.lock = &sync.Mutex{}
 	etc.cluster = make(map[string]Node)
-	etc.partition = make([]string, pNumber)
+	etc.partition = make([]string, CLUSTER_PARTITION_NUM)
 	etc.Quit = make(chan bool)
 	etc.Started = &sync.WaitGroup{}
 	etc.Started.Add(1)
@@ -166,7 +165,7 @@ func (c *Etc) View() iter.Seq[Node] {
 }
 
 func (c *Etc) Partition(key []byte) Node {
-	p := util.Partition(key, uint32(c.partitionNumber))
+	p := util.Partition(key, uint32(CLUSTER_PARTITION_NUM))
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	return c.cluster[c.partition[p]]
@@ -182,7 +181,7 @@ func (c *Etc) group() {
 		i++
 	}
 	slices.Sort(nds)
-	for p := range c.partitionNumber {
+	for p := range CLUSTER_PARTITION_NUM {
 		i := p % sz
 		c.partition[p] = nds[i]
 		fmt.Printf("Partition %d %s %d\n", i, nds[i], p)
