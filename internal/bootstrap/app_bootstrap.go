@@ -24,9 +24,15 @@ func AppBootstrap(service TarantulaContext) {
 		fmt.Printf("Config not existed %s\n", err.Error())
 		return
 	}
-	c := cluster.NewEtc(f.GroupName,f.EtcdEndpoints, cluster.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.TcpEndpoint})
+	c := cluster.NewEtc(f.GroupName, f.EtcdEndpoints, cluster.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.Evp.TcpEndpoint})
 	c.Kyl = service
-	e := event.Endpoint{TcpEndpoint: f.TcpEndpoint, Service: service}
+	e := event.Endpoint{TcpEndpoint: f.Evp.TcpEndpoint, Service: service}
+	if f.Evp.Enabled {
+		go func() {
+			c.Started.Wait()
+			e.Open()
+		}()
+	}
 	go func() {
 		c.Started.Wait()
 		for v := range c.View() {
@@ -38,10 +44,7 @@ func AppBootstrap(service TarantulaContext) {
 			fmt.Printf("Error %s\n", err.Error())
 		}
 	}()
-	go func() {
-		c.Started.Wait()
-		e.Open()
-	}()
+
 	go func() {
 		c.Started.Wait()
 		fmt.Println("Wating for signal to exit ...")
@@ -50,7 +53,9 @@ func AppBootstrap(service TarantulaContext) {
 		<-sigs
 		service.Shutdown()
 		c.Quit <- true
-		e.Close()
+		if f.Evp.Enabled {
+			e.Close()
+		}
 		signal.Stop(sigs)
 		close(sigs)
 	}()
