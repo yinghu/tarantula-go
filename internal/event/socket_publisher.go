@@ -5,12 +5,10 @@ import (
 	"strings"
 )
 
-const SOCKET_READ_BUFFER_SIZE int = 1024
-
+const SOCKET_DATA_BUFFER_SIZE int = 1024
 
 type SocketPublisher struct {
-	Remote     string
-	BufferSize int
+	Remote string
 }
 
 func (s *SocketPublisher) Publish(e Event) {
@@ -21,10 +19,8 @@ func (s *SocketPublisher) Publish(e Event) {
 		return
 	}
 	defer conn.Close()
-	if s.BufferSize==0{
-		s.BufferSize = SOCKET_READ_BUFFER_SIZE
-	}
-	buffer := SocketBuffer{Socket: conn, Buffer: make([]byte, s.BufferSize)}
+
+	buffer := SocketBuffer{Socket: conn, Buffer: make([]byte, SOCKET_DATA_BUFFER_SIZE)}
 	err = buffer.WriteInt32(int32(e.ClassId()))
 	if err != nil {
 		e.OnError(err)

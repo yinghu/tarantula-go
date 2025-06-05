@@ -170,7 +170,7 @@ func TestEndpoint(t *testing.T) {
 	sample1.C128 = 228
 	sample1.F32 = 12.09
 	sample1.F64 = 64.09
-	soc := SocketPublisher{Remote: "tcp://localhost:5000", BufferSize: 1024}
+	soc := SocketPublisher{Remote: "tcp://localhost:5000"}
 	soc.Publish(&sample1)
 	W.Wait()
 	tcp.Close()

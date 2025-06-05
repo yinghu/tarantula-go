@@ -25,15 +25,15 @@ type Node struct {
 }
 
 type Etc struct {
-	Kyl             KeyListener
-	Quit            chan bool
-	Started         *sync.WaitGroup
-	Group           string
-	EtcdEndpoints   []string
-	local           Node
-	lock            *sync.Mutex
-	cluster         map[string]Node
-	partition       []string
+	Kyl           KeyListener
+	Quit          chan bool
+	Started       *sync.WaitGroup
+	Group         string
+	EtcdEndpoints []string
+	local         Node
+	lock          *sync.Mutex
+	cluster       map[string]Node
+	partition     []string
 }
 
 func NewEtc(group string, etcEndpoints []string, local Node) Etc {
@@ -184,7 +184,7 @@ func (c *Etc) group() {
 	for p := range CLUSTER_PARTITION_NUM {
 		i := p % sz
 		c.partition[p] = nds[i]
-		fmt.Printf("Partition %d %s %d\n", i, nds[i], p)
+		//fmt.Printf("Partition %d %s %d\n", i, nds[i], p)
 	}
 }
 

@@ -86,7 +86,7 @@ func (s *PresenceService) Publish(e event.Event) error {
 	for v := range s.Cls.View() {
 		if v.Name != s.Cls.Local().Name {
 			go func() {
-				pub := event.SocketPublisher{Remote: v.TcpEndpoint, BufferSize: 1024}
+				pub := event.SocketPublisher{Remote: v.TcpEndpoint}
 				pub.Publish(e)
 			}()
 		}
