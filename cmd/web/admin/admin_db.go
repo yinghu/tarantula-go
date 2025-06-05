@@ -21,21 +21,21 @@ func (s *AdminService) SaveLogin(login *event.Login) error {
 func (s *AdminService) LoadLogin(login *event.Login) error {
 	err := s.Sql.Query(func(rows pgx.Rows) error {
 		var hash string
-		var systemId int64
+		var id int32
 		var accessControl int32
-		err := rows.Scan(&hash, &systemId, &accessControl)
+		err := rows.Scan(&hash, &id, &accessControl)
 		if err != nil {
 			return err
 		}
 		login.Hash = hash
-		login.SystemId = systemId
+		login.Id = id
 		login.AccessControl = accessControl
 		return nil
 	}, "SELECT hash,id,access_control FROM login WHERE name=$1", login.Name)
 	if err != nil {
 		return err
 	}
-	if login.SystemId == 0 {
+	if login.Id == 0 {
 		return errors.New("login not existed")
 	}
 	return nil

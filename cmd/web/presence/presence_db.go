@@ -23,15 +23,17 @@ func (s *PresenceService) LoadLogin(login *event.Login) error {
 		var hash string
 		var systemId int64
 		var accessControl int32
-		err := rows.Scan(&hash, &systemId, &accessControl)
+		var id int32
+		err := rows.Scan(&hash, &systemId, &accessControl, &id)
 		if err != nil {
 			return err
 		}
 		login.Hash = hash
 		login.SystemId = systemId
 		login.AccessControl = accessControl
+		login.Id = id
 		return nil
-	}, "SELECT hash,system_id,access_control FROM login WHERE name=$1", login.Name)
+	}, "SELECT hash,system_id,access_control,id FROM login WHERE name=$1", login.Name)
 	if err != nil {
 		return err
 	}
@@ -51,4 +53,3 @@ func (s *PresenceService) UpdatePassword(login *event.Login) error {
 	}
 	return nil
 }
-

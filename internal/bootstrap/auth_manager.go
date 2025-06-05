@@ -15,6 +15,7 @@ const TOKEN_TIME_OUT_HOURS int = 24
 
 type AuthManager struct {
 	
+
 	Kid      string
 	Tkn      core.Jwt
 	Cipher   *util.Aes
@@ -26,7 +27,7 @@ func (s *AuthManager) HashPassword(password string) (string, error) {
 func (s *AuthManager) ValidatePassword(password string, hash string) error {
 	return util.ValidatePassword(password, hash)
 }
-func (s *AuthManager) CreateToken(systemId int64, stub int64, accessControl int32) (string, error) {
+func (s *AuthManager) CreateToken(systemId int64, stub int32, accessControl int32) (string, error) {
 	return s.Tkn.Token(func(h *core.JwtHeader, p *core.JwtPayload) error {
 		h.Kid = s.Kid
 		exp := time.Now().Add(time.Hour * time.Duration(TOKEN_TIME_OUT_HOURS)).UTC()
@@ -48,7 +49,7 @@ func (s *AuthManager) ValidateToken(token string) (core.OnSession, error) {
 		if err != nil {
 			return err
 		}
-		stub, err := strconv.ParseInt(parts[1], 10, 64)
+		stub, err := strconv.ParseInt(parts[1], 10, 32)
 		if err != nil {
 			return err
 		}
@@ -68,7 +69,7 @@ func (s *AuthManager) ValidateToken(token string) (core.OnSession, error) {
 			return errors.New("token timeout")
 		}
 		session.SystemId = sysId
-		session.Stub = stub
+		session.Stub = int32(stub)
 		session.AccessControl = int32(acc)
 		session.Successful = true
 		return nil

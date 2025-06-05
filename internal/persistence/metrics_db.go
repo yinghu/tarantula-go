@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"errors"
+
 	"gameclustering.com/internal/metrics"
 )
 
@@ -10,7 +11,7 @@ type MetricsDB struct {
 }
 
 func (s *MetricsDB) WebRequest(m metrics.ReqMetrics) error {
-	inserted, err := s.Sql.Exec("INSERT INTO req_metrics (path,req_timed,node) VALUES($1,$2,$3)", m.Path, m.ReqTimed, m.Node)
+	inserted, err := s.Sql.Exec("INSERT INTO req_metrics (path,req_timed,node,req_id) VALUES($1,$2,$3,$4)", m.Path, m.ReqTimed, m.Node, m.ReqId)
 	if err != nil {
 		return err
 	}
@@ -19,4 +20,3 @@ func (s *MetricsDB) WebRequest(m metrics.ReqMetrics) error {
 	}
 	return nil
 }
-

@@ -30,12 +30,12 @@ func (s *PresenceLogin) Login(login *event.Login) {
 		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), WRONG_PASS_CODE)}
 		return
 	}
-	tk, err := s.Auth.CreateToken(login.SystemId, login.SystemId, login.AccessControl)
+	tk, err := s.Auth.CreateToken(login.SystemId, login.Id, login.AccessControl)
 	if err != nil {
 		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), INVALID_TOKEN_CODE)}
 		return
 	}
-	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk, Home: s.Cls.Local().HttpEndpoint}
+	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: s.Cls.Local().HttpEndpoint}
 	login.Cc <- event.Chunk{Remaining: false, Data: util.ToJson(session)}
 }
 

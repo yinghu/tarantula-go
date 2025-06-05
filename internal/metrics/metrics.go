@@ -8,4 +8,5 @@ type ReqMetrics struct {
 	Path     string
 	ReqTimed int64
 	Node     string
+	ReqId    int32
 }

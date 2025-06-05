@@ -35,12 +35,12 @@ func (s *AdminLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 		w.Write(util.ToJson(session))
 		return
 	}
-	tk, err := s.Auth.CreateToken(login.SystemId, login.SystemId, login.AccessControl)
+	tk, err := s.Auth.CreateToken(login.SystemId, login.Id, login.AccessControl)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.SystemId, Token: tk, Home: s.Cluster().Local().HttpEndpoint}
+	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: s.Cluster().Local().HttpEndpoint}
 	w.Write(util.ToJson(session))
 }

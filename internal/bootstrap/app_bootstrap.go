@@ -76,9 +76,10 @@ func illegalAccess(w http.ResponseWriter, r *http.Request) {
 func Logging(s TarantulaApp) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
+		var stub int32 = 0
 		defer func() {
 			dur := time.Since(start)
-			ms := metrics.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.Cluster().Local().Name}
+			ms := metrics.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.Cluster().Local().Name, ReqId: stub}
 			s.Metrics().WebRequest(ms)
 		}()
 		if s.AccessControl() == PUBLIC_ACCESS_CONTROL {
@@ -100,6 +101,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			illegalAccess(w, r)
 			return
 		}
+		stub = session.Stub
 		s.Request(session, w, r)
 	}
 }
