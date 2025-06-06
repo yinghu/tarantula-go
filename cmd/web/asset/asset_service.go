@@ -12,6 +12,7 @@ import (
 
 type AssetService struct {
 	bootstrap.AppManager
+	assetDir string
 }
 
 func (s *AssetService) Config() string {
@@ -20,6 +21,7 @@ func (s *AssetService) Config() string {
 
 func (s *AssetService) Start(f conf.Env, c cluster.Cluster) error {
 	s.AppManager.Start(f, c)
+	s.assetDir = f.LocalDir
 	err := s.createSchema()
 	if err != nil {
 		return nil
