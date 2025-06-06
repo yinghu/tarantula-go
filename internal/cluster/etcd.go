@@ -193,7 +193,6 @@ func (c *Etc) Atomic(prefix string, t Exec) error {
 		prefix = c.Group
 		fmt.Printf("Reset Lock prefix %s\n", prefix)
 	}
-	fmt.Printf("Lock prefix %s\n", prefix)
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   c.EtcdEndpoints,
 		DialTimeout: 5 * time.Second,

@@ -25,6 +25,10 @@ const (
 	INVALID_TOKEN_MSG  string = "invalid token"
 )
 
+const (
+	METRICS_SQL_SCHEMA string = "CREATE TABLE IF NOT EXISTS req_metrics (id BIGSERIAL PRIMARY KEY,path VARCHAR(50) NOT NULL,req_timed BIGINT NOT NULL,req_time TIMESTAMP DEFAULT NOW(),node VARCHAR(10) NOT NULL,req_id INTEGER DEFAULT 0)"
+)
+
 type TarantulaContext interface {
 	Config() string
 	Start(f conf.Env, c cluster.Cluster) error
