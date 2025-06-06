@@ -11,8 +11,7 @@ type Sql struct {
 }
 
 type LocalStore struct {
-	InMemory bool   `json:"InMemory"`
-	Path     string `json:"Path"`
+	InMemory bool `json:"InMemory"`
 }
 
 type EventEndpoint struct {

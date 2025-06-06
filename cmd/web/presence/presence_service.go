@@ -45,7 +45,8 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	}
 	sfk := util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.Seq = &sfk
-	ds := persistence.Cache{InMemory: env.Bdg.InMemory, Path: env.Bdg.Path, Seq: s.Seq}
+	path := env.LocalDir + "/store"
+	ds := persistence.Cache{InMemory: env.Bdg.InMemory, Path: path, Seq: s.Seq}
 	err = ds.Open()
 	if err != nil {
 		return err
