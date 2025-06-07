@@ -30,6 +30,7 @@ func (s *AssetUpload) Request(rs core.OnSession, w http.ResponseWriter, r *http.
 	os.MkdirAll(pdir, 0755)
 	fid := uuid.New()
 	dest, err := os.OpenFile(pdir+"/"+fid.String()+"."+strings.Split(ctype, "/")[1], os.O_CREATE, 0644)
+	w.WriteHeader(http.StatusOK)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))

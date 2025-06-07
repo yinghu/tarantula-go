@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -22,6 +23,7 @@ func (s *AssetDownload) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 	defer r.Body.Close()
 	aIndex := AssetIndex{systemId: rs.SystemId, name: "profile.png"}
 	err := s.loadAssetIndex(&aIndex)
+	w.WriteHeader(http.StatusOK)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
@@ -35,6 +37,5 @@ func (s *AssetDownload) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 		return
 	}
 	defer dest.Close()
-	session := core.OnSession{Successful: true, Message: "download [" + aIndex.fileIndex + "]"}
-	w.Write(util.ToJson(session))
+	io.Copy(w, dest)
 }
