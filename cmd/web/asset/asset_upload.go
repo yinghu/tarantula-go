@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -30,20 +31,20 @@ func (s *AssetUpload) Request(rs core.OnSession, w http.ResponseWriter, r *http.
 	fid := uuid.New()
 	dest, err := os.OpenFile(pdir+"/"+fid.String()+"."+strings.Split(ctype, "/")[1], os.O_CREATE, 0644)
 	if err != nil {
-		session := core.OnSession{Successful: true, Message: err.Error()}
+		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
 	defer dest.Close()
 	rt, err := io.Copy(dest, r.Body)
 	if err != nil {
-		session := core.OnSession{Successful: true, Message: err.Error()}
+		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	err = s.saveAssetIndex(AssetIndex{systemId: rs.SystemId, name: "profile.png", fileIndex: fid.String()})
+	err = s.saveAssetIndex(AssetIndex{systemId: rs.SystemId, name: "profile.png", fileIndex: fid.String(), uploadTime: time.Now()})
 	if err != nil {
-		session := core.OnSession{Successful: true, Message: err.Error()}
+		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
