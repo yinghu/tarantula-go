@@ -13,20 +13,25 @@ import (
 const (
 	PUBLIC_ACCESS_CONTROL    int32 = 0
 	PROTECTED_ACCESS_CONTROL int32 = 1
-	ADMIN_ACCESS_CONTROL     int32 = 6
+	ADMIN_ACCESS_CONTROL     int32 = 30
 	SUDO_ACCESS_CONTROL      int32 = 100
 )
 
 const (
-	DB_OP_ERR_CODE     int    = 500100
-	WRONG_PASS_CODE    int    = 400100
-	WRONG_PASS_MSG     string = "wrong user/password"
-	INVALID_TOKEN_CODE int    = 400101
-	INVALID_TOKEN_MSG  string = "invalid token"
+	DB_OP_ERR_CODE      int    = 500100
+	
+	WRONG_PASS_CODE     int    = 400100
+	WRONG_PASS_MSG      string = "wrong user/password"
+
+	ILLEGAL_TOKEN_CODE  int    = 400101
+	INVALID_TOKEN_CODE  int    = 400102
+	ILLEGAL_ACCESS_CODE int    = 400103
+
+	INVALID_TOKEN_MSG string = "invalid token"
 )
 
 const (
-	METRICS_SQL_SCHEMA string = "CREATE TABLE IF NOT EXISTS req_metrics (id BIGSERIAL PRIMARY KEY,path VARCHAR(50) NOT NULL,req_timed BIGINT NOT NULL,req_time TIMESTAMP DEFAULT NOW(),node VARCHAR(10) NOT NULL,req_id INTEGER DEFAULT 0)"
+	METRICS_SQL_SCHEMA string = "CREATE TABLE IF NOT EXISTS req_metrics (id BIGSERIAL PRIMARY KEY,path VARCHAR(50) NOT NULL,req_timed BIGINT NOT NULL,req_time TIMESTAMP DEFAULT NOW(),node VARCHAR(10) NOT NULL,req_id INTEGER DEFAULT 0,req_code INTEGER DEFAULT 0)"
 )
 
 type TarantulaContext interface {

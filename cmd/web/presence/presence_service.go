@@ -54,6 +54,7 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	s.Ds = &ds
 	s.Started = true
 	fmt.Printf("Presence service started %s\n", env.HttpBinding)
+	http.Handle("/presence/admin", bootstrap.Logging(&PresenceAdmin{PresenceService: s}))
 	http.Handle("/presence/register", bootstrap.Logging(&PresenceRegister{PresenceService: s}))
 	http.Handle("/presence/login", bootstrap.Logging(&PresenceLogin{PresenceService: s}))
 	http.Handle("/presence/password", bootstrap.Logging(&PresenceChangePwd{PresenceService: s}))
