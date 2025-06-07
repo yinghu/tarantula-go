@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -27,7 +28,7 @@ func (s *AssetUpload) Request(rs core.OnSession, w http.ResponseWriter, r *http.
 	pdir := s.assetDir + "/" + strconv.Itoa(int(rs.SystemId))
 	os.MkdirAll(pdir, 0755)
 	fid := uuid.New()
-	dest, err := os.OpenFile(pdir+"/"+fid.String()+"."+ctype, os.O_CREATE, 0644)
+	dest, err := os.OpenFile(pdir+"/"+fid.String()+"."+strings.Split(ctype, "/")[1], os.O_CREATE, 0644)
 	if err != nil {
 		session := core.OnSession{Successful: true, Message: err.Error()}
 		w.Write(util.ToJson(session))
@@ -35,6 +36,12 @@ func (s *AssetUpload) Request(rs core.OnSession, w http.ResponseWriter, r *http.
 	}
 	defer dest.Close()
 	rt, err := io.Copy(dest, r.Body)
+	if err != nil {
+		session := core.OnSession{Successful: true, Message: err.Error()}
+		w.Write(util.ToJson(session))
+		return
+	}
+	err = s.saveAssetIndex(AssetIndex{systemId: rs.SystemId, name: "profile.png", fileIndex: fid.String()})
 	if err != nil {
 		session := core.OnSession{Successful: true, Message: err.Error()}
 		w.Write(util.ToJson(session))
