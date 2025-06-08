@@ -66,7 +66,7 @@ func AppBootstrap(service TarantulaContext) {
 
 func badRequest(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	session := core.OnSession{Successful: false, Message: "not support [" + r.URL.Path + "]"}
+	session := core.OnSession{Successful: false, Message: "bad request [" + r.URL.Path + "]"}
 	w.Write(util.ToJson(session))
 }
 
