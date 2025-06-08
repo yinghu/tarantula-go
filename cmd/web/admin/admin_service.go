@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"gameclustering.com/internal/cluster"
@@ -36,6 +35,5 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	http.Handle("/admin/password", bootstrap.Logging(&AdminChangePwd{AdminService: s}))
 	http.Handle("/admin/login", bootstrap.Logging(&AdminLogin{AdminService: s}))
 	fmt.Printf("Admin service started %s\n", f.HttpBinding)
-	log.Fatal(http.ListenAndServe(f.HttpBinding, nil))
 	return nil
 }

@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -40,9 +41,10 @@ func AppBootstrap(service TarantulaContext) {
 		}
 		err := service.Start(f, &c)
 		if err != nil {
-			//panic(err)
 			fmt.Printf("Error %s\n", err.Error())
 		}
+		http.Handle("/", http.HandlerFunc(badRequest))
+		log.Fatal(http.ListenAndServe(f.HttpBinding, nil))
 	}()
 
 	go func() {
@@ -60,6 +62,12 @@ func AppBootstrap(service TarantulaContext) {
 		close(sigs)
 	}()
 	c.Join()
+}
+
+func badRequest(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	session := core.OnSession{Successful: false, Message: "not support [" + r.URL.Path + "]"}
+	w.Write(util.ToJson(session))
 }
 
 func invalidToken(w http.ResponseWriter, r *http.Request) {

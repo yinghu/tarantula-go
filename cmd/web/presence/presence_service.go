@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
@@ -58,7 +57,6 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	http.Handle("/presence/register", bootstrap.Logging(&PresenceRegister{PresenceService: s}))
 	http.Handle("/presence/login", bootstrap.Logging(&PresenceLogin{PresenceService: s}))
 	http.Handle("/presence/password", bootstrap.Logging(&PresenceChangePwd{PresenceService: s}))
-	log.Fatal(http.ListenAndServe(env.HttpBinding, nil))
 	return nil
 }
 func (s *PresenceService) Shutdown() {
