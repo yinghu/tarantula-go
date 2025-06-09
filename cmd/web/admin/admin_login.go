@@ -29,13 +29,13 @@ func (s *AdminLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 		w.Write(util.ToJson(session))
 		return
 	}
-	err = s.Auth.ValidatePassword(pwd, login.Hash)
+	err = s.Authenticator().ValidatePassword(pwd, login.Hash)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	tk, err := s.Auth.CreateToken(login.SystemId, login.Id, login.AccessControl)
+	tk, err := s.Authenticator().CreateToken(login.SystemId, login.Id, login.AccessControl)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))

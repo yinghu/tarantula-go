@@ -4,12 +4,13 @@ import (
 	"crypto/rand"
 	"testing"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 )
 
 func TestAuthManager(t *testing.T) {
 
-	tkn := util.JwtHMac{Alg: "SHS256"}
+	tkn := util.JwtHMac{Alg: core.JWT_ALG}
 	key := make([]byte, tkn.Ksz)
 	rand.Read(key)
 	tkn.HMacFromKey(key)

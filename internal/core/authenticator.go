@@ -1,10 +1,9 @@
 package core
 
 type Authenticator interface {
-	HashPassword(password string) (string, error)
-	ValidatePassword(password string, hash string) error
-	CreateToken(systemId int64, stub int32, accessControl int32) (string, error)
-	ValidateToken(token string) (OnSession, error)
+	Password
+	Token
+	Ticket
 }
 
 type OnSession struct {

@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/event"
-
-	"gameclustering.com/internal/bootstrap"
 )
 
 type AdminService struct {
@@ -21,7 +20,7 @@ func (s *AdminService) Config() string {
 
 func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	s.AppManager.Start(f, c)
-	hash, err := s.Auth.HashPassword("password")
+	hash, err := s.Authenticator().HashPassword("password")
 	if err != nil {
 		return err
 	}
@@ -29,6 +28,13 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	if err != nil {
 		fmt.Printf("Root already existed %s\n", err.Error())
 	}
+	configApp := AdminConfigApp{AdminService: s}
+	err = configApp.start()
+	if err != nil {
+		return err
+	}
+	http.Handle("/admin/configapp/{app}", bootstrap.Logging(&configApp))
+	http.Handle("/admin/resetkey", bootstrap.Logging(&AdminResetKey{AdminService: s}))
 	http.Handle("/admin/getnode/{group}/{name}", bootstrap.Logging(&AdminGetNode{AdminService: s}))
 	http.Handle("/admin/addlogin", bootstrap.Logging(&SudoAddLogin{AdminService: s}))
 	http.Handle("/admin/confignode", bootstrap.Logging(&SudoConfigNode{AdminService: s}))

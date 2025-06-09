@@ -11,14 +11,15 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-const TOKEN_TIME_OUT_HOURS int = 24
+const (
+	TOKEN_TIME_OUT_HOURS    int = 24
+	TICKET_TIME_OUT_SECONDS int = 5
+)
 
 type AuthManager struct {
-	
-
-	Kid      string
-	Tkn      core.Jwt
-	Cipher   *util.Aes
+	Kid    string
+	Tkn    core.Jwt
+	Cipher *util.Aes
 }
 
 func (s *AuthManager) HashPassword(password string) (string, error) {
@@ -78,4 +79,18 @@ func (s *AuthManager) ValidateToken(token string) (core.OnSession, error) {
 		return session, err
 	}
 	return session, nil
+}
+
+func (s *AuthManager) CreateTicket(systemId int64, stub int32, accessControl int32) (string, error) {
+	return s.Tkn.Token(func(h *core.JwtHeader, p *core.JwtPayload) error {
+		h.Kid = s.Kid
+		exp := time.Now().Add(time.Hour * time.Duration(TICKET_TIME_OUT_SECONDS)).UTC()
+		p.Exp = exp.UnixMilli()
+		aud := fmt.Sprintf("%d.%d.%d.%d", systemId, stub, accessControl, p.Exp)
+		p.Aud = s.Cipher.Encrypt(aud)
+		return nil
+	})
+}
+func (s *AuthManager) ValidateTicket(ticket string) (core.OnSession, error) {
+	return s.ValidateToken(ticket)
 }

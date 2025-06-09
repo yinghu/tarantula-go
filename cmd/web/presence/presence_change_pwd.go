@@ -20,7 +20,7 @@ func (s *PresenceChangePwd) chnagePwd(login *event.Login) {
 		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
 		return
 	}
-	hash, err := s.Auth.HashPassword(pwd)
+	hash, err := s.Authenticator().HashPassword(pwd)
 	if err != nil {
 		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
 		return

@@ -13,25 +13,25 @@ import (
 )
 
 type AppManager struct {
-	Cls  cluster.Cluster
-	Metr metrics.MetricsService
-	Auth core.Authenticator
+	cls  cluster.Cluster
+	metr metrics.MetricsService
+	auth core.Authenticator
 	Sql  persistence.Postgresql
 }
 
 func (s *AppManager) Metrics() metrics.MetricsService {
-	return s.Metr
+	return s.metr
 }
 func (s *AppManager) Cluster() cluster.Cluster {
-	return s.Cls
+	return s.cls
 }
 func (s *AppManager) Authenticator() core.Authenticator {
-	return s.Auth
+	return s.auth
 }
 
 func (s *AppManager) Start(f conf.Env, c cluster.Cluster) error {
-	s.Cls = c
-	tkn := util.JwtHMac{Alg: "SHS256", Ksz: core.JWT_KEY_SIZE}
+	s.cls = c
+	tkn := util.JwtHMac{Alg: core.JWT_ALG, Ksz: core.JWT_KEY_SIZE}
 	ci := util.Aes{Ksz: core.CIPHER_KEY_SIZE}
 	err := c.Atomic(f.Presence, func(ctx cluster.Ctx) error {
 		jsk, err := ctx.Get(core.JWT_KEY_NAME)
@@ -70,7 +70,7 @@ func (s *AppManager) Start(f conf.Env, c cluster.Cluster) error {
 	if err != nil {
 		return err
 	}
-	s.Auth = &AuthManager{Tkn: &tkn, Cipher: &ci, Kid: f.GroupName}
+	s.auth = &AuthManager{Tkn: &tkn, Cipher: &ci, Kid: f.GroupName}
 	sql := persistence.Postgresql{Url: f.Pgs.DatabaseURL}
 	err = sql.Create()
 	if err != nil {
@@ -78,7 +78,7 @@ func (s *AppManager) Start(f conf.Env, c cluster.Cluster) error {
 	}
 	s.Sql = sql
 	ms := persistence.MetricsDB{Sql: &sql}
-	s.Metr = &ms
+	s.metr = &ms
 	return nil
 }
 

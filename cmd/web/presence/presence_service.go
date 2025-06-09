@@ -83,8 +83,8 @@ func (s *PresenceService) Publish(e event.Event) error {
 	if err == nil {
 		fmt.Printf("LOADED %d\n", load.SystemId)
 	}
-	for v := range s.Cls.View() {
-		if v.Name != s.Cls.Local().Name {
+	for v := range s.Cluster().View() {
+		if v.Name != s.Cluster().Local().Name {
 			go func() {
 				pub := event.SocketPublisher{Remote: v.TcpEndpoint}
 				pub.Publish(e)

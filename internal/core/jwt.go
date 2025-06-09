@@ -7,8 +7,9 @@ type JwtHeader struct {
 }
 
 const (
-	JWT_KEY_NAME    string = "jwtkey"
+	JWT_KEY_NAME string = "jwtkey"
 	JWT_KEY_SIZE int16  = 32
+	JWT_ALG      string = "SHS256"
 )
 
 type JwtPayload struct {

@@ -29,7 +29,7 @@ func (s *AdminChangePwd) Request(rs core.OnSession,w http.ResponseWriter, r *htt
 		w.Write(util.ToJson(session))
 		return
 	}
-	hash, err := s.Auth.HashPassword(pwd)
+	hash, err := s.Authenticator().HashPassword(pwd)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))

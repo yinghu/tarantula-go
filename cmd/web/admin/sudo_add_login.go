@@ -29,7 +29,7 @@ func (s *SudoAddLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http
 	if login.AccessControl <= 0 {
 		login.AccessControl = bootstrap.PROTECTED_ACCESS_CONTROL
 	}
-	hash, err := s.Auth.HashPassword(login.Hash)
+	hash, err := s.Authenticator().HashPassword(login.Hash)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
