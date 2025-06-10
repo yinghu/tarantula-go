@@ -11,10 +11,11 @@ type InventoryService struct {
 }
 
 func (s *InventoryService) Config() string {
-	return "/etc/tarantula/asset-conf.json"
+	return "/etc/tarantula/inventory-conf.json"
 }
 
 func (s *InventoryService) Start(f conf.Env, c cluster.Cluster) error {
 	s.AppManager.Start(f, c)
+	s.createSchema()
 	return nil
 }
