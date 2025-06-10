@@ -12,16 +12,16 @@ const (
 )
 
 type Endpoint struct {
-	TcpEndpoint    string
-	Service        EventService
-	listener       net.Listener
+	TcpEndpoint string
+	Service     EventService
+	listener    net.Listener
 }
 
 func (s *Endpoint) handleClient(client net.Conn) {
 	defer func() {
 		client.Close()
 	}()
-	socket := SocketBuffer{Socket: client, Buffer: make([]byte,TCP_READ_BUFFER_SIZE)}
+	socket := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
 	cid, err := socket.ReadInt32()
 	if err != nil {
 		fmt.Printf("Error on read cid %s\n", err.Error())

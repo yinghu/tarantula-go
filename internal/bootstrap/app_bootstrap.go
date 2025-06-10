@@ -46,7 +46,6 @@ func AppBootstrap(service TarantulaContext) {
 		http.Handle("/", http.HandlerFunc(badRequest))
 		log.Fatal(http.ListenAndServe(f.HttpBinding, nil))
 	}()
-
 	go func() {
 		c.Started.Wait()
 		fmt.Println("Wating for signal to exit ...")

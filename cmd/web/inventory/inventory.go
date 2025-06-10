@@ -1,7 +1,7 @@
 package main
 
-import "fmt"
+import "gameclustering.com/internal/bootstrap"
 
 func main() {
-	fmt.Printf("Inventory app\n")
+	bootstrap.AppBootstrap(&InventoryService{})
 }
