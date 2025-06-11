@@ -1,8 +1,6 @@
 package bootstrap
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -22,7 +20,7 @@ func AppBootstrap(service TarantulaContext) {
 	f := conf.Env{}
 	err := f.Load(service.Config())
 	if err != nil {
-		fmt.Printf("Config not existed %s\n", err.Error())
+		core.AppLog.Printf("Config not existed %s\n", err.Error())
 		return
 	}
 	c := cluster.NewEtc(f.GroupName, f.EtcdEndpoints, cluster.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.Evp.TcpEndpoint})
@@ -37,18 +35,19 @@ func AppBootstrap(service TarantulaContext) {
 	go func() {
 		c.Started.Wait()
 		for v := range c.View() {
-			fmt.Printf("View :%v\n", v)
+			core.AppLog.Printf("View :%v\n", v)
 		}
 		err := service.Start(f, &c)
 		if err != nil {
-			fmt.Printf("Error %s\n", err.Error())
+			core.AppLog.Printf("Error %s\n", err.Error())
 		}
 		http.Handle("/", http.HandlerFunc(badRequest))
-		log.Fatal(http.ListenAndServe(f.HttpBinding, nil))
+		core.AppLog.Fatal(http.ListenAndServe(f.HttpBinding, nil))
+
 	}()
 	go func() {
 		c.Started.Wait()
-		fmt.Println("Wating for signal to exit ...")
+		core.AppLog.Println("Wating for signal to exit ...")
 		sigs := make(chan os.Signal, 1)
 		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 		<-sigs

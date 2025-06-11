@@ -1,8 +1,6 @@
 package bootstrap
 
 import (
-	"fmt"
-
 	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
@@ -36,7 +34,7 @@ func (s *AppManager) Start(f conf.Env, c cluster.Cluster) error {
 	err := c.Atomic(f.Presence, func(ctx cluster.Ctx) error {
 		jsk, err := ctx.Get(core.JWT_KEY_NAME)
 		if err != nil {
-			fmt.Println("Create new jwt key")
+			core.AppLog.Println("Create new jwt key")
 			nkey := util.Key(tkn.Ksz)
 			ctx.Put(core.JWT_KEY_NAME, util.KeyToBase64(nkey))
 			tkn.HMacFromKey(nkey)
@@ -55,7 +53,7 @@ func (s *AppManager) Start(f conf.Env, c cluster.Cluster) error {
 	err = c.Atomic(f.Presence, func(ctx cluster.Ctx) error {
 		csk, err := ctx.Get(core.CIPHER_KEY_NAME)
 		if err != nil {
-			fmt.Println("Create new cipher key")
+			core.AppLog.Println("Create new cipher key")
 			ckey := util.Key(ci.Ksz)
 			ctx.Put(core.CIPHER_KEY_NAME, util.KeyToBase64(ckey))
 			ci.AesGcmFromKey(ckey)
@@ -95,5 +93,5 @@ func (s *AppManager) OnEvent(e event.Event) {
 }
 
 func (s *AppManager) Updated(key string, value string) {
-	fmt.Printf("Key updated %s %s\n", key, value)
+	core.AppLog.Printf("Key updated %s %s\n", key, value)
 }
