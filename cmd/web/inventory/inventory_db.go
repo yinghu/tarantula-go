@@ -19,9 +19,14 @@ func (s *InventoryService) createSchema() error {
 	if err != nil {
 		return err
 	}
-	s.Sql.Exec(ITEM_INDEX_SQL_SCHEMA)
-	s.Sql.Exec(INVENTORY_SQL_SCHEMA)
+	_, err = s.Sql.Exec(ITEM_INDEX_SQL_SCHEMA)
+	if err != nil {
+		return err
+	}
+	_, err = s.Sql.Exec(INVENTORY_SQL_SCHEMA)
+	if err != nil {
+		return err
+	}
 	return nil
 
-	
 }
