@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+
+	"gameclustering.com/internal/core"
 )
 
 type Sql struct {
@@ -55,5 +57,6 @@ func (f *Env) Load(fn string) error {
 			return err
 		}
 	}
+	core.CreateAppLog(f.LocalDir)
 	return nil
 }
