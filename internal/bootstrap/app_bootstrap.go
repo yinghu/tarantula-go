@@ -51,6 +51,7 @@ func AppBootstrap(service TarantulaContext) {
 		sigs := make(chan os.Signal, 1)
 		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 		<-sigs
+		core.AppLog.Println("Signal to exit")
 		service.Shutdown()
 		c.Quit <- true
 		if f.Evp.Enabled {
