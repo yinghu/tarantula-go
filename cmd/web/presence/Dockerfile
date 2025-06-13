@@ -19,6 +19,10 @@ RUN go -C cmd/web/presence build -o main
 # Create a new stage for the final image
 FROM alpine:latest
 VOLUME /presence
+USER root
+RUN mkdir /etc/tarantula 
+COPY cmd/web/presence/presence-conf.json /etc/tarantula/presence-conf.json
+
 # Set the working directory inside the container
 WORKDIR /cmd/web/presence
 

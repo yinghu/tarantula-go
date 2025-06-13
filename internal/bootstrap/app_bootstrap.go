@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -20,7 +21,7 @@ func AppBootstrap(service TarantulaContext) {
 	f := conf.Env{}
 	err := f.Load(service.Config())
 	if err != nil {
-		core.AppLog.Printf("Config not existed %s\n", err.Error())
+		fmt.Printf("Config not existed %s\n", err.Error())
 		return
 	}
 	c := cluster.NewEtc(f.GroupName, f.EtcdEndpoints, cluster.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.Evp.TcpEndpoint})
