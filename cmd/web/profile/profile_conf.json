@@ -1,0 +1,19 @@
+{
+    "GroupName" :"presence",
+	"NodeName" :   "a01",
+	"NodeId"     :   1,
+	"HttpBinding":  ":8080",
+	"HttpEndpoint":  "192.168.1.4:8080",
+	"EtcdEndpoints": ["192.168.1.7:2379"],
+	"LocalDir":"",
+	"Sql":{
+		"DatabaseURL"  : "postgres://postgres:password@192.168.1.7:5432/tarantula_presence"	
+	},
+	"LocalStore":{
+		"InMemory":false
+	},
+	"EventEndpoint":{
+		"Enabled":true,
+		"TcpEndpoint"  : "tcp://192.168.1.4:5000"
+	}
+}
