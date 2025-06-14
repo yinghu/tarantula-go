@@ -13,13 +13,14 @@ RUN go build -o main .
 
 # Create a new stage for the final image
 FROM alpine:latest
-VOLUME /profile
+RUN addgroup -S tarantula && adduser -S tarantula -G tarantula
+#VOLUME /profile
 # Set the working directory inside the container
-WORKDIR /cmd/web/profile
-USER root
+#USER root
 RUN mkdir /etc/tarantula 
 COPY profile_conf.json /etc/tarantula/profile_conf.json
-
+USER tarantula
+WORKDIR /home/tarantula/cmd/web/profile
 # Copy the binary from the builder stage
 COPY --from=builder /build/main .
 
