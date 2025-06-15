@@ -41,9 +41,9 @@ func (s *Endpoint) handleClient(client net.Conn) {
 }
 
 func (s *Endpoint) Open() error {
-	parts := strings.Split(s.TcpEndpoint, "://")
-	fmt.Printf("Endpoint %s %s\n", parts[0], parts[1])
-	server, err := net.Listen(parts[0], parts[1])
+	parts := strings.Split(s.TcpEndpoint, ":")
+	fmt.Printf("Endpoint %s %s\n", parts[0], parts[2])
+	server, err := net.Listen(parts[0], ":"+parts[2])
 	if err != nil {
 		return err
 	}
