@@ -13,19 +13,28 @@ RUN go build -o main .
 
 # Create a new stage for the final image
 FROM alpine:latest
+
+RUN apk update
+RUN apk add openrc
+RUN apk add nginx
+RUN rc-update add nginx default
 RUN addgroup -S tarantula && adduser -S tarantula -G tarantula
 #VOLUME /profile
 # Set the working directory inside the container
 #USER root
 RUN mkdir /etc/tarantula 
 COPY profile_conf.json /etc/tarantula/profile_conf.json
-USER tarantula
-WORKDIR /home/tarantula/cmd/web/profile
+
+#USER tarantula
+#WORKDIR /home/tarantula/cmd/web/profile
 # Copy the binary from the builder stage
 COPY --from=builder /build/main .
 
 # Expose the port the application listens on
 EXPOSE 8080
-
+EXPOSE 80
 # Command to run the application
-CMD ["./main"]
+#CMD ["nginx", "-g", "daemon off;"]
+#CMD ["./main"]
+
+ENTRYPOINT /bin/bash -x nginx -g 'daemon off;' && ./main

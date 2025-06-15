@@ -1,4 +1,4 @@
 # tarantula migration go version
 
 # To build docker image 
-  docker build --file cmd/web/presence/Dockerfile -t tarantula.presence .
+  docker build --file cmd/web/{application}/docker_build -t tarantula.{application}:v1 .
