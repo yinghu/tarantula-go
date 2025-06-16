@@ -12,7 +12,13 @@ func TestHeader(t *testing.T) {
 
 	err := json.Unmarshal([]byte(h), &c)
 	if err != nil {
-		t.Errorf("Error %s\n", err.Error())
+		t.Errorf("Parse Error %s\n", err.Error())
 	}
-	fmt.Printf("JSON %v %v %v %s %s\n", c.Header, c.Reference, c.Application,c.Name,c.Type)
+	fmt.Printf("JSON %v %v %v %s %s\n", c.Header, c.Reference, c.Application, c.Name, c.Type)
+
+	r, err := json.Marshal(c)
+	if err != nil {
+		t.Errorf("Flat Error %s\n", err.Error())
+	}
+	fmt.Printf("JSON %s\n", string(r))
 }

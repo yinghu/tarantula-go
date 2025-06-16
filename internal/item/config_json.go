@@ -11,3 +11,5 @@ type Configuration struct {
 	Application map[string][]int64 `json:"application"`
 	Reference   []int64            `json:"reference"`
 }
+
+
