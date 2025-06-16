@@ -32,7 +32,6 @@ func (s *PresenceService) OnEvent(e event.Event) {
 		fmt.Printf("No save %s\n", err.Error())
 		return
 	}
-	fmt.Printf("event saved")
 }
 
 func (s *PresenceService) Config() string {

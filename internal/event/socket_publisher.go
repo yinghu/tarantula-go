@@ -1,7 +1,6 @@
 package event
 
 import (
-	"fmt"
 	"net"
 	"strings"
 )
@@ -13,7 +12,6 @@ type SocketPublisher struct {
 }
 
 func (s *SocketPublisher) Publish(e Event) {
-	fmt.Printf("publish %s\n", s.Remote)
 	parts := strings.Split(s.Remote, "://")
 	conn, err := net.Dial(parts[0], parts[1])
 	if err != nil {
