@@ -1,4 +1,4 @@
-module gameclustering.com/main
+module gameclustering.com/tournament
 
 go 1.24.2
 

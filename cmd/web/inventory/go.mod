@@ -1,4 +1,4 @@
-module gameclustering.com/main
+module gameclustering.com/inventory
 
 go 1.24.2
 
