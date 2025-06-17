@@ -22,8 +22,13 @@ func (s *AdminService) Config() string {
 func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	s.AppManager.Start(f, c)
 	s.createSchema()
-	cnf := item.Configuration{Name: "b", Type: "CH", TypeId: "c-100", Category: "Cash", Version: "1.0"}
-	s.ItemService().Save(cnf)
+	cnf := item.Configuration{Name: "mx", Type: "CH", TypeId: "c-100", Category: "Cash", Version: "1.0", Header: map[string]any{"name": "bom", "max": 100}}
+	//cnf.Header["name"] = "b01"
+	//cnf.Header["max"] = 100
+	err := s.ItemService().Save(cnf)
+	if err != nil {
+		fmt.Printf("SQL ER %s\n", err.Error())
+	}
 	hash, err := s.Authenticator().HashPassword("password")
 	if err != nil {
 		return err
