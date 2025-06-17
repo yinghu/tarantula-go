@@ -7,9 +7,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-
 type Next func(row pgx.Rows) error
-type Transaction func (tx pgx.Tx) error
+type Transaction func(tx pgx.Tx) error
 
 type Postgresql struct {
 	Pool      *pgxpool.Pool
@@ -59,26 +58,26 @@ func (p *Postgresql) Exec(query string, values ...any) (int64, error) {
 	return tag.RowsAffected(), nil
 }
 
-func (p *Postgresql) Txn(tx Transaction) error{
+func (p *Postgresql) Txn(tx Transaction) error {
 	conn, err := p.Pool.Acquire(context.Background())
 	if err != nil {
 		return err
 	}
 	defer conn.Release()
-	ptx, err := conn.BeginTx(context.Background(),pgx.TxOptions{})
-	if err != nil{
+	ptx, err := conn.BeginTx(context.Background(), pgx.TxOptions{})
+	if err != nil {
 		return err
 	}
 	err = tx(ptx)
 	defer func() {
-        if err != nil {
-            ptx.Rollback(context.Background())
-        } else {
-            ptx.Commit(context.Background())
-        }
-    }()
-	
-	return nil
+		if err != nil {
+			ptx.Rollback(context.Background())
+		} else {
+			ptx.Commit(context.Background())
+		}
+	}()
+
+	return err
 }
 
 func (p *Postgresql) Close() {
