@@ -16,11 +16,14 @@ replace gameclustering.com/internal/core => ../core
 
 replace gameclustering.com/internal/metrics => ../metrics
 
+replace gameclustering.com/internal/item => ../item
+
 require (
 	gameclustering.com/internal/cluster v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/conf v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000

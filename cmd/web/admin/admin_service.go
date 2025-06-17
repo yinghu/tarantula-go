@@ -8,6 +8,7 @@ import (
 	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/item"
 )
 
 type AdminService struct {
@@ -20,6 +21,9 @@ func (s *AdminService) Config() string {
 
 func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	s.AppManager.Start(f, c)
+	s.createSchema()
+	cnf := item.Configuration{Name: "b", Type: "CH", TypeId: "c-100", Category: "Cash", Version: "1.0"}
+	s.ItemService().Save(cnf)
 	hash, err := s.Authenticator().HashPassword("password")
 	if err != nil {
 		return err

@@ -3,9 +3,30 @@ package main
 import (
 	"errors"
 
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/event"
 	"github.com/jackc/pgx/v5"
 )
+
+func (s *AdminService) createSchema() error {
+	_, err := s.Sql.Exec(bootstrap.METRICS_SQL_SCHEMA)
+	if err != nil {
+		return err
+	}
+	_, err = s.Sql.Exec(bootstrap.ITEM_CONFIGURATION_SQL_SCHEMA)
+	if err != nil {
+		return err
+	}
+	_, err = s.Sql.Exec(bootstrap.ITEM_HEADER_SQL_SCHEMA)
+	if err != nil {
+		return err
+	}
+	_, err = s.Sql.Exec(bootstrap.ITEM_APPLICATION_SQL_SCHEMA)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func (s *AdminService) SaveLogin(login *event.Login) error {
 	inserted, err := s.Sql.Exec("INSERT INTO login (name,hash,access_control) VALUES($1,$2,$3)", login.Name, login.Hash, login.AccessControl)

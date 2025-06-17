@@ -5,6 +5,7 @@ import (
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/metrics"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
@@ -13,8 +14,13 @@ import (
 type AppManager struct {
 	cls  cluster.Cluster
 	metr metrics.MetricsService
+	imse item.ItemService
 	auth core.Authenticator
 	Sql  persistence.Postgresql
+}
+
+func (s *AppManager) ItemService() item.ItemService {
+	return s.imse
 }
 
 func (s *AppManager) Metrics() metrics.MetricsService {
@@ -77,6 +83,8 @@ func (s *AppManager) Start(f conf.Env, c cluster.Cluster) error {
 	s.Sql = sql
 	ms := persistence.MetricsDB{Sql: &sql}
 	s.metr = &ms
+	is := persistence.ItemDB{Sql: &sql}
+	s.imse = &is
 	return nil
 }
 
