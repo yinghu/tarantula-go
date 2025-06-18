@@ -8,7 +8,6 @@ import (
 	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/event"
-	"gameclustering.com/internal/item"
 )
 
 type AdminService struct {
@@ -22,16 +21,16 @@ func (s *AdminService) Config() string {
 func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	s.AppManager.Start(f, c)
 	s.createSchema()
-	cnf := item.Configuration{Name: "mx200", Type: "CH", TypeId: "c-100", Category: "Cash", Version: "1.0", Header: map[string]any{"name": "bom", "max": 100}}
-	cnf.Application = map[string][]int64{"Skus": {1, 3, 4}}
-	err := s.ItemService().Save(cnf)
-	if err != nil {
-		fmt.Printf("SQL err %s\n", err.Error())
-	}
-	err = s.ItemService().DeleteWithName("mx100")
-	if err != nil {
-		fmt.Printf("SQL ER %s\n", err.Error())
-	}
+	//cnf := item.Configuration{Name: "mx200", Type: "CH", TypeId: "c-100", Category: "Cash", Version: "1.0", Header: map[string]any{"name": "bom", "max": 100}}
+	//cnf.Application = map[string][]int64{"Skus": {1, 3, 4}}
+	//err := s.ItemService().Save(cnf)
+	//if err != nil {
+	//fmt.Printf("SQL err %s\n", err.Error())
+	//}
+	//err = s.ItemService().DeleteWithName("mx100")
+	//if err != nil {
+	//fmt.Printf("SQL ER %s\n", err.Error())
+	//}
 	hash, err := s.Authenticator().HashPassword("password")
 	if err != nil {
 		return err

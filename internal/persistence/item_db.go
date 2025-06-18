@@ -10,12 +10,13 @@ import (
 )
 
 const (
-	INSERT_CONFIG      string = "INSERT INTO item_configuration (name,type,type_id,category,version) VALUES($1,$2,$3,$4,$5) RETURNING id"
-	INSERT_HEADER      string = "INSERT INTO item_header (configuration_id,name,value) VALUES($1,$2,$3)"
-	INSERT_APPLICATION string = "INSERT INTO item_application (configuration_id,name,reference_id) VALUES($1,$2,$3)"
-	DELETE_CONFIG      string = "DELETE FROM item_configuration WHERE name = $1 RETURNING id"
-	DELETE_HEADER      string = "DELETE FROM item_header WHERE configuration_id = $1"
-	DELETE_APPLICATION string = "DELETE FROM item_application WHERE configuration_id = $1"
+	INSERT_CONFIG           string = "INSERT INTO item_configuration (name,type,type_id,category,version) VALUES($1,$2,$3,$4,$5) RETURNING id"
+	INSERT_HEADER           string = "INSERT INTO item_header (configuration_id,name,value) VALUES($1,$2,$3)"
+	INSERT_APPLICATION      string = "INSERT INTO item_application (configuration_id,name,reference_id) VALUES($1,$2,$3)"
+	DELETE_CONFIG_WITH_NAME string = "DELETE FROM item_configuration WHERE name = $1 RETURNING id"
+	DELETE_HEADER           string = "DELETE FROM item_header WHERE configuration_id = $1"
+	DELETE_APPLICATION      string = "DELETE FROM item_application WHERE configuration_id = $1"
+	DELETE_CONFIG_WITH_ID   string = "DELETE FROM item_configuration WHERE id"
 )
 
 type ItemDB struct {
@@ -53,7 +54,7 @@ func (db *ItemDB) Save(c item.Configuration) error {
 	})
 }
 func (db *ItemDB) LoadWithName(cname string) (item.Configuration, error) {
-
+	
 	return item.Configuration{}, nil
 }
 
@@ -61,10 +62,28 @@ func (db *ItemDB) LoadWithId(cid int32) (item.Configuration, error) {
 	return item.Configuration{}, nil
 }
 
+func (db *ItemDB) DeleteWithId(cid int32) error {
+	return db.Sql.Txn(func(tx pgx.Tx) error {
+		_,err := tx.Exec(context.Background(), DELETE_CONFIG_WITH_ID, cid)
+		if err != nil {
+			return err
+		}
+		_, err = tx.Exec(context.Background(), DELETE_HEADER, cid)
+		if err != nil {
+			return err
+		}
+		_, err = tx.Exec(context.Background(), DELETE_APPLICATION, cid)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
 func (db *ItemDB) DeleteWithName(cname string) error {
 	return db.Sql.Txn(func(tx pgx.Tx) error {
 		var id int32
-		err := tx.QueryRow(context.Background(), DELETE_CONFIG, cname).Scan(&id)
+		err := tx.QueryRow(context.Background(), DELETE_CONFIG_WITH_NAME, cname).Scan(&id)
 		if err != nil {
 			return err
 		}

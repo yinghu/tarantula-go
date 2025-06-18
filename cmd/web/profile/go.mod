@@ -18,6 +18,8 @@ replace gameclustering.com/internal/metrics => ../../../internal/metrics
 
 replace gameclustering.com/internal/bootstrap => ../../../internal/bootstrap
 
+replace gameclustering.com/internal/item => ../../../internal/item
+
 require (
 	gameclustering.com/internal/bootstrap v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/cluster v0.0.0-00010101000000-000000000000
@@ -27,6 +29,7 @@ require (
 require (
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000 // indirect
+	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000 // indirect

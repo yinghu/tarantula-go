@@ -18,6 +18,8 @@ replace gameclustering.com/internal/metrics => ../../../internal/metrics
 
 replace gameclustering.com/internal/bootstrap => ../../../internal/bootstrap
 
+replace gameclustering.com/internal/item => ../../../internal/item
+
 require (
 	gameclustering.com/internal/bootstrap v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/cluster v0.0.0-00010101000000-000000000000
@@ -30,6 +32,7 @@ require (
 )
 
 require (
+	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect

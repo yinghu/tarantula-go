@@ -17,4 +17,5 @@ type ItemService interface {
 	LoadWithId(cid int32) (Configuration, error)
 
 	DeleteWithName(cname string) error
+	DeleteWithId(cid int32) error
 }
