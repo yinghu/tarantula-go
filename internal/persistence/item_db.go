@@ -17,6 +17,7 @@ const (
 	DELETE_HEADER           string = "DELETE FROM item_header WHERE configuration_id = $1"
 	DELETE_APPLICATION      string = "DELETE FROM item_application WHERE configuration_id = $1"
 	DELETE_CONFIG_WITH_ID   string = "DELETE FROM item_configuration WHERE id"
+	SELECT_CONFIG_WITH_NAME string = "SELECT id,type,type_id,category,version FROM item_configuration WHERE name = $1 LIMIT $2"
 )
 
 type ItemDB struct {
@@ -41,7 +42,7 @@ func (db *ItemDB) Save(c item.Configuration) error {
 		}
 		for k, v := range c.Application {
 			for i := range v {
-				inserted, err := tx.Exec(context.Background(), INSERT_APPLICATION, id, k, i)
+				inserted, err := tx.Exec(context.Background(), INSERT_APPLICATION, id, k, v[i])
 				if err != nil {
 					return err
 				}
@@ -53,9 +54,27 @@ func (db *ItemDB) Save(c item.Configuration) error {
 		return nil
 	})
 }
-func (db *ItemDB) LoadWithName(cname string) (item.Configuration, error) {
-	
-	return item.Configuration{}, nil
+func (db *ItemDB) LoadWithName(cname string, limit int) ([]item.Configuration, error) {
+	list := make([]item.Configuration, limit)
+	ct := 0
+	err := db.Sql.Query(func(row pgx.Rows) error {
+		conf := item.Configuration{Name: cname}
+		err := row.Scan(&conf.Id, &conf.Type, &conf.TypeId, &conf.Category, &conf.Version)
+		if err != nil {
+			return err
+		}
+		if conf.Id > 0 {
+			fmt.Printf("ID : %d\n", conf.Id)
+			list[ct] = conf
+			ct++
+		}
+		return nil
+	}, SELECT_CONFIG_WITH_NAME, cname, limit)
+	if err != nil {
+		return nil, err
+	}
+	return list[:ct], nil
+
 }
 
 func (db *ItemDB) LoadWithId(cid int32) (item.Configuration, error) {
@@ -64,7 +83,7 @@ func (db *ItemDB) LoadWithId(cid int32) (item.Configuration, error) {
 
 func (db *ItemDB) DeleteWithId(cid int32) error {
 	return db.Sql.Txn(func(tx pgx.Tx) error {
-		_,err := tx.Exec(context.Background(), DELETE_CONFIG_WITH_ID, cid)
+		_, err := tx.Exec(context.Background(), DELETE_CONFIG_WITH_ID, cid)
 		if err != nil {
 			return err
 		}

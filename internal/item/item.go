@@ -1,6 +1,7 @@
 package item
 
 type Configuration struct {
+	Id          int32              `json:"ItemId"`
 	Name        string             `json:"ConfigurationName"`
 	Type        string             `json:"ConfigurationType"`
 	TypeId      string             `json:"ConfigurationTypeId"`
@@ -13,7 +14,7 @@ type Configuration struct {
 
 type ItemService interface {
 	Save(c Configuration) error
-	LoadWithName(cname string) (Configuration, error)
+	LoadWithName(cname string, limit int) ([]Configuration, error)
 	LoadWithId(cid int32) (Configuration, error)
 
 	DeleteWithName(cname string) error
