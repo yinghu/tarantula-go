@@ -176,3 +176,19 @@ func (db *ItemDB) LoadCategory(cname string) (item.Category, error) {
 	}
 	return cat, nil
 }
+
+func (db *ItemDB) Validate(c item.Configuration) error {
+	cat, err := db.LoadCategory(c.Category)
+	if err != nil {
+		return err
+	}
+	for i := range cat.Properties {
+		prop := cat.Properties[i]
+		_, existed := c.Header[prop.Name]
+		if !existed {
+			return errors.New(prop.Name + " not existed")
+		}
+
+	}
+	return nil
+}

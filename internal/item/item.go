@@ -39,4 +39,6 @@ type ItemService interface {
 
 	DeleteWithName(cname string) error
 	DeleteWithId(cid int32) error
+
+	Validate(c Configuration) error
 }
