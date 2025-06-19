@@ -13,6 +13,14 @@ func (s *AdminService) createSchema() error {
 	if err != nil {
 		return err
 	}
+	_, err = s.Sql.Exec(bootstrap.ITEM_CATEGORY_SQL_SCHEMA)
+	if err != nil {
+		return err
+	}
+	_, err = s.Sql.Exec(bootstrap.ITEM_PROPERTY_SQL_SCHEMA)
+	if err != nil {
+		return err
+	}
 	_, err = s.Sql.Exec(bootstrap.ITEM_CONFIGURATION_SQL_SCHEMA)
 	if err != nil {
 		return err

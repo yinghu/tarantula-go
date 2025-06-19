@@ -117,3 +117,11 @@ func (db *ItemDB) DeleteWithName(cname string) error {
 		return nil
 	})
 }
+
+func (db *ItemDB) SaveCategory(c item.Category) error {
+	return nil
+}
+
+func (db *ItemDB) LoadCategory(cname string) (item.Category, error) {
+	return item.Category{}, nil
+}

@@ -1,5 +1,22 @@
 package item
 
+type Category struct {
+	Scope        string     `json:"Scope"`
+	Name         string     `json:"Name"`
+	Rechargeable bool       `json:"Rechargeable"`
+	Version      string     `json:"Version"`
+	Description  string     `json:"Description"`
+	Properties   []Property `json:"Properties"`
+}
+
+type Property struct {
+	Name         string `json:"Name"`
+	Type         string `json:"Type"`
+	Reference    string `json:"Reference"`
+	Nullable     bool   `json:"Nullable"`
+	Downloadable bool   `json:"Downloadable"`
+}
+
 type Configuration struct {
 	Id          int32              `json:"ItemId"`
 	Name        string             `json:"ConfigurationName"`
@@ -13,6 +30,9 @@ type Configuration struct {
 }
 
 type ItemService interface {
+	SaveCategory(c Category) error
+	LoadCategory(cname string) (Category, error)
+
 	Save(c Configuration) error
 	LoadWithName(cname string, limit int) ([]Configuration, error)
 	LoadWithId(cid int32) (Configuration, error)
