@@ -10,6 +10,11 @@ import (
 )
 
 const (
+	INSERT_CATEGORY            string = "INSERT INTO item_category (name,scope,rechargeable,description) VALUES($1,$2,$3,$4) RETURNING id"
+	INSERT_PROPERTY            string = "INSERT INTO item_property (category_id,name,type,reference,nullable,downloadable) VALUES($1,$2,$3,$4,$5,$6)"
+	SELECT_CATEGORY_WITH_NAME  string = "SELECT id,scope,rechargeable,description FROM item_category WHERE name = $1"
+	SELECT_PROPERTIES_WITH_CID string = "SELECT name,type,reference,nullable,downloadable FROM item_property WHERE category_id = $1"
+
 	INSERT_CONFIG           string = "INSERT INTO item_configuration (name,type,type_id,category,version) VALUES($1,$2,$3,$4,$5) RETURNING id"
 	INSERT_HEADER           string = "INSERT INTO item_header (configuration_id,name,value) VALUES($1,$2,$3)"
 	INSERT_APPLICATION      string = "INSERT INTO item_application (configuration_id,name,reference_id) VALUES($1,$2,$3)"
@@ -64,7 +69,6 @@ func (db *ItemDB) LoadWithName(cname string, limit int) ([]item.Configuration, e
 			return err
 		}
 		if conf.Id > 0 {
-			fmt.Printf("ID : %d\n", conf.Id)
 			list[ct] = conf
 			ct++
 		}
@@ -119,9 +123,56 @@ func (db *ItemDB) DeleteWithName(cname string) error {
 }
 
 func (db *ItemDB) SaveCategory(c item.Category) error {
-	return nil
+	return db.Sql.Txn(func(tx pgx.Tx) error {
+		var id int32
+		err := tx.QueryRow(context.Background(), INSERT_CATEGORY, c.Name, c.Scope, c.Rechargeable, c.Description).Scan(&id)
+		if err != nil {
+			return err
+		}
+		valid := false
+		for i := range c.Properties {
+			p := c.Properties[i]
+			_, err = tx.Exec(context.Background(), INSERT_PROPERTY, id, p.Name, p.Type, p.Reference, p.Nullable, p.Downloadable)
+			if err != nil {
+				valid = false
+				return err
+			}
+			valid = true
+		}
+		if !valid {
+			return errors.New("at least 1 property required")
+		}
+		return nil
+	})
 }
 
 func (db *ItemDB) LoadCategory(cname string) (item.Category, error) {
-	return item.Category{}, nil
+	cat := item.Category{Name: cname}
+	err := db.Sql.Query(func(row pgx.Rows) error {
+		err := row.Scan(&cat.Id, &cat.Scope, &cat.Rechargeable, &cat.Description)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, SELECT_CATEGORY_WITH_NAME, cname)
+	if err != nil {
+		return cat, err
+	}
+	if cat.Id == 0 {
+		return cat, errors.New("not existed")
+	}
+	cat.Properties = make([]item.Property, 0)
+	err = db.Sql.Query(func(row pgx.Rows) error {
+		var prop item.Property
+		err := row.Scan(&prop.Name, &prop.Type, &prop.Reference, &prop.Nullable, &prop.Downloadable)
+		if err != nil {
+			return err
+		}
+		cat.Properties = append(cat.Properties, prop)
+		return nil
+	}, SELECT_PROPERTIES_WITH_CID, cat.Id)
+	if err != nil {
+		return cat, errors.New("no property existed")
+	}
+	return cat, nil
 }

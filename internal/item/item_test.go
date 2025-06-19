@@ -49,3 +49,34 @@ func TestApplication(t *testing.T) {
 	}
 	fmt.Printf("JSON %s\n", string(r))
 }
+
+func TestCategory(t *testing.T) {
+	h := `{"Scope":"commodity","Name":"GameAsset","Rechargeable":false,"Description":"game view"}`
+	var c Category
+
+	err := json.Unmarshal([]byte(h), &c)
+	if err != nil {
+		t.Errorf("Parse Error %s\n", err.Error())
+	}
+	fmt.Printf("JSON %v\n", c)
+	for i := range c.Properties {
+		fmt.Printf("%d %v\n", i, c.Properties[i])
+	}
+
+	r, err := json.Marshal(c)
+	if err != nil {
+		t.Errorf("Flat Error %s\n", err.Error())
+	}
+	fmt.Printf("JSON %s\n", string(r))
+
+	props := make([]Property, 0)
+	props = append(props, Property{Name: "abc1"})
+	fmt.Printf("Len : %d\n", len(props))
+	props = append(props, Property{Name: "abc2"})
+	fmt.Printf("Len : %d\n", len(props))
+	props = append(props, Property{Name: "abc3"})
+	fmt.Printf("Len : %d\n", len(props))
+	props = append(props, Property{Name: "abc4"})
+	fmt.Printf("Len : %d\n", len(props))
+
+}

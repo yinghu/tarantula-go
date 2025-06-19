@@ -1,10 +1,10 @@
 package item
 
 type Category struct {
+	Id           int32      `json:"Id"`
 	Scope        string     `json:"Scope"`
 	Name         string     `json:"Name"`
 	Rechargeable bool       `json:"Rechargeable"`
-	Version      string     `json:"Version"`
 	Description  string     `json:"Description"`
 	Properties   []Property `json:"Properties"`
 }

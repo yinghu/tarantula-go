@@ -44,6 +44,8 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	if err != nil {
 		return err
 	}
+	http.Handle("/admin/loadcategory/{name}", bootstrap.Logging(&AdminLoadCategory{AdminService: s}))
+	http.Handle("/admin/savecategory", bootstrap.Logging(&AdminSaveCategory{AdminService: s}))
 	http.Handle("/admin/loadconfig/{name}/{limit}", bootstrap.Logging(&AdminLoadConfig{AdminService: s}))
 	http.Handle("/admin/saveconfig", bootstrap.Logging(&AdminSaveConfig{AdminService: s}))
 	http.Handle("/admin/configapp/{app}", bootstrap.Logging(&configApp))
