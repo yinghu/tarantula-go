@@ -184,11 +184,57 @@ func (db *ItemDB) Validate(c item.Configuration) error {
 	}
 	for i := range cat.Properties {
 		prop := cat.Properties[i]
-		_, existed := c.Header[prop.Name]
+		v, existed := c.Header[prop.Name]
 		if !existed {
 			return errors.New(prop.Name + " not existed")
+		}
+		if prop.Type == "string" {
+			err = asString(v)
+			if err != nil {
+				return err
+			}
+			continue
+		}
+		if prop.Type == "number" {
+			err = asNumber(v)
+			if err != nil {
+				return err
+			}
+			continue
+		}
+		if prop.Type == "boolean" {
+			err = asBool(v)
+			if err != nil {
+				return err
+			}
+			continue
 		}
 
 	}
 	return nil
+}
+
+func asString(v any) error {
+	_, ok := v.(string)
+	if ok {
+		return nil
+	}
+	return errors.New("wrong string format")
+}
+
+func asNumber(v any) error {
+	_, ok1 := v.(int64)
+	_, ok2 := v.(float64)
+	if !ok1 && !ok2 {
+		return errors.New("wrong number format")
+	}
+	return nil
+}
+
+func asBool(v any) error {
+	_, ok := v.(bool)
+	if ok {
+		return nil
+	}
+	return errors.New("wrong bool format")
 }
