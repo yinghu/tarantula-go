@@ -21,16 +21,6 @@ func (s *AdminService) Config() string {
 func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	s.AppManager.Start(f, c)
 	s.createSchema()
-	//cnf := item.Configuration{Name: "mx200", Type: "CH", TypeId: "c-100", Category: "Cash", Version: "1.0", Header: map[string]any{"name": "bom", "max": 100}}
-	//cnf.Application = map[string][]int64{"Skus": {1, 3, 4}}
-	//err := s.ItemService().Save(cnf)
-	//if err != nil {
-	//fmt.Printf("SQL err %s\n", err.Error())
-	//}
-	//err = s.ItemService().DeleteWithName("mx100")
-	//if err != nil {
-	//fmt.Printf("SQL ER %s\n", err.Error())
-	//}
 	hash, err := s.Authenticator().HashPassword("password")
 	if err != nil {
 		return err
@@ -44,6 +34,8 @@ func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	if err != nil {
 		return err
 	}
+	http.Handle("/admin/loadenum/{name}", bootstrap.Logging(&AdminLoadEnum{AdminService: s}))
+	http.Handle("/admin/saveenum", bootstrap.Logging(&AdminSaveEnum{AdminService: s}))
 	http.Handle("/admin/loadcategory/{name}", bootstrap.Logging(&AdminLoadCategory{AdminService: s}))
 	http.Handle("/admin/savecategory", bootstrap.Logging(&AdminSaveCategory{AdminService: s}))
 	http.Handle("/admin/loadconfig/{name}/{limit}", bootstrap.Logging(&AdminLoadConfig{AdminService: s}))

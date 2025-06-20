@@ -1,5 +1,16 @@
 package item
 
+type Enum struct {
+	Id     int32       `json:"Id"`
+	Name   string      `json:"Name"`
+	Values []EnumValue `json:"Values"`
+}
+
+type EnumValue struct {
+	Name  string `json:"Name"`
+	Value int32  `json:"Value"`
+}
+
 type Category struct {
 	Id           int32      `json:"Id"`
 	Scope        string     `json:"Scope"`
@@ -30,6 +41,8 @@ type Configuration struct {
 }
 
 type ItemService interface {
+	SaveEnum(c Enum) error
+	LoadEnum(cname string) (Enum, error)
 	SaveCategory(c Category) error
 	LoadCategory(cname string) (Category, error)
 
