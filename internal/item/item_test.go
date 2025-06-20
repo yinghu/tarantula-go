@@ -78,5 +78,20 @@ func TestCategory(t *testing.T) {
 	fmt.Printf("Len : %d\n", len(props))
 	props = append(props, Property{Name: "abc4"})
 	fmt.Printf("Len : %d\n", len(props))
+	//var v any
+	var v any = 9223372036854775807
+	x, ok := v.(int)
+	if ok {
+		fmt.Printf("Data %d\n", x)
+	}
+	fmt.Printf("fm %d\n", x)
+	
+	var f any = 9223372036854775807.23
+	y, ok := f.(float64)
+	if ok {
+		fmt.Printf("Data %v\n", y)
+	}
+	fmt.Printf("fm %v\n", y)
+	
 
 }

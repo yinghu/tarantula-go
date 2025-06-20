@@ -36,7 +36,7 @@ type Configuration struct {
 	Category    string             `json:"ConfigurationCategory"`
 	Version     string             `json:"ConfigurationVersion"`
 	Header      map[string]any     `json:"header"`
-	Application map[string][]int64 `json:"application"`
+	Application map[string][]int32 `json:"application"`
 	Reference   []int64            `json:"reference"`
 }
 
@@ -54,4 +54,6 @@ type ItemService interface {
 	DeleteWithId(cid int32) error
 
 	Validate(c Configuration) error
+	ValidateCategory(c Category) error
+	ValidateEnum(c Enum) error
 }

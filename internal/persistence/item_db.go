@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"gameclustering.com/internal/item"
@@ -15,19 +16,23 @@ const (
 	INSERT_ENUM_VALUE           string = "INSERT INTO item_enum_value (enum_id,name,value) VALUES ($1,$2,$3)"
 	SELECT_ENUM_WITH_NAME       string = "SELECT id FROM item_enum WHERE name = $1"
 	SELECT_ENUM_VALUES_WITH_CID string = "SELECT name,value FROM item_enum_value WHERE enum_id = $1"
-	INSERT_CATEGORY             string = "INSERT INTO item_category (name,scope,rechargeable,description) VALUES($1,$2,$3,$4) RETURNING id"
-	INSERT_PROPERTY             string = "INSERT INTO item_property (category_id,name,type,reference,nullable,downloadable) VALUES($1,$2,$3,$4,$5,$6)"
-	SELECT_CATEGORY_WITH_NAME   string = "SELECT id,scope,rechargeable,description FROM item_category WHERE name = $1"
-	SELECT_PROPERTIES_WITH_CID  string = "SELECT name,type,reference,nullable,downloadable FROM item_property WHERE category_id = $1"
 
-	INSERT_CONFIG           string = "INSERT INTO item_configuration (name,type,type_id,category,version) VALUES($1,$2,$3,$4,$5) RETURNING id"
-	INSERT_HEADER           string = "INSERT INTO item_header (configuration_id,name,value) VALUES($1,$2,$3)"
-	INSERT_APPLICATION      string = "INSERT INTO item_application (configuration_id,name,reference_id) VALUES($1,$2,$3)"
+	INSERT_CATEGORY            string = "INSERT INTO item_category (name,scope,rechargeable,description) VALUES($1,$2,$3,$4) RETURNING id"
+	INSERT_PROPERTY            string = "INSERT INTO item_category_property (category_id,name,type,reference,nullable,downloadable) VALUES($1,$2,$3,$4,$5,$6)"
+	SELECT_CATEGORY_WITH_NAME  string = "SELECT id,scope,rechargeable,description FROM item_category WHERE name = $1"
+	SELECT_PROPERTIES_WITH_CID string = "SELECT name,type,reference,nullable,downloadable FROM item_category_property WHERE category_id = $1"
+
+	INSERT_CONFIG      string = "INSERT INTO item_configuration (name,type,type_id,category,version) VALUES($1,$2,$3,$4,$5) RETURNING id"
+	INSERT_HEADER      string = "INSERT INTO item_header (configuration_id,name,value) VALUES($1,$2,$3)"
+	INSERT_APPLICATION string = "INSERT INTO item_application (configuration_id,name,reference_id) VALUES($1,$2,$3)"
+
 	DELETE_CONFIG_WITH_NAME string = "DELETE FROM item_configuration WHERE name = $1 RETURNING id"
 	DELETE_HEADER           string = "DELETE FROM item_header WHERE configuration_id = $1"
 	DELETE_APPLICATION      string = "DELETE FROM item_application WHERE configuration_id = $1"
 	DELETE_CONFIG_WITH_ID   string = "DELETE FROM item_configuration WHERE id"
+
 	SELECT_CONFIG_WITH_NAME string = "SELECT id,type,type_id,category,version FROM item_configuration WHERE name = $1 LIMIT $2"
+	SELECT_CONFIG_WITH_ID   string = "SELECT name,type,type_id,category,version FROM item_configuration WHERE id = $1"
 )
 
 type ItemDB struct {
@@ -87,7 +92,19 @@ func (db *ItemDB) LoadWithName(cname string, limit int) ([]item.Configuration, e
 }
 
 func (db *ItemDB) LoadWithId(cid int32) (item.Configuration, error) {
-	return item.Configuration{}, nil
+	conf := item.Configuration{Id: cid}
+	err := db.Sql.Query(func(row pgx.Rows) error {
+		conf := item.Configuration{Id: cid}
+		err := row.Scan(&conf.Id, &conf.Type, &conf.TypeId, &conf.Category, &conf.Version)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, SELECT_CONFIG_WITH_ID, cid)
+	if err != nil {
+		return conf, err
+	}
+	return conf, nil
 }
 
 func (db *ItemDB) DeleteWithId(cid int32) error {
@@ -164,7 +181,7 @@ func (db *ItemDB) LoadCategory(cname string) (item.Category, error) {
 		return cat, err
 	}
 	if cat.Id == 0 {
-		return cat, errors.New("not existed")
+		return cat, errors.New("category not existed")
 	}
 	cat.Properties = make([]item.Property, 0)
 	err = db.Sql.Query(func(row pgx.Rows) error {
@@ -219,7 +236,7 @@ func (db *ItemDB) LoadEnum(cname string) (item.Enum, error) {
 		return cat, err
 	}
 	if cat.Id == 0 {
-		return cat, errors.New("not existed")
+		return cat, errors.New("enum not existed")
 	}
 	cat.Values = make([]item.EnumValue, 0)
 	err = db.Sql.Query(func(row pgx.Rows) error {
@@ -237,18 +254,113 @@ func (db *ItemDB) LoadEnum(cname string) (item.Enum, error) {
 	return cat, nil
 }
 
+func (db *ItemDB) ValidateEnum(c item.Enum) error {
+	if c.Name == "" {
+		return errors.New("name none empty string required")
+	}
+	if len(c.Values) == 0 {
+		return errors.New("at least 1 value required")
+	}
+	for i := range c.Values {
+		v := c.Values[i]
+		if v.Name == "" {
+			return errors.New("prop name none empty string required")
+		}
+	}
+	return nil
+}
+
+func (db *ItemDB) ValidateCategory(c item.Category) error {
+	if c.Scope == "" {
+		return errors.New("scope none empty string required")
+	}
+	if c.Name == "" {
+		return errors.New("name none empty string required")
+	}
+	if c.Description == "" {
+		return errors.New("description none empty string required")
+	}
+	if len(c.Properties) == 0 {
+		return errors.New("at least 1 property required")
+	}
+	for i := range c.Properties {
+		prop := c.Properties[i]
+		if prop.Name == "" {
+			return errors.New("prop name none empty string required")
+		}
+		if prop.Type == "" {
+			return errors.New("prop type none empty string required")
+		}
+		if prop.Reference == "" {
+			return errors.New("prop reference none empty string required")
+		}
+		if prop.Type == "enum" {
+			_, err := db.LoadEnum(prop.Reference)
+			if err != nil {
+				return err
+			}
+			continue
+		}
+		if prop.Type == "category" {
+			parts := strings.Split(prop.Reference, ":")
+			if len(parts) != 2 {
+				return errors.New("wrong category reference format")
+			}
+			_, err := db.LoadCategory(parts[1])
+			if err != nil {
+				return err
+			}
+			continue
+		}
+		if prop.Type == "set" || prop.Type == "list" {
+			parts := strings.Split(prop.Reference, ":")
+			if len(parts) != 2 {
+				return errors.New("wrong category reference format")
+			}
+			_, err := db.LoadCategory(parts[1])
+			if err != nil {
+				return err
+			}
+			continue
+		}
+	}
+	return nil
+}
+
 func (db *ItemDB) Validate(c item.Configuration) error {
+	if c.Name == "" {
+		return errors.New("name none empty string required")
+	}
+	if c.TypeId == "" {
+		return errors.New("typeId none empty string required")
+	}
+	if c.Type == "" {
+		return errors.New("type none empty string required")
+	}
+	if c.Category == "" {
+		return errors.New("category none empty string required")
+	}
+	if c.Version == "" {
+		return errors.New("version none empty string required")
+	}
 	cat, err := db.LoadCategory(c.Category)
 	if err != nil {
 		return err
 	}
-	valid := 0
+	valid := len(c.Header)
 	for i := range cat.Properties {
 		prop := cat.Properties[i]
-		v, existed := c.Header[prop.Name]
-		if !existed {
-			return errors.New(prop.Name + " not existed")
+		if prop.Type == "category" || prop.Type == "set" || prop.Type == "list" {
+			//for _, v := range c.Application {
+			//db.LoadWithId(v)
+			//}
+			continue
 		}
+		v, existed := c.Header[prop.Name]
+		if !existed && !prop.Nullable {
+			return errors.New("value not existed : " + prop.Type)
+		}
+		valid--
 		if prop.Type == "string" {
 			err = asString(v)
 			if err != nil {
@@ -257,28 +369,28 @@ func (db *ItemDB) Validate(c item.Configuration) error {
 			continue
 		}
 		if prop.Type == "number" && prop.Reference == "int" {
-			err = asInt32(v)
+			err = asInt(v)
 			if err != nil {
 				return err
 			}
 			continue
 		}
 		if prop.Type == "number" && prop.Reference == "long" {
-			err = asInt64(v)
+			err = asLong(v)
 			if err != nil {
 				return err
 			}
 			continue
 		}
 		if prop.Type == "number" && prop.Reference == "float" {
-			err = asFloat32(v)
+			err = asFloat(v)
 			if err != nil {
 				return err
 			}
 			continue
 		}
 		if prop.Type == "number" && prop.Reference == "double" {
-			err = asFloat64(v)
+			err = asDouble(v)
 			if err != nil {
 				return err
 			}
@@ -303,13 +415,26 @@ func (db *ItemDB) Validate(c item.Configuration) error {
 			continue
 		}
 		if prop.Type == "enum" {
-			_, err := db.LoadEnum(prop.Reference)
+			em, err := db.LoadEnum(prop.Reference)
 			if err != nil {
 				return err
 			}
+			e, err := toInt32(v)
+			if err != nil {
+				return err
+			}
+			matched := false
+			for i := range em.Values {
+				matched = em.Values[i].Value == e
+				if matched {
+					break
+				}
+			}
+			if !matched {
+				return errors.New("enum value not matched")
+			}
 			continue
 		}
-		valid++
 	}
 	if valid == 0 {
 		return nil
@@ -325,36 +450,44 @@ func asString(v any) error {
 	return errors.New("wrong string format")
 }
 
-func asFloat64(v any) error {
+func asDouble(v any) error {
 	_, ok := v.(float64)
 	if ok {
 		return nil
 	}
-	return errors.New("wrong float64 format")
+	return errors.New("wrong double format")
 }
 
-func asFloat32(v any) error {
-	_, ok := v.(float32)
+func asFloat(v any) error {
+	_, ok := v.(float64)
 	if ok {
 		return nil
 	}
-	return errors.New("wrong float32 format")
+	return errors.New("wrong float format")
 }
 
-func asInt64(v any) error {
-	_, ok := v.(int64)
+func asInt(v any) error {
+	_, ok := v.(float64)
 	if ok {
 		return nil
 	}
-	return errors.New("wrong int64 format")
+	return errors.New("wrong int format")
 }
 
-func asInt32(v any) error {
-	_, ok := v.(int32)
+func toInt32(v any) (int32, error) {
+	x, ok := v.(float64)
+	if ok {
+		return int32(x), nil
+	}
+	return 0, errors.New("wrong int format")
+}
+
+func asLong(v any) error {
+	_, ok := v.(float64)
 	if ok {
 		return nil
 	}
-	return errors.New("wrong int32 format")
+	return errors.New("wrong long format")
 }
 
 func asBool(v any) error {
