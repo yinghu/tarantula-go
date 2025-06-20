@@ -104,6 +104,9 @@ func (db *ItemDB) LoadWithId(cid int32) (item.Configuration, error) {
 	if err != nil {
 		return conf, err
 	}
+	if conf.Type == "" {
+		return conf, errors.New("obj not existed")
+	}
 	return conf, nil
 }
 
@@ -351,9 +354,16 @@ func (db *ItemDB) Validate(c item.Configuration) error {
 	for i := range cat.Properties {
 		prop := cat.Properties[i]
 		if prop.Type == "category" || prop.Type == "set" || prop.Type == "list" {
-			//for _, v := range c.Application {
-			//db.LoadWithId(v)
-			//}
+			fmt.Println("APPLICATION VAL")
+			for _, v := range c.Application {
+				for i := range v {
+					fmt.Printf("CID : %d\n", v[i])
+					_, err := db.LoadWithId(v[i])
+					if err != nil {
+						return err
+					}
+				}
+			}
 			continue
 		}
 		v, existed := c.Header[prop.Name]
