@@ -2,8 +2,6 @@ package main
 
 import (
 	"errors"
-
-	"gameclustering.com/internal/bootstrap"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -14,11 +12,8 @@ const (
 )
 
 func (s *AssetService) createSchema() error {
-	_, err := s.Sql.Exec(bootstrap.METRICS_SQL_SCHEMA)
-	if err != nil {
-		return err
-	}
-	_, err = s.Sql.Exec(ASSET_INDEX_SQL_SCHEMA)
+	
+	_, err := s.Sql.Exec(ASSET_INDEX_SQL_SCHEMA)
 	return err
 }
 
