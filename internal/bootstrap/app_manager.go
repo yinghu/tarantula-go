@@ -82,8 +82,16 @@ func (s *AppManager) Start(f conf.Env, c cluster.Cluster) error {
 	}
 	s.Sql = sql
 	ms := persistence.MetricsDB{Sql: &sql}
+	err = ms.Start()
+	if err != nil {
+		return err
+	}
 	s.metr = &ms
 	is := persistence.ItemDB{Sql: &sql}
+	err = is.Start()
+	if err != nil {
+		return err
+	}
 	s.imse = &is
 	return nil
 }

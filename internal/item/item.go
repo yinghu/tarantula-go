@@ -1,5 +1,7 @@
 package item
-
+import (
+	"gameclustering.com/internal/core"
+)
 type Enum struct {
 	Id     int32       `json:"Id"`
 	Name   string      `json:"Name"`
@@ -41,6 +43,7 @@ type Configuration struct {
 }
 
 type ItemService interface {
+	core.SetUp
 	SaveEnum(c Enum) error
 	LoadEnum(cname string) (Enum, error)
 	SaveCategory(c Category) error

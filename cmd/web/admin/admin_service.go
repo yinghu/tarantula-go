@@ -20,7 +20,6 @@ func (s *AdminService) Config() string {
 
 func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
 	s.AppManager.Start(f, c)
-	s.createSchema()
 	hash, err := s.Authenticator().HashPassword("password")
 	if err != nil {
 		return err
