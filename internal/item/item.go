@@ -39,7 +39,6 @@ type Configuration struct {
 	Version     string             `json:"ConfigurationVersion"`
 	Header      map[string]any     `json:"header"`
 	Application map[string][]int32 `json:"application"`
-	Reference   []int64            `json:"reference"`
 }
 
 type ItemService interface {

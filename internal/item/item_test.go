@@ -8,14 +8,14 @@ import (
 )
 
 func TestHeader(t *testing.T) {
-	h := `{"ConfigurationName":"Item1","ConfigurationType":"I100","header":{"name":"HP","value":200},"application":{"SkuList":[1],"ItemList":[2]},"reference":[1,2]}`
+	h := `{"ConfigurationName":"Item1","ConfigurationType":"I100","header":{"name":"HP","value":200},"application":{"SkuList":[1],"ItemList":[2]}}`
 	var c Configuration
 
 	err := json.Unmarshal([]byte(h), &c)
 	if err != nil {
 		t.Errorf("Parse Error %s\n", err.Error())
 	}
-	fmt.Printf("JSON %v %v %v %s %s\n", c.Header, c.Reference, c.Application, c.Name, c.Type)
+	fmt.Printf("JSON %v %v %s %s\n", c.Header, c.Application, c.Name, c.Type)
 	for k, v := range c.Application {
 		fmt.Printf("%s %v\n", k, v)
 		for i := range v {
@@ -30,14 +30,14 @@ func TestHeader(t *testing.T) {
 }
 
 func TestApplication(t *testing.T) {
-	h := `{"ConfigurationName":"Item1","ConfigurationType":"I100","header":{"name":"HP","value":200},"reference":[1,2]}`
+	h := `{"ConfigurationName":"Item1","ConfigurationType":"I100","header":{"name":"HP","value":200}}`
 	var c Configuration
 
 	err := json.Unmarshal([]byte(h), &c)
 	if err != nil {
 		t.Errorf("Parse Error %s\n", err.Error())
 	}
-	fmt.Printf("JSON %v %v %v %s %s\n", c.Header, c.Reference, c.Application, c.Name, c.Type)
+	fmt.Printf("JSON %v %v %s %s\n", c.Header, c.Application, c.Name, c.Type)
 	for k, v := range c.Application {
 		fmt.Printf("%s %v\n", k, v)
 		for i := range v {
@@ -98,5 +98,5 @@ func TestCategory(t *testing.T) {
 	if err != nil {
 		t.Errorf("Time parse err : %s", err.Error())
 	}
-	fmt.Printf("%v\n",tm)
+	fmt.Printf("%v\n", tm)
 }
