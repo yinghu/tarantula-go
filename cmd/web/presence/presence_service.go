@@ -43,6 +43,10 @@ func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
 	if err != nil {
 		return err
 	}
+	err = s.createSchema()
+	if err != nil {
+		return err
+	}
 	sfk := util.NewSnowflake(env.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.Seq = &sfk
 	path := env.LocalDir + "/store"
