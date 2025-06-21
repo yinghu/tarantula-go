@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -32,6 +31,5 @@ func (s *AdminLoadConfig) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		w.Write(util.ToJson(session))
 		return
 	}
-	fmt.Printf("%d\n", len(confs))
 	w.Write(util.ToJson(confs))
 }

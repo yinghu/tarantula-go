@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
+	"time"
 )
 
 func TestHeader(t *testing.T) {
@@ -85,13 +86,17 @@ func TestCategory(t *testing.T) {
 		fmt.Printf("Data %d\n", x)
 	}
 	fmt.Printf("fm %d\n", x)
-	
+
 	var f any = 9223372036854775807.23
 	y, ok := f.(float64)
 	if ok {
 		fmt.Printf("Data %v\n", y)
 	}
 	fmt.Printf("fm %v\n", y)
-	
-
+	var dt any = "2025-05-29T10:00"
+	tm, err := time.Parse("2006-01-02T15:04", fmt.Sprintf("%v", dt))
+	if err != nil {
+		t.Errorf("Time parse err : %s", err.Error())
+	}
+	fmt.Printf("%v\n",tm)
 }

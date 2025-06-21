@@ -135,8 +135,7 @@ func (db *ItemDB) LoadWithName(cname string, limit int) ([]item.Configuration, e
 func (db *ItemDB) LoadWithId(cid int32) (item.Configuration, error) {
 	conf := item.Configuration{Id: cid}
 	err := db.Sql.Query(func(row pgx.Rows) error {
-		conf := item.Configuration{Id: cid}
-		err := row.Scan(&conf.Id, &conf.Type, &conf.TypeId, &conf.Category, &conf.Version)
+		err := row.Scan(&conf.Name, &conf.Type, &conf.TypeId, &conf.Category, &conf.Version)
 		if err != nil {
 			return err
 		}
@@ -145,7 +144,7 @@ func (db *ItemDB) LoadWithId(cid int32) (item.Configuration, error) {
 	if err != nil {
 		return conf, err
 	}
-	if conf.Type == "" {
+	if conf.Name == "" {
 		return conf, errors.New("obj not existed")
 	}
 	return conf, nil
@@ -457,7 +456,7 @@ func (db *ItemDB) Validate(c item.Configuration) error {
 			if err != nil {
 				return err
 			}
-			_, err = time.Parse("yyyy-MM-dd'T'HH:mm", fmt.Sprintf("%v", v))
+			_, err = time.Parse(prop.Reference, fmt.Sprintf("%v", v))
 			if err != nil {
 				return err
 			}
