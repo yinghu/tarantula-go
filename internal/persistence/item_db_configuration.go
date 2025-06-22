@@ -81,6 +81,8 @@ func (db *ItemDB) LoadWithId(cid int32) (item.Configuration, error) {
 	if conf.Name == "" {
 		return conf, errors.New("obj not existed")
 	}
+	db.loadHeader(&conf)
+	db.loadApplication(&conf)
 	return conf, nil
 }
 
