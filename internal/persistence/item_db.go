@@ -368,6 +368,13 @@ func (db *ItemDB) ValidateCategory(c item.Category) error {
 			}
 			continue
 		}
+		if prop.Type == "scope" {
+			parts := strings.Split(prop.Reference, ":")
+			if len(parts) != 2 {
+				return errors.New("wrong scope reference format")
+			}
+			continue
+		}
 	}
 	return nil
 }
@@ -395,7 +402,7 @@ func (db *ItemDB) Validate(c item.Configuration) error {
 	valid := len(c.Header)
 	for i := range cat.Properties {
 		prop := cat.Properties[i]
-		if prop.Type == "category" || prop.Type == "set" || prop.Type == "list" {
+		if prop.Type == "category" || prop.Type == "set" || prop.Type == "list" || prop.Type == "scope" {
 			for _, v := range c.Application {
 				for i := range v {
 					_, err := db.LoadWithId(v[i])
