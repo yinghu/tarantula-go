@@ -9,14 +9,14 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-type AdminLoadConfig struct {
+type AdminLoadConfigs struct {
 	*AdminService
 }
 
-func (s *AdminLoadConfig) AccessControl() int32 {
+func (s *AdminLoadConfigs) AccessControl() int32 {
 	return bootstrap.ADMIN_ACCESS_CONTROL
 }
-func (s *AdminLoadConfig) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
+func (s *AdminLoadConfigs) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	cname := r.PathValue("name")
 	climt, err := strconv.Atoi(r.PathValue("limit"))
