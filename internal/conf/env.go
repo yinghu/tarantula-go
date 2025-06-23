@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"gameclustering.com/internal/core"
 )
 
 const (
-	TN_NODE_NAME string = "TARANTULA_NODE_NAME"
-	TN_NODE_ID   string = "TARANTULA_NODE_ID"
+	TN_NODE_CONFIG string = "TARANTULA_NODE_CONFIG"
 )
 
 type Sql struct {
@@ -63,7 +63,13 @@ func (f *Env) Load(fn string) error {
 			return err
 		}
 	}
-	fmt.Printf("%s %s\n", os.Getenv(TN_NODE_NAME), os.Getenv(TN_NODE_ID))
+	cfg, existed := os.LookupEnv(TN_NODE_CONFIG)
+	if existed {
+		parts := strings.Split(cfg, "#")
+		fmt.Printf("%s\n", parts[0])
+		fmt.Printf("%s\n", parts[1])
+		fmt.Printf("%s\n", parts[2])
+	}
 	core.CreateAppLog(f.LocalDir)
 	return nil
 }
