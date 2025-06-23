@@ -1,0 +1,6 @@
+FROM nginx:alpine
+
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Ensure Nginx stays in the foreground for Docker to track the process
+CMD ["nginx", "-g", "daemon off;"]
