@@ -2,10 +2,16 @@ package conf
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 
 	"gameclustering.com/internal/core"
+)
+
+const (
+	TN_NODE_NAME string = "TARANTULA_NODE_NAME"
+	TN_NODE_ID   string = "TARANTULA_NODE_ID"
 )
 
 type Sql struct {
@@ -57,6 +63,7 @@ func (f *Env) Load(fn string) error {
 			return err
 		}
 	}
+	fmt.Printf("%s %s\n", os.Getenv(TN_NODE_NAME), os.Getenv(TN_NODE_ID))
 	core.CreateAppLog(f.LocalDir)
 	return nil
 }

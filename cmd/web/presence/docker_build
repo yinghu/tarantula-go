@@ -23,5 +23,6 @@ COPY --from=builder /build/cmd/web/presence/main .
 
 EXPOSE 8080
 EXPOSE 5000
-
+ENV TARANTULA_NODE_NAME=a01
+ENV TARANTULA_NODE_ID=1
 ENTRYPOINT ["./main"]
