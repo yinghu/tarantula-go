@@ -6,3 +6,5 @@
   docker run -d --name presence --network tarantula tarantula.presence:v1.0
 
   docker build --file[-f] .\docker_nginx_build -t[--tag] tarantula.nginx .
+
+  build.bat|build.sh [version] [host] [nodeid]
