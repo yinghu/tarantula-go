@@ -5,13 +5,16 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 
 	"gameclustering.com/internal/core"
 )
 
 const (
-	TN_NODE_CONFIG string = "TARANTULA_NODE_CONFIG"
+	NODE_HOST string = "TN_HOST"
+	NODE_NAME string = "TN_NAME"
+	NODE_ID   string = "TN_ID"
 )
 
 type Sql struct {
@@ -63,12 +66,28 @@ func (f *Env) Load(fn string) error {
 			return err
 		}
 	}
-	cfg, existed := os.LookupEnv(TN_NODE_CONFIG)
-	if existed {
-		parts := strings.Split(cfg, "#")
-		fmt.Printf("%s\n", parts[0])
-		fmt.Printf("%s\n", parts[1])
-		fmt.Printf("%s\n", parts[2])
+	h, eh := os.LookupEnv(NODE_HOST)
+	if eh {
+		fmt.Printf("Using http endpoint : %s\n", h)
+		f.HttpEndpoint = h
+		if f.Evp.Enabled {
+			parts := strings.Split(f.Evp.TcpEndpoint, ":")
+			f.Evp.TcpEndpoint = parts[0] + "://" + h + ":" + parts[2]
+			fmt.Printf("Using tcp endpoint : %s\n", f.Evp.TcpEndpoint)
+		}
+	}
+	n, en := os.LookupEnv(NODE_NAME)
+	if en {
+		fmt.Printf("Using node name : %s\n", n)
+		f.NodeName = n
+	}
+	d, ed := os.LookupEnv(NODE_ID)
+	if ed {
+		fmt.Printf("Using node id : %s\n", d)
+		id, err := strconv.Atoi(d)
+		if err == nil {
+			f.NodeId = int64(id)
+		}
 	}
 	core.CreateAppLog(f.LocalDir)
 	return nil

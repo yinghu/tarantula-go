@@ -7,21 +7,25 @@ RUN echo building app : ${app}
 RUN go -C cmd/web/${app} build -o main 
 # Alpine Linux 
 FROM alpine:latest
-
+ARG app
 RUN addgroup -S tarantula && adduser -S tarantula -G tarantula
 RUN mkdir /etc/tarantula 
-COPY cmd/web/presence/presence-conf.json /etc/tarantula/presence-conf.json
-RUN mkdir /home/tarantula/presence
-RUN chown -R tarantula /home/tarantula/presence
-VOLUME /home/tarantula/presence
+COPY cmd/web/${app}/${app}-conf.json /etc/tarantula/${app}-conf.json
+RUN mkdir /home/tarantula/${app}
+RUN chown -R tarantula /home/tarantula/${app}
+VOLUME /home/tarantula/${app}
 
 # Application Install 
 USER tarantula
 WORKDIR /home/tarantula/bin
 
-COPY --from=builder /build/cmd/web/presence/main .
-ARG cfg
+COPY --from=builder /build/cmd/web/${app}/main .
+ARG h
+ARG n
+ARG i
 EXPOSE 8080
 EXPOSE 5000
-ENV TARANTULA_NODE_CONFIG=${cfg}
+ENV TN_HOST=${h}
+ENV TN_NAME=${n}
+ENV TN_ID=${i}
 ENTRYPOINT ["./main"]
