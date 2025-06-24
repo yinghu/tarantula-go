@@ -3,56 +3,42 @@ services:
   presence:
     container_name: presence
     hostname: presence
-    environment:
-      USE_HOSTNAME: true
     image: tarantula.presence:v1.0  
     networks:
       - net
   profile:
     container_name: profile
     hostname: profile
-    environment:
-      USE_HOSTNAME: true
     image: tarantula.profile:v1.0
     networks:
       - net  
   inventory:
     container_name: inventory
     hostname: inventory
-    environment:
-      USE_HOSTNAME: true
     image: tarantula.inventory:v1.0
     networks:
       - net
   asset:
     container_name: asset
     hostname: asset
-    environment:
-      USE_HOSTNAME: true
     image: tarantula.asset:v1.0
     networks:
       - net
   tournament:
     container_name: tournament
     hostname: tournament
-    environment:
-      USE_HOSTNAME: true
     image: tarantula.tournament:v1.0
     networks:
       - net    
   admin:
     container_name: admin
     hostname: admin
-    environment:
-      USE_HOSTNAME: true
     image: tarantula.admin:v1.0
     networks:
       - net
   web:
     container_name: web
     hostname: web
-    environment:
-      USE_HOSTNAME: true
     image: tarantula.nginx:latest
     ports:
       - "80:80"
