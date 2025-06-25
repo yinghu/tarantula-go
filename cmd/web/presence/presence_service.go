@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
@@ -28,7 +27,7 @@ func (s *PresenceService) Create(classId int) event.Event {
 func (s *PresenceService) OnEvent(e event.Event) {
 	err := s.Ds.Save(e)
 	if err != nil {
-		fmt.Printf("No save %s\n", err.Error())
+		core.AppLog.Printf("No save %s\n", err.Error())
 		return
 	}
 }
@@ -56,7 +55,7 @@ func (s *PresenceService) Start(env conf.Env, c core.Cluster) error {
 	}
 	s.Ds = &ds
 	s.Started = true
-	fmt.Printf("Presence service started %s\n", env.HttpBinding)
+	core.AppLog.Printf("Presence service started %s\n", env.HttpBinding)
 	http.Handle("/presence/admin", bootstrap.Logging(&PresenceAdmin{PresenceService: s}))
 	http.Handle("/presence/register", bootstrap.Logging(&PresenceRegister{PresenceService: s}))
 	http.Handle("/presence/login", bootstrap.Logging(&PresenceLogin{PresenceService: s}))
@@ -67,25 +66,25 @@ func (s *PresenceService) Shutdown() {
 	s.AppManager.Shutdown()
 	err := s.Ds.Close()
 	if err != nil {
-		fmt.Printf("Error %s\n", err.Error())
+		core.AppLog.Printf("Error %s\n", err.Error())
 	}
-	fmt.Printf("Presence service shut down\n")
+	core.AppLog.Printf("Presence service shut down\n")
 
 }
 
 func (s *PresenceService) Publish(e event.Event) error {
 	err := s.Ds.Save(e)
 	if err != nil {
-		fmt.Printf("Cache Error %s\n", err.Error())
+		core.AppLog.Printf("Cache Error %s\n", err.Error())
 	}
 	v, ok := e.(*event.Login)
 	if ok {
-		fmt.Printf("LOGIN %s\n", v.Name)
+		core.AppLog.Printf("LOGIN %s\n", v.Name)
 	}
 	load := event.Login{Name: v.Name}
 	err = s.Ds.Load(&load)
 	if err == nil {
-		fmt.Printf("LOADED %d\n", load.SystemId)
+		core.AppLog.Printf("LOADED %d\n", load.SystemId)
 	}
 	view := s.Cluster().View()
 	for i := range view {
