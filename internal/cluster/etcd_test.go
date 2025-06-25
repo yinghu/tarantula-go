@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 )
 
@@ -23,8 +24,8 @@ func TestPartition(t *testing.T) {
 }
 
 func TestNode(t *testing.T) {
-	nodes := []Node{{Name: "a05"}, {Name: "a04"}, {Name: "a02"}, {Name: "a01"}}
-	slices.SortFunc(nodes, func(a, b Node) int {
+	nodes := []core.Node{{Name: "a05"}, {Name: "a04"}, {Name: "a02"}, {Name: "a01"}}
+	slices.SortFunc(nodes, func(a, b core.Node) int {
 		return cmp.Compare(a.Name, b.Name)
 	})
 	for n := range nodes {
@@ -33,7 +34,8 @@ func TestNode(t *testing.T) {
 }
 
 func TestCluster(t *testing.T) {
-	c := NewEtc("tarantula", []string{"192.168.1.7:2379"}, Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"})
+	lc := core.Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"}
+	c := NewEtc("tarantula", []string{"192.168.1.7:2379"}, LocalNode{Node: lc})
 	tk := time.NewTimer(20 * time.Second)
 	go func() {
 		<-tk.C
@@ -46,8 +48,9 @@ func TestCluster(t *testing.T) {
 }
 
 func TestTransaction(t *testing.T) {
-	c := NewEtc("tarantula", []string{"192.168.1.7:2379"}, Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"})
-	c.Atomic("", func(c Ctx) error {
+	lc := core.Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"}
+	c := NewEtc("tarantula", []string{"192.168.1.7:2379"}, LocalNode{Node: lc})
+	c.Atomic("", func(c core.Ctx) error {
 		k := "jwkkey"
 		v := util.KeyToBase64(util.Key(32))
 		err := c.Put(k, v)

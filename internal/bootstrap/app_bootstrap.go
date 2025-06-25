@@ -24,7 +24,7 @@ func AppBootstrap(service TarantulaContext) {
 		fmt.Printf("Config not existed %s\n", err.Error())
 		return
 	}
-	c := cluster.NewEtc(f.GroupName, f.EtcdEndpoints, cluster.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.Evp.TcpEndpoint})
+	c := cluster.NewEtc(f.GroupName, f.EtcdEndpoints, cluster.LocalNode{Node: core.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.Evp.TcpEndpoint}})
 	c.Kyl = service
 	e := event.Endpoint{TcpEndpoint: f.Evp.TcpEndpoint, Service: service}
 	if f.Evp.Enabled {
@@ -35,8 +35,9 @@ func AppBootstrap(service TarantulaContext) {
 	}
 	go func() {
 		c.Started.Wait()
-		for v := range c.View() {
-			core.AppLog.Printf("View :%v\n", v)
+		view := c.View()
+		for i := range view {
+			core.AppLog.Printf("View :%v\n", view[i])
 		}
 		err := service.Start(f, &c)
 		if err != nil {

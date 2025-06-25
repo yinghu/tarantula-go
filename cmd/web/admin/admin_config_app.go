@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 )
@@ -19,7 +18,7 @@ type AdminConfigApp struct {
 func (s *AdminConfigApp) start() error {
 	tkn := util.JwtHMac{Alg: core.JWT_ALG, Ksz: core.JWT_KEY_SIZE}
 	ci := util.Aes{Ksz: core.CIPHER_KEY_SIZE}
-	err := s.Cluster().Atomic("presence", func(ctx cluster.Ctx) error {
+	err := s.Cluster().Atomic("presence", func(ctx core.Ctx) error {
 		jsk, err := ctx.Get(core.JWT_KEY_NAME)
 		if err != nil {
 			fmt.Println("Create new jwt key")
@@ -38,7 +37,7 @@ func (s *AdminConfigApp) start() error {
 	if err != nil {
 		return err
 	}
-	err = s.Cluster().Atomic("presence", func(ctx cluster.Ctx) error {
+	err = s.Cluster().Atomic("presence", func(ctx core.Ctx) error {
 		csk, err := ctx.Get(core.CIPHER_KEY_NAME)
 		if err != nil {
 			fmt.Println("Create new cipher key")

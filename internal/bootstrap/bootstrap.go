@@ -3,7 +3,6 @@ package bootstrap
 import (
 	"net/http"
 
-	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -31,19 +30,18 @@ const (
 	INVALID_TOKEN_MSG string = "invalid token"
 )
 
-
 type TarantulaContext interface {
 	Config() string
-	Start(f conf.Env, c cluster.Cluster) error
+	Start(f conf.Env, c core.Cluster) error
 	Shutdown()
 	event.EventService
-	cluster.KeyListener
+	core.KeyListener
 }
 
 type TarantulaApp interface {
 	ItemService() item.ItemService
 	Metrics() metrics.MetricsService
-	Cluster() cluster.Cluster
+	Cluster() core.Cluster
 	Authenticator() core.Authenticator
 	AccessControl() int32
 	Request(sesion core.OnSession, w http.ResponseWriter, r *http.Request)

@@ -1,7 +1,6 @@
 package bootstrap
 
 import (
-	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -12,7 +11,7 @@ import (
 )
 
 type AppManager struct {
-	cls  cluster.Cluster
+	cls  core.Cluster
 	metr metrics.MetricsService
 	imse item.ItemService
 	auth core.Authenticator
@@ -26,18 +25,18 @@ func (s *AppManager) ItemService() item.ItemService {
 func (s *AppManager) Metrics() metrics.MetricsService {
 	return s.metr
 }
-func (s *AppManager) Cluster() cluster.Cluster {
+func (s *AppManager) Cluster() core.Cluster {
 	return s.cls
 }
 func (s *AppManager) Authenticator() core.Authenticator {
 	return s.auth
 }
 
-func (s *AppManager) Start(f conf.Env, c cluster.Cluster) error {
+func (s *AppManager) Start(f conf.Env, c core.Cluster) error {
 	s.cls = c
 	tkn := util.JwtHMac{Alg: core.JWT_ALG, Ksz: core.JWT_KEY_SIZE}
 	ci := util.Aes{Ksz: core.CIPHER_KEY_SIZE}
-	err := c.Atomic(f.Presence, func(ctx cluster.Ctx) error {
+	err := c.Atomic(f.Presence, func(ctx core.Ctx) error {
 		jsk, err := ctx.Get(core.JWT_KEY_NAME)
 		if err != nil {
 			core.AppLog.Println("Create new jwt key")
@@ -56,7 +55,7 @@ func (s *AppManager) Start(f conf.Env, c cluster.Cluster) error {
 	if err != nil {
 		return err
 	}
-	err = c.Atomic(f.Presence, func(ctx cluster.Ctx) error {
+	err = c.Atomic(f.Presence, func(ctx core.Ctx) error {
 		csk, err := ctx.Get(core.CIPHER_KEY_NAME)
 		if err != nil {
 			core.AppLog.Println("Create new cipher key")

@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/cluster"
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/event"
 )
@@ -18,7 +18,7 @@ func (s *AdminService) Config() string {
 	return "/etc/tarantula/admin-conf.json"
 }
 
-func (s *AdminService) Start(f conf.Env, c cluster.Cluster) error {
+func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	s.AppManager.Start(f, c)
 	err := s.createSchema()
 	if err != nil {

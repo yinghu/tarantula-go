@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
+	"gameclustering.com/internal/core"
 )
 
 type AssetService struct {
@@ -18,7 +18,7 @@ func (s *AssetService) Config() string {
 	return "/etc/tarantula/asset-conf.json"
 }
 
-func (s *AssetService) Start(f conf.Env, c cluster.Cluster) error {
+func (s *AssetService) Start(f conf.Env, c core.Cluster) error {
 	s.AppManager.Start(f, c)
 	s.assetDir = f.LocalDir
 	err := s.createSchema()

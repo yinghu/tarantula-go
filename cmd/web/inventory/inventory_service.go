@@ -2,8 +2,8 @@ package main
 
 import (
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
+	"gameclustering.com/internal/core"
 )
 
 type InventoryService struct {
@@ -14,7 +14,7 @@ func (s *InventoryService) Config() string {
 	return "/etc/tarantula/inventory-conf.json"
 }
 
-func (s *InventoryService) Start(f conf.Env, c cluster.Cluster) error {
+func (s *InventoryService) Start(f conf.Env, c core.Cluster) error {
 	s.AppManager.Start(f, c)
 	s.createSchema()
 	return nil

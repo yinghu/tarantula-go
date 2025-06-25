@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 )
@@ -19,7 +18,7 @@ func (s *AdminResetKey) AccessControl() int32 {
 func (s *AdminResetKey) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	w.WriteHeader(http.StatusOK)
-	s.Cluster().Atomic("presence", func(ctx cluster.Ctx) error {
+	s.Cluster().Atomic("presence", func(ctx core.Ctx) error {
 		//ctx.Get(core.JWT_KEY_NAME)
 		ctx.Put("teset", "test key")
 		return nil

@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/cluster"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -38,7 +37,7 @@ func (s *PresenceService) Config() string {
 	return "/etc/tarantula/presence-conf.json"
 }
 
-func (s *PresenceService) Start(env conf.Env, c cluster.Cluster) error {
+func (s *PresenceService) Start(env conf.Env, c core.Cluster) error {
 	err := s.AppManager.Start(env, c)
 	if err != nil {
 		return err
@@ -88,7 +87,9 @@ func (s *PresenceService) Publish(e event.Event) error {
 	if err == nil {
 		fmt.Printf("LOADED %d\n", load.SystemId)
 	}
-	for v := range s.Cluster().View() {
+	view := s.Cluster().View()
+	for i := range view {
+		v := view[i]
 		if v.Name != s.Cluster().Local().Name {
 			go func() {
 				pub := event.SocketPublisher{Remote: v.TcpEndpoint}

@@ -1,12 +1,14 @@
-package cluster
-
-import (
-	"iter"
-)
+package core
 
 const (
 	CLUSTER_PARTITION_NUM int = 271
 )
+
+type Node struct {
+	Name         string `json:"name"`
+	HttpEndpoint string `json:"http"`
+	TcpEndpoint  string `json:"tcp"`
+}
 
 type Ctx interface {
 	Put(key string, value string) error
@@ -18,9 +20,8 @@ type Exec func(ctx Ctx) error
 
 type Cluster interface {
 	Local() Node
-	View() iter.Seq[Node]
+	View() []Node
 	Partition(key []byte) Node
-	//Atomic(t Exec) error
 	Atomic(prefix string, t Exec) error
 }
 

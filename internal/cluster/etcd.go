@@ -4,43 +4,41 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"iter"
-	"maps"
 	"slices"
 	"strings"
 	"sync"
 	"time"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
+
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/concurrency"
 )
 
-type Node struct {
-	Name         string `json:"name"`
-	HttpEndpoint string `json:"http"`
-	TcpEndpoint  string `json:"tcp"`
+type LocalNode struct {
+	core.Node
 	pingCount    *int8  `json:"-"`
 	timeoutCount *uint8 `json:"-"`
 }
 
 type Etc struct {
-	Kyl           KeyListener
+	Kyl           core.KeyListener
 	Quit          chan bool
 	Started       *sync.WaitGroup
 	Group         string
 	EtcdEndpoints []string
-	local         Node
+	local         LocalNode
 	lock          *sync.Mutex
-	cluster       map[string]Node
+	cluster       map[string]LocalNode
 	partition     []string
 }
 
-func NewEtc(group string, etcEndpoints []string, local Node) Etc {
+func NewEtc(group string, etcEndpoints []string, local LocalNode) Etc {
 	etc := Etc{Group: group, EtcdEndpoints: etcEndpoints, local: local}
 	etc.lock = &sync.Mutex{}
-	etc.cluster = make(map[string]Node)
-	etc.partition = make([]string, CLUSTER_PARTITION_NUM)
+	etc.cluster = make(map[string]LocalNode)
+	etc.partition = make([]string, core.CLUSTER_PARTITION_NUM)
 	etc.Quit = make(chan bool)
 	etc.Started = &sync.WaitGroup{}
 	etc.Started.Add(1)
@@ -125,13 +123,13 @@ func (c *Etc) Join() error {
 					c.lock.Unlock()
 				}
 			case "join":
-				var rnd Node
+				var rnd LocalNode
 				err := json.Unmarshal(ev.Kv.Value, &rnd)
 				if err == nil {
 					cli.Put(context.Background(), c.Group+"#joined", string(nd))
 				}
 			case "joined":
-				var rnd Node
+				var rnd LocalNode
 				err := json.Unmarshal(ev.Kv.Value, &rnd)
 				if err == nil {
 					c.lock.Lock()
@@ -155,20 +153,24 @@ func (c *Etc) Join() error {
 	fmt.Printf("Cluster shut down [%s]\n", c.Group)
 	return nil
 }
-func (c *Etc) Local() Node {
-	return c.local
+func (c *Etc) Local() core.Node {
+	return c.local.Node
 }
-func (c *Etc) View() iter.Seq[Node] {
+func (c *Etc) View() []core.Node {
 	c.lock.Lock()
 	defer c.lock.Unlock()
-	return maps.Values(c.cluster)
+	nv := make([]core.Node,0)
+	for _, v:= range c.cluster{
+		nv = append(nv,v.Node)
+	}
+	return nv
 }
 
-func (c *Etc) Partition(key []byte) Node {
-	p := util.Partition(key, uint32(CLUSTER_PARTITION_NUM))
+func (c *Etc) Partition(key []byte) core.Node {
+	p := util.Partition(key, uint32(core.CLUSTER_PARTITION_NUM))
 	c.lock.Lock()
 	defer c.lock.Unlock()
-	return c.cluster[c.partition[p]]
+	return c.cluster[c.partition[p]].Node
 }
 
 func (c *Etc) group() {
@@ -181,14 +183,14 @@ func (c *Etc) group() {
 		i++
 	}
 	slices.Sort(nds)
-	for p := range CLUSTER_PARTITION_NUM {
+	for p := range core.CLUSTER_PARTITION_NUM {
 		i := p % sz
 		c.partition[p] = nds[i]
 		//fmt.Printf("Partition %d %s %d\n", i, nds[i], p)
 	}
 }
 
-func (c *Etc) Atomic(prefix string, t Exec) error {
+func (c *Etc) Atomic(prefix string, t core.Exec) error {
 	if prefix == "" {
 		prefix = c.Group
 		fmt.Printf("Reset Lock prefix %s\n", prefix)
