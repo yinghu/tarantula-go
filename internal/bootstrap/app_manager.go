@@ -99,11 +99,15 @@ func (s *AppManager) Shutdown() {
 	s.Sql.Close()
 }
 
-func (s *AppManager) Create(classId int) event.Event {
-	return &event.Login{}
+func (s *AppManager) Create(classId int, magicHeader string) (event.Event, error) {
+	return &event.Login{}, nil
 }
 
 func (s *AppManager) OnEvent(e event.Event) {
+
+}
+
+func (s *AppManager) OnError(e error) {
 
 }
 
