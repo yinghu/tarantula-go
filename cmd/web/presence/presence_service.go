@@ -33,6 +33,10 @@ func (s *PresenceService) OnEvent(e event.Event) {
 	core.AppLog.Printf("On event %d:\n", e.ClassId())
 }
 
+func (s *PresenceService) OnError(e error) {
+	core.AppLog.Printf("On event error %s\n", e.Error())
+}
+
 func (s *PresenceService) Config() string {
 	return "/etc/tarantula/presence-conf.json"
 }

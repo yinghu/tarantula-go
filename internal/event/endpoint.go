@@ -25,16 +25,19 @@ func (s *Endpoint) handleClient(client net.Conn) {
 	cid, err := socket.ReadInt32()
 	if err != nil {
 		core.AppLog.Printf("error on read cid %s\n", err.Error())
+		s.Service.OnError(err)
 		return
 	}
 	tik, err := socket.ReadString()
 	if err != nil {
 		core.AppLog.Printf("error on read ticket %s\n", err.Error())
+		s.Service.OnError(err)
 		return
 	}
 	e, err := s.Service.Create(int(cid), tik)
 	if err != nil {
 		core.AppLog.Printf("error on create event %s\n", err.Error())
+		s.Service.OnError(err)
 		return
 	}
 	e.Inbound(&socket)

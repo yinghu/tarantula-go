@@ -1,6 +1,7 @@
 package event
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 	"testing"
@@ -15,10 +16,15 @@ type sampleFactory struct {
 
 func (s *sampleFactory) Create(classId int, ticket string) (Event, error) {
 	fmt.Printf("%d %s\n", classId, ticket)
-	return &sampleEvent{}, nil
+	return &sampleEvent{}, errors.New("error")
 }
 func (s *sampleFactory) OnEvent(e Event) {
 
+}
+
+func (s *sampleFactory) OnError(e error) {
+	fmt.Printf("err %s\n", e.Error())
+	W.Done()
 }
 
 type sampleEvent struct {

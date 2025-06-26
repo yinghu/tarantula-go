@@ -11,6 +11,7 @@ type Chunk struct {
 
 type EventListener interface {
 	OnEvent(e Event)
+	OnError(err error)
 }
 
 type EventService interface {
