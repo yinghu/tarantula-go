@@ -89,6 +89,7 @@ func (s *PresenceService) Publish(e event.Event) error {
 	view := s.Cluster().View()
 	for i := range view {
 		v := view[i]
+		core.AppLog.Printf("View %v : %v\n", v, s.Cluster().Local())
 		if v.Name != s.Cluster().Local().Name {
 			go func() {
 				pub := event.SocketPublisher{Remote: v.TcpEndpoint}
