@@ -30,6 +30,7 @@ func (s *PresenceService) OnEvent(e event.Event) {
 		core.AppLog.Printf("No save %s\n", err.Error())
 		return
 	}
+	core.AppLog.Printf("On event %d:\n", e.ClassId())
 }
 
 func (s *PresenceService) Config() string {
