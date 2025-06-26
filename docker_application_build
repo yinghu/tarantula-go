@@ -23,8 +23,6 @@ COPY --from=builder /build/cmd/web/${app}/main .
 ARG h
 ARG n
 ARG i
-#EXPOSE 8080
-#EXPOSE 5000
 ENV TN_HOST=${h}
 ENV TN_NAME=${n}
 ENV TN_ID=${i}

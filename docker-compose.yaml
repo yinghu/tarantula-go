@@ -8,6 +8,14 @@ services:
       - "5000:5000"
     networks:
       - net
+  asset:
+    container_name: asset
+    hostname: asset
+    image: tarantula.asset:v1.0
+    ports:
+      - "5001:5001"
+    networks:
+      - net
   profile:
     container_name: profile
     hostname: profile
@@ -22,14 +30,6 @@ services:
     image: tarantula.inventory:v1.0
     ports:
       - "5003:5003"
-    networks:
-      - net
-  asset:
-    container_name: asset
-    hostname: asset
-    image: tarantula.asset:v1.0
-    ports:
-      - "5001:5001"
     networks:
       - net
   tournament:
@@ -52,8 +52,8 @@ services:
       - "80:80"
     depends_on:
       - presence
-      - profile
       - asset
+      - profile
       - inventory
       - tournament
       - admin
