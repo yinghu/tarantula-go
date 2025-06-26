@@ -19,6 +19,7 @@ type Endpoint struct {
 }
 
 func (s *Endpoint) handleClient(client net.Conn) {
+	core.AppLog.Printf("SOC : %s\n", client.LocalAddr().String())
 	defer func() {
 		client.Close()
 	}()

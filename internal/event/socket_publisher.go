@@ -35,4 +35,5 @@ func (s *SocketPublisher) Publish(e Event) {
 		return
 	}
 	e.Outbound(&buffer)
+	core.AppLog.Printf("END %s %s\n", parts[0], parts[1])
 }
