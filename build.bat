@@ -8,4 +8,4 @@ docker build -f .\docker_application_build --tag tarantula.profile:%version% --b
 docker build -f .\docker_application_build --tag tarantula.inventory:%version% --build-arg app=inventory --build-arg h=%host% --build-arg n=v%id% --build-arg i=%id% . 
 docker build -f .\docker_application_build --tag tarantula.asset:%version% --build-arg app=asset --build-arg h=%host% --build-arg n=s%id% --build-arg i=%id% .
 docker build -f .\docker_application_build --tag tarantula.tournament:%version% --build-arg app=tournament --build-arg h=%host% --build-arg n=t%id% --build-arg i=%id% . 
-docker build -f .\docker_nginx_build --tag tarantula.nginx .
+docker build -f .\docker_nginx_build --tag tarantula.nginx:%version% .

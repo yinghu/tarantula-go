@@ -47,7 +47,7 @@ services:
   web:
     container_name: web
     hostname: web
-    image: tarantula.nginx:latest
+    image: tarantula.nginx:v1.0
     ports:
       - "80:80"
     depends_on:
