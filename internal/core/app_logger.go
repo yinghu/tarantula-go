@@ -27,3 +27,9 @@ func CreateAppLog(dir string) {
 	AppLog = log.New(file, "", log.LstdFlags|log.Lshortfile)
 	AppLog.Println("Initialized app log")
 }
+
+func CreateTestLog() {
+	flag.Parse()
+	AppLog = log.New(os.Stdout, "", log.LstdFlags)
+	AppLog.Println("Initialized app log")
+}

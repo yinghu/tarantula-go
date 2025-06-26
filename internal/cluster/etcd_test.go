@@ -11,7 +11,9 @@ import (
 	"gameclustering.com/internal/util"
 )
 
+
 func TestPartition(t *testing.T) {
+	core.CreateTestLog()
 	nodes := []string{"a11", "a02", "a03", "a04", "a05", "a06", "a07", "a08", "a09", "a10", "a01", "a12"}
 	slices.Sort(nodes)
 	mp := make(map[int]string)
@@ -24,6 +26,7 @@ func TestPartition(t *testing.T) {
 }
 
 func TestNode(t *testing.T) {
+	core.CreateTestLog()
 	nodes := []core.Node{{Name: "a05"}, {Name: "a04"}, {Name: "a02"}, {Name: "a01"}}
 	slices.SortFunc(nodes, func(a, b core.Node) int {
 		return cmp.Compare(a.Name, b.Name)
@@ -34,6 +37,7 @@ func TestNode(t *testing.T) {
 }
 
 func TestCluster(t *testing.T) {
+	core.CreateTestLog()
 	lc := core.Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"}
 	c := NewEtc("tarantula", []string{"192.168.1.7:2379"}, LocalNode{Node: lc})
 	tk := time.NewTimer(20 * time.Second)
@@ -48,6 +52,7 @@ func TestCluster(t *testing.T) {
 }
 
 func TestTransaction(t *testing.T) {
+	core.CreateTestLog()
 	lc := core.Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"}
 	c := NewEtc("tarantula", []string{"192.168.1.7:2379"}, LocalNode{Node: lc})
 	c.Atomic("", func(c core.Ctx) error {

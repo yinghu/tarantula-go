@@ -2,9 +2,10 @@ package event
 
 import (
 	"errors"
-	"fmt"
 	"net"
 	"strings"
+
+	"gameclustering.com/internal/core"
 )
 
 const (
@@ -24,7 +25,7 @@ func (s *Endpoint) handleClient(client net.Conn) {
 	socket := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
 	cid, err := socket.ReadInt32()
 	if err != nil {
-		fmt.Printf("Error on read cid %s\n", err.Error())
+		core.AppLog.Printf("Error on read cid %s\n", err.Error())
 		return
 	}
 	e := s.Service.Create(int(cid))
@@ -42,7 +43,7 @@ func (s *Endpoint) handleClient(client net.Conn) {
 
 func (s *Endpoint) Open() error {
 	parts := strings.Split(s.TcpEndpoint, ":")
-	fmt.Printf("Endpoint %s %s\n", parts[0], parts[2])
+	core.AppLog.Printf("Endpoint %s %s\n", parts[0], parts[2])
 	server, err := net.Listen(parts[0], ":"+parts[2])
 	if err != nil {
 		return err
@@ -51,12 +52,12 @@ func (s *Endpoint) Open() error {
 	for {
 		client, err := s.listener.Accept()
 		if err != nil {
-			fmt.Printf("Error :%s\n", err.Error())
+			core.AppLog.Printf("Error :%s\n", err.Error())
 			break
 		}
 		go s.handleClient(client)
 	}
-	fmt.Println("Server closed")
+	core.AppLog.Println("Server closed")
 	return nil
 }
 func (s *Endpoint) Close() error {

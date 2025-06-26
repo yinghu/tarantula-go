@@ -1,8 +1,6 @@
 package event
 
 import (
-	"fmt"
-
 	"gameclustering.com/internal/core"
 )
 
@@ -103,5 +101,5 @@ func (s *Login) streaming(c Chunk) {
 }
 
 func (s *Login) OnError(err error) {
-	fmt.Printf("On error %s\n", err.Error())
+	core.AppLog.Printf("On error %s\n", err.Error())
 }

@@ -3,7 +3,6 @@ package cluster
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"slices"
 	"strings"
 	"sync"
@@ -60,7 +59,7 @@ func (c *Etc) Join() error {
 		defer tik.Stop()
 		for r := range 7 {
 			w := <-tik.C
-			fmt.Printf("Waiting for member joining [%s]: %v\n", c.Group, w)
+			core.AppLog.Printf("Waiting for member joining [%s]: %v\n", c.Group, w)
 			if r == 0 {
 				cli.Put(context.Background(), c.Group+"#join", string(nd))
 			} else {
@@ -88,7 +87,7 @@ func (c *Etc) Join() error {
 						if n != c.local.Name {
 							cn := c.cluster[n]
 							if *cn.timeoutCount == 3 {
-								fmt.Printf("Node timeout %d %d %s %v\n", *cn.pingCount, *cn.timeoutCount, cn.Name, p)
+								core.AppLog.Printf("Node timeout %d %d %s %v\n", *cn.pingCount, *cn.timeoutCount, cn.Name, p)
 								delete(c.cluster, n)
 								c.group()
 							} else {
@@ -135,7 +134,7 @@ func (c *Etc) Join() error {
 					c.lock.Lock()
 					_, joined := c.cluster[rnd.Name]
 					if !joined {
-						fmt.Printf("Node [%s] has joined\n", rnd.Name)
+						core.AppLog.Printf("Node [%s] has joined\n", rnd.Name)
 						rnd.pingCount = new(int8)
 						rnd.timeoutCount = new(uint8)
 						*rnd.pingCount = 0
@@ -150,7 +149,7 @@ func (c *Etc) Join() error {
 			}
 		}
 	}
-	fmt.Printf("Cluster shut down [%s]\n", c.Group)
+	core.AppLog.Printf("Cluster shut down [%s]\n", c.Group)
 	return nil
 }
 func (c *Etc) Local() core.Node {
@@ -159,9 +158,9 @@ func (c *Etc) Local() core.Node {
 func (c *Etc) View() []core.Node {
 	c.lock.Lock()
 	defer c.lock.Unlock()
-	nv := make([]core.Node,0)
-	for _, v:= range c.cluster{
-		nv = append(nv,v.Node)
+	nv := make([]core.Node, 0)
+	for _, v := range c.cluster {
+		nv = append(nv, v.Node)
 	}
 	return nv
 }
@@ -175,7 +174,7 @@ func (c *Etc) Partition(key []byte) core.Node {
 
 func (c *Etc) group() {
 	sz := len(c.cluster)
-	fmt.Printf("Cluster grouping %d\n", sz)
+	core.AppLog.Printf("Cluster grouping %d\n", sz)
 	nds := make([]string, sz)
 	i := 0
 	for n := range c.cluster {
@@ -193,7 +192,7 @@ func (c *Etc) group() {
 func (c *Etc) Atomic(prefix string, t core.Exec) error {
 	if prefix == "" {
 		prefix = c.Group
-		fmt.Printf("Reset Lock prefix %s\n", prefix)
+		core.AppLog.Printf("Reset Lock prefix %s\n", prefix)
 	}
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   c.EtcdEndpoints,
