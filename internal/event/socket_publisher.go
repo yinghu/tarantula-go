@@ -3,8 +3,6 @@ package event
 import (
 	"net"
 	"strings"
-
-	"gameclustering.com/internal/core"
 )
 
 const SOCKET_DATA_BUFFER_SIZE int = 1024
@@ -14,7 +12,7 @@ type SocketPublisher struct {
 }
 
 func (s *SocketPublisher) Publish(e Event) {
-	core.AppLog.Printf("PUB %s\n", s.Remote)
+
 	parts := strings.Split(s.Remote, "://")
 	conn, err := net.Dial(parts[0], parts[1])
 	if err != nil {
@@ -35,5 +33,4 @@ func (s *SocketPublisher) Publish(e Event) {
 		return
 	}
 	e.Outbound(&buffer)
-	core.AppLog.Printf("END %s %s\n", parts[0], parts[1])
 }
