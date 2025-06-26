@@ -22,7 +22,6 @@ type EventService interface {
 type Event interface {
 	Inbound(buff core.DataBuffer)
 	Outbound(buff core.DataBuffer)
-	OnError(err error)
 	core.Persistentable
 	Listener() EventListener
 }

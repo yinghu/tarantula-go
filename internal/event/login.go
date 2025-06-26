@@ -99,7 +99,3 @@ func (s *Login) Outbound(buff core.DataBuffer) {
 
 func (s *Login) streaming(c Chunk) {
 }
-
-func (s *Login) OnError(err error) {
-	core.AppLog.Printf("On error %s\n", err.Error())
-}
