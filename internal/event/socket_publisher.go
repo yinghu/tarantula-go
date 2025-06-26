@@ -11,7 +11,7 @@ type SocketPublisher struct {
 	Remote string
 }
 
-func (s *SocketPublisher) Publish(e Event) {
+func (s *SocketPublisher) Publish(e Event,ticket string) {
 
 	parts := strings.Split(s.Remote, "://")
 	conn, err := net.Dial(parts[0], parts[1])
@@ -27,7 +27,7 @@ func (s *SocketPublisher) Publish(e Event) {
 		e.OnError(err)
 		return
 	}
-	err = buffer.WriteString("ticket")
+	err = buffer.WriteString(ticket)
 	if err != nil {
 		e.OnError(err)
 		return

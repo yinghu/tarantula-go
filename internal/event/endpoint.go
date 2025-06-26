@@ -1,7 +1,6 @@
 package event
 
 import (
-	"errors"
 	"net"
 	"strings"
 
@@ -25,17 +24,17 @@ func (s *Endpoint) handleClient(client net.Conn) {
 	socket := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
 	cid, err := socket.ReadInt32()
 	if err != nil {
-		core.AppLog.Printf("Error on read cid %s\n", err.Error())
+		core.AppLog.Printf("error on read cid %s\n", err.Error())
 		return
 	}
-	e := s.Service.Create(int(cid))
 	tik, err := socket.ReadString()
 	if err != nil {
-		e.OnError(err)
+		core.AppLog.Printf("error on read ticket %s\n", err.Error())
 		return
 	}
-	if tik != "ticket" {
-		e.OnError(errors.New("invalid ticket"))
+	e, err := s.Service.Create(int(cid), tik)
+	if err != nil {
+		core.AppLog.Printf("error on create event %s\n", err.Error())
 		return
 	}
 	e.Inbound(&socket)

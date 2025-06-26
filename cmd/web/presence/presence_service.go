@@ -18,10 +18,10 @@ type PresenceService struct {
 	Started bool
 }
 
-func (s *PresenceService) Create(classId int) event.Event {
+func (s *PresenceService) Create(classId int, ticket string) (event.Event, error) {
 	login := event.Login{}
 	login.Cb = s
-	return &login
+	return &login, nil
 }
 
 func (s *PresenceService) OnEvent(e event.Event) {
@@ -93,7 +93,7 @@ func (s *PresenceService) Publish(e event.Event) error {
 		if v.Name != s.Cluster().Local().Name {
 			go func() {
 				pub := event.SocketPublisher{Remote: v.TcpEndpoint}
-				pub.Publish(e)
+				pub.Publish(e, "ticket")
 			}()
 		}
 	}

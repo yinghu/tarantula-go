@@ -13,8 +13,9 @@ var W sync.WaitGroup = sync.WaitGroup{}
 type sampleFactory struct {
 }
 
-func (s *sampleFactory) Create(classId int) Event {
-	return &sampleEvent{}
+func (s *sampleFactory) Create(classId int, ticket string) (Event, error) {
+	fmt.Printf("%d %s\n", classId, ticket)
+	return &sampleEvent{}, nil
 }
 func (s *sampleFactory) OnEvent(e Event) {
 
@@ -39,6 +40,9 @@ type sampleEvent struct {
 	EventObj
 }
 
+func (s *sampleEvent) ClassId() int {
+	return 100
+}
 func (s *sampleEvent) WriteKey(value core.DataBuffer) error {
 	value.WriteInt64(s.Id)
 	return nil
@@ -113,7 +117,6 @@ func (s *sampleEvent) Read(value core.DataBuffer) error {
 	return nil
 }
 
-
 func (s *sampleEvent) streaming(c Chunk) {
 	fmt.Printf("REV : %s\n", string(c.Data))
 	//s.listener <- c
@@ -155,6 +158,7 @@ func (s *sampleEvent) Outbound(buff core.DataBuffer) {
 }
 
 func TestEndpoint(t *testing.T) {
+	core.CreateTestLog()
 	tcp := Endpoint{TcpEndpoint: "tcp://localhost:5000", Service: &sampleFactory{}}
 	go tcp.Open()
 
@@ -171,7 +175,7 @@ func TestEndpoint(t *testing.T) {
 	sample1.F32 = 12.09
 	sample1.F64 = 64.09
 	soc := SocketPublisher{Remote: "tcp://localhost:5000"}
-	soc.Publish(&sample1)
+	soc.Publish(&sample1, "ticket12123131")
 	W.Wait()
 	tcp.Close()
 }

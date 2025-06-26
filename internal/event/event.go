@@ -14,7 +14,7 @@ type EventListener interface {
 }
 
 type EventService interface {
-	Create(classId int) Event
+	Create(classId int, ticket string) (Event, error)
 	EventListener
 }
 
@@ -31,11 +31,10 @@ type EventPublisher interface {
 }
 
 type EventObj struct {
-	Cc    chan Chunk
-	Cb    EventListener
+	Cc chan Chunk
+	Cb EventListener
 	core.PersistentableObj
 }
-
 
 func (s *EventObj) Inbound(buff core.DataBuffer) {
 
