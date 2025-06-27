@@ -3,7 +3,9 @@ services:
   presence:
     container_name: presence
     hostname: presence
-    image: tarantula.presence:v1.0  
+    image: tarantula.presence:v1.0
+    volumes:
+      - volume_presence:/home/tarantula/presence  
     ports:
       - "5000:5000"
     networks:
@@ -12,6 +14,8 @@ services:
     container_name: asset
     hostname: asset
     image: tarantula.asset:v1.0
+    volumes:
+      - volume_asset:/home/tarantula/asset  
     ports:
       - "5001:5001"
     networks:
@@ -20,6 +24,8 @@ services:
     container_name: profile
     hostname: profile
     image: tarantula.profile:v1.0
+    volumes:
+      - volume_profile:/home/tarantula/profile  
     ports:
       - "5002:5002"
     networks:
@@ -28,6 +34,8 @@ services:
     container_name: inventory
     hostname: inventory
     image: tarantula.inventory:v1.0
+    volumes:
+      - volume_inventory:/home/tarantula/inventory  
     ports:
       - "5003:5003"
     networks:
@@ -36,12 +44,16 @@ services:
     container_name: tournament
     hostname: tournament
     image: tarantula.tournament:v1.0
+    volumes:
+      - volume_tournament:/home/tarantula/tournament  
     networks:
       - net    
   admin:
     container_name: admin
     hostname: admin
     image: tarantula.admin:v1.0
+    volumes:
+      - volume_admin:/home/tarantula/admin  
     networks:
       - net
   web:
@@ -66,3 +78,10 @@ networks:
       config:
         - subnet: 10.20.0.0/16
           gateway: 10.20.0.1
+volumes:
+  volume_presence:
+  volume_asset:
+  volume_profile:
+  volume_inventory:
+  volume_tournament:
+  volume_admin:

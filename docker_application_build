@@ -13,7 +13,6 @@ RUN mkdir /etc/tarantula
 COPY cmd/web/${app}/${app}-conf.json /etc/tarantula/${app}-conf.json
 RUN mkdir /home/tarantula/${app}
 RUN chown -R tarantula /home/tarantula/${app}
-VOLUME /home/tarantula/${app}
 
 # Application Install 
 USER tarantula
