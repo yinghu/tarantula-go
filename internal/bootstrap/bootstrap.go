@@ -36,13 +36,20 @@ type TarantulaContext interface {
 	Shutdown()
 	event.EventService
 	core.KeyListener
+
+	Context() string
+	Service() TarantulaService
 }
 
-type TarantulaApp interface {
+type TarantulaService interface {
 	ItemService() item.ItemService
 	Metrics() metrics.MetricsService
 	Cluster() core.Cluster
 	Authenticator() core.Authenticator
+}
+
+type TarantulaApp interface {
+	TarantulaService
 	AccessControl() int32
 	Request(sesion core.OnSession, w http.ResponseWriter, r *http.Request)
 }

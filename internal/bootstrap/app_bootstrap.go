@@ -17,16 +17,16 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-func AppBootstrap(service TarantulaContext) {
+func AppBootstrap(tcx TarantulaContext) {
 	f := conf.Env{}
-	err := f.Load(service.Config())
+	err := f.Load(tcx.Config())
 	if err != nil {
 		fmt.Printf("Config not existed %s\n", err.Error())
 		return
 	}
 	c := cluster.NewEtc(f.GroupName, f.EtcdEndpoints, cluster.LocalNode{Node: core.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.Evp.TcpEndpoint}})
-	c.Kyl = service
-	e := event.Endpoint{TcpEndpoint: f.Evp.TcpEndpoint, Service: service}
+	c.Kyl = tcx
+	e := event.Endpoint{TcpEndpoint: f.Evp.TcpEndpoint, Service: tcx}
 	if f.Evp.Enabled {
 		go func() {
 			c.Started.Wait()
@@ -39,9 +39,13 @@ func AppBootstrap(service TarantulaContext) {
 		for i := range view {
 			core.AppLog.Printf("View :%v\n", view[i])
 		}
-		err := service.Start(f, &c)
+		err := tcx.Start(f, &c)
 		if err != nil {
 			core.AppLog.Printf("Error %s\n", err.Error())
+		}
+		if tcx.Context() != "admin" {
+			http.Handle("/"+tcx.Context()+"/admin", Logging(&AppAdmin{tcx.Service()}))
+			fmt.Printf("Register app admin endpoint %s\n", tcx.Context())
 		}
 		http.Handle("/", http.HandlerFunc(badRequest))
 		core.AppLog.Fatal(http.ListenAndServe(f.HttpBinding, nil))
@@ -54,7 +58,7 @@ func AppBootstrap(service TarantulaContext) {
 		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 		<-sigs
 		core.AppLog.Println("Signal to exit")
-		service.Shutdown()
+		tcx.Shutdown()
 		c.Quit <- true
 		if f.Evp.Enabled {
 			e.Close()

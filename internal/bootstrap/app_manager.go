@@ -16,6 +16,7 @@ type AppManager struct {
 	imse item.ItemService
 	auth core.Authenticator
 	Sql  persistence.Postgresql
+	ctx  string
 }
 
 func (s *AppManager) ItemService() item.ItemService {
@@ -34,6 +35,7 @@ func (s *AppManager) Authenticator() core.Authenticator {
 
 func (s *AppManager) Start(f conf.Env, c core.Cluster) error {
 	s.cls = c
+	s.ctx = f.GroupName
 	tkn := util.JwtHMac{Alg: core.JWT_ALG, Ksz: core.JWT_KEY_SIZE}
 	ci := util.Aes{Ksz: core.CIPHER_KEY_SIZE}
 	err := c.Atomic(f.Presence, func(ctx core.Ctx) error {
@@ -113,4 +115,12 @@ func (s *AppManager) OnError(e error) {
 
 func (s *AppManager) Updated(key string, value string) {
 	core.AppLog.Printf("Key updated %s %s\n", key, value)
+}
+
+func (s *AppManager) Context() string {
+	return s.ctx
+}
+
+func (s *AppManager) Service() TarantulaService {
+	return s
 }
