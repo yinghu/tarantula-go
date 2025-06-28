@@ -6,7 +6,10 @@ replace gameclustering.com/internal/util => ../util
 
 replace gameclustering.com/internal/core => ../core
 
+replace gameclustering.com/internal/conf => ../conf
+
 require (
+	gameclustering.com/internal/conf v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
 	go.etcd.io/etcd/client/v3 v3.5.21

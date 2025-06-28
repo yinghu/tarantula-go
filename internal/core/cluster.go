@@ -23,6 +23,12 @@ type Cluster interface {
 	View() []Node
 	Partition(key []byte) Node
 	Atomic(prefix string, t Exec) error
+	Join() error
+	Wait()
+	Quit()
+
+	OnJoin(join Node)
+	Listener() KeyListener
 }
 
 type KeyListener interface {

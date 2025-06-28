@@ -24,42 +24,41 @@ func AppBootstrap(tcx TarantulaContext) {
 		fmt.Printf("Config not existed %s\n", err.Error())
 		return
 	}
-	c := cluster.NewEtc(f.GroupName, f.EtcdEndpoints, cluster.LocalNode{Node: core.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.Evp.TcpEndpoint}})
-	c.Kyl = tcx
+	c := cluster.CreateCluster(f, tcx)
 	e := event.Endpoint{TcpEndpoint: f.Evp.TcpEndpoint, Service: tcx}
 	if f.Evp.Enabled {
 		go func() {
-			c.Started.Wait()
+			c.Wait()
 			e.Open()
 		}()
 	}
 	go func() {
-		c.Started.Wait()
+		c.Wait()
 		view := c.View()
 		for i := range view {
 			core.AppLog.Printf("View :%v\n", view[i])
 		}
-		err := tcx.Start(f, &c)
+		err := tcx.Start(f, c)
 		if err != nil {
 			core.AppLog.Printf("Error %s\n", err.Error())
 		}
 		if tcx.Context() != "admin" {
 			http.Handle("/"+tcx.Context()+"/admin", Logging(&AppAdmin{tcx.Service()}))
-			fmt.Printf("Register app admin endpoint %s\n", tcx.Context())
+			core.AppLog.Printf("Register app admin endpoint %s\n", tcx.Context())
 		}
 		http.Handle("/", http.HandlerFunc(badRequest))
 		core.AppLog.Fatal(http.ListenAndServe(f.HttpBinding, nil))
 
 	}()
 	go func() {
-		c.Started.Wait()
+		c.Wait()
 		core.AppLog.Println("Wating for signal to exit ...")
 		sigs := make(chan os.Signal, 1)
 		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 		<-sigs
 		core.AppLog.Println("Signal to exit")
 		tcx.Shutdown()
-		c.Quit <- true
+		c.Quit()
 		if f.Evp.Enabled {
 			e.Close()
 		}

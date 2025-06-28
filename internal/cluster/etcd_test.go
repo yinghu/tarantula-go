@@ -11,7 +11,6 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-
 func TestPartition(t *testing.T) {
 	core.CreateTestLog()
 	nodes := []string{"a11", "a02", "a03", "a04", "a05", "a06", "a07", "a08", "a09", "a10", "a01", "a12"}
@@ -39,11 +38,11 @@ func TestNode(t *testing.T) {
 func TestCluster(t *testing.T) {
 	core.CreateTestLog()
 	lc := core.Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"}
-	c := NewEtc("tarantula", []string{"192.168.1.7:2379"}, LocalNode{Node: lc})
+	c := newCluster("tarantula", []string{"192.168.1.7:2379"}, LocalNode{Node: lc}, nil)
 	tk := time.NewTimer(20 * time.Second)
 	go func() {
 		<-tk.C
-		c.Quit <- true
+		c.Quit()
 	}()
 	err := c.Join()
 	if err != nil {
@@ -54,7 +53,7 @@ func TestCluster(t *testing.T) {
 func TestTransaction(t *testing.T) {
 	core.CreateTestLog()
 	lc := core.Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"}
-	c := NewEtc("tarantula", []string{"192.168.1.7:2379"}, LocalNode{Node: lc})
+	c := newCluster("tarantula", []string{"192.168.1.7:2379"}, LocalNode{Node: lc},nil)
 	c.Atomic("", func(c core.Ctx) error {
 		k := "jwkkey"
 		v := util.KeyToBase64(util.Key(32))

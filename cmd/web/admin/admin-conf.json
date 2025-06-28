@@ -1,4 +1,5 @@
 {
+	"Clustering" : true,
     "GroupName" :"admin",
 	"NodeName" :   "a01",
 	"NodeId"     :   1,

@@ -3,6 +3,7 @@ package cluster
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"slices"
 	"strings"
 	"sync"
@@ -21,10 +22,10 @@ type LocalNode struct {
 	timeoutCount *uint8 `json:"-"`
 }
 
-type Etc struct {
-	Kyl           core.KeyListener
-	Quit          chan bool
-	Started       *sync.WaitGroup
+type EtcdCluster struct {
+	kyl           core.KeyListener
+	quit          chan bool
+	started       *sync.WaitGroup
 	Group         string
 	EtcdEndpoints []string
 	local         LocalNode
@@ -33,18 +34,19 @@ type Etc struct {
 	partition     []string
 }
 
-func NewEtc(group string, etcEndpoints []string, local LocalNode) Etc {
-	etc := Etc{Group: group, EtcdEndpoints: etcEndpoints, local: local}
+func newCluster(group string, etcEndpoints []string, local LocalNode, kl core.KeyListener) core.Cluster {
+	etc := EtcdCluster{Group: group, EtcdEndpoints: etcEndpoints, local: local}
+	etc.kyl = kl
 	etc.lock = &sync.Mutex{}
 	etc.cluster = make(map[string]LocalNode)
 	etc.partition = make([]string, core.CLUSTER_PARTITION_NUM)
-	etc.Quit = make(chan bool)
-	etc.Started = &sync.WaitGroup{}
-	etc.Started.Add(1)
-	return etc
+	etc.quit = make(chan bool)
+	etc.started = &sync.WaitGroup{}
+	etc.started.Add(1)
+	return &etc
 }
 
-func (c *Etc) Join() error {
+func (c *EtcdCluster) Join() error {
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   c.EtcdEndpoints,
 		DialTimeout: 5 * time.Second,
@@ -66,15 +68,15 @@ func (c *Etc) Join() error {
 				cli.Put(context.Background(), c.Group+"#ping", string(nd))
 			}
 		}
-		c.Started.Done()
+		c.started.Done()
 	}()
 	go func() {
-		c.Started.Wait() //blocked
+		c.started.Wait() //blocked
 		tik := time.NewTicker(1 * time.Second)
 		pct := 5
 		for {
 			select {
-			case <-c.Quit:
+			case <-c.quit:
 				cli.Close()
 				return
 			case p := <-tik.C:
@@ -108,7 +110,6 @@ func (c *Etc) Join() error {
 	wch := cli.Watch(context.Background(), c.Group, clientv3.WithPrefix())
 	for wresp := range wch { //blocked
 		for _, ev := range wresp.Events {
-			//fmt.Printf("Orignal %s\n", string(ev.Kv.Key))
 			cmds := strings.Split(string(ev.Kv.Key), "#")
 			switch cmds[1] {
 			case "ping":
@@ -145,17 +146,17 @@ func (c *Etc) Join() error {
 					c.lock.Unlock()
 				}
 			default:
-				c.Kyl.Updated(cmds[1], string(ev.Kv.Value))
+				c.kyl.Updated(cmds[1], string(ev.Kv.Value))
 			}
 		}
 	}
 	core.AppLog.Printf("Cluster shut down [%s]\n", c.Group)
 	return nil
 }
-func (c *Etc) Local() core.Node {
+func (c *EtcdCluster) Local() core.Node {
 	return c.local.Node
 }
-func (c *Etc) View() []core.Node {
+func (c *EtcdCluster) View() []core.Node {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	nv := make([]core.Node, 0)
@@ -165,14 +166,14 @@ func (c *Etc) View() []core.Node {
 	return nv
 }
 
-func (c *Etc) Partition(key []byte) core.Node {
+func (c *EtcdCluster) Partition(key []byte) core.Node {
 	p := util.Partition(key, uint32(core.CLUSTER_PARTITION_NUM))
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	return c.cluster[c.partition[p]].Node
 }
 
-func (c *Etc) group() {
+func (c *EtcdCluster) group() {
 	sz := len(c.cluster)
 	core.AppLog.Printf("Cluster grouping %d\n", sz)
 	nds := make([]string, sz)
@@ -185,11 +186,10 @@ func (c *Etc) group() {
 	for p := range core.CLUSTER_PARTITION_NUM {
 		i := p % sz
 		c.partition[p] = nds[i]
-		//fmt.Printf("Partition %d %s %d\n", i, nds[i], p)
 	}
 }
 
-func (c *Etc) Atomic(prefix string, t core.Exec) error {
+func (c *EtcdCluster) Atomic(prefix string, t core.Exec) error {
 	if prefix == "" {
 		prefix = c.Group
 		core.AppLog.Printf("Reset Lock prefix %s\n", prefix)
@@ -212,4 +212,20 @@ func (c *Etc) Atomic(prefix string, t core.Exec) error {
 	mutex.Lock(ctx)
 	defer mutex.Unlock(ctx)
 	return t(&EtcdClient{cli: cli, prefix: prefix})
+}
+
+func (c *EtcdCluster) Wait() {
+	c.started.Wait()
+}
+
+func (c *EtcdCluster) Quit() {
+	c.quit <- true
+}
+
+func (c *EtcdCluster) OnJoin(join core.Node) {
+	fmt.Printf("Node joined %v\n", join)
+}
+
+func (c *EtcdCluster) Listener() core.KeyListener {
+	return c.kyl
 }

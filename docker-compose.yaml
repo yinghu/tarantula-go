@@ -18,6 +18,8 @@ services:
       - volume_asset:/home/tarantula/asset  
     ports:
       - "5001:5001"
+    depends_on:
+      - presence  
     networks:
       - net
   profile:
@@ -28,6 +30,8 @@ services:
       - volume_profile:/home/tarantula/profile  
     ports:
       - "5002:5002"
+    depends_on:
+      - presence  
     networks:
       - net  
   inventory:
@@ -38,6 +42,8 @@ services:
       - volume_inventory:/home/tarantula/inventory  
     ports:
       - "5003:5003"
+    depends_on:
+      - presence  
     networks:
       - net
   tournament:
@@ -45,7 +51,9 @@ services:
     hostname: tournament
     image: tarantula.tournament:v1.0
     volumes:
-      - volume_tournament:/home/tarantula/tournament  
+      - volume_tournament:/home/tarantula/tournament
+    depends_on:
+      - presence    
     networks:
       - net    
   admin:
@@ -54,6 +62,11 @@ services:
     image: tarantula.admin:v1.0
     volumes:
       - volume_admin:/home/tarantula/admin  
+    depends_on:
+      - asset
+      - profile
+      - inventory
+      - tournament
     networks:
       - net
   web:
@@ -63,11 +76,7 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - presence
-      - asset
-      - profile
-      - inventory
-      - tournament
+    
       - admin
     networks:
       - net

@@ -17,6 +17,7 @@ func (s *AppAdmin) AccessControl() int32 {
 
 func (s *AppAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+	s.Cluster().OnJoin(core.Node{Name: "a1"})
 	w.WriteHeader(http.StatusOK)
 	session := core.OnSession{Successful: true, Message: "app admin"}
 	w.Write(util.ToJson(session))
