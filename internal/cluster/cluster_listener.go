@@ -2,7 +2,6 @@ package cluster
 
 import (
 	"context"
-	"fmt"
 	"slices"
 	"sync"
 	"time"
@@ -14,7 +13,7 @@ import (
 )
 
 type ClusterListener struct {
-	kyl           core.KeyListener
+	clistener           core.ClusterListener
 	Group         string
 	EtcdEndpoints []string
 	local         core.Node
@@ -24,9 +23,9 @@ type ClusterListener struct {
 	quit          chan bool
 }
 
-func newListener(group string, etcEndpoints []string, local core.Node, kl core.KeyListener) core.Cluster {
+func newListener(group string, etcEndpoints []string, local core.Node, kl core.ClusterListener) core.Cluster {
 	listener := ClusterListener{Group: group, EtcdEndpoints: etcEndpoints, local: local}
-	listener.kyl = kl
+	listener.clistener = kl
 	listener.lock = &sync.Mutex{}
 	listener.cluster = make(map[string]core.Node)
 	listener.partition = make([]string, core.CLUSTER_PARTITION_NUM)
@@ -81,11 +80,12 @@ func (c *ClusterListener) Atomic(prefix string, t core.Exec) error {
 }
 
 func (c *ClusterListener) OnJoin(join core.Node) {
+	c.cluster[join.Name] = join
 	c.group()
 }
 
 func (c *ClusterListener) Join() error {
-	fmt.Printf("Waiting %s\n", c.Group)
+	core.AppLog.Printf("Cluster waiting for quit signal %s\n", c.Group)
 	<-c.quit
 	return nil
 }
@@ -97,8 +97,13 @@ func (c *ClusterListener) Wait() {
 func (c *ClusterListener) Quit() {
 	c.quit <- true
 }
-func (c *ClusterListener) Listener() core.KeyListener {
-	return c.kyl
+
+func (c *ClusterListener) Started(){
+	
+}
+
+func (c *ClusterListener) Listener() core.ClusterListener {
+	return c.clistener
 }
 func (c *ClusterListener) group() {
 	sz := len(c.cluster)

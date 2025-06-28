@@ -26,11 +26,13 @@ type Cluster interface {
 	Join() error
 	Wait()
 	Quit()
+	Started()
 
 	OnJoin(join Node)
-	Listener() KeyListener
+	Listener() ClusterListener
 }
 
-type KeyListener interface {
+type ClusterListener interface {
 	Updated(key string, value string)
+	MemberJoined(joined Node)
 }

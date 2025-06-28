@@ -5,7 +5,7 @@ import (
 	"gameclustering.com/internal/core"
 )
 
-func CreateCluster(f conf.Env, kl core.KeyListener) core.Cluster {
+func CreateCluster(f conf.Env, kl core.ClusterListener) core.Cluster {
 	if f.Clustering {
 		return newCluster(f.GroupName, f.EtcdEndpoints, LocalNode{Node: core.Node{Name: f.NodeName, HttpEndpoint: f.HttpEndpoint, TcpEndpoint: f.Evp.TcpEndpoint}}, kl)
 	}

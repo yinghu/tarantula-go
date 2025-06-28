@@ -94,6 +94,7 @@ func (s *AppManager) Start(f conf.Env, c core.Cluster) error {
 		return err
 	}
 	s.imse = &is
+	c.Started()
 	return nil
 }
 
@@ -115,6 +116,16 @@ func (s *AppManager) OnError(e error) {
 
 func (s *AppManager) Updated(key string, value string) {
 	core.AppLog.Printf("Key updated %s %s\n", key, value)
+}
+
+func (s *AppManager) MemberJoined(joined core.Node) {
+	core.AppLog.Printf("Member joined %v\n", joined)
+	tick, err := s.auth.CreateTicket(1, 1, SUDO_ACCESS_CONTROL)
+	if err != nil {
+		return
+	}
+	core.AppLog.Printf("%s\n", tick)
+
 }
 
 func (s *AppManager) Context() string {

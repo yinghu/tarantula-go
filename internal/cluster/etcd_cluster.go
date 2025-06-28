@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -23,9 +24,10 @@ type LocalNode struct {
 }
 
 type EtcdCluster struct {
-	kyl           core.KeyListener
+	started       atomic.Bool
+	clistener     core.ClusterListener
 	quit          chan bool
-	started       *sync.WaitGroup
+	starting      *sync.WaitGroup
 	Group         string
 	EtcdEndpoints []string
 	local         LocalNode
@@ -34,15 +36,16 @@ type EtcdCluster struct {
 	partition     []string
 }
 
-func newCluster(group string, etcEndpoints []string, local LocalNode, kl core.KeyListener) core.Cluster {
+func newCluster(group string, etcEndpoints []string, local LocalNode, kl core.ClusterListener) core.Cluster {
 	etc := EtcdCluster{Group: group, EtcdEndpoints: etcEndpoints, local: local}
-	etc.kyl = kl
+	etc.started.Store(false)
+	etc.clistener = kl
 	etc.lock = &sync.Mutex{}
 	etc.cluster = make(map[string]LocalNode)
 	etc.partition = make([]string, core.CLUSTER_PARTITION_NUM)
 	etc.quit = make(chan bool)
-	etc.started = &sync.WaitGroup{}
-	etc.started.Add(1)
+	etc.starting = &sync.WaitGroup{}
+	etc.starting.Add(1)
 	return &etc
 }
 
@@ -68,10 +71,10 @@ func (c *EtcdCluster) Join() error {
 				cli.Put(context.Background(), c.Group+"#ping", string(nd))
 			}
 		}
-		c.started.Done()
+		c.starting.Done()
 	}()
 	go func() {
-		c.started.Wait() //blocked
+		c.starting.Wait() //blocked
 		tik := time.NewTicker(1 * time.Second)
 		pct := 5
 		for {
@@ -142,11 +145,14 @@ func (c *EtcdCluster) Join() error {
 						*rnd.timeoutCount = 0
 						c.cluster[rnd.Name] = rnd
 						c.group()
+						if c.started.Load() {
+							c.clistener.MemberJoined(rnd.Node)
+						}
 					}
 					c.lock.Unlock()
 				}
 			default:
-				c.kyl.Updated(cmds[1], string(ev.Kv.Value))
+				c.clistener.Updated(cmds[1], string(ev.Kv.Value))
 			}
 		}
 	}
@@ -215,17 +221,21 @@ func (c *EtcdCluster) Atomic(prefix string, t core.Exec) error {
 }
 
 func (c *EtcdCluster) Wait() {
-	c.started.Wait()
+	c.starting.Wait()
 }
 
 func (c *EtcdCluster) Quit() {
 	c.quit <- true
 }
 
+func (c *EtcdCluster) Started() {
+	c.started.Store(true)
+}
+
 func (c *EtcdCluster) OnJoin(join core.Node) {
 	fmt.Printf("Node joined %v\n", join)
 }
 
-func (c *EtcdCluster) Listener() core.KeyListener {
-	return c.kyl
+func (c *EtcdCluster) Listener() core.ClusterListener {
+	return c.clistener
 }

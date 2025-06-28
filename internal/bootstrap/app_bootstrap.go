@@ -34,16 +34,18 @@ func AppBootstrap(tcx TarantulaContext) {
 	}
 	go func() {
 		c.Wait()
-		view := c.View()
-		for i := range view {
-			core.AppLog.Printf("View :%v\n", view[i])
-		}
 		err := tcx.Start(f, c)
 		if err != nil {
 			core.AppLog.Printf("Error %s\n", err.Error())
 		}
+		view := c.View()
+		for i := range view {
+			core.AppLog.Printf("View :%v\n", view[i])
+			c.Listener().MemberJoined(view[i])
+		}
+		http.Handle("/"+tcx.Context()+"/health", Logging(&AppHealth{tcx.Service()}))
 		if tcx.Context() != "admin" {
-			http.Handle("/"+tcx.Context()+"/admin", Logging(&AppAdmin{tcx.Service()}))
+			http.Handle("/"+tcx.Context()+"/admin/{cmd}", Logging(&AppAdmin{tcx.Service()}))
 			core.AppLog.Printf("Register app admin endpoint %s\n", tcx.Context())
 		}
 		http.Handle("/", http.HandlerFunc(badRequest))
