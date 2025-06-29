@@ -32,6 +32,7 @@ type EventEndpoint struct {
 
 type Env struct {
 	Clustering    bool          `json:"Clustering"`
+	Standalone    bool          `json:"Standalone"`
 	GroupName     string        `json:"GroupName"`
 	NodeName      string        `json:"NodeName"`
 	NodeId        int64         `json:"NodeId"`

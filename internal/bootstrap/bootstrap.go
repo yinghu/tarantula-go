@@ -36,7 +36,6 @@ type TarantulaContext interface {
 	Shutdown()
 	event.EventService
 	core.ClusterListener
-
 	Context() string
 	Service() TarantulaService
 }
