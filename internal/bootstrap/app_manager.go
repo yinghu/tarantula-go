@@ -111,7 +111,7 @@ func (s *AppManager) MemberJoined(joined core.Node) {
 		return
 	}
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", "http://web/presence/admin/join", bytes.NewBuffer(data))
+	req, err := http.NewRequest("POST", "http://web/asset/admin/join", bytes.NewBuffer(data))
 	if err != nil {
 		return
 	}
@@ -128,7 +128,6 @@ func (s *AppManager) MemberJoined(joined core.Node) {
 		core.AppLog.Printf("Resp Error %s\n", err.Error())
 	}
 	core.AppLog.Printf("Response code : %d %s\n", resp.StatusCode, string(r))
-
 }
 
 func (s *AppManager) Context() string {

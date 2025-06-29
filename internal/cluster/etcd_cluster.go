@@ -3,18 +3,15 @@ package cluster
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"slices"
+
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/util"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
-	"go.etcd.io/etcd/client/v3/concurrency"
 )
 
 type LocalNode struct {
@@ -24,20 +21,14 @@ type LocalNode struct {
 }
 
 type EtcdCluster struct {
-	started       atomic.Bool
-	clistener     core.ClusterListener
-	quit          chan bool
-	starting      *sync.WaitGroup
-	Group         string
-	EtcdEndpoints []string
-	local         LocalNode
-	lock          *sync.Mutex
-	cluster       map[string]LocalNode
-	partition     []string
+	started  atomic.Bool
+	starting *sync.WaitGroup
+	ClusterManager
 }
 
 func newCluster(group string, etcEndpoints []string, local LocalNode, kl core.ClusterListener) core.Cluster {
-	etc := EtcdCluster{Group: group, EtcdEndpoints: etcEndpoints, local: local}
+	cmanager := ClusterManager{Group: group, EtcdEndpoints: etcEndpoints, local: local}
+	etc := EtcdCluster{ClusterManager: cmanager}
 	etc.started.Store(false)
 	etc.clistener = kl
 	etc.lock = &sync.Mutex{}
@@ -159,83 +150,11 @@ func (c *EtcdCluster) Join() error {
 	core.AppLog.Printf("Cluster shut down [%s]\n", c.Group)
 	return nil
 }
-func (c *EtcdCluster) Local() core.Node {
-	return c.local.Node
-}
-func (c *EtcdCluster) View() []core.Node {
-	c.lock.Lock()
-	defer c.lock.Unlock()
-	nv := make([]core.Node, 0)
-	for _, v := range c.cluster {
-		nv = append(nv, v.Node)
-	}
-	return nv
-}
-
-func (c *EtcdCluster) Partition(key []byte) core.Node {
-	p := util.Partition(key, uint32(core.CLUSTER_PARTITION_NUM))
-	c.lock.Lock()
-	defer c.lock.Unlock()
-	return c.cluster[c.partition[p]].Node
-}
-
-func (c *EtcdCluster) group() {
-	sz := len(c.cluster)
-	core.AppLog.Printf("Cluster grouping %d\n", sz)
-	nds := make([]string, sz)
-	i := 0
-	for n := range c.cluster {
-		nds[i] = n
-		i++
-	}
-	slices.Sort(nds)
-	for p := range core.CLUSTER_PARTITION_NUM {
-		i := p % sz
-		c.partition[p] = nds[i]
-	}
-}
-
-func (c *EtcdCluster) Atomic(prefix string, t core.Exec) error {
-	if prefix == "" {
-		prefix = c.Group
-		core.AppLog.Printf("Reset Lock prefix %s\n", prefix)
-	}
-	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   c.EtcdEndpoints,
-		DialTimeout: 5 * time.Second,
-	})
-	if err != nil {
-		return err
-	}
-	defer cli.Close()
-	session, err := concurrency.NewSession(cli)
-	if err != nil {
-		return err
-	}
-	defer session.Close()
-	mutex := concurrency.NewMutex(session, prefix+"#lock")
-	ctx := context.Background()
-	mutex.Lock(ctx)
-	defer mutex.Unlock(ctx)
-	return t(&EtcdClient{cli: cli, prefix: prefix})
-}
 
 func (c *EtcdCluster) Wait() {
 	c.starting.Wait()
 }
 
-func (c *EtcdCluster) Quit() {
-	c.quit <- true
-}
-
 func (c *EtcdCluster) Started() {
 	c.started.Store(true)
-}
-
-func (c *EtcdCluster) OnJoin(join core.Node) {
-	fmt.Printf("Node joined %v\n", join)
-}
-
-func (c *EtcdCluster) Listener() core.ClusterListener {
-	return c.clistener
 }

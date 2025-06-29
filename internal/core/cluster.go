@@ -35,4 +35,5 @@ type Cluster interface {
 type ClusterListener interface {
 	Updated(key string, value string)
 	MemberJoined(joined Node)
+	
 }
