@@ -19,12 +19,12 @@ func (s *AppAdmin) AccessControl() int32 {
 func (s *AppAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	cmd := r.PathValue("cmd")
-	core.AppLog.Printf("Call on cmd %s %v\n", cmd,s.Cluster().Local())
+	core.AppLog.Printf("Call on cmd %s %v\n", cmd, s.Cluster().Local())
 	if cmd == "join" {
 		var join core.Node
 		json.NewDecoder(r.Body).Decode(&join)
 		s.Cluster().OnJoin(join)
-		core.AppLog.Printf("Call on join %s\n", join.Name)
+		core.AppLog.Printf("Call on join %v\n", join)
 	}
 	w.WriteHeader(http.StatusOK)
 	session := core.OnSession{Successful: true, Message: "app admin"}
