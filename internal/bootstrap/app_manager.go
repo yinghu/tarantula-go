@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"gameclustering.com/internal/conf"
@@ -142,13 +143,19 @@ func (s *AppManager) MemberJoined(joined core.Node) {
 	if err != nil {
 		return
 	}
+	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+tick)
 	resp, err := client.Do(req)
 	if err != nil {
 		core.AppLog.Printf("Error %s\n", err.Error())
 		return
 	}
-	core.AppLog.Printf("Response code : %d\n", resp.StatusCode)
+	defer resp.Body.Close()
+	r, err := io.ReadAll(resp.Body)
+	if err != nil {
+		core.AppLog.Printf("Resp Error %s\n", err.Error())
+	}
+	core.AppLog.Printf("Response code : %d %s\n", resp.StatusCode, string(r))
 
 }
 
