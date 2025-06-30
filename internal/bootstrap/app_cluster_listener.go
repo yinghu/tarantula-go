@@ -44,7 +44,11 @@ func (s *AppManager) sendToApp(app string, cmd string, node core.Node) {
 	if err != nil {
 		return
 	}
-	client := &http.Client{}
+	tr := &http.Transport{
+		DisableKeepAlives:  true,
+		DisableCompression: true,
+	}
+	client := &http.Client{Transport: tr}
 	req, err := http.NewRequest("POST", "http://"+app+":8080/"+app+"/admin/"+cmd, bytes.NewBuffer(data))
 	if err != nil {
 		return
