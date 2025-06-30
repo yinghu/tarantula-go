@@ -24,6 +24,7 @@ type AppManager struct {
 	ctx        string
 	standalone bool
 	appAuth    core.Authenticator
+	seq        core.Sequence
 }
 
 func (s *AppManager) ItemService() item.ItemService {
@@ -39,11 +40,17 @@ func (s *AppManager) Cluster() core.Cluster {
 func (s *AppManager) Authenticator() core.Authenticator {
 	return s.auth
 }
+func (s *AppManager) Sequence() core.Sequence {
+	return s.seq
+}
 
 func (s *AppManager) Start(f conf.Env, c core.Cluster) error {
+	core.AppLog.Printf("app manager starting %v\n", f)
 	s.cls = c
 	s.ctx = f.GroupName
 	s.standalone = f.Standalone
+	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
+	s.seq = &sfk
 	au, err := s.LoadAuth(f.Presence, f.GroupName)
 	if err != nil {
 		return nil

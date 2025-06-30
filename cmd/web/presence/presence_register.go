@@ -19,7 +19,7 @@ func (s *PresenceRegister) AccessControl() int32 {
 }
 
 func (s *PresenceRegister) Register(login *event.Login) {
-	id, _ := s.Seq.Id()
+	id, _ := s.Sequence().Id()
 	login.SystemId = id
 	login.AccessControl = bootstrap.PROTECTED_ACCESS_CONTROL
 	hash, _ := s.Authenticator().HashPassword(login.Hash)

@@ -45,6 +45,7 @@ type TarantulaService interface {
 	Metrics() metrics.MetricsService
 	Cluster() core.Cluster
 	Authenticator() core.Authenticator
+	Sequence() core.Sequence
 }
 
 type TarantulaApp interface {
