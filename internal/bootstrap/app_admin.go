@@ -29,16 +29,23 @@ func (s *AppAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Req
 	if cmd == "join" {
 		var join core.Node
 		json.NewDecoder(r.Body).Decode(&join)
-		join.Name = strings.Replace(join.Name, "admin", s.Cluster().Group(), 1)
-		s.Cluster().OnJoin(join)
+		s.Cluster().OnJoin(s.convert(join))
 		core.AppLog.Printf("Call on join %v\n", join)
 		return
 	}
 	if cmd == "left" {
-		var join core.Node
-		json.NewDecoder(r.Body).Decode(&join)
-		s.Cluster().OnLeave(join)
-		core.AppLog.Printf("Call on left %v\n", join)
+		var left core.Node
+		json.NewDecoder(r.Body).Decode(&left)
+		s.Cluster().OnLeave(s.convert(left))
+		core.AppLog.Printf("Call on left %v\n", left)
 	}
+}
 
+func (s *AppAdmin) convert(node core.Node) core.Node {
+	node.Name = strings.Replace(node.Name, "admin", s.Cluster().Group(), 1)
+	lparts := strings.Split(s.Cluster().Local().TcpEndpoint, ":")
+	rparts := strings.Split(node.TcpEndpoint, ":")
+	node.TcpEndpoint = rparts[0] + ":" + rparts[1] + ":" + lparts[2]
+	core.AppLog.Printf("Node : %v\n", node)
+	return node
 }
