@@ -7,6 +7,6 @@
 
   docker build --file[-f] .\docker_nginx_build -t[--tag] tarantula.nginx .
 
-  build.bat|build.sh [version] [host] [nodeid]
+  build.bat|build.sh [version] [host] [hostId] [nodeIdStart]
 
 windows stop 80 : NET stop HTTP 

@@ -72,11 +72,9 @@ func (f *Env) Load(fn string) error {
 	if eh {
 		fmt.Printf("Using http endpoint : %s\n", h)
 		f.HttpEndpoint = h
-		if f.Evp.Enabled {
-			parts := strings.Split(f.Evp.TcpEndpoint, ":")
-			f.Evp.TcpEndpoint = parts[0] + "://" + h + ":" + parts[2]
-			fmt.Printf("Using tcp endpoint : %s\n", f.Evp.TcpEndpoint)
-		}
+		parts := strings.Split(f.Evp.TcpEndpoint, ":")
+		f.Evp.TcpEndpoint = parts[0] + "://" + h + ":" + parts[2]
+		fmt.Printf("Using tcp endpoint : %s\n", f.Evp.TcpEndpoint)
 	}
 	n, en := os.LookupEnv(NODE_NAME)
 	if en {
