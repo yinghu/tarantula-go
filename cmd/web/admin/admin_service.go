@@ -32,9 +32,7 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	if err != nil {
 		fmt.Printf("Root already existed %s\n", err.Error())
 	}
-	if err != nil {
-		return err
-	}
+	
 	http.Handle("/admin/loadenum/{name}", bootstrap.Logging(&AdminLoadEnum{AdminService: s}))
 	http.Handle("/admin/saveenum", bootstrap.Logging(&AdminSaveEnum{AdminService: s}))
 	http.Handle("/admin/loadcategory/{name}", bootstrap.Logging(&AdminLoadCategory{AdminService: s}))
@@ -42,7 +40,7 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	http.Handle("/admin/loadconfig/{id}", bootstrap.Logging(&AdminLoadConfig{AdminService: s}))
 	http.Handle("/admin/loadconfigs/{name}/{limit}", bootstrap.Logging(&AdminLoadConfigs{AdminService: s}))
 	http.Handle("/admin/saveconfig", bootstrap.Logging(&AdminSaveConfig{AdminService: s}))
-	http.Handle("/admin/configapp/{app}", bootstrap.Logging(&AdminConfigApp{}))
+	http.Handle("/admin/configapp/{app}", bootstrap.Logging(&AdminConfigApp{AdminService: s}))
 	http.Handle("/admin/resetkey", bootstrap.Logging(&AdminResetKey{AdminService: s}))
 	http.Handle("/admin/getnode/{group}/{name}", bootstrap.Logging(&AdminGetNode{AdminService: s}))
 	http.Handle("/admin/addlogin", bootstrap.Logging(&SudoAddLogin{AdminService: s}))

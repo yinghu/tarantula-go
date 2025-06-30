@@ -86,6 +86,7 @@ func (c *EtcdCluster) Join() error {
 								core.AppLog.Printf("Node timeout %d %d %s %v\n", *cn.pingCount, *cn.timeoutCount, cn.Name, p)
 								delete(c.cluster, n)
 								c.group()
+								c.Listener().MemberLeft(cn.Node)
 							} else {
 								if *cn.pingCount == 3 {
 									*cn.timeoutCount++

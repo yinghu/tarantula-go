@@ -98,10 +98,16 @@ func (c *ClusterManager) Wait() {
 }
 
 func (c *ClusterManager) Started() {
-	
+
 }
 
 func (c *ClusterManager) OnJoin(join core.Node) {
 	c.cluster[join.Name] = LocalNode{Node: join}
 	c.group()
+}
+
+func (c *ClusterManager) OnLeave(leave core.Node) {
+	core.AppLog.Printf("Cluster node leaving %v\n", leave)
+	//c.cluster[join.Name] = LocalNode{Node: join}
+	//c.group()
 }

@@ -11,7 +11,6 @@ import (
 
 type AdminConfigApp struct {
 	*AdminService
-	core.Ticket
 }
 
 func (s *AdminConfigApp) AccessControl() int32 {

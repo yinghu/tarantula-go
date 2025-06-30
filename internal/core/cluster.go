@@ -29,11 +29,12 @@ type Cluster interface {
 	Started()
 
 	OnJoin(join Node)
+	OnLeave(leave Node)
 	Listener() ClusterListener
 }
 
 type ClusterListener interface {
 	Updated(key string, value string)
 	MemberJoined(joined Node)
-	
+	MemberLeft(left Node)
 }
