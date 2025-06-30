@@ -55,7 +55,7 @@ func (c *EtcdCluster) Join() error {
 		defer tik.Stop()
 		for r := range 7 {
 			w := <-tik.C
-			core.AppLog.Printf("Waiting for member joining [%s]: %v\n", c.Group, w)
+			core.AppLog.Printf("Waiting for member joining [%s]: %v\n", c.Group(), w)
 			if r == 0 {
 				cli.Put(context.Background(), c.group+"#join", string(nd))
 			} else {
@@ -148,7 +148,7 @@ func (c *EtcdCluster) Join() error {
 			}
 		}
 	}
-	core.AppLog.Printf("Cluster shut down [%s]\n", c.Group)
+	core.AppLog.Printf("Cluster shut down [%s]\n", c.Group())
 	return nil
 }
 
