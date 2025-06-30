@@ -23,7 +23,7 @@ type AppManager struct {
 	Sql        persistence.Postgresql
 	ctx        string
 	standalone bool
-	appAuth    core.Authenticator
+	AppAuth    core.Authenticator
 	seq        core.Sequence
 }
 
@@ -60,7 +60,7 @@ func (s *AppManager) Start(f conf.Env, c core.Cluster) error {
 	if err != nil {
 		return err
 	}
-	s.appAuth = ap
+	s.AppAuth = ap
 	sql := persistence.Postgresql{Url: f.Pgs.DatabaseURL}
 	err = sql.Create()
 	if err != nil {
@@ -109,7 +109,7 @@ func (s *AppManager) MemberJoined(joined core.Node) {
 		return
 	}
 	core.AppLog.Printf("Member joined %v\n", joined)
-	tick, err := s.appAuth.CreateTicket(1, 1, SUDO_ACCESS_CONTROL)
+	tick, err := s.AppAuth.CreateTicket(1, 1, SUDO_ACCESS_CONTROL)
 	if err != nil {
 		return
 	}
