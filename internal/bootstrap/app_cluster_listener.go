@@ -53,7 +53,7 @@ func (s *AppManager) Updated(key string, value string) {
 
 func sendToApp(ticket string, app string, cmd string, data []byte) {
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", "http://web/"+app+"/admin/"+cmd, bytes.NewBuffer(data))
+	req, err := http.NewRequest("POST", "http://web:8080/"+app+"/admin/"+cmd, bytes.NewBuffer(data))
 	if err != nil {
 		return
 	}
