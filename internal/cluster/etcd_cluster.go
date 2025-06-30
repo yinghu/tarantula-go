@@ -27,7 +27,7 @@ type EtcdCluster struct {
 }
 
 func newCluster(group string, etcEndpoints []string, local LocalNode, kl core.ClusterListener) core.Cluster {
-	cmanager := ClusterManager{Group: group, EtcdEndpoints: etcEndpoints, local: local}
+	cmanager := ClusterManager{group: group, EtcdEndpoints: etcEndpoints, local: local}
 	etc := EtcdCluster{ClusterManager: cmanager}
 	etc.started.Store(false)
 	etc.clistener = kl
@@ -57,9 +57,9 @@ func (c *EtcdCluster) Join() error {
 			w := <-tik.C
 			core.AppLog.Printf("Waiting for member joining [%s]: %v\n", c.Group, w)
 			if r == 0 {
-				cli.Put(context.Background(), c.Group+"#join", string(nd))
+				cli.Put(context.Background(), c.group+"#join", string(nd))
 			} else {
-				cli.Put(context.Background(), c.Group+"#ping", string(nd))
+				cli.Put(context.Background(), c.group+"#ping", string(nd))
 			}
 		}
 		c.starting.Done()
@@ -74,7 +74,7 @@ func (c *EtcdCluster) Join() error {
 				cli.Close()
 				return
 			case p := <-tik.C:
-				cli.Put(context.Background(), c.Group+"#ping", c.local.Name)
+				cli.Put(context.Background(), c.group+"#ping", c.local.Name)
 				pct--
 				if pct == 0 {
 					pct = 5
@@ -85,7 +85,7 @@ func (c *EtcdCluster) Join() error {
 							if *cn.timeoutCount == 3 {
 								core.AppLog.Printf("Node timeout %d %d %s %v\n", *cn.pingCount, *cn.timeoutCount, cn.Name, p)
 								delete(c.cluster, n)
-								c.group()
+								c.grouping()
 								c.Listener().MemberLeft(cn.Node)
 							} else {
 								if *cn.pingCount == 3 {
@@ -102,7 +102,7 @@ func (c *EtcdCluster) Join() error {
 			}
 		}
 	}()
-	wch := cli.Watch(context.Background(), c.Group, clientv3.WithPrefix())
+	wch := cli.Watch(context.Background(), c.group, clientv3.WithPrefix())
 	for wresp := range wch { //blocked
 		for _, ev := range wresp.Events {
 			cmds := strings.Split(string(ev.Kv.Key), "#")
@@ -121,7 +121,7 @@ func (c *EtcdCluster) Join() error {
 				var rnd LocalNode
 				err := json.Unmarshal(ev.Kv.Value, &rnd)
 				if err == nil {
-					cli.Put(context.Background(), c.Group+"#joined", string(nd))
+					cli.Put(context.Background(), c.group+"#joined", string(nd))
 				}
 			case "joined":
 				var rnd LocalNode
@@ -136,7 +136,7 @@ func (c *EtcdCluster) Join() error {
 						*rnd.pingCount = 0
 						*rnd.timeoutCount = 0
 						c.cluster[rnd.Name] = rnd
-						c.group()
+						c.grouping()
 						if c.started.Load() {
 							c.clistener.MemberJoined(rnd.Node)
 						}

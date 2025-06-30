@@ -13,6 +13,7 @@ func (s *AppManager) MemberJoined(joined core.Node) {
 	if s.standalone {
 		return
 	}
+	//joined.Name = strings.Replace(joined.Name, "admin", "asset", 1)
 	core.AppLog.Printf("Member joined %v\n", joined)
 	tick, err := s.AppAuth.CreateTicket(1, 1, SUDO_ACCESS_CONTROL)
 	if err != nil {

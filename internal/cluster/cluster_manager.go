@@ -14,7 +14,7 @@ import (
 
 type ClusterManager struct {
 	clistener     core.ClusterListener
-	Group         string
+	group         string
 	EtcdEndpoints []string
 	local         LocalNode
 	lock          *sync.Mutex
@@ -46,7 +46,7 @@ func (c *ClusterManager) Partition(key []byte) core.Node {
 
 func (c *ClusterManager) Atomic(prefix string, t core.Exec) error {
 	if prefix == "" {
-		prefix = c.Group
+		prefix = c.Group()
 		core.AppLog.Printf("Reset Lock prefix %s\n", prefix)
 	}
 	cli, err := clientv3.New(clientv3.Config{
@@ -77,7 +77,7 @@ func (c *ClusterManager) Quit() {
 	c.quit <- true
 }
 
-func (c *ClusterManager) group() {
+func (c *ClusterManager) grouping() {
 	sz := len(c.cluster)
 	core.AppLog.Printf("Cluster grouping %d\n", sz)
 	nds := make([]string, sz)
@@ -103,11 +103,15 @@ func (c *ClusterManager) Started() {
 
 func (c *ClusterManager) OnJoin(join core.Node) {
 	c.cluster[join.Name] = LocalNode{Node: join}
-	c.group()
+	c.grouping()
 }
 
 func (c *ClusterManager) OnLeave(leave core.Node) {
 	core.AppLog.Printf("Cluster node leaving %v\n", leave)
 	//c.cluster[join.Name] = LocalNode{Node: join}
 	//c.group()
+}
+
+func (c *ClusterManager) Group() string {
+	return c.group
 }

@@ -19,6 +19,7 @@ type Ctx interface {
 type Exec func(ctx Ctx) error
 
 type Cluster interface {
+	Group() string
 	Local() Node
 	View() []Node
 	Partition(key []byte) Node

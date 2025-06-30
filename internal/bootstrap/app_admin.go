@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
@@ -28,6 +29,7 @@ func (s *AppAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Req
 	if cmd == "join" {
 		var join core.Node
 		json.NewDecoder(r.Body).Decode(&join)
+		join.Name = strings.Replace(join.Name, "admin", s.Cluster().Group(), 1)
 		s.Cluster().OnJoin(join)
 		core.AppLog.Printf("Call on join %v\n", join)
 		return

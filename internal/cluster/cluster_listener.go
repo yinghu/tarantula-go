@@ -11,7 +11,7 @@ type ClusterListener struct {
 }
 
 func newListener(group string, etcEndpoints []string, local LocalNode, kl core.ClusterListener) core.Cluster {
-	cmanager := ClusterManager{Group: group, EtcdEndpoints: etcEndpoints, local: local}
+	cmanager := ClusterManager{group: group, EtcdEndpoints: etcEndpoints, local: local}
 	listener := ClusterListener{ClusterManager: cmanager}
 	listener.clistener = kl
 	listener.lock = &sync.Mutex{}
