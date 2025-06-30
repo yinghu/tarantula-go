@@ -22,7 +22,7 @@ func newListener(group string, etcEndpoints []string, local LocalNode, kl core.C
 }
 
 func (c *ClusterListener) Join() error {
-	core.AppLog.Printf("Cluster waiting for quit signal %s\n", c.Group)
+	core.AppLog.Printf("Cluster waiting for quit signal %s\n", c.Group())
 	<-c.quit
 	return nil
 }

@@ -107,9 +107,8 @@ func (c *ClusterManager) OnJoin(join core.Node) {
 }
 
 func (c *ClusterManager) OnLeave(leave core.Node) {
-	core.AppLog.Printf("Cluster node leaving %v\n", leave)
-	//c.cluster[join.Name] = LocalNode{Node: join}
-	//c.group()
+	delete(c.cluster, leave.Name)
+	c.grouping()
 }
 
 func (c *ClusterManager) Group() string {
