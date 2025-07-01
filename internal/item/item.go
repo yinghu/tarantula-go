@@ -1,7 +1,9 @@
 package item
+
 import (
 	"gameclustering.com/internal/core"
 )
+
 type Enum struct {
 	Id     int32       `json:"Id"`
 	Name   string      `json:"Name"`
@@ -58,4 +60,8 @@ type ItemService interface {
 	Validate(c Configuration) error
 	ValidateCategory(c Category) error
 	ValidateEnum(c Enum) error
+}
+
+type ItemListener interface {
+	PublishEnum(c Enum)
 }
