@@ -20,7 +20,7 @@ func (s *AppClusterAdmin) AccessControl() int32 {
 func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		w.WriteHeader(http.StatusOK)
-		session := core.OnSession{Successful: true, Message: "app admin [" + s.Cluster().Group() + "]"}
+		session := core.OnSession{Successful: true, Message: "app cluster admin [" + s.Cluster().Group() + "]"}
 		w.Write(util.ToJson(session))
 		r.Body.Close()
 	}()

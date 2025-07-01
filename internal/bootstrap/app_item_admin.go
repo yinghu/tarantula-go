@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/item"
+	"gameclustering.com/internal/util"
 )
 
 type AppItemAdmin struct {
@@ -15,6 +17,13 @@ func (s *AppItemAdmin) AccessControl() int32 {
 }
 
 func (s *AppItemAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
-
-	
+	defer func() {
+		w.WriteHeader(http.StatusOK)
+		session := core.OnSession{Successful: true, Message: "app item admin [" + s.Cluster().Group() + "]"}
+		w.Write(util.ToJson(session))
+		r.Body.Close()
+	}()
+	s.ItemListener().OnEnum(item.Enum{})
+	s.ItemListener().OnCategory(item.Category{})
+	s.ItemListener().OnConfiguration(item.Configuration{})
 }

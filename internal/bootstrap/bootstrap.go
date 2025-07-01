@@ -50,6 +50,7 @@ type TarantulaService interface {
 	Cluster() core.Cluster
 	Authenticator() core.Authenticator
 	Sequence() core.Sequence
+	ItemListener() item.ItemListener
 }
 
 type TarantulaApp interface {
