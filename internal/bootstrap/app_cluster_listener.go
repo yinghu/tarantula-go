@@ -56,7 +56,7 @@ func (s *AppManager) updateToApp(app string, cmd string, update KVUpdate) {
 		DisableCompression: true,
 	}
 	client := &http.Client{Transport: tr}
-	req, err := http.NewRequest("POST", "http://"+app+":8080/"+app+"/admin/"+cmd, bytes.NewBuffer(data))
+	req, err := http.NewRequest("POST", "http://"+app+":8080/"+app+"/clusteradmin/"+cmd, bytes.NewBuffer(data))
 	if err != nil {
 		return
 	}
@@ -89,7 +89,7 @@ func (s *AppManager) sendToApp(app string, cmd string, node core.Node) {
 		DisableCompression: true,
 	}
 	client := &http.Client{Transport: tr}
-	req, err := http.NewRequest("POST", "http://"+app+":8080/"+app+"/admin/"+cmd, bytes.NewBuffer(data))
+	req, err := http.NewRequest("POST", "http://"+app+":8080/"+app+"/clusteradmin/"+cmd, bytes.NewBuffer(data))
 	if err != nil {
 		return
 	}

@@ -27,7 +27,7 @@ func (s *AdminConfigApp) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 		return
 	}
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", "http://web/"+app+"/admin/test", nil)
+	req, err := http.NewRequest("GET", "http://"+app+":8080/"+app+"/clusteradmin/test", nil)
 	if err != nil {
 		session := core.OnSession{Successful: true, Message: err.Error()}
 		w.Write(util.ToJson(session))
