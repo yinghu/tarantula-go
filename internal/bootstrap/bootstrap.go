@@ -26,8 +26,12 @@ const (
 	ILLEGAL_TOKEN_CODE  int = 400101
 	INVALID_TOKEN_CODE  int = 400102
 	ILLEGAL_ACCESS_CODE int = 400103
+	BAD_REQUEST_CODE    int = 400100
 
-	INVALID_TOKEN_MSG string = "invalid token"
+	INVALID_TOKEN_MSG  string = "invalid token"
+	ILLEGAL_ACCESS_MSG string = "illegal access"
+	ILLEGAL_TOKEN_MSG  string = "bad token"
+	BAD_REQUEST_MSG    string = "bad request"
 )
 
 type TarantulaContext interface {

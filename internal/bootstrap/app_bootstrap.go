@@ -72,18 +72,18 @@ func AppBootstrap(tcx TarantulaContext) {
 
 func badRequest(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	session := core.OnSession{Successful: false, Message: "bad request [" + r.URL.Path + "]"}
+	session := core.OnSession{Successful: false, Message: "bad request [" + r.URL.Path + "]", ErrorCode: BAD_REQUEST_CODE}
 	w.Write(util.ToJson(session))
 }
 
 func invalidToken(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	session := core.OnSession{Successful: false, Message: "invalid token"}
+	session := core.OnSession{Successful: false, Message: INVALID_TOKEN_MSG, ErrorCode: INVALID_TOKEN_CODE}
 	w.Write(util.ToJson(session))
 }
 func illegalAccess(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	session := core.OnSession{Successful: false, Message: "illegal access"}
+	session := core.OnSession{Successful: false, Message: ILLEGAL_ACCESS_MSG, ErrorCode: ILLEGAL_ACCESS_CODE}
 	w.Write(util.ToJson(session))
 }
 
