@@ -9,28 +9,33 @@ import (
 	"errors"
 	"hash"
 	"strings"
+	"sync"
 
 	"gameclustering.com/internal/core"
 )
 
 type JwtHMac struct {
-	Mac hash.Hash
-	Alg string
-	Ksz int16
+	Mac  hash.Hash
+	Alg  string
+	Ksz  int16
+	lock *sync.Mutex
 }
 
 func (j *JwtHMac) HMac() {
 	key := make([]byte, j.Ksz)
 	rand.Read(key)
 	j.Mac = hmac.New(sha256.New, key)
+	j.lock = &sync.Mutex{}
 }
 
 func (j *JwtHMac) HMacFromKey(key []byte) {
-
 	j.Mac = hmac.New(sha256.New, key)
+	j.lock = &sync.Mutex{}
 }
 
 func (j *JwtHMac) Token(jp core.JwtProcess) (string, error) {
+	j.lock.Lock()
+	defer j.lock.Unlock()
 	h := core.JwtHeader{Alg: j.Alg, Typ: "JWT"}
 	p := core.JwtPayload{}
 	err := jp(&h, &p)
@@ -52,6 +57,8 @@ func (j *JwtHMac) Token(jp core.JwtProcess) (string, error) {
 }
 
 func (j *JwtHMac) Verify(token string, jp core.JwtProcess) error {
+	j.lock.Lock()
+	defer j.lock.Unlock()
 	parts := strings.Split(token, ".")
 	if len(parts) != 3 {
 		return errors.New("bad token format")
