@@ -9,15 +9,15 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-type AppAdmin struct {
+type AppClusterAdmin struct {
 	TarantulaService
 }
 
-func (s *AppAdmin) AccessControl() int32 {
+func (s *AppClusterAdmin) AccessControl() int32 {
 	return ADMIN_ACCESS_CONTROL
 }
 
-func (s *AppAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
+func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		w.WriteHeader(http.StatusOK)
 		session := core.OnSession{Successful: true, Message: "app admin [" + s.Cluster().Group() + "]"}
@@ -38,10 +38,16 @@ func (s *AppAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Req
 		json.NewDecoder(r.Body).Decode(&left)
 		s.Cluster().OnLeave(s.convert(left))
 		core.AppLog.Printf("Call on left %v\n", left)
+		return
+	}
+	if cmd == "update" {
+		var update KVUpdate
+		json.NewDecoder(r.Body).Decode(&update)
+		core.AppLog.Printf("%s, %s, %s\n", update.Key, update.Value, update.Type)
 	}
 }
 
-func (s *AppAdmin) convert(node core.Node) core.Node {
+func (s *AppClusterAdmin) convert(node core.Node) core.Node {
 	node.Name = strings.Replace(node.Name, "admin", s.Cluster().Group(), 1)
 	lparts := strings.Split(s.Cluster().Local().TcpEndpoint, ":")
 	rparts := strings.Split(node.TcpEndpoint, ":")

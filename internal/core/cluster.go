@@ -34,8 +34,14 @@ type Cluster interface {
 	Listener() ClusterListener
 }
 
+type Opt struct {
+	IsCreate bool   `json:"IsCreate"`
+	IsModify bool   `json:"IsModify"`
+	Type     string `json:"Type"`
+}
+
 type ClusterListener interface {
-	Updated(key string, value string)
+	Updated(key string, value string, opt Opt)
 	MemberJoined(joined Node)
 	MemberLeft(left Node)
 }
