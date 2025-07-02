@@ -12,13 +12,15 @@ import (
 
 func (db *ItemDB) Save(c item.Configuration) error {
 	return db.Sql.Txn(func(tx pgx.Tx) error {
-		var id int32
-		err := tx.QueryRow(context.Background(), INSERT_CONFIG, c.Name, c.Type, c.TypeId, c.Category, c.Version).Scan(&id)
+		r, err := tx.Exec(context.Background(), INSERT_CONFIG, c.Id, c.Name, c.Type, c.TypeId, c.Category, c.Version)
 		if err != nil {
 			return err
 		}
+		if r.RowsAffected() == 0 {
+			return errors.New("no insert")
+		}
 		for k, v := range c.Header {
-			inserted, err := tx.Exec(context.Background(), INSERT_HEADER, id, k, fmt.Sprintf("%v", v))
+			inserted, err := tx.Exec(context.Background(), INSERT_HEADER, c.Id, k, fmt.Sprintf("%v", v))
 			if err != nil {
 				return err
 			}
@@ -28,7 +30,7 @@ func (db *ItemDB) Save(c item.Configuration) error {
 		}
 		for k, v := range c.Application {
 			for i := range v {
-				inserted, err := tx.Exec(context.Background(), INSERT_APPLICATION, id, k, v[i])
+				inserted, err := tx.Exec(context.Background(), INSERT_APPLICATION, c.Id, k, v[i])
 				if err != nil {
 					return err
 				}
@@ -67,7 +69,7 @@ func (db *ItemDB) LoadWithName(cname string, limit int) ([]item.Configuration, e
 
 }
 
-func (db *ItemDB) LoadWithId(cid int32) (item.Configuration, error) {
+func (db *ItemDB) LoadWithId(cid int64) (item.Configuration, error) {
 	conf := item.Configuration{Id: cid}
 	err := db.Sql.Query(func(row pgx.Rows) error {
 		err := row.Scan(&conf.Name, &conf.Type, &conf.TypeId, &conf.Category, &conf.Version)
@@ -87,7 +89,7 @@ func (db *ItemDB) LoadWithId(cid int32) (item.Configuration, error) {
 	return conf, nil
 }
 
-func (db *ItemDB) DeleteWithId(cid int32) error {
+func (db *ItemDB) DeleteWithId(cid int64) error {
 	return db.Sql.Txn(func(tx pgx.Tx) error {
 		_, err := tx.Exec(context.Background(), DELETE_CONFIG_WITH_ID, cid)
 		if err != nil {
@@ -139,10 +141,10 @@ func (db *ItemDB) loadHeader(c *item.Configuration) error {
 }
 
 func (db *ItemDB) loadApplication(c *item.Configuration) error {
-	c.Application = make(map[string][]int32)
+	c.Application = make(map[string][]int64)
 	return db.Sql.Query(func(row pgx.Rows) error {
 		var k string
-		var v int32
+		var v int64
 		err := row.Scan(&k, &v)
 		if err != nil {
 			return err

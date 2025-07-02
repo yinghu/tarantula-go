@@ -26,9 +26,23 @@ func (s *AppItemAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *http
 	}()
 	cmd := r.PathValue("cmd")
 	core.AppLog.Printf("command %s\n", cmd)
-	var e item.Enum
-	json.NewDecoder(r.Body).Decode(&e)
-	s.ItemListener().OnEnum(e)
-	s.ItemListener().OnCategory(item.Category{})
-	s.ItemListener().OnConfiguration(item.Configuration{})
+	if cmd == "saveenum" {
+		var e item.Enum
+		json.NewDecoder(r.Body).Decode(&e)
+		s.ItemListener().OnEnum(e)
+		return
+	}
+	if cmd == "savecategory" {
+		var e item.Category
+		json.NewDecoder(r.Body).Decode(&e)
+		s.ItemListener().OnCategory(e)
+		return
+	}
+	if cmd == "saveconfig" {
+		var e item.Configuration
+		json.NewDecoder(r.Body).Decode(&e)
+		s.ItemListener().OnConfiguration(e)
+		return
+	}
+	core.AppLog.Printf("cmd not supported %s\n", cmd)
 }

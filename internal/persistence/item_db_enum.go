@@ -10,16 +10,17 @@ import (
 
 func (db *ItemDB) SaveEnum(c item.Enum) error {
 	return db.Sql.Txn(func(tx pgx.Tx) error {
-		var id int32
-		err := tx.QueryRow(context.Background(), INSERT_ENUM, c.Name).Scan(&id)
+		r, err := tx.Exec(context.Background(), INSERT_ENUM, c.Id, c.Name)
 		if err != nil {
 			return err
 		}
-		c.Id = id
+		if r.RowsAffected() == 0 {
+			return errors.New("no insert")
+		}
 		valid := false
 		for i := range c.Values {
 			p := c.Values[i]
-			_, err = tx.Exec(context.Background(), INSERT_ENUM_VALUE, id, p.Name, p.Value)
+			_, err = tx.Exec(context.Background(), INSERT_ENUM_VALUE, c.Id, p.Name, p.Value)
 			if err != nil {
 				valid = false
 				return err
@@ -34,6 +35,9 @@ func (db *ItemDB) SaveEnum(c item.Enum) error {
 }
 
 func (db *ItemDB) ValidateEnum(c item.Enum) error {
+	if c.Id <= 0 {
+		return errors.New("none negative id required")
+	}
 	if c.Name == "" {
 		return errors.New("name none empty string required")
 	}

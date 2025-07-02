@@ -26,6 +26,13 @@ func (s *AdminSaveConfig) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		w.Write(util.ToJson(session))
 		return
 	}
+	sid, err := s.Sequence().Id()
+	if err != nil {
+		session := core.OnSession{Successful: false, Message: err.Error()}
+		w.Write(util.ToJson(session))
+		return
+	}
+	conf.Id = sid
 	err = s.ItemService().Validate(conf)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
@@ -38,5 +45,10 @@ func (s *AdminSaveConfig) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		w.Write(util.ToJson(session))
 		return
 	}
-	w.Write(util.ToJson(conf))
+	ch := make(chan core.OnSession, 1)
+	defer close(ch)
+	go s.PostJson("http://inventory:8080/inventory/itemadmin/saveconfig", conf, ch)
+	ret := <-ch
+	w.Write(util.ToJson(ret))
+	//w.Write(util.ToJson(conf))
 }

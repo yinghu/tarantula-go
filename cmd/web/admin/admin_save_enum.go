@@ -26,6 +26,13 @@ func (s *AdminSaveEnum) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 		w.Write(util.ToJson(session))
 		return
 	}
+	sid, err := s.Sequence().Id()
+	if err != nil {
+		session := core.OnSession{Successful: false, Message: err.Error()}
+		w.Write(util.ToJson(session))
+		return
+	}
+	conf.Id = sid
 	err = s.ItemService().ValidateEnum(conf)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}

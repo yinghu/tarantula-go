@@ -24,7 +24,7 @@ func (s *AdminLoadConfig) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		w.Write(util.ToJson(session))
 		return
 	}
-	conf, err := s.ItemService().LoadWithId(int32(id))
+	conf, err := s.ItemService().LoadWithId(int64(id))
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))

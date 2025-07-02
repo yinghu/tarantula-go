@@ -5,7 +5,7 @@ import (
 )
 
 type Enum struct {
-	Id     int32       `json:"Id"`
+	Id     int64       `json:"Id"`
 	Name   string      `json:"Name"`
 	Values []EnumValue `json:"Values"`
 }
@@ -16,7 +16,7 @@ type EnumValue struct {
 }
 
 type Category struct {
-	Id           int32      `json:"Id"`
+	Id           int64      `json:"Id"`
 	Scope        string     `json:"Scope"`
 	Name         string     `json:"Name"`
 	Rechargeable bool       `json:"Rechargeable"`
@@ -33,14 +33,14 @@ type Property struct {
 }
 
 type Configuration struct {
-	Id          int32              `json:"ItemId"`
+	Id          int64              `json:"ItemId"`
 	Name        string             `json:"ConfigurationName"`
 	Type        string             `json:"ConfigurationType"`
 	TypeId      string             `json:"ConfigurationTypeId"`
 	Category    string             `json:"ConfigurationCategory"`
 	Version     string             `json:"ConfigurationVersion"`
 	Header      map[string]any     `json:"header"`
-	Application map[string][]int32 `json:"application"`
+	Application map[string][]int64 `json:"application"`
 }
 
 type ItemService interface {
@@ -52,10 +52,10 @@ type ItemService interface {
 
 	Save(c Configuration) error
 	LoadWithName(cname string, limit int) ([]Configuration, error)
-	LoadWithId(cid int32) (Configuration, error)
+	LoadWithId(cid int64) (Configuration, error)
 
 	DeleteWithName(cname string) error
-	DeleteWithId(cid int32) error
+	DeleteWithId(cid int64) error
 
 	Validate(c Configuration) error
 	ValidateCategory(c Category) error

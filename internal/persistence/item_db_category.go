@@ -11,15 +11,17 @@ import (
 
 func (db *ItemDB) SaveCategory(c item.Category) error {
 	return db.Sql.Txn(func(tx pgx.Tx) error {
-		var id int32
-		err := tx.QueryRow(context.Background(), INSERT_CATEGORY, c.Name, c.Scope, c.Rechargeable, c.Description).Scan(&id)
+		r, err := tx.Exec(context.Background(), INSERT_CATEGORY, c.Id, c.Name, c.Scope, c.Rechargeable, c.Description)
 		if err != nil {
 			return err
+		}
+		if r.RowsAffected() == 0 {
+			return errors.New("no insert")
 		}
 		valid := false
 		for i := range c.Properties {
 			p := c.Properties[i]
-			_, err = tx.Exec(context.Background(), INSERT_PROPERTY, id, p.Name, p.Type, p.Reference, p.Nullable, p.Downloadable)
+			_, err = tx.Exec(context.Background(), INSERT_PROPERTY, c.Id, p.Name, p.Type, p.Reference, p.Nullable, p.Downloadable)
 			if err != nil {
 				valid = false
 				return err
@@ -65,6 +67,9 @@ func (db *ItemDB) LoadCategory(cname string) (item.Category, error) {
 }
 
 func (db *ItemDB) ValidateCategory(c item.Category) error {
+	if c.Id <= 0 {
+		return errors.New("none negative id required")
+	}
 	if c.Scope == "" {
 		return errors.New("scope none empty string required")
 	}
