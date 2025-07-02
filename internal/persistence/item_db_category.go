@@ -1,1 +1,129 @@
 package persistence
+
+import (
+	"context"
+	"errors"
+	"strings"
+
+	"gameclustering.com/internal/item"
+	"github.com/jackc/pgx/v5"
+)
+
+func (db *ItemDB) SaveCategory(c item.Category) error {
+	return db.Sql.Txn(func(tx pgx.Tx) error {
+		var id int32
+		err := tx.QueryRow(context.Background(), INSERT_CATEGORY, c.Name, c.Scope, c.Rechargeable, c.Description).Scan(&id)
+		if err != nil {
+			return err
+		}
+		valid := false
+		for i := range c.Properties {
+			p := c.Properties[i]
+			_, err = tx.Exec(context.Background(), INSERT_PROPERTY, id, p.Name, p.Type, p.Reference, p.Nullable, p.Downloadable)
+			if err != nil {
+				valid = false
+				return err
+			}
+			valid = true
+		}
+		if !valid {
+			return errors.New("at least 1 property required")
+		}
+		return nil
+	})
+}
+
+func (db *ItemDB) LoadCategory(cname string) (item.Category, error) {
+	cat := item.Category{Name: cname}
+	err := db.Sql.Query(func(row pgx.Rows) error {
+		err := row.Scan(&cat.Id, &cat.Scope, &cat.Rechargeable, &cat.Description)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, SELECT_CATEGORY_WITH_NAME, cname)
+	if err != nil {
+		return cat, err
+	}
+	if cat.Id == 0 {
+		return cat, errors.New("category not existed")
+	}
+	cat.Properties = make([]item.Property, 0)
+	err = db.Sql.Query(func(row pgx.Rows) error {
+		var prop item.Property
+		err := row.Scan(&prop.Name, &prop.Type, &prop.Reference, &prop.Nullable, &prop.Downloadable)
+		if err != nil {
+			return err
+		}
+		cat.Properties = append(cat.Properties, prop)
+		return nil
+	}, SELECT_PROPERTIES_WITH_CID, cat.Id)
+	if err != nil {
+		return cat, errors.New("no property existed")
+	}
+	return cat, nil
+}
+
+func (db *ItemDB) ValidateCategory(c item.Category) error {
+	if c.Scope == "" {
+		return errors.New("scope none empty string required")
+	}
+	if c.Name == "" {
+		return errors.New("name none empty string required")
+	}
+	if c.Description == "" {
+		return errors.New("description none empty string required")
+	}
+	if len(c.Properties) == 0 {
+		return errors.New("at least 1 property required")
+	}
+	for i := range c.Properties {
+		prop := c.Properties[i]
+		if prop.Name == "" {
+			return errors.New("prop name none empty string required")
+		}
+		if prop.Type == "" {
+			return errors.New("prop type none empty string required")
+		}
+		if prop.Reference == "" {
+			return errors.New("prop reference none empty string required")
+		}
+		if prop.Type == "enum" {
+			_, err := db.LoadEnum(prop.Reference)
+			if err != nil {
+				return err
+			}
+			continue
+		}
+		if prop.Type == "category" {
+			parts := strings.Split(prop.Reference, ":")
+			if len(parts) != 2 {
+				return errors.New("wrong category reference format")
+			}
+			_, err := db.LoadCategory(parts[1])
+			if err != nil {
+				return err
+			}
+			continue
+		}
+		if prop.Type == "set" || prop.Type == "list" {
+			parts := strings.Split(prop.Reference, ":")
+			if len(parts) != 2 {
+				return errors.New("wrong category reference format")
+			}
+			_, err := db.LoadCategory(parts[1])
+			if err != nil {
+				return err
+			}
+			continue
+		}
+		if prop.Type == "scope" {
+			parts := strings.Split(prop.Reference, ":")
+			if len(parts) != 2 {
+				return errors.New("wrong scope reference format")
+			}
+			continue
+		}
+	}
+	return nil
+}
