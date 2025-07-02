@@ -10,7 +10,7 @@ type AppItemListener struct {
 }
 
 func (a *AppItemListener) OnEnum(e item.Enum) {
-	core.AppLog.Printf("%s\n", "enum call")
+	core.AppLog.Printf("%s %v\n", "enum call", e)
 }
 
 func (a *AppItemListener) OnCategory(c item.Category) {

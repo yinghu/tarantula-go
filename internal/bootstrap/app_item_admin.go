@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"gameclustering.com/internal/core"
@@ -23,7 +24,11 @@ func (s *AppItemAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *http
 		w.Write(util.ToJson(session))
 		r.Body.Close()
 	}()
-	s.ItemListener().OnEnum(item.Enum{})
+	cmd := r.PathValue("cmd")
+	core.AppLog.Printf("command %s\n", cmd)
+	var e item.Enum
+	json.NewDecoder(r.Body).Decode(&e)
+	s.ItemListener().OnEnum(e)
 	s.ItemListener().OnCategory(item.Category{})
 	s.ItemListener().OnConfiguration(item.Configuration{})
 }

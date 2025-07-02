@@ -38,5 +38,9 @@ func (s *AdminSaveEnum) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 		w.Write(util.ToJson(session))
 		return
 	}
-	w.Write(util.ToJson(conf))
+	ch := make(chan core.OnSession, 1)
+	defer close(ch)
+	go s.PostJson("http://inventory:8080/inventory/itemadmin/saveenum", conf, ch)
+	ret := <-ch
+	w.Write(util.ToJson(ret))
 }

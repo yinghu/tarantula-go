@@ -23,10 +23,12 @@ const (
 	WRONG_PASS_CODE int    = 400100
 	WRONG_PASS_MSG  string = "wrong user/password"
 
+	BAD_REQUEST_CODE    int = 400100
 	ILLEGAL_TOKEN_CODE  int = 400101
 	INVALID_TOKEN_CODE  int = 400102
 	ILLEGAL_ACCESS_CODE int = 400103
-	BAD_REQUEST_CODE    int = 400100
+	INVALID_TICKET_CODE int = 400104
+	INVALID_JSON_CODE   int = 400105
 
 	INVALID_TOKEN_MSG  string = "invalid token"
 	ILLEGAL_ACCESS_MSG string = "illegal access"
