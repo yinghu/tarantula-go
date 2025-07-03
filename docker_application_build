@@ -22,7 +22,9 @@ COPY --from=builder /build/cmd/web/${app}/main .
 ARG h
 ARG n
 ARG i
+ARG g
 ENV TN_HOST=${h}
 ENV TN_NAME=${n}
 ENV TN_ID=${i}
+ENV TN_GROUP=${g}
 ENTRYPOINT ["./main"]

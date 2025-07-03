@@ -12,9 +12,10 @@ import (
 )
 
 const (
-	NODE_HOST string = "TN_HOST"
-	NODE_NAME string = "TN_NAME"
-	NODE_ID   string = "TN_ID"
+	NODE_GROUP string = "TN_GROUP"
+	NODE_HOST  string = "TN_HOST"
+	NODE_NAME  string = "TN_NAME"
+	NODE_ID    string = "TN_ID"
 )
 
 type Sql struct {
@@ -88,6 +89,14 @@ func (f *Env) Load(fn string) error {
 		if err == nil {
 			f.NodeId = int64(id)
 		}
+	}
+	g, eg := os.LookupEnv(NODE_GROUP)
+	if eg {
+		fmt.Printf("Using node group : %s\n", g)
+		//id, err := strconv.Atoi(d)
+		//if err == nil {
+		//f.NodeId = int64(id)
+		//}
 	}
 	core.CreateAppLog(f.LocalDir)
 	return nil
