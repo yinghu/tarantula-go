@@ -20,7 +20,7 @@ const (
 	SELECT_CATEGORY_WITH_NAME  string = "SELECT id,scope,rechargeable,description FROM item_category WHERE name = $1"
 	SELECT_PROPERTIES_WITH_CID string = "SELECT name,type,reference,nullable,downloadable FROM item_category_property WHERE category_id = $1"
 
-	INSERT_CONFIG      string = "INSERT INTO item_configuration (id,name,type,type_id,category,version) VALUES($1,$2,$3,$4,$5)"
+	INSERT_CONFIG      string = "INSERT INTO item_configuration (id,name,type,type_id,category,version) VALUES($1,$2,$3,$4,$5,$6)"
 	INSERT_HEADER      string = "INSERT INTO item_header (configuration_id,name,value) VALUES($1,$2,$3)"
 	INSERT_APPLICATION string = "INSERT INTO item_application (configuration_id,name,reference_id) VALUES($1,$2,$3)"
 

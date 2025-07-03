@@ -18,19 +18,17 @@ func (s *AppClusterAdmin) AccessControl() int32 {
 }
 
 func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
-	defer func() {
-		w.WriteHeader(http.StatusOK)
-		session := core.OnSession{Successful: true, Message: "app cluster admin [" + s.Cluster().Group() + "]"}
-		w.Write(util.ToJson(session))
-		r.Body.Close()
-	}()
+	defer r.Body.Close()
 	cmd := r.PathValue("cmd")
 	core.AppLog.Printf("Call on cmd %s %v\n", cmd, s.Cluster().Local())
+	session := core.OnSession{Successful: true, Message: "app cluster admin [" + s.Cluster().Group() + "]"}
 	if cmd == "join" {
 		var join core.Node
 		json.NewDecoder(r.Body).Decode(&join)
 		s.Cluster().OnJoin(s.convert(join))
 		core.AppLog.Printf("Call on join %v\n", join)
+		w.WriteHeader(http.StatusOK)
+		w.Write(util.ToJson(session))
 		return
 	}
 	if cmd == "left" {
@@ -38,13 +36,21 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		json.NewDecoder(r.Body).Decode(&left)
 		s.Cluster().OnLeave(s.convert(left))
 		core.AppLog.Printf("Call on left %v\n", left)
+		w.WriteHeader(http.StatusOK)
+		w.Write(util.ToJson(session))
 		return
 	}
 	if cmd == "update" {
 		var update KVUpdate
 		json.NewDecoder(r.Body).Decode(&update)
 		core.AppLog.Printf("%s, %s, %s\n", update.Key, update.Value, update.Type)
+		w.WriteHeader(http.StatusOK)
+		w.Write(util.ToJson(session))
+		return
 	}
+	core.AppLog.Printf("cmd not supported %s\n", cmd)
+	w.WriteHeader(http.StatusOK)
+	w.Write(util.ToJson(session))
 }
 
 func (s *AppClusterAdmin) convert(node core.Node) core.Node {
