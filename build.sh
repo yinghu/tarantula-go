@@ -2,7 +2,7 @@
 if [[ -n "$1" ]]; then
     version="$1"
 else
-    version=dev
+    version=latest
 fi
 if [[ -n "$2" ]]; then
     host="$2"
