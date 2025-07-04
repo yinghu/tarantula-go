@@ -102,11 +102,19 @@ func (c *ClusterManager) Started() {
 }
 
 func (c *ClusterManager) OnJoin(join core.Node) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	_, joined := c.cluster[join.Name]
+	if joined {
+		return
+	}
 	c.cluster[join.Name] = LocalNode{Node: join}
 	c.grouping()
 }
 
 func (c *ClusterManager) OnLeave(leave core.Node) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	delete(c.cluster, leave.Name)
 	c.grouping()
 }

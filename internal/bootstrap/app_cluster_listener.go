@@ -1,7 +1,7 @@
 package bootstrap
 
 import (
-	"fmt"
+	"time"
 
 	"gameclustering.com/internal/core"
 )
@@ -35,16 +35,28 @@ func (s *AppManager) MemberLeft(left core.Node) {
 	go s.sendToApp("tournament", "left", left)
 }
 func (s *AppManager) Updated(key string, value string, opt core.Opt) {
-	fmt.Printf("Key updated %s %s %v\n", key, value, opt)
+	core.AppLog.Printf("Key updated %s %s %v\n", key, value, opt)
 	go s.updateToApp("presence", "update", KVUpdate{Key: key, Value: value, Opt: opt})
 }
 
 func (s *AppManager) updateToApp(app string, cmd string, update KVUpdate) {
-	ret := s.PostJsonSync("http://"+app+":8080/"+app+"/clusteradmin/"+cmd, update)
-	core.AppLog.Printf("%v\n", ret)
+	for i := range 5 {
+		ret := s.PostJsonSync("http://"+app+":8080/"+app+"/clusteradmin/"+cmd, update)
+		if ret.ErrorCode == 0 {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+		core.AppLog.Printf("Retries: %d %v\n", i, ret)
+	}
 }
 
 func (s *AppManager) sendToApp(app string, cmd string, node core.Node) {
-	ret := s.PostJsonSync("http://"+app+":8080/"+app+"/clusteradmin/"+cmd, node)
-	core.AppLog.Printf("%v\n", ret)
+	for i := range 5 {
+		ret := s.PostJsonSync("http://"+app+":8080/"+app+"/clusteradmin/"+cmd, node)
+		if ret.ErrorCode == 0 {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+		core.AppLog.Printf("Retries: %d %v\n", i, ret)
+	}
 }
