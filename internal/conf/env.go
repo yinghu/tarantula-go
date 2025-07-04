@@ -38,7 +38,6 @@ type Env struct {
 	GroupName     string        `json:"GroupName"`
 	NodeName      string        `json:"NodeName"`
 	NodeId        int64         `json:"NodeId"`
-	Presence      string        `json:"Presence"`
 	LocalDir      string        `json:"LocalDir"`
 	HttpBinding   string        `json:"HttpBinding"`
 	HttpEndpoint  string        `json:"HttpEndpoint"`
@@ -46,6 +45,14 @@ type Env struct {
 	EtcdEndpoints []string      `json:"EtcdEndpoints"`
 	Pgs           Sql           `json:"Sql"`
 	Bdg           LocalStore    `json:"LocalStore"`
+}
+
+func (f *Env) ClusterCtx() string {
+	return f.Prefix + "/" + f.GroupName
+}
+
+func (f *Env) PresenceCtx() string {
+	return f.Prefix + "/presence"
 }
 
 func (f *Env) Load(fn string) error {

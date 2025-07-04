@@ -50,12 +50,16 @@ func (s *AppManager) Start(f conf.Env, c core.Cluster) error {
 	s.standalone = f.Standalone
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
-	au, err := s.LoadAuth(f.Presence, f.GroupName)
+	fctx := f.PresenceCtx()
+	if f.GroupName == "admin" {
+		fctx = f.ClusterCtx()
+	}
+	au, err := s.LoadAuth(fctx)
 	if err != nil {
 		return nil
 	}
 	s.auth = au
-	ap, err := s.LoadAuth("presence", "presence")
+	ap, err := s.LoadAuth(f.PresenceCtx())
 	if err != nil {
 		return err
 	}
@@ -107,7 +111,7 @@ func (s *AppManager) Service() TarantulaService {
 	return s
 }
 
-func (s *AppManager) LoadAuth(context string, group string) (core.Authenticator, error) {
+func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
 	tkn := util.JwtHMac{Alg: core.JWT_ALG, Ksz: core.JWT_KEY_SIZE}
 	ci := util.Aes{Ksz: core.CIPHER_KEY_SIZE}
 	err := s.cls.Atomic(context, func(ctx core.Ctx) error {
@@ -147,5 +151,5 @@ func (s *AppManager) LoadAuth(context string, group string) (core.Authenticator,
 	if err != nil {
 		return nil, err
 	}
-	return &AuthManager{Tkn: &tkn, Cipher: &ci, Kid: group}, nil
+	return &AuthManager{Tkn: &tkn, Cipher: &ci, Kid: "presence"}, nil
 }
