@@ -1,8 +1,24 @@
 #!/bin/bash
-version=$1
-host=$2
-id=$3
-seq=$4
+if [[ -n "$1" ]]; then
+    version="$1"
+else
+    version=dev
+fi
+if [[ -n "$2" ]]; then
+    host="$2"
+else
+    host="localhost"
+fi
+if [[ -n "$3" ]]; then
+    id="$3"
+else
+    id=1
+fi
+if [[ -n "$4" ]]; then
+    seq="$4"
+else
+    seq=1
+fi
 if [[ -n "$5" ]]; then
     grp="$5"
 else

@@ -32,6 +32,7 @@ type EventEndpoint struct {
 }
 
 type Env struct {
+	Prefix        string        `json:"Prefix"`
 	Clustering    bool          `json:"Clustering"`
 	Standalone    bool          `json:"Standalone"`
 	GroupName     string        `json:"GroupName"`
@@ -88,15 +89,16 @@ func (f *Env) Load(fn string) error {
 		id, err := strconv.Atoi(d)
 		if err == nil {
 			f.NodeId = int64(id)
+			fmt.Printf("Node id : %d %d\n", id, f.NodeId)
 		}
 	}
 	g, eg := os.LookupEnv(NODE_GROUP)
 	if eg {
-		fmt.Printf("Using node group : %s\n", g)
-		//id, err := strconv.Atoi(d)
-		//if err == nil {
-		//f.NodeId = int64(id)
-		//}
+		fmt.Printf("Using node group prefix : %s\n", g)
+		f.Prefix = g
+	}
+	if f.Prefix == "" {
+		f.Prefix = "dev"
 	}
 	core.CreateAppLog(f.LocalDir)
 	return nil
