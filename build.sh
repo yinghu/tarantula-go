@@ -24,6 +24,7 @@ if [[ -n "$5" ]]; then
 else
     grp="dev"
 fi
+echo "Build params : ${version} ${host} ${id} ${seq} ${grp}"
 docker build -f ./docker_application_build --tag tarantula.admin:$version --build-arg app=admin --build-arg h=$host --build-arg n=admin$id --build-arg i=$seq --build-arg g=$grp .
 ((seq++))
 docker build -f ./docker_application_build --tag tarantula.presence:$version --build-arg app=presence --build-arg h=$host --build-arg n=presence$id --build-arg i=$seq --build-arg g=$grp . 
