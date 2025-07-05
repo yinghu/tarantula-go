@@ -64,7 +64,7 @@ func (s *AppManager) Start(f conf.Env, c core.Cluster) error {
 		return err
 	}
 	s.AppAuth = ap
-	sql := persistence.Postgresql{Url: f.Pgs.DatabaseURL}
+	sql := persistence.Postgresql{Url: f.Pgs.DatabaseURL + "/" + f.Prefix + "_tarantula_" + f.GroupName}
 	err = sql.Create()
 	if err != nil {
 		return err
