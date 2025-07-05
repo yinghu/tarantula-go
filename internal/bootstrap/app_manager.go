@@ -44,7 +44,7 @@ func (s *AppManager) ItemListener() item.ItemListener {
 }
 
 func (s *AppManager) Start(f conf.Env, c core.Cluster) error {
-	core.AppLog.Printf("app manager starting %v\n", f)
+	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
 	s.cls = c
 	s.ctx = f.GroupName
 	s.standalone = f.Standalone
