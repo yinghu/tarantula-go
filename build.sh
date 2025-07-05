@@ -37,3 +37,4 @@ docker build -f ./docker_application_build --tag tarantula.asset:$version --buil
 ((seq++))
 docker build -f ./docker_application_build --tag tarantula.tournament:$version --build-arg app=tournament --build-arg h=$host --build-arg n=tournament$id --build-arg s=$seq --build-arg g=$grp .   
 docker build -f ./docker_nginx_build --tag tarantula.nginx:$version .
+docker builder prune -af
