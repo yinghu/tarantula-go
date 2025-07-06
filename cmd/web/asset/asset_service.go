@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
@@ -25,8 +24,8 @@ func (s *AssetService) Start(f conf.Env, c core.Cluster) error {
 	if err != nil {
 		return nil
 	}
-	fmt.Printf("Asset service started %s %s\n", f.HttpBinding, f.LocalDir)
-	http.Handle("/asset/upload", bootstrap.Logging(&AssetUpload{AssetService: s}))
-	http.Handle("/asset/download", bootstrap.Logging(&AssetDownload{AssetService: s}))
+	core.AppLog.Printf("Asset service started %s %s\n", f.HttpBinding, f.LocalDir)
+	http.Handle("/asset/upload/{name}", bootstrap.Logging(&AssetUpload{AssetService: s}))
+	http.Handle("/asset/download/{name}", bootstrap.Logging(&AssetDownload{AssetService: s}))
 	return nil
 }

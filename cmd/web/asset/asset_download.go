@@ -21,7 +21,8 @@ func (s *AssetDownload) AccessControl() int32 {
 
 func (s *AssetDownload) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	aIndex := AssetIndex{systemId: rs.SystemId, name: "profile.png"}
+	un := r.PathValue("name")
+	aIndex := AssetIndex{systemId: rs.SystemId, name: un}
 	err := s.loadAssetIndex(&aIndex)
 	w.WriteHeader(http.StatusOK)
 	if err != nil {
@@ -30,7 +31,7 @@ func (s *AssetDownload) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 		return
 	}
 	pdir := s.assetDir + "/" + strconv.Itoa(int(rs.SystemId))
-	dest, err := os.OpenFile(pdir+"/"+aIndex.fileIndex+".png", os.O_RDONLY, 0644)
+	dest, err := os.OpenFile(pdir+"/"+aIndex.fileIndex, os.O_RDONLY, 0644)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
