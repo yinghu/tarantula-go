@@ -2,9 +2,20 @@ package persistence
 
 import (
 	"context"
+	"time"
 
+	"gameclustering.com/internal/core"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+const (
+	maxConns          = int32(1)
+	minConns          = int32(0)
+	maxConnLifetime   = time.Hour
+	maxConnIdleTime   = time.Minute * 30
+	healthCheckPeriod = time.Minute
+	connectTimeout    = time.Second * 5
 )
 
 type Next func(row pgx.Rows) error
@@ -14,10 +25,46 @@ type Postgresql struct {
 	Pool      *pgxpool.Pool
 	Connected bool
 	Url       string
+	MaxConns  int32
+}
+
+func beforeAcquire(ctx context.Context, c *pgx.Conn) bool {
+	core.AppLog.Println("call before acquire")
+	return true
+}
+func afterRelease(c *pgx.Conn) bool {
+	core.AppLog.Println("call after release")
+	return true
+}
+func beforeClose(c *pgx.Conn) {
+	core.AppLog.Println("call before close")
+}
+func (p *Postgresql) pconfig() (*pgxpool.Config, error) {
+	cfg, err := pgxpool.ParseConfig(p.Url)
+	if err != nil {
+		return nil, err
+	}
+	cfg.MaxConns = maxConns
+	cfg.MinConns = minConns
+	cfg.MaxConnLifetime = maxConnLifetime
+	cfg.MaxConnIdleTime = maxConnIdleTime
+	cfg.HealthCheckPeriod = healthCheckPeriod
+	cfg.ConnConfig.ConnectTimeout = connectTimeout
+	if p.MaxConns > 0 {
+		cfg.MaxConns = p.MaxConns
+	}
+	cfg.BeforeAcquire = beforeAcquire
+	cfg.AfterRelease = afterRelease
+	cfg.BeforeClose = beforeClose
+	return cfg, nil
 }
 
 func (p *Postgresql) Create() error {
-	pool, err := pgxpool.New(context.Background(), p.Url)
+	cfg, err := p.pconfig()
+	if err != nil {
+		return err
+	}
+	pool, err := pgxpool.NewWithConfig(context.Background(), cfg)
 	if err != nil {
 		return err
 	}
