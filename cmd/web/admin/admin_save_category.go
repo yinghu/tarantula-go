@@ -50,5 +50,5 @@ func (s *AdminSaveCategory) Request(rs core.OnSession, w http.ResponseWriter, r 
 	go s.PostJson("http://inventory:8080/inventory/itemadmin/savecategory", conf, ch)
 	ret := <-ch
 	w.Write(util.ToJson(ret))
-	//w.Write(util.ToJson(conf))
+	
 }

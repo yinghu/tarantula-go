@@ -36,7 +36,7 @@ func AppBootstrap(tcx TarantulaContext) {
 		c.Wait()
 		err := tcx.Start(f, c)
 		if err != nil {
-			core.AppLog.Printf("Error %s\n", err.Error())
+			fmt.Printf("Error %s\n", err.Error())
 		}
 		view := c.View()
 		for i := range view {
