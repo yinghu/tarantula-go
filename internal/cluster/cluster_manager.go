@@ -119,6 +119,10 @@ func (c *ClusterManager) OnLeave(leave core.Node) {
 	c.grouping()
 }
 
+func (c *ClusterManager) OnUpdate(key string, value string, opt core.Opt) {
+	core.AppLog.Printf("Key update %s, %s, %v\n", key, value, opt)
+}
+
 func (c *ClusterManager) Group() string {
 	return c.group
 }

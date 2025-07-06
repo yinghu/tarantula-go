@@ -40,6 +40,7 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 	if cmd == "update" {
 		var update KVUpdate
 		json.NewDecoder(r.Body).Decode(&update)
+		s.Cluster().OnUpdate(update.Key, update.Value, update.Opt)
 		w.WriteHeader(http.StatusOK)
 		w.Write(util.ToJson(session))
 		return
