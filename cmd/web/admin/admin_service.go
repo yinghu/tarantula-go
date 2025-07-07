@@ -32,7 +32,8 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	if err != nil {
 		fmt.Printf("Root already existed %s\n", err.Error())
 	}
-	http.Handle("/admin/index", bootstrap.Logging(&AdminIndex{AdminService: s}))
+	
+	http.Handle("/admin/web/{name}", bootstrap.Logging(&AdminIndex{AdminService: s}))
 	http.Handle("/admin/loadenum/{name}", bootstrap.Logging(&AdminLoadEnum{AdminService: s}))
 	http.Handle("/admin/saveenum", bootstrap.Logging(&AdminSaveEnum{AdminService: s}))
 	http.Handle("/admin/loadcategory/{name}", bootstrap.Logging(&AdminLoadCategory{AdminService: s}))
