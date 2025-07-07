@@ -1,6 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css"/>
+    <link rel="stylesheet" href="tarantula.admin.css"/>
+    <script src="tarantula.admin.js"></script>
+    <title>iCodeSoftware</title>
+    </head>
     <body>
-        <h1>Tarantula Admin</h1>
+        <div class="w3-container w3-teal tx-oswald">
+            <span id="tx-title">Admin</span>
+            <i class="material-symbols-outlined tx-white-icon-24">login</i>
+        </div>
+        <script>
+            document.querySelector('#tx-title').innerHTML = Admin.test();
+        </script>
     </body>
 </html>
