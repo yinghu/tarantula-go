@@ -4,7 +4,10 @@ ARG app
 WORKDIR /build
 COPY . .
 RUN echo building app : ${app}
+RUN mkdir site
+RUN if [ ${app} = "admin" ]; then cp -r cmd/web/${app}/site site; fi
 RUN go -C cmd/web/${app} build -o main 
+
 # Alpine Linux 
 FROM alpine:latest
 ARG app
@@ -12,13 +15,14 @@ RUN addgroup -S tarantula && adduser -S tarantula -G tarantula
 RUN mkdir /etc/tarantula 
 COPY cmd/web/${app}/${app}-conf.json /etc/tarantula/${app}-conf.json
 RUN mkdir /home/tarantula/${app}
-RUN chown -R tarantula /home/tarantula/${app}
+RUN chown -R tarantula /home/tarantula/${app}   
 
 # Application Install 
 USER tarantula
 WORKDIR /home/tarantula/bin
-
+RUN mkdir site
 COPY --from=builder /build/cmd/web/${app}/main .
+COPY --from=builder /build/site/* site
 ARG h
 ARG n
 ARG s

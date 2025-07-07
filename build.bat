@@ -20,7 +20,7 @@ IF "%grp%" == "" (
     SET grp=dev
 )
 @echo "Build params : %version% %host% %id% %seq% %grp%"
-docker build -f .\docker_application_build --tag tarantula.admin:%version% --build-arg app=admin --build-arg h=%host% --build-arg n=admin%id% --build-arg s=%seq% --build-arg g=%grp% .
+docker build -f .\docker_application_build --tag tarantula.admin:%version% --build-arg app=admin --build-arg h=%host% --build-arg n=admin%id% --build-arg s=%seq% --build-arg g=%grp% --progress=plain .
 SET /A seq=%seq%+1
 docker build -f .\docker_application_build --tag tarantula.presence:%version% --build-arg app=presence --build-arg h=%host% --build-arg n=presence%id% --build-arg s=%seq% --build-arg g=%grp% . 
 SET /A seq=%seq%+1
