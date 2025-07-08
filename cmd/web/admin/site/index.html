@@ -11,12 +11,16 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css"/>
     <link rel="stylesheet" href="tarantula.admin.css"/>
     <script src="tarantula.admin.js"></script>
+    <script src="tarantula.html.js"></script>
     <title>iCodeSoftware</title>
     </head>
     <body>
-        <div class="w3-display-container w3-teal tx-content-120">
+        <div class="w3-display-container w3-teal w3-border-bottom w3-border-red tx-content-120">
             <div class="w3-display-topleft w3-padding">
                 <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-48">widgets</i></span>
+            </div>
+            <div class="w3-display-topright w3-padding">
+                <span id="tx-logout" style="display: none;"><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-32">logout</i></span>
             </div>
             <div class="w3-display-bottomleft w3-padding">
                <span class="tx-margin-left-8 tx-text-32">Tarantula Web Admin Tool</span>             
@@ -26,98 +30,59 @@
             </div>
         </div>
         <div class="w3-flex">
-            <div class="w3-padding w3-green" style="flex-grow:2">
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
-                <div class="w3-panel"><span>ITEM1</span></div>
+            <div class="w3-padding w3-teal" style="flex-grow:2;">
+                <div style="display: block;">
+                    <h1>CONTENT</h1>
+                    <h1>CONTENT</h1>
+                    <h1>CONTENT</h1>
+                </div>
             </div>
-            <div class="w3-padding w3-white" style="flex-grow:7">
-             <div class="w3-display-container w3-teal tx-content-120">
-            <div class="w3-display-topleft w3-padding">
-                <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-48">widgets</i></span>
-            </div>
-            <div class="w3-display-bottomleft w3-padding">
-               <span class="tx-margin-left-8 tx-text-32">Tarantula Web Admin Tool</span>             
-            </div>
-            <div class="w3-display-bottomright w3-padding">
-               <span class="tx-margin-right-8 tx-text-16">Powered By iCodeSoftware LLC</span>             
+            <div class="w3-padding w3-white" style="flex-grow:8;">
+                <div id="tx-info-box" class="w3-display-container w3-border w3-border-red tx-content-48" style="display: none;">
+                    <div class="w3-display-topleft w3-padding">
+                        <span><i class="material-symbols-outlined tx-margin-left-8 tx-red-icon-24">info</i></span>
+                    </div>
+                    <div class="w3-display-topright w3-padding">
+                        <span id="tx-info-box-close"><i class="material-symbols-outlined tx-margin-left-8 tx-red-icon-24">close</i></span>
+                    </div>
+                    <div id="tx-info-box-content" class="w3-display-middle w3-padding">
+                        <span class="tx-text-12"></span>             
+                    </div>
+                </div>
+                <div id="tx-form-box" class="w3-container tx-margin-top-8" style="display: none">
+                            
+                </div>    
             </div>
         </div>
-         <div class="w3-display-container w3-teal tx-content-120">
-            <div class="w3-display-topleft w3-padding">
-                <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-48">widgets</i></span>
-            </div>
-            <div class="w3-display-bottomleft w3-padding">
-               <span class="tx-margin-left-8 tx-text-32">Tarantula Web Admin Tool</span>             
-            </div>
-            <div class="w3-display-bottomright w3-padding">
-               <span class="tx-margin-right-8 tx-text-16">Powered By iCodeSoftware LLC</span>             
-            </div>
-        </div>
-         <div class="w3-display-container w3-teal tx-content-120">
-            <div class="w3-display-topleft w3-padding">
-                <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-48">widgets</i></span>
-            </div>
-            <div class="w3-display-bottomleft w3-padding">
-               <span class="tx-margin-left-8 tx-text-32">Tarantula Web Admin Tool</span>             
-            </div>
-            <div class="w3-display-bottomright w3-padding">
-               <span class="tx-margin-right-8 tx-text-16">Powered By iCodeSoftware LLC</span>             
-            </div>
-        </div>    
-            </div>
-        </div>
-        
-    
         <script>
-            //document.querySelector('#tx-title').innerHTML = Admin.test();
+            Html.eventWithId('#tx-info-box-close',()=>{Html.closeWithId('#tx-info-box');});
+            if (!Admin.query().authenticated){
+                Admin.getJson("/admin/web/login.json",resp=>{
+                    Html.form("#tx-form-box","login",resp,(data)=>{
+                        console.log(data);
+                        Admin.postJson("/admin/login",data,(resp)=>{
+                            console.log(resp)
+                            if(!resp.successful){
+                                Html.messageWithId("#tx-info-box-content",resp.message);    
+                                Html.openWithId("#tx-info-box");
+                                return;
+                            }
+                            Admin.login(resp);
+                            Html.closeWithId("#tx-info-box");
+                            Html.openWithId("#tx-logout");
+                            Html.closeWithId("#tx-form-box");
+                        });
+                    });
+                    Html.openWithId("#tx-form-box");
+                });
+            }
+           
+            Html.eventWithId('#tx-logout',()=>{
+                Admin.logout();
+                Html.closeWithId("#tx-info-box");
+                Html.closeWithId("#tx-logout");
+                Html.openWithId("#tx-form-box");    
+            });
         </script>
     </body>
 </html>

@@ -1,6 +1,9 @@
 .tx-oswald{font-family: Oswald, serif;}
 .tx-orange-icon-48{font-size: 48px; color: orange;}
+.tx-orange-icon-32{font-size: 32px; color: orange;}
+.tx-red-icon-24{font-size: 24px; color: red;}
 .tx-content-120{height: 120px; width: 100%;}
+.tx-content-48{height: 48px; width: 100%;}
 .tx-margin-left-4{margin-left: 4px;}.tx-margin-right-4{margin-right: 4px;}.tx-margin-top-4{margin-top: 4px;}.tx-margin-bottom-4{margin-bottom: 4px;}
 .tx-margin-left-8{margin-left: 8px;}.tx-margin-right-8{margin-right: 8px;}.tx-margin-top-8{margin-top: 8px;}.tx-margin-bottom-8{margin-bottom: 8px;}
 .tx-margin-left-12{margin-left: 12px;}.tx-margin-right-12{margin-right: 12px;}.tx-margin-top-12{margin-top: 12px;}.tx-margin-bottom-12{margin-bottom: 12px;}
@@ -16,3 +19,4 @@
 .tx-text-20{font-family: "Oswald";font-size: 20px;}
 .tx-text-24{font-family: "Oswald";font-size: 24px;}
 .tx-text-32{font-family: "Oswald";font-size: 32px;}
+.tx-padding-button{padding:2px 4px 2px 4px;}

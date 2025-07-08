@@ -1,22 +1,22 @@
 {
-    "Scope": "asset",
+    "Scope": "admin",
     "Name": "Login",
     "Description": "login form",
     "Rechargeable": false,
     "Properties":[
         {
-            "Name": "Name",
+            "Name": "login",
             "Type":"string",
             "Reference": "text",
             "Nullable": false,
             "Downloadable": false
         },
         {
-            "Name": "Password",
+            "Name": "password",
             "Type":"string",
             "Reference": "password",
             "Nullable": false,
-            "Downloadable": true
+            "Downloadable": false
         }
     ]
 }
