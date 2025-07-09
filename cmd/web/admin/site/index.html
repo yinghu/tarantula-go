@@ -30,79 +30,9 @@
             </div>
         </div>
         <div class="w3-flex">
-            <div id="tx-task-list" class="w3-padding w3-teal" style="flex-grow:2;">
-                
-                    <div class="w3-display-container w3-border-bottom w3-border-red tx-content-48">
-                        <div class="w3-display-bottomright w3-padding">
-                            <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-24">double_arrow</i></span>
-                        </div>
-                        <div class="w3-display-bottomleft w3-padding">
-                            <span class="tx-margin-left-8 tx-text-24">Asset</span>             
-                        </div>
-                    </div>
-               
-              
-                    <div class="w3-display-container w3-border-bottom w3-border-red tx-content-48">
-                        <div class="w3-display-bottomright w3-padding">
-                            <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-24">double_arrow</i></span>
-                        </div>
-                        <div class="w3-display-bottomleft w3-padding">
-                            <span class="tx-margin-left-8 tx-text-24">Component</span>             
-                        </div>
-                    </div>
-              
-                
-                    <div class="w3-display-container  w3-border-bottom w3-border-red tx-content-48">
-                        <div class="w3-display-bottomright w3-padding">
-                            <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-24">double_arrow</i></span>
-                        </div>
-                        <div class="w3-display-bottomleft w3-padding">
-                            <span class="tx-margin-left-8 tx-text-24">Commodity</span>             
-                        </div>
-                    </div>
-               
-                
-                    <div class="w3-display-container  w3-border-bottom w3-border-red tx-content-48">
-                        <div class="w3-display-bottomright w3-padding">
-                            <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-24">double_arrow</i></span>
-                        </div>
-                        <div class="w3-display-bottomleft w3-padding">
-                            <span class="tx-margin-left-8 tx-text-24">Item</span>             
-                        </div>
-                    </div>
-               
-             
-                    <div class="w3-display-container  w3-border-bottom w3-border-red tx-content-48">
-                        <div class="w3-display-bottomright w3-padding">
-                            <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-24">double_arrow</i></span>
-                        </div>
-                        <div class="w3-display-bottomleft w3-padding">
-                            <span class="tx-margin-left-8 tx-text-24">Store</span>             
-                        </div>
-                    </div>
-                
-               
-                    <div class="w3-display-container  w3-border-bottom w3-border-red tx-content-48">
-                        <div class="w3-display-bottomright w3-padding">
-                            <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-24">double_arrow</i></span>
-                        </div>
-                        <div class="w3-display-bottomleft w3-padding">
-                            <span class="tx-margin-left-8 tx-text-24">Tournament</span>             
-                        </div>
-                    </div>
-               
-               
-                    <div class="w3-display-container w3-border-bottom w3-border-red tx-content-48">
-                        <div class="w3-display-bottomright w3-padding">
-                            <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-24">double_arrow</i></span>
-                        </div>
-                        <div class="w3-display-bottomleft w3-padding">
-                            <span class="tx-margin-left-8 tx-text-24">Resource</span>             
-                        </div>
-                    </div>
-                
+            <div id="tx-task-list" class="w3-padding w3-teal" style="flex-basis:20%;">
             </div>
-            <div class="w3-padding w3-white" style="flex-grow:8;">
+            <div class="w3-padding w3-white" style="flex-basis:80%;">
                 <div id="tx-info-box" class="w3-display-container w3-border w3-border-red tx-content-48" style="display: none;">
                     <div class="w3-display-topleft w3-padding">
                         <span><i class="material-symbols-outlined tx-margin-left-8 tx-red-icon-24">info</i></span>
@@ -114,7 +44,34 @@
                         <span class="tx-text-12"></span>             
                     </div>
                 </div>
+                <div id="tx-job-list-box" class="w3-container tx-margin-top-8" style="display: none">
+                    <span tx-pane-name='homing-agent' class="w3-left w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">HomingAgent<i id='tx-homing-agent-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>
+                    <span tx-pane-name='game-cluster' class="w3-right w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">Configuration<i id='tx-game-cluster-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>
+                    <span tx-pane-name='metrics' class="w3-right w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">Metrics<i id='tx-metrics-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>
+                    <span tx-pane-name='management' class="w3-right w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">Management<i id='tx-management-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>                   
+                </div> 
                 <div id="tx-form-box" class="w3-container tx-margin-top-8" style="display: none">
+                            
+                </div>
+                <div id="tx-category-list-box" class="w3-container tx-margin-top-8" style="display: none">
+                     <span tx-pane-name='homing-agent' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">HomingAgent<i id='tx-homing-agent-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>
+                     <span tx-pane-name='game-cluster' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">Configuration<i id='tx-game-cluster-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>
+                     <span tx-pane-name='metrics' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">Metrics<i id='tx-metrics-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>
+                     <span tx-pane-name='management' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">Management<i id='tx-management-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span> 
+                     <span tx-pane-name='homing-agent' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">HomingAgent<i id='tx-homing-agent-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>
+                     <span tx-pane-name='game-cluster' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">Configuration<i id='tx-game-cluster-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>
+                     <span tx-pane-name='metrics' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">Metrics<i id='tx-metrics-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>
+                     <span tx-pane-name='management' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">Management<i id='tx-management-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>        
+                     <span tx-pane-name='homing-agent' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">HomingAgent<i id='tx-homing-agent-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>
+                     <span tx-pane-name='game-cluster' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">Configuration<i id='tx-game-cluster-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>
+                     <span tx-pane-name='metrics' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">Metrics<i id='tx-metrics-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>
+                     <span tx-pane-name='management' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">Management<i id='tx-management-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>        
+                     <span tx-pane-name='homing-agent' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">HomingAgent<i id='tx-homing-agent-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>
+                     <span tx-pane-name='game-cluster' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">Configuration<i id='tx-game-cluster-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>
+                     <span tx-pane-name='metrics' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">Metrics<i id='tx-metrics-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>
+                     <span tx-pane-name='management' class="w3-green w3-tag  w3-border-red tx-text-20 tx-padding-button tx-opt">Management<i id='tx-management-down' class="material-symbols-outlined" style="font-size:24px;">arrow_downward_alt</i></span>               
+                </div>
+                <div id="tx-instance-list-box" class="w3-container tx-margin-top-8" style="display: none">
                             
                 </div>    
             </div>
@@ -135,6 +92,8 @@
                             on_login(resp);
                             Html.closeWithId("#tx-info-box");
                             Html.openWithId("#tx-logout");
+                            Html.openWithId("#tx-job-list-box");
+                            Html.openWithId("#tx-category-list-box");
                             Html.closeWithId("#tx-form-box");
                         });
                     });
@@ -146,12 +105,15 @@
                 Admin.logout();
                 Html.closeWithId("#tx-info-box");
                 Html.closeWithId("#tx-logout");
-                Html.openWithId("#tx-form-box");    
+                Html.openWithId("#tx-form-box"); 
+                Html.messageWithId("#tx-task-list","");   
             });
             function on_login(auth){
                 Admin.login(auth);
                 Admin.getJson("/admin/webprotected/task.bar.json",(resp)=>{
-                    console.log(resp);
+                    Html.taskList("#tx-task-list","task",resp,(a)=>{
+                        console.log("action");        
+                    });
                 });
             }
         </script>

@@ -63,6 +63,31 @@ var Html = (function(){
         });
     };
 
+    let _taskList = function(containerId,prefix,tbar,callback){
+        console.log(tbar);
+        document.querySelector(containerId).innerHTML="";
+        let tem=[];
+        tbar.Tasks.forEach(task=>{
+            tem.push("<div class='w3-display-container  w3-border-bottom w3-border-red tx-content-48 ");
+            tem.push("tx-"+prefix+"-action'>");
+            tem.push("<div class='w3-display-bottomright w3-padding'>");
+            tem.push("<span><i class='material-symbols-outlined tx-margin-left-8 tx-orange-icon-24'>double_arrow</i></span>");
+            tem.push("</div>");
+            tem.push("<div class='w3-display-bottomleft w3-padding'>");
+            tem.push("<span class='tx-margin-left-8 tx-text-24'>");
+            tem.push(task.Name);
+            tem.push("</span>");
+            tem.push("</div>");
+            tem.push("</div>");
+        });
+        document.querySelector(containerId).innerHTML = tem.join("");
+        document.querySelectorAll(".tx-"+prefix+"-action").forEach(a=>{
+            a.onclick = ()=>{
+                callback(a);    
+            };
+        });
+    };
+
 
     return {
         messageWithId : _messageWithId,
@@ -70,5 +95,6 @@ var Html = (function(){
         closeWithId : _closeWithId,
         eventWithId : _eventWithId,
         form : _form,
+        taskList : _taskList,
     };
 })();

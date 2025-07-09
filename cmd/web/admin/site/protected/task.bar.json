@@ -1,28 +1,55 @@
 {
-    "tasks":[
+    "Tasks":[
         {
-            "name":"Asset"    
+            "Name":"Asset"    
         },
         {
-            "name":"Component"    
+            "Name":"Component"    
         },
         {
-            "name":"Commodity"    
+            "Name":"Commodity"    
         },
         {
-            "name":"Item"    
+            "Name":"Item"    
         },
         {
-            "name":"Store"    
+            "Name":"Store"    
         },
         {
-            "name":"Tournament"    
+            "Name":"Tournament"    
         },
         {
-            "name":"Resource"    
+            "Name":"Resource"    
         },
         {
-            "name":"Achievement"    
+            "Name":"Achievement"    
+        },
+        {
+            "Name":"DailLogin"    
+        },
+        {
+            "Name":"Tournament1"    
+        },
+        {
+            "Name":"Resource2"    
+        },
+        {
+            "Name":"Achievement2"    
+        },
+        {
+            "Name":"DailLogin4"    
+        },
+        {
+            "Name":"Tournament"    
+        },
+        {
+            "Name":"Resource"    
+        },
+        {
+            "Name":"Achievement"    
+        },
+        {
+            "Name":"DailLogin"    
         }
     ]
     }
