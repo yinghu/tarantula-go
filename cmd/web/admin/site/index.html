@@ -30,12 +30,77 @@
             </div>
         </div>
         <div class="w3-flex">
-            <div class="w3-padding w3-teal" style="flex-grow:2;">
-                <div style="display: block;">
-                    <h1>CONTENT</h1>
-                    <h1>CONTENT</h1>
-                    <h1>CONTENT</h1>
-                </div>
+            <div id="tx-task-list" class="w3-padding w3-teal" style="flex-grow:2;">
+                
+                    <div class="w3-display-container w3-border-bottom w3-border-red tx-content-48">
+                        <div class="w3-display-bottomright w3-padding">
+                            <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-24">double_arrow</i></span>
+                        </div>
+                        <div class="w3-display-bottomleft w3-padding">
+                            <span class="tx-margin-left-8 tx-text-24">Asset</span>             
+                        </div>
+                    </div>
+               
+              
+                    <div class="w3-display-container w3-border-bottom w3-border-red tx-content-48">
+                        <div class="w3-display-bottomright w3-padding">
+                            <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-24">double_arrow</i></span>
+                        </div>
+                        <div class="w3-display-bottomleft w3-padding">
+                            <span class="tx-margin-left-8 tx-text-24">Component</span>             
+                        </div>
+                    </div>
+              
+                
+                    <div class="w3-display-container  w3-border-bottom w3-border-red tx-content-48">
+                        <div class="w3-display-bottomright w3-padding">
+                            <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-24">double_arrow</i></span>
+                        </div>
+                        <div class="w3-display-bottomleft w3-padding">
+                            <span class="tx-margin-left-8 tx-text-24">Commodity</span>             
+                        </div>
+                    </div>
+               
+                
+                    <div class="w3-display-container  w3-border-bottom w3-border-red tx-content-48">
+                        <div class="w3-display-bottomright w3-padding">
+                            <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-24">double_arrow</i></span>
+                        </div>
+                        <div class="w3-display-bottomleft w3-padding">
+                            <span class="tx-margin-left-8 tx-text-24">Item</span>             
+                        </div>
+                    </div>
+               
+             
+                    <div class="w3-display-container  w3-border-bottom w3-border-red tx-content-48">
+                        <div class="w3-display-bottomright w3-padding">
+                            <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-24">double_arrow</i></span>
+                        </div>
+                        <div class="w3-display-bottomleft w3-padding">
+                            <span class="tx-margin-left-8 tx-text-24">Store</span>             
+                        </div>
+                    </div>
+                
+               
+                    <div class="w3-display-container  w3-border-bottom w3-border-red tx-content-48">
+                        <div class="w3-display-bottomright w3-padding">
+                            <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-24">double_arrow</i></span>
+                        </div>
+                        <div class="w3-display-bottomleft w3-padding">
+                            <span class="tx-margin-left-8 tx-text-24">Tournament</span>             
+                        </div>
+                    </div>
+               
+               
+                    <div class="w3-display-container w3-border-bottom w3-border-red tx-content-48">
+                        <div class="w3-display-bottomright w3-padding">
+                            <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-24">double_arrow</i></span>
+                        </div>
+                        <div class="w3-display-bottomleft w3-padding">
+                            <span class="tx-margin-left-8 tx-text-24">Resource</span>             
+                        </div>
+                    </div>
+                
             </div>
             <div class="w3-padding w3-white" style="flex-grow:8;">
                 <div id="tx-info-box" class="w3-display-container w3-border w3-border-red tx-content-48" style="display: none;">
@@ -67,7 +132,7 @@
                                 Html.openWithId("#tx-info-box");
                                 return;
                             }
-                            Admin.login(resp);
+                            on_login(resp);
                             Html.closeWithId("#tx-info-box");
                             Html.openWithId("#tx-logout");
                             Html.closeWithId("#tx-form-box");
@@ -83,6 +148,12 @@
                 Html.closeWithId("#tx-logout");
                 Html.openWithId("#tx-form-box");    
             });
+            function on_login(auth){
+                Admin.login(auth);
+                Admin.getJson("/admin/webprotected/task.bar.json",(resp)=>{
+                    console.log(resp);
+                });
+            }
         </script>
     </body>
 </html>

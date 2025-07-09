@@ -35,6 +35,8 @@ func (s *AdminWebIndex) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 		w.Header().Set("Content-Type", "text/css")
 	} else if strings.HasSuffix(fn, ".json") {
 		w.Header().Set("Content-Type", "application/json")
+	} else if strings.HasSuffix(fn, ".ico") {
+		w.Header().Set("Content-Type", "image/x-icon")
 	} else {
 		w.Header().Set("Content-Type", "text/html")
 	}

@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -19,12 +20,25 @@ func (s *AdminWebProtected) AccessControl() int32 {
 }
 func (s *AdminWebProtected) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	dest, err := os.OpenFile("site/index.html", os.O_RDONLY, 0644)
+	fn := r.PathValue("name")
+	dest, err := os.OpenFile("site/protected/"+fn, os.O_RDONLY, 0644)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
+	if strings.HasSuffix(fn, ".js") {
+		w.Header().Set("Content-Type", "text/javascript")
+	} else if strings.HasSuffix(fn, ".css") {
+		w.Header().Set("Content-Type", "text/css")
+	} else if strings.HasSuffix(fn, ".json") {
+		w.Header().Set("Content-Type", "application/json")
+	} else if strings.HasSuffix(fn, ".ico") {
+		w.Header().Set("Content-Type", "image/x-icon")
+	} else {
+		w.Header().Set("Content-Type", "text/html")
+	}
+	w.WriteHeader(http.StatusOK)
 	defer dest.Close()
 	io.Copy(w, dest)
 }
