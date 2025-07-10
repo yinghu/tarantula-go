@@ -85,8 +85,24 @@
         <script>
             Html.eventWithId('#tx-info-box-close',()=>{Html.closeWithId('#tx-info-box');});
             if (!Admin.query().authenticated){
+                on_logout();
+            }
+           
+            Html.eventWithId('#tx-logout',()=>{
+                Admin.logout();
+                Html.closeWithId("#tx-info-box");
+                Html.closeWithId("#tx-logout");
+                Html.openWithId("#tx-form-box"); 
+                Html.messageWithId("#tx-task-list","");
+                Html.closeWithId("#tx-job-list-box");
+                Html.closeWithId("#tx-category-list-box");
+                Html.closeWithId("#tx-instance-list-box");   
+                on_logout();
+            });
+
+            function on_logout(){
                 Admin.getJson("/admin/web/login.json",resp=>{
-                    Html.form("#tx-form-box","login",resp,(data)=>{
+                    Html.form("#tx-form-box","login",resp,false,(data)=>{
                         console.log(data);
                         Admin.postJson("/admin/login",data,(resp)=>{
                             console.log(resp)
@@ -107,17 +123,7 @@
                     Html.openWithId("#tx-form-box");
                 });
             }
-           
-            Html.eventWithId('#tx-logout',()=>{
-                Admin.logout();
-                Html.closeWithId("#tx-info-box");
-                Html.closeWithId("#tx-logout");
-                Html.openWithId("#tx-form-box"); 
-                Html.messageWithId("#tx-task-list","");
-                Html.closeWithId("#tx-job-list-box");
-                Html.closeWithId("#tx-category-list-box");
-                Html.closeWithId("#tx-instance-list-box");   
-            });
+
             function on_login(auth){
                 Admin.login(auth);
                 Admin.getJson("/admin/webprotected/task.bar.json",(resp)=>{
@@ -126,13 +132,34 @@
                             eval(b+"()");
                         });        
                     });
+                    Html.jobList("#tx-job-list-box","job","Asset",(b)=>{
+                        eval(b+"()");
+                    });
                 });
             }
+
             function create_new_enum(){
-                console.log("enum");
+                Html.enumForm("#tx-form-box",(data)=>{
+                    let valid = {Name:data.Name,Values:[]};
+                    for( let i=0;i<data.ix;i++){
+                        if("entry"+i in data){
+                            let ev = data["entry"+i];
+                            valid.Values.push(ev);
+                        }    
+                    }
+                    console.log(valid);
+                    Admin.postJson("/admin/saveenum",valid,resp=>{
+                        console.log(resp);
+                    });
+                });
+                Html.openWithId("#tx-form-box");
             }
+
             function create_new_category(){
-                console.log("category");
+                Html.categoryForm("#tx-form-box",(data)=>{
+                    console.log(data);
+                });
+                Html.openWithId("#tx-form-box");    
             }
         </script>
     </body>

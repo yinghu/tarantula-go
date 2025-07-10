@@ -1,9 +1,11 @@
 var Html = (function(){
     
     let _tasks = {};
+    let _enum ={};
+    let _category ={};
 
     let _caption = function(word){
-        return word[0].toUpperCase() + word.slice(1).toLowerCase()
+        return word[0].toUpperCase() + word.slice(1);
     };
     let _messageWithId = function(id,message){
         document.querySelector(id).innerHTML = message;
@@ -30,19 +32,29 @@ var Html = (function(){
         tem.push("</div>");
         return tem.join("");       
     };
-    let _button = function(category,prefix){
+    let _button = function(name,prefix){
         let tem=[];
         tem.push("<div class='w3-panel'>");
         tem.push("<span id='");
-        tem.push(prefix+"-"+category.Name+"' ");
+        tem.push(prefix+"-"+name+"' ");
         tem.push("class='w3-right w3-tag w3-green tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-right-8'>");
-        tem.push(category.Name);
+        tem.push(name);
         tem.push("</span>");
         tem.push("</div>");
         return tem.join("");
     };
 
-    let _form = function(containerId,prefix,category,callback){
+    let _icon = function(prefix,n,icon,color){
+        let tem=[];
+        tem.push("<div class='w3-panel'>");
+        tem.push("<span id='");
+        tem.push(prefix+"-"+n+"-"+icon+"' class='w3-right'>");
+        tem.push("<i class='material-symbols-outlined tx-margin-right-8 tx-"+color+"-icon-24'>"+icon+"</i></span>");
+        tem.push("</div>");
+        return tem.join("");
+    }
+
+    let _form = function(containerId,prefix,category,closeable,callback){
         console.log(category);
         document.querySelector(containerId).innerHTML="";
         let tem=[];
@@ -50,12 +62,20 @@ var Html = (function(){
         tem.push("<legend class='tx-text-20'>");
         tem.push(category.Scope.toUpperCase()+"/"+category.Description.toUpperCase());
         tem.push("</legend>");
+        if(closeable){
+            tem.push(_icon(prefix,category.Name,"close","red"));
+        }
         category.Properties.forEach(prop=>{
             tem.push(_input(prop,prefix));    
         });
-        tem.push(_button(category,prefix,callback));
+        tem.push(_button(category.Name,prefix,callback));
         tem.push("</fieldset>");
         document.querySelector(containerId).innerHTML += tem.join("");
+        if(closeable){
+            _eventWithId("#"+prefix+"-"+category.Name+"-close",()=>{
+                document.querySelector(containerId).style.display='none';
+            });
+        }
         _eventWithId("#"+prefix+"-"+category.Name,()=>{
             let data ={};
             category.Properties.forEach(p=>{
@@ -116,6 +136,100 @@ var Html = (function(){
         });
     };
 
+    let _enumForm = function(containerId,callback){
+        document.querySelector(containerId).innerHTML="";
+        _enum ={ix:0};
+        let tem=[];
+        tem.push("<fieldset>");
+        tem.push("<legend class='tx-text-20'>");
+        tem.push("Enum");
+        tem.push("</legend>");
+        tem.push(_icon("ee","enum","close","red"));
+        tem.push(_input({Name:"Name",Reference:"text"},"enum"));
+        tem.push(_input({Name:"Entry",Reference:"text"},"enum"));
+        tem.push(_input({Name:"Value",Reference:"number"},"enum"));
+        tem.push(_icon("ee","enum","add","orange"));
+        tem.push("<div class='w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4'>");
+        tem.push("<ul id='tx-create-enum-properties' class='w3-ul'>");
+        tem.push("</ul></div>");
+        tem.push(_button("Save","ee",callback));
+        tem.push("</fieldset>");
+        document.querySelector(containerId).innerHTML += tem.join("");
+        _eventWithId("#ee-enum-close",()=>{
+            document.querySelector(containerId).style.display='none';
+        });
+        _eventWithId("#ee-enum-add",()=>{
+            let id = "entry"+_enum.ix;
+            _enum.ix++;
+            let e = document.querySelector("#enum-Entry").value;
+            let v = document.querySelector("#enum-Value").value/1;
+            let prop = e+" : "+v; 
+            let li = "<li id='"+id+"'>"+prop+"<scan class='w3-right tx-enum-entry-remove' "+"tx-enum-entry-id='"+id+"'><i class='material-symbols-outlined tx-red-icon-24'>remove</i></span></li>";
+            document.querySelector("#tx-create-enum-properties").innerHTML += li;
+            _enum[id]={Name:e,Value:v};
+            document.querySelectorAll(".tx-enum-entry-remove").forEach(a=>{
+                a.onclick = ()=>{
+                    let removeId = a.getAttribute("tx-enum-entry-id");
+                    document.querySelector("#"+removeId).style.display="none";
+                    delete _enum[removeId];
+                    console.log(a.getAttribute("tx-enum-entry-id"));
+                };            
+            });
+        });
+        _eventWithId("#ee-Save",()=>{
+            let n = document.querySelector("#enum-Name").value;
+            _enum.Name = n;
+            callback(_enum);
+        });       
+    };
+
+    let _categoryHeader = function(containerId, prefix){
+        let tem=[];
+        tem.push("<fieldset>");
+        tem.push("<legend class='tx-text-20'>");
+        tem.push("Header");
+        tem.push("</legend>");
+        tem.push(_input({Name:"Name",Reference:"text"},"category"));
+        tem.push(_input({Name:"Desctiption",Reference:"text"},"category"));
+        tem.push(_input({Name:"Version",Reference:"text"},"category"));
+        //tem.push(_input({Name:"Value",Reference:"number"},"category"));
+        tem.push("</fieldset>");
+        document.querySelector(containerId).innerHTML += tem.join("");
+    }
+
+    let _categoryForm = function(containerId,callback){
+        document.querySelector(containerId).innerHTML="";
+        _category ={ix:0};
+        let tem=[];
+        tem.push(_icon("cc","category","close","red"));
+        document.querySelector(containerId).innerHTML += tem.join("");
+        _categoryHeader(containerId,"cc-header");
+        tem = [];
+        tem.push("<fieldset>");
+        tem.push("<legend class='tx-text-20'>");
+        tem.push("Category");
+        tem.push("</legend>");
+        //tem.push(_icon("cc","category","close","red"));
+        tem.push(_input({Name:"Name",Reference:"text"},"category"));
+        tem.push(_input({Name:"Entry",Reference:"text"},"category"));
+        tem.push(_input({Name:"Value",Reference:"number"},"category"));
+        tem.push(_icon("cc","category","add","orange"));
+        tem.push("<div class='w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4'>");
+        tem.push("<ul id='tx-create-category-properties' class='w3-ul'>");
+        tem.push("</ul></div>");
+        tem.push(_button("Save","cc",callback));
+        tem.push("</fieldset>");
+        document.querySelector(containerId).innerHTML += tem.join("");
+        _eventWithId("#cc-category-close",()=>{
+            document.querySelector(containerId).style.display='none';
+        }); 
+         _eventWithId("#cc-Save",()=>{
+            //let n = document.querySelector("#enum-Name").value;
+            //_enum.Name = n;
+            callback(_category);
+        });      
+    };
+
     return {
         messageWithId : _messageWithId,
         openWithId : _openWithId,
@@ -124,5 +238,7 @@ var Html = (function(){
         form : _form,
         taskList : _taskList,
         jobList : _jobList,
+        enumForm : _enumForm,
+        categoryForm : _categoryForm,
     };
 })();
