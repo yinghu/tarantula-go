@@ -1,5 +1,7 @@
 var Html = (function(){
     
+    let _tasks = {};
+
     let _caption = function(word){
         return word[0].toUpperCase() + word.slice(1).toLowerCase()
     };
@@ -33,7 +35,7 @@ var Html = (function(){
         tem.push("<div class='w3-panel'>");
         tem.push("<span id='");
         tem.push(prefix+"-"+category.Name+"' ");
-        tem.push("class='w3-right w3-tag w3-green w3-round w3-border w3-border-red tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-bottom-8'>");
+        tem.push("class='w3-right w3-tag w3-green tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-right-8'>");
         tem.push(category.Name);
         tem.push("</span>");
         tem.push("</div>");
@@ -68,7 +70,10 @@ var Html = (function(){
         document.querySelector(containerId).innerHTML="";
         let tem=[];
         tbar.Tasks.forEach(task=>{
-            tem.push("<div class='w3-display-container  w3-border-bottom w3-border-red tx-content-48 ");
+            _tasks[task.Name]=task;
+            tem.push("<div tx-task-name='");
+            tem.push(task.Name+"' ")  
+            tem.push("class='w3-display-container  w3-border-bottom w3-border-red tx-content-48 ");
             tem.push("tx-"+prefix+"-action'>");
             tem.push("<div class='w3-display-bottomright w3-padding'>");
             tem.push("<span><i class='material-symbols-outlined tx-margin-left-8 tx-orange-icon-24'>double_arrow</i></span>");
@@ -83,11 +88,33 @@ var Html = (function(){
         document.querySelector(containerId).innerHTML = tem.join("");
         document.querySelectorAll(".tx-"+prefix+"-action").forEach(a=>{
             a.onclick = ()=>{
-                callback(a);    
+                callback(a.getAttribute("tx-task-name"));    
             };
         });
     };
 
+    let _jobList = function(containerId,prefix,tn,callback){
+        let task = _tasks[tn];
+        console.log(task);
+        document.querySelector(containerId).innerHTML="";
+        let tem=[];
+        tem.push("<span class='w3-bar-item w3-left w3-teal w3-tag tx-text-24 tx-padding-button'><i class='material-symbols-outlined tx-orange-icon-24 tx-margin-top-8'>settings</i>");
+        tem.push(" "+task.Name);
+        tem.push("</span>");
+        task.Jobs.forEach(job=>{
+            tem.push("<span tx-job-name='");
+            tem.push(job.Callback+"' ");
+            tem.push("class='w3-bar-item w3-right w3-green w3-tag tx-text-24 tx-padding-button tx-margin-left-4 ");
+            tem.push("tx-"+prefix+"-action")
+            tem.push("'>"+job.Name+"</span>");
+        });
+        document.querySelector(containerId).innerHTML = tem.join("");
+        document.querySelectorAll(".tx-"+prefix+"-action").forEach(a=>{
+            a.onclick = ()=>{
+                callback(a.getAttribute("tx-job-name"));    
+            };
+        });
+    };
 
     return {
         messageWithId : _messageWithId,
@@ -96,5 +123,6 @@ var Html = (function(){
         eventWithId : _eventWithId,
         form : _form,
         taskList : _taskList,
+        jobList : _jobList,
     };
 })();
