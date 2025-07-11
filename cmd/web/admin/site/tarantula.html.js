@@ -72,6 +72,37 @@ var Html = (function(){
         return tem.join('');    
     };
 
+    let _selectType = function(prop,prefix,types){
+        let tem=[];
+        tem.push("<div class='w3-panel'>");
+        tem.push("<label class='tx-text-12'>");
+        tem.push(_caption(prop.Name));
+        tem.push("</label>");
+        tem.push("<select id='");
+        tem.push(prefix+'-'+prop.Name);
+        tem.push("' name='chs' class='w3-round w3-border tx-text-16 w3-select tx-margin-left-4'>");
+        for(const k of Object.keys(types)){
+            tem.push("<option value='"+k+"'>"+k+"</option>");
+        }
+        tem.push("</select>");
+        tem.push("</div>");
+        return tem.join("");  
+    }
+
+    let _selectReference = function(prop,prefix){
+        let tem=[];
+        tem.push("<div id='"+prefix+"-"+prop.Name+"-box' "+"class='w3-panel'>");
+        tem.push("<label class='tx-text-12'>");
+        tem.push(_caption(prop.Name));
+        tem.push("</label>");
+        tem.push("<select id='");
+        tem.push(prefix+'-'+prop.Name);
+        tem.push("' name='chs' class='w3-round w3-border tx-text-16 w3-select tx-margin-left-4'>");
+        tem.push("</select>");
+        tem.push("</div>");
+        return tem.join("");  
+    }
+
     let _selectCategory = function(prop,prefix){
         let tem=[];
         tem.push("<div class='w3-panel'>");
@@ -216,7 +247,7 @@ var Html = (function(){
         tem.push(_input({Name:"Value",Reference:"number"},"enum"));
         tem.push(_icon("ee","enum","add","orange"));
         tem.push("<div class='w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4'>");
-        tem.push("<ul id='tx-create-enum-properties' class='w3-ul'>");
+        tem.push("<ul id='create-enum-properties' class='w3-ul'>");
         tem.push("</ul></div>");
         tem.push(_button("Save","ee",callback));
         tem.push("</fieldset>");
@@ -230,15 +261,15 @@ var Html = (function(){
             let e = document.querySelector("#enum-Entry").value;
             let v = document.querySelector("#enum-Value").value/1;
             let prop = e+" : "+v; 
-            let li = "<li id='"+id+"'>"+prop+"<scan class='w3-right tx-enum-entry-remove' "+"tx-enum-entry-id='"+id+"'><i class='material-symbols-outlined tx-red-icon-24'>remove</i></span></li>";
-            document.querySelector("#tx-create-enum-properties").innerHTML += li;
+            let li = "<li id='"+id+"'>"+prop+"<scan class='w3-right enum-entry-remove' "+"enum-entry-id='"+id+"'><i class='material-symbols-outlined tx-red-icon-24'>remove</i></span></li>";
+            document.querySelector("#create-enum-properties").innerHTML += li;
             _enum[id]={Name:e,Value:v};
-            document.querySelectorAll(".tx-enum-entry-remove").forEach(a=>{
+            document.querySelectorAll(".enum-entry-remove").forEach(a=>{
                 a.onclick = ()=>{
-                    let removeId = a.getAttribute("tx-enum-entry-id");
+                    let removeId = a.getAttribute("enum-entry-id");
                     document.querySelector("#"+removeId).style.display="none";
                     delete _enum[removeId];
-                    console.log(a.getAttribute("tx-enum-entry-id"));
+                    console.log(a.getAttribute("enum-entry-id"));
                 };            
             });
         });
@@ -253,7 +284,7 @@ var Html = (function(){
         let tem=[];
         tem.push("<fieldset>");
         tem.push("<legend class='tx-text-20'>");
-        tem.push("Category/Header");
+        tem.push("Category : Header");
         tem.push("</legend>");
         tem.push(_input({Name:"Name",Reference:"text"},prefix));
         tem.push(_input({Name:"Desctiption",Reference:"text"},prefix));
@@ -264,9 +295,9 @@ var Html = (function(){
         document.querySelector(containerId).innerHTML += tem.join("");
     }
 
-    let _categoryForm = function(containerId,callback){
+    let _categoryForm = function(containerId,data,callback){
         document.querySelector(containerId).innerHTML="";
-        _category ={ix:0};
+        _category ={ix:0,types:data};
         let tem=[];
         tem.push(_icon("cc","category","close","red"));
         document.querySelector(containerId).innerHTML += tem.join("");
@@ -274,30 +305,102 @@ var Html = (function(){
         tem = [];
         tem.push("<fieldset>");
         tem.push("<legend class='tx-text-20'>");
-        tem.push("Category/Properties");
+        tem.push("Category : Properties");
         tem.push("</legend>");
         tem.push(_input({Name:"Name",Reference:"text"},"category"));
-        tem.push(_selectEnum({Name:"Type",Reference:"text"},"category"));
+        tem.push(_selectType({Name:"Type",Reference:"text"},"category",data));
         tem.push(_checkbox({Name:"Nullable",Reference:"text"},"category"));
         tem.push(_checkbox({Name:"Downloadable",Reference:"text"},"category"));
+        tem.push(_selectReference({Name:"Reference",Reference:"text"},"category"));
         tem.push(_icon("cc","category","add","orange"));
         tem.push("<div class='w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4'>");
-        tem.push("<ul id='tx-create-category-properties' class='w3-ul'>");
+        tem.push("<ul id='create-category-properties' class='w3-ul'>");
         tem.push("</ul></div>");
         tem.push(_button("Save","cc",callback));
         tem.push("</fieldset>");
         document.querySelector(containerId).innerHTML += tem.join("");
+        _category.typeSelect = document.querySelector("#category-Type");
+        _category.referenceSelectBox = document.querySelector("#category-Reference-box");
+        _category.referenceSelectBox.style.display = "none";
+        _category.referenceSelect = document.querySelector("#category-Reference");
+        _category.build = document.querySelector("#create-category-properties");
+        _category.typeSelect.onchange =()=>{
+             _category.referenceSelectBox.style.display = "none";
+            let ty = _category.typeSelect.options[_category.typeSelect.selectedIndex].text;
+            if (ty=="List" || ty=="Set"){
+                let ref =[];
+                for(const k of Object.keys(data)){
+                    ref.push("<option value='"+k+"'>"+k+"</option>");
+                }
+                _category.referenceSelect.innerHTML = ref.join("");
+                _category.referenceSelectBox.style.display = "block";
+            }
+            else{
+                let cat = data[ty];
+                if(cat.type == "enum"){
+                    let ref =[];
+                    cat.value.forEach(v=>{
+                        ref.push("<option value='"+cat.name+"'>"+v.name+"</option>");
+                    });
+                    _category.referenceSelect.innerHTML = ref.join("");
+                    _category.referenceSelectBox.style.display = "block";        
+                }
+            }
+        };
+        _category.referenceSelect.onchange=()=>{
+            console.log(_category.referenceSelect.options[_category.referenceSelect.selectedIndex].getAttribute("value"));
+        };
         _eventWithId("#cc-category-close",()=>{
             document.querySelector(containerId).style.display='none';
         });
          _eventWithId("#cc-category-add",()=>{
-            console.log("add property");
+            let cn = document.querySelector("#category-Name");
+            let tp = data[_category.typeSelect.options[_category.typeSelect.selectedIndex].text];
+            if( tp.type == "list" || tp.type =="set"){
+               v = _category.referenceSelect.options[_category.referenceSelect.selectedIndex].getAttribute("value");
+               let cat = data[v];
+               let item = cn.value+":"+tp.type+"&lt"+"category:"+cat.name+"&gt";
+               let id = "c-entry"+_category.ix;
+               _addItem(id,item);
+               _category.ix++;
+               _category[id]=item;
+               return; 
+            }
+            if(tp.type== "enum"){
+               v = _category.referenceSelect.options[_category.referenceSelect.selectedIndex].getAttribute("value");
+               let cat = data[v];
+               let item = (cn.value+":"+tp.type+"&lt"+cat.name+"&gt");
+               let id = "c-entry"+_category.ix;
+               _addItem(id,item);
+               _category.ix++;
+               _category[id]=item;
+               return;
+            }
+            if(tp.type =="category"){
+                let item = (cn.value+":category"+"&lt"+tp.name+"&gt");
+                let id = "c-entry"+_category.ix;
+               _addItem(id,item);
+               _category.ix++;
+               _category[id]=item;    
+                return;
+            }
+            let  item = cn.value+":"+tp.type+"&lt"+tp.name+"&gt";
+            let id = "c-entry"+_category.ix;
+            _addItem(id,item);
+            _category.ix++;
+            _category[id]=item;
+                
         }); 
          _eventWithId("#cc-Save",()=>{
             //let n = document.querySelector("#enum-Name").value;
             //_enum.Name = n;
             callback(_category);
         });      
+    };
+
+    let _addItem = function(id,item){
+        let li = "<li id='"+id+"'>"+item+"<scan class='w3-right category-entry-remove' "+"category-entry-id='"+id+"'><i class='material-symbols-outlined tx-red-icon-24'>remove</i></span></li>";
+        _category.build.innerHTML += li;
     };
 
     return {

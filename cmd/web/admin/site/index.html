@@ -156,10 +156,18 @@
             }
 
             function create_new_category(){
-                Html.categoryForm("#tx-form-box",(data)=>{
-                    console.log(data);
-                });
-                Html.openWithId("#tx-form-box");    
+                Admin.getJson("/admin/webprotected/category.json",(resp)=>{
+                    Html.categoryForm("#tx-form-box",resp,(data)=>{
+                        for( let i=0;i<data.ix;i++){
+                            if("c-entry"+i in data){
+                                let ev = data["c-entry"+i];
+                                console.log(ev);
+                                //valid.Values.push(ev);
+                            }    
+                        }
+                    });
+                    Html.openWithId("#tx-form-box"); 
+                });   
             }
         </script>
     </body>
