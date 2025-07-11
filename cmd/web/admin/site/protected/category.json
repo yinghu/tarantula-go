@@ -1,0 +1,39 @@
+{
+    "Scope": "asset",
+    "Name": "DisplayCard",
+    "Description": "currency display card",
+    "Rechargeable": false,
+    "Headers":[
+        
+    ],
+    "Properties":[
+        {
+            "Name": "Name",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "SmallIconURL",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": true
+        },
+        {
+            "Name": "MediumIconURL",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": true
+        },
+        {
+            "Name": "LargeIconURL",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": true
+        }
+    ]
+}

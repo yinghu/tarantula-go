@@ -32,6 +32,18 @@ var Html = (function(){
         tem.push("</div>");
         return tem.join("");       
     };
+    let _checkbox = function(prop,prefix){
+        let tem=[];
+        tem.push("<div class='w3-panel'>");
+        tem.push("<label class='tx-text-12'>");
+        tem.push(_caption(prop.Name));
+        tem.push("</label>");
+        tem.push("<input id='");
+        tem.push(prefix+"-"+prop.Name+"' ");
+        tem.push("class='w3-check w3-round w3-border tx-text-16 tx-margin-left-8' type='checkbox'/>");
+        tem.push("</div>");
+        return tem.join("");       
+    };
     let _button = function(name,prefix){
         let tem=[];
         tem.push("<div class='w3-panel'>");
@@ -43,6 +55,60 @@ var Html = (function(){
         tem.push("</div>");
         return tem.join("");
     };
+
+    let _selectEnum = function(prop,prefix){
+        let tem=[];
+        tem.push("<div class='w3-panel'>");
+        tem.push("<label class='tx-text-12'>");
+        tem.push(_caption(prop.Name));
+        tem.push("</label>");
+        tem.push("<select id='");
+        tem.push(prefix+'-'+prop.name);
+        tem.push("' name='chs' class='w3-round w3-border tx-text-16 w3-select tx-margin-left-4'>");
+        tem.push("<option value='1'>"+"One"+"</option>");
+        tem.push("<option value='2'>"+"Two"+"</option>");
+        tem.push("</select>");
+        tem.push("</div>");
+        return tem.join('');    
+    };
+
+    let _selectCategory = function(prop,prefix){
+        let tem=[];
+        tem.push("<div class='w3-panel'>");
+        tem.push("<label class='tx-text-12'>");
+        tem.push(_caption(prop.Name));
+        tem.push("</label>");
+        tem.push("<span tx-property-name='");
+        tem.push(prop.Name);    
+        tem.push("' class='w3-right tx-margin-right-4 ");
+        tem.push(prefix+"-upload'>");
+        tem.push("<i class='material-symbols-outlined tx-orange-icon-20'>add</i></span>");
+        tem.push("<select id='");
+        tem.push(prefix+'-'+prop.name);
+        tem.push("' name='chs' class='w3-round w3-border tx-text-16 w3-select tx-margin-left-4'>");
+        tem.push("<option value='' disabled selected>click plus to load</option>");
+        tem.push("</select>");
+        tem.push("</div>");
+        return tem.join("");  
+    }
+
+    let _upload = function(prop,prefix){
+        let tem=[];
+        tem.push("<div class='w3-panel'>");
+        tem.push("<label class='tx-text-12'>");
+        tem.push(_caption(prop.Name));
+        tem.push("</label>");
+        tem.push("<span tx-property-name='");
+        tem.push(prop.Name);    
+        tem.push("' class='w3-right tx-margin-right-4 ");
+        tem.push(prefix+"-upload'>");
+        tem.push("<i class='material-symbols-outlined tx-orange-icon-20'>file_open</i></span>");
+        tem.push("<input disabled id='");
+        tem.push(prefix+"-"+prop.Name+"' ");
+        tem.push("class='w3-input w3-round w3-border tx-text-16' type='text'/>");
+        tem.push("</div>");
+        return tem.join("");  
+    }
 
     let _icon = function(prefix,n,icon,color){
         let tem=[];
@@ -187,12 +253,13 @@ var Html = (function(){
         let tem=[];
         tem.push("<fieldset>");
         tem.push("<legend class='tx-text-20'>");
-        tem.push("Header");
+        tem.push("Category/Header");
         tem.push("</legend>");
-        tem.push(_input({Name:"Name",Reference:"text"},"category"));
-        tem.push(_input({Name:"Desctiption",Reference:"text"},"category"));
-        tem.push(_input({Name:"Version",Reference:"text"},"category"));
-        //tem.push(_input({Name:"Value",Reference:"number"},"category"));
+        tem.push(_input({Name:"Name",Reference:"text"},prefix));
+        tem.push(_input({Name:"Desctiption",Reference:"text"},prefix));
+        tem.push(_input({Name:"Version",Reference:"text"},prefix));
+        tem.push(_checkbox({Name:"Rechargeable"},prefix));
+        tem.push(_checkbox({Name:"Downloadable"},prefix));
         tem.push("</fieldset>");
         document.querySelector(containerId).innerHTML += tem.join("");
     }
@@ -207,12 +274,13 @@ var Html = (function(){
         tem = [];
         tem.push("<fieldset>");
         tem.push("<legend class='tx-text-20'>");
-        tem.push("Category");
+        tem.push("Category/Properties");
         tem.push("</legend>");
-        //tem.push(_icon("cc","category","close","red"));
         tem.push(_input({Name:"Name",Reference:"text"},"category"));
-        tem.push(_input({Name:"Entry",Reference:"text"},"category"));
-        tem.push(_input({Name:"Value",Reference:"number"},"category"));
+        tem.push(_input({Name:"StartTime",Reference:"dateTime-local"},"category"));
+        tem.push(_selectEnum({Name:"Value",Reference:"enum"},"category"));
+        tem.push(_selectCategory({Name:"SkuList",Reference:"category"},"category"));
+        tem.push(_upload({Name:"Icon",Reference:"text"},"category"));
         tem.push(_icon("cc","category","add","orange"));
         tem.push("<div class='w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4'>");
         tem.push("<ul id='tx-create-category-properties' class='w3-ul'>");

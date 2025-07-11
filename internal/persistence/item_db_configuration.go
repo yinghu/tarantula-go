@@ -10,6 +10,10 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+const (
+	DATE_TIME_FORMAT string = "2006-01-02T15:04"
+)
+
 func (db *ItemDB) Save(c item.Configuration) error {
 	return db.Sql.Txn(func(tx pgx.Tx) error {
 		r, err := tx.Exec(context.Background(), INSERT_CONFIG, c.Id, c.Name, c.Type, c.TypeId, c.Category, c.Version)
@@ -200,28 +204,28 @@ func (db *ItemDB) Validate(c item.Configuration) error {
 			}
 			continue
 		}
-		if prop.Type == "number" && prop.Reference == "int" {
+		if prop.Type == "int" {
 			err = asInt(v)
 			if err != nil {
 				return err
 			}
 			continue
 		}
-		if prop.Type == "number" && prop.Reference == "long" {
+		if prop.Type == "long" {
 			err = asLong(v)
 			if err != nil {
 				return err
 			}
 			continue
 		}
-		if prop.Type == "number" && prop.Reference == "float" {
+		if prop.Type == "float" {
 			err = asFloat(v)
 			if err != nil {
 				return err
 			}
 			continue
 		}
-		if prop.Type == "number" && prop.Reference == "double" {
+		if prop.Type == "double" {
 			err = asDouble(v)
 			if err != nil {
 				return err
@@ -240,7 +244,7 @@ func (db *ItemDB) Validate(c item.Configuration) error {
 			if err != nil {
 				return err
 			}
-			_, err = time.Parse(prop.Reference, fmt.Sprintf("%v", v))
+			_, err = time.Parse(DATE_TIME_FORMAT, fmt.Sprintf("%v", v))
 			if err != nil {
 				return err
 			}
