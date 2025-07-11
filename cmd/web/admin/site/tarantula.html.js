@@ -277,10 +277,9 @@ var Html = (function(){
         tem.push("Category/Properties");
         tem.push("</legend>");
         tem.push(_input({Name:"Name",Reference:"text"},"category"));
-        tem.push(_input({Name:"StartTime",Reference:"dateTime-local"},"category"));
-        tem.push(_selectEnum({Name:"Value",Reference:"enum"},"category"));
-        tem.push(_selectCategory({Name:"SkuList",Reference:"category"},"category"));
-        tem.push(_upload({Name:"Icon",Reference:"text"},"category"));
+        tem.push(_selectEnum({Name:"Type",Reference:"text"},"category"));
+        tem.push(_checkbox({Name:"Nullable",Reference:"text"},"category"));
+        tem.push(_checkbox({Name:"Downloadable",Reference:"text"},"category"));
         tem.push(_icon("cc","category","add","orange"));
         tem.push("<div class='w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4'>");
         tem.push("<ul id='tx-create-category-properties' class='w3-ul'>");
@@ -290,6 +289,9 @@ var Html = (function(){
         document.querySelector(containerId).innerHTML += tem.join("");
         _eventWithId("#cc-category-close",()=>{
             document.querySelector(containerId).style.display='none';
+        });
+         _eventWithId("#cc-category-add",()=>{
+            console.log("add property");
         }); 
          _eventWithId("#cc-Save",()=>{
             //let n = document.querySelector("#enum-Name").value;
