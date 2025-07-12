@@ -354,41 +354,43 @@ var Html = (function(){
             document.querySelector(containerId).style.display='none';
         });
          _eventWithId("#cc-category-add",()=>{
-            let cn = document.querySelector("#category-Name");
+            let cn = document.querySelector("#category-Name").value;
+            let nullable = document.querySelector("#category-Nullable").checked;
+            let downloadable = document.querySelector("#category-Downloadable").checked;
             let tp = data[_category.typeSelect.options[_category.typeSelect.selectedIndex].text];
             if( tp.type == "list" || tp.type =="set"){
                v = _category.referenceSelect.options[_category.referenceSelect.selectedIndex].getAttribute("value");
                let cat = data[v];
-               let item = cn.value+":"+tp.type+"&lt"+"category:"+cat.name+"&gt";
+               let item = cn+":"+tp.type+"&lt"+"category:"+cat.name+"&gt";
                let id = "c-entry"+_category.ix;
                _addItem(id,item);
                _category.ix++;
-               _category[id]=item;
+               _category[id]={Name:cn,Type:tp.type,Reference:tp.reference,Nullable:nullable,Downloadable:downloadable}
                return; 
             }
             if(tp.type== "enum"){
                v = _category.referenceSelect.options[_category.referenceSelect.selectedIndex].getAttribute("value");
                let cat = data[v];
-               let item = (cn.value+":"+tp.type+"&lt"+cat.name+"&gt");
+               let item = (cn+":"+tp.type+"&lt"+cat.name+"&gt");
                let id = "c-entry"+_category.ix;
                _addItem(id,item);
                _category.ix++;
-               _category[id]=item;
+               _category[id]={Name:cn,Type:tp.type,Reference:tp.reference,Nullable:nullable,Downloadable:downloadable}
                return;
             }
             if(tp.type =="category"){
-                let item = (cn.value+":category"+"&lt"+tp.name+"&gt");
+                let item = (cn+":category"+"&lt"+tp.name+"&gt");
                 let id = "c-entry"+_category.ix;
                _addItem(id,item);
                _category.ix++;
-               _category[id]=item;    
+               _category[id]={Name:cn,Type:tp.type,Reference:tp.reference,Nullable:nullable,Downloadable:downloadable}   
                 return;
             }
-            let  item = cn.value+":"+tp.type+"&lt"+tp.name+"&gt";
+            let  item = cn+":"+tp.type+"&lt"+tp.name+"&gt";
             let id = "c-entry"+_category.ix;
             _addItem(id,item);
             _category.ix++;
-            _category[id]=item;
+            _category[id]={Name:cn,Type:tp.type,Reference:tp.reference,Nullable:nullable,Downloadable:downloadable}
                 
         }); 
          _eventWithId("#cc-Save",()=>{
@@ -401,6 +403,13 @@ var Html = (function(){
     let _addItem = function(id,item){
         let li = "<li id='"+id+"'>"+item+"<scan class='w3-right category-entry-remove' "+"category-entry-id='"+id+"'><i class='material-symbols-outlined tx-red-icon-24'>remove</i></span></li>";
         _category.build.innerHTML += li;
+        document.querySelectorAll(".category-entry-remove").forEach(a=>{
+            a.onclick = ()=>{
+                let removeId = a.getAttribute("category-entry-id");
+                document.querySelector("#"+removeId).style.display="none";
+                delete _category[removeId];
+            };
+        });
     };
 
     return {
