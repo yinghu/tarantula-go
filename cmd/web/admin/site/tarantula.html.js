@@ -365,7 +365,7 @@ var Html = (function(){
                let id = "c-entry"+_category.ix;
                _addItem(id,item);
                _category.ix++;
-               _category[id]={Name:cn,Type:tp.type,Reference:tp.reference,Nullable:nullable,Downloadable:downloadable}
+               _category[id]={Name:cn,Type:tp.type,Reference:"category:"+cat.name,Nullable:nullable,Downloadable:downloadable}
                return; 
             }
             if(tp.type== "enum"){
@@ -375,7 +375,7 @@ var Html = (function(){
                let id = "c-entry"+_category.ix;
                _addItem(id,item);
                _category.ix++;
-               _category[id]={Name:cn,Type:tp.type,Reference:tp.reference,Nullable:nullable,Downloadable:downloadable}
+               _category[id]={Name:cn,Type:tp.type,Reference:cat.name,Nullable:nullable,Downloadable:downloadable}
                return;
             }
             if(tp.type =="category"){
@@ -383,7 +383,7 @@ var Html = (function(){
                 let id = "c-entry"+_category.ix;
                _addItem(id,item);
                _category.ix++;
-               _category[id]={Name:cn,Type:tp.type,Reference:tp.reference,Nullable:nullable,Downloadable:downloadable}   
+               _category[id]={Name:cn,Type:tp.type,Reference:tp.type+":"+tp.name,Nullable:nullable,Downloadable:downloadable}   
                 return;
             }
             let  item = cn+":"+tp.type+"&lt"+tp.name+"&gt";
