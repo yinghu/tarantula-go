@@ -290,7 +290,6 @@ var Html = (function(){
         tem.push(_input({Name:"Desctiption",Reference:"text"},prefix));
         tem.push(_input({Name:"Version",Reference:"text"},prefix));
         tem.push(_checkbox({Name:"Rechargeable"},prefix));
-        tem.push(_checkbox({Name:"Downloadable"},prefix));
         tem.push("</fieldset>");
         document.querySelector(containerId).innerHTML += tem.join("");
     }
@@ -337,10 +336,10 @@ var Html = (function(){
             }
             else{
                 let cat = data[ty];
-                if(cat.type == "enum"){
+                if(cat.Type == "enum"){
                     let ref =[];
-                    cat.value.forEach(v=>{
-                        ref.push("<option value='"+cat.name+"'>"+v.name+"</option>");
+                    cat.Values.forEach(v=>{
+                        ref.push("<option value='"+cat.Name+"'>"+v.Name+"</option>");
                     });
                     _category.referenceSelect.innerHTML = ref.join("");
                     _category.referenceSelectBox.style.display = "block";        
@@ -358,39 +357,39 @@ var Html = (function(){
             let nullable = document.querySelector("#category-Nullable").checked;
             let downloadable = document.querySelector("#category-Downloadable").checked;
             let tp = data[_category.typeSelect.options[_category.typeSelect.selectedIndex].text];
-            if( tp.type == "list" || tp.type =="set"){
+            if( tp.Type == "list" || tp.Type =="set"){
                v = _category.referenceSelect.options[_category.referenceSelect.selectedIndex].getAttribute("value");
                let cat = data[v];
-               let item = cn+":"+tp.type+"&lt"+"category:"+cat.name+"&gt";
+               let item = cn+":"+tp.Type+"&lt"+"category:"+cat.Name+"&gt";
                let id = "c-entry"+_category.ix;
                _addItem(id,item);
                _category.ix++;
-               _category[id]={Name:cn,Type:tp.type,Reference:"category:"+cat.name,Nullable:nullable,Downloadable:downloadable}
+               _category[id]={Name:cn,Type:tp.Type,Reference:"category:"+cat.Name,Nullable:nullable,Downloadable:downloadable}
                return; 
             }
-            if(tp.type== "enum"){
+            if(tp.Type== "enum"){
                v = _category.referenceSelect.options[_category.referenceSelect.selectedIndex].getAttribute("value");
                let cat = data[v];
-               let item = (cn+":"+tp.type+"&lt"+cat.name+"&gt");
+               let item = (cn+":"+tp.Type+"&lt"+cat.Name+"&gt");
                let id = "c-entry"+_category.ix;
                _addItem(id,item);
                _category.ix++;
-               _category[id]={Name:cn,Type:tp.type,Reference:cat.name,Nullable:nullable,Downloadable:downloadable}
+               _category[id]={Name:cn,Type:tp.Type,Reference:cat.Name,Nullable:nullable,Downloadable:downloadable}
                return;
             }
-            if(tp.type =="category"){
-                let item = (cn+":category"+"&lt"+tp.name+"&gt");
+            if(tp.Type =="category"){
+                let item = (cn+":category"+"&lt"+tp.Name+"&gt");
                 let id = "c-entry"+_category.ix;
                _addItem(id,item);
                _category.ix++;
-               _category[id]={Name:cn,Type:tp.type,Reference:tp.type+":"+tp.name,Nullable:nullable,Downloadable:downloadable}   
+               _category[id]={Name:cn,Type:tp.Type,Reference:tp.Type+":"+tp.Name,Nullable:nullable,Downloadable:downloadable}   
                 return;
             }
-            let  item = cn+":"+tp.type+"&lt"+tp.name+"&gt";
+            let  item = cn+":"+tp.Type+"&lt"+tp.Name+"&gt";
             let id = "c-entry"+_category.ix;
             _addItem(id,item);
             _category.ix++;
-            _category[id]={Name:cn,Type:tp.type,Reference:tp.reference,Nullable:nullable,Downloadable:downloadable}
+            _category[id]={Name:cn,Type:tp.Type,Reference:tp.Reference,Nullable:nullable,Downloadable:downloadable}
                 
         }); 
          _eventWithId("#cc-Save",()=>{
