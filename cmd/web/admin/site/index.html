@@ -40,9 +40,9 @@
                     <div class="w3-display-topright w3-padding">
                         <span id="tx-info-box-close"><i class="material-symbols-outlined tx-margin-left-8 tx-red-icon-24">close</i></span>
                     </div>
-                    <div id="tx-info-box-content" class="w3-display-middle w3-padding tx-text-14 w3-text-red"></div>
+                    <div id="tx-info-box-content" class="w3-display-middle w3-padding tx-text-12 w3-text-red"></div>
                 </div>
-                <div id="tx-job-list-box" class="w3-bar w3-border-bottom w3-border-teal" style="display: none"></div> 
+                <div id="tx-job-list-box" class="w3-bar w3-border-bottom w3-border-teal tx-margin-top-4" style="display: none"></div> 
                 <div id="tx-form-box" class="w3-container tx-margin-top-8" style="display: none"></div>
                 <div id="tx-category-list-box" class="w3-bar w3-border-bottom w3-border-teal tx-margin-top-8" style="display: none">
                      <span class="w3-bar-item w3-green w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4 tx-category-opt">HomingAgent</span>
@@ -111,6 +111,7 @@
                                 Html.openWithId("#tx-info-box");
                                 return;
                             }
+                            Html.registerTaskChangeListener(on_task_change);
                             on_login(resp);
                             Html.closeWithId("#tx-info-box");
                             Html.openWithId("#tx-logout");
@@ -150,6 +151,8 @@
                     console.log(valid);
                     Admin.postJson("/admin/saveenum",valid,resp=>{
                         console.log(resp);
+                        Html.messageWithId("#tx-info-box-content",resp.message);    
+                        Html.openWithId("#tx-info-box");
                     });
                 });
                 Html.openWithId("#tx-form-box");
@@ -158,16 +161,29 @@
             function create_new_category(){
                 Admin.getJson("/admin/webprotected/category.json",(resp)=>{
                     Html.categoryForm("#tx-form-box",resp,(data)=>{
+                        let valid ={Name:data.Name,Description:data.Description,Scope:data.Scope,Properties:[]};
                         for( let i=0;i<data.ix;i++){
                             if("c-entry"+i in data){
                                 let ev = data["c-entry"+i];
-                                console.log(ev);
-                                //valid.Values.push(ev);
+                                valid.Properties.push(ev);
                             }    
                         }
+                        console.log(valid);
+                        Admin.postJson("/admin/savecategory",valid,resp=>{
+                            console.log(resp);
+                            Html.messageWithId("#tx-info-box-content",resp.message);    
+                            Html.openWithId("#tx-info-box");
+                        });
                     });
                     Html.openWithId("#tx-form-box"); 
                 });   
+            }
+            function on_task_change(tn){
+                Admin.getJson("/admin/loadcategories/"+tn,resp=>{
+                    Html.categoryList("#tx-category-list-box","cc",resp,cid=>{
+                        console.log(cid)
+                    });    
+                });
             }
         </script>
     </body>

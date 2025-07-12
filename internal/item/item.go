@@ -5,7 +5,7 @@ import (
 )
 
 type Enum struct {
-	Id     int64       `json:"Id"`
+	Id     int64       `json:"Id,string"`
 	Name   string      `json:"Name"`
 	Values []EnumValue `json:"Values"`
 }
@@ -16,7 +16,7 @@ type EnumValue struct {
 }
 
 type Category struct {
-	Id           int64      `json:"Id"`
+	Id           int64      `json:"Id,string"`
 	Scope        string     `json:"Scope"`
 	Name         string     `json:"Name"`
 	Rechargeable bool       `json:"Rechargeable"`
@@ -33,7 +33,7 @@ type Property struct {
 }
 
 type Configuration struct {
-	Id          int64              `json:"ItemId"`
+	Id          int64              `json:"ItemId,string"`
 	Name        string             `json:"ConfigurationName"`
 	Type        string             `json:"ConfigurationType"`
 	TypeId      string             `json:"ConfigurationTypeId"`
@@ -49,6 +49,7 @@ type ItemService interface {
 	LoadEnum(cname string) (Enum, error)
 	SaveCategory(c Category) error
 	LoadCategory(cname string) (Category, error)
+	FromScope(scope string) []Category
 
 	Save(c Configuration) error
 	LoadWithName(cname string, limit int) ([]Configuration, error)

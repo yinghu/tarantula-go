@@ -35,6 +35,9 @@ func (s *AppManager) MemberLeft(left core.Node) {
 	go s.sendToApp("tournament", "left", left)
 }
 func (s *AppManager) Updated(key string, value string, opt core.Opt) {
+	if s.standalone {
+		return
+	}
 	core.AppLog.Printf("Key updated %s %s %v\n", key, value, opt)
 	go s.updateToApp("presence", "update", KVUpdate{Key: key, Value: value, Opt: opt})
 }

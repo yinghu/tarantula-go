@@ -9,6 +9,14 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+const (
+	INSERT_CATEGORY              string = "INSERT INTO item_category (id,name,scope,rechargeable,description) VALUES($1,$2,$3,$4,$5)"
+	INSERT_PROPERTY              string = "INSERT INTO item_category_property (category_id,name,type,reference,nullable,downloadable) VALUES($1,$2,$3,$4,$5,$6)"
+	SELECT_CATEGORY_WITH_NAME    string = "SELECT id,scope,rechargeable,description FROM item_category WHERE name = $1"
+	SELECT_PROPERTIES_WITH_CID   string = "SELECT name,type,reference,nullable,downloadable FROM item_category_property WHERE category_id = $1"
+	SELECT_CATEGORIES_WITH_SCOPE string = "SELECT id,name,rechargeable,description FROM item_category WHERE scope = $1"
+)
+
 func (db *ItemDB) SaveCategory(c item.Category) error {
 	return db.Sql.Txn(func(tx pgx.Tx) error {
 		r, err := tx.Exec(context.Background(), INSERT_CATEGORY, c.Id, c.Name, c.Scope, c.Rechargeable, c.Description)
@@ -64,6 +72,20 @@ func (db *ItemDB) LoadCategory(cname string) (item.Category, error) {
 		return cat, errors.New("no property existed")
 	}
 	return cat, nil
+}
+
+func (db *ItemDB) FromScope(scope string) []item.Category {
+	list := make([]item.Category, 0)
+	db.Sql.Query(func(row pgx.Rows) error {
+		var cat = item.Category{Scope: scope}
+		err := row.Scan(&cat.Id, &cat.Name, &cat.Rechargeable, &cat.Description)
+		if err != nil {
+			return err
+		}
+		list = append(list, cat)
+		return nil
+	}, SELECT_CATEGORIES_WITH_SCOPE, scope)
+	return list
 }
 
 func (db *ItemDB) ValidateCategory(c item.Category) error {

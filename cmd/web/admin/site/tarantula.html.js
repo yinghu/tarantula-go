@@ -3,7 +3,10 @@ var Html = (function(){
     let _tasks = {};
     let _enum ={};
     let _category ={};
-
+    let _task ={};
+    let _taskChanged = tn=>{
+        console.log("Task changed :"+tn);
+    };
     let _caption = function(word){
         return word[0].toUpperCase() + word.slice(1);
     };
@@ -212,7 +215,9 @@ var Html = (function(){
 
     let _jobList = function(containerId,prefix,tn,callback){
         let task = _tasks[tn];
+        _task.Name = tn;
         console.log(task);
+        _taskChanged(_task.Name);
         document.querySelector(containerId).innerHTML="";
         let tem=[];
         tem.push("<span class='w3-bar-item w3-left w3-teal w3-tag tx-text-24 tx-padding-button'><i class='material-symbols-outlined tx-orange-icon-24 tx-margin-top-8'>settings</i>");
@@ -232,6 +237,23 @@ var Html = (function(){
             };
         });
     };
+
+    let _categoryList = function(containerId,prefix,clist,callback){
+        document.querySelector(containerId).innerHTML = "";
+        let tem =[];
+        clist.forEach(c=>{
+            tem.push("<span tx-category-id='"+c.Id+"' ");
+            tem.push("class='w3-bar-item w3-green w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4 tx-"+prefix+"-opt'>");
+            tem.push(c.Name);
+            tem.push("</span>");    
+        });
+        document.querySelector(containerId).innerHTML = tem.join("");
+        document.querySelectorAll(".tx-"+prefix+"-opt").forEach(a=>{
+            a.onclick = ()=>{
+                callback(a.getAttribute("tx-category-id"));    
+            };
+        });
+    }
 
     let _enumForm = function(containerId,callback){
         document.querySelector(containerId).innerHTML="";
@@ -269,7 +291,6 @@ var Html = (function(){
                     let removeId = a.getAttribute("enum-entry-id");
                     document.querySelector("#"+removeId).style.display="none";
                     delete _enum[removeId];
-                    console.log(a.getAttribute("enum-entry-id"));
                 };            
             });
         });
@@ -287,8 +308,7 @@ var Html = (function(){
         tem.push("Category : Header");
         tem.push("</legend>");
         tem.push(_input({Name:"Name",Reference:"text"},prefix));
-        tem.push(_input({Name:"Desctiption",Reference:"text"},prefix));
-        tem.push(_input({Name:"Version",Reference:"text"},prefix));
+        tem.push(_input({Name:"Description",Reference:"text"},prefix));
         tem.push(_checkbox({Name:"Rechargeable"},prefix));
         tem.push("</fieldset>");
         document.querySelector(containerId).innerHTML += tem.join("");
@@ -393,8 +413,13 @@ var Html = (function(){
                 
         }); 
          _eventWithId("#cc-Save",()=>{
-            //let n = document.querySelector("#enum-Name").value;
-            //_enum.Name = n;
+            let nm = document.querySelector("#cc-header-Name").value;
+            let des = document.querySelector("#cc-header-Description").value;
+            let rc = document.querySelector("#cc-header-Rechargeable").checked;
+            _category.Name = nm;
+            _category.Description = des;
+            _category.Rechargeable = rc;
+            _category.Scope = _task.Name;
             callback(_category);
         });      
     };
@@ -411,7 +436,12 @@ var Html = (function(){
         });
     };
 
+    let _registerTaskChangeListener = function(listener){
+        _taskChanged = listener;
+    }
+
     return {
+        registerTaskChangeListener : _registerTaskChangeListener,
         messageWithId : _messageWithId,
         openWithId : _openWithId,
         closeWithId : _closeWithId,
@@ -419,6 +449,7 @@ var Html = (function(){
         form : _form,
         taskList : _taskList,
         jobList : _jobList,
+        categoryList : _categoryList,
         enumForm : _enumForm,
         categoryForm : _categoryForm,
     };
