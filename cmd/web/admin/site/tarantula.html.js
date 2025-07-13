@@ -25,7 +25,10 @@ var Html = (function(){
     };
     let _registerTaskChangeListener = function(listener){
         _taskChanged = listener;
-    }
+    };
+    let _typeList = function(tlist){
+        _category ={ix:0,types:tlist.Types,headers:tlist.Headers};
+    };
     let _taskList = function(conf,tbar,callback){
         console.log(tbar);
         document.querySelector(conf.id).innerHTML="";
@@ -92,7 +95,7 @@ var Html = (function(){
                 callback(a.getAttribute("tx-category-id"));    
             };
         });
-    }
+    };
     let _enumForm = function(conf,callback){
         document.querySelector(conf.id).innerHTML="";
         _enum ={ix:0};
@@ -290,7 +293,7 @@ var Html = (function(){
         document.querySelector(conf.id).innerHTML += tem.join("");
         if(conf.closeable){
             _eventWithId("#"+conf.prefix+"-"+category.Name+"-close",()=>{
-                document.querySelector(containerId).style.display='none';
+                document.querySelector(conf.id).style.display='none';
             });
         }
         _eventWithId("#"+conf.prefix+"-"+category.Name,()=>{
@@ -301,18 +304,6 @@ var Html = (function(){
             callback(data);
         });
     };
-
-    let _instanceHeader = function(conf,header){
-        let tem=[];
-        tem.push("<fieldset>");
-        tem.push("<legend class='tx-text-20'>");
-        tem.push("Category : Header");
-        tem.push("</legend>");
-        tem.push(_input({Name:"Name",Reference:"text"},conf.prefix));
-        tem.push(_input({Name:"Description",Reference:"text"},conf.prefix));
-        tem.push("</fieldset>");
-        document.querySelector(conf.id).innerHTML += tem.join("");
-    }
 
     let _categoryHeader = function(containerId, prefix){
         let tem=[];
@@ -327,20 +318,20 @@ var Html = (function(){
         document.querySelector(containerId).innerHTML += tem.join("");
     }
 
-    let _categoryForm = function(containerId,data,callback){
-        document.querySelector(containerId).innerHTML="";
-        _category ={ix:0,types:data};
+    let _categoryForm = function(conf,data,callback){
+        document.querySelector(conf.id).innerHTML="";
+        _category ={ix:0,types:data.Types,headers:data.Headers};
         let tem=[];
         tem.push(_icon("cc","category","close","red"));
-        document.querySelector(containerId).innerHTML += tem.join("");
-        _categoryHeader(containerId,"cc-header");
+        document.querySelector(conf.id).innerHTML += tem.join("");
+        _categoryHeader(conf.id,"cc-header");
         tem = [];
         tem.push("<fieldset>");
         tem.push("<legend class='tx-text-20'>");
         tem.push("Category : Properties");
         tem.push("</legend>");
         tem.push(_input({Name:"Name",Reference:"text"},"category"));
-        tem.push(_selectType({Name:"Type",Reference:"text"},"category",data));
+        tem.push(_selectType({Name:"Type",Reference:"text"},"category",data.Types));
         tem.push(_checkbox({Name:"Nullable",Reference:"text"},"category"));
         tem.push(_checkbox({Name:"Downloadable",Reference:"text"},"category"));
         tem.push(_selectReference({Name:"Reference",Reference:"text"},"category"));
@@ -350,7 +341,7 @@ var Html = (function(){
         tem.push("</ul></div>");
         tem.push(_button("Save","cc",callback));
         tem.push("</fieldset>");
-        document.querySelector(containerId).innerHTML += tem.join("");
+        document.querySelector(conf.id).innerHTML += tem.join("");
         _category.typeSelect = document.querySelector("#category-Type");
         _category.referenceSelectBox = document.querySelector("#category-Reference-box");
         _category.referenceSelectBox.style.display = "none";
@@ -361,14 +352,14 @@ var Html = (function(){
             let ty = _category.typeSelect.options[_category.typeSelect.selectedIndex].text;
             if (ty=="List" || ty=="Set"){
                 let ref =[];
-                for(const k of Object.keys(data)){
+                for(const k of Object.keys(data.Types)){
                     ref.push("<option value='"+k+"'>"+k+"</option>");
                 }
                 _category.referenceSelect.innerHTML = ref.join("");
                 _category.referenceSelectBox.style.display = "block";
             }
             else{
-                let cat = data[ty];
+                let cat = data.Types[ty];
                 if(cat.Type == "enum"){
                     let ref =[];
                     cat.Values.forEach(v=>{
@@ -383,16 +374,16 @@ var Html = (function(){
             console.log(_category.referenceSelect.options[_category.referenceSelect.selectedIndex].getAttribute("value"));
         };
         _eventWithId("#cc-category-close",()=>{
-            document.querySelector(containerId).style.display='none';
+            document.querySelector(conf.id).style.display='none';
         });
          _eventWithId("#cc-category-add",()=>{
             let cn = document.querySelector("#category-Name").value;
             let nullable = document.querySelector("#category-Nullable").checked;
             let downloadable = document.querySelector("#category-Downloadable").checked;
-            let tp = data[_category.typeSelect.options[_category.typeSelect.selectedIndex].text];
+            let tp = data.Types[_category.typeSelect.options[_category.typeSelect.selectedIndex].text];
             if( tp.Type == "list" || tp.Type =="set"){
                v = _category.referenceSelect.options[_category.referenceSelect.selectedIndex].getAttribute("value");
-               let cat = data[v];
+               let cat = data.Types[v];
                let item = cn+":"+tp.Type+"&lt"+"category:"+cat.Name+"&gt";
                let id = "c-entry"+_category.ix;
                _addItem(id,item);
@@ -402,7 +393,7 @@ var Html = (function(){
             }
             if(tp.Type== "enum"){
                v = _category.referenceSelect.options[_category.referenceSelect.selectedIndex].getAttribute("value");
-               let cat = data[v];
+               let cat = data.Types[v];
                let item = (cn+":"+tp.Type+"&lt"+cat.Name+"&gt");
                let id = "c-entry"+_category.ix;
                _addItem(id,item);
@@ -449,9 +440,42 @@ var Html = (function(){
         });
     };
 
+    let _instanceHeader = function(conf,header){
+        let tem=[];
+        tem.push("<fieldset>");
+        tem.push("<legend class='tx-text-20'>");
+        tem.push(conf.category+" : Header");
+        tem.push("</legend>");
+        header.Properties.forEach(c=>{
+            tem.push(_input(c,conf.prefix));
+        });
+        tem.push("</fieldset>");
+        document.querySelector(conf.id).innerHTML += tem.join("");
+    }
     
-    let _instanceForm = function(){
-
+    let _instanceForm = function(conf,data,callback){
+        document.querySelector(conf.id).innerHTML="";
+        let tem=[];
+        tem.push(_icon("ins","category","close","red"));
+        document.querySelector(conf.id).innerHTML += tem.join("");
+        _instanceHeader({id:conf.id,prefix:"ins-header",category:data.Name},_category.headers[data.Scope]);
+        tem = [];
+        tem.push("<fieldset>");
+        tem.push("<legend class='tx-text-20'>");
+        tem.push(data.Name+" : Properties");
+        tem.push("</legend>");
+        data.Properties.forEach(p=>{
+            tem.push(_input(p,conf.prefix));
+        })
+        tem.push(_button("Save","ins",callback));
+        tem.push("</fieldset>");
+        document.querySelector(conf.id).innerHTML += tem.join("");
+        _eventWithId("#ins-category-close",()=>{
+            document.querySelector(conf.id).style.display='none';
+        });
+        _eventWithId("#ins-Save",()=>{
+            callback({});
+        });
     }
 
     return {
@@ -463,6 +487,7 @@ var Html = (function(){
         form : _form,
         taskList : _taskList,
         jobList : _jobList,
+        typeList : _typeList,
         categoryList : _categoryList,
         enumForm : _enumForm,
         categoryForm : _categoryForm,

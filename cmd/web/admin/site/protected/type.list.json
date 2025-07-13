@@ -1,0 +1,186 @@
+{
+  "Types":
+  {
+    "String" : {"Type": "string","Name": "String","Reference": "text"},
+    "Integer" : {"Type": "int","Name": "Integer","Reference": "number"},
+    "Double" : {"Type": "float64","Name": "Double","Reference": "number"},
+    "Long" : {"Type": "int64","Name": "Long","Reference": "number"},
+    "Float": {"Type": "float32","Name": "Float","Reference": "number"},
+    "Boolean" : {"Type": "boolean","Name": "Boolean","Reference": "checkbox"},
+    "DateTime" : {"Type": "dateTime","Name": "DateTime","Reference": "dateTime-local"},
+    "Password" : {"Type": "string","Name": "Password","Reference": "password"},
+    "Email" : {"Type": "string","Name": "Email","Reference": "email"},
+    "Editor" : {"Type": "editor","Name": "Editor","Reference": "textarea"},
+    "List" : {"Type": "list","Name": "List"},
+    "Set" : {"Type": "set","Name": "Set"},
+    "PlayMode" : {"Type": "enum","Name": "PlayMode","Values": [{"Name": "PVE","Value": 0},{"Name": "PVP","Value": 1},{"Name": "TVE","Value": 2},{"Name": "TVT","Value": 3}]},
+    "Environment" : {"Type": "enum","Name": "Environment","Values": [{"Name":"Development","Value":0},{"Name":"Staging","Value":1},{"Name":"Production","Value":2},{"Name":"QA","Value":3}]},
+    "Schedule" : {"Type": "enum","Name": "Schedule","Values": [{"Name":"Daily","Value":0},{"Name":"Weekly","Value":1},{"Name":"Monthly","Value":2},{"Name":"OnDemand","Value":3}]},
+    "ItemType": {"Type": "enum","Name": "ItemType","Values": [{"Name":"HardCurrency","Value":0},{"Name":"SoftCurrency","Value":1},{"Name":"Bundle","Value":2}]},
+    "PurchaseType" : {"Type": "enum","Name": "PurchaseType","Values": [{"Name":"HardCurrency","Value":0},{"Name":"SoftCurrency","Value":1},{"Name":"IAP","Value":2}]},
+    "VirtualCurrency" : {"Type": "enum","Name": "VirtualCurrency","Values": [{"Name":"Gold","Value":0},{"Name":"Gem","Value":1},{"Name":"Coin","Value":2},{"Name":"Chip","Value":3},{"Name":"None","Value":4}]},
+    "DisplayCard":{"Type":"category","Name":"DisplayCard"}
+ },
+ "Headers":{
+    "Asset":{
+      "Properties":[
+        {
+            "Name": "ConfigurationName",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "ConfigurationType",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "ConfigurationTypeId",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "ConfigurationVersion",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        }
+      ]
+    },
+    "Component":{
+      "Properties":[
+        {
+            "Name": "ConfigurationName",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "ConfigurationType",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "ConfigurationTypeId",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "ConfigurationVersion",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        }
+      ]       
+    },
+    "Commodity":{
+      "Properties":[
+        {
+            "Name": "ConfigurationName",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "ConfigurationType",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "ConfigurationTypeId",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "ConfigurationVersion",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        }
+      ]
+    },
+    "Item":{
+      "Properties":[
+        {
+            "Name": "ConfigurationName",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "ConfigurationType",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "ConfigurationTypeId",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "ConfigurationVersion",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        }
+      ]
+    },
+    "Application":{
+      "Properties":[
+        {
+            "Name": "ConfigurationName",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "ConfigurationType",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "ConfigurationTypeId",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        },
+        {
+            "Name": "ConfigurationVersion",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false,
+            "Downloadable": false
+        }
+      ]
+    }   
+  }
+}

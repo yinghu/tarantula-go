@@ -103,7 +103,7 @@
             function on_login(auth){
                 after_login(true);
                 Admin.login(auth);
-                Admin.getJson("/admin/webprotected/task.bar.json",(resp)=>{
+                Admin.getJson("/admin/webprotected/task.list.json",(resp)=>{
                     Html.taskList({id:"#tx-task-list",prefix:"task"},resp,(a)=>{
                         Html.jobList({id:"#tx-job-list-box",prefix:"job"},a,(b)=>{
                             eval(b+"()");
@@ -112,6 +112,9 @@
                     Html.jobList({id:"#tx-job-list-box",prefix:"job"},"Asset",(b)=>{
                         eval(b+"()");
                     });
+                });
+                Admin.getJson("/admin/webprotected/type.list.json",(resp)=>{
+                    Html.typeList(resp);    
                 });
             }
 
@@ -135,8 +138,8 @@
             }
 
             function create_new_category(){
-                Admin.getJson("/admin/webprotected/category.json",(resp)=>{
-                    Html.categoryForm("#tx-form-box",resp,(data)=>{
+                Admin.getJson("/admin/webprotected/type.list.json",(resp)=>{
+                    Html.categoryForm({id:"#tx-form-box"},resp,(data)=>{
                         let valid ={Name:data.Name,Description:data.Description,Scope:data.Scope,Properties:[]};
                         for( let i=0;i<data.ix;i++){
                             if("c-entry"+i in data){
@@ -173,9 +176,9 @@
             function load_category(cid){
                 Admin.getJson("/admin/loadcategory/"+cid+"/n",resp=>{
                     console.log(resp);
-                    //Html.form("#tx-form-box","category",resp,true,data=>{
-                        //console.log(data);
-                    //});
+                    Html.instanceForm({id:"#tx-form-box",prefix:"category",closeable:true},resp,data=>{
+                        console.log(data);
+                    });
                     Html.openWithId("#tx-form-box");
                 });
             }
