@@ -2,7 +2,6 @@
     "Scope": "admin",
     "Name": "Login",
     "Description": "login form",
-    "Rechargeable": false,
     "Properties":[
         {
             "Name": "login",

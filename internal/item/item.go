@@ -49,6 +49,7 @@ type ItemService interface {
 	LoadEnum(cname string) (Enum, error)
 	SaveCategory(c Category) error
 	LoadCategory(cname string) (Category, error)
+	LoadCategoryWithId(cid int64) (Category, error)
 	FromScope(scope string) []Category
 
 	Save(c Configuration) error

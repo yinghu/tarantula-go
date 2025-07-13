@@ -13,6 +13,7 @@ const (
 	INSERT_CATEGORY              string = "INSERT INTO item_category (id,name,scope,rechargeable,description) VALUES($1,$2,$3,$4,$5)"
 	INSERT_PROPERTY              string = "INSERT INTO item_category_property (category_id,name,type,reference,nullable,downloadable) VALUES($1,$2,$3,$4,$5,$6)"
 	SELECT_CATEGORY_WITH_NAME    string = "SELECT id,scope,rechargeable,description FROM item_category WHERE name = $1"
+	SELECT_CATEGORY_WITH_ID      string = "SELECT name,scope,rechargeable,description FROM item_category WHERE id = $1"
 	SELECT_PROPERTIES_WITH_CID   string = "SELECT name,type,reference,nullable,downloadable FROM item_category_property WHERE category_id = $1"
 	SELECT_CATEGORIES_WITH_SCOPE string = "SELECT id,name,rechargeable,description FROM item_category WHERE scope = $1"
 )
@@ -41,6 +42,37 @@ func (db *ItemDB) SaveCategory(c item.Category) error {
 		}
 		return nil
 	})
+}
+
+func (db *ItemDB) LoadCategoryWithId(cid int64) (item.Category, error) {
+	cat := item.Category{Id: cid}
+	err := db.Sql.Query(func(row pgx.Rows) error {
+		err := row.Scan(&cat.Name, &cat.Scope, &cat.Rechargeable, &cat.Description)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, SELECT_CATEGORY_WITH_ID, cid)
+	if err != nil {
+		return cat, err
+	}
+	if cat.Name == "" {
+		return cat, errors.New("category not existed")
+	}
+	cat.Properties = make([]item.Property, 0)
+	err = db.Sql.Query(func(row pgx.Rows) error {
+		var prop item.Property
+		err := row.Scan(&prop.Name, &prop.Type, &prop.Reference, &prop.Nullable, &prop.Downloadable)
+		if err != nil {
+			return err
+		}
+		cat.Properties = append(cat.Properties, prop)
+		return nil
+	}, SELECT_PROPERTIES_WITH_CID, cat.Id)
+	if err != nil {
+		return cat, errors.New("no property existed")
+	}
+	return cat, nil
 }
 
 func (db *ItemDB) LoadCategory(cname string) (item.Category, error) {

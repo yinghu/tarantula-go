@@ -37,7 +37,7 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	http.Handle("/admin/web/{name}", bootstrap.Logging(&AdminWebIndex{AdminService: s}))
 	http.Handle("/admin/loadenum/{name}", bootstrap.Logging(&AdminLoadEnum{AdminService: s}))
 	http.Handle("/admin/saveenum", bootstrap.Logging(&AdminSaveEnum{AdminService: s}))
-	http.Handle("/admin/loadcategory/{name}", bootstrap.Logging(&AdminLoadCategory{AdminService: s}))
+	http.Handle("/admin/loadcategory/{id}/{name}", bootstrap.Logging(&AdminLoadCategory{AdminService: s}))
 	http.Handle("/admin/loadcategories/{scope}", bootstrap.Logging(&AdminLoadCategories{AdminService: s}))
 	http.Handle("/admin/savecategory", bootstrap.Logging(&AdminSaveCategory{AdminService: s}))
 	http.Handle("/admin/loadconfig/{id}", bootstrap.Logging(&AdminLoadConfig{AdminService: s}))

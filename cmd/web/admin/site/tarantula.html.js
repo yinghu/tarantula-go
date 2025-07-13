@@ -4,6 +4,7 @@ var Html = (function(){
     let _enum ={};
     let _category ={};
     let _task ={};
+    
     let _taskChanged = tn=>{
         console.log("Task changed :"+tn);
     };
@@ -22,6 +23,123 @@ var Html = (function(){
     let _eventWithId = function(id,callback){
         document.querySelector(id).onclick = callback 
     };
+    let _registerTaskChangeListener = function(listener){
+        _taskChanged = listener;
+    }
+    let _taskList = function(conf,tbar,callback){
+        console.log(tbar);
+        document.querySelector(conf.id).innerHTML="";
+        let tem=[];
+        tbar.Tasks.forEach(task=>{
+            _tasks[task.Name]=task;
+            tem.push("<div tx-task-name='");
+            tem.push(task.Name+"' ")  
+            tem.push("class='w3-display-container  w3-border-bottom w3-border-red tx-content-48 ");
+            tem.push("tx-"+conf.prefix+"-action'>");
+            tem.push("<div class='w3-display-bottomright w3-padding'>");
+            tem.push("<span><i class='material-symbols-outlined tx-margin-left-8 tx-orange-icon-24'>double_arrow</i></span>");
+            tem.push("</div>");
+            tem.push("<div class='w3-display-bottomleft w3-padding'>");
+            tem.push("<span class='tx-margin-left-8 tx-text-24'>");
+            tem.push(task.Name);
+            tem.push("</span>");
+            tem.push("</div>");
+            tem.push("</div>");
+        });
+        document.querySelector(conf.id).innerHTML = tem.join("");
+        document.querySelectorAll(".tx-"+conf.prefix+"-action").forEach(a=>{
+            a.onclick = ()=>{
+                callback(a.getAttribute("tx-task-name"));    
+            };
+        });
+    };
+    let _jobList = function(conf,tn,callback){
+        let task = _tasks[tn];
+        _task.Name = tn;
+        console.log(task);
+        _taskChanged(_task.Name);
+        document.querySelector(conf.id).innerHTML="";
+        let tem=[];
+        tem.push("<span class='w3-bar-item w3-left w3-teal w3-tag tx-text-24 tx-padding-button'><i class='material-symbols-outlined tx-orange-icon-24 tx-margin-top-8'>settings</i>");
+        tem.push(" "+task.Name);
+        tem.push("</span>");
+        task.Jobs.forEach(job=>{
+            tem.push("<span tx-job-name='");
+            tem.push(job.Callback+"' ");
+            tem.push("class='w3-bar-item w3-right w3-green w3-tag tx-text-24 tx-padding-button tx-margin-left-4 ");
+            tem.push("tx-"+conf.prefix+"-action")
+            tem.push("'>"+job.Name+"</span>");
+        });
+        document.querySelector(conf.id).innerHTML = tem.join("");
+        document.querySelectorAll(".tx-"+conf.prefix+"-action").forEach(a=>{
+            a.onclick = ()=>{
+                callback(a.getAttribute("tx-job-name"));    
+            };
+        });
+    };
+     let _categoryList = function(conf,clist,callback){
+        document.querySelector(conf.id).innerHTML = "";
+        let tem =[];
+        clist.forEach(c=>{
+            tem.push("<span tx-category-id='"+c.Id+"' ");
+            tem.push("class='w3-bar-item w3-green w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4 tx-"+conf.prefix+"-opt'>");
+            tem.push(c.Name);
+            tem.push("</span>");    
+        });
+        document.querySelector(conf.id).innerHTML = tem.join("");
+        document.querySelectorAll(".tx-"+conf.prefix+"-opt").forEach(a=>{
+            a.onclick = ()=>{
+                callback(a.getAttribute("tx-category-id"));    
+            };
+        });
+    }
+    let _enumForm = function(conf,callback){
+        document.querySelector(conf.id).innerHTML="";
+        _enum ={ix:0};
+        let tem=[];
+        tem.push("<fieldset>");
+        tem.push("<legend class='tx-text-20'>");
+        tem.push("Enum");
+        tem.push("</legend>");
+        tem.push(_icon("ee","enum","close","red"));
+        tem.push(_input({Name:"Name",Reference:"text"},"enum"));
+        tem.push(_input({Name:"Entry",Reference:"text"},"enum"));
+        tem.push(_input({Name:"Value",Reference:"number"},"enum"));
+        tem.push(_icon("ee","enum","add","orange"));
+        tem.push("<div class='w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4'>");
+        tem.push("<ul id='create-enum-properties' class='w3-ul'>");
+        tem.push("</ul></div>");
+        tem.push(_button("Save","ee",callback));
+        tem.push("</fieldset>");
+        document.querySelector(conf.id).innerHTML += tem.join("");
+        _eventWithId("#ee-enum-close",()=>{
+            document.querySelector(conf.id).style.display='none';
+        });
+        _eventWithId("#ee-enum-add",()=>{
+            let id = "entry"+_enum.ix;
+            _enum.ix++;
+            let e = document.querySelector("#enum-Entry").value;
+            let v = document.querySelector("#enum-Value").value/1;
+            let prop = e+" : "+v; 
+            let li = "<li id='"+id+"'>"+prop+"<scan class='w3-right enum-entry-remove' "+"enum-entry-id='"+id+"'><i class='material-symbols-outlined tx-red-icon-24'>remove</i></span></li>";
+            document.querySelector("#create-enum-properties").innerHTML += li;
+            _enum[id]={Name:e,Value:v};
+            document.querySelectorAll(".enum-entry-remove").forEach(a=>{
+                a.onclick = ()=>{
+                    let removeId = a.getAttribute("enum-entry-id");
+                    document.querySelector("#"+removeId).style.display="none";
+                    delete _enum[removeId];
+                };            
+            });
+        });
+        _eventWithId("#ee-Save",()=>{
+            let n = document.querySelector("#enum-Name").value;
+            _enum.Name = n;
+            callback(_enum);
+        });       
+    };
+    //END
+
     let _input = function(prop,prefix){
         let tem=[];
         tem.push("<div class='w3-panel'>");
@@ -154,152 +272,47 @@ var Html = (function(){
         return tem.join("");
     }
 
-    let _form = function(containerId,prefix,category,closeable,callback){
-        console.log(category);
-        document.querySelector(containerId).innerHTML="";
+    let _form = function(conf,category,callback){
+        document.querySelector(conf.id).innerHTML="";
         let tem=[];
         tem.push("<fieldset>");
         tem.push("<legend class='tx-text-20'>");
         tem.push(category.Scope.toUpperCase()+"/"+category.Description.toUpperCase());
         tem.push("</legend>");
-        if(closeable){
-            tem.push(_icon(prefix,category.Name,"close","red"));
+        if(conf.closeable){
+            tem.push(_icon(conf.prefix,category.Name,"close","red"));
         }
         category.Properties.forEach(prop=>{
-            tem.push(_input(prop,prefix));    
+            tem.push(_input(prop,conf.prefix));    
         });
-        tem.push(_button(category.Name,prefix,callback));
+        tem.push(_button(category.Name,conf.prefix,callback));
         tem.push("</fieldset>");
-        document.querySelector(containerId).innerHTML += tem.join("");
-        if(closeable){
-            _eventWithId("#"+prefix+"-"+category.Name+"-close",()=>{
+        document.querySelector(conf.id).innerHTML += tem.join("");
+        if(conf.closeable){
+            _eventWithId("#"+conf.prefix+"-"+category.Name+"-close",()=>{
                 document.querySelector(containerId).style.display='none';
             });
         }
-        _eventWithId("#"+prefix+"-"+category.Name,()=>{
+        _eventWithId("#"+conf.prefix+"-"+category.Name,()=>{
             let data ={};
             category.Properties.forEach(p=>{
-                data[p.Name] = document.querySelector("#"+prefix+"-"+p.Name).value;
+                data[p.Name] = document.querySelector("#"+conf.prefix+"-"+p.Name).value;
             });
             callback(data);
         });
     };
 
-    let _taskList = function(containerId,prefix,tbar,callback){
-        console.log(tbar);
-        document.querySelector(containerId).innerHTML="";
-        let tem=[];
-        tbar.Tasks.forEach(task=>{
-            _tasks[task.Name]=task;
-            tem.push("<div tx-task-name='");
-            tem.push(task.Name+"' ")  
-            tem.push("class='w3-display-container  w3-border-bottom w3-border-red tx-content-48 ");
-            tem.push("tx-"+prefix+"-action'>");
-            tem.push("<div class='w3-display-bottomright w3-padding'>");
-            tem.push("<span><i class='material-symbols-outlined tx-margin-left-8 tx-orange-icon-24'>double_arrow</i></span>");
-            tem.push("</div>");
-            tem.push("<div class='w3-display-bottomleft w3-padding'>");
-            tem.push("<span class='tx-margin-left-8 tx-text-24'>");
-            tem.push(task.Name);
-            tem.push("</span>");
-            tem.push("</div>");
-            tem.push("</div>");
-        });
-        document.querySelector(containerId).innerHTML = tem.join("");
-        document.querySelectorAll(".tx-"+prefix+"-action").forEach(a=>{
-            a.onclick = ()=>{
-                callback(a.getAttribute("tx-task-name"));    
-            };
-        });
-    };
-
-    let _jobList = function(containerId,prefix,tn,callback){
-        let task = _tasks[tn];
-        _task.Name = tn;
-        console.log(task);
-        _taskChanged(_task.Name);
-        document.querySelector(containerId).innerHTML="";
-        let tem=[];
-        tem.push("<span class='w3-bar-item w3-left w3-teal w3-tag tx-text-24 tx-padding-button'><i class='material-symbols-outlined tx-orange-icon-24 tx-margin-top-8'>settings</i>");
-        tem.push(" "+task.Name);
-        tem.push("</span>");
-        task.Jobs.forEach(job=>{
-            tem.push("<span tx-job-name='");
-            tem.push(job.Callback+"' ");
-            tem.push("class='w3-bar-item w3-right w3-green w3-tag tx-text-24 tx-padding-button tx-margin-left-4 ");
-            tem.push("tx-"+prefix+"-action")
-            tem.push("'>"+job.Name+"</span>");
-        });
-        document.querySelector(containerId).innerHTML = tem.join("");
-        document.querySelectorAll(".tx-"+prefix+"-action").forEach(a=>{
-            a.onclick = ()=>{
-                callback(a.getAttribute("tx-job-name"));    
-            };
-        });
-    };
-
-    let _categoryList = function(containerId,prefix,clist,callback){
-        document.querySelector(containerId).innerHTML = "";
-        let tem =[];
-        clist.forEach(c=>{
-            tem.push("<span tx-category-id='"+c.Id+"' ");
-            tem.push("class='w3-bar-item w3-green w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4 tx-"+prefix+"-opt'>");
-            tem.push(c.Name);
-            tem.push("</span>");    
-        });
-        document.querySelector(containerId).innerHTML = tem.join("");
-        document.querySelectorAll(".tx-"+prefix+"-opt").forEach(a=>{
-            a.onclick = ()=>{
-                callback(a.getAttribute("tx-category-id"));    
-            };
-        });
-    }
-
-    let _enumForm = function(containerId,callback){
-        document.querySelector(containerId).innerHTML="";
-        _enum ={ix:0};
+    let _instanceHeader = function(conf,header){
         let tem=[];
         tem.push("<fieldset>");
         tem.push("<legend class='tx-text-20'>");
-        tem.push("Enum");
+        tem.push("Category : Header");
         tem.push("</legend>");
-        tem.push(_icon("ee","enum","close","red"));
-        tem.push(_input({Name:"Name",Reference:"text"},"enum"));
-        tem.push(_input({Name:"Entry",Reference:"text"},"enum"));
-        tem.push(_input({Name:"Value",Reference:"number"},"enum"));
-        tem.push(_icon("ee","enum","add","orange"));
-        tem.push("<div class='w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4'>");
-        tem.push("<ul id='create-enum-properties' class='w3-ul'>");
-        tem.push("</ul></div>");
-        tem.push(_button("Save","ee",callback));
+        tem.push(_input({Name:"Name",Reference:"text"},conf.prefix));
+        tem.push(_input({Name:"Description",Reference:"text"},conf.prefix));
         tem.push("</fieldset>");
-        document.querySelector(containerId).innerHTML += tem.join("");
-        _eventWithId("#ee-enum-close",()=>{
-            document.querySelector(containerId).style.display='none';
-        });
-        _eventWithId("#ee-enum-add",()=>{
-            let id = "entry"+_enum.ix;
-            _enum.ix++;
-            let e = document.querySelector("#enum-Entry").value;
-            let v = document.querySelector("#enum-Value").value/1;
-            let prop = e+" : "+v; 
-            let li = "<li id='"+id+"'>"+prop+"<scan class='w3-right enum-entry-remove' "+"enum-entry-id='"+id+"'><i class='material-symbols-outlined tx-red-icon-24'>remove</i></span></li>";
-            document.querySelector("#create-enum-properties").innerHTML += li;
-            _enum[id]={Name:e,Value:v};
-            document.querySelectorAll(".enum-entry-remove").forEach(a=>{
-                a.onclick = ()=>{
-                    let removeId = a.getAttribute("enum-entry-id");
-                    document.querySelector("#"+removeId).style.display="none";
-                    delete _enum[removeId];
-                };            
-            });
-        });
-        _eventWithId("#ee-Save",()=>{
-            let n = document.querySelector("#enum-Name").value;
-            _enum.Name = n;
-            callback(_enum);
-        });       
-    };
+        document.querySelector(conf.id).innerHTML += tem.join("");
+    }
 
     let _categoryHeader = function(containerId, prefix){
         let tem=[];
@@ -436,8 +449,9 @@ var Html = (function(){
         });
     };
 
-    let _registerTaskChangeListener = function(listener){
-        _taskChanged = listener;
+    
+    let _instanceForm = function(){
+
     }
 
     return {
@@ -452,5 +466,6 @@ var Html = (function(){
         categoryList : _categoryList,
         enumForm : _enumForm,
         categoryForm : _categoryForm,
+        instanceForm : _instanceForm,
     };
 })();

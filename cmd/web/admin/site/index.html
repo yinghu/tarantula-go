@@ -76,7 +76,8 @@
             function on_logout(){
                 after_login(false);
                 Admin.getJson("/admin/web/login.json",resp=>{
-                    Html.form("#tx-form-box","login",resp,false,(data)=>{
+                    let conf ={id:"#tx-form-box",prefix:"login",closeable:false};
+                    Html.form(conf,resp,(data)=>{
                         console.log(data);
                         Admin.postJson("/admin/login",data,(resp)=>{
                             console.log(resp)
@@ -103,19 +104,19 @@
                 after_login(true);
                 Admin.login(auth);
                 Admin.getJson("/admin/webprotected/task.bar.json",(resp)=>{
-                    Html.taskList("#tx-task-list","task",resp,(a)=>{
-                        Html.jobList("#tx-job-list-box","job",a,(b)=>{
+                    Html.taskList({id:"#tx-task-list",prefix:"task"},resp,(a)=>{
+                        Html.jobList({id:"#tx-job-list-box",prefix:"job"},a,(b)=>{
                             eval(b+"()");
                         });        
                     });
-                    Html.jobList("#tx-job-list-box","job","Asset",(b)=>{
+                    Html.jobList({id:"#tx-job-list-box",prefix:"job"},"Asset",(b)=>{
                         eval(b+"()");
                     });
                 });
             }
 
             function create_new_enum(){
-                Html.enumForm("#tx-form-box",(data)=>{
+                Html.enumForm({id:"#tx-form-box"},(data)=>{
                     let valid = {Name:data.Name,Values:[]};
                     for( let i=0;i<data.ix;i++){
                         if("entry"+i in data){
@@ -155,8 +156,8 @@
             }
             function on_task_change(tn){
                 Admin.getJson("/admin/loadcategories/"+tn,resp=>{
-                    Html.categoryList("#tx-category-list-box","cc",resp,cid=>{
-                        console.log(cid)
+                    Html.categoryList({id:"#tx-category-list-box",prefix:"cc"},resp,cid=>{
+                        load_category(cid);
                     });    
                 });
             }
@@ -167,6 +168,15 @@
                     }else{
                         a.style.display = "none";
                     }
+                });
+            }
+            function load_category(cid){
+                Admin.getJson("/admin/loadcategory/"+cid+"/n",resp=>{
+                    console.log(resp);
+                    //Html.form("#tx-form-box","category",resp,true,data=>{
+                        //console.log(data);
+                    //});
+                    Html.openWithId("#tx-form-box");
                 });
             }
         </script>
