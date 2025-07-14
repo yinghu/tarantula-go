@@ -465,7 +465,17 @@ var Html = (function(){
         tem.push(data.Name+" : Properties");
         tem.push("</legend>");
         data.Properties.forEach(p=>{
-            tem.push(_input(p,conf.prefix));
+            if(p.Type =="boolean"){
+                tem.push(_checkbox(p,"ins"));
+            }else if(p.Type=="enum"){
+                tem.push(_selectEnum(p,"ins"));
+            }else if(p.Type=="list"){
+                tem.push(_selectCategory(p,"ins"));
+            }else if(p.Type=="category"){
+                tem.push(_selectCategory(p,"ins"));
+            }else{
+                tem.push(_input(p,conf.prefix));
+            }
         })
         tem.push(_button("Save","ins",callback));
         tem.push("</fieldset>");
