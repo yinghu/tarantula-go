@@ -18,13 +18,13 @@ func (s *AdminLoadConfig) AccessControl() int32 {
 }
 func (s *AdminLoadConfig) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	id, err := strconv.Atoi(r.PathValue("id"))
+	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	conf, err := s.ItemService().LoadWithId(int64(id))
+	conf, err := s.ItemService().LoadWithId(id)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
