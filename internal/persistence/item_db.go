@@ -1,5 +1,6 @@
 package persistence
 
+
 const (
 	ITEM_ENUM_SQL_SCHEMA       string = "CREATE TABLE IF NOT EXISTS item_enum (id BIGINT NOT NULL,name VARCHAR(100) NOT NULL UNIQUE,PRIMARY KEY(id))"
 	ITEM_ENUM_VALUE_SQL_SCHEMA string = "CREATE TABLE IF NOT EXISTS item_enum_value (enum_id BIGINT NOT NULL,name VARCHAR(100) NOT NULL,value INTEGER NOT NULL,PRIMARY KEY(enum_id,name))"
@@ -24,14 +25,10 @@ const (
 	DELETE_APPLICATION      string = "DELETE FROM item_application WHERE configuration_id = $1"
 	DELETE_CONFIG_WITH_ID   string = "DELETE FROM item_configuration WHERE id"
 
-	SELECT_CONFIG_WITH_NAME           string = "SELECT id,type,type_id,category,version FROM item_configuration WHERE name = $1 LIMIT $2"
-	SELECT_CONFIG_WITH_ID             string = "SELECT name,type,type_id,category,version FROM item_configuration WHERE id = $1"
-	SELECT_CONFIG_HEADER_WIHT_ID      string = "SELECT name,value FROM item_header WHERE configuration_id = $1"
-	SELECT_CONFIG_APPLICATION_WITH_ID string = "SELECT name,reference_id FROM item_application WHERE configuration_id = $1"
 )
 
 type ItemDB struct {
-	Sql *Postgresql
+	Sql        *Postgresql
 }
 
 func (db *ItemDB) Start() error {

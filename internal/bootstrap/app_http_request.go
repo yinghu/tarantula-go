@@ -9,6 +9,10 @@ import (
 )
 
 func (s *AppManager) PostJson(url string, payload any, ch chan core.OnSession) {
+	if s.standalone {
+		ch <- core.OnSession{ErrorCode: STANDALONE_APP, Message: STANDALONE_APP_MSG}
+		return
+	}
 	tick, err := s.AppAuth.CreateTicket(1, 1, SUDO_ACCESS_CONTROL)
 	if err != nil {
 		ch <- core.OnSession{ErrorCode: INVALID_TICKET_CODE, Message: err.Error()}
@@ -49,6 +53,9 @@ func (s *AppManager) PostJson(url string, payload any, ch chan core.OnSession) {
 }
 
 func (s *AppManager) PostJsonSync(url string, payload any) core.OnSession {
+	if s.standalone {
+		return core.OnSession{ErrorCode: STANDALONE_APP, Message: STANDALONE_APP_MSG}
+	}
 	tick, err := s.AppAuth.CreateTicket(1, 1, SUDO_ACCESS_CONTROL)
 	if err != nil {
 		return core.OnSession{ErrorCode: INVALID_TICKET_CODE, Message: err.Error()}

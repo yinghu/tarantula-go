@@ -11,7 +11,11 @@ import (
 )
 
 const (
-	DATE_TIME_FORMAT string = "2006-01-02T15:04"
+	DATE_TIME_FORMAT                  string = "2006-01-02T15:04"
+	SELECT_CONFIG_WITH_NAME           string = "SELECT id,name,type,type_id,version FROM item_configuration WHERE category = $1 LIMIT $2"
+	SELECT_CONFIG_WITH_ID             string = "SELECT name,type,type_id,category,version FROM item_configuration WHERE id = $1"
+	SELECT_CONFIG_HEADER_WIHT_ID      string = "SELECT name,value FROM item_header WHERE configuration_id = $1"
+	SELECT_CONFIG_APPLICATION_WITH_ID string = "SELECT name,reference_id FROM item_application WHERE configuration_id = $1"
 )
 
 func (db *ItemDB) Save(c item.Configuration) error {
@@ -51,8 +55,8 @@ func (db *ItemDB) LoadWithName(cname string, limit int) ([]item.Configuration, e
 	list := make([]item.Configuration, limit)
 	ct := 0
 	err := db.Sql.Query(func(row pgx.Rows) error {
-		conf := item.Configuration{Name: cname}
-		err := row.Scan(&conf.Id, &conf.Type, &conf.TypeId, &conf.Category, &conf.Version)
+		conf := item.Configuration{Category: cname}
+		err := row.Scan(&conf.Id, &conf.Name, &conf.Type, &conf.TypeId, &conf.Version)
 		if err != nil {
 			return err
 		}

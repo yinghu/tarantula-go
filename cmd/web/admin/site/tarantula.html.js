@@ -4,6 +4,7 @@ var Html = (function(){
     let _enum ={};
     let _category ={};
     let _task ={};
+    let _instance ={};
     
     let _taskChanged = tn=>{
         console.log("Task changed :"+tn);
@@ -96,6 +97,37 @@ var Html = (function(){
             };
         });
     };
+    let _categorySelect = function(conf,clist,callback){
+        let ctn = document.querySelector(conf.id);
+        ctn.innerHTML = "";
+        let tem =[];
+        tem.push("<option value='' disabled selected>select to load</option>");
+        clist.forEach(c=>{
+            tem.push("<option tx-category-id='"+c.Id+"'>");
+            tem.push(c.Name);
+            tem.push("</option>");    
+        });
+        ctn.innerHTML = tem.join("");
+        ctn.onchange = ()=>{
+            callback(ctn.options[ctn.selectedIndex].text);
+        };
+    };
+    let _instanceList = function(conf,clist,callback){
+        document.querySelector(conf.id).innerHTML = "";
+        let tem =[];
+        clist.forEach(c=>{
+            tem.push("<span tx-instance-id='"+c.ItemId+"' ");
+            tem.push("class='w3-bar-item w3-green w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4 tx-"+conf.prefix+"-opt'>");
+            tem.push(c.ConfigurationName+" : "+c.ConfigurationVersion);
+            tem.push("</span>");    
+        });
+        document.querySelector(conf.id).innerHTML = tem.join("");
+        document.querySelectorAll(".tx-"+conf.prefix+"-opt").forEach(a=>{
+            a.onclick = ()=>{
+                callback(a.getAttribute("tx-instance-id"));    
+            };
+        });
+    };
     let _enumForm = function(conf,callback){
         document.querySelector(conf.id).innerHTML="";
         _enum ={ix:0};
@@ -112,7 +144,7 @@ var Html = (function(){
         tem.push("<div class='w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4'>");
         tem.push("<ul id='create-enum-properties' class='w3-ul'>");
         tem.push("</ul></div>");
-        tem.push(_button("Save","ee",callback));
+        tem.push(_button("Save","ee"));
         tem.push("</fieldset>");
         document.querySelector(conf.id).innerHTML += tem.join("");
         _eventWithId("#ee-enum-close",()=>{
@@ -181,16 +213,18 @@ var Html = (function(){
     };
 
     let _selectEnum = function(prop,prefix){
+        let t = _category.types[prop.Reference];
         let tem=[];
         tem.push("<div class='w3-panel'>");
         tem.push("<label class='tx-text-12'>");
         tem.push(_caption(prop.Name));
         tem.push("</label>");
         tem.push("<select id='");
-        tem.push(prefix+'-'+prop.name);
+        tem.push(prefix+'-'+prop.Name);
         tem.push("' name='chs' class='w3-round w3-border tx-text-16 w3-select tx-margin-left-4'>");
-        tem.push("<option value='1'>"+"One"+"</option>");
-        tem.push("<option value='2'>"+"Two"+"</option>");
+        t.Values.forEach(e=>{
+            tem.push("<option value='"+e.Value+"'>"+e.Name+"</option>");    
+        });
         tem.push("</select>");
         tem.push("</div>");
         return tem.join('');    
@@ -233,13 +267,14 @@ var Html = (function(){
         tem.push("<label class='tx-text-12'>");
         tem.push(_caption(prop.Name));
         tem.push("</label>");
-        tem.push("<span tx-property-name='");
+        tem.push("<span tx-property-category='");
+        tem.push(prop.Reference.split(":")[1]+"' tx-property-name='");
         tem.push(prop.Name);    
         tem.push("' class='w3-right tx-margin-right-4 ");
-        tem.push(prefix+"-upload'>");
+        tem.push(prefix+"-load'>");
         tem.push("<i class='material-symbols-outlined tx-orange-icon-20'>add</i></span>");
         tem.push("<select id='");
-        tem.push(prefix+'-'+prop.name);
+        tem.push(prefix+'-'+prop.Name);
         tem.push("' name='chs' class='w3-round w3-border tx-text-16 w3-select tx-margin-left-4'>");
         tem.push("<option value='' disabled selected>click plus to load</option>");
         tem.push("</select>");
@@ -288,7 +323,7 @@ var Html = (function(){
         category.Properties.forEach(prop=>{
             tem.push(_input(prop,conf.prefix));    
         });
-        tem.push(_button(category.Name,conf.prefix,callback));
+        tem.push(_button(category.Name,conf.prefix));
         tem.push("</fieldset>");
         document.querySelector(conf.id).innerHTML += tem.join("");
         if(conf.closeable){
@@ -339,7 +374,7 @@ var Html = (function(){
         tem.push("<div class='w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4'>");
         tem.push("<ul id='create-category-properties' class='w3-ul'>");
         tem.push("</ul></div>");
-        tem.push(_button("Save","cc",callback));
+        tem.push(_button("Save","cc"));
         tem.push("</fieldset>");
         document.querySelector(conf.id).innerHTML += tem.join("");
         _category.typeSelect = document.querySelector("#category-Type");
@@ -452,13 +487,51 @@ var Html = (function(){
         tem.push("</fieldset>");
         document.querySelector(conf.id).innerHTML += tem.join("");
     }
+
+    let _readInstanceHeader = function(conf){
+        _instance.header.Properties.forEach(c=>{
+            _instance.save[c.Name]=document.querySelector("#"+conf.prefix+"-"+c.Name).value;
+        });
+    }
+    let _readInstance = function(conf){
+        _instance.save.header = {};
+        _instance.category.Properties.forEach(c=>{
+            if(c.Type=="boolean"){
+                _instance.save.header[c.Name]=document.querySelector("#"+conf.prefix+"-"+c.Name).checked;
+            }else if(c.Type=="enum"){
+                let ctn = document.querySelector("#"+conf.prefix+"-"+c.Name);
+                _instance.save.header[c.Name]= ctn.options[ctn.selectedIndex].value;    
+            }else if(c.Type=="list" ||c.Type=="set"){
+                
+            }else if(c.Type=="category"){
+                let ctn = document.querySelector("#"+conf.prefix+"-"+c.Name);
+                let tem =[];
+                tem.push(ctn.options[ctn.selectedIndex].value);
+                _instance.save.application[c.Name]= tem;
+            }else{
+                _instance.save.header[c.Name]=document.querySelector("#"+conf.prefix+"-"+c.Name).value;
+            }
+        });
+    }
+
+    let _addCategories = function(containerId,cats){
+        let cnt = document.querySelector(containerId);
+        cnt.innerHTML = "";
+        let tem =[];
+        tem.push("<option value='' disabled selected>click plus to load</option>");
+        cats.forEach(c=>{
+            tem.push("<option value='"+c.ItemId+"'>"+c.ConfigurationCategory+":"+c.ConfigurationName+"/"+c.ConfigurationVersion+"</option>");     
+        });
+        cnt.innerHTML = tem.join("");
+    }
     
-    let _instanceForm = function(conf,data,callback){
+    let _instanceForm = function(conf,data,save,load){
+        _instance = {save:{header:{},application:{}},category:data,header:_category.headers[data.Scope]};
         document.querySelector(conf.id).innerHTML="";
         let tem=[];
         tem.push(_icon("ins","category","close","red"));
         document.querySelector(conf.id).innerHTML += tem.join("");
-        _instanceHeader({id:conf.id,prefix:"ins-header",category:data.Name},_category.headers[data.Scope]);
+        _instanceHeader({id:conf.id,prefix:"ins-header",category:data.Name},_instance.header);
         tem = [];
         tem.push("<fieldset>");
         tem.push("<legend class='tx-text-20'>");
@@ -474,17 +547,29 @@ var Html = (function(){
             }else if(p.Type=="category"){
                 tem.push(_selectCategory(p,"ins"));
             }else{
-                tem.push(_input(p,conf.prefix));
+                tem.push(_input(p,"ins"));
             }
         })
-        tem.push(_button("Save","ins",callback));
+        tem.push(_button("Save","ins"));
         tem.push("</fieldset>");
         document.querySelector(conf.id).innerHTML += tem.join("");
+        document.querySelectorAll(".ins-load").forEach(a=>{
+            a.onclick = ()=>{
+                let cid = "#ins-"+a.getAttribute("tx-property-name");
+                load(a.getAttribute("tx-property-category"),cats=>{
+                    _addCategories(cid,cats);
+                });
+            };
+        });
         _eventWithId("#ins-category-close",()=>{
             document.querySelector(conf.id).style.display='none';
         });
         _eventWithId("#ins-Save",()=>{
-            callback({});
+            _readInstanceHeader({prefix:"ins-header"});
+            _instance.save.ConfigurationCategory = data.Name;
+            _readInstance({prefix:"ins"});
+            console.log(_instance.save);
+            save(_instance.save);
         });
     }
 
@@ -499,6 +584,8 @@ var Html = (function(){
         jobList : _jobList,
         typeList : _typeList,
         categoryList : _categoryList,
+        categorySelect : _categorySelect,
+        instanceList : _instanceList,
         enumForm : _enumForm,
         categoryForm : _categoryForm,
         instanceForm : _instanceForm,

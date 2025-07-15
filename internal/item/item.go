@@ -62,6 +62,7 @@ type ItemService interface {
 	Validate(c Configuration) error
 	ValidateCategory(c Category) error
 	ValidateEnum(c Enum) error
+	
 }
 
 type ItemListener interface {

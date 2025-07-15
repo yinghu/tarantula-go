@@ -18,7 +18,9 @@ const (
 )
 
 const (
-	DB_OP_ERR_CODE int = 500100
+	STANDALONE_APP     int    = 200000
+	STANDALONE_APP_MSG string = "publish skipped"
+	DB_OP_ERR_CODE     int    = 500100
 
 	WRONG_PASS_CODE int    = 400100
 	WRONG_PASS_MSG  string = "wrong user/password"
