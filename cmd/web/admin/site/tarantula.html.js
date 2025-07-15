@@ -187,6 +187,21 @@ var Html = (function(){
         tem.push("</div>");
         return tem.join("");       
     };
+
+    let _textarea = function(prop,prefix){
+        let tem=[];
+        tem.push("<div class='w3-panel'>");
+        tem.push("<label class='tx-text-12'>");
+        tem.push(_caption(prop.Name));
+        tem.push("</label>");
+        tem.push("<textarea id='");
+        tem.push(prefix+"-"+prop.Name+"' ");
+        tem.push("class='w3-round w3-border tx-text-16' type='");
+        tem.push(prop.Reference+"'></textarea>");
+        tem.push("</div>");
+        return tem.join("");       
+    };
+
     let _checkbox = function(prop,prefix){
         let tem=[];
         tem.push("<div class='w3-panel'>");
@@ -522,7 +537,8 @@ var Html = (function(){
             }else{
                 if (c.Reference == "number"){
                     _instance.save.header[c.Name]=document.querySelector("#"+conf.prefix+"-"+c.Name).value/1;    
-                }else{
+                }
+                else{
                     _instance.save.header[c.Name]=document.querySelector("#"+conf.prefix+"-"+c.Name).value;
                 }
             }
@@ -559,7 +575,11 @@ var Html = (function(){
     };
     
     let _instanceForm = function(conf,data,save,load){
-        _instance = {ix:0,save:{header:{},application:{}},category:data,header:_category.headers[data.Scope],build:{}};
+        if (_category.headers[data.Scope] === undefined){
+            _instance = {ix:0,save:{header:{},application:{}},category:data,header:_category.headers["Application"],build:{}};
+        }else{
+            _instance = {ix:0,save:{header:{},application:{}},category:data,header:_category.headers[data.Scope],build:{}};
+        }
         document.querySelector(conf.id).innerHTML="";
         let tem=[];
         tem.push(_icon("ins","category","close","red"));
@@ -581,9 +601,13 @@ var Html = (function(){
             }else if(p.Type=="category"){
                 tem.push(_selectCategory(p,"ins",false));
             }else{
-                tem.push(_input(p,"ins"));
+                if(p.Reference == "textarea"){
+                    tem.push(_textarea(p,"ins"));
+                }else{
+                    tem.push(_input(p,"ins"));
+                }
             }
-        })
+        });
         tem.push(_button("Save","ins"));
         tem.push("</fieldset>");
         document.querySelector(conf.id).innerHTML += tem.join("");

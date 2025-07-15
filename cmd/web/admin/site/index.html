@@ -84,6 +84,7 @@
 
             function on_logout(){
                 after_login(false);
+                set_task_header("Welcome","doorbell");
                 Admin.getJson("/admin/web/login.json",resp=>{
                     let conf ={id:"#tx-form-box",prefix:"login",closeable:false};
                     Html.form(conf,resp,(data)=>{
@@ -168,8 +169,7 @@
             }
 
             function on_task_change(tn){
-                document.querySelector("#tx-task-header-box-content").innerHTML=tn;
-                document.querySelector("#tx-task-header-box-icon").innerHTML="settings";
+                set_task_header(tn,"settings");
                 Html.closeWithId("#tx-form-box");
                 Html.closeWithId("#tx-instance-list-box");
                 Admin.getJson("/admin/loadcategories/"+tn,resp=>{
@@ -242,6 +242,11 @@
                 Admin.getJson("/admin/loadconfigs/"+prop+"/10",cats=>{
                     callback(cats);
                 });    
+            }
+
+            function set_task_header(tn,icon){
+                document.querySelector("#tx-task-header-box-content").innerHTML=tn;
+                document.querySelector("#tx-task-header-box-icon").innerHTML=icon;
             }
 
         </script>

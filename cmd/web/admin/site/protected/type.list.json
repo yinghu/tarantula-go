@@ -10,7 +10,7 @@
     "DateTime" : {"Type": "dateTime","Name": "DateTime","Reference": "dateTime-local"},
     "Password" : {"Type": "string","Name": "Password","Reference": "password"},
     "Email" : {"Type": "string","Name": "Email","Reference": "email"},
-    "Editor" : {"Type": "editor","Name": "Editor","Reference": "textarea"},
+    "Editor" : {"Type": "string","Name": "Editor","Reference": "textarea"},
     "List" : {"Type": "list","Name": "List"},
     "Set" : {"Type": "set","Name": "Set"},
     "PlayMode" : {"Type": "enum","Name": "PlayMode","Values": [{"Name": "PVE","Value": 0},{"Name": "PVP","Value": 1},{"Name": "TVE","Value": 2},{"Name": "TVT","Value": 3}]},
