@@ -162,6 +162,8 @@
             }
 
             function on_task_change(tn){
+                Html.closeWithId("#tx-form-box");
+                Html.closeWithId("#tx-instance-list-box");
                 Admin.getJson("/admin/loadcategories/"+tn,resp=>{
                     Html.categoryList({id:"#tx-category-list-box",prefix:"cc"},resp,cid=>{
                         load_category(cid);
@@ -191,17 +193,13 @@
                             Html.messageWithId("#tx-info-box-content",resp.message);    
                             Html.openWithId("#tx-info-box");
                         });
-                    },(prop,callback)=>{
-                        console.log(prop);
-                        Admin.getJson("/admin/loadconfigs/"+prop+"/10",cats=>{
-                            callback(cats);
-                        });
-                    });
+                    },load_categories);
                     Html.openWithId("#tx-form-box");
                 });
             }
 
             function load_instances(cat){
+                Html.openWithId("#tx-instance-list-box");
                 Admin.getJson("/admin/loadconfigs/"+cat+"/10",resp=>{
                     console.log(resp);
                     Html.instanceList({id:"#tx-instance-list-box",prefix:"ins"},resp,(id)=>{
@@ -213,15 +211,29 @@
 
             function load_instance(id){ 
                 Admin.getJson("/admin/loadconfig/"+id,resp=>{
-                    console.log(resp);
                     populate_instance(resp);
                 });   
             }
 
             function populate_instance(ins){
                 Admin.getJson("/admin/loadcategory/0/"+ins.ConfigurationCategory,resp=>{
-                    console.log(resp);
+                    Html.instanceForm({id:"#tx-form-box",prefix:"ins"},resp,data=>{
+                        Admin.postJson("/admin/saveconfig",data,resp=>{
+                            console.log(data);
+                            Html.messageWithId("#tx-info-box-content",resp.message);    
+                            Html.openWithId("#tx-info-box");
+                        });
+                    },load_categories);
+                    Html.openWithId("#tx-form-box");
+                    Html.populateInstance(ins,load_categories);
                 });
+            }
+
+            function load_categories(prop,callback){
+                console.log(prop);
+                Admin.getJson("/admin/loadconfigs/"+prop+"/10",cats=>{
+                    callback(cats);
+                });    
             }
 
         </script>

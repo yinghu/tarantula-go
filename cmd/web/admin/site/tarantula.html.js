@@ -173,7 +173,6 @@ var Html = (function(){
             callback(_enum);
         });       
     };
-    //END
 
     let _input = function(prop,prefix){
         let tem=[];
@@ -245,7 +244,7 @@ var Html = (function(){
         tem.push("</select>");
         tem.push("</div>");
         return tem.join("");  
-    }
+    };
 
     let _selectReference = function(prop,prefix){
         let tem=[];
@@ -259,9 +258,9 @@ var Html = (function(){
         tem.push("</select>");
         tem.push("</div>");
         return tem.join("");  
-    }
+    };
 
-    let _selectCategory = function(prop,prefix){
+    let _selectCategory = function(prop,prefix,listing){
         let tem=[];
         tem.push("<div class='w3-panel'>");
         tem.push("<label class='tx-text-12'>");
@@ -275,12 +274,23 @@ var Html = (function(){
         tem.push("<i class='material-symbols-outlined tx-orange-icon-20'>add</i></span>");
         tem.push("<select id='");
         tem.push(prefix+'-'+prop.Name);
-        tem.push("' name='chs' class='w3-round w3-border tx-text-16 w3-select tx-margin-left-4'>");
+        tem.push("' name='"+prop.Name+"' class='w3-round w3-border tx-text-16 w3-select tx-margin-left-4");
+        if (listing){
+            tem.push(" "+prefix+"-select");
+        }
+        tem.push("'>");
         tem.push("<option value='' disabled selected>click plus to load</option>");
         tem.push("</select>");
         tem.push("</div>");
+        if (listing){
+            tem.push("<div class='w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4'>");
+            tem.push("<ul id='");
+            tem.push(prefix+"-select-"+prop.Name);
+            tem.push("' class='w3-ul'>");
+            tem.push("</ul></div>");
+        }
         return tem.join("");  
-    }
+    };
 
     let _upload = function(prop,prefix){
         let tem=[];
@@ -298,7 +308,7 @@ var Html = (function(){
         tem.push("class='w3-input w3-round w3-border tx-text-16' type='text'/>");
         tem.push("</div>");
         return tem.join("");  
-    }
+    };
 
     let _icon = function(prefix,n,icon,color){
         let tem=[];
@@ -308,7 +318,7 @@ var Html = (function(){
         tem.push("<i class='material-symbols-outlined tx-margin-right-8 tx-"+color+"-icon-24'>"+icon+"</i></span>");
         tem.push("</div>");
         return tem.join("");
-    }
+    };
 
     let _form = function(conf,category,callback){
         document.querySelector(conf.id).innerHTML="";
@@ -351,7 +361,7 @@ var Html = (function(){
         tem.push(_checkbox({Name:"Rechargeable"},prefix));
         tem.push("</fieldset>");
         document.querySelector(containerId).innerHTML += tem.join("");
-    }
+    };
 
     let _categoryForm = function(conf,data,callback){
         document.querySelector(conf.id).innerHTML="";
@@ -486,13 +496,14 @@ var Html = (function(){
         });
         tem.push("</fieldset>");
         document.querySelector(conf.id).innerHTML += tem.join("");
-    }
+    };
 
     let _readInstanceHeader = function(conf){
         _instance.header.Properties.forEach(c=>{
             _instance.save[c.Name]=document.querySelector("#"+conf.prefix+"-"+c.Name).value;
         });
-    }
+    };
+
     let _readInstance = function(conf){
         _instance.save.header = {};
         _instance.category.Properties.forEach(c=>{
@@ -500,33 +511,55 @@ var Html = (function(){
                 _instance.save.header[c.Name]=document.querySelector("#"+conf.prefix+"-"+c.Name).checked;
             }else if(c.Type=="enum"){
                 let ctn = document.querySelector("#"+conf.prefix+"-"+c.Name);
-                _instance.save.header[c.Name]= ctn.options[ctn.selectedIndex].value;    
+                _instance.save.header[c.Name]= ctn.options[ctn.selectedIndex].value/1;    
             }else if(c.Type=="list" ||c.Type=="set"){
-                
+                _instance.save.application[c.Name]=_instance.build[c.Name];    
             }else if(c.Type=="category"){
                 let ctn = document.querySelector("#"+conf.prefix+"-"+c.Name);
                 let tem =[];
                 tem.push(ctn.options[ctn.selectedIndex].value);
                 _instance.save.application[c.Name]= tem;
             }else{
-                _instance.save.header[c.Name]=document.querySelector("#"+conf.prefix+"-"+c.Name).value;
+                if (c.Reference == "number"){
+                    _instance.save.header[c.Name]=document.querySelector("#"+conf.prefix+"-"+c.Name).value/1;    
+                }else{
+                    _instance.save.header[c.Name]=document.querySelector("#"+conf.prefix+"-"+c.Name).value;
+                }
             }
         });
-    }
+    };
 
     let _addCategories = function(containerId,cats){
         let cnt = document.querySelector(containerId);
         cnt.innerHTML = "";
         let tem =[];
-        tem.push("<option value='' disabled selected>click plus to load</option>");
+        tem.push("<option value='0' disabled selected>drop down to choose</option>");
         cats.forEach(c=>{
             tem.push("<option value='"+c.ItemId+"'>"+c.ConfigurationCategory+":"+c.ConfigurationName+"/"+c.ConfigurationVersion+"</option>");     
         });
         cnt.innerHTML = tem.join("");
-    }
+    };
+
+    let _addInstance = function(item){
+        let tem=[];
+        tem.push("<li id='"+item.id+"' tx-select-name='"+item.selected+"'>");
+        tem.push(item.name);
+        tem.push("<scan class='w3-right instance-entry-remove' "+"instance-entry-id='"+item.id+"'><i class='material-symbols-outlined tx-red-icon-24'>remove</i></span></li>");
+        item.build.innerHTML += tem.join("");
+        document.querySelectorAll(".instance-entry-remove").forEach(a=>{
+            a.onclick = ()=>{
+                let removeId = a.getAttribute("instance-entry-id");
+                let removed = document.querySelector("#"+removeId);
+                removed.style.display="none";
+                let selected = removed.getAttribute("tx-select-name").split(":");
+                let ids = _instance.build[selected[0]].filter(id=> id!==selected[1]);
+                _instance.build[selected[0]]=ids;
+            };
+        });
+    };
     
     let _instanceForm = function(conf,data,save,load){
-        _instance = {save:{header:{},application:{}},category:data,header:_category.headers[data.Scope]};
+        _instance = {ix:0,save:{header:{},application:{}},category:data,header:_category.headers[data.Scope],build:{}};
         document.querySelector(conf.id).innerHTML="";
         let tem=[];
         tem.push(_icon("ins","category","close","red"));
@@ -542,10 +575,11 @@ var Html = (function(){
                 tem.push(_checkbox(p,"ins"));
             }else if(p.Type=="enum"){
                 tem.push(_selectEnum(p,"ins"));
-            }else if(p.Type=="list"){
-                tem.push(_selectCategory(p,"ins"));
+            }else if(p.Type=="list" || p.Type=="set"){
+                _instance.build[p.Name]=[];
+                tem.push(_selectCategory(p,"ins",true));
             }else if(p.Type=="category"){
-                tem.push(_selectCategory(p,"ins"));
+                tem.push(_selectCategory(p,"ins",false));
             }else{
                 tem.push(_input(p,"ins"));
             }
@@ -561,6 +595,25 @@ var Html = (function(){
                 });
             };
         });
+        document.querySelectorAll(".ins-select").forEach(a=>{
+            a.onchange = ()=>{
+                let pname = a.getAttribute("name");
+                let selected = document.querySelector("#ins-"+pname);
+                let sid = selected.options[selected.selectedIndex].value;
+                let notExisting = true;
+                _instance.build[pname].forEach(i=>{
+                    if(i===sid && notExisting){
+                        notExisting = false;
+                    }
+                });
+                if (notExisting){
+                    _instance.build[pname].push(sid);
+                    let item ={selected:pname+":"+sid,id:"ins-"+pname+"-"+_instance.ix,name:sid,build:document.querySelector("#ins-select-"+pname)};
+                    _addInstance(item);
+                    _instance.ix++;
+                }
+            };
+        });
         _eventWithId("#ins-category-close",()=>{
             document.querySelector(conf.id).style.display='none';
         });
@@ -568,10 +621,51 @@ var Html = (function(){
             _readInstanceHeader({prefix:"ins-header"});
             _instance.save.ConfigurationCategory = data.Name;
             _readInstance({prefix:"ins"});
-            console.log(_instance.save);
             save(_instance.save);
         });
-    }
+    };
+
+    let _populateInstance = function(ins,load){
+        _instance.header.Properties.forEach(p=>{
+            document.querySelector("#ins-header-"+p.Name).value = ins[p.Name];
+        });
+        _instance.category.Properties.forEach(p=>{
+            let ctn = document.querySelector("#ins-"+p.Name);
+            if(p.Type =="boolean"){
+                ctn.checked = ins.header[p.Name];    
+            }else if(p.Type=="enum"){
+                ctn.options[ins.header[p.Name]].selected = true;    
+            }else if(p.Type=="list" || p.Type=="set"){
+                let cid = "#ins-"+p.Name;
+                load(p.Reference.split(":")[1],cats=>{
+                    _addCategories(cid,cats);
+                    ins.application[p.Name].forEach(c=>{    
+                        if(c!==""){
+                            console.log(c);
+                            _instance.build[p.Name].push(c);
+                            let item ={selected:p.Name+":"+c,id:"ins-"+p.Name+"-"+_instance.ix,name:c,build:document.querySelector("#ins-select-"+p.Name)};
+                            _addInstance(item);
+                            _instance.ix++;
+                        }
+                    });
+                });
+            }else if(p.Type=="category"){
+                let cid = "#ins-"+p.Name;
+                let ctn = document.querySelector(cid);
+                load(p.Reference.split(":")[1],cats=>{
+                    _addCategories(cid,cats);
+                    for(let i=0;i<ctn.options.length;i++){
+                        if(ctn.options[i].value === ins.application[p.Name][0]){
+                            ctn.options[i].selected = true;
+                            break;
+                        }
+                    }
+                });   
+            }else{
+                ctn.value = ins.header[p.Name];    
+            }
+        });
+    };
 
     return {
         registerTaskChangeListener : _registerTaskChangeListener,
@@ -589,5 +683,6 @@ var Html = (function(){
         enumForm : _enumForm,
         categoryForm : _categoryForm,
         instanceForm : _instanceForm,
+        populateInstance : _populateInstance,
     };
 })();

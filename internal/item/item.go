@@ -33,14 +33,14 @@ type Property struct {
 }
 
 type Configuration struct {
-	Id          int64              `json:"ItemId,string"`
-	Name        string             `json:"ConfigurationName"`
-	Type        string             `json:"ConfigurationType"`
-	TypeId      string             `json:"ConfigurationTypeId"`
-	Category    string             `json:"ConfigurationCategory"`
-	Version     string             `json:"ConfigurationVersion"`
-	Header      map[string]any     `json:"header"`
-	Application map[string][]int64 `json:"application"`
+	Id          int64               `json:"ItemId,string"`
+	Name        string              `json:"ConfigurationName"`
+	Type        string              `json:"ConfigurationType"`
+	TypeId      string              `json:"ConfigurationTypeId"`
+	Category    string              `json:"ConfigurationCategory"`
+	Version     string              `json:"ConfigurationVersion"`
+	Header      map[string]any      `json:"header"`
+	Application map[string][]string `json:"application"`
 }
 
 type ItemService interface {
@@ -62,7 +62,6 @@ type ItemService interface {
 	Validate(c Configuration) error
 	ValidateCategory(c Category) error
 	ValidateEnum(c Enum) error
-	
 }
 
 type ItemListener interface {

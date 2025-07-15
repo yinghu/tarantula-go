@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"gameclustering.com/internal/item"
@@ -43,7 +44,11 @@ func (db *ItemDB) Save(c item.Configuration) error {
 		}
 		for k, v := range c.Application {
 			for i := range v {
-				inserted, err := tx.Exec(context.Background(), INSERT_APPLICATION, c.Id, k, v[i])
+				aid, err := strconv.ParseInt(v[i], 10, 64)
+				if err != nil {
+					return err
+				}
+				inserted, err := tx.Exec(context.Background(), INSERT_APPLICATION, c.Id, k, aid)
 				if err != nil {
 					return err
 				}
@@ -154,7 +159,7 @@ func (db *ItemDB) loadHeader(c *item.Configuration) error {
 }
 
 func (db *ItemDB) loadApplication(c *item.Configuration) error {
-	c.Application = make(map[string][]int64)
+	c.Application = make(map[string][]string)
 	return db.Sql.Query(func(row pgx.Rows) error {
 		var k string
 		var v int64
@@ -162,7 +167,7 @@ func (db *ItemDB) loadApplication(c *item.Configuration) error {
 		if err != nil {
 			return err
 		}
-		c.Application[k] = append(c.Application[k], v)
+		c.Application[k] = append(c.Application[k], fmt.Sprintf("%d", v))
 		return nil
 	}, SELECT_CONFIG_APPLICATION_WITH_ID, c.Id)
 }
@@ -193,7 +198,11 @@ func (db *ItemDB) Validate(c item.Configuration) error {
 		if prop.Type == "category" || prop.Type == "set" || prop.Type == "list" || prop.Type == "scope" {
 			for _, v := range c.Application {
 				for i := range v {
-					_, err := db.LoadWithId(v[i])
+					aid, err := strconv.ParseInt(v[i], 10, 64)
+					if err != nil {
+						return err
+					}
+					_, err = db.LoadWithId(aid)
 					if err != nil {
 						return err
 					}
@@ -320,11 +329,12 @@ func asInt(v any) error {
 }
 
 func toInt32(v any) (int32, error) {
-	x, ok := v.(float64)
-	if ok {
-		return int32(x), nil
+	x, err := strconv.ParseInt(fmt.Sprintf("%v", v), 10, 32)
+	if err != nil {
+		return 0, err
+
 	}
-	return 0, errors.New("wrong int format")
+	return int32(x), nil
 }
 
 func asLong(v any) error {
