@@ -33,7 +33,13 @@
             <div id="tx-task-list" class="w3-padding w3-teal" style="flex-basis:20%;">
             </div>
             <div class="w3-padding w3-white" style="flex-basis:80%;">
-                <div id="tx-info-box" class="w3-display-container w3-border w3-border-red tx-content-48" style="display: none;">
+                <div class="w3-display-container w3-border w3-border-teal tx-content-48">
+                    <div class="w3-display-left w3-padding">
+                        <span><i id="tx-task-header-box-icon"  class="material-symbols-outlined tx-margin-top-8 tx-orange-icon-32">doorbell</i></span>
+                    </div>
+                    <div id="tx-task-header-box-content" class="w3-display-right w3-padding tx-text-20">Wellcome</div>
+                </div>
+                <div id="tx-info-box" class="w3-display-container w3-border w3-border-red tx-margin-top-8 tx-content-48" style="display: none;">
                     <div class="w3-display-topleft w3-padding">
                         <span><i class="material-symbols-outlined tx-margin-left-8 tx-orange-icon-32">report</i></span>
                     </div>
@@ -162,6 +168,8 @@
             }
 
             function on_task_change(tn){
+                document.querySelector("#tx-task-header-box-content").innerHTML=tn;
+                document.querySelector("#tx-task-header-box-icon").innerHTML="settings";
                 Html.closeWithId("#tx-form-box");
                 Html.closeWithId("#tx-instance-list-box");
                 Admin.getJson("/admin/loadcategories/"+tn,resp=>{

@@ -53,6 +53,17 @@
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
             ]        
+        },
+        {
+            "Name":"CustomerService",
+            "Jobs":[
+                {"Name":"Ban","Callback":"create_new_enum"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"}
+                ,{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"}
+                ,{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"}
+                ,{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"}
+                ,{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"}
+                ,{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"}           
+            ]        
         }
     ]
     }

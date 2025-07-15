@@ -64,13 +64,13 @@ var Html = (function(){
         _taskChanged(_task.Name);
         document.querySelector(conf.id).innerHTML="";
         let tem=[];
-        tem.push("<span class='w3-bar-item w3-left w3-teal w3-tag tx-text-24 tx-padding-button'><i class='material-symbols-outlined tx-orange-icon-24 tx-margin-top-8'>settings</i>");
-        tem.push(" "+task.Name);
-        tem.push("</span>");
+        //tem.push("<span class='w3-bar-item w3-left w3-teal w3-tag tx-text-20 tx-padding-button'><i class='material-symbols-outlined tx-orange-icon-24 tx-margin-top-8'>settings</i>");
+        //tem.push(" "+task.Name);
+        //tem.push("</span>");
         task.Jobs.forEach(job=>{
             tem.push("<span tx-job-name='");
             tem.push(job.Callback+"' ");
-            tem.push("class='w3-bar-item w3-right w3-green w3-tag tx-text-24 tx-padding-button tx-margin-left-4 ");
+            tem.push("class='w3-bar-item w3-green w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4 ");
             tem.push("tx-"+conf.prefix+"-action")
             tem.push("'>"+job.Name+"</span>");
         });
