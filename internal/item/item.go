@@ -47,6 +47,8 @@ type ItemService interface {
 	core.SetUp
 	SaveEnum(c Enum) error
 	LoadEnum(cname string) (Enum, error)
+	LoadEnums() ([]Enum, error)
+	
 	SaveCategory(c Category) error
 	LoadCategory(cname string) (Category, error)
 	LoadCategoryWithId(cid int64) (Category, error)

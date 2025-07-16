@@ -18,11 +18,21 @@ func (s *AdminLoadEnum) AccessControl() int32 {
 func (s *AdminLoadEnum) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	cname := r.PathValue("name")
-	cat, err := s.ItemService().LoadEnum(cname)
+	if cname == "all" {
+		enums, err := s.ItemService().LoadEnums()
+		if err != nil {
+			session := core.OnSession{Successful: false, Message: err.Error()}
+			w.Write(util.ToJson(session))
+			return
+		}
+		w.Write(util.ToJson(enums))
+		return
+	}
+	enum, err := s.ItemService().LoadEnum(cname)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	w.Write(util.ToJson(cat))
+	w.Write(util.ToJson(enum))
 }

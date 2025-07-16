@@ -88,9 +88,7 @@
                 Admin.getJson("/admin/web/login.json",resp=>{
                     let conf ={id:"#tx-form-box",prefix:"login",closeable:false};
                     Html.form(conf,resp,(data)=>{
-                        console.log(data);
                         Admin.postJson("/admin/login",data,(resp)=>{
-                            console.log(resp)
                             if(!resp.successful){
                                 Html.messageWithId("#tx-info-box-content",resp.message);    
                                 Html.openWithId("#tx-info-box");
@@ -126,6 +124,10 @@
                 Admin.getJson("/admin/webprotected/type.list.json",(resp)=>{
                     Html.typeList(resp);    
                 });
+                Admin.getJson("/admin/loadenum/all",resp=>{
+                    Html.enumList(resp);
+                });
+
             }
 
             function create_new_enum(){
@@ -137,9 +139,7 @@
                             valid.Values.push(ev);
                         }    
                     }
-                    console.log(valid);
                     Admin.postJson("/admin/saveenum",valid,resp=>{
-                        console.log(resp);
                         Html.messageWithId("#tx-info-box-content",resp.message);    
                         Html.openWithId("#tx-info-box");
                     });
@@ -148,24 +148,20 @@
             }
 
             function create_new_category(){
-                Admin.getJson("/admin/webprotected/type.list.json",(resp)=>{
-                    Html.categoryForm({id:"#tx-form-box"},resp,(data)=>{
-                        let valid ={Name:data.Name,Description:data.Description,Scope:data.Scope,Properties:[]};
-                        for( let i=0;i<data.ix;i++){
-                            if("c-entry"+i in data){
-                                let ev = data["c-entry"+i];
-                                valid.Properties.push(ev);
-                            }    
-                        }
-                        console.log(valid);
-                        Admin.postJson("/admin/savecategory",valid,resp=>{
-                            console.log(resp);
-                            Html.messageWithId("#tx-info-box-content",resp.message);    
-                            Html.openWithId("#tx-info-box");
-                        });
+                Html.categoryForm({id:"#tx-form-box"},(data)=>{
+                    let valid ={Name:data.Name,Description:data.Description,Scope:data.Scope,Properties:[]};
+                    for( let i=0;i<data.ix;i++){
+                        if("c-entry"+i in data){
+                            let ev = data["c-entry"+i];
+                            valid.Properties.push(ev);
+                        }    
+                    }
+                    Admin.postJson("/admin/savecategory",valid,resp=>{
+                        Html.messageWithId("#tx-info-box-content",resp.message);    
+                        Html.openWithId("#tx-info-box");
                     });
-                    Html.openWithId("#tx-form-box"); 
-                });   
+                });
+                Html.openWithId("#tx-form-box");   
             }
 
             function on_task_change(tn){
@@ -194,10 +190,8 @@
 
             function load_category(cid){
                 Admin.getJson("/admin/loadcategory/"+cid+"/n",resp=>{
-                    console.log(resp);
                     Html.instanceForm({id:"#tx-form-box",prefix:"category",closeable:true},resp,data=>{
                         Admin.postJson("/admin/saveconfig",data,resp=>{
-                            console.log(data);
                             Html.messageWithId("#tx-info-box-content",resp.message);    
                             Html.openWithId("#tx-info-box");
                         });
@@ -209,9 +203,7 @@
             function load_instances(cat){
                 Html.openWithId("#tx-instance-list-box");
                 Admin.getJson("/admin/loadconfigs/"+cat+"/10",resp=>{
-                    console.log(resp);
                     Html.instanceList({id:"#tx-instance-list-box",prefix:"ins"},resp,(id)=>{
-                        console.log(id);
                         load_instance(id);
                     });
                 });
@@ -227,7 +219,6 @@
                 Admin.getJson("/admin/loadcategory/0/"+ins.ConfigurationCategory,resp=>{
                     Html.instanceForm({id:"#tx-form-box",prefix:"ins"},resp,data=>{
                         Admin.postJson("/admin/saveconfig",data,resp=>{
-                            console.log(data);
                             Html.messageWithId("#tx-info-box-content",resp.message);    
                             Html.openWithId("#tx-info-box");
                         });
@@ -238,7 +229,6 @@
             }
 
             function load_categories(prop,callback){
-                console.log(prop);
                 Admin.getJson("/admin/loadconfigs/"+prop+"/10",cats=>{
                     callback(cats);
                 });    

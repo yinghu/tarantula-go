@@ -12,14 +12,7 @@
     "Email" : {"Type": "string","Name": "Email","Reference": "email"},
     "Editor" : {"Type": "string","Name": "Editor","Reference": "textarea"},
     "List" : {"Type": "list","Name": "List"},
-    "Set" : {"Type": "set","Name": "Set"},
-    "PlayMode" : {"Type": "enum","Name": "PlayMode","Values": [{"Name": "PVE","Value": 0},{"Name": "PVP","Value": 1},{"Name": "TVE","Value": 2},{"Name": "TVT","Value": 3}]},
-    "Environment" : {"Type": "enum","Name": "Environment","Values": [{"Name":"Development","Value":0},{"Name":"Staging","Value":1},{"Name":"Production","Value":2},{"Name":"QA","Value":3}]},
-    "Schedule" : {"Type": "enum","Name": "Schedule","Values": [{"Name":"Daily","Value":0},{"Name":"Weekly","Value":1},{"Name":"Monthly","Value":2},{"Name":"OnDemand","Value":3}]},
-    "ItemType": {"Type": "enum","Name": "ItemType","Values": [{"Name":"HardCurrency","Value":0},{"Name":"SoftCurrency","Value":1},{"Name":"Bundle","Value":2}]},
-    "PurchaseType" : {"Type": "enum","Name": "PurchaseType","Values": [{"Name":"HardCurrency","Value":0},{"Name":"SoftCurrency","Value":1},{"Name":"IAP","Value":2}]},
-    "VirtualCurrency" : {"Type": "enum","Name": "VirtualCurrency","Values": [{"Name":"Gold","Value":0},{"Name":"Gem","Value":1},{"Name":"Coin","Value":2},{"Name":"Chip","Value":3},{"Name":"None","Value":4}]},
-    "DisplayCard":{"Type":"category","Name":"DisplayCard"}
+    "Set" : {"Type": "set","Name": "Set"}
  },
  "Headers":{
     "Asset":{

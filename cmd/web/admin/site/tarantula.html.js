@@ -1,6 +1,8 @@
 var Html = (function(){
     
     let _tasks = {};
+    let _types = {};
+    let _headers ={};
     let _enum ={};
     let _category ={};
     let _task ={};
@@ -28,10 +30,16 @@ var Html = (function(){
         _taskChanged = listener;
     };
     let _typeList = function(tlist){
-        _category ={ix:0,types:tlist.Types,headers:tlist.Headers};
+        _types = tlist.Types;
+        _headers = tlist.Headers;
+    };
+    let _enumList = function(elist){
+        elist.forEach(e=>{
+            e.Type="enum";
+            _types[e.Name]=e;
+        });
     };
     let _taskList = function(conf,tbar,callback){
-        console.log(tbar);
         document.querySelector(conf.id).innerHTML="";
         let tem=[];
         tbar.Tasks.forEach(task=>{
@@ -60,13 +68,9 @@ var Html = (function(){
     let _jobList = function(conf,tn,callback){
         let task = _tasks[tn];
         _task.Name = tn;
-        console.log(task);
         _taskChanged(_task.Name);
         document.querySelector(conf.id).innerHTML="";
         let tem=[];
-        //tem.push("<span class='w3-bar-item w3-left w3-teal w3-tag tx-text-20 tx-padding-button'><i class='material-symbols-outlined tx-orange-icon-24 tx-margin-top-8'>settings</i>");
-        //tem.push(" "+task.Name);
-        //tem.push("</span>");
         task.Jobs.forEach(job=>{
             tem.push("<span tx-job-name='");
             tem.push(job.Callback+"' ");
@@ -378,9 +382,9 @@ var Html = (function(){
         document.querySelector(containerId).innerHTML += tem.join("");
     };
 
-    let _categoryForm = function(conf,data,callback){
+    let _categoryForm = function(conf,callback){
         document.querySelector(conf.id).innerHTML="";
-        _category ={ix:0,types:data.Types,headers:data.Headers};
+        _category = {ix:0,types:_types,headers:_headers};
         let tem=[];
         tem.push(_icon("cc","category","close","red"));
         document.querySelector(conf.id).innerHTML += tem.join("");
@@ -391,7 +395,7 @@ var Html = (function(){
         tem.push("Category : Properties");
         tem.push("</legend>");
         tem.push(_input({Name:"Name",Reference:"text"},"category"));
-        tem.push(_selectType({Name:"Type",Reference:"text"},"category",data.Types));
+        tem.push(_selectType({Name:"Type",Reference:"text"},"category",_category.types));
         tem.push(_checkbox({Name:"Nullable",Reference:"text"},"category"));
         tem.push(_checkbox({Name:"Downloadable",Reference:"text"},"category"));
         tem.push(_selectReference({Name:"Reference",Reference:"text"},"category"));
@@ -412,14 +416,14 @@ var Html = (function(){
             let ty = _category.typeSelect.options[_category.typeSelect.selectedIndex].text;
             if (ty=="List" || ty=="Set"){
                 let ref =[];
-                for(const k of Object.keys(data.Types)){
+                for(const k of Object.keys(_category.types)){
                     ref.push("<option value='"+k+"'>"+k+"</option>");
                 }
                 _category.referenceSelect.innerHTML = ref.join("");
                 _category.referenceSelectBox.style.display = "block";
             }
             else{
-                let cat = data.Types[ty];
+                let cat = _category.types[ty];
                 if(cat.Type == "enum"){
                     let ref =[];
                     cat.Values.forEach(v=>{
@@ -440,10 +444,10 @@ var Html = (function(){
             let cn = document.querySelector("#category-Name").value;
             let nullable = document.querySelector("#category-Nullable").checked;
             let downloadable = document.querySelector("#category-Downloadable").checked;
-            let tp = data.Types[_category.typeSelect.options[_category.typeSelect.selectedIndex].text];
+            let tp = _category.types[_category.typeSelect.options[_category.typeSelect.selectedIndex].text];
             if( tp.Type == "list" || tp.Type =="set"){
                v = _category.referenceSelect.options[_category.referenceSelect.selectedIndex].getAttribute("value");
-               let cat = data.Types[v];
+               let cat = _category.types[v];
                let item = cn+":"+tp.Type+"&lt"+"category:"+cat.Name+"&gt";
                let id = "c-entry"+_category.ix;
                _addItem(id,item);
@@ -453,7 +457,7 @@ var Html = (function(){
             }
             if(tp.Type== "enum"){
                v = _category.referenceSelect.options[_category.referenceSelect.selectedIndex].getAttribute("value");
-               let cat = data.Types[v];
+               let cat = _category.types[v];
                let item = (cn+":"+tp.Type+"&lt"+cat.Name+"&gt");
                let id = "c-entry"+_category.ix;
                _addItem(id,item);
@@ -489,7 +493,7 @@ var Html = (function(){
     };
 
     let _addItem = function(id,item){
-        let li = "<li id='"+id+"'>"+item+"<scan class='w3-right category-entry-remove' "+"category-entry-id='"+id+"'><i class='material-symbols-outlined tx-red-icon-24'>remove</i></span></li>";
+        let li = "<li id='"+id+"'>"+item+"<scan class='w3-right tx-text-16 category-entry-remove' "+"category-entry-id='"+id+"'><i class='material-symbols-outlined tx-red-icon-24'>remove</i></span></li>";
         _category.build.innerHTML += li;
         document.querySelectorAll(".category-entry-remove").forEach(a=>{
             a.onclick = ()=>{
@@ -701,6 +705,7 @@ var Html = (function(){
         taskList : _taskList,
         jobList : _jobList,
         typeList : _typeList,
+        enumList : _enumList,
         categoryList : _categoryList,
         categorySelect : _categorySelect,
         instanceList : _instanceList,

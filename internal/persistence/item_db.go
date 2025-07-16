@@ -10,10 +10,7 @@ const (
 	ITEM_HEADER_SQL_SCHEMA        string = "CREATE TABLE IF NOT EXISTS item_header (configuration_id BIGINT NOT NULL,name VARCHAR(100) NOT NULL,value VARCHAR(100) NOT NULL, PRIMARY KEY(configuration_id,name))"
 	ITEM_APPLICATION_SQL_SCHEMA   string = "CREATE TABLE IF NOT EXISTS item_application (configuration_id BIGINT NOT NULL,name VARCHAR(100) NOT NULL,reference_id BIGINT NOT NULL,PRIMARY KEY(configuration_id,name,reference_id))"
 
-	INSERT_ENUM                 string = "INSERT INTO item_enum (id,name) VALUES ($1,$2)"
-	INSERT_ENUM_VALUE           string = "INSERT INTO item_enum_value (enum_id,name,value) VALUES ($1,$2,$3)"
-	SELECT_ENUM_WITH_NAME       string = "SELECT id FROM item_enum WHERE name = $1"
-	SELECT_ENUM_VALUES_WITH_CID string = "SELECT name,value FROM item_enum_value WHERE enum_id = $1"
+
 
 	DELETE_CONFIG_WITH_NAME string = "DELETE FROM item_configuration WHERE name = $1 RETURNING id"
 	DELETE_HEADER           string = "DELETE FROM item_header WHERE configuration_id = $1"
