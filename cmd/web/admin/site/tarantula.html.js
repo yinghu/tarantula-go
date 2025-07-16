@@ -98,10 +98,12 @@ var Html = (function(){
         document.querySelector(conf.id).innerHTML = "";
         let tem =[];
         clist.forEach(c=>{
-            tem.push("<span tx-category-id='"+c.Id+"' ");
-            tem.push("class='w3-bar-item w3-green w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4 tx-"+conf.prefix+"-opt'>");
-            tem.push(c.Name);
-            tem.push("</span>");    
+            if(c.ScopeSequence == _task.ScopeSequence){
+                tem.push("<span tx-category-id='"+c.Id+"' ");
+                tem.push("class='w3-bar-item w3-green w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4 tx-"+conf.prefix+"-opt'>");
+                tem.push(c.Name);
+                tem.push("</span>");
+            }    
         });
         document.querySelector(conf.id).innerHTML = tem.join("");
         document.querySelectorAll(".tx-"+conf.prefix+"-opt").forEach(a=>{
@@ -389,6 +391,9 @@ var Html = (function(){
         tem.push(_checkbox({Name:"Rechargeable"},prefix));
         tem.push("</fieldset>");
         document.querySelector(containerId).innerHTML += tem.join("");
+        if(_task.ScopeSequence != 3){
+            document.querySelector("#"+prefix+"-Rechargeable").disabled = true;
+        }
     };
 
     let _categoryForm = function(conf,callback){
@@ -425,8 +430,10 @@ var Html = (function(){
             let ty = _category.typeSelect.options[_category.typeSelect.selectedIndex].text;
             if (ty=="List" || ty=="Set"){
                 let ref =[];
-                for(const k of Object.keys(_category.types)){
-                    ref.push("<option value='"+k+"'>"+k+"</option>");
+                for(const [k,v] of Object.entries(_category.types)){
+                    if(v.Type=="category"){
+                        ref.push("<option value='"+k+"'>"+k+"</option>");
+                    }
                 }
                 _category.referenceSelect.innerHTML = ref.join("");
                 _category.referenceSelectBox.style.display = "block";
