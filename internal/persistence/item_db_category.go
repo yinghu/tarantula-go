@@ -10,17 +10,17 @@ import (
 )
 
 const (
-	INSERT_CATEGORY              string = "INSERT INTO item_category (id,name,scope,rechargeable,description) VALUES($1,$2,$3,$4,$5)"
+	INSERT_CATEGORY              string = "INSERT INTO item_category (id,name,scope,scope_sequence,rechargeable,description) VALUES($1,$2,$3,$4,$5,$6)"
 	INSERT_PROPERTY              string = "INSERT INTO item_category_property (category_id,name,type,reference,nullable,downloadable) VALUES($1,$2,$3,$4,$5,$6)"
-	SELECT_CATEGORY_WITH_NAME    string = "SELECT id,scope,rechargeable,description FROM item_category WHERE name = $1"
-	SELECT_CATEGORY_WITH_ID      string = "SELECT name,scope,rechargeable,description FROM item_category WHERE id = $1"
+	SELECT_CATEGORY_WITH_NAME    string = "SELECT id,scope,scope_sequence,rechargeable,description FROM item_category WHERE name = $1"
+	SELECT_CATEGORY_WITH_ID      string = "SELECT name,scope,scope_sequence,rechargeable,description FROM item_category WHERE id = $1"
 	SELECT_PROPERTIES_WITH_CID   string = "SELECT name,type,reference,nullable,downloadable FROM item_category_property WHERE category_id = $1"
-	SELECT_CATEGORIES_WITH_SCOPE string = "SELECT id,name,rechargeable,description FROM item_category WHERE scope = $1"
+	SELECT_CATEGORIES_WITH_SCOPE string = "SELECT id,name,scope,scope_sequence,rechargeable,description FROM item_category WHERE scope_sequence >= $1 AND scope_sequence <= $2"
 )
 
 func (db *ItemDB) SaveCategory(c item.Category) error {
 	return db.Sql.Txn(func(tx pgx.Tx) error {
-		r, err := tx.Exec(context.Background(), INSERT_CATEGORY, c.Id, c.Name, c.Scope, c.Rechargeable, c.Description)
+		r, err := tx.Exec(context.Background(), INSERT_CATEGORY, c.Id, c.Name, c.Scope, c.ScopeSequence, c.Rechargeable, c.Description)
 		if err != nil {
 			return err
 		}
@@ -47,7 +47,7 @@ func (db *ItemDB) SaveCategory(c item.Category) error {
 func (db *ItemDB) LoadCategoryWithId(cid int64) (item.Category, error) {
 	cat := item.Category{Id: cid}
 	err := db.Sql.Query(func(row pgx.Rows) error {
-		err := row.Scan(&cat.Name, &cat.Scope, &cat.Rechargeable, &cat.Description)
+		err := row.Scan(&cat.Name, &cat.Scope, &cat.ScopeSequence, &cat.Rechargeable, &cat.Description)
 		if err != nil {
 			return err
 		}
@@ -78,7 +78,7 @@ func (db *ItemDB) LoadCategoryWithId(cid int64) (item.Category, error) {
 func (db *ItemDB) LoadCategory(cname string) (item.Category, error) {
 	cat := item.Category{Name: cname}
 	err := db.Sql.Query(func(row pgx.Rows) error {
-		err := row.Scan(&cat.Id, &cat.Scope, &cat.Rechargeable, &cat.Description)
+		err := row.Scan(&cat.Id, &cat.Scope, &cat.ScopeSequence, &cat.Rechargeable, &cat.Description)
 		if err != nil {
 			return err
 		}
@@ -106,17 +106,17 @@ func (db *ItemDB) LoadCategory(cname string) (item.Category, error) {
 	return cat, nil
 }
 
-func (db *ItemDB) FromScope(scope string) []item.Category {
+func (db *ItemDB) LoadCategories(scopeStart int32, scopeEnd int32) []item.Category {
 	list := make([]item.Category, 0)
 	db.Sql.Query(func(row pgx.Rows) error {
-		var cat = item.Category{Scope: scope}
-		err := row.Scan(&cat.Id, &cat.Name, &cat.Rechargeable, &cat.Description)
+		var cat = item.Category{}
+		err := row.Scan(&cat.Id, &cat.Name, &cat.Scope, &cat.ScopeSequence, &cat.Rechargeable, &cat.Description)
 		if err != nil {
 			return err
 		}
 		list = append(list, cat)
 		return nil
-	}, SELECT_CATEGORIES_WITH_SCOPE, scope)
+	}, SELECT_CATEGORIES_WITH_SCOPE, scopeStart, scopeEnd)
 	return list
 }
 

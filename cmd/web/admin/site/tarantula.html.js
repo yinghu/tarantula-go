@@ -2,14 +2,15 @@ var Html = (function(){
     
     let _tasks = {};
     let _types = {};
+    let _scopedTypes ={};
     let _headers ={};
     let _enum ={};
     let _category ={};
     let _task ={};
     let _instance ={};
     
-    let _taskChanged = tn=>{
-        console.log("Task changed :"+tn);
+    let _taskChanged = (tn,ts)=>{
+        console.log("Task changed :"+tn+":"+ts);
     };
     let _caption = function(word){
         return word[0].toUpperCase() + word.slice(1);
@@ -29,9 +30,16 @@ var Html = (function(){
     let _registerTaskChangeListener = function(listener){
         _taskChanged = listener;
     };
-    let _typeList = function(tlist){
+    let _setup = function(tlist){
         _types = tlist.Types;
         _headers = tlist.Headers;
+    };
+    let _typeList = function(scope,tlist){
+        _scopedTypes[scope]=tlist;
+        tlist.forEach(e=>{
+            e.Type="category";
+            _types[e.Name]=e;
+        });
     };
     let _enumList = function(elist){
         elist.forEach(e=>{
@@ -52,7 +60,7 @@ var Html = (function(){
             tem.push("<span><i class='material-symbols-outlined tx-margin-left-8 tx-orange-icon-24'>double_arrow</i></span>");
             tem.push("</div>");
             tem.push("<div class='w3-display-bottomleft w3-padding'>");
-            tem.push("<span class='tx-margin-left-8 tx-text-24'>");
+            tem.push("<span class='tx-margin-left-8 tx-text-20'>");
             tem.push(task.Name);
             tem.push("</span>");
             tem.push("</div>");
@@ -68,7 +76,8 @@ var Html = (function(){
     let _jobList = function(conf,tn,callback){
         let task = _tasks[tn];
         _task.Name = tn;
-        _taskChanged(_task.Name);
+        _task.ScopeSequence = task.ScopeSequence;
+        _taskChanged(_task.Name,_task.ScopeSequence);
         document.querySelector(conf.id).innerHTML="";
         let tem=[];
         task.Jobs.forEach(job=>{
@@ -488,6 +497,7 @@ var Html = (function(){
             _category.Description = des;
             _category.Rechargeable = rc;
             _category.Scope = _task.Name;
+            _category.ScopeSequence = _task.ScopeSequence;
             callback(_category);
         });      
     };
@@ -704,6 +714,7 @@ var Html = (function(){
         form : _form,
         taskList : _taskList,
         jobList : _jobList,
+        setup : _setup,
         typeList : _typeList,
         enumList : _enumList,
         categoryList : _categoryList,

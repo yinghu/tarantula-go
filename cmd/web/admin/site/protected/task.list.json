@@ -1,61 +1,61 @@
 {
     "Tasks":[
         {
-            "Name":"Asset",    
+            "Name":"Asset","ScopeSequence":1,    
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
             ]
         },
         {
-            "Name":"Component",
+            "Name":"Component","ScopeSequence":2,
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
             ]    
         },
         {
-            "Name":"Commodity",
+            "Name":"Commodity","ScopeSequence":3,
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
             ]        
         },
         {
-            "Name":"Item",
+            "Name":"Item","ScopeSequence":4,
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}            
             ]        
         },
         {
-            "Name":"Store",
+            "Name":"Store","ScopeSequence":5,
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}            
             ]        
         },
         {
-            "Name":"Tournament",
+            "Name":"Tournament","ScopeSequence":5,
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
             ]        
         },
         {
-            "Name":"Resource",
+            "Name":"Resource","ScopeSequence":5,
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}            
             ]        
         },
         {
-            "Name":"Achievement",
+            "Name":"Achievement","ScopeSequence":5,
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
             ]        
         },
         {
-            "Name":"DailLogin",
+            "Name":"DailLogin","ScopeSequence":5,
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
             ]        
         },
         {
-            "Name":"CustomerService",
+            "Name":"CustomerService","ScopeSequence":0,
             "Jobs":[
                 {"Name":"Ban","Callback":"create_new_enum"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"}
                 ,{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"}
