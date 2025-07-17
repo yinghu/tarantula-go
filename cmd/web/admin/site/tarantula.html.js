@@ -116,9 +116,11 @@ var Html = (function(){
         let tem =[];
         tem.push("<option value='' disabled selected>select to load</option>");
         clist.forEach(c=>{
-            tem.push("<option tx-category-id='"+c.Id+"'>");
-            tem.push(c.Name);
-            tem.push("</option>");    
+            if(c.ScopeSequence==_task.ScopeSequence){
+                tem.push("<option tx-category-id='"+c.Id+"'>");
+                tem.push(c.Name);
+                tem.push("</option>");
+            }    
         });
         ctn.innerHTML = tem.join("");
         ctn.onchange = ()=>{

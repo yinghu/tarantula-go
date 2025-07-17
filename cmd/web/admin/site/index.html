@@ -203,7 +203,7 @@
 
             function load_instances(cat){
                 Html.openWithId("#tx-instance-list-box");
-                Admin.getJson("/admin/loadconfigs/"+cat+"/10",resp=>{
+                Admin.getJson("/admin/config/load/0/"+cat+"/10",resp=>{
                     Html.instanceList({id:"#tx-instance-list-box",prefix:"ins"},resp,(id)=>{
                         load_instance(id);
                     });
@@ -211,7 +211,7 @@
             }
 
             function load_instance(id){ 
-                Admin.getJson("/admin/loadconfig/"+id,resp=>{
+                Admin.getJson("/admin/config/load/"+id+"/n/0",resp=>{
                     populate_instance(resp);
                 });   
             }
@@ -219,7 +219,7 @@
             function populate_instance(ins){
                 Admin.getJson("/admin/category/load/0/"+ins.ConfigurationCategory+"/0/0",resp=>{
                     Html.instanceForm({id:"#tx-form-box",prefix:"ins"},resp,data=>{
-                        Admin.postJson("/admin/saveconfig",data,resp=>{
+                        Admin.postJson("/admin/config/save",data,resp=>{
                             Html.messageWithId("#tx-info-box-content",resp.message);    
                             Html.openWithId("#tx-info-box");
                         });
@@ -230,7 +230,7 @@
             }
 
             function load_categories(prop,callback){
-                Admin.getJson("/admin/loadconfigs/"+prop+"/10",cats=>{
+                Admin.getJson("/admin/config/load/0/"+prop+"/10",cats=>{
                     callback(cats);
                 });    
             }
