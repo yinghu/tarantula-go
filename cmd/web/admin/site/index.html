@@ -164,11 +164,11 @@
                 Html.openWithId("#tx-form-box");   
             }
 
-            function on_task_change(tn,ts){
-                set_task_header(tn+":"+ts,"settings");
+            function on_task_change(tsk){
+                set_task_header(tsk.Name+":"+tsk.ScopeSequence,tsk.Icon);
                 Html.closeWithId("#tx-form-box");
                 Html.closeWithId("#tx-instance-list-box");
-                Admin.getJson("/admin/category/load/0/scope/1/"+ts,resp=>{
+                Admin.getJson("/admin/category/load/0/scope/1/"+tsk.ScopeSequence,resp=>{
                     Html.typeList(resp);
                     Html.categoryList({id:"#tx-category-list-box",prefix:"cc"},resp,cid=>{
                         load_category(cid);
@@ -177,6 +177,7 @@
                         load_instances(c);
                     });    
                 });
+                after_login(tsk.ScopeSequence != 0);
             }
 
             function after_login(open){
@@ -238,6 +239,19 @@
             function set_task_header(tn,icon){
                 document.querySelector("#tx-task-header-box-content").innerHTML=tn;
                 document.querySelector("#tx-task-header-box-icon").innerHTML=icon;
+            }
+
+            function change_password(){
+                Admin.getJson("/admin/webprotected/change.password.json",(resp)=>{
+                    let conf ={id:"#tx-form-box",prefix:"password",closeable:true};
+                    Html.form(conf,resp,(data)=>{
+                        Admin.postJson("/admin/password",data,ret=>{
+                            Html.messageWithId("#tx-info-box-content",ret.message);    
+                            Html.openWithId("#tx-info-box");
+                        });    
+                    });
+                    Html.openWithId("#tx-form-box");
+                });
             }
 
         </script>

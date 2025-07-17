@@ -8,9 +8,7 @@ var Html = (function(){
     let _task ={};
     let _instance ={};
     
-    let _taskChanged = (tn,ts)=>{
-        console.log("Task changed :"+tn+":"+ts);
-    };
+    let _taskChanged = (tsk)=>{};
     let _caption = function(word){
         return word[0].toUpperCase() + word.slice(1);
     };
@@ -75,7 +73,8 @@ var Html = (function(){
         let task = _tasks[tn];
         _task.Name = tn;
         _task.ScopeSequence = task.ScopeSequence;
-        _taskChanged(_task.Name,_task.ScopeSequence);
+        _task.Icon = task.Icon;
+        _taskChanged(_task);
         document.querySelector(conf.id).innerHTML="";
         let tem=[];
         task.Jobs.forEach(job=>{

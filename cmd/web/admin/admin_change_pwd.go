@@ -14,14 +14,20 @@ type AdminChangePwd struct {
 	*AdminService
 }
 
+type ChangePassword struct {
+	Login  string `json:"login"`
+	OldPwd string `json:"oldPassword"`
+	NewPwd string `json:"newPassword"`
+}
+
 func (s *AdminChangePwd) AccessControl() int32 {
 	return bootstrap.PROTECTED_ACCESS_CONTROL
 }
-func (s *AdminChangePwd) Request(rs core.OnSession,w http.ResponseWriter, r *http.Request) {
+func (s *AdminChangePwd) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var login event.Login
-	json.NewDecoder(r.Body).Decode(&login)
-	pwd := login.Hash
+	var cp ChangePassword
+	json.NewDecoder(r.Body).Decode(&cp)
+	login := event.Login{Name:cp.Login}
 	err := s.LoadLogin(&login)
 	w.WriteHeader(http.StatusOK)
 	if err != nil {
@@ -29,7 +35,7 @@ func (s *AdminChangePwd) Request(rs core.OnSession,w http.ResponseWriter, r *htt
 		w.Write(util.ToJson(session))
 		return
 	}
-	hash, err := s.Authenticator().HashPassword(pwd)
+	hash, err := s.Authenticator().HashPassword(cp.NewPwd)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))

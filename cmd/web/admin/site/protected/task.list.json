@@ -1,69 +1,77 @@
 {
     "Tasks":[
         {
-            "Name":"Asset","ScopeSequence":1,    
+            "Name":"Asset","ScopeSequence":1,"Icon":"videogame_asset",    
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
             ]
         },
         {
-            "Name":"Component","ScopeSequence":2,
+            "Name":"Component","ScopeSequence":2,"Icon":"component_exchange",
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
             ]    
         },
         {
-            "Name":"Commodity","ScopeSequence":3,
+            "Name":"Commodity","ScopeSequence":3,"Icon":"inventory_2",
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
             ]        
         },
         {
-            "Name":"Item","ScopeSequence":4,
+            "Name":"Item","ScopeSequence":4,"Icon":"package_2",
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}            
             ]        
         },
         {
-            "Name":"Store","ScopeSequence":5,
+            "Name":"Store","ScopeSequence":5,"Icon":"shopping_cart",
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}            
             ]        
         },
         {
-            "Name":"Tournament","ScopeSequence":5,
+            "Name":"Tournament","ScopeSequence":5,"Icon":"trophy",
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
             ]        
         },
         {
-            "Name":"Resource","ScopeSequence":5,
+            "Name":"Resource","ScopeSequence":5,"Icon":"extension",
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}            
             ]        
         },
         {
-            "Name":"Achievement","ScopeSequence":5,
+            "Name":"Achievement","ScopeSequence":5,"Icon":"award_star",
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
             ]        
         },
         {
-            "Name":"DailLogin","ScopeSequence":5,
+            "Name":"DailyLogin","ScopeSequence":5,"Icon":"commute",
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
             ]        
         },
         {
-            "Name":"CustomerService","ScopeSequence":0,
+            "Name":"Cloud","ScopeSequence":5,"Icon":"cloud",
             "Jobs":[
-                {"Name":"Ban","Callback":"create_new_enum"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"}
-                ,{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"}
-                ,{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"}
-                ,{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"}
-                ,{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"}
-                ,{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"},{"Name":"Grant","Callback":"create_new_category"}           
+                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
+            ]        
+        },
+        {
+            "Name":"Admin Tool","ScopeSequence":0,"Icon":"admin_panel_settings",
+            "Jobs":[
+                {"Name":"Change Password","Callback":"change_password"}
+            ]        
+        },
+        {
+            "Name":"CS Tool","ScopeSequence":0,"Icon":"support",
+            "Jobs":[
+                {"Name":"Change Password","Callback":"change_password"}
             ]        
         }
+        
     ]
     }
