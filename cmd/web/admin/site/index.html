@@ -95,6 +95,7 @@
                                 return;
                             }
                             Html.registerTaskChangeListener(on_task_change);
+                            Html.registerUploadTask(on_upload_task);
                             on_login(resp);
                             Html.closeWithId("#tx-info-box");
                             Html.openWithId("#tx-logout");
@@ -251,6 +252,16 @@
                         });    
                     });
                     Html.openWithId("#tx-form-box");
+                });
+            }
+
+            function on_upload_task(upload,callback){
+                Admin.postJson("/admin/file/save",upload.data,resp=>{
+                    Html.messageWithId("#tx-info-box-content",resp.message);    
+                    Html.openWithId("#tx-info-box"); 
+                    if(resp.successful){
+                        callback({file:resp.message});
+                    }
                 });
             }
 

@@ -12,6 +12,7 @@ import (
 
 type AdminService struct {
 	bootstrap.AppManager
+	assetDir string
 }
 
 func (s *AdminService) Config() string {
@@ -20,6 +21,7 @@ func (s *AdminService) Config() string {
 
 func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	s.AppManager.Start(f, c)
+	s.assetDir = f.LocalDir
 	err := s.createSchema()
 	if err != nil {
 		return err
@@ -35,8 +37,9 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 
 	http.Handle("/admin/webprotected/{name}", bootstrap.Logging(&AdminWebProtected{AdminService: s}))
 	http.Handle("/admin/web/{name}", bootstrap.Logging(&AdminWebIndex{AdminService: s}))
-	
+
 	http.Handle("/admin/enum/load/{name}", bootstrap.Logging(&EnumLoader{AdminService: s}))
+	http.Handle("/admin/file/save", bootstrap.Logging(&FileSaver{AdminService: s}))
 	http.Handle("/admin/enum/save", bootstrap.Logging(&EnumSaver{AdminService: s}))
 	http.Handle("/admin/category/load/{id}/{name}/{from}/{to}", bootstrap.Logging(&CategoryLoader{AdminService: s}))
 	http.Handle("/admin/category/save", bootstrap.Logging(&CategorySaver{AdminService: s}))

@@ -23,3 +23,5 @@
 .tx-text-32{font-family: "Oswald";font-size: 32px;}
 .tx-padding-button{padding:4px 8px 4px 8px;}
 textarea {width:100%; height: 240px; border:1px solid green}
+::file-selector-button {border: 1px solid black;padding: 4px 8px 4px 8px ;background-color: lightgreen;font-size: 12px;}
+.tx-hidden {display: none;}

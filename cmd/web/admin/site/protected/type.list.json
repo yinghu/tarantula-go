@@ -11,6 +11,7 @@
     "Password" : {"Type": "string","Name": "Password","Reference": "password"},
     "Email" : {"Type": "string","Name": "Email","Reference": "email"},
     "Editor" : {"Type": "string","Name": "Editor","Reference": "textarea"},
+    "File" : {"Type": "string","Name": "File","Reference": "file"},
     "List" : {"Type": "list","Name": "List"},
     "Set" : {"Type": "set","Name": "Set"}
  },

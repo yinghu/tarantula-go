@@ -7,7 +7,9 @@ var Html = (function(){
     let _category ={};
     let _task ={};
     let _instance ={};
+    let _upload ={};
     
+    let _uploadTask = (data,callback)=>{}
     let _taskChanged = (tsk)=>{};
     let _caption = function(word){
         return word[0].toUpperCase() + word.slice(1);
@@ -26,6 +28,9 @@ var Html = (function(){
     };
     let _registerTaskChangeListener = function(listener){
         _taskChanged = listener;
+    };
+    let _registerUploadTask = function(task){
+        _uploadTask = task;
     };
     let _setup = function(tlist){
         _types = tlist.Types;
@@ -240,6 +245,37 @@ var Html = (function(){
         return tem.join("");
     };
 
+    let _uploadFile = function(prop,prefix){
+        let tem=[];
+        tem.push("<div class='w3-panel'>");
+        tem.push("<label class='tx-text-12'>");
+        tem.push(_caption(prop.Name));
+        tem.push("</label>");
+        tem.push("<span tx-property-name='");
+        tem.push(prop.Name+"' id='");
+        tem.push(prefix+"-"+prop.Name+"-upload");    
+        tem.push("' class='w3-right tx-hidden tx-margin-right-4 ");
+        tem.push(prefix+"-upload'>");
+        tem.push("<i class='material-symbols-outlined tx-orange-icon-20'>upload</i></span>");
+        tem.push("<input id='");
+        tem.push(prefix+"-"+prop.Name+"' ");
+        tem.push("class='w3-input w3-round w3-border tx-text-16 ");
+        tem.push(prefix+"-file-ready' type='file'/>");
+        tem.push("</div>");
+        return tem.join("");  
+    };
+
+    let _icon = function(prefix,n,icon,color){
+        let tem=[];
+        tem.push("<div class='w3-panel'>");
+        tem.push("<span id='");
+        tem.push(prefix+"-"+n+"-"+icon+"' class='w3-right'>");
+        tem.push("<i class='material-symbols-outlined tx-margin-right-8 tx-"+color+"-icon-24'>"+icon+"</i></span>");
+        tem.push("</div>");
+        return tem.join("");
+    };
+
+
     let _selectEnum = function(prop,prefix){
         let t = _category.types[prop.Reference];
         let tem=[];
@@ -321,34 +357,6 @@ var Html = (function(){
             tem.push("</ul></div>");
         }
         return tem.join("");  
-    };
-
-    let _upload = function(prop,prefix){
-        let tem=[];
-        tem.push("<div class='w3-panel'>");
-        tem.push("<label class='tx-text-12'>");
-        tem.push(_caption(prop.Name));
-        tem.push("</label>");
-        tem.push("<span tx-property-name='");
-        tem.push(prop.Name);    
-        tem.push("' class='w3-right tx-margin-right-4 ");
-        tem.push(prefix+"-upload'>");
-        tem.push("<i class='material-symbols-outlined tx-orange-icon-20'>file_open</i></span>");
-        tem.push("<input disabled id='");
-        tem.push(prefix+"-"+prop.Name+"' ");
-        tem.push("class='w3-input w3-round w3-border tx-text-16' type='text'/>");
-        tem.push("</div>");
-        return tem.join("");  
-    };
-
-    let _icon = function(prefix,n,icon,color){
-        let tem=[];
-        tem.push("<div class='w3-panel'>");
-        tem.push("<span id='");
-        tem.push(prefix+"-"+n+"-"+icon+"' class='w3-right'>");
-        tem.push("<i class='material-symbols-outlined tx-margin-right-8 tx-"+color+"-icon-24'>"+icon+"</i></span>");
-        tem.push("</div>");
-        return tem.join("");
     };
 
     let _form = function(conf,category,callback){
@@ -561,7 +569,11 @@ var Html = (function(){
                     _instance.save.header[c.Name]=document.querySelector("#"+conf.prefix+"-"+c.Name).value/1;    
                 }
                 else{
-                    _instance.save.header[c.Name]=document.querySelector("#"+conf.prefix+"-"+c.Name).value;
+                    if(c.Reference == "file"){
+                        _instance.save.header[c.Name] = _instance.build[c.Name];
+                    }else{
+                        _instance.save.header[c.Name]=document.querySelector("#"+conf.prefix+"-"+c.Name).value;
+                    }
                 }
             }
         });
@@ -625,7 +637,10 @@ var Html = (function(){
             }else{
                 if(p.Reference == "textarea"){
                     tem.push(_textarea(p,"ins"));
-                }else{
+                }else if(p.Reference =="file"){
+                    tem.push(_uploadFile(p,"ins"));
+                }
+                else{
                     tem.push(_input(p,"ins"));
                 }
             }
@@ -660,6 +675,30 @@ var Html = (function(){
                 }
             };
         });
+        document.querySelectorAll(".ins-upload").forEach(a=>{
+            a.onclick = ()=>{
+                _uploadTask(_upload,(resp)=>{
+                    pname = a.getAttribute("tx-property-name");
+                    _closeWithId("#ins-"+pname+"-upload");
+                    _instance.build[pname]=resp.file;
+                });
+            };
+        });
+        document.querySelectorAll(".ins-file-ready").forEach(a=>{
+            a.onchange = (e)=>{
+                _upload = {};
+                let _fd = e.target.files[0];
+                _upload.file = _fd;
+                _upload.name = _fd.name;
+                let reader = new FileReader();
+                reader.onloadend = ()=>{
+                    _upload.data = reader.result;
+                    _upload.ready = true;
+                    document.querySelector("#"+a.getAttribute("id")+"-upload").style.display = "block";
+                } ;
+                reader.readAsArrayBuffer(_fd);
+            };
+        });
         _eventWithId("#ins-category-close",()=>{
             document.querySelector(conf.id).style.display='none';
         });
@@ -687,7 +726,6 @@ var Html = (function(){
                     _addCategories(cid,cats);
                     ins.application[p.Name].forEach(c=>{    
                         if(c!==""){
-                            console.log(c);
                             _instance.build[p.Name].push(c);
                             let item ={selected:p.Name+":"+c,id:"ins-"+p.Name+"-"+_instance.ix,name:c,build:document.querySelector("#ins-select-"+p.Name)};
                             _addInstance(item);
@@ -708,13 +746,16 @@ var Html = (function(){
                     }
                 });   
             }else{
-                ctn.value = ins.header[p.Name];    
+                if(p.Reference!="file"){
+                    ctn.value = ins.header[p.Name];
+                }    
             }
         });
     };
 
     return {
         registerTaskChangeListener : _registerTaskChangeListener,
+        registerUploadTask : _registerUploadTask,
         messageWithId : _messageWithId,
         openWithId : _openWithId,
         closeWithId : _closeWithId,
