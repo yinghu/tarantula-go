@@ -22,29 +22,25 @@
             "Name": "ConfigurationName",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         },
         {
             "Name": "ConfigurationType",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         },
         {
             "Name": "ConfigurationTypeId",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         },
         {
             "Name": "ConfigurationVersion",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         }
       ]
     },
@@ -54,29 +50,25 @@
             "Name": "ConfigurationName",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         },
         {
             "Name": "ConfigurationType",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         },
         {
             "Name": "ConfigurationTypeId",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         },
         {
             "Name": "ConfigurationVersion",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         }
       ]       
     },
@@ -86,29 +78,25 @@
             "Name": "ConfigurationName",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         },
         {
             "Name": "ConfigurationType",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         },
         {
             "Name": "ConfigurationTypeId",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         },
         {
             "Name": "ConfigurationVersion",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         }
       ]
     },
@@ -118,29 +106,25 @@
             "Name": "ConfigurationName",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         },
         {
             "Name": "ConfigurationType",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         },
         {
             "Name": "ConfigurationTypeId",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         },
         {
             "Name": "ConfigurationVersion",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         }
       ]
     },
@@ -150,29 +134,25 @@
             "Name": "ConfigurationName",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         },
         {
             "Name": "ConfigurationType",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         },
         {
             "Name": "ConfigurationTypeId",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         },
         {
             "Name": "ConfigurationVersion",
             "Type":"string",
             "Reference": "text",
-            "Nullable": false,
-            "Downloadable": false
+            "Nullable": false
         }
       ]
     }   

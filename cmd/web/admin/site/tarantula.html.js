@@ -420,7 +420,6 @@ var Html = (function(){
         tem.push(_input({Name:"Name",Reference:"text"},"category"));
         tem.push(_selectType({Name:"Type",Reference:"text"},"category",_category.types));
         tem.push(_checkbox({Name:"Nullable",Reference:"text"},"category"));
-        tem.push(_checkbox({Name:"Downloadable",Reference:"text"},"category"));
         tem.push(_selectReference({Name:"Reference",Reference:"text"},"category"));
         tem.push(_icon("cc","category","add","orange"));
         tem.push("<div class='w3-card-4 w3-round w3-border tx-text-12 w3-ul tx-margin-left-4'>");
@@ -468,7 +467,6 @@ var Html = (function(){
          _eventWithId("#cc-category-add",()=>{
             let cn = document.querySelector("#category-Name").value;
             let nullable = document.querySelector("#category-Nullable").checked;
-            let downloadable = document.querySelector("#category-Downloadable").checked;
             let tp = _category.types[_category.typeSelect.options[_category.typeSelect.selectedIndex].text];
             if( tp.Type == "list" || tp.Type =="set"){
                v = _category.referenceSelect.options[_category.referenceSelect.selectedIndex].getAttribute("value");
@@ -477,7 +475,7 @@ var Html = (function(){
                let id = "c-entry"+_category.ix;
                _addItem(id,item);
                _category.ix++;
-               _category[id]={Name:cn,Type:tp.Type,Reference:"category:"+cat.Name,Nullable:nullable,Downloadable:downloadable}
+               _category[id]={Name:cn,Type:tp.Type,Reference:"category:"+cat.Name,Nullable:nullable}
                return; 
             }
             if(tp.Type== "enum"){
@@ -487,7 +485,7 @@ var Html = (function(){
                let id = "c-entry"+_category.ix;
                _addItem(id,item);
                _category.ix++;
-               _category[id]={Name:cn,Type:tp.Type,Reference:cat.Name,Nullable:nullable,Downloadable:downloadable}
+               _category[id]={Name:cn,Type:tp.Type,Reference:cat.Name,Nullable:nullable}
                return;
             }
             if(tp.Type =="category"){
@@ -495,14 +493,14 @@ var Html = (function(){
                 let id = "c-entry"+_category.ix;
                _addItem(id,item);
                _category.ix++;
-               _category[id]={Name:cn,Type:tp.Type,Reference:tp.Type+":"+tp.Name,Nullable:nullable,Downloadable:downloadable}   
+               _category[id]={Name:cn,Type:tp.Type,Reference:tp.Type+":"+tp.Name,Nullable:nullable}   
                 return;
             }
             let  item = cn+":"+tp.Type+"&lt"+tp.Name+"&gt";
             let id = "c-entry"+_category.ix;
             _addItem(id,item);
             _category.ix++;
-            _category[id]={Name:cn,Type:tp.Type,Reference:tp.Reference,Nullable:nullable,Downloadable:downloadable}
+            _category[id]={Name:cn,Type:tp.Type,Reference:tp.Reference,Nullable:nullable}
                 
         }); 
          _eventWithId("#cc-Save",()=>{

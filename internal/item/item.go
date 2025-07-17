@@ -30,7 +30,6 @@ type Property struct {
 	Type         string `json:"Type"`
 	Reference    string `json:"Reference"`
 	Nullable     bool   `json:"Nullable"`
-	Downloadable bool   `json:"Downloadable"`
 }
 
 type Configuration struct {
