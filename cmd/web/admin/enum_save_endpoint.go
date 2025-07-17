@@ -10,16 +10,16 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-type AdminSaveCategory struct {
+type EnumSaver struct {
 	*AdminService
 }
 
-func (s *AdminSaveCategory) AccessControl() int32 {
+func (s *EnumSaver) AccessControl() int32 {
 	return bootstrap.ADMIN_ACCESS_CONTROL
 }
-func (s *AdminSaveCategory) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
+func (s *EnumSaver) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var conf item.Category
+	var conf item.Enum
 	err := json.NewDecoder(r.Body).Decode(&conf)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
@@ -33,13 +33,13 @@ func (s *AdminSaveCategory) Request(rs core.OnSession, w http.ResponseWriter, r 
 		return
 	}
 	conf.Id = sid
-	err = s.ItemService().ValidateCategory(conf)
+	err = s.ItemService().ValidateEnum(conf)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	err = s.ItemService().SaveCategory(conf)
+	err = s.ItemService().SaveEnum(conf)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
@@ -47,8 +47,7 @@ func (s *AdminSaveCategory) Request(rs core.OnSession, w http.ResponseWriter, r 
 	}
 	ch := make(chan core.OnSession, 1)
 	defer close(ch)
-	go s.PostJson("http://inventory:8080/inventory/itemadmin/savecategory", conf, ch)
+	go s.PostJson("http://inventory:8080/inventory/itemadmin/saveenum", conf, ch)
 	ret := <-ch
 	w.Write(util.ToJson(ret))
-
 }

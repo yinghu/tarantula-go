@@ -124,7 +124,7 @@
                 Admin.getJson("/admin/webprotected/type.list.json",(resp)=>{
                     Html.setup(resp);    
                 });
-                Admin.getJson("/admin/loadenum/all",resp=>{
+                Admin.getJson("/admin/enum/load/all",resp=>{
                     Html.enumList(resp);
                 });
 
@@ -139,7 +139,7 @@
                             valid.Values.push(ev);
                         }    
                     }
-                    Admin.postJson("/admin/saveenum",valid,resp=>{
+                    Admin.postJson("/admin/enum/save",valid,resp=>{
                         Html.messageWithId("#tx-info-box-content",resp.message);    
                         Html.openWithId("#tx-info-box");
                     });
@@ -156,7 +156,7 @@
                             valid.Properties.push(ev);
                         }    
                     }
-                    Admin.postJson("/admin/savecategory",valid,resp=>{
+                    Admin.postJson("/admin/category/save",valid,resp=>{
                         Html.messageWithId("#tx-info-box-content",resp.message);    
                         Html.openWithId("#tx-info-box");
                     });
@@ -169,7 +169,7 @@
                 Html.closeWithId("#tx-form-box");
                 Html.closeWithId("#tx-instance-list-box");
                 Admin.getJson("/admin/category/load/0/scope/1/"+ts,resp=>{
-                    Html.typeList(tn,resp);
+                    Html.typeList(resp);
                     Html.categoryList({id:"#tx-category-list-box",prefix:"cc"},resp,cid=>{
                         load_category(cid);
                     });
@@ -192,7 +192,7 @@
             function load_category(cid){
                 Admin.getJson("/admin/category/load/"+cid+"/n/0/0",resp=>{
                     Html.instanceForm({id:"#tx-form-box",prefix:"category",closeable:true},resp,data=>{
-                        Admin.postJson("/admin/saveconfig",data,resp=>{
+                        Admin.postJson("/admin/config/save",data,resp=>{
                             Html.messageWithId("#tx-info-box-content",resp.message);    
                             Html.openWithId("#tx-info-box");
                         });

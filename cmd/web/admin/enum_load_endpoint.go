@@ -8,14 +8,14 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-type AdminLoadEnum struct {
+type EnumLoader struct {
 	*AdminService
 }
 
-func (s *AdminLoadEnum) AccessControl() int32 {
+func (s *EnumLoader) AccessControl() int32 {
 	return bootstrap.ADMIN_ACCESS_CONTROL
 }
-func (s *AdminLoadEnum) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
+func (s *EnumLoader) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	cname := r.PathValue("name")
 	if cname == "all" {

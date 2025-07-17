@@ -2,7 +2,6 @@ var Html = (function(){
     
     let _tasks = {};
     let _types = {};
-    let _scopedTypes ={};
     let _headers ={};
     let _enum ={};
     let _category ={};
@@ -34,8 +33,7 @@ var Html = (function(){
         _types = tlist.Types;
         _headers = tlist.Headers;
     };
-    let _typeList = function(scope,tlist){
-        _scopedTypes[scope]=tlist;
+    let _typeList = function(tlist){
         tlist.forEach(e=>{
             e.Type="category";
             _types[e.Name]=e;
@@ -268,8 +266,10 @@ var Html = (function(){
         tem.push("<select id='");
         tem.push(prefix+'-'+prop.Name);
         tem.push("' name='chs' class='w3-round w3-border tx-text-16 w3-select tx-margin-left-4'>");
-        for(const k of Object.keys(types)){
-            tem.push("<option value='"+k+"'>"+k+"</option>");
+        for(const [k,v] of Object.entries(types)){
+            if(v.Type != "category" || v.ScopeSequence <= _task.ScopeSequence){ 
+                tem.push("<option value='"+k+"'>"+k+"</option>");
+            }
         }
         tem.push("</select>");
         tem.push("</div>");
@@ -596,10 +596,10 @@ var Html = (function(){
     };
     
     let _instanceForm = function(conf,data,save,load){
-        if (_category.headers[data.Scope] === undefined){
-            _instance = {ix:0,save:{header:{},application:{}},category:data,header:_category.headers["Application"],build:{}};
+        if (_headers[data.Scope] === undefined){
+            _instance = {ix:0,save:{header:{},application:{}},category:data,header:_headers["Application"],build:{}};
         }else{
-            _instance = {ix:0,save:{header:{},application:{}},category:data,header:_category.headers[data.Scope],build:{}};
+            _instance = {ix:0,save:{header:{},application:{}},category:data,header:_headers[data.Scope],build:{}};
         }
         document.querySelector(conf.id).innerHTML="";
         let tem=[];

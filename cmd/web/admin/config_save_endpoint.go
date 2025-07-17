@@ -10,16 +10,16 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-type AdminSaveEnum struct {
+type ConfigSaver struct {
 	*AdminService
 }
 
-func (s *AdminSaveEnum) AccessControl() int32 {
+func (s *ConfigSaver) AccessControl() int32 {
 	return bootstrap.ADMIN_ACCESS_CONTROL
 }
-func (s *AdminSaveEnum) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
+func (s *ConfigSaver) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var conf item.Enum
+	var conf item.Configuration
 	err := json.NewDecoder(r.Body).Decode(&conf)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
@@ -33,13 +33,13 @@ func (s *AdminSaveEnum) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 		return
 	}
 	conf.Id = sid
-	err = s.ItemService().ValidateEnum(conf)
+	err = s.ItemService().Validate(conf)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	err = s.ItemService().SaveEnum(conf)
+	err = s.ItemService().Save(conf)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
@@ -47,7 +47,8 @@ func (s *AdminSaveEnum) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 	}
 	ch := make(chan core.OnSession, 1)
 	defer close(ch)
-	go s.PostJson("http://inventory:8080/inventory/itemadmin/saveenum", conf, ch)
+	go s.PostJson("http://inventory:8080/inventory/itemadmin/saveconfig", conf, ch)
 	ret := <-ch
 	w.Write(util.ToJson(ret))
+	//w.Write(util.ToJson(conf))
 }

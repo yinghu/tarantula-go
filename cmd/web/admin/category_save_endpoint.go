@@ -10,16 +10,16 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-type AdminSaveConfig struct {
+type CategorySaver struct {
 	*AdminService
 }
 
-func (s *AdminSaveConfig) AccessControl() int32 {
+func (s *CategorySaver) AccessControl() int32 {
 	return bootstrap.ADMIN_ACCESS_CONTROL
 }
-func (s *AdminSaveConfig) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
+func (s *CategorySaver) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var conf item.Configuration
+	var conf item.Category
 	err := json.NewDecoder(r.Body).Decode(&conf)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
@@ -33,13 +33,13 @@ func (s *AdminSaveConfig) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		return
 	}
 	conf.Id = sid
-	err = s.ItemService().Validate(conf)
+	err = s.ItemService().ValidateCategory(conf)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	err = s.ItemService().Save(conf)
+	err = s.ItemService().SaveCategory(conf)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
@@ -47,8 +47,8 @@ func (s *AdminSaveConfig) Request(rs core.OnSession, w http.ResponseWriter, r *h
 	}
 	ch := make(chan core.OnSession, 1)
 	defer close(ch)
-	go s.PostJson("http://inventory:8080/inventory/itemadmin/saveconfig", conf, ch)
+	go s.PostJson("http://inventory:8080/inventory/itemadmin/savecategory", conf, ch)
 	ret := <-ch
 	w.Write(util.ToJson(ret))
-	//w.Write(util.ToJson(conf))
+
 }
