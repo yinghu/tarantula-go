@@ -9,7 +9,9 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsoneditor@10.1.0/dist/jsoneditor.min.css"/>
     <link rel="stylesheet" href="tarantula.admin.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/jsoneditor@10.1.0/dist/jsoneditor.min.js"></script>
     <script src="tarantula.admin.js"></script>
     <script src="tarantula.html.js"></script>
     <title>iCodeSoftware</title>
@@ -63,7 +65,28 @@
                 </fieldset>    
             </div>
         </div>
+        <div id="tx-json-preview-box" class="w3-modal w3-animate-zoom tx-hidden">
+                <div class="w3-modal-content">
+                    <div class="w3-display-container w3-border w3-border-teal tx-content-64">
+                        <div class="w3-display-topright">
+                            <span id="tx-json-preview-box-close"><i class="material-symbols-outlined tx-margin-top-8 tx-margin-right-8 tx-red-icon-24">close</i></span>
+                        </div>
+                        <div class="w3-display-topleft">
+                            <span><i class="material-symbols-outlined tx-margin-top-8 tx-margin-left-8 tx-orange-icon-24">preview</i></span>
+                        </div>
+                        <div id="tx-json-preview-box-title" class="w3-display-middle tx-text-16">content title</div>
+                        <div class="w3-display-bottomleft">
+                            <span id="tx-json-preview-box-tree" class="w3-tag w3-blue tx-text-12 tx-padding-button">Tree</span>
+                            <span id="tx-json-preview-box-code" class="w3-tag w3-blue tx-text-12 tx-padding-button">Code</span>
+                            <span id="tx-json-preview-box-preview" class="w3-tag w3-blue tx-text-12 tx-padding-button">Preview</span>
+                        </div>
+                    </div>
+                    <div id="tx-json-preview-box-content">
+                    </div>
+                </div>
+        </div>
         <script>
+            let editor;
             after_login(false)
             Html.eventWithId('#tx-info-box-close',()=>{Html.closeWithId('#tx-info-box');});
             if (!Admin.query().authenticated){
@@ -80,6 +103,20 @@
                 Html.closeWithId("#tx-category-list-box");
                 Html.closeWithId("#tx-instance-list-box");   
                 on_logout();
+            });
+
+            Html.eventWithId("#tx-json-preview-box-close",()=>{
+                editor.destroy();
+                Html.closeWithId("#tx-json-preview-box");
+            });
+            Html.eventWithId("#tx-json-preview-box-tree",()=>{
+                editor.setMode("tree");
+            });
+            Html.eventWithId("#tx-json-preview-box-code",()=>{
+                editor.setMode("code");
+            });
+            Html.eventWithId("#tx-json-preview-box-preview",()=>{
+                editor.setMode("preview");
             });
 
             function on_logout(){
@@ -278,17 +315,19 @@
                 Admin.getJson("/admin/webprotected/parse.snow.flake.id.json",(resp)=>{
                     let conf ={id:"#tx-form-box",prefix:"parse",closeable:true};
                     Html.form(conf,resp,(data)=>{
-                        console.log(data);
                         Admin.getJson("/admin/snowflake/parse/"+data.snowFlakeId,ret=>{
-                            console.log(ret);
-                            const d = new Date(ret.timestamp);
-                            console.log(d.toUTCString());
-                            //Html.messageWithId("#tx-info-box-content",ret.message);    
-                            //Html.openWithId("#tx-info-box");
+                            on_preview("SnowFlakeView",ret);    
                         });    
                     });
                     Html.openWithId("#tx-form-box");
                 });
+            }
+
+            function on_preview(title,json){
+                editor = new JSONEditor(document.querySelector("#tx-json-preview-box-content"),{mode:'tree'},{});
+                editor.set(json);
+                document.querySelector("#tx-json-preview-box-title").innerHTML=title;
+                Html.openWithId("#tx-json-preview-box");    
             }
 
         </script>
