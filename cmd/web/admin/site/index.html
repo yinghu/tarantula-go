@@ -274,6 +274,23 @@
                 Html.openWithId("#tx-info-box"); 
             }
 
+            function parse_snow_flake_id(){
+                Admin.getJson("/admin/webprotected/parse.snow.flake.id.json",(resp)=>{
+                    let conf ={id:"#tx-form-box",prefix:"parse",closeable:true};
+                    Html.form(conf,resp,(data)=>{
+                        console.log(data);
+                        Admin.getJson("/admin/snowflake/parse/"+data.snowFlakeId,ret=>{
+                            console.log(ret);
+                            const d = new Date(ret.timestamp);
+                            console.log(d.toUTCString());
+                            //Html.messageWithId("#tx-info-box-content",ret.message);    
+                            //Html.openWithId("#tx-info-box");
+                        });    
+                    });
+                    Html.openWithId("#tx-form-box");
+                });
+            }
+
         </script>
     </body>
 </html>

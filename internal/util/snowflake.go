@@ -57,5 +57,5 @@ func (s *Snowflake) Parse(snowflakeId int64) (int64, int64, int64) {
 	timestamp := (snowflakeId >> (BITS_OF_NODE_NUMBER + BITS_OF_SEQUENCE))
 	nodeId := (snowflakeId & int64(nodeIdMask)) >> BITS_OF_SEQUENCE
 	sequence := snowflakeId & int64(sequenceMask)
-	return timestamp, nodeId, sequence
+	return timestamp + s.EpochStart, nodeId, sequence
 }

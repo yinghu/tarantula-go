@@ -1,0 +1,13 @@
+{
+    "Scope": "admin",
+    "Name": "Parse",
+    "Description": "snow flake id form",
+    "Properties":[
+        {
+            "Name": "snowFlakeId",
+            "Type":"int64",
+            "Reference": "number",
+            "Nullable": false
+        }
+    ]
+}
