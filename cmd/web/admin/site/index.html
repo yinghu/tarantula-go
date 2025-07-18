@@ -115,11 +115,11 @@
                 Admin.getJson("/admin/webprotected/task.list.json",(resp)=>{
                     Html.taskList({id:"#tx-task-list",prefix:"task"},resp,(a)=>{
                         Html.jobList({id:"#tx-job-list-box",prefix:"job"},a,(b)=>{
-                            eval(b+"()");
+                            on_job(b);
                         });        
                     });
                     Html.jobList({id:"#tx-job-list-box",prefix:"job"},"Asset",(b)=>{
-                        eval(b+"()");
+                        on_job(b);
                     });
                 });
                 Admin.getJson("/admin/webprotected/type.list.json",(resp)=>{
@@ -166,10 +166,10 @@
             }
 
             function on_task_change(tsk){
-                set_task_header(tsk.Name+":"+tsk.ScopeSequence,tsk.Icon);
+                set_task_header(tsk.Name,tsk.Icon);
                 Html.closeWithId("#tx-form-box");
                 Html.closeWithId("#tx-instance-list-box");
-                Admin.getJson("/admin/category/load/0/scope/1/"+tsk.ScopeSequence,resp=>{
+                Admin.getJson("/admin/category/load/0/scope/"+tsk.ScopeSequence+"/"+tsk.Name,resp=>{
                     Html.typeList(resp);
                     Html.categoryList({id:"#tx-category-list-box",prefix:"cc"},resp,cid=>{
                         load_category(cid);
@@ -192,7 +192,7 @@
             }
 
             function load_category(cid){
-                Admin.getJson("/admin/category/load/"+cid+"/n/0/0",resp=>{
+                Admin.getJson("/admin/category/load/"+cid+"/n/0/n",resp=>{
                     Html.instanceForm({id:"#tx-form-box",prefix:"category",closeable:true},resp,data=>{
                         Admin.postJson("/admin/config/save",data,resp=>{
                             Html.messageWithId("#tx-info-box-content",resp.message);    
@@ -219,7 +219,7 @@
             }
 
             function populate_instance(ins){
-                Admin.getJson("/admin/category/load/0/"+ins.ConfigurationCategory+"/0/0",resp=>{
+                Admin.getJson("/admin/category/load/0/"+ins.ConfigurationCategory+"/0/n",resp=>{
                     Html.instanceForm({id:"#tx-form-box",prefix:"ins"},resp,data=>{
                         Admin.postJson("/admin/config/save",data,resp=>{
                             Html.messageWithId("#tx-info-box-content",resp.message);    
@@ -263,6 +263,15 @@
                         callback({file:resp.message});
                     }
                 });
+            }
+
+            function on_job(job){
+                if(typeof window[job] === 'function'){
+                    eval(job+"()");
+                    return;
+                }
+                Html.messageWithId("#tx-info-box-content","["+job+"] not defined!");    
+                Html.openWithId("#tx-info-box"); 
             }
 
         </script>

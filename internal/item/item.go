@@ -52,7 +52,7 @@ type ItemService interface {
 	SaveCategory(c Category) error
 	LoadCategory(cname string) (Category, error)
 	LoadCategoryWithId(cid int64) (Category, error)
-	LoadCategories(scopeStart int32, scopeEnd int32) []Category
+	LoadCategories(scopeEnd int32,targetScope string) []Category
 
 	Save(c Configuration) error
 	LoadWithName(cname string, limit int) ([]Configuration, error)

@@ -20,8 +20,8 @@ func (s *CategoryLoader) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 	defer r.Body.Close()
 	cid, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	cname := r.PathValue("name")
-	from := r.PathValue("from")
 	to := r.PathValue("to")
+	target := r.PathValue("target")
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
@@ -42,16 +42,11 @@ func (s *CategoryLoader) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 		w.Write(util.ToJson(cat))
 		return
 	}
-	sp, err := strconv.ParseInt(from, 10, 32)
+	sp, err := strconv.ParseInt(to, 10, 32)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	ep, err := strconv.ParseInt(to, 10, 32)
-	if err != nil {
-		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
-		return
-	}
-	list := s.ItemService().LoadCategories(int32(sp),int32(ep))
+	list := s.ItemService().LoadCategories(int32(sp),target)
 	w.Write(util.ToJson(list))
 }

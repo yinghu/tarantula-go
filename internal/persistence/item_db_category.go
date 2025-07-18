@@ -15,7 +15,7 @@ const (
 	SELECT_CATEGORY_WITH_NAME    string = "SELECT id,scope,scope_sequence,rechargeable,description FROM item_category WHERE name = $1"
 	SELECT_CATEGORY_WITH_ID      string = "SELECT name,scope,scope_sequence,rechargeable,description FROM item_category WHERE id = $1"
 	SELECT_PROPERTIES_WITH_CID   string = "SELECT name,type,reference,nullable FROM item_category_property WHERE category_id = $1"
-	SELECT_CATEGORIES_WITH_SCOPE string = "SELECT id,name,scope,scope_sequence,rechargeable,description FROM item_category WHERE scope_sequence >= $1 AND scope_sequence <= $2"
+	SELECT_CATEGORIES_WITH_SCOPE string = "SELECT id,name,scope,scope_sequence,rechargeable,description FROM item_category WHERE scope_sequence < $1 OR scope = $2"
 )
 
 func (db *ItemDB) SaveCategory(c item.Category) error {
@@ -106,7 +106,7 @@ func (db *ItemDB) LoadCategory(cname string) (item.Category, error) {
 	return cat, nil
 }
 
-func (db *ItemDB) LoadCategories(scopeStart int32, scopeEnd int32) []item.Category {
+func (db *ItemDB) LoadCategories(scopeEnd int32, targetScope string) []item.Category {
 	list := make([]item.Category, 0)
 	db.Sql.Query(func(row pgx.Rows) error {
 		var cat = item.Category{}
@@ -116,7 +116,7 @@ func (db *ItemDB) LoadCategories(scopeStart int32, scopeEnd int32) []item.Catego
 		}
 		list = append(list, cat)
 		return nil
-	}, SELECT_CATEGORIES_WITH_SCOPE, scopeStart, scopeEnd)
+	}, SELECT_CATEGORIES_WITH_SCOPE, scopeEnd, targetScope)
 	return list
 }
 

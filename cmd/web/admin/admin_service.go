@@ -41,7 +41,7 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	http.Handle("/admin/enum/load/{name}", bootstrap.Logging(&EnumLoader{AdminService: s}))
 	http.Handle("/admin/file/save", bootstrap.Logging(&FileSaver{AdminService: s}))
 	http.Handle("/admin/enum/save", bootstrap.Logging(&EnumSaver{AdminService: s}))
-	http.Handle("/admin/category/load/{id}/{name}/{from}/{to}", bootstrap.Logging(&CategoryLoader{AdminService: s}))
+	http.Handle("/admin/category/load/{id}/{name}/{to}/{target}", bootstrap.Logging(&CategoryLoader{AdminService: s}))
 	http.Handle("/admin/category/save", bootstrap.Logging(&CategorySaver{AdminService: s}))
 	http.Handle("/admin/config/load/{id}/{name}/{limit}", bootstrap.Logging(&ConfigLoader{AdminService: s}))
 	http.Handle("/admin/config/save", bootstrap.Logging(&ConfigSaver{AdminService: s}))

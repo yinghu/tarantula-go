@@ -3,67 +3,78 @@
         {
             "Name":"Asset","ScopeSequence":1,"Icon":"videogame_asset",    
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
+                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
+                {"Name":"Publish","Callback":"publish_category"},{"Name":"Edit","Callback":"edit_category"}           
             ]
         },
         {
             "Name":"Component","ScopeSequence":2,"Icon":"component_exchange",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
+                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
+                {"Name":"Publish","Callback":"publish_category"},{"Name":"Edit","Callback":"edit_category"}           
             ]    
         },
         {
             "Name":"Commodity","ScopeSequence":3,"Icon":"inventory_2",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
+                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
+                {"Name":"Publish","Callback":"publish_category"},{"Name":"Edit","Callback":"edit_category"}           
             ]        
         },
         {
             "Name":"Item","ScopeSequence":4,"Icon":"package_2",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}            
+                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
+                {"Name":"Publish","Callback":"publish_category"},{"Name":"Edit","Callback":"edit_category"}            
             ]        
         },
         {
             "Name":"Store","ScopeSequence":5,"Icon":"shopping_cart",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}            
+                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
+                {"Name":"Publish","Callback":"publish_category"},{"Name":"Edit","Callback":"edit_category"}            
             ]        
         },
         {
             "Name":"Tournament","ScopeSequence":5,"Icon":"trophy",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
+                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
+                {"Name":"Publish","Callback":"publish_category"},{"Name":"Edit","Callback":"edit_category"}           
             ]        
         },
         {
             "Name":"Resource","ScopeSequence":5,"Icon":"extension",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}            
+                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
+                {"Name":"Publish","Callback":"publish_category"},{"Name":"Edit","Callback":"edit_category"}            
             ]        
         },
         {
             "Name":"Achievement","ScopeSequence":5,"Icon":"award_star",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
+                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
+                {"Name":"Publish","Callback":"publish_category"},{"Name":"Edit","Callback":"edit_category"}           
             ]        
         },
         {
             "Name":"DailyLogin","ScopeSequence":5,"Icon":"commute",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
+                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
+                {"Name":"Publish","Callback":"publish_category"},{"Name":"Edit","Callback":"edit_category"}           
             ]        
         },
         {
             "Name":"Cloud","ScopeSequence":5,"Icon":"cloud",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"}           
+                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
+                {"Name":"Publish","Callback":"publish_category"},{"Name":"Edit","Callback":"edit_category"}           
             ]        
         },
         {
             "Name":"AdminTool","ScopeSequence":0,"Icon":"admin_panel_settings",
             "Jobs":[
-                {"Name":"Change Password","Callback":"change_password"}
+                {"Name":"Change Password","Callback":"change_password"},
+                {"Name":"Add Login","Callback":"add_login"}
             ]        
         },
         {

@@ -1,0 +1,25 @@
+{
+    "Scope": "admin",
+    "Name": "AddLogin",
+    "Description": "login form",
+    "Properties":[
+        {
+            "Name": "login",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false
+        },
+        {
+            "Name": "password",
+            "Type":"string",
+            "Reference": "password",
+            "Nullable": false
+        },
+        {
+            "Name": "accessControl",
+            "Type":"int32",
+            "Reference": "number",
+            "Nullable": false
+        }
+    ]
+}
