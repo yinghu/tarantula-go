@@ -61,13 +61,13 @@
             ]        
         },
         {
-            "Name":"Admin Tool","ScopeSequence":0,"Icon":"admin_panel_settings",
+            "Name":"AdminTool","ScopeSequence":0,"Icon":"admin_panel_settings",
             "Jobs":[
                 {"Name":"Change Password","Callback":"change_password"}
             ]        
         },
         {
-            "Name":"CS Tool","ScopeSequence":0,"Icon":"support",
+            "Name":"CSTool","ScopeSequence":0,"Icon":"support",
             "Jobs":[
                 {"Name":"Change Password","Callback":"change_password"}
             ]        
