@@ -18,19 +18,21 @@ RUN mkdir /etc/tarantula
 COPY cmd/web/${app}/${app}-conf.json /etc/tarantula/${app}-conf.json
 RUN mkdir /home/tarantula/${app}
 RUN mkdir /home/tarantula/.ssh
-
 RUN chown -R tarantula /home/tarantula/.ssh
-COPY id_ed25519 /home/tarantula/.ssh
-RUN chown tarantula /home/tarantula/.ssh/id_ed25519
 RUN chown -R tarantula /home/tarantula/${app}   
-
-# Application Install 
+COPY --from=builder /build/id_ed25519 /home/tarantula/.ssh
+COPY --from=builder /build/known_hosts /home/tarantula/.ssh
+RUN chown tarantula /home/tarantula/.ssh/id_ed25519
+RUN chown tarantula /home/tarantula/.ssh/known_hosts
 USER tarantula
+WORKDIR /home/tarantula/.ssh
+RUN chmod 700 id_ed25519
+# Application Install 
 WORKDIR /home/tarantula/bin
 RUN mkdir site
 COPY --from=builder /build/cmd/web/${app}/main .
 COPY --from=builder /build/site/* site
-
+RUN git clone git@github.com:yinghu/tarantula.git
 ARG h
 ARG n
 ARG s

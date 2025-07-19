@@ -21,6 +21,7 @@ IF "%grp%" == "" (
 )
 @echo "Build params : %version% %host% %id% %seq% %grp%"
 xcopy "%HOMEDRIVE%/%HOMEPATH%"\.ssh\id_ed25519 . /s
+xcopy "%HOMEDRIVE%/%HOMEPATH%"\.ssh\known_hosts . /s
 docker build -f .\docker_application_build --tag tarantula.admin:%version% --build-arg app=admin --build-arg h=%host% --build-arg n=admin%id% --build-arg s=%seq% --build-arg g=%grp% --progress=plain .
 SET /A seq=%seq%+1
 docker build -f .\docker_application_build --tag tarantula.presence:%version% --build-arg app=presence --build-arg h=%host% --build-arg n=presence%id% --build-arg s=%seq% --build-arg g=%grp% . 
@@ -35,3 +36,4 @@ docker build -f .\docker_application_build --tag tarantula.tournament:%version% 
 docker build -f .\docker_nginx_build --tag tarantula.nginx:%version% .
 docker builder prune -af
 del id_ed25519
+del known_hosts
