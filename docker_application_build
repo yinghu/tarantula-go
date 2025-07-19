@@ -27,7 +27,8 @@ RUN chown tarantula /home/tarantula/.ssh/known_hosts
 USER tarantula
 WORKDIR /home/tarantula/.ssh
 RUN chmod 700 id_ed25519
-# Application Install 
+
+# Application Install
 WORKDIR /home/tarantula/bin
 RUN mkdir site
 COPY --from=builder /build/cmd/web/${app}/main .

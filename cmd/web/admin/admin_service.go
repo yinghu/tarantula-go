@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/conf"
@@ -12,7 +13,8 @@ import (
 
 type AdminService struct {
 	bootstrap.AppManager
-	assetDir string
+	assetDir   string
+	publishDir string
 }
 
 func (s *AdminService) Config() string {
@@ -21,8 +23,14 @@ func (s *AdminService) Config() string {
 
 func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	s.AppManager.Start(f, c)
-	s.assetDir = f.LocalDir
-	err := s.createSchema()
+	s.assetDir = f.LocalDir + "/asset"
+	os.MkdirAll(s.assetDir, 0755)
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	s.publishDir = homeDir + "/bin/tarantula"
+	err = s.createSchema()
 	if err != nil {
 		return err
 	}
@@ -45,9 +53,9 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	http.Handle("/admin/category/save", bootstrap.Logging(&CategorySaver{AdminService: s}))
 	http.Handle("/admin/config/load/{id}/{name}/{limit}", bootstrap.Logging(&ConfigLoader{AdminService: s}))
 	http.Handle("/admin/config/save", bootstrap.Logging(&ConfigSaver{AdminService: s}))
+	http.Handle("/admin/category/publish/{id}", bootstrap.Logging(&CategoryPublisher{AdminService: s}))
 
 	http.Handle("/admin/configapp/{app}", bootstrap.Logging(&AdminConfigApp{AdminService: s}))
-	http.Handle("/admin/resetkey", bootstrap.Logging(&AdminResetKey{AdminService: s}))
 	http.Handle("/admin/getnode/{group}/{name}", bootstrap.Logging(&AdminGetNode{AdminService: s}))
 	http.Handle("/admin/confignode", bootstrap.Logging(&SudoConfigNode{AdminService: s}))
 

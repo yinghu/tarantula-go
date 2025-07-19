@@ -330,6 +330,12 @@
                 Html.openWithId("#tx-json-preview-box");    
             }
 
+            function publish_category(){
+                Admin.getJson("/admin/category/publish/100",ret=>{
+                    on_preview("CategoryPublish",ret);    
+                });    
+            }
+
         </script>
     </body>
 </html>
