@@ -26,17 +26,17 @@ else
 fi
 echo "Build params : ${version} ${host} ${id} ${seq} ${grp}"
 cp ~/.ssh/id_ed25519 .
-docker build -f ./docker_application_build --tag tarantula.admin:$version --build-arg app=admin --build-arg h=$host --build-arg n=admin$id --build-arg s=$seq --build-arg g=$grp .
+sudo docker build -f ./docker_application_build --tag tarantula.admin:$version --build-arg app=admin --build-arg h=$host --build-arg n=admin$id --build-arg s=$seq --build-arg g=$grp .
 ((seq++))
-docker build -f ./docker_application_build --tag tarantula.presence:$version --build-arg app=presence --build-arg h=$host --build-arg n=presence$id --build-arg s=$seq --build-arg g=$grp . 
+sudo docker build -f ./docker_application_build --tag tarantula.presence:$version --build-arg app=presence --build-arg h=$host --build-arg n=presence$id --build-arg s=$seq --build-arg g=$grp . 
 ((seq++))
-docker build -f ./docker_application_build --tag tarantula.profile:$version --build-arg app=profile --build-arg h=$host --build-arg n=profile$id --build-arg s=$seq --build-arg g=$grp . 
+sudo docker build -f ./docker_application_build --tag tarantula.profile:$version --build-arg app=profile --build-arg h=$host --build-arg n=profile$id --build-arg s=$seq --build-arg g=$grp . 
 ((seq++))
-docker build -f ./docker_application_build --tag tarantula.inventory:$version --build-arg app=inventory --build-arg h=$host --build-arg n=inventory$id --build-arg s=$seq --build-arg g=$grp .
+sudo docker build -f ./docker_application_build --tag tarantula.inventory:$version --build-arg app=inventory --build-arg h=$host --build-arg n=inventory$id --build-arg s=$seq --build-arg g=$grp .
 ((seq++))
-docker build -f ./docker_application_build --tag tarantula.asset:$version --build-arg app=asset --build-arg h=$host --build-arg n=asset$id --build-arg s=$id --build-arg g=$grp . 
+sudo docker build -f ./docker_application_build --tag tarantula.asset:$version --build-arg app=asset --build-arg h=$host --build-arg n=asset$id --build-arg s=$id --build-arg g=$grp . 
 ((seq++))
-docker build -f ./docker_application_build --tag tarantula.tournament:$version --build-arg app=tournament --build-arg h=$host --build-arg n=tournament$id --build-arg s=$seq --build-arg g=$grp .   
-docker build -f ./docker_nginx_build --tag tarantula.nginx:$version .
-docker builder prune -af
+sudo docker build -f ./docker_application_build --tag tarantula.tournament:$version --build-arg app=tournament --build-arg h=$host --build-arg n=tournament$id --build-arg s=$seq --build-arg g=$grp .   
+sudo docker build -f ./docker_nginx_build --tag tarantula.nginx:$version .
+sudo docker builder prune -af
 rm id_ed25519
