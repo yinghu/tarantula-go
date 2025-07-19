@@ -10,12 +10,15 @@ RUN go -C cmd/web/${app} build -o main
 
 # Alpine Linux 
 FROM alpine:latest
+RUN apk add --no-cache openssh
 RUN apk add --no-cache git
 ARG app
 RUN addgroup -S tarantula && adduser -S tarantula -G tarantula
 RUN mkdir /etc/tarantula 
 COPY cmd/web/${app}/${app}-conf.json /etc/tarantula/${app}-conf.json
 RUN mkdir /home/tarantula/${app}
+RUN mkdir /home/tarantula/.ssh
+COPY id_ed25519 /home/tarantula/.ssh
 RUN chown -R tarantula /home/tarantula/${app}   
 
 # Application Install 
