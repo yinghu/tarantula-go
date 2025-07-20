@@ -14,6 +14,7 @@ import (
 type AdminService struct {
 	bootstrap.AppManager
 	assetDir   string
+	contentDir string
 	publishDir string
 }
 
@@ -23,6 +24,11 @@ func (s *AdminService) Config() string {
 
 func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	s.AppManager.Start(f, c)
+	wd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	s.contentDir = wd
 	s.assetDir = f.LocalDir + "/asset"
 	os.MkdirAll(s.assetDir, 0755)
 	homeDir, err := os.UserHomeDir()

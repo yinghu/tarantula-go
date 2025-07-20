@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 	"os/exec"
 	"strconv"
 
@@ -25,7 +26,8 @@ func (s *CategoryPublisher) Request(rs core.OnSession, w http.ResponseWriter, r 
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	cmd := exec.Command("git", "--git-dir="+s.publishDir+"/.git", "--work-tree=tarantula", "status")
+	os.Chdir(s.publishDir);
+	cmd := exec.Command("git","status")
 	output, err := cmd.Output()
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))

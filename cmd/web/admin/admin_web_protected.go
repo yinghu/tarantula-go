@@ -21,7 +21,7 @@ func (s *AdminWebProtected) AccessControl() int32 {
 func (s *AdminWebProtected) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	fn := r.PathValue("name")
-	dest, err := os.OpenFile("site/protected/"+fn, os.O_RDONLY, 0644)
+	dest, err := os.OpenFile(s.contentDir+"/site/protected/"+fn, os.O_RDONLY, 0644)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))

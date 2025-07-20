@@ -331,10 +331,22 @@
             }
 
             function publish_category(){
-                Admin.getJson("/admin/category/publish/100",ret=>{
-                    on_preview("CategoryPublish",ret);    
+                //Html.publishForm({});
+                let tsk = Html.currentTask();
+                Admin.getJson("/admin/category/load/0/scope/"+tsk.ScopeSequence+"/"+tsk.Name,ret=>{
+                   Html.publishForm({id:"#tx-form-box",prefix:"publish"},ret,(id)=>{
+                        on_publish_category(id);
+                   });
+                   Html.openWithId("#tx-form-box");    
                 });    
             }
+            
+            function on_publish_category(cid){
+                Admin.getJson("/admin/category/publish/"+cid,(resp)=>{
+                    on_preview("Publish View",resp);
+                });    
+            }
+
 
         </script>
     </body>

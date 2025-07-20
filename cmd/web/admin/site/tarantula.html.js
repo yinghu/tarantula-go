@@ -23,6 +23,9 @@ var Html = (function(){
     let _closeWithId = function(id){
         document.querySelector(id).style.display = "none";
     };
+    let _currentTask = function(){
+        return _task;
+    };
     let _closeWithClass = function(cls){
         document.querySelectorAll(cls).forEach(a=>{
             a.style.display = "none";
@@ -763,6 +766,35 @@ var Html = (function(){
         });
     };
 
+    _publishForm = function(conf,clist,callback){
+        document.querySelector(conf.id).innerHTML = "";
+        let tem =[];
+        tem.push("<fieldset>");
+        tem.push("<legend class='tx-text-20'>");
+        tem.push("Publish Form");
+        tem.push("</legend>");
+        tem.push(_icon(conf.prefix,"category","close","red"));
+        clist.forEach(c=>{
+            if(c.ScopeSequence == _task.ScopeSequence){
+                tem.push("<span tx-category-id='"+c.Id+"' ");
+                tem.push("class='w3-green w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4 tx-"+conf.prefix+"-opt'>");
+                tem.push(c.Name);
+                tem.push("</span>");
+            }    
+        });
+        tem.push(_button("Publish",conf.prefix));
+        tem.push("</fieldset>");
+        document.querySelector(conf.id).innerHTML = tem.join("");
+        document.querySelectorAll(".tx-"+conf.prefix+"-opt").forEach(a=>{
+            a.onclick = ()=>{
+                callback(a.getAttribute("tx-category-id"));    
+            };
+        });
+        _eventWithId("#"+conf.prefix+"-category-close",()=>{
+            document.querySelector(conf.id).style.display='none';
+        });       
+    };
+
     return {
         registerTaskChangeListener : _registerTaskChangeListener,
         registerUploadTask : _registerUploadTask,
@@ -771,6 +803,7 @@ var Html = (function(){
         closeWithId : _closeWithId,
         eventWithId : _eventWithId,
         form : _form,
+        currentTask : _currentTask,
         taskList : _taskList,
         jobList : _jobList,
         setup : _setup,
@@ -783,5 +816,6 @@ var Html = (function(){
         categoryForm : _categoryForm,
         instanceForm : _instanceForm,
         populateInstance : _populateInstance,
+        publishForm : _publishForm,
     };
 })();
