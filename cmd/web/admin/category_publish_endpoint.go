@@ -21,13 +21,38 @@ func (s *CategoryPublisher) AccessControl() int32 {
 func (s *CategoryPublisher) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	w.WriteHeader(http.StatusOK)
-	cid, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	sid := r.PathValue("id")
+	cid, err := strconv.ParseInt(sid, 10, 64)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	os.Chdir(s.publishDir);
-	cmd := exec.Command("git","status")
+	conf, err := s.ItemService().LoadCategoryWithId(cid)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	dest, err := os.OpenFile(s.publishDir+"/"+sid+".json", os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	defer dest.Close()
+	dest.WriteString(string(util.ToJson(conf)))
+	os.Chdir(s.publishDir)
+	cmd := exec.Command("git", "add", sid+".json")
+	_, err = cmd.Output()
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	cmd = exec.Command("git", "commit", ".", "-m", "publish config :"+sid+".json")
+	_, err = cmd.Output()
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	cmd = exec.Command("git", "push")
 	output, err := cmd.Output()
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))

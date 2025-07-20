@@ -776,13 +776,16 @@ var Html = (function(){
         tem.push(_icon(conf.prefix,"category","close","red"));
         clist.forEach(c=>{
             if(c.ScopeSequence == _task.ScopeSequence){
-                tem.push("<span tx-category-id='"+c.Id+"' ");
-                tem.push("class='w3-green w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4 tx-"+conf.prefix+"-opt'>");
+                tem.push("<div class='w3-panel'>");
+                tem.push("<span class='w3-green w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4'>");
                 tem.push(c.Name);
                 tem.push("</span>");
+                tem.push("<span tx-category-id='"+c.Id+"' ");
+                tem.push("class='w3-green w3-right w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4 tx-"+conf.prefix+"-opt'>Publish");
+                tem.push("</span>");
+                tem.push("</div>");
             }    
         });
-        tem.push(_button("Publish",conf.prefix));
         tem.push("</fieldset>");
         document.querySelector(conf.id).innerHTML = tem.join("");
         document.querySelectorAll(".tx-"+conf.prefix+"-opt").forEach(a=>{
