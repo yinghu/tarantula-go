@@ -331,18 +331,25 @@
             }
 
             function publish_category(){
-                //Html.publishForm({});
                 let tsk = Html.currentTask();
                 Admin.getJson("/admin/category/load/0/scope/"+tsk.ScopeSequence+"/"+tsk.Name,ret=>{
-                   Html.publishForm({id:"#tx-form-box",prefix:"publish"},ret,(id)=>{
-                        on_publish_category(id);
+                   Html.publishForm({id:"#tx-form-box",prefix:"publish"},ret,(id,env)=>{
+                        on_publish_category(id,env);
+                   },(id)=>{
+                        on_preview_category(id); 
                    });
                    Html.openWithId("#tx-form-box");    
                 });    
             }
             
-            function on_publish_category(cid){
-                Admin.getJson("/admin/category/publish/"+cid,(resp)=>{
+            function on_publish_category(cid,env){
+                console.log(env);
+                Admin.getJson("/admin/category/publish/"+env+"/"+cid,(resp)=>{
+                    on_preview("Publish View",resp);
+                });    
+            }
+            function on_preview_category(cid){
+                Admin.getJson("/admin/category/load/"+cid+"/n/0/n",(resp)=>{
                     on_preview("Publish View",resp);
                 });    
             }

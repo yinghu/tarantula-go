@@ -59,7 +59,7 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	http.Handle("/admin/category/save", bootstrap.Logging(&CategorySaver{AdminService: s}))
 	http.Handle("/admin/config/load/{id}/{name}/{limit}", bootstrap.Logging(&ConfigLoader{AdminService: s}))
 	http.Handle("/admin/config/save", bootstrap.Logging(&ConfigSaver{AdminService: s}))
-	http.Handle("/admin/category/publish/{id}", bootstrap.Logging(&CategoryPublisher{AdminService: s}))
+	http.Handle("/admin/category/publish/{env}/{id}", bootstrap.Logging(&CategoryPublisher{AdminService: s}))
 
 	http.Handle("/admin/configapp/{app}", bootstrap.Logging(&AdminConfigApp{AdminService: s}))
 	http.Handle("/admin/getnode/{group}/{name}", bootstrap.Logging(&AdminGetNode{AdminService: s}))

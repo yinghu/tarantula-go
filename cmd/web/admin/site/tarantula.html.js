@@ -766,7 +766,7 @@ var Html = (function(){
         });
     };
 
-    _publishForm = function(conf,clist,callback){
+    _publishForm = function(conf,clist,publish,preview){
         document.querySelector(conf.id).innerHTML = "";
         let tem =[];
         tem.push("<fieldset>");
@@ -774,23 +774,45 @@ var Html = (function(){
         tem.push("Publish Form");
         tem.push("</legend>");
         tem.push(_icon(conf.prefix,"category","close","red"));
+        tem.push("<div class='w3-panel'>");
+        tem.push("<select id='");
+        tem.push(conf.prefix+'-env-select');
+        tem.push("' class='w3-round w3-border tx-text-16 w3-select");
+        tem.push("'>");
+        tem.push("<option value='dev' selected>Development</option>");
+        tem.push("<option value='stg'>Staging</option>");
+        tem.push("<option value='qa'>QA</option>");
+        tem.push("<option value='prod'>Production</option>");
+        tem.push("</select>");
+        tem.push("</div>");
+       
         clist.forEach(c=>{
             if(c.ScopeSequence == _task.ScopeSequence){
-                tem.push("<div class='w3-panel'>");
-                tem.push("<span class='w3-green w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4'>");
+                tem.push("<div class='w3-panel w3-padding w3-border-bottom w3-border-red'>");
+                tem.push("<span class='w3-green w3-tag tx-text-20 tx-padding-button'>");
                 tem.push(c.Name);
                 tem.push("</span>");
                 tem.push("<span tx-category-id='"+c.Id+"' ");
-                tem.push("class='w3-green w3-right w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4 tx-"+conf.prefix+"-opt'>Publish");
+                tem.push("class='w3-green w3-right w3-tag tx-text-20 tx-padding-button tx-margin-left-8 tx-"+conf.prefix+"-publish-opt'>Publish");
+                tem.push("</span>");
+                 tem.push("<span tx-category-id='"+c.Id+"' ");
+                tem.push("class='w3-green w3-right w3-tag tx-text-20 tx-padding-button tx-margin-left-8 tx-"+conf.prefix+"-preview-opt'>Preview");
                 tem.push("</span>");
                 tem.push("</div>");
             }    
         });
         tem.push("</fieldset>");
         document.querySelector(conf.id).innerHTML = tem.join("");
-        document.querySelectorAll(".tx-"+conf.prefix+"-opt").forEach(a=>{
+        document.querySelectorAll(".tx-"+conf.prefix+"-publish-opt").forEach(a=>{
             a.onclick = ()=>{
-                callback(a.getAttribute("tx-category-id"));    
+                let env = document.querySelector("#"+conf.prefix+"-env-select");
+                let publishEnv = env.options[env.selectedIndex].value;
+                publish(a.getAttribute("tx-category-id"),publishEnv);    
+            };
+        });
+        document.querySelectorAll(".tx-"+conf.prefix+"-preview-opt").forEach(a=>{
+            a.onclick = ()=>{
+                preview(a.getAttribute("tx-category-id"));    
             };
         });
         _eventWithId("#"+conf.prefix+"-category-close",()=>{

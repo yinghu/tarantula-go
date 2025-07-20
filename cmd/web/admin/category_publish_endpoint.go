@@ -21,6 +21,7 @@ func (s *CategoryPublisher) AccessControl() int32 {
 func (s *CategoryPublisher) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	w.WriteHeader(http.StatusOK)
+	env :=r.PathValue("env");
 	sid := r.PathValue("id")
 	cid, err := strconv.ParseInt(sid, 10, 64)
 	if err != nil {
@@ -58,7 +59,7 @@ func (s *CategoryPublisher) Request(rs core.OnSession, w http.ResponseWriter, r 
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	core.AppLog.Printf("Publish category :%d\n", cid)
+	core.AppLog.Printf("Publish category :%d %s\n", cid,env)
 	session := core.OnSession{Successful: true, Message: string(output)}
 	w.Write(util.ToJson(session))
 }
