@@ -60,13 +60,10 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	http.Handle("/admin/config/load/{id}/{name}/{limit}", bootstrap.Logging(&ConfigLoader{AdminService: s}))
 	http.Handle("/admin/config/save", bootstrap.Logging(&ConfigSaver{AdminService: s}))
 	http.Handle("/admin/category/publish/{env}/{id}", bootstrap.Logging(&CategoryPublisher{AdminService: s}))
-
-	http.Handle("/admin/configapp/{app}", bootstrap.Logging(&AdminConfigApp{AdminService: s}))
-	http.Handle("/admin/getnode/{group}/{name}", bootstrap.Logging(&AdminGetNode{AdminService: s}))
-	http.Handle("/admin/confignode", bootstrap.Logging(&SudoConfigNode{AdminService: s}))
-
+	
+	http.Handle("/admin/env", bootstrap.Logging(&AdminEnv{AdminService: s}))
 	http.Handle("/admin/snowflake/parse/{id}", bootstrap.Logging(&AdminParseSnowFlakeId{AdminService: s}))
-	http.Handle("/admin/addlogin", bootstrap.Logging(&SudoAddLogin{AdminService: s}))
+	http.Handle("/admin/login/add", bootstrap.Logging(&SudoAddLogin{AdminService: s}))
 	http.Handle("/admin/password", bootstrap.Logging(&AdminChangePwd{AdminService: s}))
 	http.Handle("/admin/login", bootstrap.Logging(&AdminLogin{AdminService: s}))
 	fmt.Printf("Admin service started %s\n", f.HttpBinding)

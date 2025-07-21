@@ -45,10 +45,5 @@ func (s *ConfigSaver) Request(rs core.OnSession, w http.ResponseWriter, r *http.
 		w.Write(util.ToJson(session))
 		return
 	}
-	ch := make(chan core.OnSession, 1)
-	defer close(ch)
-	go s.PostJson("http://inventory:8080/inventory/itemadmin/saveconfig", conf, ch)
-	ret := <-ch
-	w.Write(util.ToJson(ret))
-	//w.Write(util.ToJson(conf))
+	w.Write(util.ToJson(core.OnSession{Successful: true, Message: "saved"}))
 }

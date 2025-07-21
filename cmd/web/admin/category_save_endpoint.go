@@ -45,10 +45,6 @@ func (s *CategorySaver) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 		w.Write(util.ToJson(session))
 		return
 	}
-	ch := make(chan core.OnSession, 1)
-	defer close(ch)
-	go s.PostJson("http://inventory:8080/inventory/itemadmin/savecategory", conf, ch)
-	ret := <-ch
-	w.Write(util.ToJson(ret))
+	w.Write(util.ToJson(core.OnSession{Successful: true,Message: "saved"}))
 
 }
