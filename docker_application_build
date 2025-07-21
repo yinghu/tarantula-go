@@ -33,14 +33,18 @@ RUN chmod 700 id_ed25519
 
 # Application Install
 WORKDIR /home/tarantula/bin
-RUN mkdir site
-COPY --from=builder /build/cmd/web/${app}/main .
-COPY --from=builder /build/site/* site
-RUN git clone git@github.com:yinghu/tarantula.git
 ARG h
 ARG n
 ARG s
 ARG g
+RUN mkdir site
+COPY --from=builder /build/cmd/web/${app}/main .
+COPY --from=builder /build/site/* site
+RUN git clone git@github.com:yinghu/tarantula.git
+WORKDIR /home/tarantula/bin/tarantula
+RUN git pull
+RUN git checkout ${g}
+WORKDIR /home/tarantula/bin
 RUN echo ${h} ${n} ${s} ${g}
 ENV TN_HOST=${h}
 ENV TN_NAME=${n}
