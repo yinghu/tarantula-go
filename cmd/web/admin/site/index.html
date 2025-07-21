@@ -205,7 +205,9 @@
             }
 
             function on_task_change(tsk){
-                set_task_header(tsk.Name,tsk.Icon);
+                Admin.getJson("/admin/env",resp=>{
+                    set_task_header(resp.CurBranch+" : "+tsk.Name,tsk.Icon);
+                });
                 Html.closeWithId("#tx-form-box");
                 Html.closeWithId("#tx-instance-list-box");
                 Admin.getJson("/admin/category/load/0/scope/"+tsk.ScopeSequence+"/"+tsk.Name,resp=>{

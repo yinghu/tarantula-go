@@ -3,7 +3,6 @@ package main
 import (
 	"net/http"
 	"os"
-	"os/exec"
 	"strconv"
 
 	"gameclustering.com/internal/bootstrap"
@@ -21,7 +20,7 @@ func (s *CategoryPublisher) AccessControl() int32 {
 func (s *CategoryPublisher) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	w.WriteHeader(http.StatusOK)
-	env :=r.PathValue("env");
+	env := r.PathValue("env")
 	sid := r.PathValue("id")
 	cid, err := strconv.ParseInt(sid, 10, 64)
 	if err != nil {
@@ -41,25 +40,26 @@ func (s *CategoryPublisher) Request(rs core.OnSession, w http.ResponseWriter, r 
 	defer dest.Close()
 	dest.WriteString(string(util.ToJson(conf)))
 	os.Chdir(s.publishDir)
-	cmd := exec.Command("git", "add", sid+".json")
-	_, err = cmd.Output()
-	if err != nil {
-		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+	gr := util.GitPull()
+	if !gr.Successful {
+		w.Write(util.ToJson(gr))
 		return
 	}
-	cmd = exec.Command("git", "commit", ".", "-m", "publish config :"+sid+".json")
-	_, err = cmd.Output()
-	if err != nil {
-		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+	gr = util.GitAdd(sid + ".json")
+	if !gr.Successful {
+		w.Write(util.ToJson(gr))
 		return
 	}
-	cmd = exec.Command("git", "push")
-	output, err := cmd.Output()
-	if err != nil {
-		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+	gr = util.GitCommit("publish config :" + sid + ".json")
+	if !gr.Successful {
+		w.Write(util.ToJson(gr))
 		return
 	}
-	core.AppLog.Printf("Publish category :%d %s\n", cid,env)
-	session := core.OnSession{Successful: true, Message: string(output)}
-	w.Write(util.ToJson(session))
+	gr = util.GitPush()
+	if !gr.Successful {
+		w.Write(util.ToJson(gr))
+		return
+	}
+	core.AppLog.Printf("Publish category :%d %s\n", cid, env)
+	w.Write(util.ToJson(util.GitStatus()))
 }
