@@ -353,7 +353,7 @@
                 });    
             }
             function on_preview_category(cid){
-                Admin.getJson("/admin/category/load/"+cid+"/n/0/n",(resp)=>{
+                Admin.getJson("/admin/category/preview/"+cid,(resp)=>{
                     on_preview("Publish View",resp);
                 });    
             }
