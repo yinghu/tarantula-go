@@ -40,6 +40,7 @@ func (db *ItemDB) SaveCategory(c item.Category) error {
 		if !valid {
 			return errors.New("at least 1 property required")
 		}
+		db.Gis.SaveCategory(c)
 		return nil
 	})
 }

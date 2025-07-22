@@ -24,19 +24,11 @@ func (s *AdminService) Config() string {
 
 func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	s.AppManager.Start(f, c)
-	wd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	s.contentDir = wd
+	s.contentDir = f.Bin
 	s.assetDir = f.LocalDir + "/asset"
 	os.MkdirAll(s.assetDir, 0755)
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
-	s.publishDir = homeDir + "/bin/tarantula"
-	err = s.createSchema()
+	s.publishDir = f.Bin + "/tarantula"
+	err := s.createSchema()
 	if err != nil {
 		return err
 	}

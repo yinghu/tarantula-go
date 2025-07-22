@@ -45,6 +45,7 @@ type Env struct {
 	EtcdEndpoints []string      `json:"EtcdEndpoints"`
 	Pgs           Sql           `json:"Sql"`
 	Bdg           LocalStore    `json:"LocalStore"`
+	Bin           string        `json:"-"`
 }
 
 func (f *Env) ClusterCtx() string {
@@ -108,5 +109,10 @@ func (f *Env) Load(fn string) error {
 		f.Prefix = "dev"
 	}
 	core.CreateAppLog(f.LocalDir)
+	wd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	f.Bin = wd
 	return nil
 }

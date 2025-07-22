@@ -76,7 +76,9 @@ func (s *AppManager) Start(f conf.Env, c core.Cluster) error {
 		return err
 	}
 	s.metr = &ms
-	is := persistence.ItemDB{Sql: &sql}
+	gitStore := persistence.GitItemStore{RepositoryDir: f.Bin + "/tarantula"}
+	gitStore.Start()
+	is := persistence.ItemDB{Sql: &sql, Gis: &gitStore}
 	err = is.Start()
 	if err != nil {
 		return err
