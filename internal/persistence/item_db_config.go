@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
 	"github.com/jackc/pgx/v5"
 )
@@ -87,6 +88,21 @@ func (db *ItemDB) LoadWithName(cname string, limit int) ([]item.Configuration, e
 	for i := range list[:ct] {
 		db.loadHeader(&list[i])
 		db.loadApplication(&list[i])
+		list[i].Reference = map[string]any{}
+		for k := range list[i].Application {
+			refs := list[i].Application[k]
+			confs := make([]item.Configuration, 0)
+			for r := range refs {
+				//fmt.Printf("Ref 1 id : %s\n", refs[r])
+				cid, _ := strconv.ParseInt(refs[r], 10, 64)
+				conf, err := db.LoadWithId(cid)
+				if err != nil {
+					core.AppLog.Printf("Err %s\n", err.Error())
+				}
+				confs = append(confs, conf)
+			}
+			list[i].Reference[k] = confs
+		}
 	}
 	return list[:ct], nil
 
@@ -109,6 +125,21 @@ func (db *ItemDB) LoadWithId(cid int64) (item.Configuration, error) {
 	}
 	db.loadHeader(&conf)
 	db.loadApplication(&conf)
+	conf.Reference = map[string]any{}
+	for k := range conf.Application {
+		refs := conf.Application[k]
+		confs := make([]item.Configuration, 0)
+		for r := range refs {
+			//fmt.Printf("Ref 2 id : %s\n", refs[r])
+			cid, _ := strconv.ParseInt(refs[r], 10, 64)
+			conf, err := db.LoadWithId(cid)
+			if err != nil {
+				core.AppLog.Printf("Err %s\n", err.Error())
+			}
+			confs = append(confs, conf)
+		}
+		conf.Reference[k] = confs
+	}
 	return conf, nil
 }
 

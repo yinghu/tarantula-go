@@ -21,7 +21,7 @@ func (s *AdminWebIndex) AccessControl() int32 {
 func (s *AdminWebIndex) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	fn := r.PathValue("name")
-	dest, err := os.OpenFile(s.contentDir+"/site/"+fn, os.O_RDONLY, 0644)
+	dest, err := os.OpenFile(s.contentDir+"/exsite/"+fn, os.O_RDONLY, 0644)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)

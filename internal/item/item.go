@@ -26,10 +26,10 @@ type Category struct {
 }
 
 type Property struct {
-	Name         string `json:"Name"`
-	Type         string `json:"Type"`
-	Reference    string `json:"Reference"`
-	Nullable     bool   `json:"Nullable"`
+	Name      string `json:"Name"`
+	Type      string `json:"Type"`
+	Reference string `json:"Reference"`
+	Nullable  bool   `json:"Nullable"`
 }
 
 type Configuration struct {
@@ -41,6 +41,7 @@ type Configuration struct {
 	Version     string              `json:"ConfigurationVersion"`
 	Header      map[string]any      `json:"header"`
 	Application map[string][]string `json:"application"`
+	Reference   map[string]any      `json:"reference"`
 }
 
 type ItemService interface {
@@ -52,7 +53,7 @@ type ItemService interface {
 	SaveCategory(c Category) error
 	LoadCategory(cname string) (Category, error)
 	LoadCategoryWithId(cid int64) (Category, error)
-	LoadCategories(scopeEnd int32,targetScope string) []Category
+	LoadCategories(scopeEnd int32, targetScope string) []Category
 
 	Save(c Configuration) error
 	LoadWithName(cname string, limit int) ([]Configuration, error)
