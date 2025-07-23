@@ -42,13 +42,9 @@ func (db *GitItemStore) SaveCategory(c item.Category) error {
 	if !gr.Successful {
 		return errors.New("cannot add file [" + fn + "]")
 	}
-	gr = util.GitCommit("save category [" + fn + "]")
+	gr = util.GitCommit(fmt.Sprintf("save category [ %s : %d]", c.Name, c.Id))
 	if !gr.Successful {
 		return errors.New("cannot commit file [" + fn + "]")
-	}
-	gr = util.GitPush()
-	if !gr.Successful {
-		return errors.New("cannot push file [" + fn + "]")
 	}
 	return nil
 }
@@ -69,13 +65,9 @@ func (db *GitItemStore) SaveEnum(c item.Enum) error {
 	if !gr.Successful {
 		return errors.New("cannot add file [" + fn + "]")
 	}
-	gr = util.GitCommit("save enum [" + fn + "]")
+	gr = util.GitCommit(fmt.Sprintf("save enum [ %s : %d]", c.Name, c.Id))
 	if !gr.Successful {
 		return errors.New("cannot commit file [" + fn + "]")
-	}
-	gr = util.GitPush()
-	if !gr.Successful {
-		return errors.New("cannot push file [" + fn + "]")
 	}
 	return nil
 }
@@ -96,13 +88,9 @@ func (db *GitItemStore) SaveConfiguration(c item.Configuration) error {
 	if !gr.Successful {
 		return errors.New("cannot add file [" + fn + "]")
 	}
-	gr = util.GitCommit("save configuration [" + fn + "]")
+	gr = util.GitCommit(fmt.Sprintf("save configuration [ %s : %d]", c.Name, c.Id))
 	if !gr.Successful {
 		return errors.New("cannot commit file [" + fn + "]")
-	}
-	gr = util.GitPush()
-	if !gr.Successful {
-		return errors.New("cannot push file [" + fn + "]")
 	}
 	return nil
 }

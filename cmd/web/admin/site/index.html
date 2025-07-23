@@ -334,11 +334,11 @@
                 Html.openWithId("#tx-json-preview-box");    
             }
 
-            function publish_category(){
+            function edit_category(){
                 let tsk = Html.currentTask();
                 Admin.getJson("/admin/category/load/0/scope/"+tsk.ScopeSequence+"/"+tsk.Name,ret=>{
-                   Html.publishForm({id:"#tx-form-box",prefix:"publish"},ret,(id,env)=>{
-                        on_publish_category(id,env);
+                   Html.editForm({id:"#tx-form-box",prefix:"edit"},ret,(id)=>{
+                        on_delete_category(id);
                    },(id)=>{
                         on_preview_category(id); 
                    });
@@ -346,15 +346,28 @@
                 });    
             }
             
-            function on_publish_category(cid,env){
-                console.log(env);
-                Admin.getJson("/admin/category/publish/"+env+"/"+cid,(resp)=>{
-                    on_preview("Publish View",resp);
-                });    
+            function on_delete_category(cid){
+                console.log("Delete : "+cid);
+                //Admin.getJson("/admin/category/publish/"+env+"/"+cid,(resp)=>{
+                    //on_preview("Publish View",resp);
+                //});    
             }
             function on_preview_category(cid){
                 Admin.getJson("/admin/category/preview/"+cid,(resp)=>{
                     on_preview("Publish View",resp);
+                });    
+            }
+
+            function publish_repository(){
+                Admin.getJson("/admin/webprotected/publish.repository.json",(resp)=>{
+                    let conf ={id:"#tx-form-box",prefix:"publish",closeable:true};
+                    Html.form(conf,resp,(data)=>{
+                        console.log(data);
+                        Admin.getJson("/admin/publish/"+data.branchName,(resp)=>{
+                            on_preview("Publish View",resp);
+                        });      
+                    });
+                    Html.openWithId("#tx-form-box");
                 });    
             }
 

@@ -766,25 +766,25 @@ var Html = (function(){
         });
     };
 
-    _publishForm = function(conf,clist,publish,preview){
+    _editForm = function(conf,clist,edit,preview){
         document.querySelector(conf.id).innerHTML = "";
         let tem =[];
         tem.push("<fieldset>");
         tem.push("<legend class='tx-text-20'>");
-        tem.push("Publish Form");
+        tem.push("Edit Form");
         tem.push("</legend>");
         tem.push(_icon(conf.prefix,"category","close","red"));
-        tem.push("<div class='w3-panel'>");
-        tem.push("<select id='");
-        tem.push(conf.prefix+'-env-select');
-        tem.push("' class='w3-round w3-border tx-text-16 w3-select");
-        tem.push("'>");
-        tem.push("<option value='dev' selected>Development</option>");
-        tem.push("<option value='stg'>Staging</option>");
-        tem.push("<option value='qa'>QA</option>");
-        tem.push("<option value='prod'>Production</option>");
-        tem.push("</select>");
-        tem.push("</div>");
+        //tem.push("<div class='w3-panel'>");
+        //tem.push("<select id='");
+        //tem.push(conf.prefix+'-env-select');
+        //tem.push("' class='w3-round w3-border tx-text-16 w3-select");
+        //tem.push("'>");
+        //tem.push("<option value='dev' selected>Development</option>");
+        //tem.push("<option value='stg'>Staging</option>");
+        //tem.push("<option value='qa'>QA</option>");
+        //tem.push("<option value='prod'>Production</option>");
+        //tem.push("</select>");
+        //tem.push("</div>");
        
         clist.forEach(c=>{
             if(c.ScopeSequence == _task.ScopeSequence){
@@ -793,7 +793,7 @@ var Html = (function(){
                 tem.push(c.Name);
                 tem.push("</span>");
                 tem.push("<span tx-category-id='"+c.Id+"' ");
-                tem.push("class='w3-green w3-right w3-tag tx-text-20 tx-padding-button tx-margin-left-8 tx-"+conf.prefix+"-publish-opt'>Publish");
+                tem.push("class='w3-green w3-right w3-tag tx-text-20 tx-padding-button tx-margin-left-8 tx-"+conf.prefix+"-delete-opt'>Delete");
                 tem.push("</span>");
                  tem.push("<span tx-category-id='"+c.Id+"' ");
                 tem.push("class='w3-green w3-right w3-tag tx-text-20 tx-padding-button tx-margin-left-8 tx-"+conf.prefix+"-preview-opt'>Preview");
@@ -803,11 +803,9 @@ var Html = (function(){
         });
         tem.push("</fieldset>");
         document.querySelector(conf.id).innerHTML = tem.join("");
-        document.querySelectorAll(".tx-"+conf.prefix+"-publish-opt").forEach(a=>{
+        document.querySelectorAll(".tx-"+conf.prefix+"-delete-opt").forEach(a=>{
             a.onclick = ()=>{
-                let env = document.querySelector("#"+conf.prefix+"-env-select");
-                let publishEnv = env.options[env.selectedIndex].value;
-                publish(a.getAttribute("tx-category-id"),publishEnv);    
+                edit(a.getAttribute("tx-category-id"));    
             };
         });
         document.querySelectorAll(".tx-"+conf.prefix+"-preview-opt").forEach(a=>{
@@ -841,6 +839,6 @@ var Html = (function(){
         categoryForm : _categoryForm,
         instanceForm : _instanceForm,
         populateInstance : _populateInstance,
-        publishForm : _publishForm,
+        editForm : _editForm,
     };
 })();

@@ -1,0 +1,13 @@
+{
+    "Scope": "admin",
+    "Name": "Publish",
+    "Description": "publish form",
+    "Properties":[
+        {
+            "Name": "branchName",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false
+        }
+    ]
+}
