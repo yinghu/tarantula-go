@@ -44,6 +44,10 @@ type Configuration struct {
 	Reference   map[string]any      `json:"reference"`
 }
 
+type ItemLoader interface {
+	Load(cid int64) (Configuration, error)
+}
+
 type ItemService interface {
 	core.SetUp
 	SaveEnum(c Enum) error
@@ -65,6 +69,7 @@ type ItemService interface {
 	Validate(c Configuration) error
 	ValidateCategory(c Category) error
 	ValidateEnum(c Enum) error
+	Loader() ItemLoader
 }
 
 type ItemListener interface {

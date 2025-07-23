@@ -76,7 +76,8 @@
                 {"Name":"Change Password","Callback":"change_password"},
                 {"Name":"Add Login","Callback":"add_login"},
                 {"Name":"Parse SnowFlakeId","Callback":"parse_snow_flake_id"},
-                {"Name":"Publish","Callback":"publish_repository"}
+                {"Name":"Publish","Callback":"publish_repository"},
+                {"Name":"ViewItem","Callback":"view_item"}
             ]        
         },
         {

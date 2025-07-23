@@ -1,9 +1,11 @@
 package persistence
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
@@ -93,4 +95,35 @@ func (db *GitItemStore) SaveConfiguration(c item.Configuration) error {
 		return errors.New("cannot commit file [" + fn + "]")
 	}
 	return nil
+}
+
+func (db *GitItemStore) Load(cid int64) (item.Configuration, error) {
+	conf := item.Configuration{Id: cid}
+	fn := fmt.Sprintf("%s/%d.json", db.ConfigurationDir, cid)
+	src, err := os.Open(fn)
+	if err != nil {
+		core.AppLog.Printf("Err %s\n", err.Error())
+		return conf, err
+	}
+	defer src.Close()
+	err = json.NewDecoder(src).Decode(&conf)
+	if err != nil {
+		return conf, err
+	}
+	conf.Reference = map[string]any{}
+	for k := range conf.Application {
+		refs := conf.Application[k]
+		confs := make([]item.Configuration, 0)
+		for r := range refs {
+			//fmt.Printf("Ref 2 id : %s\n", refs[r])
+			cid, _ := strconv.ParseInt(refs[r], 10, 64)
+			conf, err := db.Load(cid)
+			if err != nil {
+				core.AppLog.Printf("Err %s\n", err.Error())
+			}
+			confs = append(confs, conf)
+		}
+		conf.Reference[k] = confs
+	}
+	return conf, nil
 }

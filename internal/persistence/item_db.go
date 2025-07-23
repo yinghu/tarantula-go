@@ -1,5 +1,9 @@
 package persistence
 
+import (
+	"gameclustering.com/internal/item"
+)
+
 const (
 	ITEM_ENUM_SQL_SCHEMA       string = "CREATE TABLE IF NOT EXISTS item_enum (id BIGINT NOT NULL,name VARCHAR(100) NOT NULL UNIQUE,PRIMARY KEY(id))"
 	ITEM_ENUM_VALUE_SQL_SCHEMA string = "CREATE TABLE IF NOT EXISTS item_enum_value (enum_id BIGINT NOT NULL,name VARCHAR(100) NOT NULL,value INTEGER NOT NULL,PRIMARY KEY(enum_id,name))"
@@ -14,6 +18,10 @@ const (
 type ItemDB struct {
 	Sql *Postgresql
 	Gis *GitItemStore
+}
+
+func (db *ItemDB) Loader() item.ItemLoader {
+	return db.Gis
 }
 
 func (db *ItemDB) Start() error {

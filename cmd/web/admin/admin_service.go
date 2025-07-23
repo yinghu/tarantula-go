@@ -52,7 +52,8 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	http.Handle("/admin/config/load/{id}/{name}/{limit}", bootstrap.Logging(&ConfigLoader{AdminService: s}))
 	http.Handle("/admin/config/save", bootstrap.Logging(&ConfigSaver{AdminService: s}))
 	http.Handle("/admin/category/preview/{id}", bootstrap.Logging(&CategoryPreviewer{AdminService: s}))
-	
+
+	http.Handle("/admin/view/{id}", bootstrap.Logging(&AdminItemViewer{AdminService: s}))
 	http.Handle("/admin/publish/{repo}", bootstrap.Logging(&AdminPublisher{AdminService: s}))
 	http.Handle("/admin/env", bootstrap.Logging(&AdminEnv{AdminService: s}))
 	http.Handle("/admin/snowflake/parse/{id}", bootstrap.Logging(&AdminParseSnowFlakeId{AdminService: s}))

@@ -1,0 +1,13 @@
+{
+    "Scope": "admin",
+    "Name": "ViewItem",
+    "Description": "view item form",
+    "Properties":[
+        {
+            "Name": "itemId",
+            "Type":"int64",
+            "Reference": "number",
+            "Nullable": false
+        }
+    ]
+}

@@ -371,6 +371,19 @@
                 });    
             }
 
+            function view_item(){
+                Admin.getJson("/admin/webprotected/view.item.json",(resp)=>{
+                    let conf ={id:"#tx-form-box",prefix:"view",closeable:true};
+                    Html.form(conf,resp,(data)=>{
+                        console.log(data);
+                        Admin.getJson("/admin/view/"+data.itemId,(resp)=>{
+                            on_preview("View Item",resp);
+                        });      
+                    });
+                    Html.openWithId("#tx-form-box");
+                }); 
+            }
+
 
         </script>
     </body>
