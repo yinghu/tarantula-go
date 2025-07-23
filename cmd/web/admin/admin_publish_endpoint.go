@@ -50,4 +50,5 @@ func (s *AdminPublisher) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 	gr = util.GitPush()
 	util.GitCheckout(cur)
 	w.Write(util.ToJson(gr))
+	
 }

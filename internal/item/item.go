@@ -73,7 +73,5 @@ type ItemService interface {
 }
 
 type ItemListener interface {
-	OnEnum(e Enum)
-	OnCategory(c Category)
-	OnConfiguration(c Configuration)
+	OnUpdate()
 }

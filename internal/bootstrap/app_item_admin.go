@@ -1,11 +1,9 @@
 package bootstrap
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
 )
 
@@ -26,22 +24,8 @@ func (s *AppItemAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *http
 	}()
 	cmd := r.PathValue("cmd")
 	core.AppLog.Printf("command %s\n", cmd)
-	if cmd == "saveenum" {
-		var e item.Enum
-		json.NewDecoder(r.Body).Decode(&e)
-		s.ItemListener().OnEnum(e)
-		return
-	}
-	if cmd == "savecategory" {
-		var e item.Category
-		json.NewDecoder(r.Body).Decode(&e)
-		s.ItemListener().OnCategory(e)
-		return
-	}
-	if cmd == "saveconfig" {
-		var e item.Configuration
-		json.NewDecoder(r.Body).Decode(&e)
-		s.ItemListener().OnConfiguration(e)
+	if cmd == "onupdate" {
+		s.ItemListener().OnUpdate()
 		return
 	}
 	core.AppLog.Printf("cmd not supported %s\n", cmd)

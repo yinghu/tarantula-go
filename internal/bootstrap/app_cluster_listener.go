@@ -40,6 +40,10 @@ func (s *AppManager) Updated(key string, value string, opt core.Opt) {
 	}
 	core.AppLog.Printf("Key updated %s %s %v\n", key, value, opt)
 	go s.updateToApp("presence", "update", KVUpdate{Key: key, Value: value, Opt: opt})
+	go s.updateToApp("asset", "update", KVUpdate{Key: key, Value: value, Opt: opt})
+	go s.updateToApp("profile", "update", KVUpdate{Key: key, Value: value, Opt: opt})
+	go s.updateToApp("inventory", "update", KVUpdate{Key: key, Value: value, Opt: opt})
+	go s.updateToApp("tournament", "update", KVUpdate{Key: key, Value: value, Opt: opt})
 }
 
 func (s *AppManager) updateToApp(app string, cmd string, update KVUpdate) {

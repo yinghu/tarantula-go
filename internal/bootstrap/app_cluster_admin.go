@@ -43,6 +43,7 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		s.Cluster().OnUpdate(update.Key, update.Value, update.Opt)
 		w.WriteHeader(http.StatusOK)
 		w.Write(util.ToJson(session))
+		s.ItemListener().OnUpdate()
 		return
 	}
 	core.AppLog.Printf("cmd not supported %s\n", cmd)
