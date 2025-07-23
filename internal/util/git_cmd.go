@@ -79,3 +79,12 @@ func GitCheckout(branch string) GitResponse {
 	}
 	return fromOut(out)
 }
+
+func GitMerge(branch string) GitResponse {
+	cmd := exec.Command("git", "merge", branch)
+	out, err := cmd.Output()
+	if err != nil {
+		return fromErr(err)
+	}
+	return fromOut(out)
+}
