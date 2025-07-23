@@ -63,7 +63,7 @@ func (db *ItemDB) Save(c item.Configuration) error {
 				}
 			}
 		}
-		return nil
+		return db.Gis.SaveConfiguration(c)
 	})
 }
 

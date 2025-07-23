@@ -1,9 +1,11 @@
 package persistence
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
 )
@@ -26,24 +28,81 @@ func (db *GitItemStore) Start() error {
 
 func (db *GitItemStore) SaveCategory(c item.Category) error {
 	fn := fmt.Sprintf("%s/%d.json", db.CategoryDir, c.Id)
-	fmt.Printf("Save to %s\n", fn)
 	dest, err := os.OpenFile(fn, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		fmt.Printf("Err %s\n", err.Error())
+		core.AppLog.Printf("Err %s\n", err.Error())
 		return err
 	}
 	defer dest.Close()
-	dest.WriteString(string(util.ToJson(c)))
-	util.GitAdd(fn)
-	util.GitCommit("save category [" + fn + "]")
-	util.GitPush()
+	_, err = dest.WriteString(string(util.ToJson(c)))
+	if err != nil {
+		return err
+	}
+	gr := util.GitAdd(fn)
+	if !gr.Successful {
+		return errors.New("cannot add file [" + fn + "]")
+	}
+	gr = util.GitCommit("save category [" + fn + "]")
+	if !gr.Successful {
+		return errors.New("cannot commit file [" + fn + "]")
+	}
+	gr = util.GitPush()
+	if !gr.Successful {
+		return errors.New("cannot push file [" + fn + "]")
+	}
 	return nil
 }
 
 func (db *GitItemStore) SaveEnum(c item.Enum) error {
+	fn := fmt.Sprintf("%s/%d.json", db.EnumDir, c.Id)
+	dest, err := os.OpenFile(fn, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		core.AppLog.Printf("Err %s\n", err.Error())
+		return err
+	}
+	defer dest.Close()
+	_, err = dest.WriteString(string(util.ToJson(c)))
+	if err != nil {
+		return err
+	}
+	gr := util.GitAdd(fn)
+	if !gr.Successful {
+		return errors.New("cannot add file [" + fn + "]")
+	}
+	gr = util.GitCommit("save enum [" + fn + "]")
+	if !gr.Successful {
+		return errors.New("cannot commit file [" + fn + "]")
+	}
+	gr = util.GitPush()
+	if !gr.Successful {
+		return errors.New("cannot push file [" + fn + "]")
+	}
 	return nil
 }
 
 func (db *GitItemStore) SaveConfiguration(c item.Configuration) error {
+	fn := fmt.Sprintf("%s/%d.json", db.ConfigurationDir, c.Id)
+	dest, err := os.OpenFile(fn, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		core.AppLog.Printf("Err %s\n", err.Error())
+		return err
+	}
+	defer dest.Close()
+	_, err = dest.WriteString(string(util.ToJson(c)))
+	if err != nil {
+		return err
+	}
+	gr := util.GitAdd(fn)
+	if !gr.Successful {
+		return errors.New("cannot add file [" + fn + "]")
+	}
+	gr = util.GitCommit("save configuration [" + fn + "]")
+	if !gr.Successful {
+		return errors.New("cannot commit file [" + fn + "]")
+	}
+	gr = util.GitPush()
+	if !gr.Successful {
+		return errors.New("cannot push file [" + fn + "]")
+	}
 	return nil
 }

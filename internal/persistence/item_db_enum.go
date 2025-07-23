@@ -38,7 +38,7 @@ func (db *ItemDB) SaveEnum(c item.Enum) error {
 		if !valid {
 			return errors.New("at least 1 enum value required")
 		}
-		return nil
+		return db.Gis.SaveEnum(c)
 	})
 }
 

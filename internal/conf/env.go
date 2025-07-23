@@ -46,6 +46,7 @@ type Env struct {
 	Pgs           Sql           `json:"Sql"`
 	Bdg           LocalStore    `json:"LocalStore"`
 	Bin           string        `json:"-"`
+	HomeDir       string        `json:"-"`
 }
 
 func (f *Env) ClusterCtx() string {
@@ -73,6 +74,7 @@ func (f *Env) Load(fn string) error {
 			return err
 		}
 		f.LocalDir = homeDir + "/" + f.GroupName
+		f.HomeDir = homeDir
 		err = os.MkdirAll(f.LocalDir, 0755)
 		if err != nil {
 			return err
