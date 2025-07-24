@@ -43,6 +43,7 @@ type Env struct {
 	HttpEndpoint  string        `json:"HttpEndpoint"`
 	Evp           EventEndpoint `json:"EventEndpoint"`
 	EtcdEndpoints []string      `json:"EtcdEndpoints"`
+	ManagedApps   []string      `json:"ManagedApps"`
 	Pgs           Sql           `json:"Sql"`
 	Bdg           LocalStore    `json:"LocalStore"`
 	Bin           string        `json:"-"`

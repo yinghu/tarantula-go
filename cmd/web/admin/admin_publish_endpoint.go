@@ -19,7 +19,7 @@ func (s *AdminPublisher) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 	defer r.Body.Close()
 	defer func() {
 		s.Cluster().Atomic(s.Cluster().Group(), func(ctx core.Ctx) error {
-			ctx.Put("push", s.Cluster().Group())
+			ctx.Put("push:tournament", s.Cluster().Group())
 			return nil
 		})
 	}()

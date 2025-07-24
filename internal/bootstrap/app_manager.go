@@ -11,16 +11,17 @@ import (
 )
 
 type AppManager struct {
-	cls        core.Cluster
-	metr       metrics.MetricsService
-	imse       item.ItemService
-	auth       core.Authenticator
-	Sql        persistence.Postgresql
-	ctx        string
-	standalone bool
-	AppAuth    core.Authenticator
-	seq        core.Sequence
-	Iup        item.ItemListener
+	cls         core.Cluster
+	metr        metrics.MetricsService
+	imse        item.ItemService
+	auth        core.Authenticator
+	Sql         persistence.Postgresql
+	ctx         string
+	standalone  bool
+	AppAuth     core.Authenticator
+	seq         core.Sequence
+	Iup         item.ItemListener
+	ManagedApps []string
 }
 
 func (s *AppManager) ItemService() item.ItemService {
@@ -45,6 +46,7 @@ func (s *AppManager) ItemListener() item.ItemListener {
 
 func (s *AppManager) Start(f conf.Env, c core.Cluster) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
+	s.ManagedApps = f.ManagedApps
 	s.cls = c
 	s.ctx = f.GroupName
 	s.standalone = f.Standalone

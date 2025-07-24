@@ -1,7 +1,6 @@
 package bootstrap
 
 import (
-	"fmt"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -13,25 +12,20 @@ func (s *AppManager) MemberJoined(joined core.Node) {
 		return
 	}
 	core.AppLog.Printf("Member joined %v\n", joined)
-	go s.sendToApp("presence", "join", joined)
-	go s.sendToApp("asset", "join", joined)
-	go s.sendToApp("profile", "join", joined)
-	go s.sendToApp("inventory", "join", joined)
-	go s.sendToApp("tournament", "join", joined)
+	for i := range s.ManagedApps {
+		go s.sendToApp(s.ManagedApps[i], "join", joined)
+	}
 }
 func (s *AppManager) MemberLeft(left core.Node) {
 	if s.standalone {
 		return
 	}
 	core.AppLog.Printf("Member left %v\n", left)
-	go s.sendToApp("presence", "left", left)
-	go s.sendToApp("asset", "left", left)
-	go s.sendToApp("profile", "left", left)
-	go s.sendToApp("inventory", "left", left)
-	go s.sendToApp("tournament", "left", left)
+	for i := range s.ManagedApps {
+		go s.sendToApp(s.ManagedApps[i], "left", left)
+	}
 }
 func (s *AppManager) KVUpdated(key string, value string, opt core.Opt) {
-	fmt.Printf("KV %s : %s\n", key, value)
 	if s.standalone {
 		return
 	}
