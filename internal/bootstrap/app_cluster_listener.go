@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"fmt"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -30,6 +31,7 @@ func (s *AppManager) MemberLeft(left core.Node) {
 	go s.sendToApp("tournament", "left", left)
 }
 func (s *AppManager) KVUpdated(key string, value string, opt core.Opt) {
+	fmt.Printf("KV %s : %s\n", key, value)
 	if s.standalone {
 		return
 	}
