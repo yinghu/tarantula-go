@@ -31,7 +31,7 @@ type Cluster interface {
 
 	OnJoin(join Node)
 	OnLeave(leave Node)
-	OnUpdate(key string, value string, opt Opt)
+	//OnUpdate(key string, value string, opt Opt)
 	Listener() ClusterListener
 }
 
@@ -42,7 +42,7 @@ type Opt struct {
 }
 
 type ClusterListener interface {
-	Updated(key string, value string, opt Opt)
+	KVUpdated(key string, value string, opt Opt)
 	MemberJoined(joined Node)
 	MemberLeft(left Node)
 }

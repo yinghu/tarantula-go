@@ -147,7 +147,7 @@ func (c *EtcdCluster) Join() error {
 				if strings.HasPrefix(cmds[1], "lock") {
 					continue
 				}
-				c.clistener.Updated(cmds[1], string(ev.Kv.Value), core.Opt{IsCreate: ev.IsCreate(), IsModify: ev.IsModify(), Type: ev.Type.String()})
+				c.clistener.KVUpdated(cmds[1], string(ev.Kv.Value), core.Opt{IsCreate: ev.IsCreate(), IsModify: ev.IsModify(), Type: ev.Type.String()})
 			}
 		}
 	}

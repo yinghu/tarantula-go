@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"gameclustering.com/internal/core"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -28,17 +27,6 @@ type Postgresql struct {
 	MaxConns  int32
 }
 
-func beforeAcquire(ctx context.Context, c *pgx.Conn) bool {
-	core.AppLog.Println("call before acquire")
-	return true
-}
-func afterRelease(c *pgx.Conn) bool {
-	core.AppLog.Println("call after release")
-	return true
-}
-func beforeClose(c *pgx.Conn) {
-	core.AppLog.Println("call before close")
-}
 func (p *Postgresql) pconfig() (*pgxpool.Config, error) {
 	cfg, err := pgxpool.ParseConfig(p.Url)
 	if err != nil {
@@ -53,9 +41,9 @@ func (p *Postgresql) pconfig() (*pgxpool.Config, error) {
 	if p.MaxConns > 0 {
 		cfg.MaxConns = p.MaxConns
 	}
-	cfg.BeforeAcquire = beforeAcquire
-	cfg.AfterRelease = afterRelease
-	cfg.BeforeClose = beforeClose
+	//cfg.BeforeAcquire = beforeAcquire
+	//cfg.AfterRelease = afterRelease
+	//cfg.BeforeClose = beforeClose
 	return cfg, nil
 }
 

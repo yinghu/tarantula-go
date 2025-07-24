@@ -4,13 +4,8 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/item"
 )
-
-type KVUpdate struct {
-	Key      string `json:"Key"`
-	Value    string `json:"value"`
-	core.Opt `json:"Opt"`
-}
 
 func (s *AppManager) MemberJoined(joined core.Node) {
 	if s.standalone {
@@ -34,19 +29,19 @@ func (s *AppManager) MemberLeft(left core.Node) {
 	go s.sendToApp("inventory", "left", left)
 	go s.sendToApp("tournament", "left", left)
 }
-func (s *AppManager) Updated(key string, value string, opt core.Opt) {
+func (s *AppManager) KVUpdated(key string, value string, opt core.Opt) {
 	if s.standalone {
 		return
 	}
 	core.AppLog.Printf("Key updated %s %s %v\n", key, value, opt)
-	go s.updateToApp("presence", "update", KVUpdate{Key: key, Value: value, Opt: opt})
-	go s.updateToApp("asset", "update", KVUpdate{Key: key, Value: value, Opt: opt})
-	go s.updateToApp("profile", "update", KVUpdate{Key: key, Value: value, Opt: opt})
-	go s.updateToApp("inventory", "update", KVUpdate{Key: key, Value: value, Opt: opt})
-	go s.updateToApp("tournament", "update", KVUpdate{Key: key, Value: value, Opt: opt})
+	go s.updateToApp("presence", "update", item.KVUpdate{Key: key, Value: value, Opt: opt})
+	go s.updateToApp("asset", "update", item.KVUpdate{Key: key, Value: value, Opt: opt})
+	go s.updateToApp("profile", "update", item.KVUpdate{Key: key, Value: value, Opt: opt})
+	go s.updateToApp("inventory", "update", item.KVUpdate{Key: key, Value: value, Opt: opt})
+	go s.updateToApp("tournament", "update", item.KVUpdate{Key: key, Value: value, Opt: opt})
 }
 
-func (s *AppManager) updateToApp(app string, cmd string, update KVUpdate) {
+func (s *AppManager) updateToApp(app string, cmd string, update item.KVUpdate) {
 	for i := range 5 {
 		ret := s.PostJsonSync("http://"+app+":8080/"+app+"/clusteradmin/"+cmd, update)
 		if ret.ErrorCode == 0 {

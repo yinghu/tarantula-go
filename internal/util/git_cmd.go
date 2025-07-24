@@ -6,7 +6,7 @@ import (
 )
 
 type GitResponse struct {
-	Successful bool   `json:"successfule"`
+	Successful bool   `json:"successful"`
 	Message    string `json:"message"`
 }
 

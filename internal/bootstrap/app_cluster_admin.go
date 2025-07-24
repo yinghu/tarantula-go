@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
 )
 
@@ -38,12 +39,11 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		return
 	}
 	if cmd == "update" {
-		var update KVUpdate
+		var update item.KVUpdate
 		json.NewDecoder(r.Body).Decode(&update)
-		s.Cluster().OnUpdate(update.Key, update.Value, update.Opt)
 		w.WriteHeader(http.StatusOK)
 		w.Write(util.ToJson(session))
-		s.ItemListener().OnUpdate()
+		s.ItemListener().OnUpdated(update)
 		return
 	}
 	core.AppLog.Printf("cmd not supported %s\n", cmd)

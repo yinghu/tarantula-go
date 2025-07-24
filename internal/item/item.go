@@ -72,6 +72,12 @@ type ItemService interface {
 	Loader() ItemLoader
 }
 
+type KVUpdate struct {
+	Key      string `json:"Key"`
+	Value    string `json:"value"`
+	core.Opt `json:"Opt"`
+}
+
 type ItemListener interface {
-	OnUpdate()
+	OnUpdated(kv KVUpdate)
 }
