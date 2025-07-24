@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"strings"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -26,15 +27,22 @@ func (s *AppManager) MemberLeft(left core.Node) {
 	}
 }
 func (s *AppManager) KVUpdated(key string, value string, opt core.Opt) {
+	hs := strings.Split(key, ":")
+	core.AppLog.Printf("Key updated %s %s %v %d\n", key, value, opt, len(hs))
 	if s.standalone {
 		return
 	}
-	core.AppLog.Printf("Key updated %s %s %v\n", key, value, opt)
-	go s.updateToApp("presence", "update", item.KVUpdate{Key: key, Value: value, Opt: opt})
-	go s.updateToApp("asset", "update", item.KVUpdate{Key: key, Value: value, Opt: opt})
-	go s.updateToApp("profile", "update", item.KVUpdate{Key: key, Value: value, Opt: opt})
-	go s.updateToApp("inventory", "update", item.KVUpdate{Key: key, Value: value, Opt: opt})
-	go s.updateToApp("tournament", "update", item.KVUpdate{Key: key, Value: value, Opt: opt})
+	n := len(hs)
+	if n == 1 {
+		for i := range s.ManagedApps {
+			go s.updateToApp(s.ManagedApps[i], "update", item.KVUpdate{Key: key, Value: value, Opt: opt})
+		}
+		return
+	}
+	ns := strings.Split(hs[1], ",")
+	for i := range ns {
+		go s.updateToApp(ns[i], "update", item.KVUpdate{Key: key, Value: value, Opt: opt})
+	}
 }
 
 func (s *AppManager) updateToApp(app string, cmd string, update item.KVUpdate) {

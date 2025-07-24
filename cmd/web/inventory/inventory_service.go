@@ -15,6 +15,7 @@ func (s *InventoryService) Config() string {
 }
 
 func (s *InventoryService) Start(f conf.Env, c core.Cluster) error {
+	s.KVUpdater = s
 	s.AppManager.Start(f, c)
 	s.createSchema()
 	return nil

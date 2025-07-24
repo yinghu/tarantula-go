@@ -40,6 +40,7 @@ func (s *PresenceService) Config() string {
 }
 
 func (s *PresenceService) Start(env conf.Env, c core.Cluster) error {
+	s.KVUpdater = s
 	err := s.AppManager.Start(env, c)
 	if err != nil {
 		return err
