@@ -43,6 +43,9 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		json.NewDecoder(r.Body).Decode(&update)
 		w.WriteHeader(http.StatusOK)
 		w.Write(util.ToJson(session))
+		if s.ItemListener() == nil {
+			return
+		}
 		s.ItemListener().OnUpdated(update)
 		return
 	}

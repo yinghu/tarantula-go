@@ -20,7 +20,7 @@ type AppManager struct {
 	standalone bool
 	AppAuth    core.Authenticator
 	seq        core.Sequence
-	iml        item.ItemListener
+	Iup        item.ItemListener
 }
 
 func (s *AppManager) ItemService() item.ItemService {
@@ -40,7 +40,7 @@ func (s *AppManager) Sequence() core.Sequence {
 	return s.seq
 }
 func (s *AppManager) ItemListener() item.ItemListener {
-	return s.iml
+	return s.Iup
 }
 
 func (s *AppManager) Start(f conf.Env, c core.Cluster) error {
@@ -84,7 +84,6 @@ func (s *AppManager) Start(f conf.Env, c core.Cluster) error {
 		return err
 	}
 	s.imse = &is
-	s.iml = &AppItemListener{s}
 	c.Started()
 	return nil
 }
