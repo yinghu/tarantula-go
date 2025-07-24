@@ -50,5 +50,9 @@ func (s *AdminPublisher) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 	gr = util.GitPush()
 	util.GitCheckout(cur)
 	w.Write(util.ToJson(gr))
-	
+	s.Cluster().Atomic(s.Context(), func(ctx core.Ctx) error {
+		ctx.Put("push", string(util.ToJson(gr)))
+		return nil
+	})
+
 }
