@@ -31,6 +31,10 @@ const (
 )
 
 func (db *ItemDB) Save(c item.Configuration) error {
+	refids, err := db.validate(c)
+	if err != nil {
+		return err
+	}
 	return db.Sql.Txn(func(tx pgx.Tx) error {
 		r, err := tx.Exec(context.Background(), INSERT_CONFIG, c.Id, c.Name, c.Type, c.TypeId, c.Category, c.Version)
 		if err != nil {
@@ -61,6 +65,15 @@ func (db *ItemDB) Save(c item.Configuration) error {
 				if inserted.RowsAffected() != 1 {
 					return errors.New("no data inserted")
 				}
+			}
+		}
+		for i := range refids {
+			f, err := tx.Exec(context.Background(), INSERT_REFERENCE, c.Id, refids[i])
+			if err != nil {
+				return err
+			}
+			if f.RowsAffected() == 0 {
+				return errors.New("no reference insert")
 			}
 		}
 		return db.Gis.SaveConfiguration(c)
@@ -208,26 +221,28 @@ func (db *ItemDB) loadApplication(c *item.Configuration) error {
 	}, SELECT_CONFIG_APPLICATION_WITH_ID, c.Id)
 }
 
-func (db *ItemDB) Validate(c item.Configuration) error {
+func (db *ItemDB) validate(c item.Configuration) ([]int64, error) {
+	refids := make([]int64, 0)
 	if c.Name == "" {
-		return errors.New("name none empty string required")
+		return refids, errors.New("name none empty string required")
 	}
 	if c.TypeId == "" {
-		return errors.New("typeId none empty string required")
+		return refids, errors.New("typeId none empty string required")
 	}
 	if c.Type == "" {
-		return errors.New("type none empty string required")
+		return refids, errors.New("type none empty string required")
 	}
 	if c.Category == "" {
-		return errors.New("category none empty string required")
+		return refids, errors.New("category none empty string required")
 	}
 	if c.Version == "" {
-		return errors.New("version none empty string required")
+		return refids, errors.New("version none empty string required")
 	}
 	cat, err := db.LoadCategory(c.Category)
 	if err != nil {
-		return err
+		return refids, err
 	}
+	refids = append(refids, cat.Id)
 	valid := len(c.Header)
 	for i := range cat.Properties {
 		prop := cat.Properties[i]
@@ -236,82 +251,83 @@ func (db *ItemDB) Validate(c item.Configuration) error {
 				for i := range v {
 					aid, err := strconv.ParseInt(v[i], 10, 64)
 					if err != nil {
-						return err
+						return refids, err
 					}
 					_, err = db.LoadWithId(aid)
 					if err != nil {
-						return err
+						return refids, err
 					}
+					refids = append(refids, aid)
 				}
 			}
 			continue
 		}
 		v, existed := c.Header[prop.Name]
 		if !existed && !prop.Nullable {
-			return errors.New("value not existed : " + prop.Type)
+			return refids, errors.New("value not existed : " + prop.Type)
 		}
 		valid--
 		if prop.Type == "string" {
 			err = asString(v)
 			if err != nil {
-				return err
+				return refids, err
 			}
 			continue
 		}
 		if prop.Type == "int" {
 			err = asInt(v)
 			if err != nil {
-				return err
+				return refids, err
 			}
 			continue
 		}
 		if prop.Type == "long" {
 			err = asLong(v)
 			if err != nil {
-				return err
+				return refids, err
 			}
 			continue
 		}
 		if prop.Type == "float" {
 			err = asFloat(v)
 			if err != nil {
-				return err
+				return refids, err
 			}
 			continue
 		}
 		if prop.Type == "double" {
 			err = asDouble(v)
 			if err != nil {
-				return err
+				return refids, err
 			}
 			continue
 		}
 		if prop.Type == "boolean" {
 			err = asBool(v)
 			if err != nil {
-				return err
+				return refids, err
 			}
 			continue
 		}
 		if prop.Type == "dateTime" {
 			err = asString(v)
 			if err != nil {
-				return err
+				return refids, err
 			}
 			_, err = time.Parse(DATE_TIME_FORMAT, fmt.Sprintf("%v", v))
 			if err != nil {
-				return err
+				return refids, err
 			}
 			continue
 		}
 		if prop.Type == "enum" {
 			em, err := db.LoadEnum(prop.Reference)
 			if err != nil {
-				return err
+				return refids, err
 			}
 			e, err := toInt32(v)
 			if err != nil {
-				return err
+				return refids, err
 			}
 			matched := false
 			for i := range em.Values {
@@ -321,15 +337,16 @@ func (db *ItemDB) Validate(c item.Configuration) error {
 				}
 			}
 			if !matched {
-				return errors.New("enum value not matched")
+				return refids, errors.New("enum value not matched")
 			}
+			refids = append(refids, em.Id)
 			continue
 		}
 	}
 	if valid == 0 {
-		return nil
+		return refids, nil
 	}
-	return errors.New("invalid data")
+	return refids, errors.New("invalid data")
 }
 
 func asString(v any) error {

@@ -17,6 +17,10 @@ const (
 )
 
 func (db *ItemDB) SaveEnum(c item.Enum) error {
+	err := db.validateEnum(c)
+	if err != nil {
+		return err
+	}
 	return db.Sql.Txn(func(tx pgx.Tx) error {
 		r, err := tx.Exec(context.Background(), INSERT_ENUM, c.Id, c.Name)
 		if err != nil {
@@ -42,7 +46,7 @@ func (db *ItemDB) SaveEnum(c item.Enum) error {
 	})
 }
 
-func (db *ItemDB) ValidateEnum(c item.Enum) error {
+func (db *ItemDB) validateEnum(c item.Enum) error {
 	if c.Id <= 0 {
 		return errors.New("none negative id required")
 	}

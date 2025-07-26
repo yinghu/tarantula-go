@@ -33,12 +33,6 @@ func (s *EnumSaver) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 		return
 	}
 	conf.Id = sid
-	err = s.ItemService().ValidateEnum(conf)
-	if err != nil {
-		session := core.OnSession{Successful: false, Message: err.Error()}
-		w.Write(util.ToJson(session))
-		return
-	}
 	err = s.ItemService().SaveEnum(conf)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}

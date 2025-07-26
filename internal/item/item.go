@@ -66,9 +66,7 @@ type ItemService interface {
 	DeleteWithName(cname string) error
 	DeleteWithId(cid int64) error
 
-	Validate(c Configuration) error
-	ValidateCategory(c Category) error
-	ValidateEnum(c Enum) error
+	//ValidateEnum(c Enum) error
 	Loader() ItemLoader
 }
 

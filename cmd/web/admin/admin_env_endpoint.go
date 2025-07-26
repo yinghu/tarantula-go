@@ -10,7 +10,8 @@ import (
 )
 
 type WorkingEnv struct {
-	CurBranch string `json:"CurBranch"`
+	CurBranch   string   `json:"CurBranch"`
+	ManagedApps []string `json:"ManagedApps"`
 }
 
 type AdminEnv struct {
@@ -23,5 +24,5 @@ func (s *AdminEnv) AccessControl() int32 {
 func (s *AdminEnv) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	os.Chdir(s.publishDir)
-	w.Write(util.ToJson(WorkingEnv{CurBranch: util.GitCurBranch().Message}))
+	w.Write(util.ToJson(WorkingEnv{CurBranch: util.GitCurBranch().Message, ManagedApps: s.managedApps}))
 }
