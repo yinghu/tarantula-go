@@ -57,6 +57,7 @@ type ItemService interface {
 	SaveCategory(c Category) error
 	LoadCategory(cname string) (Category, error)
 	LoadCategoryWithId(cid int64) (Category, error)
+	DeleteCategoryWithId(cid int64) error
 	LoadCategories(scopeEnd int32, targetScope string) []Category
 
 	Save(c Configuration) error
@@ -66,7 +67,6 @@ type ItemService interface {
 	DeleteWithName(cname string) error
 	DeleteWithId(cid int64) error
 
-	//ValidateEnum(c Enum) error
 	Loader() ItemLoader
 }
 

@@ -3,20 +3,23 @@ package persistence
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"gameclustering.com/internal/item"
+	"gameclustering.com/internal/util"
 	"github.com/jackc/pgx/v5"
 )
 
 const (
-	INSERT_CATEGORY              string = "INSERT INTO item_category (id,name,scope,scope_sequence,rechargeable,description) VALUES($1,$2,$3,$4,$5,$6)"
-	INSERT_PROPERTY              string = "INSERT INTO item_category_property (category_id,name,type,reference,nullable) VALUES($1,$2,$3,$4,$5)"
-	SELECT_CATEGORY_WITH_NAME    string = "SELECT id,scope,scope_sequence,rechargeable,description FROM item_category WHERE name = $1"
-	SELECT_CATEGORY_WITH_ID      string = "SELECT name,scope,scope_sequence,rechargeable,description FROM item_category WHERE id = $1"
-	SELECT_PROPERTIES_WITH_CID   string = "SELECT name,type,reference,nullable FROM item_category_property WHERE category_id = $1"
-	SELECT_CATEGORIES_WITH_SCOPE string = "SELECT id,name,scope,scope_sequence,rechargeable,description FROM item_category WHERE scope_sequence < $1 OR scope = $2"
-	INSERT_REFERENCE             string = "INSERT INTO item_reference (item_id,ref_id) VALUES ($1,$2)"
+	INSERT_CATEGORY                  string = "INSERT INTO item_category (id,name,scope,scope_sequence,rechargeable,description) VALUES($1,$2,$3,$4,$5,$6)"
+	INSERT_PROPERTY                  string = "INSERT INTO item_category_property (category_id,name,type,reference,nullable) VALUES($1,$2,$3,$4,$5)"
+	SELECT_CATEGORY_WITH_NAME        string = "SELECT id,scope,scope_sequence,rechargeable,description FROM item_category WHERE name = $1"
+	SELECT_CATEGORY_WITH_ID          string = "SELECT name,scope,scope_sequence,rechargeable,description FROM item_category WHERE id = $1"
+	SELECT_PROPERTIES_WITH_CID       string = "SELECT name,type,reference,nullable FROM item_category_property WHERE category_id = $1"
+	SELECT_CATEGORIES_WITH_SCOPE     string = "SELECT id,name,scope,scope_sequence,rechargeable,description FROM item_category WHERE scope_sequence < $1 OR scope = $2"
+	DELETE_CATEGORY_WITH_ID          string = "DELETE FROM item_category WHERE id = $1"
+	DELETE_CATEGORY_PROPERTY_WITH_ID string = "DELETE FROM item_category_property WHERE category_id = $1"
 )
 
 func (db *ItemDB) SaveCategory(c item.Category) error {
@@ -132,6 +135,46 @@ func (db *ItemDB) LoadCategories(scopeEnd int32, targetScope string) []item.Cate
 		return nil
 	}, SELECT_CATEGORIES_WITH_SCOPE, scopeEnd, targetScope)
 	return list
+}
+
+func (db *ItemDB) DeleteCategoryWithId(cid int64) error {
+	var refs int
+	err := db.Sql.Query(func(row pgx.Rows) error {
+		err := row.Scan(&refs)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, SELECT_REFERENCE_WITH_REF_ID, cid)
+	if err != nil {
+		return err
+	}
+	if refs > 0 {
+		return fmt.Errorf("reference ct : %d", refs)
+	}
+	err = db.Sql.Txn(func(tx pgx.Tx) error {
+		dc, err := tx.Exec(context.Background(), DELETE_CATEGORY_WITH_ID, cid)
+		if err != nil {
+			return err
+		}
+		if dc.RowsAffected() == 0 {
+			return fmt.Errorf("not existed %d", cid)
+		}
+		pc, err := tx.Exec(context.Background(), DELETE_CATEGORY_PROPERTY_WITH_ID, cid)
+		if err != nil {
+			return err
+		}
+		if pc.RowsAffected() == 0 {
+			return fmt.Errorf("not property existed %d", cid)
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	//delete from git
+	util.GitRemove(fmt.Sprintf("%d.json", cid))
+	return nil
 }
 
 func (db *ItemDB) validateCategory(c item.Category) ([]int64, error) {

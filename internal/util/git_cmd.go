@@ -88,3 +88,11 @@ func GitMerge(branch string) GitResponse {
 	}
 	return fromOut(out)
 }
+func GitRemove(fn string) GitResponse {
+	cmd := exec.Command("git", "rm", fn)
+	out, err := cmd.Output()
+	if err != nil {
+		return fromErr(err)
+	}
+	return fromOut(out)
+}

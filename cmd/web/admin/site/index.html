@@ -373,13 +373,11 @@
             function on_delete_category(cid){
                 Admin.query()['confirm']=()=>{
                     console.log("confirmed ["+cid+"]");
+                    Admin.getJson("/admin/category/edit/"+cid,(resp)=>{
+                        on_preview("Delete View",resp);
+                    }); 
                 };
-
-                Html.openWithId("#tx-edit-confirmation-box");
-                //console.log("Delete : "+cid);
-                //Admin.getJson("/admin/category/publish/"+env+"/"+cid,(resp)=>{
-                    //on_preview("Publish View",resp);
-                //});    
+                Html.openWithId("#tx-edit-confirmation-box");   
             }
             function on_preview_category(cid){
                 Admin.getJson("/admin/category/preview/"+cid,(resp)=>{
