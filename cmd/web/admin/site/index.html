@@ -85,6 +85,24 @@
                     <div class="tx-content-24"></div>
                 </div>
         </div>
+        <div id="tx-edit-confirmation-box" class="w3-modal w3-animate-zoom tx-hidden">
+                <div class="w3-modal-content">
+                    <div class="w3-display-container tx-content-200">
+                        <div class="w3-display-topright">
+                            <span id="tx-edit-confirmation-box-close"><i class="material-symbols-outlined tx-margin-top-8 tx-margin-right-8 tx-red-icon-24">close</i></span>
+                        </div>
+                        <div class="w3-display-topleft">
+                            <span><i class="material-symbols-outlined tx-margin-top-8 tx-margin-left-8 tx-orange-icon-48">question_mark</i></span>
+                        </div>
+                        <div id="tx-edit-confirmation-box-title" class="w3-display-middle tx-text-16">Are you sure to delete item ?</div>
+                       
+                        <div class="w3-display-bottommiddle">
+                            <span id="tx-edit-confirmation-box-confirm" class="w3-tag w3-green tx-text-20 tx-padding-button">Confirm</span>
+                        </div>
+                    </div>
+                    <div class="tx-content-24"></div>
+                </div>
+        </div>
         <script>
             let editor;
             after_login(false)
@@ -118,7 +136,13 @@
             Html.eventWithId("#tx-json-preview-box-preview",()=>{
                 editor.setMode("preview");
             });
-
+            Html.eventWithId("#tx-edit-confirmation-box-close",()=>{
+                Html.closeWithId("#tx-edit-confirmation-box");
+            }); 
+            Html.eventWithId("#tx-edit-confirmation-box-confirm",()=>{
+                Admin.query()["confirm"]();
+                Html.closeWithId("#tx-edit-confirmation-box");
+            });    
             function on_logout(){
                 after_login(false);
                 set_task_header("Welcome","doorbell");
@@ -347,7 +371,12 @@
             }
             
             function on_delete_category(cid){
-                console.log("Delete : "+cid);
+                Admin.query()['confirm']=()=>{
+                    console.log("confirmed ["+cid+"]");
+                };
+
+                Html.openWithId("#tx-edit-confirmation-box");
+                //console.log("Delete : "+cid);
                 //Admin.getJson("/admin/category/publish/"+env+"/"+cid,(resp)=>{
                     //on_preview("Publish View",resp);
                 //});    
