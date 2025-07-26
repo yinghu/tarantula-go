@@ -43,6 +43,7 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 
 	http.Handle("/admin/webprotected/{name}", bootstrap.Logging(&AdminWebProtected{AdminService: s}))
 	http.Handle("/admin/web/{name}", bootstrap.Logging(&AdminWebIndex{AdminService: s}))
+	//handle / context from nginx proxy
 	http.Handle("/admin/{name}", bootstrap.Logging(&AdminWebIndex{AdminService: s}))
 
 	http.Handle("/admin/enum/load/{name}", bootstrap.Logging(&EnumLoader{AdminService: s}))

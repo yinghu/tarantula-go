@@ -774,18 +774,7 @@ var Html = (function(){
         tem.push("Edit Form");
         tem.push("</legend>");
         tem.push(_icon(conf.prefix,"category","close","red"));
-        //tem.push("<div class='w3-panel'>");
-        //tem.push("<select id='");
-        //tem.push(conf.prefix+'-env-select');
-        //tem.push("' class='w3-round w3-border tx-text-16 w3-select");
-        //tem.push("'>");
-        //tem.push("<option value='dev' selected>Development</option>");
-        //tem.push("<option value='stg'>Staging</option>");
-        //tem.push("<option value='qa'>QA</option>");
-        //tem.push("<option value='prod'>Production</option>");
-        //tem.push("</select>");
-        //tem.push("</div>");
-       
+        
         clist.forEach(c=>{
             if(c.ScopeSequence == _task.ScopeSequence){
                 tem.push("<div class='w3-panel w3-padding w3-border-bottom w3-border-red'>");
@@ -795,8 +784,14 @@ var Html = (function(){
                 tem.push("<span tx-category-id='"+c.Id+"' ");
                 tem.push("class='w3-green w3-right w3-tag tx-text-20 tx-padding-button tx-margin-left-8 tx-"+conf.prefix+"-delete-opt'>Delete");
                 tem.push("</span>");
-                 tem.push("<span tx-category-id='"+c.Id+"' ");
+                tem.push("<span tx-category-id='"+c.Id+"' ");
                 tem.push("class='w3-green w3-right w3-tag tx-text-20 tx-padding-button tx-margin-left-8 tx-"+conf.prefix+"-preview-opt'>Preview");
+                tem.push("</span>");
+                tem.push("<span tx-category-id='"+c.Id+"' ");
+                tem.push("class='w3-green w3-right w3-tag tx-text-20 tx-padding-button tx-margin-left-8 tx-"+conf.prefix+"-register-opt'>Register");
+                tem.push("</span>");
+                tem.push("<span tx-category-id='"+c.Id+"' ");
+                tem.push("class='w3-green w3-right w3-tag tx-text-20 tx-padding-button tx-margin-left-8 tx-"+conf.prefix+"-release-opt'>Release");
                 tem.push("</span>");
                 tem.push("</div>");
             }    
