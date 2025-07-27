@@ -53,6 +53,7 @@ type ItemService interface {
 	SaveEnum(c Enum) error
 	LoadEnum(cname string) (Enum, error)
 	LoadEnums() ([]Enum, error)
+	DeleteEnumWithId(cid int64) error
 
 	SaveCategory(c Category) error
 	LoadCategory(cname string) (Category, error)
@@ -63,8 +64,6 @@ type ItemService interface {
 	Save(c Configuration) error
 	LoadWithName(cname string, limit int) ([]Configuration, error)
 	LoadWithId(cid int64) (Configuration, error)
-
-	DeleteWithName(cname string) error
 	DeleteWithId(cid int64) error
 
 	Loader() ItemLoader

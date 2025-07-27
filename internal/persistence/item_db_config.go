@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"strconv"
 	"time"
 
@@ -68,6 +69,7 @@ func (db *ItemDB) Save(c item.Configuration) error {
 			}
 		}
 		for i := range refids {
+			fmt.Printf("ref id : %d=>%d\n", i, refids[i])
 			f, err := tx.Exec(context.Background(), INSERT_REFERENCE, c.Id, refids[i])
 			if err != nil {
 				return err
@@ -143,7 +145,6 @@ func (db *ItemDB) LoadWithId(cid int64) (item.Configuration, error) {
 		refs := conf.Application[k]
 		confs := make([]item.Configuration, 0)
 		for r := range refs {
-			//fmt.Printf("Ref 2 id : %s\n", refs[r])
 			cid, _ := strconv.ParseInt(refs[r], 10, 64)
 			conf, err := db.LoadWithId(cid)
 			if err != nil {
@@ -157,6 +158,10 @@ func (db *ItemDB) LoadWithId(cid int64) (item.Configuration, error) {
 }
 
 func (db *ItemDB) DeleteWithId(cid int64) error {
+	err := db.checkRefs(cid)
+	if err != nil {
+		return err
+	}
 	return db.Sql.Txn(func(tx pgx.Tx) error {
 		_, err := tx.Exec(context.Background(), DELETE_CONFIG_WITH_ID, cid)
 		if err != nil {
@@ -182,24 +187,6 @@ func (db *ItemDB) DeleteWithId(cid int64) error {
 	})
 }
 
-func (db *ItemDB) DeleteWithName(cname string) error {
-	return db.Sql.Txn(func(tx pgx.Tx) error {
-		var id int32
-		err := tx.QueryRow(context.Background(), DELETE_CONFIG_WITH_NAME, cname).Scan(&id)
-		if err != nil {
-			return err
-		}
-		_, err = tx.Exec(context.Background(), DELETE_HEADER, id)
-		if err != nil {
-			return err
-		}
-		_, err = tx.Exec(context.Background(), DELETE_APPLICATION, id)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-}
 
 func (db *ItemDB) loadHeader(c *item.Configuration) error {
 	c.Header = make(map[string]any)
@@ -352,6 +339,8 @@ func (db *ItemDB) validate(c item.Configuration) ([]int64, error) {
 		}
 	}
 	if valid == 0 {
+		slices.Sort(refids)
+		refids = slices.Compact(refids)
 		return refids, nil
 	}
 	return refids, errors.New("invalid data")

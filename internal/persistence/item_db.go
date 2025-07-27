@@ -1,7 +1,10 @@
 package persistence
 
 import (
+	"fmt"
+
 	"gameclustering.com/internal/item"
+	"github.com/jackc/pgx/v5"
 )
 
 const (
@@ -61,6 +64,24 @@ func (db *ItemDB) Start() error {
 	_, err = db.Sql.Exec(ITEM_REFERENCE_SQL_SCHEMA)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (db *ItemDB) checkRefs(refId int64) error {
+	var refs int
+	err := db.Sql.Query(func(row pgx.Rows) error {
+		err := row.Scan(&refs)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, SELECT_REFERENCE_WITH_REF_ID, refId)
+	if err != nil {
+		return err
+	}
+	if refs > 0 {
+		return fmt.Errorf("reference ct : %d", refs)
 	}
 	return nil
 }

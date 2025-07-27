@@ -107,6 +107,15 @@ func (db *ItemDB) LoadEnums() ([]item.Enum, error) {
 	return enums, nil
 }
 
+func (db *ItemDB) DeleteEnumWithId(cid int64) error {
+	err := db.checkRefs(cid)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (db *ItemDB) loadValues(enum *item.Enum) error {
 	enum.Values = make([]item.EnumValue, 0)
 	err := db.Sql.Query(func(row pgx.Rows) error {
@@ -122,5 +131,4 @@ func (db *ItemDB) loadValues(enum *item.Enum) error {
 		return err
 	}
 	return nil
-
 }

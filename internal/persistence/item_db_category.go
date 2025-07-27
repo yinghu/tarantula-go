@@ -137,19 +137,9 @@ func (db *ItemDB) LoadCategories(scopeEnd int32, targetScope string) []item.Cate
 }
 
 func (db *ItemDB) DeleteCategoryWithId(cid int64) error {
-	var refs int
-	err := db.Sql.Query(func(row pgx.Rows) error {
-		err := row.Scan(&refs)
-		if err != nil {
-			return err
-		}
-		return nil
-	}, SELECT_REFERENCE_WITH_REF_ID, cid)
+	err := db.checkRefs(cid)
 	if err != nil {
 		return err
-	}
-	if refs > 0 {
-		return fmt.Errorf("reference ct : %d", refs)
 	}
 	err = db.Sql.Txn(func(tx pgx.Tx) error {
 		dc, err := tx.Exec(context.Background(), DELETE_CATEGORY_WITH_ID, cid)
