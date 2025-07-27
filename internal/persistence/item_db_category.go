@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"gameclustering.com/internal/item"
-	"gameclustering.com/internal/util"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -167,13 +166,15 @@ func (db *ItemDB) DeleteCategoryWithId(cid int64) error {
 		if pc.RowsAffected() == 0 {
 			return fmt.Errorf("not property existed %d", cid)
 		}
+		err = db.Gis.RemoveCategory(cid)
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 	if err != nil {
 		return err
 	}
-	//delete from git
-	util.GitRemove(fmt.Sprintf("%d.json", cid))
 	return nil
 }
 

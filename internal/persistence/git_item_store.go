@@ -115,7 +115,6 @@ func (db *GitItemStore) Load(cid int64) (item.Configuration, error) {
 		refs := conf.Application[k]
 		confs := make([]item.Configuration, 0)
 		for r := range refs {
-			//fmt.Printf("Ref 2 id : %s\n", refs[r])
 			cid, _ := strconv.ParseInt(refs[r], 10, 64)
 			conf, err := db.Load(cid)
 			if err != nil {
@@ -126,4 +125,17 @@ func (db *GitItemStore) Load(cid int64) (item.Configuration, error) {
 		conf.Reference[k] = confs
 	}
 	return conf, nil
+}
+
+func (db *GitItemStore) RemoveCategory(cid int64) error {
+	fn := fmt.Sprintf("%s/%d.json", db.CategoryDir, cid)
+	gr := util.GitRemove(fn)
+	if !gr.Successful {
+		return fmt.Errorf("cannot remove file :%s", fn)
+	}
+	gr = util.GitCommit(fmt.Sprintf("remove configuration [%d]", cid))
+	if !gr.Successful {
+		return errors.New("cannot commit file [" + fn + "]")
+	}
+	return nil
 }
