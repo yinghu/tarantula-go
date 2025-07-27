@@ -91,6 +91,7 @@ func (s *AppManager) Start(f conf.Env, c core.Cluster) error {
 }
 
 func (s *AppManager) Shutdown() {
+	util.GitPush()
 	s.Sql.Close()
 }
 
