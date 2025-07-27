@@ -166,6 +166,10 @@ func (db *ItemDB) DeleteCategoryWithId(cid int64) error {
 		if pc.RowsAffected() == 0 {
 			return fmt.Errorf("not property existed %d", cid)
 		}
+		_, err = tx.Exec(context.Background(), DELETE_REFERENCE_WITH_ITEM_ID, cid)
+		if err != nil {
+			return err
+		}
 		err = db.Gis.RemoveCategory(cid)
 		if err != nil {
 			return err

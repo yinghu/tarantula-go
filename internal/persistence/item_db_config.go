@@ -170,6 +170,10 @@ func (db *ItemDB) DeleteWithId(cid int64) error {
 		if err != nil {
 			return err
 		}
+		_, err = tx.Exec(context.Background(), DELETE_REFERENCE_WITH_ITEM_ID, cid)
+		if err != nil {
+			return err
+		}
 		err = db.Gis.RemoveConfig(cid)
 		if err != nil {
 			return err

@@ -771,7 +771,6 @@ var Html = (function(){
             }
         });
         _eventWithId("#ins-delete",()=>{
-            console.log(ins.ItemId);
             deleteCall(ins.ItemId);     
         });
         _openWithId("#ins-delete");

@@ -294,11 +294,11 @@
                     Html.openWithId("#tx-form-box");
                     Html.populateInstance(ins,load_categories,(itemId)=>{
                         Admin.query()['confirm']=()=>{
-                            console.log("confirmed ["+itemId+"]");
                             Admin.getJson("/admin/item/delete/config/"+itemId,(resp)=>{
                                 on_preview("Delete View",resp);
                             }); 
                         };
+                        Html.messageWithId("#tx-edit-confirmation-box-title","Are you sure to delete item ["+itemId+"]");
                         Html.openWithId("#tx-edit-confirmation-box");        
                     });
                 });
@@ -380,11 +380,11 @@
             
             function on_delete_category(cid){
                 Admin.query()['confirm']=()=>{
-                    console.log("confirmed ["+cid+"]");
                     Admin.getJson("/admin/item/delete/category/"+cid,(resp)=>{
                         on_preview("Delete View",resp);
                     }); 
                 };
+                Html.messageWithId("#tx-edit-confirmation-box-title","Are you sure to delete category ["+cid+"]");
                 Html.openWithId("#tx-edit-confirmation-box");   
             }
             function on_preview_category(cid){

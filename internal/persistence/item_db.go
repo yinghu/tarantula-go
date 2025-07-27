@@ -15,8 +15,9 @@ const (
 	ITEM_APPLICATION_SQL_SCHEMA   string = "CREATE TABLE IF NOT EXISTS item_application (configuration_id BIGINT NOT NULL,name VARCHAR(100) NOT NULL,reference_id BIGINT NOT NULL,PRIMARY KEY(configuration_id,name,reference_id))"
 	ITEM_REFERENCE_SQL_SCHEMA     string = "CREATE TABLE IF NOT EXISTS item_reference (id SERIAL PRIMARY KEY, item_id BIGINT NOT NULL,ref_id BIGINT NOT NULL)"
 
-	INSERT_REFERENCE             string = "INSERT INTO item_reference (item_id,ref_id) VALUES ($1,$2)"
-	SELECT_REFERENCE_WITH_REF_ID string = "SELECT COUNT(*) FROM item_reference WHERE ref_id = $1"
+	INSERT_REFERENCE              string = "INSERT INTO item_reference (item_id,ref_id) VALUES ($1,$2)"
+	SELECT_REFERENCE_WITH_REF_ID  string = "SELECT COUNT(*) FROM item_reference WHERE ref_id = $1"
+	DELETE_REFERENCE_WITH_ITEM_ID string = "DELETE FROM item_reference WHERE item_id = $1"
 )
 
 type ItemDB struct {
