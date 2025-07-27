@@ -292,7 +292,15 @@
                         });
                     },load_categories);
                     Html.openWithId("#tx-form-box");
-                    Html.populateInstance(ins,load_categories);
+                    Html.populateInstance(ins,load_categories,(itemId)=>{
+                        Admin.query()['confirm']=()=>{
+                            console.log("confirmed ["+itemId+"]");
+                            Admin.getJson("/admin/item/delete/config/"+itemId,(resp)=>{
+                                on_preview("Delete View",resp);
+                            }); 
+                        };
+                        Html.openWithId("#tx-edit-confirmation-box");        
+                    });
                 });
             }
 
@@ -373,7 +381,7 @@
             function on_delete_category(cid){
                 Admin.query()['confirm']=()=>{
                     console.log("confirmed ["+cid+"]");
-                    Admin.getJson("/admin/category/edit/"+cid,(resp)=>{
+                    Admin.getJson("/admin/item/delete/category/"+cid,(resp)=>{
                         on_preview("Delete View",resp);
                     }); 
                 };

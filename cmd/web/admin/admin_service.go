@@ -40,7 +40,7 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	}
 	err = s.SaveLogin(&event.Login{Name: "root", Hash: hash, AccessControl: bootstrap.SUDO_ACCESS_CONTROL})
 	if err != nil {
-		fmt.Printf("Root already existed %s\n", err.Error())
+		core.AppLog.Printf("Root already existed %s\n", err.Error())
 	}
 
 	http.Handle("/admin/webprotected/{name}", bootstrap.Logging(&AdminWebProtected{AdminService: s}))
@@ -56,7 +56,7 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	http.Handle("/admin/config/load/{id}/{name}/{limit}", bootstrap.Logging(&ConfigLoader{AdminService: s}))
 	http.Handle("/admin/config/save", bootstrap.Logging(&ConfigSaver{AdminService: s}))
 	http.Handle("/admin/category/preview/{id}", bootstrap.Logging(&CategoryPreviewer{AdminService: s}))
-	http.Handle("/admin/category/edit/{id}", bootstrap.Logging(&CategoryEditor{AdminService: s}))
+	http.Handle("/admin/item/delete/{type}/{id}", bootstrap.Logging(&ItemDeleter{AdminService: s}))
 
 	http.Handle("/admin/view/{id}", bootstrap.Logging(&AdminItemViewer{AdminService: s}))
 	http.Handle("/admin/publish/{repo}", bootstrap.Logging(&AdminPublisher{AdminService: s}))

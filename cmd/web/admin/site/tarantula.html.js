@@ -252,6 +252,12 @@ var Html = (function(){
         let tem=[];
         tem.push("<div class='w3-panel'>");
         tem.push("<span id='");
+        tem.push(prefix+"-delete' ");
+        tem.push("class='w3-left w3-tag w3-green tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-right-8 tx-hidden'>");
+        tem.push("Delete");
+        tem.push("</span>");
+
+        tem.push("<span id='");
         tem.push(prefix+"-"+name+"' ");
         tem.push("class='w3-right w3-tag w3-green tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-right-8'>");
         tem.push(name);
@@ -723,7 +729,7 @@ var Html = (function(){
         });
     };
 
-    let _populateInstance = function(ins,load){
+    let _populateInstance = function(ins,load,deleteCall){
         _instance.header.Properties.forEach(p=>{
             document.querySelector("#ins-header-"+p.Name).value = ins[p.Name];
         });
@@ -764,6 +770,11 @@ var Html = (function(){
                 }    
             }
         });
+        _eventWithId("#ins-delete",()=>{
+            console.log(ins.ItemId);
+            deleteCall(ins.ItemId);     
+        });
+        _openWithId("#ins-delete");
     };
 
     _editForm = function(conf,clist,edit,preview){

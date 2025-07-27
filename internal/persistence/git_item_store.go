@@ -133,6 +133,18 @@ func (db *GitItemStore) RemoveCategory(cid int64) error {
 	if !gr.Successful {
 		return fmt.Errorf("cannot remove file :%s", fn)
 	}
+	gr = util.GitCommit(fmt.Sprintf("remove category [%d]", cid))
+	if !gr.Successful {
+		return errors.New("cannot commit file [" + fn + "]")
+	}
+	return nil
+}
+func (db *GitItemStore) RemoveConfig(cid int64) error {
+	fn := fmt.Sprintf("%s/%d.json", db.ConfigurationDir, cid)
+	gr := util.GitRemove(fn)
+	if !gr.Successful {
+		return fmt.Errorf("cannot remove file :%s", fn)
+	}
 	gr = util.GitCommit(fmt.Sprintf("remove configuration [%d]", cid))
 	if !gr.Successful {
 		return errors.New("cannot commit file [" + fn + "]")

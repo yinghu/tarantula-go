@@ -27,7 +27,7 @@ const (
 	DELETE_CONFIG_WITH_NAME string = "DELETE FROM item_configuration WHERE name = $1 RETURNING id"
 	DELETE_HEADER           string = "DELETE FROM item_header WHERE configuration_id = $1"
 	DELETE_APPLICATION      string = "DELETE FROM item_application WHERE configuration_id = $1"
-	DELETE_CONFIG_WITH_ID   string = "DELETE FROM item_configuration WHERE id"
+	DELETE_CONFIG_WITH_ID   string = "DELETE FROM item_configuration WHERE id = $1"
 )
 
 func (db *ItemDB) Save(c item.Configuration) error {
@@ -167,6 +167,10 @@ func (db *ItemDB) DeleteWithId(cid int64) error {
 			return err
 		}
 		_, err = tx.Exec(context.Background(), DELETE_APPLICATION, cid)
+		if err != nil {
+			return err
+		}
+		err = db.Gis.RemoveConfig(cid)
 		if err != nil {
 			return err
 		}

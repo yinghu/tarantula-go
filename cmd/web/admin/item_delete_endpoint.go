@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -9,22 +10,29 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-type CategoryEditor struct {
+type ItemDeleter struct {
 	*AdminService
 }
 
-func (s *CategoryEditor) AccessControl() int32 {
+func (s *ItemDeleter) AccessControl() int32 {
 	return bootstrap.ADMIN_ACCESS_CONTROL
 }
-func (s *CategoryEditor) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
+func (s *ItemDeleter) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+	tp := r.PathValue("type")
 	cid, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
-
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	err = s.AdminService.ItemService().DeleteCategoryWithId(cid)
+	switch tp {
+	case "category":
+		err = s.AdminService.ItemService().DeleteCategoryWithId(cid)
+	case "config":
+		err = s.AdminService.ItemService().DeleteWithId(cid)
+	default:
+		err = errors.New("type not supported :" + tp)
+	}
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
