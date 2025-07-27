@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"gameclustering.com/internal/item"
 	"github.com/jackc/pgx/v5"
@@ -14,6 +15,8 @@ const (
 	SELECT_ENUM_WITH_NAME       string = "SELECT id FROM item_enum WHERE name = $1"
 	SELECT_ALL_ENUM             string = "SELECT id,name FROM item_enum"
 	SELECT_ENUM_VALUES_WITH_CID string = "SELECT name,value FROM item_enum_value WHERE enum_id = $1"
+	DELETE_ENUM_WITH_ID         string = "DELETE FROM item_enum WHERE id = $1"
+	DELETE_ENUM_VALUE_WITH_ID   string = "DELETE FROM item_enum_value WHERE enum_id = $1"
 )
 
 func (db *ItemDB) SaveEnum(c item.Enum) error {
@@ -112,7 +115,34 @@ func (db *ItemDB) DeleteEnumWithId(cid int64) error {
 	if err != nil {
 		return err
 	}
-
+	err = db.Sql.Txn(func(tx pgx.Tx) error {
+		dc, err := tx.Exec(context.Background(), DELETE_ENUM_WITH_ID, cid)
+		if err != nil {
+			return err
+		}
+		if dc.RowsAffected() == 0 {
+			return fmt.Errorf("not existed %d", cid)
+		}
+		pc, err := tx.Exec(context.Background(), DELETE_ENUM_VALUE_WITH_ID, cid)
+		if err != nil {
+			return err
+		}
+		if pc.RowsAffected() == 0 {
+			return fmt.Errorf("not enumb value existed %d", cid)
+		}
+		_, err = tx.Exec(context.Background(), DELETE_REFERENCE_WITH_ITEM_ID, cid)
+		if err != nil {
+			return err
+		}
+		err = db.Gis.RemoveEnum(cid)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

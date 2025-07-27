@@ -151,3 +151,15 @@ func (db *GitItemStore) RemoveConfig(cid int64) error {
 	}
 	return nil
 }
+func (db *GitItemStore) RemoveEnum(cid int64) error {
+	fn := fmt.Sprintf("%s/%d.json", db.EnumDir, cid)
+	gr := util.GitRemove(fn)
+	if !gr.Successful {
+		return fmt.Errorf("cannot remove file :%s", fn)
+	}
+	gr = util.GitCommit(fmt.Sprintf("remove enum [%d]", cid))
+	if !gr.Successful {
+		return errors.New("cannot commit file [" + fn + "]")
+	}
+	return nil
+}
