@@ -256,6 +256,11 @@ var Html = (function(){
         tem.push("class='w3-left w3-tag w3-green tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-right-8 tx-hidden'>");
         tem.push("Delete");
         tem.push("</span>");
+        tem.push("<span id='");
+        tem.push(prefix+"-register' ");
+        tem.push("class='w3-left w3-tag w3-green tx-text-18 tx-padding-button tx-margin-top-8 tx-margin-right-8 tx-hidden'>");
+        tem.push("Register");
+        tem.push("</span>");
 
         tem.push("<span id='");
         tem.push(prefix+"-"+name+"' ");
@@ -664,7 +669,7 @@ var Html = (function(){
                 }
             }
         });
-        tem.push(_button("Save","ins"));
+        tem.push(_button(conf.name,"ins"));
         tem.push("</fieldset>");
         document.querySelector(conf.id).innerHTML += tem.join("");
         document.querySelectorAll(".ins-load").forEach(a=>{
@@ -721,7 +726,7 @@ var Html = (function(){
         _eventWithId("#ins-category-close",()=>{
             document.querySelector(conf.id).style.display='none';
         });
-        _eventWithId("#ins-Save",()=>{
+        _eventWithId("#ins-"+conf.name,()=>{
             _readInstanceHeader({prefix:"ins-header"});
             _instance.save.ConfigurationCategory = data.Name;
             _readInstance({prefix:"ins"});
@@ -729,7 +734,7 @@ var Html = (function(){
         });
     };
 
-    let _populateInstance = function(ins,load,deleteCall){
+    let _populateInstance = function(ins,load,deleteCall,registerCall){
         _instance.header.Properties.forEach(p=>{
             document.querySelector("#ins-header-"+p.Name).value = ins[p.Name];
         });
@@ -774,6 +779,10 @@ var Html = (function(){
             deleteCall(ins.ItemId);     
         });
         _openWithId("#ins-delete");
+        _eventWithId("#ins-register",()=>{
+            registerCall(ins.ItemId);     
+        });
+        _openWithId("#ins-register");
     };
 
     _editForm = function(conf,clist,edit,preview){

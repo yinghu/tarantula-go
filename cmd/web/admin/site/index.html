@@ -103,6 +103,46 @@
                     <div class="tx-content-24"></div>
                 </div>
         </div>
+        <div id="tx-configuration-register-box" class="w3-modal w3-animate-zoom tx-hidden">
+                <div class="w3-modal-content">
+                    <div class="w3-display-container tx-content-24">
+                        <div class="w3-display-topright">
+                            <span id="tx-configuration-register-box-close"><i class="material-symbols-outlined tx-margin-top-8 tx-margin-right-8 tx-red-icon-24">close</i></span>
+                        </div>
+                        <div class="w3-display-topleft">
+                            <span><i class="material-symbols-outlined tx-margin-top-8 tx-margin-left-8 tx-orange-icon-32">schedule</i></span>
+                        </div>
+                    </div>
+                    <div class="w3-panel">
+                        <fieldset>
+                            <legend class="tx-text-20">Schedule</legend>
+                            <div class="w3-panel">
+                                <select class='w3-round w3-border tx-text-16 w3-select tx-margin-left-4'>
+                                    <option value="" disabled selected>Choose App</option>
+                                    <option value="presence">Presence</option>
+                                    <option value="inventory">Inventory</option>
+                                </select>
+                            </div>
+                            <div class="w3-panel">
+                                <label class="tx-text-12">StartTime</label>
+                                <input class='w3-input w3-round w3-border tx-text-16' type="dateTime-local"/>
+                            </div>
+                            <div class="w3-panel">
+                                <label class="tx-text-12">CloseTime</label>
+                                <input class='w3-input w3-round w3-border tx-text-16' type="dateTime-local"/>
+                            </div>
+                            <div class="w3-panel">
+                                <label class="tx-text-12">EndTime</label>
+                                <input class='w3-input w3-round w3-border tx-text-16' type="dateTime-local"/>
+                            </div>
+                            <div class="w3-panel"> 
+                                <span class="w3-tag w3-right w3-green tx-text-20 tx-padding-button">Register</span>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="tx-content-24"></div>
+                </div>
+        </div>
         <script>
             let editor;
             after_login(false)
@@ -142,7 +182,10 @@
             Html.eventWithId("#tx-edit-confirmation-box-confirm",()=>{
                 Admin.query()["confirm"]();
                 Html.closeWithId("#tx-edit-confirmation-box");
-            });    
+            }); 
+            Html.eventWithId("#tx-configuration-register-box-close",()=>{
+                Html.closeWithId("#tx-configuration-register-box");
+            });   
             function on_logout(){
                 after_login(false);
                 set_task_header("Welcome","doorbell");
@@ -189,9 +232,6 @@
                 Admin.getJson("/admin/enum/load/all",resp=>{
                     Html.enumList(resp);
                 });
-                //Admin.getJson("/admin/env",resp=>{
-                    //console.log(resp);
-                //});
             }
 
             function create_new_enum(){
@@ -258,7 +298,7 @@
 
             function load_category(cid){
                 Admin.getJson("/admin/category/load/"+cid+"/n/0/n",resp=>{
-                    Html.instanceForm({id:"#tx-form-box",prefix:"category",closeable:true},resp,data=>{
+                    Html.instanceForm({id:"#tx-form-box",prefix:"category",name:"Save",closeable:true},resp,data=>{
                         Admin.postJson("/admin/config/save",data,resp=>{
                             Html.messageWithId("#tx-info-box-content",resp.message);    
                             Html.openWithId("#tx-info-box");
@@ -285,7 +325,7 @@
 
             function populate_instance(ins){
                 Admin.getJson("/admin/category/load/0/"+ins.ConfigurationCategory+"/0/n",resp=>{
-                    Html.instanceForm({id:"#tx-form-box",prefix:"ins"},resp,data=>{
+                    Html.instanceForm({id:"#tx-form-box",prefix:"ins",name:"Upgrade"},resp,data=>{
                         Admin.postJson("/admin/config/save",data,resp=>{
                             Html.messageWithId("#tx-info-box-content",resp.message);    
                             Html.openWithId("#tx-info-box");
@@ -300,6 +340,9 @@
                         };
                         Html.messageWithId("#tx-edit-confirmation-box-title","Are you sure to delete item ["+itemId+"]");
                         Html.openWithId("#tx-edit-confirmation-box");        
+                    },(itemId)=>{
+                        console.log("register : "+itemId);
+                        Html.openWithId("#tx-configuration-register-box");
                     });
                 });
             }

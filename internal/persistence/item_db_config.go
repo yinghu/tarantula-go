@@ -69,7 +69,7 @@ func (db *ItemDB) Save(c item.Configuration) error {
 			}
 		}
 		for i := range refids {
-			fmt.Printf("ref id : %d=>%d\n", i, refids[i])
+			//fmt.Printf("ref id : %d=>%d\n", i, refids[i])
 			f, err := tx.Exec(context.Background(), INSERT_REFERENCE, c.Id, refids[i])
 			if err != nil {
 				return err
@@ -186,7 +186,6 @@ func (db *ItemDB) DeleteWithId(cid int64) error {
 		return nil
 	})
 }
-
 
 func (db *ItemDB) loadHeader(c *item.Configuration) error {
 	c.Header = make(map[string]any)
