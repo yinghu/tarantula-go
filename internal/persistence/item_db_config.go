@@ -16,9 +16,10 @@ import (
 const (
 	DATE_TIME_FORMAT string = "2006-01-02T15:04"
 
-	INSERT_CONFIG      string = "INSERT INTO item_configuration (id,name,type,type_id,category,version) VALUES($1,$2,$3,$4,$5,$6)"
-	INSERT_HEADER      string = "INSERT INTO item_header (configuration_id,name,value) VALUES($1,$2,$3)"
-	INSERT_APPLICATION string = "INSERT INTO item_application (configuration_id,name,reference_id) VALUES($1,$2,$3)"
+	INSERT_CONFIG       string = "INSERT INTO item_configuration (id,name,type,type_id,category,version) VALUES($1,$2,$3,$4,$5,$6)"
+	INSERT_HEADER       string = "INSERT INTO item_header (configuration_id,name,value) VALUES($1,$2,$3)"
+	INSERT_APPLICATION  string = "INSERT INTO item_application (configuration_id,name,reference_id) VALUES($1,$2,$3)"
+	INSERT_REGISTRATION string = "INSERT INTO item_registration (item_id,app,scheduling,start_time,close_time,end_time) VALUES($1,$2,$3,$4,$5,$6)"
 
 	SELECT_CONFIG_WITH_NAME           string = "SELECT id,name,type,type_id,version FROM item_configuration WHERE category = $1 LIMIT $2"
 	SELECT_CONFIG_WITH_ID             string = "SELECT name,type,type_id,category,version FROM item_configuration WHERE id = $1"
@@ -185,6 +186,21 @@ func (db *ItemDB) DeleteWithId(cid int64) error {
 		}
 		return nil
 	})
+}
+
+func (db *ItemDB) Register(reg item.ConfigRegistration) error {
+	if reg.Scheduling {
+		_, err := db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, true, reg.StartTime.UnixMilli(), reg.CloseTime.UnixMilli(), reg.EndTime.UnixMilli())
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	_, err := db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, false, 0, 0, 0)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (db *ItemDB) loadHeader(c *item.Configuration) error {

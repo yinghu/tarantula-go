@@ -20,9 +20,14 @@ func (s *AdminLogin) AccessControl() int32 {
 func (s *AdminLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var login event.Login
-	json.NewDecoder(r.Body).Decode(&login)
+	err := json.NewDecoder(r.Body).Decode(&login)
+	if err != nil {
+		session := core.OnSession{Successful: false, Message: err.Error()}
+		w.Write(util.ToJson(session))
+		return
+	}
 	pwd := login.Hash
-	err := s.LoadLogin(&login)
+	err = s.LoadLogin(&login)
 	w.WriteHeader(http.StatusOK)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}

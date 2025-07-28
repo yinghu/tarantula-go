@@ -115,7 +115,7 @@
                     </div>
                     <div class="w3-panel">
                         <fieldset>
-                            <legend class="tx-text-20">Schedule</legend>
+                            <legend class="tx-text-20">Register Form</legend>
                             <div class="w3-panel">
                                 <select class='w3-round w3-border tx-text-16 w3-select tx-margin-left-4'>
                                     <option value="" disabled selected>Choose App</option>
@@ -124,19 +124,25 @@
                                 </select>
                             </div>
                             <div class="w3-panel">
-                                <label class="tx-text-12">StartTime</label>
-                                <input class='w3-input w3-round w3-border tx-text-16' type="dateTime-local"/>
+                                <label class="tx-text-12">Schduling</label>
+                                <input id="tx-configuration-register-box-scheduling" class='w3-check w3-round w3-border tx-text-16 tx-margin-left-8' type="checkbox"/>
                             </div>
-                            <div class="w3-panel">
-                                <label class="tx-text-12">CloseTime</label>
-                                <input class='w3-input w3-round w3-border tx-text-16' type="dateTime-local"/>
-                            </div>
-                            <div class="w3-panel">
-                                <label class="tx-text-12">EndTime</label>
-                                <input class='w3-input w3-round w3-border tx-text-16' type="dateTime-local"/>
+                            <div id="tx-configuration-register-box-schedule" class="tx-hidden">
+                                <div class="w3-panel">
+                                    <label class="tx-text-12">StartTime</label>
+                                    <input id="tx-configuration-register-box-schedule-start-time" class='w3-input w3-round w3-border tx-text-16' type="dateTime-local"/>
+                                </div>
+                                <div class="w3-panel">
+                                    <label class="tx-text-12">CloseTime</label>
+                                    <input id="tx-configuration-register-box-schedule-close-time" class='w3-input w3-round w3-border tx-text-16' type="dateTime-local"/>
+                                </div>
+                                <div class="w3-panel">
+                                    <label class="tx-text-12">EndTime</label>
+                                    <input id="tx-configuration-register-box-schedule-end-time" class='w3-input w3-round w3-border tx-text-16' type="dateTime-local"/>
+                                </div>
                             </div>
                             <div class="w3-panel"> 
-                                <span class="w3-tag w3-right w3-green tx-text-20 tx-padding-button">Register</span>
+                                <span id="tx-configuration-register" class="w3-tag w3-right w3-green tx-text-20 tx-padding-button">Register</span>
                             </div>
                         </fieldset>
                     </div>
@@ -185,7 +191,35 @@
             }); 
             Html.eventWithId("#tx-configuration-register-box-close",()=>{
                 Html.closeWithId("#tx-configuration-register-box");
-            });   
+            });
+            document.querySelector("#tx-configuration-register-box-scheduling").onchange = ()=>{
+                let ch = document.querySelector("#tx-configuration-register-box-scheduling").checked;
+                if (ch){
+                    Html.openWithId("#tx-configuration-register-box-schedule");
+                }else{
+                    Html.closeWithId("#tx-configuration-register-box-schedule");
+                }
+            };
+            Html.eventWithId("#tx-configuration-register",()=>{
+                console.log(Admin.query().registerId);
+                let ch = document.querySelector("#tx-configuration-register-box-scheduling").checked;
+                let st = document.querySelector("#tx-configuration-register-box-schedule-start-time").value;
+                let ct = document.querySelector("#tx-configuration-register-box-schedule-close-time").value;
+                let et = document.querySelector("#tx-configuration-register-box-schedule-end-time").value;
+                let reg ={ItemId:Admin.query().registerId,App:"asset",Scheduling:ch};
+                if (reg.Scheduling){
+                    let stt = new Date(Date.parse(st)).toISOString();
+                    let ctt = new Date(Date.parse(ct)).toISOString();
+                    let ett = new Date(Date.parse(et)).toISOString();        
+                    reg.StartTime = stt;
+                    reg.CloseTime = ctt;
+                    reg.EndTime = ett;
+                }
+                Admin.postJson("/admin/config/register",reg,(resp)=>{
+                    console.log(resp);
+                });
+            });
+
             function on_logout(){
                 after_login(false);
                 set_task_header("Welcome","doorbell");
@@ -341,7 +375,7 @@
                         Html.messageWithId("#tx-edit-confirmation-box-title","Are you sure to delete item ["+itemId+"]");
                         Html.openWithId("#tx-edit-confirmation-box");        
                     },(itemId)=>{
-                        console.log("register : "+itemId);
+                        Admin.query().registerId = itemId;
                         Html.openWithId("#tx-configuration-register-box");
                     });
                 });
@@ -461,8 +495,6 @@
                     Html.openWithId("#tx-form-box");
                 }); 
             }
-
-
         </script>
     </body>
 </html>

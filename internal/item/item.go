@@ -1,6 +1,8 @@
 package item
 
 import (
+	"time"
+
 	"gameclustering.com/internal/core"
 )
 
@@ -44,6 +46,15 @@ type Configuration struct {
 	Reference   map[string]any      `json:"reference"`
 }
 
+type ConfigRegistration struct {
+	ItemId     int64     `json:"ItemId,string"`
+	App        string    `json:"App"`
+	Scheduling bool      `json:"Scheduling"`
+	StartTime  time.Time `json:"StartTime"`
+	CloseTime  time.Time `json:"CloseTime"`
+	EndTime    time.Time `json:"EndTime"`
+}
+
 type ItemLoader interface {
 	Load(cid int64) (Configuration, error)
 }
@@ -65,6 +76,7 @@ type ItemService interface {
 	LoadWithName(cname string, limit int) ([]Configuration, error)
 	LoadWithId(cid int64) (Configuration, error)
 	DeleteWithId(cid int64) error
+	Register(reg ConfigRegistration) error
 
 	Loader() ItemLoader
 }
