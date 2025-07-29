@@ -578,6 +578,8 @@ var Html = (function(){
         _instance.category.Properties.forEach(c=>{
             if(c.Type=="boolean"){
                 _instance.save.header[c.Name]=document.querySelector("#"+conf.prefix+"-"+c.Name).checked;
+            }else if(c.Type=="dateTime"){
+                _instance.save.header[c.Name]=new Date(Date.parse(document.querySelector("#"+conf.prefix+"-"+c.Name).value)).toISOString();
             }else if(c.Type=="enum"){
                 let ctn = document.querySelector("#"+conf.prefix+"-"+c.Name);
                 _instance.save.header[c.Name]= ctn.options[ctn.selectedIndex].value/1;    
@@ -744,6 +746,10 @@ var Html = (function(){
                 ctn.checked = ins.header[p.Name];    
             }else if(p.Type=="enum"){
                 ctn.options[ins.header[p.Name]].selected = true;    
+            }else if(p.Type=='dateTime'){
+                const date = new Date(Date.parse(ins.header[p.Name]));
+                let parts = date.toISOString().split('T');
+                ctn.value = parts[0]+"T"+parts[1].split(".")[0];    
             }else if(p.Type=="list" || p.Type=="set"){
                 let cid = "#ins-"+p.Name;
                 load(p.Reference.split(":")[1],cats=>{

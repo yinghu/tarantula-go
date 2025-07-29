@@ -14,8 +14,7 @@ import (
 )
 
 const (
-	DATE_TIME_FORMAT string = "2006-01-02T15:04"
-
+	
 	INSERT_CONFIG       string = "INSERT INTO item_configuration (id,name,type,type_id,category,version) VALUES($1,$2,$3,$4,$5,$6)"
 	INSERT_HEADER       string = "INSERT INTO item_header (configuration_id,name,value) VALUES($1,$2,$3)"
 	INSERT_APPLICATION  string = "INSERT INTO item_application (configuration_id,name,reference_id) VALUES($1,$2,$3)"
@@ -189,6 +188,10 @@ func (db *ItemDB) DeleteWithId(cid int64) error {
 }
 
 func (db *ItemDB) Register(reg item.ConfigRegistration) error {
+	_, err := db.LoadWithId(reg.ItemId)
+	if err != nil {
+		return err
+	}
 	if reg.Scheduling {
 		_, err := db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, true, reg.StartTime.UnixMilli(), reg.CloseTime.UnixMilli(), reg.EndTime.UnixMilli())
 		if err != nil {
@@ -196,7 +199,7 @@ func (db *ItemDB) Register(reg item.ConfigRegistration) error {
 		}
 		return nil
 	}
-	_, err := db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, false, 0, 0, 0)
+	_, err = db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, false, 0, 0, 0)
 	if err != nil {
 		return err
 	}
@@ -324,7 +327,7 @@ func (db *ItemDB) validate(c item.Configuration) ([]int64, error) {
 			if err != nil {
 				return refids, err
 			}
-			_, err = time.Parse(DATE_TIME_FORMAT, fmt.Sprintf("%v", v))
+			_, err = time.Parse(time.RFC3339, fmt.Sprintf("%v", v))
 			if err != nil {
 				return refids, err
 			}

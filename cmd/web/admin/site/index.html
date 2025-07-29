@@ -117,10 +117,10 @@
                         <fieldset>
                             <legend class="tx-text-20">Register Form</legend>
                             <div class="w3-panel">
-                                <select class='w3-round w3-border tx-text-16 w3-select tx-margin-left-4'>
-                                    <option value="" disabled selected>Choose App</option>
-                                    <option value="presence">Presence</option>
-                                    <option value="inventory">Inventory</option>
+                                <p id="tx-configuration-register-box-message" class='tx-text-16'></p>
+                            </div>
+                            <div class="w3-panel">
+                                <select id="tx-configuration-register-box-app" class='w3-round w3-border tx-text-16 w3-select tx-margin-left-4'>
                                 </select>
                             </div>
                             <div class="w3-panel">
@@ -201,12 +201,13 @@
                 }
             };
             Html.eventWithId("#tx-configuration-register",()=>{
-                console.log(Admin.query().registerId);
+                let app = document.querySelector("#tx-configuration-register-box-app");
+                let sapp = app.options[app.selectedIndex].value;
                 let ch = document.querySelector("#tx-configuration-register-box-scheduling").checked;
                 let st = document.querySelector("#tx-configuration-register-box-schedule-start-time").value;
                 let ct = document.querySelector("#tx-configuration-register-box-schedule-close-time").value;
                 let et = document.querySelector("#tx-configuration-register-box-schedule-end-time").value;
-                let reg ={ItemId:Admin.query().registerId,App:"asset",Scheduling:ch};
+                let reg ={ItemId:Admin.query().registerId,App:sapp,Scheduling:ch};
                 if (reg.Scheduling){
                     let stt = new Date(Date.parse(st)).toISOString();
                     let ctt = new Date(Date.parse(ct)).toISOString();
@@ -217,6 +218,7 @@
                 }
                 Admin.postJson("/admin/config/register",reg,(resp)=>{
                     console.log(resp);
+                    Html.messageWithId("#tx-configuration-register-box-message",resp.message);
                 });
             });
 
@@ -305,6 +307,7 @@
             function on_task_change(tsk){
                 Admin.getJson("/admin/env",resp=>{
                     set_task_header(resp.CurBranch+" : "+tsk.Name,tsk.Icon);
+                    set_app_list(resp.ManagedApps);
                 });
                 Html.closeWithId("#tx-form-box");
                 Html.closeWithId("#tx-instance-list-box");
@@ -494,6 +497,19 @@
                     });
                     Html.openWithId("#tx-form-box");
                 }); 
+            }
+
+            function set_app_list(apps){
+                let tn = document.querySelector("#tx-configuration-register-box-app");
+                tn.innerHTML = "";
+                let tem = [];
+                tem.push("<option value='' disabled selected>Choose App</option>");
+                apps.forEach(a=>{
+                    tem.push("<option value='");
+                    tem.push(a);
+                    tem.push("'>"+a+"</option>");
+                });
+                tn.innerHTML = tem.join('');
             }
         </script>
     </body>

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"slices"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -23,6 +24,11 @@ func (s *ConfigRegister) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 	err := json.NewDecoder(r.Body).Decode(&reg)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	app := reg.App
+	if !slices.Contains(s.managedApps,app){
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: "app not existed"}))
 		return
 	}
 	err = s.AdminService.ItemService().Register(reg)
