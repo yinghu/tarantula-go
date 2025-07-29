@@ -47,6 +47,7 @@ type Configuration struct {
 }
 
 type ConfigRegistration struct {
+	Id         int32     `json:"Id,string"`
 	ItemId     int64     `json:"ItemId,string"`
 	App        string    `json:"App"`
 	Scheduling bool      `json:"Scheduling"`
@@ -77,7 +78,8 @@ type ItemService interface {
 	LoadWithId(cid int64) (Configuration, error)
 	DeleteWithId(cid int64) error
 	Register(reg ConfigRegistration) error
-
+	Check(itemId int64, app string) (ConfigRegistration, error)
+	Release(regId int32) error
 	Loader() ItemLoader
 }
 

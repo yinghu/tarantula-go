@@ -32,7 +32,7 @@ var Html = (function(){
         });
     }
     let _eventWithId = function(id,callback){
-        document.querySelector(id).onclick = callback 
+        document.querySelector(id).onclick = callback; 
     };
     let _registerTaskChangeListener = function(listener){
         _taskChanged = listener;

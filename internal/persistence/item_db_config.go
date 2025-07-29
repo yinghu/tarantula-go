@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	
 	INSERT_CONFIG       string = "INSERT INTO item_configuration (id,name,type,type_id,category,version) VALUES($1,$2,$3,$4,$5,$6)"
 	INSERT_HEADER       string = "INSERT INTO item_header (configuration_id,name,value) VALUES($1,$2,$3)"
 	INSERT_APPLICATION  string = "INSERT INTO item_application (configuration_id,name,reference_id) VALUES($1,$2,$3)"
@@ -29,6 +28,9 @@ const (
 	DELETE_HEADER           string = "DELETE FROM item_header WHERE configuration_id = $1"
 	DELETE_APPLICATION      string = "DELETE FROM item_application WHERE configuration_id = $1"
 	DELETE_CONFIG_WITH_ID   string = "DELETE FROM item_configuration WHERE id = $1"
+
+	SELECT_REGISTRATION_WITH_ITEM_ID_APP string = "SELECT id,scheduling,start_time,close_time,end_time FROM item_registration WHERE item_id = $1 AND app = $2"
+	DELETE_REGISTRATION_WITH_ID          string = "DELETE FROM item_registration WHERE id = $1"
 )
 
 func (db *ItemDB) Save(c item.Configuration) error {
@@ -203,6 +205,27 @@ func (db *ItemDB) Register(reg item.ConfigRegistration) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (db *ItemDB) Check(itemId int64, app string) (item.ConfigRegistration, error) {
+	reg := item.ConfigRegistration{ItemId: itemId, App: app}
+	err := db.Sql.Query(func(row pgx.Rows) error {
+		err := row.Scan(&reg.Id, &reg.Scheduling, &reg.StartTime, &reg.CloseTime, &reg.EndTime)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, SELECT_REGISTRATION_WITH_ITEM_ID_APP, itemId, app)
+	if err != nil {
+		return reg, err
+	}
+	if reg.Id == 0 {
+		return reg, errors.New("obj not existed")
+	}
+	return reg, nil
+}
+func (db *ItemDB) Release(regId int32) error {
 	return nil
 }
 

@@ -55,7 +55,7 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	http.Handle("/admin/category/save", bootstrap.Logging(&CategorySaver{AdminService: s}))
 	http.Handle("/admin/config/load/{id}/{name}/{limit}", bootstrap.Logging(&ConfigLoader{AdminService: s}))
 	http.Handle("/admin/config/save", bootstrap.Logging(&ConfigSaver{AdminService: s}))
-	http.Handle("/admin/config/register", bootstrap.Logging(&ConfigRegister{AdminService: s}))
+	http.Handle("/admin/config/register/{opt}/{id}/{app}", bootstrap.Logging(&ConfigRegister{AdminService: s}))
 	http.Handle("/admin/category/preview/{id}", bootstrap.Logging(&CategoryPreviewer{AdminService: s}))
 	http.Handle("/admin/item/delete/{type}/{id}", bootstrap.Logging(&ItemDeleter{AdminService: s}))
 

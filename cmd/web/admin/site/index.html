@@ -142,7 +142,7 @@
                                 </div>
                             </div>
                             <div class="w3-panel"> 
-                                <span id="tx-configuration-register" class="w3-tag w3-right w3-green tx-text-20 tx-padding-button">Register</span>
+                                <span id="tx-configuration-register" class="w3-tag w3-right w3-green tx-text-20 tx-padding-button tx-hidden">Register</span>
                             </div>
                         </fieldset>
                     </div>
@@ -192,6 +192,21 @@
             Html.eventWithId("#tx-configuration-register-box-close",()=>{
                 Html.closeWithId("#tx-configuration-register-box");
             });
+            document.querySelector("#tx-configuration-register-box-app").onchange = ()=>{
+                let app = document.querySelector("#tx-configuration-register-box-app");
+                let sapp = app.options[app.selectedIndex].value;
+                console.log(sapp+Admin.query().registerId);
+                Admin.getJson("/admin/config/register/load/"+Admin.query().registerId+"/"+sapp,resp=>{
+                    console.log(resp);
+                    let rct = document.querySelector("#tx-configuration-register");
+                    if (resp.Id == "0"){
+                        rct.innerHTML = "Register";    
+                    }else{
+                        rct.innerHTML = "Release";
+                    }
+                    rct.style.display = "block";
+                });
+            };
             document.querySelector("#tx-configuration-register-box-scheduling").onchange = ()=>{
                 let ch = document.querySelector("#tx-configuration-register-box-scheduling").checked;
                 if (ch){
@@ -216,7 +231,7 @@
                     reg.CloseTime = ctt;
                     reg.EndTime = ett;
                 }
-                Admin.postJson("/admin/config/register",reg,(resp)=>{
+                Admin.postJson("/admin/config/register/save/"+reg.ItemId+"/"+reg.App,reg,(resp)=>{
                     console.log(resp);
                     Html.messageWithId("#tx-configuration-register-box-message",resp.message);
                 });
@@ -379,6 +394,8 @@
                         Html.openWithId("#tx-edit-confirmation-box");        
                     },(itemId)=>{
                         Admin.query().registerId = itemId;
+                        document.querySelector("#tx-configuration-register-box-app").options[0].selected = true;
+                        Html.closeWithId("#tx-configuration-register");
                         Html.openWithId("#tx-configuration-register-box");
                     });
                 });
