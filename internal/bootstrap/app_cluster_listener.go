@@ -41,7 +41,7 @@ func (s *AppManager) KVUpdated(key string, value string, opt core.Opt) {
 	}
 	ns := strings.Split(hs[1], ",")
 	for i := range ns {
-		go s.updateToApp(ns[i], "update", item.KVUpdate{Key: key, Value: value, Opt: opt})
+		go s.updateToApp(ns[i], "update", item.KVUpdate{Key: hs[0], Value: value, Opt: opt})
 	}
 }
 
