@@ -3,6 +3,7 @@ package persistence
 import (
 	"fmt"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
 	"github.com/jackc/pgx/v5"
 )
@@ -28,6 +29,7 @@ const (
 type ItemDB struct {
 	Sql *Postgresql
 	Gis *GitItemStore
+	Cls core.Cluster
 }
 
 func (db *ItemDB) Loader() item.ItemLoader {

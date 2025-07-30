@@ -204,12 +204,14 @@ func (db *ItemDB) Register(reg item.ConfigRegistration) error {
 		if err != nil {
 			return err
 		}
+		db.Schedule(reg)
 		return nil
 	}
 	_, err = db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, false, 0, 0, 0)
 	if err != nil {
 		return err
 	}
+	db.Schedule(reg)
 	return nil
 }
 
