@@ -1,6 +1,8 @@
 package persistence
 
 import (
+	"fmt"
+
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
@@ -8,7 +10,7 @@ import (
 
 func (db *ItemDB) Schedule(reg item.ConfigRegistration) error {
 	db.Cls.Atomic(db.Cls.Group(), func(ctx core.Ctx) error {
-		ctx.Put("register:"+reg.App, string(util.ToJson(reg)))
+		ctx.Put(fmt.Sprintf("%d:%s",reg.ItemId,reg.App), string(util.ToJson(reg)))
 		return nil
 	})
 	return nil
@@ -16,7 +18,7 @@ func (db *ItemDB) Schedule(reg item.ConfigRegistration) error {
 
 func (db *ItemDB) Unschedule(reg item.ConfigRegistration) error {
 	db.Cls.Atomic(db.Cls.Group(), func(ctx core.Ctx) error {
-		ctx.Put("release:"+reg.App, string(util.ToJson(reg)))
+		ctx.Del(fmt.Sprintf("%d:%s",reg.ItemId,reg.App))
 		return nil
 	})
 	return nil
