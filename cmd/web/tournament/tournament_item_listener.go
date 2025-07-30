@@ -28,7 +28,7 @@ func (a *TournamentService) OnUpdated(kv item.KVUpdate) {
 		if err != nil {
 			return
 		}
-		core.AppLog.Printf("%v\n", ins)
+		core.AppLog.Printf("Item registered %d\n", ins.Id)
 		return
 	}
 	core.AppLog.Printf("Item released %d\n", itemId)
