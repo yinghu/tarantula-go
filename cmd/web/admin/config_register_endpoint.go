@@ -56,7 +56,12 @@ func (s *ConfigRegister) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 			w.Write(util.ToJson(reg))
 		}
 	case "delete":
-		w.Write(util.ToJson(core.OnSession{Successful: true, Message: "loaded"}))
+		err = s.ItemService().Release(int32(cid))
+		if err != nil {
+			w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		} else {
+			w.Write(util.ToJson(core.OnSession{Successful: true, Message: "deleted"}))
+		}
 	default:
 		w.Write(util.ToJson(core.OnSession{Successful: true, Message: "not supported"}))
 	}

@@ -30,6 +30,7 @@ const (
 	DELETE_CONFIG_WITH_ID   string = "DELETE FROM item_configuration WHERE id = $1"
 
 	SELECT_REGISTRATION_WITH_ITEM_ID_APP string = "SELECT id,scheduling,start_time,close_time,end_time FROM item_registration WHERE item_id = $1 AND app = $2"
+	SELECT_REGISTRATION_WITH_ITEM_ID     string = "SELECT COUNT(*) FROM item_registration WHERE item_id = $1"
 	DELETE_REGISTRATION_WITH_ID          string = "DELETE FROM item_registration WHERE id = $1"
 )
 
@@ -164,6 +165,10 @@ func (db *ItemDB) DeleteWithId(cid int64) error {
 	if err != nil {
 		return err
 	}
+	err = db.checkRegs(cid)
+	if err != nil {
+		return err
+	}
 	return db.Sql.Txn(func(tx pgx.Tx) error {
 		_, err := tx.Exec(context.Background(), DELETE_CONFIG_WITH_ID, cid)
 		if err != nil {
@@ -208,6 +213,24 @@ func (db *ItemDB) Register(reg item.ConfigRegistration) error {
 	return nil
 }
 
+func (db *ItemDB) checkRegs(itemId int64) error {
+	var ct int32
+	err := db.Sql.Query(func(row pgx.Rows) error {
+		err := row.Scan(&ct)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, SELECT_REGISTRATION_WITH_ITEM_ID, itemId)
+	if err != nil {
+		return err
+	}
+	if ct > 0 {
+		return fmt.Errorf("register ct %d", ct)
+	}
+	return nil
+}
+
 func (db *ItemDB) Check(itemId int64, app string) (item.ConfigRegistration, error) {
 	reg := item.ConfigRegistration{ItemId: itemId, App: app}
 	err := db.Sql.Query(func(row pgx.Rows) error {
@@ -226,6 +249,13 @@ func (db *ItemDB) Check(itemId int64, app string) (item.ConfigRegistration, erro
 	return reg, nil
 }
 func (db *ItemDB) Release(regId int32) error {
+	deleted, err := db.Sql.Exec(DELETE_REGISTRATION_WITH_ID, regId)
+	if err != nil {
+		return err
+	}
+	if deleted == 0 {
+		return errors.New("no row deleted")
+	}
 	return nil
 }
 

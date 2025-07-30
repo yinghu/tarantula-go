@@ -142,7 +142,7 @@
                                 </div>
                             </div>
                             <div class="w3-panel"> 
-                                <span id="tx-configuration-register" class="w3-tag w3-right w3-green tx-text-20 tx-padding-button tx-hidden">Register</span>
+                                <span id="tx-configuration-register" tx-register-id='0' class="w3-tag w3-right w3-green tx-text-20 tx-padding-button tx-hidden">Register</span>
                             </div>
                         </fieldset>
                     </div>
@@ -152,12 +152,12 @@
         <script>
             let editor;
             after_login(false)
-            Html.eventWithId('#tx-info-box-close',()=>{Html.closeWithId('#tx-info-box');});
+            Html.eventWithId({id:'#tx-info-box-close'},()=>{Html.closeWithId('#tx-info-box');});
             if (!Admin.query().authenticated){
                 on_logout();
             }
            
-            Html.eventWithId('#tx-logout',()=>{
+            Html.eventWithId({id:'#tx-logout'},()=>{
                 Admin.logout();
                 Html.closeWithId("#tx-info-box");
                 Html.closeWithId("#tx-logout");
@@ -169,30 +169,30 @@
                 on_logout();
             });
 
-            Html.eventWithId("#tx-json-preview-box-close",()=>{
+            Html.eventWithId({id:"#tx-json-preview-box-close"},()=>{
                 editor.destroy();
                 Html.closeWithId("#tx-json-preview-box");
             });
-            Html.eventWithId("#tx-json-preview-box-tree",()=>{
+            Html.eventWithId({id:"#tx-json-preview-box-tree"},()=>{
                 editor.setMode("tree");
             });
-            Html.eventWithId("#tx-json-preview-box-code",()=>{
+            Html.eventWithId({id:"#tx-json-preview-box-code"},()=>{
                 editor.setMode("code");
             });
-            Html.eventWithId("#tx-json-preview-box-preview",()=>{
+            Html.eventWithId({id:"#tx-json-preview-box-preview"},()=>{
                 editor.setMode("preview");
             });
-            Html.eventWithId("#tx-edit-confirmation-box-close",()=>{
+            Html.eventWithId({id:"#tx-edit-confirmation-box-close"},()=>{
                 Html.closeWithId("#tx-edit-confirmation-box");
             }); 
-            Html.eventWithId("#tx-edit-confirmation-box-confirm",()=>{
+            Html.eventWithId({id:"#tx-edit-confirmation-box-confirm"},()=>{
                 Admin.query()["confirm"]();
                 Html.closeWithId("#tx-edit-confirmation-box");
             }); 
-            Html.eventWithId("#tx-configuration-register-box-close",()=>{
+            Html.eventWithId({id:"#tx-configuration-register-box-close"},()=>{
                 Html.closeWithId("#tx-configuration-register-box");
             });
-            document.querySelector("#tx-configuration-register-box-app").onchange = ()=>{
+            Html.eventWithId({id:"#tx-configuration-register-box-app",event:"onchange"},()=>{
                 let app = document.querySelector("#tx-configuration-register-box-app");
                 let sapp = app.options[app.selectedIndex].value;
                 console.log(sapp+Admin.query().registerId);
@@ -200,40 +200,50 @@
                     console.log(resp);
                     let rct = document.querySelector("#tx-configuration-register");
                     if (resp.Id == "0"){
-                        rct.innerHTML = "Register";    
+                        rct.innerHTML = "Register";
+                        rct.setAttribute('tx-register-id',0);    
                     }else{
                         rct.innerHTML = "Release";
+                        rct.setAttribute('tx-register-id',resp.Id);
                     }
                     rct.style.display = "block";
                 });
-            };
-            document.querySelector("#tx-configuration-register-box-scheduling").onchange = ()=>{
+            });
+            Html.eventWithId({id:"#tx-configuration-register-box-scheduling",event:"onchange"},()=>{
                 let ch = document.querySelector("#tx-configuration-register-box-scheduling").checked;
                 if (ch){
                     Html.openWithId("#tx-configuration-register-box-schedule");
                 }else{
                     Html.closeWithId("#tx-configuration-register-box-schedule");
                 }
-            };
-            Html.eventWithId("#tx-configuration-register",()=>{
-                let app = document.querySelector("#tx-configuration-register-box-app");
-                let sapp = app.options[app.selectedIndex].value;
-                let ch = document.querySelector("#tx-configuration-register-box-scheduling").checked;
-                let st = document.querySelector("#tx-configuration-register-box-schedule-start-time").value;
-                let ct = document.querySelector("#tx-configuration-register-box-schedule-close-time").value;
-                let et = document.querySelector("#tx-configuration-register-box-schedule-end-time").value;
-                let reg ={ItemId:Admin.query().registerId,App:sapp,Scheduling:ch};
-                if (reg.Scheduling){
-                    let stt = new Date(Date.parse(st)).toISOString();
-                    let ctt = new Date(Date.parse(ct)).toISOString();
-                    let ett = new Date(Date.parse(et)).toISOString();        
-                    reg.StartTime = stt;
-                    reg.CloseTime = ctt;
-                    reg.EndTime = ett;
+            });
+            Html.eventWithId({id:"#tx-configuration-register"},(te)=>{
+                let rid = te.getAttribute('tx-register-id');
+                if( rid == "0"){
+                    let app = document.querySelector("#tx-configuration-register-box-app");
+                    let sapp = app.options[app.selectedIndex].value;
+                    let ch = document.querySelector("#tx-configuration-register-box-scheduling").checked;
+                    let st = document.querySelector("#tx-configuration-register-box-schedule-start-time").value;
+                    let ct = document.querySelector("#tx-configuration-register-box-schedule-close-time").value;
+                    let et = document.querySelector("#tx-configuration-register-box-schedule-end-time").value;
+                    let reg ={ItemId:Admin.query().registerId,App:sapp,Scheduling:ch};
+                    if (reg.Scheduling){
+                        let stt = new Date(Date.parse(st)).toISOString();
+                        let ctt = new Date(Date.parse(ct)).toISOString();
+                        let ett = new Date(Date.parse(et)).toISOString();        
+                        reg.StartTime = stt;
+                        reg.CloseTime = ctt;
+                        reg.EndTime = ett;
+                    }
+                    Admin.postJson("/admin/config/register/save/"+reg.ItemId+"/"+reg.App,reg,(resp)=>{
+                        console.log(resp);
+                        Html.messageWithId("#tx-configuration-register-box-message",resp.message);
+                    });
+                    return;
                 }
-                Admin.postJson("/admin/config/register/save/"+reg.ItemId+"/"+reg.App,reg,(resp)=>{
-                    console.log(resp);
-                    Html.messageWithId("#tx-configuration-register-box-message",resp.message);
+                Admin.getJson("/admin/config/register/delete/"+rid+"/n",(resp)=>{
+                        console.log(resp);
+                        Html.messageWithId("#tx-configuration-register-box-message",resp.message);
                 });
             });
 
@@ -524,7 +534,7 @@
                 apps.forEach(a=>{
                     tem.push("<option value='");
                     tem.push(a);
-                    tem.push("'>"+a+"</option>");
+                    tem.push("'>"+Html.caption(a)+"</option>");
                 });
                 tn.innerHTML = tem.join('');
             }

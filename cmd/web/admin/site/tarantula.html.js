@@ -31,9 +31,25 @@ var Html = (function(){
             a.style.display = "none";
         });
     }
-    let _eventWithId = function(id,callback){
-        document.querySelector(id).onclick = callback; 
+    let _eventWithId = function(ctx,callback){
+        let tgt = document.querySelector(ctx.id);
+        if(!ctx.event){
+            document.querySelector(ctx.id)['onclick'] = ()=>{
+                callback(tgt);
+            }
+            return;
+        }
+        document.querySelector(ctx.id)[ctx.event] = ()=>{
+            callback(tgt);
+        }
     };
+
+    let _eventWithClass = function(ctx,callback){
+        document.querySelectorAll(ctx.class).forEach(a=>{
+            a.onclick = callback;
+        });
+    };
+
     let _registerTaskChangeListener = function(listener){
         _taskChanged = listener;
     };
@@ -181,10 +197,10 @@ var Html = (function(){
         tem.push(_button("Save","ee"));
         tem.push("</fieldset>");
         document.querySelector(conf.id).innerHTML += tem.join("");
-        _eventWithId("#ee-enum-close",()=>{
+        _eventWithId({id:"#ee-enum-close"},()=>{
             document.querySelector(conf.id).style.display='none';
         });
-        _eventWithId("#ee-enum-add",()=>{
+        _eventWithId({id:"#ee-enum-add"},()=>{
             let id = "entry"+_enum.ix;
             _enum.ix++;
             let e = document.querySelector("#enum-Entry").value;
@@ -201,7 +217,7 @@ var Html = (function(){
                 };            
             });
         });
-        _eventWithId("#ee-Save",()=>{
+        _eventWithId({id:"#ee-Save"},()=>{
             let n = document.querySelector("#enum-Name").value;
             _enum.Name = n;
             callback(_enum);
@@ -402,11 +418,11 @@ var Html = (function(){
         tem.push("</fieldset>");
         document.querySelector(conf.id).innerHTML += tem.join("");
         if(conf.closeable){
-            _eventWithId("#"+conf.prefix+"-"+category.Name+"-close",()=>{
+            _eventWithId({id:"#"+conf.prefix+"-"+category.Name+"-close"},()=>{
                 document.querySelector(conf.id).style.display='none';
             });
         }
-        _eventWithId("#"+conf.prefix+"-"+category.Name,()=>{
+        _eventWithId({id:"#"+conf.prefix+"-"+category.Name},()=>{
             let data ={};
             category.Properties.forEach(p=>{
                 data[p.Name] = document.querySelector("#"+conf.prefix+"-"+p.Name).value;
@@ -487,10 +503,10 @@ var Html = (function(){
         _category.referenceSelect.onchange=()=>{
             console.log(_category.referenceSelect.options[_category.referenceSelect.selectedIndex].getAttribute("value"));
         };
-        _eventWithId("#cc-category-close",()=>{
+        _eventWithId({id:"#cc-category-close"},()=>{
             document.querySelector(conf.id).style.display='none';
         });
-         _eventWithId("#cc-category-add",()=>{
+         _eventWithId({id:"#cc-category-add"},()=>{
             let cn = document.querySelector("#category-Name").value;
             let nullable = document.querySelector("#category-Nullable").checked;
             let tp = _category.types[_category.typeSelect.options[_category.typeSelect.selectedIndex].text];
@@ -529,7 +545,7 @@ var Html = (function(){
             _category[id]={Name:cn,Type:tp.Type,Reference:tp.Reference,Nullable:nullable}
                 
         }); 
-         _eventWithId("#cc-Save",()=>{
+         _eventWithId({id:"#cc-Save"},()=>{
             let nm = document.querySelector("#cc-header-Name").value;
             let des = document.querySelector("#cc-header-Description").value;
             let rc = document.querySelector("#cc-header-Rechargeable").checked;
@@ -725,10 +741,10 @@ var Html = (function(){
                 reader.readAsArrayBuffer(_fd);
             };
         });
-        _eventWithId("#ins-category-close",()=>{
+        _eventWithId({id:"#ins-category-close"},()=>{
             document.querySelector(conf.id).style.display='none';
         });
-        _eventWithId("#ins-"+conf.name,()=>{
+        _eventWithId({id:"#ins-"+conf.name},()=>{
             _readInstanceHeader({prefix:"ins-header"});
             _instance.save.ConfigurationCategory = data.Name;
             _readInstance({prefix:"ins"});
@@ -781,11 +797,11 @@ var Html = (function(){
                 }    
             }
         });
-        _eventWithId("#ins-delete",()=>{
+        _eventWithId({id:"#ins-delete"},()=>{
             deleteCall(ins.ItemId);     
         });
         _openWithId("#ins-delete");
-        _eventWithId("#ins-register",()=>{
+        _eventWithId({id:"#ins-register"},()=>{
             registerCall(ins.ItemId);     
         });
         _openWithId("#ins-register");
@@ -833,18 +849,20 @@ var Html = (function(){
                 preview(a.getAttribute("tx-category-id"));    
             };
         });
-        _eventWithId("#"+conf.prefix+"-category-close",()=>{
+        _eventWithId({id:"#"+conf.prefix+"-category-close"},()=>{
             document.querySelector(conf.id).style.display='none';
         });       
     };
 
     return {
+        caption : _caption,
         registerTaskChangeListener : _registerTaskChangeListener,
         registerUploadTask : _registerUploadTask,
         messageWithId : _messageWithId,
         openWithId : _openWithId,
         closeWithId : _closeWithId,
         eventWithId : _eventWithId,
+        eventWithClass : _eventWithClass,
         form : _form,
         currentTask : _currentTask,
         taskList : _taskList,
