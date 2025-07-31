@@ -57,7 +57,7 @@ type ConfigRegistration struct {
 }
 
 type ItemLoader interface {
-	Pull() error
+	Reload(kv KVUpdate) error
 	Load(cid int64) (Configuration, error)
 }
 
@@ -82,6 +82,12 @@ type ItemService interface {
 	Check(itemId int64, app string) (ConfigRegistration, error)
 	Release(regId int32) error
 	Loader() ItemLoader
+}
+
+type RepoUpdate struct {
+	Source string `json:"Source"`
+	Target string `json:"Target"`
+	Admin  string `json:"Admin"`
 }
 
 type KVUpdate struct {

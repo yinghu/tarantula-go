@@ -36,9 +36,9 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		w.WriteHeader(http.StatusOK)
 		w.Write(util.ToJson(session))
 	case "update":
-		s.ItemService().Loader().Pull()
 		var update item.KVUpdate
 		json.NewDecoder(r.Body).Decode(&update)
+		s.ItemService().Loader().Reload(update)
 		w.WriteHeader(http.StatusOK)
 		w.Write(util.ToJson(session))
 	case "schedule":
