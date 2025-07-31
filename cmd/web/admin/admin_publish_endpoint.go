@@ -17,14 +17,12 @@ func (s *AdminPublisher) AccessControl() int32 {
 }
 func (s *AdminPublisher) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	//defer func() {
-		//s.Cluster().Atomic(s.Cluster().Group(), func(ctx core.Ctx) error {
-			//ctx.Put("push", s.Cluster().Group())
-			//ctx.Put("push:tournament", s.Cluster().Group())
-			//ctx.Put("push:presence,asset", s.Cluster().Group())
-			//return nil
-		//})
-	//}()
+	defer func() {
+		s.Cluster().Atomic(s.Cluster().Group(), func(ctx core.Ctx) error {
+			ctx.Put("push", s.Cluster().Group())
+			return nil
+		})
+	}()
 	w.WriteHeader(http.StatusOK)
 	env := r.PathValue("repo")
 	cur := util.GitCurBranch().Message
