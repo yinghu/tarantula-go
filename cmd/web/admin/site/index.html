@@ -336,6 +336,7 @@
                 });
                 Html.closeWithId("#tx-form-box");
                 Html.closeWithId("#tx-instance-list-box");
+                Html.closeWithId("#tx-info-box");
                 Admin.getJson("/admin/category/load/0/scope/"+tsk.ScopeSequence+"/"+tsk.Name,resp=>{
                     Html.typeList(resp);
                     Html.categoryList({id:"#tx-category-list-box",prefix:"cc"},resp,cid=>{
