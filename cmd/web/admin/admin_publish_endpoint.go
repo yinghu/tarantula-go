@@ -16,6 +16,7 @@ func (s *AdminPublisher) AccessControl() int32 {
 	return bootstrap.ADMIN_ACCESS_CONTROL
 }
 func (s *AdminPublisher) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
+
 	defer r.Body.Close()
 	defer func() {
 		s.Cluster().Atomic(s.Cluster().Group(), func(ctx core.Ctx) error {

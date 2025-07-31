@@ -163,3 +163,8 @@ func (db *GitItemStore) RemoveEnum(cid int64) error {
 	}
 	return nil
 }
+func (db *GitItemStore) Pull() error {
+	r := util.GitPull()
+	core.AppLog.Printf("Pull :%v\n", r)
+	return nil
+}

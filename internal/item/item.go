@@ -57,6 +57,7 @@ type ConfigRegistration struct {
 }
 
 type ItemLoader interface {
+	Pull() error
 	Load(cid int64) (Configuration, error)
 }
 
