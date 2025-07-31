@@ -500,13 +500,13 @@
                 });    
             }
 
-            function publish_repository(){
-                Admin.getJson("/admin/webprotected/publish.repository.json",(resp)=>{
-                    let conf ={id:"#tx-form-box",prefix:"publish",closeable:true};
+            function sync_repository(){
+                Admin.getJson("/admin/webprotected/sync.repository.json",(resp)=>{
+                    let conf ={id:"#tx-form-box",prefix:"sync",closeable:true};
                     Html.form(conf,resp,(data)=>{
                         console.log(data);
-                        Admin.getJson("/admin/publish/"+data.branchName,(resp)=>{
-                            on_preview("Publish View",resp);
+                        Admin.getJson("/admin/sync/"+data.branchName,(resp)=>{
+                            on_preview("Sync View",resp);
                         });      
                     });
                     Html.openWithId("#tx-form-box");

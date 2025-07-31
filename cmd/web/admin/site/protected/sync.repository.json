@@ -1,7 +1,7 @@
 {
     "Scope": "admin",
-    "Name": "Publish",
-    "Description": "publish form",
+    "Name": "Sync",
+    "Description": "sync form",
     "Properties":[
         {
             "Name": "branchName",

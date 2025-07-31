@@ -73,10 +73,10 @@
         {
             "Name":"AdminTool","ScopeSequence":0,"Icon":"admin_panel_settings",
             "Jobs":[
-                {"Name":"Change Password","Callback":"change_password"},
-                {"Name":"Add Login","Callback":"add_login"},
-                {"Name":"Parse SnowFlakeId","Callback":"parse_snow_flake_id"},
-                {"Name":"Publish","Callback":"publish_repository"},
+                {"Name":"ChangePassword","Callback":"change_password"},
+                {"Name":"AddLogin","Callback":"add_login"},
+                {"Name":"ParseSnowFlakeId","Callback":"parse_snow_flake_id"},
+                {"Name":"SyncRepo","Callback":"sync_repository"},
                 {"Name":"ViewItem","Callback":"view_item"}
             ]        
         },
