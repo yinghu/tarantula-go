@@ -60,7 +60,18 @@ services:
     depends_on:
       - presence    
     networks:
-      - net    
+      - net
+  shop:
+    restart: unless-stopped
+    container_name: shop
+    hostname: shop
+    image: tarantula.shop:v1.0
+    volumes:
+      - volume_shop:/home/tarantula/shop
+    depends_on:
+      - presence    
+    networks:
+      - net        
   admin:
     restart: unless-stopped
     container_name: admin
@@ -73,6 +84,7 @@ services:
       - profile
       - inventory
       - tournament
+      - shop
     networks:
       - net
   web:
@@ -100,3 +112,4 @@ volumes:
   volume_inventory:
   volume_tournament:
   volume_admin:
+  volume_shop:

@@ -38,7 +38,9 @@ sudo docker build -f ./docker_application_build --tag tarantula.inventory:$versi
 ((seq++))
 sudo docker build -f ./docker_application_build --tag tarantula.asset:$version --build-arg app=asset --build-arg h=$host --build-arg n=asset$id --build-arg s=$id --build-arg g=$grp . 
 ((seq++))
-sudo docker build -f ./docker_application_build --tag tarantula.tournament:$version --build-arg app=tournament --build-arg h=$host --build-arg n=tournament$id --build-arg s=$seq --build-arg g=$grp .   
+sudo docker build -f ./docker_application_build --tag tarantula.tournament:$version --build-arg app=tournament --build-arg h=$host --build-arg n=tournament$id --build-arg s=$seq --build-arg g=$grp .  
+((seq++))
+sudo docker build -f ./docker_application_build --tag tarantula.shop:$version --build-arg app=shop --build-arg h=$host --build-arg n=shop$id --build-arg s=$seq --build-arg g=$grp .  
 sudo docker build -f ./docker_nginx_build --tag tarantula.nginx:$version .
 sudo docker builder prune -af
 rm id_ed25519
