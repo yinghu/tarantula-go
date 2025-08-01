@@ -11,13 +11,13 @@ const (
 	TCP_READ_BUFFER_SIZE int = 1024
 )
 
-type Endpoint struct {
-	TcpEndpoint string
+type TcpEndpoint struct {
+	Endpoint string
 	Service     EventService
 	listener    net.Listener
 }
 
-func (s *Endpoint) handleClient(client net.Conn) {
+func (s *TcpEndpoint) handleClient(client net.Conn) {
 	defer func() {
 		client.Close()
 	}()
@@ -43,8 +43,8 @@ func (s *Endpoint) handleClient(client net.Conn) {
 	e.Inbound(&socket)
 }
 
-func (s *Endpoint) Open() error {
-	parts := strings.Split(s.TcpEndpoint, ":")
+func (s *TcpEndpoint) Open() error {
+	parts := strings.Split(s.Endpoint, ":")
 	core.AppLog.Printf("Endpoint %s %s\n", parts[0], parts[2])
 	server, err := net.Listen(parts[0], ":"+parts[2])
 	if err != nil {
@@ -62,7 +62,7 @@ func (s *Endpoint) Open() error {
 	core.AppLog.Println("Server closed")
 	return nil
 }
-func (s *Endpoint) Close() error {
+func (s *TcpEndpoint) Close() error {
 	s.listener.Close()
 	return nil
 }
