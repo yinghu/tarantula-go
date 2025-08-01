@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
@@ -25,5 +27,8 @@ func (s *CacheService) Start(env conf.Env, c core.Cluster) error {
 		return err
 	}
 	s.Ds = &ds
+	core.AppLog.Printf("Cache service started %s %s\n", env.HttpBinding, env.LocalDir)
+	http.Handle("/cache/set/{key}", bootstrap.Logging(&CacheSetter{CacheService: s}))
+	http.Handle("/cache/get/{key}", bootstrap.Logging(&CacheGetter{CacheService: s}))
 	return nil
 }
