@@ -36,7 +36,6 @@ func (s *PresenceRegister) Register(login *event.Login) {
 	}
 	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: s.Cluster().Local().HttpEndpoint}
 	login.Cc <- event.Chunk{Remaining: false, Data: util.ToJson(session)}
-	s.Publish(login)
 }
 
 func (s *PresenceRegister) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
