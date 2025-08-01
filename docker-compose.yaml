@@ -71,7 +71,18 @@ services:
     depends_on:
       - presence    
     networks:
-      - net        
+      - net  
+  cache:
+    restart: unless-stopped
+    container_name: cache
+    hostname: cache
+    image: tarantula.cache:v1.0
+    volumes:
+      - volume_cache:/home/tarantula/cache
+    depends_on:
+      - presence    
+    networks:
+      - net             
   admin:
     restart: unless-stopped
     container_name: admin
@@ -85,6 +96,7 @@ services:
       - inventory
       - tournament
       - shop
+      - cache
     networks:
       - net
   web:
@@ -113,3 +125,4 @@ volumes:
   volume_tournament:
   volume_admin:
   volume_shop:
+  volume_cache:
