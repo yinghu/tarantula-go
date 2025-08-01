@@ -85,6 +85,12 @@
             "Jobs":[
                 {"Name":"Change Password","Callback":"change_password"}
             ]        
+        },
+        {
+            "Name":"APITool","ScopeSequence":0,"Icon":"api",
+            "Jobs":[
+                {"Name":"Login","Callback":"api_login"}
+            ]        
         }
         
     ]
