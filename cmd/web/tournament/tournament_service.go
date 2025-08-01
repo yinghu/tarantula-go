@@ -15,7 +15,7 @@ func (s *TournamentService) Config() string {
 }
 
 func (s *TournamentService) Start(f conf.Env, c core.Cluster) error {
-	s.KVUpdater = s
+	s.ItemUpdater = s
 	s.AppManager.Start(f, c)
 	s.createSchema()
 	return nil

@@ -20,7 +20,7 @@ type AppManager struct {
 	standalone  bool
 	AppAuth     core.Authenticator
 	seq         core.Sequence
-	KVUpdater   item.ItemListener
+	ItemUpdater   item.ItemListener
 	ManagedApps []string
 }
 
@@ -41,7 +41,7 @@ func (s *AppManager) Sequence() core.Sequence {
 	return s.seq
 }
 func (s *AppManager) ItemListener() item.ItemListener {
-	return s.KVUpdater
+	return s.ItemUpdater
 }
 
 func (s *AppManager) Start(f conf.Env, c core.Cluster) error {

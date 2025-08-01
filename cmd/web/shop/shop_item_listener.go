@@ -5,9 +5,9 @@ import (
 	"gameclustering.com/internal/item"
 )
 
-func (a *PresenceService) OnRegister(conf item.Configuration) {
+func (a *ShopService) OnRegister(conf item.Configuration) {
 	core.AppLog.Printf("item reigster %d\n", conf.Id)
 }
-func (a *PresenceService) OnRelease(conf item.Configuration) {
+func (a *ShopService) OnRelease(conf item.Configuration) {
 	core.AppLog.Printf("item reigster %d\n", conf.Id)
 }

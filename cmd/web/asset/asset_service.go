@@ -18,6 +18,7 @@ func (s *AssetService) Config() string {
 }
 
 func (s *AssetService) Start(f conf.Env, c core.Cluster) error {
+	s.ItemUpdater = s
 	s.AppManager.Start(f, c)
 	s.assetDir = f.LocalDir
 	err := s.createSchema()

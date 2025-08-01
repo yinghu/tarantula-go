@@ -15,7 +15,8 @@ func (s *ShopService) Config() string {
 }
 
 func (s *ShopService) Start(f conf.Env, c core.Cluster) error {
+	s.ItemUpdater = s
 	s.AppManager.Start(f, c)
-	//s.createSchema()
+	s.createSchema()
 	return nil
 }

@@ -5,6 +5,9 @@ import (
 	"gameclustering.com/internal/item"
 )
 
-func (a *InventoryService) OnUpdated(kv item.KVUpdate) {
-	core.AppLog.Printf("Item update call %v \n", kv)
+func (a *InventoryService) OnRegister(conf item.Configuration) {
+	core.AppLog.Printf("item reigster %d\n", conf.Id)
+}
+func (a *InventoryService) OnRelease(conf item.Configuration) {
+	core.AppLog.Printf("item release %d\n", conf.Id)
 }

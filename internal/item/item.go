@@ -97,5 +97,6 @@ type KVUpdate struct {
 }
 
 type ItemListener interface {
-	OnUpdated(kv KVUpdate)
+	OnRegister(conf Configuration)
+	OnRelease(conf Configuration)
 }

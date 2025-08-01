@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"gameclustering.com/internal/core"
@@ -49,7 +50,7 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		if s.ItemListener() == nil {
 			return
 		}
-		s.ItemListener().OnUpdated(update)
+		s.dispatch(update)
 	default:
 		core.AppLog.Printf("cmd not supported %s\n", cmd)
 		w.WriteHeader(http.StatusOK)
@@ -63,4 +64,31 @@ func (s *AppClusterAdmin) convert(node core.Node) core.Node {
 	rparts := strings.Split(node.TcpEndpoint, ":")
 	node.TcpEndpoint = rparts[0] + ":" + rparts[1] + ":" + lparts[2]
 	return node
+}
+func (s *AppClusterAdmin) dispatch(kv item.KVUpdate) {
+	itemId, err := strconv.ParseInt(kv.Key, 10, 64)
+	if err != nil {
+		core.AppLog.Printf("Key should be int64 %s\n", kv.Key)
+	}
+	var reg item.ConfigRegistration
+	err = json.Unmarshal([]byte(kv.Value), &reg)
+	if err != nil {
+		core.AppLog.Printf("Value should be json format %v\n", kv.Value)
+		return
+	}
+	if reg.ItemId != itemId {
+		core.AppLog.Printf("Key not matched %d : %d\n", itemId, reg.ItemId)
+		return
+	}
+	ins, err := s.ItemService().Loader().Load(reg.ItemId)
+	if err != nil {
+		return
+	}
+	if kv.IsCreate || kv.IsModify {
+		core.AppLog.Printf("Item registered %d\n", ins.Id)
+		s.ItemListener().OnRegister(ins)
+		return
+	}
+	core.AppLog.Printf("Item released %d\n", itemId)
+	s.ItemListener().OnRelease(ins)
 }

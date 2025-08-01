@@ -15,6 +15,7 @@ func (s *ProfileService) Config() string {
 }
 
 func (s *ProfileService) Start(f conf.Env, c core.Cluster) error {
+	s.ItemUpdater = s
 	s.AppManager.Start(f, c)
 	s.createSchema()
 	return nil
