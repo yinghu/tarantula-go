@@ -1,5 +1,16 @@
 name: tarantula
 services:
+  postoffice:
+    restart: unless-stopped
+    container_name: postoffice
+    hostname: postoffice
+    image: tarantula.postoffice:v1.0
+    volumes:
+      - volume_postoffice:/home/tarantula/postoffice
+    ports:
+      - "5000:5000"          
+    networks:
+      - net
   presence:
     restart: unless-stopped
     container_name: presence
@@ -7,6 +18,8 @@ services:
     image: tarantula.presence:v1.0
     volumes:
       - volume_presence:/home/tarantula/presence  
+       depends_on:
+      - postoffice
     networks:
       - net
   asset:
@@ -63,19 +76,6 @@ services:
     depends_on:
       - presence    
     networks:
-      - net  
-  postoffice:
-    restart: unless-stopped
-    container_name: postoffice
-    hostname: postoffice
-    image: tarantula.postoffice:v1.0
-    volumes:
-      - volume_postoffice:/home/tarantula/postoffice
-    depends_on:
-      - presence
-    ports:
-      - "5000:5000"          
-    networks:
       - net             
   admin:
     restart: unless-stopped
@@ -90,7 +90,7 @@ services:
       - inventory
       - tournament
       - shop
-      - postoffice
+      - presence
     networks:
       - net
   web:
