@@ -5,6 +5,7 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/util"
 )
 
 type CacheGetter struct {
@@ -16,5 +17,7 @@ func (s *CacheGetter) AccessControl() int32 {
 }
 
 func (s *CacheGetter) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
-
+	defer r.Body.Close()
+	key := r.PathValue("key")
+	w.Write(util.ToJson(core.OnSession{Successful: true, Message: key}))
 }
