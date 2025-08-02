@@ -27,8 +27,8 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 		return err
 	}
 	s.Ds = &ds
-	core.AppLog.Printf("Cache service started %s %s\n", env.HttpBinding, env.LocalDir)
-	http.Handle("/cache/set/{key}", bootstrap.Logging(&CacheSetter{PostofficeService: s}))
-	http.Handle("/cache/get/{key}", bootstrap.Logging(&CacheGetter{PostofficeService: s}))
+	core.AppLog.Printf("Postoffice service started %s %s\n", env.HttpBinding, env.LocalDir)
+	http.Handle("/postoffice/set/{key}", bootstrap.Logging(&CacheSetter{PostofficeService: s}))
+	http.Handle("/postoffice/get/{key}", bootstrap.Logging(&CacheGetter{PostofficeService: s}))
 	return nil
 }

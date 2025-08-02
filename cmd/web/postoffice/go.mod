@@ -1,4 +1,4 @@
-module gameclustering.com/cache
+module gameclustering.com/postoffice
 
 go 1.24.2
 

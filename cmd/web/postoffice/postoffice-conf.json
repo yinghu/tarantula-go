@@ -1,5 +1,5 @@
 {
-    "GroupName" :"cache",
+    "GroupName" :"postoffice",
 	"NodeName" :   "a01",
 	"NodeId"     :   1,
 	"HttpBinding":  ":8080",
