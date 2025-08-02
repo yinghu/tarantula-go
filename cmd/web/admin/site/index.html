@@ -261,6 +261,7 @@
                             }
                             Html.registerTaskChangeListener(on_task_change);
                             Html.registerUploadTask(on_upload_task);
+                            Html.registerOnError(on_error);
                             on_login(resp);
                             Html.closeWithId("#tx-info-box");
                             Html.openWithId("#tx-logout");
@@ -538,6 +539,23 @@
                     tem.push("'>"+Html.caption(a)+"</option>");
                 });
                 tn.innerHTML = tem.join('');
+            }
+
+            function send_message(){
+                Admin.getJson("/admin/webprotected/send.message.json",(resp)=>{
+                    let conf ={id:"#tx-form-box",prefix:"message",closeable:true};
+                    Html.form(conf,resp,(data)=>{
+                        console.log(data);
+                        //Admin.getJson("/admin/sync/"+data.branchName,(resp)=>{
+                            //on_preview("Sync View",resp);
+                        //});      
+                    });
+                    Html.openWithId("#tx-form-box");
+                });    
+            }
+            function on_error(err){
+                Html.messageWithId("#tx-info-box-content",err);    
+                Html.openWithId("#tx-info-box");   
             }
         </script>
     </body>

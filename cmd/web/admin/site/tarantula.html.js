@@ -11,6 +11,8 @@ var Html = (function(){
     
     let _uploadTask = (data,callback)=>{}
     let _taskChanged = (tsk)=>{};
+    let _onError = (err)=>{};
+
     let _caption = function(word){
         return word[0].toUpperCase() + word.slice(1);
     };
@@ -55,6 +57,9 @@ var Html = (function(){
     };
     let _registerUploadTask = function(task){
         _uploadTask = task;
+    };
+    let _registerOnError = function(onError){
+        _onError = onError;
     };
     let _setup = function(tlist){
         _types = tlist.Types;
@@ -319,7 +324,12 @@ var Html = (function(){
 
 
     let _selectEnum = function(prop,prefix){
-        let t = _category.types[prop.Reference];
+        let t = {};
+        if (prop.Reference == 'inline'){
+            t.Values = prop.Values;
+        }else{
+            t = _category.types[prop.Reference];
+        }
         let tem=[];
         tem.push("<div class='w3-panel'>");
         tem.push("<label class='tx-text-12'>");
@@ -412,7 +422,17 @@ var Html = (function(){
             tem.push(_icon(conf.prefix,category.Name,"close","red"));
         }
         category.Properties.forEach(prop=>{
-            tem.push(_input(prop,conf.prefix));    
+            if(prop.Reference == 'Editor'){
+                tem.push(_textarea(prop,conf.prefix));    
+            }else if(prop.Type == 'boolean'){
+                tem.push(_checkbox(prop,conf.prefix));    
+            }else if(prop.Type == 'enum'){
+                tem.push(_selectEnum(prop,conf.prefix));
+            }
+            else{
+                tem.push(_input(prop,conf.prefix));
+            }
+
         });
         tem.push(_button(category.Name,conf.prefix));
         tem.push("</fieldset>");
@@ -425,7 +445,23 @@ var Html = (function(){
         _eventWithId({id:"#"+conf.prefix+"-"+category.Name},()=>{
             let data ={};
             category.Properties.forEach(p=>{
-                data[p.Name] = document.querySelector("#"+conf.prefix+"-"+p.Name).value;
+                if(p.Type=="boolean"){
+                    data[p.Name]=document.querySelector("#"+conf.prefix+"-"+p.Name).checked;
+                }else if(p.Type=="dateTime"){
+                    let tm = document.querySelector("#"+conf.prefix+"-"+p.Name).value;
+                    if( tm == ''){
+                        _onError("select date time");
+                        return
+                    }
+                    data[p.Name]=new Date(Date.parse(tm)).toISOString();
+                }else if(p.Type=="enum"){
+                    let ctn = document.querySelector("#"+conf.prefix+"-"+p.Name);
+                    data[p.Name]= ctn.options[ctn.selectedIndex].value;
+                }else if(p.Reference=="number"){
+                    data[p.Name] = document.querySelector("#"+conf.prefix+"-"+p.Name).value/1;
+                }else{  
+                    data[p.Name] = document.querySelector("#"+conf.prefix+"-"+p.Name).value;
+                }
             });
             callback(data);
         });
@@ -858,6 +894,7 @@ var Html = (function(){
         caption : _caption,
         registerTaskChangeListener : _registerTaskChangeListener,
         registerUploadTask : _registerUploadTask,
+        registerOnError : _registerOnError,
         messageWithId : _messageWithId,
         openWithId : _openWithId,
         closeWithId : _closeWithId,

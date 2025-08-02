@@ -83,7 +83,7 @@
         {
             "Name":"CSTool","ScopeSequence":0,"Icon":"support",
             "Jobs":[
-                {"Name":"Change Password","Callback":"change_password"}
+                {"Name":"SendMessage","Callback":"send_message"}
             ]        
         },
         {
