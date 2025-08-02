@@ -15,7 +15,7 @@ type PostofficeService struct {
 }
 
 func (s *PostofficeService) Config() string {
-	return "/etc/tarantula/cache-conf.json"
+	return "/etc/tarantula/postoffice-conf.json"
 }
 
 func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
