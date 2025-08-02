@@ -37,7 +37,7 @@ docker build -f .\docker_application_build --tag tarantula.tournament:%version% 
 SET /A seq=%seq%+1
 docker build -f .\docker_application_build --tag tarantula.shop:%version% --build-arg app=shop --build-arg h=%host% --build-arg n=shop%id% --build-arg s=%seq% --build-arg g=%grp% . 
 SET /A seq=%seq%+1
-docker build -f .\docker_application_build --tag tarantula.cache:%version% --build-arg app=cache --build-arg h=%host% --build-arg n=cache%id% --build-arg s=%seq% --build-arg g=%grp% . 
+docker build -f .\docker_application_build --tag tarantula.postoffice:%version% --build-arg app=postoffice --build-arg h=%host% --build-arg n=postoffice%id% --build-arg s=%seq% --build-arg g=%grp% . 
 docker build -f .\docker_nginx_build --tag tarantula.nginx:%version% .
 docker builder prune -af
 del id_ed25519

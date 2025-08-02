@@ -9,7 +9,7 @@ import (
 )
 
 type CacheSetter struct {
-	*CacheService
+	*PostofficeService
 }
 
 func (s *CacheSetter) AccessControl() int32 {

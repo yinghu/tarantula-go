@@ -9,7 +9,7 @@ import (
 )
 
 type CacheGetter struct {
-	*CacheService
+	*PostofficeService
 }
 
 func (s *CacheGetter) AccessControl() int32 {

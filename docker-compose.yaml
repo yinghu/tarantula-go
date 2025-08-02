@@ -64,13 +64,13 @@ services:
       - presence    
     networks:
       - net  
-  cache:
+  postoffice:
     restart: unless-stopped
-    container_name: cache
-    hostname: cache
-    image: tarantula.cache:v1.0
+    container_name: postoffice
+    hostname: postoffice
+    image: tarantula.postoffice:v1.0
     volumes:
-      - volume_cache:/home/tarantula/cache
+      - volume_postoffice:/home/tarantula/postoffice
     depends_on:
       - presence
     ports:
@@ -119,4 +119,4 @@ volumes:
   volume_tournament:
   volume_admin:
   volume_shop:
-  volume_cache:
+  volume_postoffice:
