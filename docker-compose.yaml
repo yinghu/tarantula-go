@@ -90,7 +90,7 @@ services:
       - inventory
       - tournament
       - shop
-      - cache
+      - postoffice
     networks:
       - net
   web:
