@@ -8,15 +8,15 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-type CacheSetter struct {
+type PostofficeUnSubscriber struct {
 	*PostofficeService
 }
 
-func (s *CacheSetter) AccessControl() int32 {
+func (s *PostofficeUnSubscriber) AccessControl() int32 {
 	return bootstrap.ADMIN_ACCESS_CONTROL
 }
 
-func (s *CacheSetter) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
+func (s *PostofficeUnSubscriber) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	key := r.PathValue("key")
 	w.Write(util.ToJson(core.OnSession{Successful: true, Message: key}))
