@@ -17,7 +17,6 @@ func (s *MessageEvent) ClassId() int {
 func (s *MessageEvent) Read(buff core.DataBuffer) error {
 	title, err := buff.ReadString()
 	if err != nil {
-		
 		return err
 	}
 	s.Title = title

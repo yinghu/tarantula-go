@@ -38,12 +38,12 @@ type EventObj struct {
 
 func (s *EventObj) Outbound(buff core.DataBuffer) {
 	err := s.WriteKey(buff)
-	if err!=nil {
+	if err != nil {
 		s.Cb.OnError(err)
 		return
 	}
 	err = s.Write(buff)
-	if err!=nil {
+	if err != nil {
 		s.Cb.OnError(err)
 		return
 	}
@@ -52,15 +52,16 @@ func (s *EventObj) Outbound(buff core.DataBuffer) {
 
 func (s *EventObj) Inbound(buff core.DataBuffer) {
 	err := s.ReadKey(buff)
-	if err!=nil {
+	if err != nil {
 		s.Cb.OnError(err)
 		return
 	}
 	err = s.Read(buff)
-	if err !=nil{
+	if err != nil {
 		s.Cb.OnError(err)
 		return
 	}
+	s.Cb.OnEvent(s)
 }
 
 func (s *EventObj) OnError(err error) {
