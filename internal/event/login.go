@@ -58,7 +58,7 @@ func (s *Login) WriteKey(buffer core.DataBuffer) error {
 	return nil
 }
 
-func (s *Login) Inbound(buff core.DataBuffer) {
+func (s *Login) Inbound(buff core.DataBuffer) error{
 	s.ReadKey(buff)
 	s.Read(buff)
 	for {
@@ -82,9 +82,10 @@ func (s *Login) Inbound(buff core.DataBuffer) {
 	buff.WriteInt32(100)
 	buff.WriteString("bye")
 	s.Listener().OnEvent(s)
+	return nil
 }
 
-func (s *Login) Outbound(buff core.DataBuffer) {
+func (s *Login) Outbound(buff core.DataBuffer) error{
 	s.WriteKey(buff)
 	s.Write(buff)
 	buff.WriteInt32(12)
@@ -94,7 +95,7 @@ func (s *Login) Outbound(buff core.DataBuffer) {
 	buff.WriteInt32(0)
 	buff.ReadInt32()
 	buff.ReadString()
-
+	return nil
 }
 
 func (s *Login) streaming(c Chunk) {

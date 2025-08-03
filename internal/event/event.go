@@ -20,8 +20,8 @@ type EventService interface {
 }
 
 type Event interface {
-	Inbound(buff core.DataBuffer)
-	Outbound(buff core.DataBuffer)
+	Inbound(buff core.DataBuffer) error
+	Outbound(buff core.DataBuffer) error
 	core.Persistentable
 	Listener() EventListener
 }
@@ -36,36 +36,28 @@ type EventObj struct {
 	core.PersistentableObj
 }
 
-func (s *EventObj) Outbound(buff core.DataBuffer) {
+func (s *EventObj) Outbound(buff core.DataBuffer) error {
 	err := s.WriteKey(buff)
 	if err != nil {
-		s.Cb.OnError(err)
-		return
+		return err
 	}
 	err = s.Write(buff)
 	if err != nil {
-		s.Cb.OnError(err)
-		return
+		return err
 	}
-	s.Cb.OnEvent(s)
+	return nil
 }
 
-func (s *EventObj) Inbound(buff core.DataBuffer) {
+func (s *EventObj) Inbound(buff core.DataBuffer) error {
 	err := s.ReadKey(buff)
 	if err != nil {
-		s.Cb.OnError(err)
-		return
+		return err
 	}
 	err = s.Read(buff)
 	if err != nil {
-		s.Cb.OnError(err)
-		return
+		return err
 	}
-	s.Cb.OnEvent(s)
-}
-
-func (s *EventObj) OnError(err error) {
-
+	return nil
 }
 
 func (s *EventObj) Listener() EventListener {

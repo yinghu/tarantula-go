@@ -128,7 +128,7 @@ func (s *sampleEvent) streaming(c Chunk) {
 	//s.listener <- c
 }
 
-func (s *sampleEvent) Inbound(buff core.DataBuffer) {
+func (s *sampleEvent) Inbound(buff core.DataBuffer) error {
 	s.Read(buff)
 	for {
 		sz, err := buff.ReadInt32()
@@ -150,9 +150,10 @@ func (s *sampleEvent) Inbound(buff core.DataBuffer) {
 	buff.WriteInt32(100)
 	buff.WriteString("bye")
 	W.Done()
+	return nil
 }
 
-func (s *sampleEvent) Outbound(buff core.DataBuffer) {
+func (s *sampleEvent) Outbound(buff core.DataBuffer) error {
 	s.Write(buff)
 	buff.WriteInt32(12)
 	buff.Write([]byte("login passed"))
@@ -161,6 +162,7 @@ func (s *sampleEvent) Outbound(buff core.DataBuffer) {
 	buff.WriteInt32(0)
 	buff.ReadInt32()
 	buff.ReadString()
+	return nil
 }
 
 func TestEndpoint(t *testing.T) {
