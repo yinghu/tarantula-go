@@ -29,6 +29,7 @@ func (s *PostofficePublisher) Request(rs core.OnSession, w http.ResponseWriter, 
 	}
 	w.Write(util.ToJson(core.OnSession{Successful: true, Message: key}))
 	view := s.Cluster().View()
+	me.Cb = s
 	for i := range view {
 		v := view[i]
 		core.AppLog.Printf("Sending to : %s,%s,%s\n", v.Name, v.TcpEndpoint, s.Cluster().Local().Name) // no prefix
