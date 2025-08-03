@@ -14,23 +14,29 @@ func (s *MessageEvent) ClassId() int {
 	return 1
 }
 
-func (s *MessageEvent) Inbound(buff core.DataBuffer) {
+func (s *MessageEvent) Read(buff core.DataBuffer) error {
 	title, err := buff.ReadString()
 	if err != nil {
-		s.Listener().OnError(err)
-		return
+		
+		return err
 	}
 	s.Title = title
 	message, err := buff.ReadString()
 	if err != nil {
-		s.Listener().OnError(err)
-		return
+		return err
 	}
 	s.Message = message
-	s.Listener().OnEvent(s)
+	return nil
 }
 
-func (s *MessageEvent) Outbound(buff core.DataBuffer) {
-	buff.WriteString(s.Title)
-	buff.WriteString(s.Message)
+func (s *MessageEvent) Write(buff core.DataBuffer) error {
+	err := buff.WriteString(s.Title)
+	if err!=nil{
+		return err
+	}
+	err = buff.WriteString(s.Message)
+	if err!=nil{
+		return err
+	}
+	return nil
 }

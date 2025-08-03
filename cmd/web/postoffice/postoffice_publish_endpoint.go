@@ -31,7 +31,7 @@ func (s *PostofficePublisher) Request(rs core.OnSession, w http.ResponseWriter, 
 	view := s.Cluster().View()
 	for i := range view {
 		v := view[i]
-		core.AppLog.Printf("Sending to : %s,%s,%s\n", v.Name, v.TcpEndpoint, s.Cluster().Local().Name)
+		core.AppLog.Printf("Sending to : %s,%s,%s\n", v.Name, v.TcpEndpoint, s.Cluster().Local().Name) // no prefix
 		if v.Name == s.Cluster().Local().Name {
 			continue
 		}
