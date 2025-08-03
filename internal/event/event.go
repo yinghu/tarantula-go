@@ -31,35 +31,10 @@ type EventPublisher interface {
 }
 
 type EventObj struct {
-	Cc chan Chunk
-	Cb EventListener
+	Callback EventListener
 	core.PersistentableObj
 }
 
-func (s *EventObj) Outbound(buff core.DataBuffer) error {
-	err := s.WriteKey(buff)
-	if err != nil {
-		return err
-	}
-	err = s.Write(buff)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *EventObj) Inbound(buff core.DataBuffer) error {
-	err := s.ReadKey(buff)
-	if err != nil {
-		return err
-	}
-	err = s.Read(buff)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (s *EventObj) Listener() EventListener {
-	return s.Cb
+	return s.Callback
 }

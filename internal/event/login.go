@@ -58,45 +58,7 @@ func (s *Login) WriteKey(buffer core.DataBuffer) error {
 	return nil
 }
 
-func (s *Login) Inbound(buff core.DataBuffer) error{
-	s.ReadKey(buff)
-	s.Read(buff)
-	for {
-		sz, err := buff.ReadInt32()
-		if err != nil {
-			s.streaming(Chunk{Remaining: true, Data: []byte{0}})
-			break
-		}
-		if sz == 0 {
-			s.streaming(Chunk{Remaining: true, Data: []byte{0}})
-			break
-		}
 
-		pd, err := buff.Read(int(sz))
-		if err != nil {
-			s.streaming(Chunk{Remaining: true, Data: []byte{0}})
-			break
-		}
-		s.streaming(Chunk{Remaining: true, Data: pd})
-	}
-	buff.WriteInt32(100)
-	buff.WriteString("bye")
-	s.Listener().OnEvent(s)
-	return nil
-}
 
-func (s *Login) Outbound(buff core.DataBuffer) error{
-	s.WriteKey(buff)
-	s.Write(buff)
-	buff.WriteInt32(12)
-	buff.Write([]byte("login passed"))
-	buff.WriteInt32(12)
-	buff.Write([]byte("login passed"))
-	buff.WriteInt32(0)
-	buff.ReadInt32()
-	buff.ReadString()
-	return nil
-}
 
-func (s *Login) streaming(c Chunk) {
-}
+

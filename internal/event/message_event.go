@@ -5,10 +5,10 @@ import (
 )
 
 type MessageEvent struct {
-	Title                  string        `json:"title"`
-	Message                string        `json:"message"`
-	Callback               EventListener `json:"-"`
-	core.PersistentableObj `json:"-"`
+	Title    string        `json:"title"`
+	Message  string        `json:"message"`
+	Callback EventListener `json:"-"`
+	EventObj `json:"-"`
 }
 
 func (s *MessageEvent) ClassId() int {
@@ -59,8 +59,4 @@ func (s *MessageEvent) Inbound(buff core.DataBuffer) error {
 	}
 	s.Callback.OnEvent(s)
 	return nil
-}
-
-func (s *MessageEvent) Listener() EventListener {
-	return s.Callback
 }
