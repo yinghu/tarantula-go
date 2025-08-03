@@ -1,0 +1,19 @@
+{
+    "Scope": "admin",
+    "Name": "Message",
+    "Description": "message form",
+    "Properties":[
+        {
+            "Name": "title",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false
+        },
+        {
+            "Name": "message",
+            "Type":"string",
+            "Reference": "Editor",
+            "Nullable": false
+        }
+    ]
+}

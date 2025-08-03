@@ -6,6 +6,7 @@ import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
 )
 
@@ -32,4 +33,18 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 	http.Handle("/postoffice/unsubscribe/{key}", bootstrap.Logging(&PostofficeUnSubscriber{PostofficeService: s}))
 	http.Handle("/postoffice/publish/{key}", bootstrap.Logging(&PostofficePublisher{PostofficeService: s}))
 	return nil
+}
+
+func (s *PostofficeService) Create(classId int, ticket string) (event.Event, error) {
+	me := event.MessageEvent{}
+	me.Cb = s
+	return &me, nil
+}
+
+func (s *PostofficeService) OnError(e error) {
+	core.AppLog.Printf("On event error %s\n", e.Error())
+}
+
+func (s *PostofficeService) OnEvent(e event.Event) {
+	core.AppLog.Printf("On event %v\n", e)
 }
