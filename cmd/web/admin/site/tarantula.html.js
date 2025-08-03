@@ -1,6 +1,7 @@
 var Html = (function(){
     
     let _tasks = {};
+    let _jobs = {};
     let _types = {};
     let _headers ={};
     let _enum ={};
@@ -28,11 +29,14 @@ var Html = (function(){
     let _currentTask = function(){
         return _task;
     };
+    let _job = function(jname){
+        return _jobs[jname];
+    };
     let _closeWithClass = function(cls){
         document.querySelectorAll(cls).forEach(a=>{
             a.style.display = "none";
         });
-    }
+    };
     let _eventWithId = function(ctx,callback){
         let tgt = document.querySelector(ctx.id);
         if(!ctx.event){
@@ -119,16 +123,17 @@ var Html = (function(){
         document.querySelector(conf.id).innerHTML="";
         let tem=[];
         task.Jobs.forEach(job=>{
+            _jobs[_task.Name+"/"+job.Name]=job;
             tem.push("<span tx-job-name='");
-            tem.push(job.Callback+"' ");
-            tem.push("class='w3-bar-item w3-green w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4 ");
+            tem.push(job.Callback);
+            tem.push("' class='w3-bar-item w3-green w3-tag tx-text-20 tx-padding-button tx-margin-right-4 tx-margin-bottom-4 ");
             tem.push("tx-"+conf.prefix+"-action")
             tem.push("'>"+job.Name+"</span>");
         });
         document.querySelector(conf.id).innerHTML = tem.join("");
         document.querySelectorAll(".tx-"+conf.prefix+"-action").forEach(a=>{
             a.onclick = ()=>{
-                callback(a.getAttribute("tx-job-name"));    
+                callback(a.getAttribute("tx-job-name"),a.innerHTML);    
             };
         });
     };
@@ -864,12 +869,6 @@ var Html = (function(){
                 tem.push("<span tx-category-id='"+c.Id+"' ");
                 tem.push("class='w3-green w3-right w3-tag tx-text-20 tx-padding-button tx-margin-left-8 tx-"+conf.prefix+"-preview-opt'>Preview");
                 tem.push("</span>");
-                tem.push("<span tx-category-id='"+c.Id+"' ");
-                tem.push("class='w3-green w3-right w3-tag tx-text-20 tx-padding-button tx-margin-left-8 tx-"+conf.prefix+"-register-opt'>Register");
-                tem.push("</span>");
-                tem.push("<span tx-category-id='"+c.Id+"' ");
-                tem.push("class='w3-green w3-right w3-tag tx-text-20 tx-padding-button tx-margin-left-8 tx-"+conf.prefix+"-release-opt'>Release");
-                tem.push("</span>");
                 tem.push("</div>");
             }    
         });
@@ -902,6 +901,7 @@ var Html = (function(){
         eventWithClass : _eventWithClass,
         form : _form,
         currentTask : _currentTask,
+        job : _job,
         taskList : _taskList,
         jobList : _jobList,
         setup : _setup,

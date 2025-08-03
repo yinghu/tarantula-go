@@ -83,7 +83,7 @@
         {
             "Name":"CSTool","ScopeSequence":0,"Icon":"support",
             "Jobs":[
-                {"Name":"SendMessage","Callback":"send_message"}
+                {"Name":"SendMessage","Callback":"on_post","Form":"/admin/webprotected/send.message.json","Path":"/admin/cs/message"}
             ]        
         },
         {

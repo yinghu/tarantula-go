@@ -1,5 +1,5 @@
 var Admin = (function(){
-    let _query = {authenticated:false,confirm:()=>{}};
+    let _query = {authenticated:false,confirm:()=>{},job:{}};
     
     let _getQuery = function(){
         return _query;

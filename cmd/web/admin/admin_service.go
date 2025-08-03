@@ -48,6 +48,8 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	//handle / context from nginx proxy
 	http.Handle("/admin/{name}", bootstrap.Logging(&AdminWebIndex{AdminService: s}))
 
+	http.Handle("/admin/cs/message", bootstrap.Logging(&CSMessager{AdminService: s}))
+
 	http.Handle("/admin/enum/load/{name}", bootstrap.Logging(&EnumLoader{AdminService: s}))
 	http.Handle("/admin/file/save", bootstrap.Logging(&FileSaver{AdminService: s}))
 	http.Handle("/admin/enum/save", bootstrap.Logging(&EnumSaver{AdminService: s}))

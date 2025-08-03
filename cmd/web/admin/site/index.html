@@ -149,6 +149,25 @@
                     <div class="tx-content-24"></div>
                 </div>
         </div>
+        <div id="tx-popup-form-box" class="w3-modal w3-animate-zoom tx-hidden">
+                <div class="w3-modal-content">
+                    <div class="w3-display-container tx-content-24">
+                        <div class="w3-display-topright">
+                            <span id="tx-popup-form-box-close"><i class="material-symbols-outlined tx-margin-top-8 tx-margin-right-8 tx-red-icon-24">close</i></span>
+                        </div>
+                        <div class="w3-display-topleft">
+                            <span><i class="material-symbols-outlined tx-margin-top-8 tx-margin-left-8 tx-orange-icon-32">schedule</i></span>
+                        </div>
+                    </div>
+                    <div class="w3-panel">
+                        <p id="tx-popup-form-box-message" class='tx-text-16 w3-text-red'></p>
+                    </div>
+                    <div id="tx-popup-form" class="w3-panel">
+                        
+                    </div>
+                    <div class="tx-content-24"></div>
+                </div>
+        </div>
         <script>
             let editor;
             after_login(false)
@@ -191,6 +210,10 @@
             }); 
             Html.eventWithId({id:"#tx-configuration-register-box-close"},()=>{
                 Html.closeWithId("#tx-configuration-register-box");
+            });
+            Html.eventWithId({id:"#tx-popup-form-box-close"},()=>{
+                Html.closeWithId("#tx-popup-form-box");
+                Html.registerOnError(on_error);
             });
             Html.eventWithId({id:"#tx-configuration-register-box-app",event:"onchange"},()=>{
                 let app = document.querySelector("#tx-configuration-register-box-app");
@@ -280,12 +303,12 @@
                 Admin.login(auth);
                 Admin.getJson("/admin/webprotected/task.list.json",(resp)=>{
                     Html.taskList({id:"#tx-task-list",prefix:"task"},resp,(a)=>{
-                        Html.jobList({id:"#tx-job-list-box",prefix:"job"},a,(b)=>{
-                            on_job(b);
+                        Html.jobList({id:"#tx-job-list-box",prefix:"job"},a,(b,p)=>{
+                            on_job(b,p);
                         });        
                     });
-                    Html.jobList({id:"#tx-job-list-box",prefix:"job"},"Asset",(b)=>{
-                        on_job(b);
+                    Html.jobList({id:"#tx-job-list-box",prefix:"job"},"Asset",(b,p)=>{
+                        on_job(b,p);
                     });
                 });
                 Admin.getJson("/admin/webprotected/type.list.json",(resp)=>{
@@ -447,8 +470,9 @@
                 });
             }
 
-            function on_job(job){
+            function on_job(job,name){
                 if(typeof window[job] === 'function'){
+                    Admin.query().job.name = name;
                     eval(job+"()");
                     return;
                 }
@@ -541,14 +565,15 @@
                 tn.innerHTML = tem.join('');
             }
 
-            function send_message(){
-                Admin.getJson("/admin/webprotected/send.message.json",(resp)=>{
+            function on_post(){
+                let job = Html.job(Html.currentTask().Name+"/"+Admin.query().job.name);
+                Admin.getJson(job.Form,(resp)=>{
                     let conf ={id:"#tx-form-box",prefix:"message",closeable:true};
                     Html.form(conf,resp,(data)=>{
                         console.log(data);
-                        //Admin.getJson("/admin/sync/"+data.branchName,(resp)=>{
-                            //on_preview("Sync View",resp);
-                        //});      
+                        Admin.postJson(job.Path,data,(resp)=>{
+                            on_preview("Post View",resp);
+                        });      
                     });
                     Html.openWithId("#tx-form-box");
                 });    
