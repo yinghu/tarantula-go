@@ -5,9 +5,10 @@ import (
 )
 
 type MessageEvent struct {
-	Title    string `json:"title"`
-	Message  string `json:"message"`
-	EventObj `json:"-"`
+	Title                  string        `json:"title"`
+	Message                string        `json:"message"`
+	Callback               EventListener `json:"-"`
+	core.PersistentableObj `json:"-"`
 }
 
 func (s *MessageEvent) ClassId() int {
@@ -41,21 +42,25 @@ func (s *MessageEvent) Write(buff core.DataBuffer) error {
 }
 
 func (s *MessageEvent) Outbound(buff core.DataBuffer) error {
-	err := s.EventObj.Outbound(buff)
+	err := s.Write(buff)
 	if err != nil {
-		s.Cb.OnError(err)
+		s.Callback.OnError(err)
 		return err
 	}
-	s.Cb.OnEvent(s)
+	s.Callback.OnEvent(s)
 	return nil
 }
 
 func (s *MessageEvent) Inbound(buff core.DataBuffer) error {
-	err := s.EventObj.Inbound(buff)
+	err := s.Read(buff)
 	if err != nil {
-		s.Cb.OnError(err)
+		s.Callback.OnError(err)
 		return err
 	}
-	s.Cb.OnEvent(s)
+	s.Callback.OnEvent(s)
 	return nil
+}
+
+func (s *MessageEvent) Listener() EventListener {
+	return s.Callback
 }

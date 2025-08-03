@@ -37,7 +37,7 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 
 func (s *PostofficeService) Create(classId int, ticket string) (event.Event, error) {
 	me := event.MessageEvent{}
-	me.Cb = s
+	me.Callback = s
 	return &me, nil
 }
 
