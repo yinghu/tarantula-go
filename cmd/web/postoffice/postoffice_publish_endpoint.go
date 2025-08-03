@@ -24,7 +24,6 @@ func (s *PostofficePublisher) Request(rs core.OnSession, w http.ResponseWriter, 
 	var me event.MessageEvent
 	err := json.NewDecoder(r.Body).Decode(&me)
 	if err != nil {
-		core.AppLog.Printf("oops %s\n",err.Error())
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
@@ -32,6 +31,7 @@ func (s *PostofficePublisher) Request(rs core.OnSession, w http.ResponseWriter, 
 	view := s.Cluster().View()
 	for i := range view {
 		v := view[i]
+		core.AppLog.Printf("Sending to : %s,%s,%s\n", v.Name, v.TcpEndpoint, s.Cluster().Local().Name)
 		if v.Name == s.Cluster().Local().Name {
 			continue
 		}
