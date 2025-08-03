@@ -24,6 +24,7 @@ func (s *PostofficePublisher) Request(rs core.OnSession, w http.ResponseWriter, 
 	var me event.MessageEvent
 	err := json.NewDecoder(r.Body).Decode(&me)
 	if err != nil {
+		core.AppLog.Printf("oops %s\n",err.Error())
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
