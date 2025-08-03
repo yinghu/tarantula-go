@@ -18,7 +18,7 @@ func (s *PresenceRegister) AccessControl() int32 {
 	return bootstrap.PUBLIC_ACCESS_CONTROL
 }
 
-func (s *PresenceRegister) Register(login *event.Login) {
+func (s *PresenceRegister) Register(login *event.LoginEvent) {
 	id, _ := s.Sequence().Id()
 	login.SystemId = id
 	login.AccessControl = bootstrap.PROTECTED_ACCESS_CONTROL
@@ -45,9 +45,9 @@ func (s *PresenceRegister) Request(rs core.OnSession, w http.ResponseWriter, r *
 		r.Body.Close()
 	}()
 	w.WriteHeader(http.StatusOK)
-	var login event.Login
+	var login event.LoginEvent
 	json.NewDecoder(r.Body).Decode(&login)
-	login.EventObj.Cc = listener
+	login.Cc = listener
 	go s.Register(&login)
 	for c := range listener {
 		w.Write(c.Data)

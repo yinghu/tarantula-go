@@ -19,7 +19,7 @@ func (s *AdminLogin) AccessControl() int32 {
 }
 func (s *AdminLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var login event.Login
+	var login event.LoginEvent
 	err := json.NewDecoder(r.Body).Decode(&login)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}

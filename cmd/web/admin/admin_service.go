@@ -38,7 +38,7 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	if err != nil {
 		return err
 	}
-	err = s.SaveLogin(&event.Login{Name: "root", Hash: hash, AccessControl: bootstrap.SUDO_ACCESS_CONTROL})
+	err = s.SaveLogin(&event.LoginEvent{Name: "root", Hash: hash, AccessControl: bootstrap.SUDO_ACCESS_CONTROL})
 	if err != nil {
 		core.AppLog.Printf("Root already existed %s\n", err.Error())
 	}

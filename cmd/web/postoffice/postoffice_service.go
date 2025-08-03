@@ -35,10 +35,6 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 	return nil
 }
 
-func (s *PostofficeService) Create(classId int, ticket string) (event.Event, error) {
-	me := event.CreateEvent(classId,s)
-	return me, nil
-}
 
 func (s *PostofficeService) OnError(e error) {
 	core.AppLog.Printf("On event error %s\n", e.Error())

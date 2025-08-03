@@ -35,6 +35,12 @@ type EventObj struct {
 	core.PersistentableObj
 }
 
+func (s *EventObj) Inbound(buff core.DataBuffer) error {
+	return nil
+}
+func (s *EventObj) Outbound(buff core.DataBuffer) error {
+	return nil
+}
 func (s *EventObj) Listener() EventListener {
 	return s.Callback
 }

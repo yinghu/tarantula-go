@@ -22,7 +22,7 @@ func (s *PresenceService) createSchema() error {
 	return nil
 }
 
-func (s *PresenceService) SaveLogin(login *event.Login) error {
+func (s *PresenceService) SaveLogin(login *event.LoginEvent) error {
 	inserted, err := s.Sql.Exec(INSERT_LOGIN, login.Name, login.Hash, login.SystemId, login.ReferenceId)
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func (s *PresenceService) SaveLogin(login *event.Login) error {
 	return nil
 }
 
-func (s *PresenceService) LoadLogin(login *event.Login) error {
+func (s *PresenceService) LoadLogin(login *event.LoginEvent) error {
 	err := s.Sql.Query(func(rows pgx.Rows) error {
 		var hash string
 		var systemId int64
@@ -58,7 +58,7 @@ func (s *PresenceService) LoadLogin(login *event.Login) error {
 	return nil
 }
 
-func (s *PresenceService) UpdatePassword(login *event.Login) error {
+func (s *PresenceService) UpdatePassword(login *event.LoginEvent) error {
 	updated, err := s.Sql.Exec(UPDATE_HASH, login.Hash, login.Name)
 	if err != nil {
 		return err

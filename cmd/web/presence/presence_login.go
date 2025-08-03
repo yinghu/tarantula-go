@@ -18,7 +18,7 @@ func (s *PresenceLogin) AccessControl() int32 {
 	return bootstrap.PUBLIC_ACCESS_CONTROL
 }
 
-func (s *PresenceLogin) Login(login *event.Login) {
+func (s *PresenceLogin) Login(login *event.LoginEvent) {
 	pwd := login.Hash
 	err := s.LoadLogin(login)
 	if err != nil {
@@ -46,9 +46,9 @@ func (s *PresenceLogin) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 		r.Body.Close()
 	}()
 	w.WriteHeader(http.StatusOK)
-	var login event.Login
+	var login event.LoginEvent
 	json.NewDecoder(r.Body).Decode(&login)
-	login.EventObj.Cc = listener
+	login.Cc = listener
 	go s.Login(&login)
 	for c := range listener {
 		w.Write(c.Data)

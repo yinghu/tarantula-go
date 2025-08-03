@@ -6,22 +6,11 @@ import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 )
 
 type PresenceService struct {
 	bootstrap.AppManager
 	Started bool
-}
-
-func (s *PresenceService) Create(classId int, ticket string) (event.Event, error) {
-	login := event.Login{}
-	login.Cb = s
-	return &login, nil
-}
-
-func (s *PresenceService) OnError(e error) {
-	core.AppLog.Printf("On event error %s\n", e.Error())
 }
 
 func (s *PresenceService) Config() string {

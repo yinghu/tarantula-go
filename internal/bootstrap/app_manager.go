@@ -20,7 +20,7 @@ type AppManager struct {
 	standalone  bool
 	AppAuth     core.Authenticator
 	seq         core.Sequence
-	ItemUpdater   item.ItemListener
+	ItemUpdater item.ItemListener
 	ManagedApps []string
 }
 
@@ -96,7 +96,8 @@ func (s *AppManager) Shutdown() {
 }
 
 func (s *AppManager) Create(classId int, magicHeader string) (event.Event, error) {
-	return &event.Login{}, nil
+	e := event.CreateEvent(classId, s)
+	return e, nil
 }
 
 func (s *AppManager) OnEvent(e event.Event) {

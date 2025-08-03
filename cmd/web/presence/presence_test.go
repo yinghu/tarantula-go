@@ -20,7 +20,7 @@ func TestAuth(t *testing.T) {
 		t.Errorf("Service error %s", err.Error())
 	}
 	defer service.Shutdown()
-	login := event.Login{Name: "foo1003", Hash: "ppp", SystemId: 10, ReferenceId: 1}
+	login := event.LoginEvent{Name: "foo1003", Hash: "ppp", SystemId: 10, ReferenceId: 1}
 	login.Cc = make(chan event.Chunk)
 	reg := PresenceRegister{&service}
 	go reg.Register(&login)

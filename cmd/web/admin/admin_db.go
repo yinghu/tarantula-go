@@ -22,7 +22,7 @@ func (s *AdminService) createSchema() error {
 	return nil
 }
 
-func (s *AdminService) SaveLogin(login *event.Login) error {
+func (s *AdminService) SaveLogin(login *event.LoginEvent) error {
 	inserted, err := s.Sql.Exec(INSERT_LOGIN, login.Name, login.Hash, login.AccessControl)
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func (s *AdminService) SaveLogin(login *event.Login) error {
 	return nil
 }
 
-func (s *AdminService) LoadLogin(login *event.Login) error {
+func (s *AdminService) LoadLogin(login *event.LoginEvent) error {
 	err := s.Sql.Query(func(rows pgx.Rows) error {
 		var hash string
 		var id int32
@@ -56,7 +56,7 @@ func (s *AdminService) LoadLogin(login *event.Login) error {
 	return nil
 }
 
-func (s *AdminService) UpdatePassword(login *event.Login) error {
+func (s *AdminService) UpdatePassword(login *event.LoginEvent) error {
 	updated, err := s.Sql.Exec(UPDATE_HASH, login.Hash, login.Name)
 	if err != nil {
 		return err
