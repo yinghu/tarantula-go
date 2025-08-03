@@ -46,5 +46,8 @@ func (s *PostofficeService) OnError(e error) {
 }
 
 func (s *PostofficeService) OnEvent(e event.Event) {
-	core.AppLog.Printf("On event %v\n", e)
+	v, ok := e.(*event.MessageEvent)
+	if ok {
+		core.AppLog.Printf("On event %s, %s\n", v.Message, v.Title)
+	}
 }
