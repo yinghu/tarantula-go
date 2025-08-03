@@ -26,6 +26,6 @@ func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	resp := s.AdminService.PostJsonSync("http://postoffice:8080/postoffice/publish/"+me.Title, util.ToJson(me))
+	resp := s.AdminService.PostJsonSync("http://postoffice:8080/postoffice/publish/"+me.Title, me)
 	w.Write(util.ToJson(resp))
 }
