@@ -52,5 +52,6 @@ func (s *PostofficeService) OnEvent(e event.Event) {
 	v, ok := e.(*event.MessageEvent)
 	if ok {
 		core.AppLog.Printf("On event %s, %s\n", v.Message, v.Title)
+		s.PostJsonSync("http://tournament:8080/tournament/clusteradmin/event", v)
 	}
 }

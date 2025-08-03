@@ -7,11 +7,13 @@ import (
 	"strings"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
 )
 
 type AppClusterAdmin struct {
+	event.EventService
 	TarantulaService
 }
 
@@ -51,6 +53,8 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 			return
 		}
 		s.dispatch(update)
+	case "event":
+		s.OnEvent(&event.MessageEvent{Message: "test"})
 	default:
 		core.AppLog.Printf("cmd not supported %s\n", cmd)
 		w.WriteHeader(http.StatusOK)
