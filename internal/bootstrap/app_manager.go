@@ -96,10 +96,8 @@ func (s *AppManager) Shutdown() {
 }
 
 func (s *AppManager) Create(classId int, magicHeader string) (event.Event, error) {
-	e := event.CreateEvent(classId, s)
-	return e, nil
+	return nil, nil
 }
-
 func (s *AppManager) OnEvent(e event.Event) {
 
 }
