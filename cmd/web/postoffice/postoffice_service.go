@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
@@ -36,7 +37,10 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 }
 
 func (s *PostofficeService) Create(classId int, ticket string) (event.Event, error) {
-	me := event.CreateEvent(classId,s)
+	me := event.CreateEvent(classId, s)
+	if me == nil {
+		return nil, fmt.Errorf("event ( %d ) not supported", classId)
+	}
 	return me, nil
 }
 

@@ -13,8 +13,8 @@ const (
 
 type TcpEndpoint struct {
 	Endpoint string
-	Service     EventService
-	listener    net.Listener
+	Service  EventService
+	listener net.Listener
 }
 
 func (s *TcpEndpoint) handleClient(client net.Conn) {
@@ -40,7 +40,10 @@ func (s *TcpEndpoint) handleClient(client net.Conn) {
 		s.Service.OnError(err)
 		return
 	}
-	e.Inbound(&socket)
+	err = e.Inbound(&socket)
+	if err != nil {
+		s.Service.OnError(err)
+	}
 }
 
 func (s *TcpEndpoint) Open() error {
