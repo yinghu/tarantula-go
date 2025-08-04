@@ -9,7 +9,11 @@ type Chunk struct {
 	Data      []byte
 }
 
-
+type Topic struct {
+	Id   int32  `json:"Id"`
+	Name string `json:"Name"`
+	App  string `json:"App"`
+}
 
 type EventListener interface {
 	OnEvent(e Event)

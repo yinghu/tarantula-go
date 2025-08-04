@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"gameclustering.com/internal/event"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -22,7 +23,7 @@ func (db *PostofficeService) createSchema() error {
 	return nil
 }
 
-func (db *PostofficeService) createTopic(t Topic) (int32, error) {
+func (db *PostofficeService) createTopic(t event.Topic) (int32, error) {
 	var id int32
 	err := db.Sql.Txn(func(tx pgx.Tx) error {
 		tx.QueryRow(context.Background(), INSERT_TOPIC, t.Name, t.App).Scan(&id)
@@ -39,7 +40,7 @@ func (db *PostofficeService) createTopic(t Topic) (int32, error) {
 
 func (db *PostofficeService) loadTopics() {
 	db.Sql.Query(func(row pgx.Rows) error {
-		var tp Topic
+		var tp event.Topic
 		err := row.Scan(&tp.Id, &tp.Name, &tp.App)
 		if err != nil {
 			return err

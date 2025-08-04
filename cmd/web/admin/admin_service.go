@@ -61,6 +61,7 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	http.Handle("/admin/category/preview/{id}", bootstrap.Logging(&CategoryPreviewer{AdminService: s}))
 	http.Handle("/admin/item/delete/{type}/{id}", bootstrap.Logging(&ItemDeleter{AdminService: s}))
 
+	http.Handle("/admin/topic/subscribe", bootstrap.Logging(&AdminTopicSubscriber{AdminService: s}))
 	http.Handle("/admin/view/{id}", bootstrap.Logging(&AdminItemViewer{AdminService: s}))
 	http.Handle("/admin/sync/{repo}", bootstrap.Logging(&AdminPublisher{AdminService: s}))
 	http.Handle("/admin/env", bootstrap.Logging(&AdminEnv{AdminService: s}))

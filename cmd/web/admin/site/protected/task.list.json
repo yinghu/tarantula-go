@@ -77,7 +77,8 @@
                 {"Name":"AddLogin","Callback":"add_login"},
                 {"Name":"ParseSnowFlakeId","Callback":"parse_snow_flake_id"},
                 {"Name":"SyncRepo","Callback":"sync_repository"},
-                {"Name":"ViewItem","Callback":"view_item"}
+                {"Name":"ViewItem","Callback":"view_item"},
+                {"Name":"AddTopic","Callback":"on_post","Form":"/admin/webprotected/admin.add.topic.json","Path":"/admin/topic/subscribe"}
             ]        
         },
         {
