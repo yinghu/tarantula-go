@@ -1,0 +1,20 @@
+{
+    "Scope": "admin",
+    "Name": "Topic",
+    "Description": "topic form",
+    "Properties":[
+        {
+            "Name": "App",
+            "Type":"enum",
+            "Reference": "inline",
+            "Nullable": false,
+            "Values":[{"Name":"Presence","Value":"presence"},{"Name":"Tournament","Value":"tournament"}]
+        },
+        {
+            "Name": "Name",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false
+        }
+    ]
+}
