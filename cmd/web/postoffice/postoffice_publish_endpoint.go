@@ -27,7 +27,7 @@ func (s *PostofficePublisher) Request(rs core.OnSession, w http.ResponseWriter, 
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	me, err := s.Create(int(cid),"ticket")
+	me, err := s.Create(int(cid),topic)
 	if err!=nil{
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
@@ -46,6 +46,6 @@ func (s *PostofficePublisher) Request(rs core.OnSession, w http.ResponseWriter, 
 			continue
 		}
 		pub := event.SocketPublisher{Remote: v.TcpEndpoint}
-		pub.Publish(me, "ticket")
+		pub.Publish(me, topic)
 	}
 }

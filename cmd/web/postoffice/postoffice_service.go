@@ -42,6 +42,7 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 
 func (s *PostofficeService) Create(classId int, ticket string) (event.Event, error) {
 	me := event.CreateEvent(classId, s)
+	me.Topic(ticket)
 	if me == nil {
 		return nil, fmt.Errorf("event ( %d ) not supported", classId)
 	}
@@ -55,7 +56,7 @@ func (s *PostofficeService) OnError(e error) {
 func (s *PostofficeService) OnEvent(e event.Event) {
 	v, ok := e.(*event.MessageEvent)
 	if ok {
-		core.AppLog.Printf("On event %s, %s\n", v.Message, v.Title)
+		core.AppLog.Printf("On event %s, %s, %s\n", v.Message, v.Title, v.OnTopic())
 		s.PostJsonSync(fmt.Sprintf("%s%d", "http://tournament:8080/tournament/clusteradmin/event/", v.ClassId()), v)
 	}
 }
