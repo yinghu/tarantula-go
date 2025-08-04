@@ -46,7 +46,6 @@ func (s *MessageEvent) Outbound(buff core.DataBuffer) error {
 		s.Callback.OnError(err)
 		return err
 	}
-	s.Callback.OnEvent(s)
 	return nil
 }
 

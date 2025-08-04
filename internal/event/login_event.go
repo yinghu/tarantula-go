@@ -39,9 +39,18 @@ func (s *LoginEvent) Read(buffer core.DataBuffer) error {
 }
 
 func (s *LoginEvent) Write(buffer core.DataBuffer) error {
-	buffer.WriteString(s.Hash)
-	buffer.WriteInt32(s.ReferenceId)
-	buffer.WriteInt64(s.SystemId)
+	err := buffer.WriteString(s.Hash)
+	if err != nil {
+		return err
+	}
+	err = buffer.WriteInt32(s.ReferenceId)
+	if err != nil {
+		return err
+	}
+	err = buffer.WriteInt64(s.SystemId)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -55,6 +64,38 @@ func (s *LoginEvent) ReadKey(buffer core.DataBuffer) error {
 }
 
 func (s *LoginEvent) WriteKey(buffer core.DataBuffer) error {
-	buffer.WriteString(s.Name)
+	err := buffer.WriteString(s.Name)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *LoginEvent) Outbound(buff core.DataBuffer) error {
+	err := s.WriteKey(buff)
+	if err != nil {
+		s.Callback.OnError(err)
+		return err
+	}
+	err = s.Write(buff)
+	if err != nil {
+		s.Callback.OnError(err)
+		return err
+	}
+	return nil
+}
+
+func (s *LoginEvent) Inbound(buff core.DataBuffer) error {
+	err := s.ReadKey(buff)
+	if err != nil {
+		s.Callback.OnError(err)
+		return err
+	}
+	err = s.Read(buff)
+	if err != nil {
+		s.Callback.OnError(err)
+		return err
+	}
+	s.Callback.OnEvent(s)
 	return nil
 }
