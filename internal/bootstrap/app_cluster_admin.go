@@ -24,6 +24,12 @@ func (s *AppClusterAdmin) AccessControl() int32 {
 func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	cmd := r.PathValue("cmd")
+	cid, err := strconv.ParseInt(r.PathValue("cid"), 10, 64)
+	if err != nil {
+		w.WriteHeader(http.StatusOK)
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: "cid should be a number"}))
+		return
+	}
 	session := core.OnSession{Successful: true, Message: "app cluster admin [" + s.Cluster().Group() + "]"}
 	switch cmd {
 	case "join":
@@ -54,7 +60,9 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		}
 		s.dispatch(update)
 	case "event":
-		s.OnEvent(&event.MessageEvent{Message: "test"})
+		e := event.CreateEvent(int(cid), s)
+		json.NewDecoder(r.Body).Decode(&e)
+		s.OnEvent(e)
 	default:
 		core.AppLog.Printf("cmd not supported %s\n", cmd)
 		w.WriteHeader(http.StatusOK)

@@ -48,7 +48,7 @@ func (s *AppManager) KVUpdated(key string, value string, opt core.Opt) {
 
 func (s *AppManager) updateToApp(app string, cmd string, update item.KVUpdate) {
 	for i := range 5 {
-		ret := s.PostJsonSync("http://"+app+":8080/"+app+"/clusteradmin/"+cmd, update)
+		ret := s.PostJsonSync("http://"+app+":8080/"+app+"/clusteradmin/"+cmd+"/0", update)
 		if ret.ErrorCode == 0 {
 			break
 		}
@@ -59,7 +59,7 @@ func (s *AppManager) updateToApp(app string, cmd string, update item.KVUpdate) {
 
 func (s *AppManager) sendToApp(app string, cmd string, node core.Node) {
 	for i := range 5 {
-		ret := s.PostJsonSync("http://"+app+":8080/"+app+"/clusteradmin/"+cmd, node)
+		ret := s.PostJsonSync("http://"+app+":8080/"+app+"/clusteradmin/"+cmd+"/0", node)
 		if ret.ErrorCode == 0 {
 			break
 		}

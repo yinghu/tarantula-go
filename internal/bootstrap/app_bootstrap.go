@@ -45,7 +45,7 @@ func AppBootstrap(tcx TarantulaContext) {
 		}
 		http.Handle("/"+tcx.Context()+"/health", Logging(&AppHealth{tcx.Service()}))
 		if tcx.Context() != "admin" {
-			http.Handle("/"+tcx.Context()+"/clusteradmin/{cmd}", Logging(&AppClusterAdmin{tcx, tcx.Service()}))
+			http.Handle("/"+tcx.Context()+"/clusteradmin/{cmd}/{cid}", Logging(&AppClusterAdmin{tcx, tcx.Service()}))
 			core.AppLog.Printf("Register app cluster admin endpoint %s\n", tcx.Context())
 		}
 		http.Handle("/", http.HandlerFunc(badRequest))

@@ -9,6 +9,8 @@ type Chunk struct {
 	Data      []byte
 }
 
+
+
 type EventListener interface {
 	OnEvent(e Event)
 	OnError(err error)
