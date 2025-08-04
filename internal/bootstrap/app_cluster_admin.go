@@ -61,8 +61,13 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		s.dispatch(update)
 	case "event":
 		e := event.CreateEvent(int(cid), s)
-		json.NewDecoder(r.Body).Decode(&e)
+		err = json.NewDecoder(r.Body).Decode(&e)
+		if err != nil {
+			core.AppLog.Printf("Error on event %s\n", err.Error())
+		}
 		s.OnEvent(e)
+		w.WriteHeader(http.StatusOK)
+		w.Write(util.ToJson(session))
 	default:
 		core.AppLog.Printf("cmd not supported %s\n", cmd)
 		w.WriteHeader(http.StatusOK)
