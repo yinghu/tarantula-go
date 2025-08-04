@@ -11,9 +11,16 @@ import (
 	"gameclustering.com/internal/persistence"
 )
 
+type Topic struct {
+	Id   int32
+	Name string
+	App  string
+}
+
 type PostofficeService struct {
 	bootstrap.AppManager
-	Ds core.DataStore
+	Ds     core.DataStore
+	topics map[int32]Topic
 }
 
 func (s *PostofficeService) Config() string {
@@ -22,6 +29,7 @@ func (s *PostofficeService) Config() string {
 
 func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 	s.AppManager.Start(env, c)
+	s.createSchema()
 	path := env.LocalDir + "/store"
 	ds := persistence.Cache{InMemory: env.Bdg.InMemory, Path: path, Seq: s.Sequence()}
 	err := ds.Open()
@@ -29,10 +37,12 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 		return err
 	}
 	s.Ds = &ds
+	s.topics = make(map[int32]Topic)
+	s.loadTopics()
 	core.AppLog.Printf("Postoffice service started %s %s\n", env.HttpBinding, env.LocalDir)
-	http.Handle("/postoffice/subscribe/{key}", bootstrap.Logging(&PostofficeSubscriber{PostofficeService: s}))
-	http.Handle("/postoffice/unsubscribe/{key}", bootstrap.Logging(&PostofficeUnSubscriber{PostofficeService: s}))
-	http.Handle("/postoffice/publish/{key}", bootstrap.Logging(&PostofficePublisher{PostofficeService: s}))
+	http.Handle("/postoffice/subscribe/{app}/{topic}", bootstrap.Logging(&PostofficeSubscriber{PostofficeService: s}))
+	http.Handle("/postoffice/unsubscribe/{app}/{topic}", bootstrap.Logging(&PostofficeUnSubscriber{PostofficeService: s}))
+	http.Handle("/postoffice/publish/{topic}/{cid}", bootstrap.Logging(&PostofficePublisher{PostofficeService: s}))
 	return nil
 }
 

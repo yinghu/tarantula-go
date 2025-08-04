@@ -18,6 +18,15 @@ func (s *PostofficeSubscriber) AccessControl() int32 {
 
 func (s *PostofficeSubscriber) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	key := r.PathValue("key")
-	w.Write(util.ToJson(core.OnSession{Successful: true, Message: key}))
+	app := r.PathValue("app")
+	topic := r.PathValue("topic")
+	pt := Topic{Name: topic, App: app}
+	id, err := s.createTopic(pt)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	pt.Id = id
+	s.topics[id] = pt
+	w.Write(util.ToJson(core.OnSession{Successful: true, Message: app + "/" + topic}))
 }
