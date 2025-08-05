@@ -54,9 +54,28 @@ func (s *PostofficeService) OnError(e error) {
 }
 
 func (s *PostofficeService) OnEvent(e event.Event) {
-	v, ok := e.(*event.MessageEvent)
-	if ok {
-		core.AppLog.Printf("On event %s, %s, %s %d\n", v.Message, v.Title, v.OnTopic(), v.ClassId())
-		s.PostJsonSync(fmt.Sprintf("%s%d", "http://tournament:8080/tournament/clusteradmin/event/", v.ClassId()), v)
+	me, isMe := e.(*event.MessageEvent)
+	if isMe {
+		core.AppLog.Printf("On event %s, %s, %s %d\n", me.Message, me.Title, me.OnTopic(), me.ClassId())
+		s.PostJsonSync(fmt.Sprintf("%s%d", "http://tournament:8080/tournament/clusteradmin/event/", me.ClassId()), me)
+		return
+	}
+	se, isSe := e.(*event.SubscriptionEvent)
+	if isSe {
+		core.AppLog.Printf("On event %d %s, %s, %s %d\n", se.Id, se.App, se.Name, se.OnTopic(), se.ClassId())
+	}
+
+}
+
+func (s *PostofficeService) Publish(e event.Event) {
+	view := s.Cluster().View()
+	for i := range view {
+		v := view[i]
+		core.AppLog.Printf("Sending to : %s,%s,%s\n", v.Name, v.TcpEndpoint, s.Cluster().Local().Name) // no prefix
+		//if v.Name == s.Cluster().Local().Name {
+		//continue
+		//}
+		pub := event.SocketPublisher{Remote: v.TcpEndpoint}
+		pub.Publish(e, e.OnTopic())
 	}
 }

@@ -7,7 +7,6 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
 )
 
@@ -41,14 +40,5 @@ func (s *PostofficePublisher) Request(rs core.OnSession, w http.ResponseWriter, 
 	for k := range s.topics {
 		core.AppLog.Printf("%v\n", s.topics[k])
 	}
-	view := s.Cluster().View()
-	for i := range view {
-		v := view[i]
-		core.AppLog.Printf("Sending to : %s,%s,%s %d\n", v.Name, v.TcpEndpoint, s.Cluster().Local().Name, cid) // no prefix
-		if v.Name == s.Cluster().Local().Name {
-			continue
-		}
-		pub := event.SocketPublisher{Remote: v.TcpEndpoint}
-		pub.Publish(me, topic)
-	}
+	s.Publish(me)
 }

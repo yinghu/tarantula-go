@@ -1,9 +1,10 @@
 package event
 
 const (
-	LOGIN_CID      int = 1
-	MESSAGE_CID    int = 2
-	TOURNAMENT_CID int = 3
+	LOGIN_CID        int = 1
+	MESSAGE_CID      int = 2
+	TOURNAMENT_CID   int = 3
+	SUBSCRIPTION_CID int = 4
 )
 
 func CreateEvent(cid int, listner EventListener) Event {
@@ -20,6 +21,10 @@ func CreateEvent(cid int, listner EventListener) Event {
 		tournament := TournamentEvent{}
 		tournament.Callback = listner
 		return &tournament
+	case SUBSCRIPTION_CID:
+		subscription := SubscriptionEvent{}
+		subscription.Callback = listner
+		return &subscription 
 	default:
 		return nil
 	}

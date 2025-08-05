@@ -34,4 +34,5 @@ func (s *PostofficeSubscriber) Request(rs core.OnSession, w http.ResponseWriter,
 	tp.Id = id
 	s.topics[id] = tp
 	w.Write(util.ToJson(core.OnSession{Successful: true, Message: tp.App + "/" + tp.Name}))
+	s.Publish(&event.SubscriptionEvent{Id: tp.Id, App: tp.App, Name: tp.Name})
 }

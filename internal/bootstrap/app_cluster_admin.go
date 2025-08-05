@@ -22,39 +22,34 @@ func (s *AppClusterAdmin) AccessControl() int32 {
 }
 
 func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
+	session := core.OnSession{Successful: true, Message: "app cluster admin [" + s.Cluster().Group() + "]"}
+	defer func() {
+		w.WriteHeader(http.StatusOK)
+		w.Write(util.ToJson(session))
+		r.Body.Close()
+	}()
 	cmd := r.PathValue("cmd")
 	cid, err := strconv.ParseInt(r.PathValue("cid"), 10, 64)
 	if err != nil {
-		w.WriteHeader(http.StatusOK)
-		w.Write(util.ToJson(core.OnSession{Successful: false, Message: "cid should be a number"}))
+		session = core.OnSession{Successful: false, Message: "cid should be a number"}
 		return
 	}
-	session := core.OnSession{Successful: true, Message: "app cluster admin [" + s.Cluster().Group() + "]"}
 	switch cmd {
 	case "join":
 		var join core.Node
 		json.NewDecoder(r.Body).Decode(&join)
 		s.Cluster().OnJoin(s.convert(join))
-		w.WriteHeader(http.StatusOK)
-		w.Write(util.ToJson(session))
 	case "left":
 		var left core.Node
 		json.NewDecoder(r.Body).Decode(&left)
 		s.Cluster().OnLeave(s.convert(left))
-		w.WriteHeader(http.StatusOK)
-		w.Write(util.ToJson(session))
 	case "update":
 		var update item.KVUpdate
 		json.NewDecoder(r.Body).Decode(&update)
 		s.ItemService().Loader().Reload(update)
-		w.WriteHeader(http.StatusOK)
-		w.Write(util.ToJson(session))
 	case "schedule":
 		var update item.KVUpdate
 		json.NewDecoder(r.Body).Decode(&update)
-		w.WriteHeader(http.StatusOK)
-		w.Write(util.ToJson(session))
 		if s.ItemListener() == nil {
 			return
 		}
@@ -63,12 +58,9 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		e := event.CreateEvent(int(cid), s)
 		json.NewDecoder(r.Body).Decode(&e)
 		s.OnEvent(e)
-		w.WriteHeader(http.StatusOK)
-		w.Write(util.ToJson(session))
 	default:
 		core.AppLog.Printf("cmd not supported %s\n", cmd)
-		w.WriteHeader(http.StatusOK)
-		w.Write(util.ToJson(session))
+		session = core.OnSession{Successful: false, Message: "cmd not supported [" + cmd + "]"}
 	}
 }
 
