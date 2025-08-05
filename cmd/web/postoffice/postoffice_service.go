@@ -71,7 +71,7 @@ func (s *PostofficeService) Publish(e event.Event) {
 	view := s.Cluster().View()
 	for i := range view {
 		v := view[i]
-		core.AppLog.Printf("Sending to : %s,%s,%s\n", v.Name, v.TcpEndpoint, s.Cluster().Local().Name) // no prefix
+		core.AppLog.Printf("Sending to : %s,%s,%s,%s\n", v.Name, v.TcpEndpoint, s.Cluster().Local().Name, s.Context()) // no prefix
 		//if v.Name == s.Cluster().Local().Name {
 		//continue
 		//}
