@@ -72,9 +72,10 @@ func (s *PostofficeService) Publish(e event.Event) {
 	for i := range view {
 		v := view[i]
 		core.AppLog.Printf("Sending to : %s,%s,%s,%s\n", v.Name, v.TcpEndpoint, s.Cluster().Local().Name, s.Context()) // no prefix
-		//if v.Name == s.Cluster().Local().Name {
-		//continue
-		//}
+		if v.Name == s.Cluster().Local().Name {
+			s.OnEvent(e)
+			continue
+		}
 		pub := event.SocketPublisher{Remote: v.TcpEndpoint}
 		pub.Publish(e, e.OnTopic())
 	}
