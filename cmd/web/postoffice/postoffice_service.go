@@ -14,7 +14,7 @@ import (
 type PostofficeService struct {
 	bootstrap.AppManager
 	Ds     core.DataStore
-	topics map[int32]event.Topic
+	topics map[int32]event.SubscriptionEvent
 }
 
 func (s *PostofficeService) Config() string {
@@ -31,7 +31,7 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 		return err
 	}
 	s.Ds = &ds
-	s.topics = make(map[int32]event.Topic)
+	s.topics = make(map[int32]event.SubscriptionEvent)
 	s.loadTopics()
 	core.AppLog.Printf("Postoffice service started %s %s\n", env.HttpBinding, env.LocalDir)
 	http.Handle("/postoffice/subscribe", bootstrap.Logging(&PostofficeSubscriber{PostofficeService: s}))

@@ -20,7 +20,7 @@ func (s *PostofficeSubscriber) AccessControl() int32 {
 
 func (s *PostofficeSubscriber) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var tp event.Topic
+	var tp event.SubscriptionEvent
 	err := json.NewDecoder(r.Body).Decode(&tp)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
@@ -34,5 +34,5 @@ func (s *PostofficeSubscriber) Request(rs core.OnSession, w http.ResponseWriter,
 	tp.Id = id
 	s.topics[id] = tp
 	w.Write(util.ToJson(core.OnSession{Successful: true, Message: tp.App + "/" + tp.Name}))
-	s.Publish(&event.SubscriptionEvent{Id: tp.Id, App: tp.App, Name: tp.Name})
+	s.Publish(&tp)
 }
