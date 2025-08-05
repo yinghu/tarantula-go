@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"sync"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/conf"
@@ -11,10 +12,16 @@ import (
 	"gameclustering.com/internal/persistence"
 )
 
+type TopicMap struct {
+	sync.RWMutex
+	topics map[int32]event.SubscriptionEvent
+}
+
 type PostofficeService struct {
 	bootstrap.AppManager
-	Ds     core.DataStore
-	topics map[int32]event.SubscriptionEvent
+	Ds core.DataStore
+	//topics map[int32]event.SubscriptionEvent
+	TopicMap
 }
 
 func (s *PostofficeService) Config() string {
@@ -54,16 +61,36 @@ func (s *PostofficeService) OnError(e error) {
 }
 
 func (s *PostofficeService) OnEvent(e event.Event) {
-	me, isMe := e.(*event.MessageEvent)
-	if isMe {
-		core.AppLog.Printf("On event %s, %s, %s %d\n", me.Message, me.Title, me.OnTopic(), me.ClassId())
-		s.PostJsonSync(fmt.Sprintf("%s%d", "http://tournament:8080/tournament/clusteradmin/event/", me.ClassId()), me)
-		return
-	}
+	//me, isMe := e.(*event.MessageEvent)
+	//if isMe {
+	//core.AppLog.Printf("On event %s, %s, %s %d\n", me.Message, me.Title, me.OnTopic(), me.ClassId())
+	//s.PostJsonSync(fmt.Sprintf("%s%d", "http://tournament:8080/tournament/clusteradmin/event/", me.ClassId()), me)
+	//return
+	//}
 	se, isSe := e.(*event.SubscriptionEvent)
 	if isSe {
 		core.AppLog.Printf("On event %d %s, %s, %s %d\n", se.Id, se.App, se.Name, se.OnTopic(), se.ClassId())
+		s.RWMutex.Lock()
+		defer s.RWMutex.Unlock()
+		s.topics[se.Id] = *se
+		return
 	}
+	s.RLock()
+	defer s.RUnlock()
+	apps := make([]string, 0)
+	for i := range s.topics {
+		if s.topics[i].Name != e.OnTopic() {
+			continue
+		}
+		apps = append(apps, s.topics[i].App)
+	}
+	go func() {
+		for x := range apps {
+			url := fmt.Sprintf("%s%s%s%s%s%d", "http://", apps[x], ":8080/", apps[x], "/clusteradmin/event/", e.ClassId())
+			core.AppLog.Printf("Pushlish to %s\n", url)
+			s.PostJsonSync(url, e)
+		}
+	}()
 
 }
 

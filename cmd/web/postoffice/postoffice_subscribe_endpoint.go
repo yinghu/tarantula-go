@@ -32,7 +32,6 @@ func (s *PostofficeSubscriber) Request(rs core.OnSession, w http.ResponseWriter,
 		return
 	}
 	tp.Id = id
-	s.topics[id] = tp
 	w.Write(util.ToJson(core.OnSession{Successful: true, Message: tp.App + "/" + tp.Name}))
 	s.Publish(&tp)
 }
