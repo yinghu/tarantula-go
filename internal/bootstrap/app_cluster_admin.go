@@ -65,9 +65,8 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 }
 
 func (s *AppClusterAdmin) convert(node core.Node) core.Node {
-	core.AppLog.Printf("Switching from %s %s %s\n", node.Name, s.Cluster().Group(), s.Cluster().Local().Name)
-	node.Name = strings.Replace(node.Name, "admin", s.Cluster().Group(), 1)
-	core.AppLog.Printf("Switching to %s \n", node.Name)
+	gparts := strings.Split(s.Cluster().Group(), "/")
+	node.Name = strings.Replace(node.Name, "admin", gparts[1], 1)
 	lparts := strings.Split(s.Cluster().Local().TcpEndpoint, ":")
 	rparts := strings.Split(node.TcpEndpoint, ":")
 	node.TcpEndpoint = rparts[0] + ":" + rparts[1] + ":" + lparts[2]

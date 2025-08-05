@@ -31,7 +31,6 @@ type Cluster interface {
 
 	OnJoin(join Node)
 	OnLeave(leave Node)
-	//OnUpdate(key string, value string, opt Opt)
 	Listener() ClusterListener
 }
 
