@@ -19,7 +19,7 @@ func (s *AdminTopicSubscriber) AccessControl() int32 {
 }
 func (s *AdminTopicSubscriber) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var me event.Topic
+	var me event.SubscriptionEvent
 	err := json.NewDecoder(r.Body).Decode(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
