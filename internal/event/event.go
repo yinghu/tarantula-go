@@ -27,6 +27,8 @@ type Event interface {
 	Listener() EventListener
 	Topic(t string)
 	OnTopic() string
+	ETag(t string)
+	OnETag() string
 }
 
 type EventPublisher interface {
@@ -36,7 +38,16 @@ type EventPublisher interface {
 type EventObj struct {
 	Callback EventListener
 	core.PersistentableObj
+	Tag   string `json:"Tag"`
 	topic string `json:"-"`
+}
+
+func (s *EventObj) ETag(t string) {
+	s.Tag = t
+}
+
+func (s *EventObj) OnETag() string {
+	return s.Tag
 }
 
 func (s *EventObj) Topic(t string) {

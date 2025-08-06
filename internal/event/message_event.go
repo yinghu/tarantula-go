@@ -14,6 +14,15 @@ func (s *MessageEvent) ClassId() int {
 	return MESSAGE_CID
 }
 
+func (s *MessageEvent) WriteKey(buff core.DataBuffer) error {
+	//buff.WriteString(s.tag)
+	return nil
+}
+
+func (s *MessageEvent) ReadKey(buff core.DataBuffer) error {
+	return nil
+}
+
 func (s *MessageEvent) Read(buff core.DataBuffer) error {
 	title, err := buff.ReadString()
 	if err != nil {
@@ -41,7 +50,12 @@ func (s *MessageEvent) Write(buff core.DataBuffer) error {
 }
 
 func (s *MessageEvent) Outbound(buff core.DataBuffer) error {
-	err := s.Write(buff)
+	err := s.WriteKey(buff)
+	if err != nil {
+		s.Callback.OnError(err)
+		return err
+	}
+	err = s.Write(buff)
 	if err != nil {
 		s.Callback.OnError(err)
 		return err
@@ -50,7 +64,12 @@ func (s *MessageEvent) Outbound(buff core.DataBuffer) error {
 }
 
 func (s *MessageEvent) Inbound(buff core.DataBuffer) error {
-	err := s.Read(buff)
+	err := s.ReadKey(buff)
+	if err != nil {
+		s.Callback.OnError(err)
+		return err
+	}
+	err = s.Read(buff)
 	if err != nil {
 		s.Callback.OnError(err)
 		return err

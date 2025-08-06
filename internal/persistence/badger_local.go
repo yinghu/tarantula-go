@@ -10,14 +10,14 @@ import (
 
 const (
 	BDG_KEY_SIZE   int = 200
-	BDG_VALUE_SIZE int = 1800
+	BDG_VALUE_SIZE int = 4096
 )
 
 type Cache struct {
-	InMemory  bool
-	Path      string
-	Db        *badger.DB
-	Seq       core.Sequence
+	InMemory bool
+	Path     string
+	Db       *badger.DB
+	Seq      core.Sequence
 }
 
 func (s *Cache) Save(t core.Persistentable) error {

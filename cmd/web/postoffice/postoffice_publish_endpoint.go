@@ -37,8 +37,5 @@ func (s *PostofficePublisher) Request(rs core.OnSession, w http.ResponseWriter, 
 		return
 	}
 	w.Write(util.ToJson(core.OnSession{Successful: true, Message: topic}))
-	for k := range s.topics {
-		core.AppLog.Printf("%v\n", s.topics[k])
-	}
 	s.Publish(me)
 }
