@@ -7,19 +7,27 @@ import (
 type MessageEvent struct {
 	Title    string `json:"title"`
 	Message  string `json:"message"`
-	EventObj `json:"EventObj"`
+	EventObj `json:"-"`
 }
 
 func (s *MessageEvent) ClassId() int {
 	return MESSAGE_CID
 }
 
+func (s *MessageEvent) ETag() string {
+	return "msg:"
+}
+
 func (s *MessageEvent) WriteKey(buff core.DataBuffer) error {
-	//buff.WriteString(s.tag)
+	buff.WriteString(s.ETag())
 	return nil
 }
 
 func (s *MessageEvent) ReadKey(buff core.DataBuffer) error {
+	_, err := buff.ReadString()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

@@ -5,6 +5,11 @@ const (
 	MESSAGE_CID      int = 2
 	TOURNAMENT_CID   int = 3
 	SUBSCRIPTION_CID int = 4
+
+	LOGIN_ETAG        string = "login:"
+	MESSAGE_ETAG      string = "msg:"
+	TOURNAMENT_ETAG   string = "tmt:"
+	SUBSCRIPTION_ETAG string = "sub:"
 )
 
 func CreateEvent(cid int, listner EventListener) Event {
@@ -24,7 +29,7 @@ func CreateEvent(cid int, listner EventListener) Event {
 	case SUBSCRIPTION_CID:
 		subscription := SubscriptionEvent{}
 		subscription.Callback = listner
-		return &subscription 
+		return &subscription
 	default:
 		return nil
 	}
