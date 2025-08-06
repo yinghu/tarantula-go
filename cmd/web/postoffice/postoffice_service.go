@@ -88,6 +88,11 @@ func (s *PostofficeService) OnEvent(e event.Event) {
 }
 
 func (s *PostofficeService) Publish(e event.Event) {
+	err := s.Ds.Save(e)
+	if err != nil {
+		core.AppLog.Printf("Save error %s\n", err.Error())
+		return
+	}
 	ticket, err := s.AppAuth.CreateTicket(0, 0, bootstrap.ADMIN_ACCESS_CONTROL)
 	if err != nil {
 		core.AppLog.Printf("Ticket error %s\n", err.Error())
