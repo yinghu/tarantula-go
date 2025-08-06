@@ -7,6 +7,7 @@ import (
 type MessageEvent struct {
 	Title    string `json:"title"`
 	Message  string `json:"message"`
+	Id       int64  `json:"id:string"`
 	EventObj `json:"-"`
 }
 
@@ -20,6 +21,7 @@ func (s *MessageEvent) ETag() string {
 
 func (s *MessageEvent) WriteKey(buff core.DataBuffer) error {
 	buff.WriteString(s.ETag())
+	buff.WriteInt64(s.Id)
 	return nil
 }
 
@@ -28,6 +30,11 @@ func (s *MessageEvent) ReadKey(buff core.DataBuffer) error {
 	if err != nil {
 		return err
 	}
+	id, err := buff.ReadInt64()
+	if err != nil {
+		return err
+	}
+	s.Id = id
 	return nil
 }
 

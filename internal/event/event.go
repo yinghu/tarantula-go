@@ -40,6 +40,7 @@ type EventObj struct {
 	topic string
 }
 
+
 func (s *EventObj) ETag() string {
 	return "Ent:"
 }
