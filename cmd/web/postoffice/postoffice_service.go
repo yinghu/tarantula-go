@@ -20,7 +20,6 @@ type TopicMap struct {
 type PostofficeService struct {
 	bootstrap.AppManager
 	Ds core.DataStore
-	//topics map[int32]event.SubscriptionEvent
 	TopicMap
 }
 
@@ -61,12 +60,6 @@ func (s *PostofficeService) OnError(e error) {
 }
 
 func (s *PostofficeService) OnEvent(e event.Event) {
-	//me, isMe := e.(*event.MessageEvent)
-	//if isMe {
-	//core.AppLog.Printf("On event %s, %s, %s %d\n", me.Message, me.Title, me.OnTopic(), me.ClassId())
-	//s.PostJsonSync(fmt.Sprintf("%s%d", "http://tournament:8080/tournament/clusteradmin/event/", me.ClassId()), me)
-	//return
-	//}
 	se, isSe := e.(*event.SubscriptionEvent)
 	if isSe {
 		core.AppLog.Printf("On event %d %s, %s, %s %d\n", se.Id, se.App, se.Name, se.OnTopic(), se.ClassId())
