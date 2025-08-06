@@ -26,6 +26,9 @@ func (s *sampleFactory) OnError(e error) {
 	fmt.Printf("err %s\n", e.Error())
 	W.Done()
 }
+func (s *sampleFactory) VerifyTicket(ticket string) error {
+	return nil
+}
 
 type sampleEvent struct {
 	Id   int64

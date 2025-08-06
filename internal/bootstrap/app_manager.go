@@ -98,6 +98,14 @@ func (s *AppManager) Shutdown() {
 func (s *AppManager) Create(classId int, topic string) (event.Event, error) {
 	return nil, nil
 }
+
+func (s *AppManager) VerifyTicket(ticket string) error {
+	_, err := s.auth.ValidateTicket(ticket)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func (s *AppManager) OnEvent(e event.Event) {
 
 }

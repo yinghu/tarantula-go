@@ -16,6 +16,7 @@ type EventListener interface {
 
 type EventService interface {
 	Create(classId int, topic string) (Event, error)
+	VerifyTicket(ticket string) error
 	EventListener
 }
 

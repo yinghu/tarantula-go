@@ -34,7 +34,12 @@ func (s *TcpEndpoint) handleClient(client net.Conn) {
 		s.Service.OnError(err)
 		return
 	}
-	core.AppLog.Printf("Validate ticket %s\n", ticket)
+	err = s.Service.VerifyTicket(ticket)
+	if err != nil {
+		core.AppLog.Printf("invalid ticket %s\n", ticket)
+		s.Service.OnError(err)
+		return
+	}
 	topic, err := socket.ReadString()
 	if err != nil {
 		core.AppLog.Printf("error on read topic %s\n", err.Error())

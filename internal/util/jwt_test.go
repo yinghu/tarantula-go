@@ -1,10 +1,11 @@
 package util
 
 import (
+	"crypto/rand"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
-	"crypto/rand"
 
 	"gameclustering.com/internal/core"
 )
@@ -12,7 +13,7 @@ import (
 func onToken(h *core.JwtHeader, p *core.JwtPayload) error {
 	h.Kid = "kid"
 	p.Aud = "player"
-	exp := time.Now().Add(time.Hour*24).UTC()
+	exp := time.Now().Add(time.Hour * 24).UTC()
 	//fmt.Println(exp)
 	p.Exp = exp.UnixMilli()
 	return nil
@@ -31,13 +32,14 @@ func onVerify(h *core.JwtHeader, p *core.JwtPayload) error {
 
 func TestSum(t *testing.T) {
 	jwt := JwtHMac{Alg: "SHS256"}
-	key := make([]byte,32)
+	key := make([]byte, 32)
 	rand.Read(key)
 	jwt.HMacFromKey(key)
 	token, _ := jwt.Token(onToken)
-	time.Sleep(1000*time.Millisecond)
+	fmt.Printf("Len : %d\n", len(token))
+	time.Sleep(1000 * time.Millisecond)
 	err := jwt.Verify(token, onVerify)
-	if err != nil{
-		t.Errorf("failed %s\n",err.Error())
+	if err != nil {
+		t.Errorf("failed %s\n", err.Error())
 	}
 }

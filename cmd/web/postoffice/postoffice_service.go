@@ -88,6 +88,11 @@ func (s *PostofficeService) OnEvent(e event.Event) {
 }
 
 func (s *PostofficeService) Publish(e event.Event) {
+	ticket, err := s.AppAuth.CreateTicket(0, 0, bootstrap.ADMIN_ACCESS_CONTROL)
+	if err != nil {
+		core.AppLog.Printf("Ticket error %s\n", err.Error())
+		return
+	}
 	view := s.Cluster().View()
 	for i := range view {
 		v := view[i]
@@ -97,6 +102,6 @@ func (s *PostofficeService) Publish(e event.Event) {
 			continue
 		}
 		pub := event.SocketPublisher{Remote: v.TcpEndpoint}
-		pub.Publish(e, "ticket")
+		pub.Publish(e, ticket)
 	}
 }
