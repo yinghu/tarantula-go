@@ -6,6 +6,7 @@ import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 )
 
 type PresenceService struct {
@@ -37,4 +38,8 @@ func (s *PresenceService) Start(env conf.Env, c core.Cluster) error {
 func (s *PresenceService) Shutdown() {
 	s.AppManager.Shutdown()
 	core.AppLog.Printf("Presence service shut down\n")
+}
+
+func (s *PresenceService) OnEvent(e event.Event) {
+	core.AppLog.Printf("%v\n", e)
 }
