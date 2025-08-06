@@ -32,6 +32,11 @@ func (s *SocketPublisher) Publish(e Event, ticket string) {
 		e.Listener().OnError(err)
 		return
 	}
+	err = buffer.WriteString(e.OnTopic())
+	if err != nil {
+		e.Listener().OnError(err)
+		return
+	}
 	err = e.Outbound(&buffer)
 	if err != nil {
 		e.Listener().OnError(err)

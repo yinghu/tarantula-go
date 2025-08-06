@@ -15,7 +15,7 @@ type EventListener interface {
 }
 
 type EventService interface {
-	Create(classId int, ticket string) (Event, error)
+	Create(classId int, topic string) (Event, error)
 	EventListener
 }
 

@@ -28,13 +28,20 @@ func (s *TcpEndpoint) handleClient(client net.Conn) {
 		s.Service.OnError(err)
 		return
 	}
-	tik, err := socket.ReadString()
+	ticket, err := socket.ReadString()
 	if err != nil {
 		core.AppLog.Printf("error on read ticket %s\n", err.Error())
 		s.Service.OnError(err)
 		return
 	}
-	e, err := s.Service.Create(int(cid), tik)
+	core.AppLog.Printf("Validate ticket %s\n", ticket)
+	topic, err := socket.ReadString()
+	if err != nil {
+		core.AppLog.Printf("error on read topic %s\n", err.Error())
+		s.Service.OnError(err)
+		return
+	}
+	e, err := s.Service.Create(int(cid), topic)
 	if err != nil {
 		core.AppLog.Printf("error on create event %s\n", err.Error())
 		s.Service.OnError(err)

@@ -46,9 +46,9 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 	return nil
 }
 
-func (s *PostofficeService) Create(classId int, ticket string) (event.Event, error) {
+func (s *PostofficeService) Create(classId int, topic string) (event.Event, error) {
 	me := event.CreateEvent(classId, s)
-	me.Topic(ticket)
+	me.Topic(topic)
 	if me == nil {
 		return nil, fmt.Errorf("event ( %d ) not supported", classId)
 	}
@@ -97,6 +97,6 @@ func (s *PostofficeService) Publish(e event.Event) {
 			continue
 		}
 		pub := event.SocketPublisher{Remote: v.TcpEndpoint}
-		pub.Publish(e, e.OnTopic())
+		pub.Publish(e, "ticket")
 	}
 }

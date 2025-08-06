@@ -95,7 +95,7 @@ func (s *AppManager) Shutdown() {
 	s.Sql.Close()
 }
 
-func (s *AppManager) Create(classId int, magicHeader string) (event.Event, error) {
+func (s *AppManager) Create(classId int, topic string) (event.Event, error) {
 	return nil, nil
 }
 func (s *AppManager) OnEvent(e event.Event) {
