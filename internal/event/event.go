@@ -36,10 +36,10 @@ type EventPublisher interface {
 }
 
 type EventObj struct {
-	Callback EventListener
-	core.PersistentableObj
-	Tag   string `json:"Tag"`
-	topic string `json:"-"`
+	Callback               EventListener `json:"-"`
+	core.PersistentableObj `json:"-"`
+	Tag                    string `json:"Tag"`
+	topic                  string `json:"-"`
 }
 
 func (s *EventObj) ETag(t string) {

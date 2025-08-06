@@ -7,7 +7,7 @@ import (
 type MessageEvent struct {
 	Title    string `json:"title"`
 	Message  string `json:"message"`
-	EventObj `json:"-"`
+	EventObj `json:"EventObj"`
 }
 
 func (s *MessageEvent) ClassId() int {
