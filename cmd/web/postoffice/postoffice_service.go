@@ -68,6 +68,11 @@ func (s *PostofficeService) OnEvent(e event.Event) {
 		s.topics[se.Id] = *se
 		return
 	}
+	err := s.Ds.Save(e)
+	if err != nil {
+		core.AppLog.Printf("Save event error %s\n", err.Error())
+		return
+	}
 	s.RLock()
 	defer s.RUnlock()
 	apps := make([]string, 0)
