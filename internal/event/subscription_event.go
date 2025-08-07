@@ -15,6 +15,10 @@ func (s *SubscriptionEvent) ClassId() int {
 	return SUBSCRIPTION_CID
 }
 
+func (s *SubscriptionEvent) ETag() string {
+	return SUBSCRIPTION_ETAG
+}
+
 func (s *SubscriptionEvent) Read(buff core.DataBuffer) error {
 	id, err := buff.ReadInt32()
 	if err != nil {

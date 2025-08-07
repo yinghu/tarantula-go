@@ -17,6 +17,9 @@ func (s *TournamentEvent) ClassId() int {
 	return TOURNAMENT_CID
 }
 
+func (s *TournamentEvent) ETag() string {
+	return TOURNAMENT_ETAG
+}
 func (s *TournamentEvent) Read(buff core.DataBuffer) error {
 	tournamentId, err := buff.ReadInt64()
 	if err != nil {

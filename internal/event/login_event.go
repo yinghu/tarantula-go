@@ -19,7 +19,9 @@ func (s *LoginEvent) ClassId() int {
 	return LOGIN_CID
 }
 
-
+func (s *LoginEvent) ETag() string {
+	return LOGIN_ETAG
+}
 func (s *LoginEvent) Read(buffer core.DataBuffer) error {
 	hash, err := buffer.ReadString()
 	if err != nil {

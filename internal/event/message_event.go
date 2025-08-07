@@ -16,7 +16,7 @@ func (s *MessageEvent) ClassId() int {
 }
 
 func (s *MessageEvent) ETag() string {
-	return "msg:"
+	return MESSAGE_ETAG
 }
 
 func (s *MessageEvent) WriteKey(buff core.DataBuffer) error {
