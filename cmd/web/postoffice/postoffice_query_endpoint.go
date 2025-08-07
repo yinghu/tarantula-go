@@ -35,7 +35,7 @@ func (s *PostofficeQueryer) Request(rs core.OnSession, w http.ResponseWriter, r 
 		cid, _ := v.ReadInt32()
 		rev, _ := v.ReadInt64()
 		core.AppLog.Printf("CID : %d REV : %d", cid, rev)
-		return limit == 0
+		return limit > 0
 	})
 	w.Write(util.ToJson(core.OnSession{Successful: false, Message: tag}))
 }
