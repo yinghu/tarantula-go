@@ -1,0 +1,20 @@
+{
+    "Scope": "admin",
+    "Name": "Query",
+    "Description": "query form",
+    "Properties":[
+        {
+            "Name": "Tag",
+            "Type":"enum",
+            "Reference": "inline",
+            "Nullable": false,
+            "Values":[{"Name":"Message","Value":"msg:"},{"Name":"Tournament","Value":"tmt:"}]
+        },
+        {
+            "Name": "Limit",
+            "Type":"int32",
+            "Reference": "number",
+            "Nullable": false
+        }
+    ]
+}

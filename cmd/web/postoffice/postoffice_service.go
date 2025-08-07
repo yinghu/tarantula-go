@@ -43,6 +43,7 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 	http.Handle("/postoffice/subscribe", bootstrap.Logging(&PostofficeSubscriber{PostofficeService: s}))
 	http.Handle("/postoffice/unsubscribe", bootstrap.Logging(&PostofficeUnSubscriber{PostofficeService: s}))
 	http.Handle("/postoffice/publish/{topic}/{cid}", bootstrap.Logging(&PostofficePublisher{PostofficeService: s}))
+	http.Handle("/postoffice/query/{tag}/{limit}", bootstrap.Logging(&PostofficeQueryer{PostofficeService: s}))
 	return nil
 }
 

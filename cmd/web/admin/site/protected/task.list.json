@@ -84,7 +84,8 @@
         {
             "Name":"CSTool","ScopeSequence":0,"Icon":"support",
             "Jobs":[
-                {"Name":"SendMessage","Callback":"on_post","Form":"/admin/webprotected/cs.send.message.json","Path":"/admin/cs/message"}
+                {"Name":"SendMessage","Callback":"on_post","Form":"/admin/webprotected/cs.send.message.json","Path":"/admin/cs/message"},
+                {"Name":"QueryMessage","Callback":"on_post","Form":"/admin/webprotected/cs.query.message.json","Path":"/admin/cs/query"}
             ]        
         },
         {
