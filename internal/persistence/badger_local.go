@@ -26,6 +26,8 @@ func (s *Cache) Save(t core.Persistentable) error {
 	value := BufferProxy{}
 	value.NewProxy(BDG_VALUE_SIZE)
 	t.WriteKey(&key)
+	value.WriteInt32(int32(t.ClassId()))
+	value.WriteInt64(t.Revision())
 	t.Write(&value)
 	key.Flip()
 	value.Flip()
@@ -38,6 +40,8 @@ func (s *Cache) New(t core.Persistentable) error {
 	value := BufferProxy{}
 	value.NewProxy(BDG_VALUE_SIZE)
 	t.WriteKey(&key)
+	value.WriteInt32(int32(t.ClassId()))
+	value.WriteInt64(t.Revision())
 	t.Write(&value)
 	key.Flip()
 	value.Flip()
@@ -55,8 +59,46 @@ func (s *Cache) Load(t core.Persistentable) error {
 	if err != nil {
 		return err
 	}
+	value.ReadInt32()
+	value.ReadInt64()
 	t.Read(&value)
 	return nil
+}
+
+func (s *Cache) List(prefix core.DataBuffer, stream core.Stream) error {
+	return s.Db.View(func(txn *badger.Txn) error {
+		it := txn.NewIterator(badger.DefaultIteratorOptions)
+		defer it.Close()
+		p, err := prefix.Read(0)
+		if err != nil {
+			return err
+		}
+		key := BufferProxy{}
+		key.NewProxy(BDG_KEY_SIZE)
+		value := BufferProxy{}
+		value.NewProxy(BDG_VALUE_SIZE)
+		for it.Seek(p); it.ValidForPrefix(p); it.Next() {
+			kv := it.Item()
+			key.Clear()
+			err = key.Write(kv.Key())
+			if err != nil {
+				return err
+			}
+			err = kv.Value(func(val []byte) error {
+				value.Clear()
+				return value.Write(val)
+			})
+			if err != nil {
+				return err
+			}
+			key.Flip()
+			value.Flip()
+			if !stream(&key, &value) {
+				break
+			}
+		}
+		return nil
+	})
 }
 
 func (s *Cache) SetNew(key *BufferProxy, value *BufferProxy) error {

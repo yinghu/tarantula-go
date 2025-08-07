@@ -1,12 +1,14 @@
 package persistence
 
 import (
+	"fmt"
 	"testing"
 
 	"gameclustering.com/internal/core"
 )
 
 type sample struct {
+	Tag  string
 	Id   int64
 	Str  string
 	I32  int32
@@ -22,6 +24,9 @@ type sample struct {
 	core.PersistentableObj
 }
 
+func (s *sample) ClassId() int {
+	return 12
+}
 func (s *sample) Write(value core.DataBuffer) error {
 	value.WriteInt64(s.I64)
 	value.WriteInt32(s.I32)
@@ -37,11 +42,17 @@ func (s *sample) Write(value core.DataBuffer) error {
 }
 
 func (s *sample) WriteKey(value core.DataBuffer) error {
+	value.WriteString(s.Tag)
 	value.WriteInt64(s.Id)
 	return nil
 }
 
 func (s *sample) ReadKey(value core.DataBuffer) error {
+	tag, err := value.ReadString()
+	if err != nil {
+		return err
+	}
+	s.Tag = tag
 	id, err := value.ReadInt64()
 	if err != nil {
 		return err
@@ -113,7 +124,7 @@ func TestLocalStore(t *testing.T) {
 		t.Errorf("Local store error %s", err.Error())
 	}
 	defer local.Close()
-	sample1 := sample{Id: 200}
+	sample1 := sample{Id: 200, Tag: "sample:"}
 	sample1.I64 = 64
 	sample1.I32 = 32
 	sample1.I16 = 16
@@ -129,7 +140,7 @@ func TestLocalStore(t *testing.T) {
 		t.Errorf("no save %s", err.Error())
 	}
 
-	load1 := sample{Id: 200}
+	load1 := sample{Id: 200, Tag: "sample:"}
 	err = local.Load(&load1)
 	if err != nil {
 		t.Errorf("no load %s", err.Error())
@@ -164,5 +175,45 @@ func TestLocalStore(t *testing.T) {
 	}
 	if load1.F64 != 64.09 {
 		t.Errorf("no load %f", load1.F64)
+	}
+	sample2 := sample{Id: 1000, Tag: "sample:"}
+	sample2.Str = "test"
+	err = local.New(&sample2)
+	if err != nil {
+		t.Errorf("no save 2 %s", err.Error())
+	}
+	sample3 := sample{Id: 2000, Tag: "sample:"}
+	sample3.Str = "high"
+	sample3.Rev = 101
+	err = local.New(&sample3)
+	if err != nil {
+		t.Errorf("no save 3 %s", err.Error())
+	}
+	sample4 := sample{Id: 20, Tag: "sample:"}
+	sample4.Str = "lower"
+	sample4.Rev = 1010
+	err = local.New(&sample4)
+	if err != nil {
+		t.Errorf("no save 4 %s", err.Error())
+	}
+	px := BufferProxy{}
+	px.NewProxy(100)
+	px.WriteString("sample:")
+	px.Flip()
+	ct := 0
+	local.List(&px, func(k, v core.DataBuffer) bool {
+		d := sample{}
+		d.ReadKey(k)
+		cid, _ := v.ReadInt32()
+		rv, _ := v.ReadInt64()
+		fmt.Printf("header %d, %d\n", cid, rv)
+		d.Read(v)
+		fmt.Printf("streaming %s, %d\n", d.Tag, d.Id)
+		fmt.Printf("streaming %s, %d\n", d.Str, d.I64)
+		ct++
+		return true
+	})
+	if ct != 4 {
+		t.Errorf("should be 3 items %s", err.Error())
 	}
 }

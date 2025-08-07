@@ -48,6 +48,10 @@ type DataBuffer interface {
 	Remaining() int
 
 	Flip() error
+
+	Rewind() error
+
+	Clear() error
 }
 
 type DataBufferHook struct{}
@@ -78,7 +82,6 @@ func (s *DataBufferHook) WriteInt32(data int32) error {
 	return nil
 }
 
-
 func (s *DataBufferHook) WriteInt16(data int16) error {
 	return nil
 }
@@ -102,7 +105,6 @@ func (s *DataBufferHook) ReadBool() (bool, error) {
 func (s *DataBufferHook) ReadInt32() (int32, error) {
 	return 0, nil
 }
-
 
 func (s *DataBufferHook) ReadInt64() (int64, error) {
 	return 0, nil
@@ -145,5 +147,11 @@ func (s *DataBufferHook) Remaining() int {
 }
 
 func (s *DataBufferHook) Flip() error {
+	return nil
+}
+func (s *DataBufferHook) Rewind() error {
+	return nil
+}
+func (s *DataBufferHook) Clear() error {
 	return nil
 }

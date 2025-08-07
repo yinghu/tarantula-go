@@ -19,6 +19,8 @@ type PersistentableObj struct {
 	Rev int64
 }
 
+type Stream func(k, v DataBuffer) bool
+
 func (s *PersistentableObj) Write(value DataBuffer) error {
 	return nil
 }
@@ -50,5 +52,6 @@ type DataStoreFactory interface {
 type DataStore interface {
 	Load(p Persistentable) error
 	Save(p Persistentable) error
+	List(prefix DataBuffer, s Stream) error
 	Close() error
 }

@@ -262,3 +262,11 @@ func (s *BufferProxy) Remaining() int {
 func (s *BufferProxy) Flip() error {
 	return s.data.Flip()
 }
+
+func (s *BufferProxy) Rewind() error {
+	return s.data.Rewind()
+}
+
+func (s *BufferProxy) Clear() error {
+	return s.data.Clear()
+}
