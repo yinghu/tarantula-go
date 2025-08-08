@@ -20,8 +20,12 @@ func (s *MessageEvent) ETag() string {
 }
 
 func (s *MessageEvent) WriteKey(buff core.DataBuffer) error {
-	buff.WriteString(s.ETag())
-	buff.WriteInt64(s.Id)
+	if err := buff.WriteString(s.ETag()); err!=nil{
+		return err 
+	}
+	if err := buff.WriteInt64(s.Id); err!=nil{
+		return err
+	}
 	return nil
 }
 

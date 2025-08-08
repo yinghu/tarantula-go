@@ -20,7 +20,30 @@ func (s *TournamentEvent) ClassId() int {
 func (s *TournamentEvent) ETag() string {
 	return TOURNAMENT_ETAG
 }
-func (s *TournamentEvent) Read(buff core.DataBuffer) error {
+
+func (s *TournamentEvent) WriteKey(buff core.DataBuffer) error {
+	if err := buff.WriteString(s.ETag()); err != nil {
+		return err
+	}
+	err := buff.WriteInt64(s.TournamentId)
+	if err != nil {
+		return err
+	}
+	err = buff.WriteInt64(s.InstanceId)
+	if err != nil {
+		return err
+	}
+	err = buff.WriteInt64(s.SystemId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (s *TournamentEvent) ReadKey(buff core.DataBuffer) error {
+	_, err := buff.ReadString()
+	if err != nil {
+		return err
+	}
 	tournamentId, err := buff.ReadInt64()
 	if err != nil {
 		return err
@@ -36,6 +59,9 @@ func (s *TournamentEvent) Read(buff core.DataBuffer) error {
 		return err
 	}
 	s.SystemId = systemId
+	return nil
+}
+func (s *TournamentEvent) Read(buff core.DataBuffer) error {
 	score, err := buff.ReadInt64()
 	if err != nil {
 		return err
@@ -50,19 +76,7 @@ func (s *TournamentEvent) Read(buff core.DataBuffer) error {
 }
 
 func (s *TournamentEvent) Write(buff core.DataBuffer) error {
-	err := buff.WriteInt64(s.TournamentId)
-	if err != nil {
-		return err
-	}
-	err = buff.WriteInt64(s.InstanceId)
-	if err != nil {
-		return err
-	}
-	err = buff.WriteInt64(s.SystemId)
-	if err != nil {
-		return err
-	}
-	err = buff.WriteInt64(s.Score)
+	err := buff.WriteInt64(s.Score)
 	if err != nil {
 		return err
 	}
