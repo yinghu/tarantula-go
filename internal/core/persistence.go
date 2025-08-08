@@ -16,12 +16,10 @@ type Persistentable interface {
 }
 
 type PersistentableObj struct {
-	Fid int
-	Cid int
-	Rev uint64
+	Rev uint64 `json:"rev,string"`
 }
 
-type Stream func(k, v DataBuffer,rev uint64) bool
+type Stream func(k, v DataBuffer, rev uint64) bool
 
 func (s *PersistentableObj) Write(value DataBuffer) error {
 	return nil
@@ -40,7 +38,7 @@ func (s *PersistentableObj) ReadKey(value DataBuffer) error {
 }
 
 func (s *PersistentableObj) ClassId() int {
-	return s.Cid
+	return 0
 }
 
 func (s *PersistentableObj) Revision() uint64 {

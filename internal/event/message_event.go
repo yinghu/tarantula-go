@@ -5,10 +5,10 @@ import (
 )
 
 type MessageEvent struct {
-	Title    string `json:"title"`
-	Message  string `json:"message"`
-	Id       int64  `json:"id,string"`
-	EventObj `json:"-"`
+	Title   string `json:"title"`
+	Message string `json:"message"`
+	Id      int64  `json:"id,string"`
+	EventObj
 }
 
 func (s *MessageEvent) ClassId() int {

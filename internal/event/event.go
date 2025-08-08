@@ -34,11 +34,10 @@ type EventPublisher interface {
 }
 
 type EventObj struct {
-	Callback EventListener
+	Callback EventListener `json:"-"`
 	core.PersistentableObj
-	topic string
+	topic string `json:"-"`
 }
-
 
 func (s *EventObj) Topic(t string) {
 	s.topic = t
