@@ -27,7 +27,6 @@ type Event interface {
 	Listener() EventListener
 	Topic(t string)
 	OnTopic() string
-	ETag() string
 }
 
 type EventPublisher interface {
@@ -40,10 +39,6 @@ type EventObj struct {
 	topic string
 }
 
-
-func (s *EventObj) ETag() string {
-	return "Ent:"
-}
 
 func (s *EventObj) Topic(t string) {
 	s.topic = t

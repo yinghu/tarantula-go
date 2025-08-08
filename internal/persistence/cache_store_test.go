@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 )
 
 type sample struct {
@@ -26,6 +27,9 @@ type sample struct {
 
 func (s *sample) ClassId() int {
 	return 12
+}
+func (s *sample) ETag() string {
+	return "sample:"
 }
 func (s *sample) Write(value core.DataBuffer) error {
 	value.WriteInt64(s.I64)
@@ -118,7 +122,7 @@ func (s *sample) Read(value core.DataBuffer) error {
 }
 
 func TestLocalStore(t *testing.T) {
-	local := Cache{InMemory: false, Path: "/home/yinghu/local/test"}
+	local := BadgerLocal{InMemory: false, Path: "/home/yinghu/local/test"}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("Local store error %s", err.Error())
@@ -135,10 +139,7 @@ func TestLocalStore(t *testing.T) {
 	sample1.C128 = 228
 	sample1.F32 = 12.09
 	sample1.F64 = 64.09
-	err = local.New(&sample1)
-	if err != nil {
-		t.Errorf("no save %s", err.Error())
-	}
+	local.Save(&sample1)
 
 	load1 := sample{Id: 200, Tag: "sample:"}
 	err = local.Load(&load1)
@@ -176,38 +177,31 @@ func TestLocalStore(t *testing.T) {
 	if load1.F64 != 64.09 {
 		t.Errorf("no load %f", load1.F64)
 	}
+	fmt.Printf("Rev :%d\n", load1.Revision())
 	sample2 := sample{Id: 1000, Tag: "sample:"}
 	sample2.Str = "test"
-	err = local.New(&sample2)
-	if err != nil {
-		t.Errorf("no save 2 %s", err.Error())
-	}
+	local.Save(&sample2)
+
 	sample3 := sample{Id: 2000, Tag: "sample:"}
 	sample3.Str = "high"
-	sample3.Rev = 101
-	err = local.New(&sample3)
-	if err != nil {
-		t.Errorf("no save 3 %s", err.Error())
-	}
+	local.Save(&sample3)
+
 	sample4 := sample{Id: 20, Tag: "sample:"}
 	sample4.Str = "lower"
-	sample4.Rev = 1010
-	err = local.New(&sample4)
-	if err != nil {
-		t.Errorf("no save 4 %s", err.Error())
-	}
+	local.Save(&sample4)
+
 	px := BufferProxy{}
 	px.NewProxy(100)
 	px.WriteString("sample:")
 	px.Flip()
 	ct := 0
-	local.List(&px, func(k, v core.DataBuffer) bool {
+	local.List(&px, func(k, v core.DataBuffer, rev uint64) bool {
 		d := sample{}
 		d.ReadKey(k)
 		cid, _ := v.ReadInt32()
-		rv, _ := v.ReadInt64()
-		fmt.Printf("header %d, %d\n", cid, rv)
+		fmt.Printf("header %d %d\n", cid, rev)
 		d.Read(v)
+		d.OnRevision(rev)
 		fmt.Printf("streaming %s, %d\n", d.Tag, d.Id)
 		fmt.Printf("streaming %s, %d\n", d.Str, d.I64)
 		ct++
@@ -216,4 +210,10 @@ func TestLocalStore(t *testing.T) {
 	if ct != 4 {
 		t.Errorf("should be 3 items %s", err.Error())
 	}
+	se := event.StatEvent{Tag: sample1.ETag(), Name: "total"}
+	err = local.Load(&se)
+	if err != nil {
+		fmt.Printf("se load err %s\n", err.Error())
+	}
+	fmt.Printf("Total count : %d\n", se.Count)
 }

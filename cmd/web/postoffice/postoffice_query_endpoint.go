@@ -25,16 +25,16 @@ func (s *PostofficeQueryer) query(query event.Query) {
 	buff.WriteString(query.Tag)
 	buff.Flip()
 	query.Cc <- event.Chunk{Remaining: true, Data: []byte("[")}
-	s.Ds.List(&buff, func(k, v core.DataBuffer) bool {
+	s.Ds.List(&buff, func(k, v core.DataBuffer,rev uint64) bool {
 		query.Limit--
 		cid, _ := v.ReadInt32()
-		rev, _ := v.ReadInt64()
 		e := event.CreateEvent(int(cid), nil)
 		if e == nil {
 			return true
 		}
 		e.ReadKey(k)
 		e.Read(v)
+		e.OnRevision(rev)
 		core.AppLog.Printf("CID : %d REV : %d %v\n", cid, rev, e)
 		query.Cc <- event.Chunk{Remaining: true, Data: util.ToJson(e)}
 		if query.Limit > 0 {

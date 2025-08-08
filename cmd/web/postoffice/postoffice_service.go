@@ -31,7 +31,7 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 	s.AppManager.Start(env, c)
 	s.createSchema()
 	path := env.LocalDir + "/store"
-	ds := persistence.Cache{InMemory: env.Bdg.InMemory, Path: path, Seq: s.Sequence()}
+	ds := persistence.BadgerLocal{InMemory: env.Bdg.InMemory, Path: path, Seq: s.Sequence()}
 	err := ds.Open()
 	if err != nil {
 		return err

@@ -19,7 +19,7 @@ func (s *CSQueryer) AccessControl() int32 {
 	return bootstrap.ADMIN_ACCESS_CONTROL
 }
 func (s *CSQueryer) query(query event.Query) {
-	s.AdminService.PostJsonAsync(fmt.Sprintf("%s%s/%d", "http://postoffice:8080/postoffice/query/", query.Tag, query.Limit), query, query.Cc)
+	s.AdminService.GetJsonAsync(fmt.Sprintf("%s%s/%d", "http://postoffice:8080/postoffice/query/", query.Tag, query.Limit), query.Cc)
 }
 func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()

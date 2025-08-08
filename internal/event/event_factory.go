@@ -1,19 +1,25 @@
 package event
 
 const (
-	LOGIN_CID        int = 1
-	MESSAGE_CID      int = 2
-	TOURNAMENT_CID   int = 3
-	SUBSCRIPTION_CID int = 4
+	STAT_CID         int = 1
+	LOGIN_CID        int = 2
+	MESSAGE_CID      int = 3
+	TOURNAMENT_CID   int = 4
+	SUBSCRIPTION_CID int = 5
 
 	LOGIN_ETAG        string = "login:"
 	MESSAGE_ETAG      string = "msg:"
 	TOURNAMENT_ETAG   string = "tmt:"
 	SUBSCRIPTION_ETAG string = "sub:"
+	STAT_ETAG         string = "stat:"
 )
 
 func CreateEvent(cid int, listner EventListener) Event {
 	switch cid {
+	case STAT_CID:
+		stat := StatEvent{}
+		stat.Callback = listner
+		return &stat
 	case LOGIN_CID:
 		login := LoginEvent{}
 		login.Callback = listner

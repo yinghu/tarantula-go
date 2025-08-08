@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -11,7 +12,7 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-func (s *AppManager) PostJsonAsync(url string, payload any, ch chan event.Chunk) {
+func (s *AppManager) GetJsonAsync(url string, ch chan event.Chunk) {
 	if s.standalone {
 		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: STANDALONE_APP, Message: STANDALONE_APP_MSG})}
 		return
@@ -21,19 +22,15 @@ func (s *AppManager) PostJsonAsync(url string, payload any, ch chan event.Chunk)
 		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: INVALID_TICKET_CODE, Message: err.Error()})}
 		return
 	}
-	data, err := json.Marshal(payload)
-	if err != nil {
-		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: err.Error()})}
-		return
-	}
+
 	tr := &http.Transport{
 		DisableKeepAlives:  true,
 		DisableCompression: true,
 	}
 	client := &http.Client{Transport: tr}
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: INVALID_JSON_CODE, Message: err.Error()})}
+		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: err.Error()})}
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
@@ -45,7 +42,7 @@ func (s *AppManager) PostJsonAsync(url string, payload any, ch chan event.Chunk)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: err.Error()})}
+		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: fmt.Sprintf("http code: %d", resp.StatusCode)})}
 		return
 	}
 	buff := make([]byte, 1024)
