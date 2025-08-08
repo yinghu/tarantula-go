@@ -121,7 +121,7 @@ func (s *sample) Read(value core.DataBuffer) error {
 	return nil
 }
 
-func TestLocalStore(t *testing.T) {
+func TestDatatBuffer(t *testing.T) {
 	local := BadgerLocal{InMemory: false, Path: "/home/yinghu/local/test"}
 	err := local.Open()
 	if err != nil {
