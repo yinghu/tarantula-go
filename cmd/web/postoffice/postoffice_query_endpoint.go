@@ -24,13 +24,13 @@ func (s *PostofficeQueryer) query(query event.Query) {
 	buff.NewProxy(100)
 	buff.WriteString(query.Tag)
 	buff.Flip()
-	query.Cc <- event.Chunk{Remaining: true, Data: []byte("[")}
 	stat := event.StatEvent{Tag: query.Tag, Name: event.STAT_TOTAL}
 	err := s.Ds.Load(&stat)
 	if err != nil {
 		query.Cc <- event.Chunk{Remaining: false, Data: []byte("[]")}
 		return
 	}
+	query.Cc <- event.Chunk{Remaining: true, Data: []byte("[")}
 	mc := stat.Count
 	s.Ds.List(&buff, func(k, v core.DataBuffer, rev uint64) bool {
 		query.Limit--
