@@ -7,7 +7,7 @@ import (
 type MessageEvent struct {
 	Title    string `json:"title"`
 	Message  string `json:"message"`
-	Id       int64  `json:"id:string"`
+	Id       int64  `json:"id,string"`
 	EventObj `json:"-"`
 }
 

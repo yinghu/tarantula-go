@@ -18,6 +18,9 @@ type CSQueryer struct {
 func (s *CSQueryer) AccessControl() int32 {
 	return bootstrap.ADMIN_ACCESS_CONTROL
 }
+func (s *CSQueryer) query(query event.Query) {
+	s.AdminService.PostJsonAsync(fmt.Sprintf("%s%s/%d", "http://postoffice:8080/postoffice/query/", query.Tag, query.Limit), query, query.Cc)
+}
 func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var me event.Query
@@ -26,6 +29,13 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	resp := s.AdminService.PostJsonSync(fmt.Sprintf("%s%s/%d", "http://postoffice:8080/postoffice/query/", me.Tag, me.Limit), me)
-	w.Write(util.ToJson(resp))
+	listener := make(chan event.Chunk)
+	me.Cc = listener
+	go s.query(me)
+	for c := range listener {
+		w.Write(c.Data)
+		if !c.Remaining {
+			break
+		}
+	}
 }
