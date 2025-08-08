@@ -12,6 +12,8 @@ const (
 	TOURNAMENT_ETAG   string = "tmt:"
 	SUBSCRIPTION_ETAG string = "sub:"
 	STAT_ETAG         string = "stat:"
+
+	STAT_TOTAL string = "total"
 )
 
 func CreateEvent(cid int, listner EventListener) Event {

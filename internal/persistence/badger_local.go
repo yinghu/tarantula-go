@@ -107,7 +107,7 @@ func (s *BadgerLocal) set(key *BufferProxy, value *BufferProxy, t core.Persisten
 			return err
 		}
 		//update stat total
-		se := event.StatEvent{Tag: t.ETag(), Name: "total"}
+		se := event.StatEvent{Tag: t.ETag(), Name: event.STAT_TOTAL}
 		ckey := BufferProxy{}
 		ckey.NewProxy(BDG_KEY_SIZE)
 		cvalue := BufferProxy{}
