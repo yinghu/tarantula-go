@@ -1,11 +1,13 @@
 package main
 
 type Segment struct {
-	Id   int64
-	Name string
+	InstanceId   int64
+	Name         string
+	SegementList []Segment
 }
 
 type SegementSchedule struct {
-	Name     string
-	Segments []Segment
+	TournamentId int64 `json:"-"`
+	Name         string 
+	Segments     []Segment
 }

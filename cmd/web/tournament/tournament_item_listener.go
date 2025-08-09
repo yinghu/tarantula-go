@@ -26,6 +26,30 @@ func (a *TournamentService) OnRegister(conf item.Configuration) {
 		return
 	}
 	if conf.Category == "SegmentSchedule" {
+		header, err := json.Marshal(conf.Header)
+		if err != nil {
+			core.AppLog.Printf("no header data %s\n", err.Error())
+			return
+		}
+		seg := SegementSchedule{}
+		seg.TournamentId = conf.Id
+		err = json.Unmarshal(header, &seg)
+		if err != nil {
+			core.AppLog.Printf("no header data %s\n", err.Error())
+			return
+		}
+		core.AppLog.Printf("Schedule :%d %v\n", seg.TournamentId, seg)
+		refs, ok := conf.Reference["SegmentList"].([]item.Configuration)
+		if !ok {
+			core.AppLog.Printf("no segement data\n")
+			return
+		}
+		for i := range refs {
+			sg := refs[i]
+			core.AppLog.Printf("segement data %d %v\n", sg.Id, sg)
+		}
+		//[]item.Configuration(conf.Reference["SegmentList"])
+		//reference, err := json.Marshal(conf.Reference)
 
 	}
 }
