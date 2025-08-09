@@ -43,7 +43,6 @@ func (s *PostofficeQueryer) query(query event.Query) {
 		e.ReadKey(k)
 		e.Read(v)
 		e.OnRevision(rev)
-		core.AppLog.Printf("CID : %d REV : %d %v\n", cid, rev, e)
 		query.Cc <- event.Chunk{Remaining: true, Data: util.ToJson(e)}
 		if query.Limit > 0 && mc > 0 {
 			query.Cc <- event.Chunk{Remaining: true, Data: []byte(",")}
