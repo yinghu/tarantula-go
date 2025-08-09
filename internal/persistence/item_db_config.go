@@ -200,19 +200,19 @@ func (db *ItemDB) Register(reg item.ConfigRegistration) error {
 		return err
 	}
 	sc, ok := conf.Reference["Schedule"].([]item.Configuration)
-	if !ok {
-		core.AppLog.Printf("no schedule data\n")
-		return fmt.Errorf("no schedule data")
-	}
-	jsc, err := json.Marshal(sc[0].Header)
-	if err != nil {
-		core.AppLog.Printf("no schedule data\n")
-		return err
-	}
-	err = json.Unmarshal(jsc, &reg)
-	if err != nil {
-		core.AppLog.Printf("no schedule data %s\n", err.Error())
-		return err
+	reg.Scheduling = ok
+	if reg.Scheduling {
+		jsc, err := json.Marshal(sc[0].Header)
+		if err != nil {
+			core.AppLog.Printf("no schedule data\n")
+			reg.Scheduling = false
+		} else {
+			err = json.Unmarshal(jsc, &reg)
+			if err != nil {
+				core.AppLog.Printf("no schedule data %s\n", err.Error())
+				reg.Scheduling = false
+			}
+		}
 	}
 	if reg.Scheduling {
 		_, err := db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, true, reg.StartTime.UnixMilli(), reg.CloseTime.UnixMilli(), reg.EndTime.UnixMilli())
