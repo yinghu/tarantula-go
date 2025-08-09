@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"slices"
@@ -194,8 +195,23 @@ func (db *ItemDB) DeleteWithId(cid int64) error {
 }
 
 func (db *ItemDB) Register(reg item.ConfigRegistration) error {
-	_, err := db.LoadWithId(reg.ItemId)
+	conf, err := db.LoadWithId(reg.ItemId)
 	if err != nil {
+		return err
+	}
+	sc, ok := conf.Reference["Schedule"].([]item.Configuration)
+	if !ok {
+		core.AppLog.Printf("no schedule data\n")
+		return fmt.Errorf("no schedule data")
+	}
+	jsc, err := json.Marshal(sc[0].Header)
+	if err != nil {
+		core.AppLog.Printf("no schedule data\n")
+		return err
+	}
+	err = json.Unmarshal(jsc, &reg)
+	if err != nil {
+		core.AppLog.Printf("no schedule data %s\n", err.Error())
 		return err
 	}
 	if reg.Scheduling {
