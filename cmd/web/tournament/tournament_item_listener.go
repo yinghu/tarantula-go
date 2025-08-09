@@ -6,8 +6,8 @@ import (
 )
 
 func (a *TournamentService) OnRegister(conf item.Configuration) {
-	core.AppLog.Printf("item reigster %d\n", conf.Id)
+	core.AppLog.Printf("item reigster %d %s\n", conf.Id,conf.Category)
 }
 func (a *TournamentService) OnRelease(conf item.Configuration) {
-	core.AppLog.Printf("item reigster %d\n", conf.Id)
+	core.AppLog.Printf("item release %d %s\n", conf.Id,conf.Category)
 }
