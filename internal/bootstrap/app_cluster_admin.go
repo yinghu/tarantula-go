@@ -77,25 +77,29 @@ func (s *AppClusterAdmin) dispatch(kv item.KVUpdate) {
 	if err != nil {
 		core.AppLog.Printf("Key should be int64 %s\n", kv.Key)
 	}
-	var reg item.ConfigRegistration
-	err = json.Unmarshal([]byte(kv.Value), &reg)
-	if err != nil {
-		core.AppLog.Printf("Value should be json format %v\n", kv.Value)
-		return
-	}
-	if reg.ItemId != itemId {
-		core.AppLog.Printf("Key not matched %d : %d\n", itemId, reg.ItemId)
-		return
-	}
-	ins, err := s.ItemService().Loader().Load(reg.ItemId)
-	if err != nil {
-		return
-	}
 	if kv.IsCreate || kv.IsModify {
+		var reg item.ConfigRegistration
+		err = json.Unmarshal([]byte(kv.Value), &reg)
+		if err != nil {
+			core.AppLog.Printf("Value should be json format %v\n", kv.Value)
+			return
+		}
+		if reg.ItemId != itemId {
+			core.AppLog.Printf("Key not matched %d : %d\n", itemId, reg.ItemId)
+			return
+		}
+		ins, err := s.ItemService().Loader().Load(reg.ItemId)
+		if err != nil {
+			return
+		}
 		core.AppLog.Printf("Item registered %d\n", ins.Id)
 		s.ItemListener().OnRegister(ins)
 		return
 	}
 	core.AppLog.Printf("Item released %d\n", itemId)
+	ins, err := s.ItemService().Loader().Load(itemId)
+	if err != nil {
+		return
+	}
 	s.ItemListener().OnRelease(ins)
 }
