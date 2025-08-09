@@ -28,7 +28,7 @@ func (a *TournamentService) OnRegister(conf item.Configuration) {
 			core.AppLog.Printf("no schedule data\n")
 			return
 		}
-		jsc, err := json.Marshal(sc)
+		jsc, err := json.Marshal(sc[0])
 		if err != nil {
 			core.AppLog.Printf("no schedule data\n")
 			return
