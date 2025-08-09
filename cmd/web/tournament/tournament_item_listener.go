@@ -44,13 +44,22 @@ func (a *TournamentService) OnRegister(conf item.Configuration) {
 			core.AppLog.Printf("no segement data\n")
 			return
 		}
+		seg.Segments = make([]Segment, 0)
 		for i := range refs {
-			sg := refs[i]
-			core.AppLog.Printf("segement data %d %v\n", sg.Id, sg)
+			cf := refs[i]
+			header, err := json.Marshal(cf.Header)
+			if err != nil {
+				continue
+			}
+			sg := Segment{InstanceId: cf.Id}
+			err = json.Unmarshal(header, &sg)
+			if err != nil {
+				continue
+			}
+			seg.Segments = append(seg.Segments, sg)
+			core.AppLog.Printf("segement data %d %v\n", sg.InstanceId, sg)
 		}
-		//[]item.Configuration(conf.Reference["SegmentList"])
-		//reference, err := json.Marshal(conf.Reference)
-
+		core.AppLog.Printf("SEG SCHEDULE %v\n", seg)
 	}
 }
 func (a *TournamentService) OnRelease(conf item.Configuration) {
