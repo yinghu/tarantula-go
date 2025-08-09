@@ -23,6 +23,21 @@ func (a *TournamentService) OnRegister(conf item.Configuration) {
 			return
 		}
 		core.AppLog.Printf("Schedule :%d %v\n", ins.TournamentId, ins)
+		sc, ok := conf.Reference["Schedule"].([]item.Configuration)
+		if !ok {
+			core.AppLog.Printf("no schedule data\n")
+			return
+		}
+		jsc, err := json.Marshal(sc)
+		if err != nil {
+			core.AppLog.Printf("no schedule data\n")
+			return
+		}
+		err = json.Unmarshal(jsc, &ins.Schedule)
+		if err != nil {
+			return
+		}
+		core.AppLog.Printf("Schedule :%d %v\n", ins.TournamentId, ins)
 		return
 	}
 	if conf.Category == "SegmentSchedule" {
