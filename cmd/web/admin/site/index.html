@@ -123,24 +123,6 @@
                                 <select id="tx-configuration-register-box-app" class='w3-round w3-border tx-text-16 w3-select tx-margin-left-4'>
                                 </select>
                             </div>
-                            <div class="w3-panel">
-                                <label class="tx-text-12">Schduling</label>
-                                <input id="tx-configuration-register-box-scheduling" class='w3-check w3-round w3-border tx-text-16 tx-margin-left-8' type="checkbox"/>
-                            </div>
-                            <div id="tx-configuration-register-box-schedule" class="tx-hidden">
-                                <div class="w3-panel">
-                                    <label class="tx-text-12">StartTime</label>
-                                    <input id="tx-configuration-register-box-schedule-start-time" class='w3-input w3-round w3-border tx-text-16' type="dateTime-local"/>
-                                </div>
-                                <div class="w3-panel">
-                                    <label class="tx-text-12">CloseTime</label>
-                                    <input id="tx-configuration-register-box-schedule-close-time" class='w3-input w3-round w3-border tx-text-16' type="dateTime-local"/>
-                                </div>
-                                <div class="w3-panel">
-                                    <label class="tx-text-12">EndTime</label>
-                                    <input id="tx-configuration-register-box-schedule-end-time" class='w3-input w3-round w3-border tx-text-16' type="dateTime-local"/>
-                                </div>
-                            </div>
                             <div class="w3-panel"> 
                                 <span id="tx-configuration-register" tx-register-id='0' class="w3-tag w3-right w3-green tx-text-20 tx-padding-button tx-hidden">Register</span>
                             </div>
@@ -232,32 +214,12 @@
                     rct.style.display = "block";
                 });
             });
-            Html.eventWithId({id:"#tx-configuration-register-box-scheduling",event:"onchange"},()=>{
-                let ch = document.querySelector("#tx-configuration-register-box-scheduling").checked;
-                if (ch){
-                    Html.openWithId("#tx-configuration-register-box-schedule");
-                }else{
-                    Html.closeWithId("#tx-configuration-register-box-schedule");
-                }
-            });
             Html.eventWithId({id:"#tx-configuration-register"},(te)=>{
                 let rid = te.getAttribute('tx-register-id');
                 if( rid == "0"){
                     let app = document.querySelector("#tx-configuration-register-box-app");
                     let sapp = app.options[app.selectedIndex].value;
-                    let ch = document.querySelector("#tx-configuration-register-box-scheduling").checked;
-                    let st = document.querySelector("#tx-configuration-register-box-schedule-start-time").value;
-                    let ct = document.querySelector("#tx-configuration-register-box-schedule-close-time").value;
-                    let et = document.querySelector("#tx-configuration-register-box-schedule-end-time").value;
-                    let reg ={ItemId:Admin.query().registerId,App:sapp,Scheduling:ch};
-                    if (reg.Scheduling){
-                        let stt = new Date(Date.parse(st)).toISOString();
-                        let ctt = new Date(Date.parse(ct)).toISOString();
-                        let ett = new Date(Date.parse(et)).toISOString();        
-                        reg.StartTime = stt;
-                        reg.CloseTime = ctt;
-                        reg.EndTime = ett;
-                    }
+                    let reg ={ItemId:Admin.query().registerId,App:sapp};
                     Admin.postJson("/admin/config/register/save/"+reg.ItemId+"/"+reg.App,reg,(resp)=>{
                         console.log(resp);
                         Html.messageWithId("#tx-configuration-register-box-message",resp.message);
