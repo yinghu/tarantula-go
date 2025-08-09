@@ -38,7 +38,7 @@ func (a *TournamentService) OnRegister(conf item.Configuration) {
 			core.AppLog.Printf("no header data %s\n", err.Error())
 			return
 		}
-		core.AppLog.Printf("Schedule :%d %v\n", seg.TournamentId, seg)
+		core.AppLog.Printf("Schedule :%d %v\n", seg.TournamentId, conf.Reference)
 		refs, ok := conf.Reference["SegmentList"].([]item.Configuration)
 		if !ok {
 			core.AppLog.Printf("no segement data\n")
