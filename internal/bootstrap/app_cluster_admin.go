@@ -111,6 +111,8 @@ func (s *AppClusterAdmin) dispatch(kv item.KVUpdate) {
 
 func (s *AppClusterAdmin) send(err error) {
 	msg := event.MessageEvent{Title: "error", Message: err.Error()}
+	id, _ := s.Sequence().Id()
+	msg.Id = id
 	msg.Topic("message")
 	s.Send(&msg)
 }

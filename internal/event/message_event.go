@@ -1,13 +1,17 @@
 package event
 
 import (
+	"time"
+
 	"gameclustering.com/internal/core"
 )
 
 type MessageEvent struct {
-	Title   string `json:"title"`
-	Message string `json:"message"`
-	Id      int64  `json:"id,string"`
+	Title    string    `json:"title"`
+	Message  string    `json:"message"`
+	DateTime time.Time `json:"dataTime"`
+	Id       int64     `json:"id,string"`
+	Source   string    `json:"title"`
 	EventObj
 }
 
@@ -20,10 +24,10 @@ func (s *MessageEvent) ETag() string {
 }
 
 func (s *MessageEvent) WriteKey(buff core.DataBuffer) error {
-	if err := buff.WriteString(s.ETag()); err!=nil{
-		return err 
+	if err := buff.WriteString(s.ETag()); err != nil {
+		return err
 	}
-	if err := buff.WriteInt64(s.Id); err!=nil{
+	if err := buff.WriteInt64(s.Id); err != nil {
 		return err
 	}
 	return nil
@@ -53,16 +57,30 @@ func (s *MessageEvent) Read(buff core.DataBuffer) error {
 		return err
 	}
 	s.Message = message
+	tm, err := buff.ReadInt64()
+	if err != nil {
+		return err
+	}
+	s.DateTime = time.UnixMilli(tm)
+	source, err := buff.ReadString()
+	if err != nil {
+		return err
+	}
+	s.Source = source
 	return nil
 }
 
 func (s *MessageEvent) Write(buff core.DataBuffer) error {
-	err := buff.WriteString(s.Title)
-	if err != nil {
+	if err := buff.WriteString(s.Title); err != nil {
 		return err
 	}
-	err = buff.WriteString(s.Message)
-	if err != nil {
+	if err := buff.WriteString(s.Message); err != nil {
+		return err
+	}
+	if err := buff.WriteInt64(s.DateTime.UnixMilli()); err != nil {
+		return err
+	}
+	if err := buff.WriteString(s.Source); err != nil {
 		return err
 	}
 	return nil
