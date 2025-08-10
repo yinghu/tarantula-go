@@ -45,8 +45,9 @@ func (s *AppManager) GetJsonAsync(url string, ch chan event.Chunk) {
 		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: fmt.Sprintf("http code: %d", resp.StatusCode)})}
 		return
 	}
-	buff := make([]byte, 1024)
+	//buff := make([]byte, 1024)
 	for {
+		buff := make([]byte, 1024)
 		n, err := resp.Body.Read(buff)
 		if n > 0 && err == nil {
 			core.AppLog.Printf("RESP : %s\n", string(buff[:n]))
