@@ -65,7 +65,9 @@ func (a *TournamentService) scheduleInstance(conf item.Configuration) {
 		return
 	}
 	core.AppLog.Printf("Schedule :%d %v\n", ins.TournamentId, ins)
-	info := event.MessageEvent{Title: "info", Message: "tournament registered"}
+	info := event.MessageEvent{Title: "info", Message: "tournament registered", Source: a.Context(), DateTime: time.Now()}
+	id, _ := a.Sequence().Id()
+	info.Id = id
 	info.Topic("message")
 	a.Send(&info)
 }

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -110,7 +111,7 @@ func (s *AppClusterAdmin) dispatch(kv item.KVUpdate) {
 }
 
 func (s *AppClusterAdmin) send(err error) {
-	msg := event.MessageEvent{Title: "error", Message: err.Error()}
+	msg := event.MessageEvent{Title: "error", Message: err.Error(), Source: s.Cluster().Group(), DateTime: time.Now()}
 	id, _ := s.Sequence().Id()
 	msg.Id = id
 	msg.Topic("message")
