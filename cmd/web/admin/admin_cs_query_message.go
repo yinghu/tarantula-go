@@ -35,7 +35,10 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 	me.Cc = listener
 	go s.query(me)
 	for c := range listener {
-		w.Write(c.Data)
+		if len(c.Data) > 0 {
+			core.AppLog.Printf("CS=> %s\n", string(c.Data))
+			w.Write(c.Data)
+		}
 		if !c.Remaining {
 			break
 		}
