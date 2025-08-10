@@ -45,22 +45,18 @@ func (s *AppManager) GetJsonAsync(url string, ch chan event.Chunk) {
 		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: fmt.Sprintf("http code: %d", resp.StatusCode)})}
 		return
 	}
-	//buff := make([]byte, 1024)
 	for {
 		buff := make([]byte, 1024)
 		n, err := resp.Body.Read(buff)
 		if n > 0 && err == nil {
-			core.AppLog.Printf("RESP : %s\n", string(buff[:n]))
 			ch <- event.Chunk{Remaining: true, Data: buff[:n]}
 			continue
 		}
 		if n > 0 && err != nil && err == io.EOF {
-			core.AppLog.Printf("RESP ON EOF : %s\n", string(buff[:n]))
 			ch <- event.Chunk{Remaining: false, Data: buff[:n]}
 			break
 		}
 		if err == io.EOF {
-			core.AppLog.Printf("EOF : %s\n", string(buff[:0]))
 			ch <- event.Chunk{Remaining: false, Data: buff[:0]}
 			break
 		}

@@ -55,7 +55,7 @@ func (s *PostofficeQueryer) query(query event.Query) {
 }
 
 func (s *PostofficeQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
-	listener := make(chan event.Chunk)
+	listener := make(chan event.Chunk, 3)
 	defer func() {
 		close(listener)
 		r.Body.Close()
