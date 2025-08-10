@@ -48,16 +48,22 @@ func (s *AppManager) GetJsonAsync(url string, ch chan event.Chunk) {
 	buff := make([]byte, 1024)
 	for {
 		n, err := resp.Body.Read(buff)
-		if n > 0 {
+		if n > 0 && err == nil {
 			core.AppLog.Printf("RESP : %s\n", string(buff[:n]))
 			ch <- event.Chunk{Remaining: true, Data: buff[:n]}
+			continue
+		}
+		if n > 0 && err != nil && err == io.EOF {
+			core.AppLog.Printf("RESP ON EOF : %s\n", string(buff[:n]))
+			ch <- event.Chunk{Remaining: false, Data: buff[:n]}
+			continue
 		}
 		if err == io.EOF {
 			core.AppLog.Printf("EOF : %s\n", string(buff[:0]))
 			ch <- event.Chunk{Remaining: false, Data: buff[:0]}
 			break
 		}
-		if err != nil {
+		if err != nil && err != io.EOF {
 			ch <- event.Chunk{Remaining: false, Data: buff[:0]}
 			core.AppLog.Printf("Resp Error %s\n", err.Error())
 			break
