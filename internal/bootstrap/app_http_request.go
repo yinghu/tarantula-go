@@ -56,7 +56,7 @@ func (s *AppManager) GetJsonAsync(url string, ch chan event.Chunk) {
 		if n > 0 && err != nil && err == io.EOF {
 			core.AppLog.Printf("RESP ON EOF : %s\n", string(buff[:n]))
 			ch <- event.Chunk{Remaining: false, Data: buff[:n]}
-			continue
+			break
 		}
 		if err == io.EOF {
 			core.AppLog.Printf("EOF : %s\n", string(buff[:0]))
