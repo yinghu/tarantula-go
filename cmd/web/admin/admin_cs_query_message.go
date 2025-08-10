@@ -33,6 +33,7 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 	w.WriteHeader(http.StatusOK)
 	listener := make(chan event.Chunk)
 	me.Cc = listener
+	defer close(listener)
 	go s.query(me)
 	for c := range listener {
 		if len(c.Data) > 0 {
