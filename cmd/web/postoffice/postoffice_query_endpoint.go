@@ -27,10 +27,10 @@ func (s *PostofficeQueryer) query(query event.Query) {
 	stat := event.StatEvent{Tag: query.Tag, Name: event.STAT_TOTAL}
 	err := s.Ds.Load(&stat)
 	if err != nil {
-		query.Cc <- event.Chunk{Remaining: false, Data: []byte("[]")}
+		query.Cc <- event.Chunk{Remaining: false, Data: []byte("{list:[]}")}
 		return
 	}
-	query.Cc <- event.Chunk{Remaining: true, Data: []byte("[")}
+	query.Cc <- event.Chunk{Remaining: true, Data: []byte("{list:[")}
 	mc := stat.Count
 	s.Ds.List(&buff, func(k, v core.DataBuffer, rev uint64) bool {
 		query.Limit--
@@ -51,7 +51,7 @@ func (s *PostofficeQueryer) query(query event.Query) {
 		}
 		return query.Limit > 0 && mc > 0
 	})
-	query.Cc <- event.Chunk{Remaining: false, Data: []byte("]")}
+	query.Cc <- event.Chunk{Remaining: false, Data: []byte("]}")}
 }
 
 func (s *PostofficeQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
