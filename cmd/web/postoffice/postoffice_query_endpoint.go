@@ -71,7 +71,10 @@ func (s *PostofficeQueryer) Request(rs core.OnSession, w http.ResponseWriter, r 
 	q.Cc = listener
 	go s.query(q)
 	for c := range listener {
-		w.Write(c.Data)
+		n, err := w.Write(c.Data)
+		if err != nil {
+			core.AppLog.Printf("Write error %s Num : %d\n", err.Error(), n)
+		}
 		if !c.Remaining {
 			break
 		}
