@@ -1,6 +1,9 @@
 package bootstrap
 
 import (
+	"fmt"
+	"time"
+
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -105,6 +108,17 @@ func (s *AppManager) VerifyTicket(ticket string) error {
 		return err
 	}
 	return nil
+}
+func (s *AppManager) Send(e event.Event) error {
+	for i := range 5 {
+		ret := s.PostJsonSync(fmt.Sprintf("%s/%s/%d", "http://postoffice:8080/postoffice/publish", e.OnTopic(), e.ClassId()), e)
+		if ret.ErrorCode == 0 {
+			return nil
+		}
+		time.Sleep(100 * time.Millisecond)
+		core.AppLog.Printf("Retries: %d %v\n", i, ret)
+	}
+	return fmt.Errorf("failed after retries")
 }
 func (s *AppManager) OnEvent(e event.Event) {
 

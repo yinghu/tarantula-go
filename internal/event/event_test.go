@@ -30,6 +30,10 @@ func (s *sampleFactory) VerifyTicket(ticket string) error {
 	return nil
 }
 
+func (s *sampleFactory) Send(e Event) error {
+	return nil
+}
+
 type sampleEvent struct {
 	Id   int64
 	Str  string

@@ -18,6 +18,7 @@ type EventService interface {
 	Create(classId int, topic string) (Event, error)
 	VerifyTicket(ticket string) error
 	EventListener
+	Postoffice
 }
 
 type Event interface {
@@ -29,8 +30,8 @@ type Event interface {
 	OnTopic() string
 }
 
-type EventPublisher interface {
-	Publish(e Event)
+type Postoffice interface {
+	Send(e Event) error
 }
 
 type EventObj struct {

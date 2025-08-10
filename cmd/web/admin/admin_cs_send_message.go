@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
@@ -32,6 +31,12 @@ func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 		return
 	}
 	me.Id = id
-	resp := s.AdminService.PostJsonSync(fmt.Sprintf("%s%d", "http://postoffice:8080/postoffice/publish/message/", me.ClassId()), me)
-	w.Write(util.ToJson(resp))
+	//resp := s.AdminService.PostJsonSync(fmt.Sprintf("%s%d", "http://postoffice:8080/postoffice/publish/message/", me.ClassId()), me)
+	me.Topic("message")
+	err = s.Send(&me)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	w.Write(util.ToJson(core.OnSession{Successful: true, Message: "message delivered"}))
 }
