@@ -11,7 +11,7 @@ type MessageEvent struct {
 	Message  string    `json:"message"`
 	DateTime time.Time `json:"dataTime"`
 	Id       int64     `json:"id,string"`
-	Source   string    `json:"title"`
+	Source   string    `json:"source"`
 	EventObj
 }
 
