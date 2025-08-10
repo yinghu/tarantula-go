@@ -31,7 +31,7 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	listener := make(chan event.Chunk)
+	listener := make(chan event.Chunk, 3)
 	me.Cc = listener
 	defer close(listener)
 	go s.query(me)
