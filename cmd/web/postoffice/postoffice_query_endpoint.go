@@ -62,6 +62,7 @@ func (s *PostofficeQueryer) Request(rs core.OnSession, w http.ResponseWriter, r 
 	}()
 	tag := r.PathValue("tag")
 	limit, err := strconv.ParseInt(r.PathValue("limit"), 10, 32)
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
