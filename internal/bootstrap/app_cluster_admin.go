@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -82,14 +83,17 @@ func (s *AppClusterAdmin) dispatch(kv item.KVUpdate) {
 		err = json.Unmarshal([]byte(kv.Value), &reg)
 		if err != nil {
 			core.AppLog.Printf("Value should be json format %v\n", kv.Value)
+			s.send(err)
 			return
 		}
 		if reg.ItemId != itemId {
 			core.AppLog.Printf("Key not matched %d : %d\n", itemId, reg.ItemId)
+			s.send(fmt.Errorf("key not matched %d : %d", itemId, reg.ItemId))
 			return
 		}
 		ins, err := s.ItemService().Loader().Load(reg.ItemId)
 		if err != nil {
+			s.send(err)
 			return
 		}
 		core.AppLog.Printf("Item registered %d\n", ins.Id)
@@ -99,7 +103,14 @@ func (s *AppClusterAdmin) dispatch(kv item.KVUpdate) {
 	core.AppLog.Printf("Item released %d\n", itemId)
 	ins, err := s.ItemService().Loader().Load(itemId)
 	if err != nil {
+		s.send(err)
 		return
 	}
 	s.ItemListener().OnRelease(ins)
+}
+
+func (s *AppClusterAdmin) send(err error) {
+	msg := event.MessageEvent{Title: "error", Message: err.Error()}
+	msg.Topic("message")
+	s.Send(&msg)
 }

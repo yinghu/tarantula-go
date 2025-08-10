@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
 )
 
@@ -64,6 +65,9 @@ func (a *TournamentService) scheduleInstance(conf item.Configuration) {
 		return
 	}
 	core.AppLog.Printf("Schedule :%d %v\n", ins.TournamentId, ins)
+	info := event.MessageEvent{Title: "info", Message: "tournament registered"}
+	info.Topic("message")
+	a.Send(&info)
 }
 
 func (a *TournamentService) scheduleSegment(conf item.Configuration) {
