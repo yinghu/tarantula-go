@@ -6,8 +6,11 @@ var Player = (function(){
     };
 
     let _login = function(auth){
-        _query.authenticated = true;
-        _query.token = auth.token;
+        if (_query.authenticated) return;
+        if (auth.hasOwnProperty("token") && auth.successful){
+            _query.authenticated = true;
+            _query.token = auth.token;
+        }
     };
 
     let _logout = function(){

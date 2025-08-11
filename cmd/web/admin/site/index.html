@@ -506,6 +506,8 @@
                         console.log(data);
                         Player.postJson(job.Path,data,(resp)=>{
                             on_preview("Post View",resp);
+                            Player.login(resp);
+                            console.log(Player.query().token);
                         });      
                     });
                     Html.openWithId("#tx-form-box");
