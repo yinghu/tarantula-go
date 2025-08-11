@@ -30,6 +30,7 @@ func (s *TournamentService) Start(f conf.Env, c core.Cluster) error {
 	s.createSchema()
 	s.tournaments = make(map[int64]any)
 	http.Handle("/tournament/list", bootstrap.Logging(&TournamentList{TournamentService: s}))
+	http.Handle("/tournament/join", bootstrap.Logging(&TournamentJoin{TournamentService: s}))
 	return nil
 }
 

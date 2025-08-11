@@ -93,7 +93,8 @@
                 {"Name":"Register","Callback":"on_player_post","Form":"/admin/register.json","Path":"/presence/register"},
                 {"Name":"Login","Callback":"on_player_post","Form":"/admin/login.json","Path":"/presence/login"},
                 {"Name":"ViewItem","Callback":"on_player_post","Form":"/admin/webprotected/view.item.json","Path":"/presence/login"},
-                {"Name":"TournamentList","Callback":"on_player_get","Path":"/tournament/list"}
+                {"Name":"TournamentList","Callback":"on_player_get","Path":"/tournament/list"},
+                {"Name":"TournamentJoin","Callback":"on_player_post","Form":"/admin/webprotected/tournament.join.json","Path":"/tournament/join"}
             ]        
         }
         
