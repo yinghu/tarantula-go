@@ -85,14 +85,14 @@
             "Name":"CSTool","ScopeSequence":0,"Icon":"support",
             "Jobs":[
                 {"Name":"SendMessage","Callback":"on_post","Form":"/admin/webprotected/cs.send.message.json","Path":"/admin/cs/message"},
-                {"Name":"QueryMessage","Callback":"on_post","Form":"/admin/webprotected/cs.query.message.json","Path":"/admin/cs/query"}
+                {"Name":"QueryEvent","Callback":"on_post","Form":"/admin/webprotected/cs.query.event.json","Path":"/admin/cs/query"}
             ]        
         },
         {
             "Name":"APITool","ScopeSequence":0,"Icon":"api",
             "Jobs":[
-                {"Name":"Register","Callback":"api_register"},
-                {"Name":"Login","Callback":"api_login"}
+                {"Name":"Register","Callback":"on_post","Form":"/admin/register.json","Path":"/presence/register"},
+                {"Name":"Login","Callback":"on_post","Form":"/admin/login.json","Path":"/presence/login"}
             ]        
         }
         

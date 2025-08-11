@@ -1,0 +1,19 @@
+{
+    "Scope": "admin",
+    "Name": "Register",
+    "Description": "register form",
+    "Properties":[
+        {
+            "Name": "login",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false
+        },
+        {
+            "Name": "password",
+            "Type":"string",
+            "Reference": "password",
+            "Nullable": false
+        }
+    ]
+}
