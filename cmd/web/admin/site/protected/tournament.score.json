@@ -1,0 +1,13 @@
+{
+    "Scope": "admin",
+    "Name": "TournamentScore",
+    "Description": "score form",
+    "Properties":[
+        {
+            "Name": "Score",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false
+        }
+    ]
+}

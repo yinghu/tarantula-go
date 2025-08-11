@@ -28,3 +28,4 @@ func (s *TournamentJoin) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 	w.WriteHeader(http.StatusOK)
 	w.Write(util.ToJson(join))
 }
+
