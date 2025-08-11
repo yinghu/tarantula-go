@@ -545,6 +545,19 @@
                 Html.messageWithId("#tx-info-box-content",err);    
                 Html.openWithId("#tx-info-box");   
             }
+            function on_player_post(){
+                let job = Html.job(Html.currentTask().Name+"/"+Admin.query().job.name);
+                Player.getJson(job.Form,(resp)=>{
+                    let conf ={id:"#tx-form-box",prefix:"message",closeable:true};
+                    Html.form(conf,resp,(data)=>{
+                        console.log(data);
+                        Admin.postJson(job.Path,data,(resp)=>{
+                            on_preview("Post View",resp);
+                        });      
+                    });
+                    Html.openWithId("#tx-form-box");
+                });    
+            }
         </script>
     </body>
 </html>

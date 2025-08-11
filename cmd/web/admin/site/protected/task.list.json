@@ -91,8 +91,8 @@
         {
             "Name":"APITool","ScopeSequence":0,"Icon":"api",
             "Jobs":[
-                {"Name":"Register","Callback":"on_post","Form":"/admin/register.json","Path":"/presence/register"},
-                {"Name":"Login","Callback":"on_post","Form":"/admin/login.json","Path":"/presence/login"}
+                {"Name":"Register","Callback":"on_player_post","Form":"/admin/register.json","Path":"/presence/register"},
+                {"Name":"Login","Callback":"on_player_post","Form":"/admin/login.json","Path":"/presence/login"}
             ]        
         }
         
