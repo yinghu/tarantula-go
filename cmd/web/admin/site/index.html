@@ -430,17 +430,6 @@
                 Html.openWithId("#tx-info-box"); 
             }
 
-            function parse_snow_flake_id(){
-                Admin.getJson("/admin/webprotected/parse.snow.flake.id.json",(resp)=>{
-                    let conf ={id:"#tx-form-box",prefix:"parse",closeable:true};
-                    Html.form(conf,resp,(data)=>{
-                        Admin.getJson("/admin/snowflake/parse/"+data.snowFlakeId,ret=>{
-                            on_preview("SnowFlakeView",ret);    
-                        });    
-                    });
-                    Html.openWithId("#tx-form-box");
-                });
-            }
 
             function on_preview(title,json){
                 editor = new JSONEditor(document.querySelector("#tx-json-preview-box-content"),{mode:'tree'},{});
@@ -470,36 +459,11 @@
                 Html.messageWithId("#tx-edit-confirmation-box-title","Are you sure to delete category ["+cid+"]");
                 Html.openWithId("#tx-edit-confirmation-box");   
             }
+
             function on_preview_category(cid){
                 Admin.getJson("/admin/category/preview/"+cid,(resp)=>{
                     on_preview("Publish View",resp);
                 });    
-            }
-
-            function sync_repository(){
-                Admin.getJson("/admin/webprotected/sync.repository.json",(resp)=>{
-                    let conf ={id:"#tx-form-box",prefix:"sync",closeable:true};
-                    Html.form(conf,resp,(data)=>{
-                        console.log(data);
-                        Admin.getJson("/admin/sync/"+data.branchName,(resp)=>{
-                            on_preview("Sync View",resp);
-                        });      
-                    });
-                    Html.openWithId("#tx-form-box");
-                });    
-            }
-
-            function view_item(){
-                Admin.getJson("/admin/webprotected/view.item.json",(resp)=>{
-                    let conf ={id:"#tx-form-box",prefix:"view",closeable:true};
-                    Html.form(conf,resp,(data)=>{
-                        console.log(data);
-                        Admin.getJson("/admin/view/"+data.itemId,(resp)=>{
-                            on_preview("View Item",resp);
-                        });      
-                    });
-                    Html.openWithId("#tx-form-box");
-                }); 
             }
 
             function set_app_list(apps){
@@ -536,7 +500,7 @@
             
             function on_player_post(){
                 let job = Html.job(Html.currentTask().Name+"/"+Admin.query().job.name);
-                Player.getJson(job.Form,(resp)=>{
+                Admin.getJson(job.Form,(resp)=>{
                     let conf ={id:"#tx-form-box",prefix:"player",closeable:true};
                     Html.form(conf,resp,(data)=>{
                         console.log(data);

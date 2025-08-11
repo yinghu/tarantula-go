@@ -75,9 +75,8 @@
             "Jobs":[
                 {"Name":"ChangePassword","Callback":"on_post","Form":"/admin/webprotected/change.password.json","Path":"/admin/password"},
                 {"Name":"AddLogin","Callback":"on_post","Form":"/admin/webprotected/add.login.json","Path":"/admin/login/add"},
-                {"Name":"ParseSnowFlakeId","Callback":"parse_snow_flake_id"},
-                {"Name":"SyncRepo","Callback":"sync_repository"},
-                {"Name":"ViewItem","Callback":"view_item"},
+                {"Name":"ParseSnowFlakeId","Callback":"on_post","Form":"/admin/webprotected/parse.snow.flake.id.json","Path":"/admin/snowflake/parse"},
+                {"Name":"SyncRepo","Callback":"on_post","Form":"/admin/webprotected/sync.repository.json","Path":"/admin/repo/sync"},
                 {"Name":"AddTopic","Callback":"on_post","Form":"/admin/webprotected/admin.add.topic.json","Path":"/admin/topic/subscribe"}
             ]        
         },
@@ -92,7 +91,8 @@
             "Name":"APITool","ScopeSequence":0,"Icon":"api",
             "Jobs":[
                 {"Name":"Register","Callback":"on_player_post","Form":"/admin/register.json","Path":"/presence/register"},
-                {"Name":"Login","Callback":"on_player_post","Form":"/admin/login.json","Path":"/presence/login"}
+                {"Name":"Login","Callback":"on_player_post","Form":"/admin/login.json","Path":"/presence/login"},
+                {"Name":"ViewItem","Callback":"on_player_post","Form":"/admin/webprotected/view.item.json","Path":"/presence/login"}
             ]        
         }
         

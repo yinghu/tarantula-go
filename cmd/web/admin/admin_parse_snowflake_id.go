@@ -1,8 +1,8 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -14,10 +14,10 @@ type AdminParseSnowFlakeId struct {
 }
 
 type SnowFlakeResp struct {
-	Id        int64 `json:"id"`
-	NodeId    int64 `json:"nodeId"`
-	Timestamp int64 `json:"timestamp"`
-	Sequence  int64 `json:"seqence"`
+	Id        int64 `json:"snowFlakeId,string"`
+	NodeId    int64 `json:"nodeId,string"`
+	Timestamp int64 `json:"timestamp,string"`
+	Sequence  int64 `json:"seqence,string"`
 }
 
 func (s *AdminParseSnowFlakeId) AccessControl() int32 {
@@ -25,17 +25,20 @@ func (s *AdminParseSnowFlakeId) AccessControl() int32 {
 }
 func (s *AdminParseSnowFlakeId) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	w.WriteHeader(http.StatusOK)
-	cid, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	var e SnowFlakeResp
+	err := json.NewDecoder(r.Body).Decode(&e)
 	if err != nil {
-		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		session := core.OnSession{Successful: false, Message: err.Error()}
+		w.Write(util.ToJson(session))
 		return
 	}
-	if cid <= 0 {
+	w.WriteHeader(http.StatusOK)
+
+	if e.Id <= 0 {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: "id cannot be less 0"}))
 		return
 	}
-	t,n,se := s.Sequence().Parse(cid)
-	ps := SnowFlakeResp{Timestamp: t,NodeId: n,Sequence:se,Id: cid}
+	t, n, se := s.Sequence().Parse(e.Id)
+	ps := SnowFlakeResp{Timestamp: t, NodeId: n, Sequence: se, Id: e.Id}
 	w.Write(util.ToJson(ps))
 }

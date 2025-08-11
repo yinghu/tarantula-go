@@ -4,10 +4,11 @@
     "Description": "sync form",
     "Properties":[
         {
-            "Name": "branchName",
-            "Type":"string",
-            "Reference": "text",
-            "Nullable": false
+            "Name": "Target",
+            "Type":"enum",
+            "Reference": "inline",
+            "Nullable": false,
+            "Values":[{"Name":"LocalDev","Value":"local-dev"},{"Name":"Develop","Value":"dev"},{"Name":"Staging","Value":"stg"},{"Name":"Production","Value":"prod"}]
         }
     ]
 }

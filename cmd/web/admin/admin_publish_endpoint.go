@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
@@ -25,22 +26,26 @@ func (s *AdminPublisher) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 			return nil
 		})
 	}()
+	err := json.NewDecoder(r.Body).Decode(&repo)
+	if err != nil {
+		session := core.OnSession{Successful: false, Message: err.Error()}
+		w.Write(util.ToJson(session))
+		return
+	}
 	w.WriteHeader(http.StatusOK)
-	env := r.PathValue("repo")
 	cur := util.GitCurBranch().Message
 	repo.Source = cur
-	repo.Target = env
 	gr := util.GitPush()
 	if !gr.Successful {
 		w.Write(util.ToJson(gr))
 		return
 	}
-	core.AppLog.Printf("Publish repo : %s : %s\n", env, cur)
-	if cur == env {
+	core.AppLog.Printf("Publish repo : %s : %s\n", repo.Target, cur)
+	if cur == repo.Target {
 		w.Write(util.ToJson(gr))
 		return
 	}
-	gr = util.GitCheckout(env)
+	gr = util.GitCheckout(repo.Target)
 	if !gr.Successful {
 		w.Write(util.ToJson(gr))
 		return

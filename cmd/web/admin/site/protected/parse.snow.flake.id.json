@@ -5,8 +5,8 @@
     "Properties":[
         {
             "Name": "snowFlakeId",
-            "Type":"int64",
-            "Reference": "number",
+            "Type":"string",
+            "Reference": "text",
             "Nullable": false
         }
     ]
