@@ -10,7 +10,7 @@ type LoginEvent struct {
 	Hash          string `json:"password"`
 	ReferenceId   int32  `json:"referenceId"`
 	SystemId      int64
-	AccessControl int32      `json:"accessControl"`
+	AccessControl int32      `json:"accessControl,string"`
 	Cc            chan Chunk `json:"-"`
 	EventObj      `json:"-"`
 }

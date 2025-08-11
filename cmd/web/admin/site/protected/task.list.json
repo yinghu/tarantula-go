@@ -73,8 +73,8 @@
         {
             "Name":"AdminTool","ScopeSequence":0,"Icon":"admin_panel_settings",
             "Jobs":[
-                {"Name":"ChangePassword","Callback":"change_password"},
-                {"Name":"AddLogin","Callback":"add_login"},
+                {"Name":"ChangePassword","Callback":"on_post","Form":"/admin/webprotected/change.password.json","Path":"/admin/password"},
+                {"Name":"AddLogin","Callback":"on_post","Form":"/admin/webprotected/add.login.json","Path":"/admin/login/add"},
                 {"Name":"ParseSnowFlakeId","Callback":"parse_snow_flake_id"},
                 {"Name":"SyncRepo","Callback":"sync_repository"},
                 {"Name":"ViewItem","Callback":"view_item"},

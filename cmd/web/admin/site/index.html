@@ -410,19 +410,6 @@
                 document.querySelector("#tx-task-header-box-icon").innerHTML=icon;
             }
 
-            function change_password(){
-                Admin.getJson("/admin/webprotected/change.password.json",(resp)=>{
-                    let conf ={id:"#tx-form-box",prefix:"password",closeable:true};
-                    Html.form(conf,resp,(data)=>{
-                        Admin.postJson("/admin/password",data,ret=>{
-                            Html.messageWithId("#tx-info-box-content",ret.message);    
-                            Html.openWithId("#tx-info-box");
-                        });    
-                    });
-                    Html.openWithId("#tx-form-box");
-                });
-            }
-
             function on_upload_task(upload,callback){
                 Admin.postJson("/admin/file/save",upload.data,resp=>{
                     Html.messageWithId("#tx-info-box-content",resp.message);    
@@ -528,10 +515,15 @@
                 tn.innerHTML = tem.join('');
             }
 
+            function on_error(err){
+                Html.messageWithId("#tx-info-box-content",err);    
+                Html.openWithId("#tx-info-box");   
+            }
+            
             function on_post(){
                 let job = Html.job(Html.currentTask().Name+"/"+Admin.query().job.name);
                 Admin.getJson(job.Form,(resp)=>{
-                    let conf ={id:"#tx-form-box",prefix:"message",closeable:true};
+                    let conf ={id:"#tx-form-box",prefix:"admin",closeable:true};
                     Html.form(conf,resp,(data)=>{
                         console.log(data);
                         Admin.postJson(job.Path,data,(resp)=>{
@@ -541,17 +533,14 @@
                     Html.openWithId("#tx-form-box");
                 });    
             }
-            function on_error(err){
-                Html.messageWithId("#tx-info-box-content",err);    
-                Html.openWithId("#tx-info-box");   
-            }
+            
             function on_player_post(){
                 let job = Html.job(Html.currentTask().Name+"/"+Admin.query().job.name);
                 Player.getJson(job.Form,(resp)=>{
-                    let conf ={id:"#tx-form-box",prefix:"message",closeable:true};
+                    let conf ={id:"#tx-form-box",prefix:"player",closeable:true};
                     Html.form(conf,resp,(data)=>{
                         console.log(data);
-                        Admin.postJson(job.Path,data,(resp)=>{
+                        Player.postJson(job.Path,data,(resp)=>{
                             on_preview("Post View",resp);
                         });      
                     });

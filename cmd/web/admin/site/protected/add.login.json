@@ -17,9 +17,10 @@
         },
         {
             "Name": "accessControl",
-            "Type":"int32",
-            "Reference": "number",
-            "Nullable": false
+            "Type":"enum",
+            "Reference": "inline",
+            "Nullable": false,
+            "Values":[{"Name":"Player","Value":"1"},{"Name":"Admin","Value":"30"},{"Name":"Sudo","Value":"100"}]
         }
     ]
 }
