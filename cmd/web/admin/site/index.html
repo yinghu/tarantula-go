@@ -513,6 +513,13 @@
                     Html.openWithId("#tx-form-box");
                 });    
             }
+
+            function on_player_get(){
+                let job = Html.job(Html.currentTask().Name+"/"+Admin.query().job.name);
+                Player.getJson(job.Path,(resp)=>{
+                    on_preview("Get View",resp);
+                });      
+            }
         </script>
     </body>
 </html>

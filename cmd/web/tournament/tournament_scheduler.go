@@ -65,6 +65,7 @@ func (a *TournamentService) scheduleInstance(conf item.Configuration) {
 		return
 	}
 	core.AppLog.Printf("Schedule :%d %v\n", ins.TournamentId, ins)
+	//a.instance = ins
 	info := event.MessageEvent{Title: "info", Message: "tournament registered", Source: a.Context(), DateTime: time.Now()}
 	id, _ := a.Sequence().Id()
 	info.Id = id
@@ -123,6 +124,7 @@ func (a *TournamentService) scheduleSegment(conf item.Configuration) {
 		core.AppLog.Printf("segement data %d %v\n", sg.InstanceId, sg)
 	}
 	core.AppLog.Printf("SEG SCHEDULE %v\n", seg)
+	//a.segment = seg
 }
 
 func (a *TournamentService) releaseTournament(id int64) {
