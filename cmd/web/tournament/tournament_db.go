@@ -89,7 +89,7 @@ func (s *TournamentService) loadSchedule() ([]int64, error) {
 			ids = append(ids, id)
 		}
 		return nil
-	}, SELECT_SCHEDULE)
+	}, SELECT_SCHEDULE,true)
 	if err != nil {
 		return ids, err
 	}
