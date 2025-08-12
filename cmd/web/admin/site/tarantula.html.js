@@ -119,6 +119,10 @@ var Html = (function(){
         _task.Name = tn;
         _task.ScopeSequence = task.ScopeSequence;
         _task.Icon = task.Icon;
+        delete _task.Callback;
+        if (task.hasOwnProperty("Callback")){
+            _task.Callback = task.Callback;
+        }
         _taskChanged(_task);
         document.querySelector(conf.id).innerHTML="";
         let tem=[];

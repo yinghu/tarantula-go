@@ -139,11 +139,11 @@
                             <span id="tx-popup-form-box-close"><i class="material-symbols-outlined tx-margin-top-8 tx-margin-right-8 tx-red-icon-24">close</i></span>
                         </div>
                         <div class="w3-display-topleft">
-                            <span><i class="material-symbols-outlined tx-margin-top-8 tx-margin-left-8 tx-orange-icon-32">schedule</i></span>
+                            <span><i class="material-symbols-outlined tx-margin-top-8 tx-margin-left-8 tx-orange-icon-32">login</i></span>
                         </div>
                     </div>
                     <div class="w3-panel">
-                        <p id="tx-popup-form-box-message" class='tx-text-16 w3-text-red'></p>
+                        <p id="tx-popup-form-box-message" class='w3-center tx-text-16 w3-text-red'></p>
                     </div>
                     <div id="tx-popup-form" class="w3-panel">
                         
@@ -334,6 +334,12 @@
                     });    
                 });
                 after_login(tsk.ScopeSequence != 0);
+                if (tsk.hasOwnProperty("Callback")){
+                    let cb = tsk.Callback;
+                    if(typeof window[cb] === 'function'){
+                        eval(cb+"()");
+                    }    
+                }
             }
 
             function after_login(open){
@@ -496,6 +502,28 @@
                     });
                     Html.openWithId("#tx-form-box");
                 });    
+            }
+
+            function on_player_login(){
+                console.log("player login required");
+                if (Player.query().authenticated){
+                    return;
+                }
+                Admin.getJson("/admin/login.json",(resp)=>{
+                    let conf ={id:"#tx-popup-form",prefix:"player",closeable:false};
+                    Html.form(conf,resp,(data)=>{
+                        console.log(data);
+                        Player.postJson("/presence/login",data,(resp)=>{
+                            Player.login(resp);
+                            if (Player.query().authenticated){
+                                Html.closeWithId("#tx-popup-form-box");
+                            }else{
+                                Html.messageWithId("#tx-popup-form-box-message",resp.message)
+                            }
+                        });      
+                    });
+                    Html.openWithId("#tx-popup-form-box");
+                });
             }
             
             function on_player_post(){
