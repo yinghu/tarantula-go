@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/jackc/pgx/v5"
 )
 
 const (
@@ -74,4 +76,22 @@ func (s *TournamentService) updateSchedule(id int64) error {
 		return fmt.Errorf("no row updated")
 	}
 	return nil
+}
+func (s *TournamentService) loadSchedule() ([]int64, error) {
+	ids := make([]int64, 0)
+	err := s.Sql.Query(func(row pgx.Rows) error {
+		var id int64
+		err := row.Scan(&id)
+		if err != nil {
+			return err
+		}
+		if id > 0 {
+			ids = append(ids, id)
+		}
+		return nil
+	}, SELECT_SCHEDULE)
+	if err != nil {
+		return ids, err
+	}
+	return ids, nil
 }

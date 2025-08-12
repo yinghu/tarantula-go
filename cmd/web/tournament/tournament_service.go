@@ -29,6 +29,15 @@ func (s *TournamentService) Start(f conf.Env, c core.Cluster) error {
 	s.AppManager.Start(f, c)
 	s.createSchema()
 	s.tournaments = make(map[int64]any)
+	ids, err := s.loadSchedule()
+	if err == nil {
+		for i := range ids {
+			c, err := s.ItemService().Loader().Load(ids[i])
+			if err == nil {
+				s.ItemListener().OnRegister(c)
+			}
+		}
+	}
 	http.Handle("/tournament/list", bootstrap.Logging(&TournamentList{TournamentService: s}))
 	http.Handle("/tournament/join", bootstrap.Logging(&TournamentJoin{TournamentService: s}))
 	http.Handle("/tournament/score", bootstrap.Logging(&TournamentScore{TournamentService: s}))
