@@ -51,6 +51,16 @@ func (s *TournamentService) updateSegmentSchedule(sc SegementSchedule) error {
 	if r == 0 {
 		return fmt.Errorf("no row updated")
 	}
+	for i := range sc.Segments {
+		si := sc.Segments[i]
+		u, err := s.Sql.Exec(INSERT_INSTANCE, si.InstanceId, sc.TournamentId, sc.StartTime.UnixMilli(), sc.CloseTime.UnixMilli(), sc.EndTime.UnixMilli())
+		if err != nil {
+			return err
+		}
+		if u == 0 {
+			return fmt.Errorf("no row updated")
+		}
+	}
 	return nil
 }
 func (s *TournamentService) updateSchedule(id int64) error {
