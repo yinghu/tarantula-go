@@ -66,7 +66,10 @@ func (a *TournamentService) scheduleInstance(conf item.Configuration) {
 	}
 	core.AppLog.Printf("Schedule :%d %v\n", ins.TournamentId, ins)
 	a.tournaments[ins.TournamentId] = ins
-	a.updateInstanceSchedule(ins)
+	err = a.updateInstanceSchedule(ins)
+	if err != nil {
+		core.AppLog.Printf("sql err :%s\n", err.Error())
+	}
 	info := event.MessageEvent{Title: "info", Message: "tournament registered", Source: a.Context(), DateTime: time.Now()}
 	id, _ := a.Sequence().Id()
 	info.Id = id
@@ -126,7 +129,10 @@ func (a *TournamentService) scheduleSegment(conf item.Configuration) {
 	}
 	core.AppLog.Printf("SEG SCHEDULE %v\n", seg)
 	a.tournaments[seg.TournamentId] = seg
-	a.updateSegmentSchedule(seg)
+	err = a.updateSegmentSchedule(seg)
+	if err != nil {
+		core.AppLog.Printf("sql err :%s\n", err.Error())
+	}
 }
 
 func (a *TournamentService) releaseTournament(id int64) {
