@@ -8,14 +8,14 @@ import (
 
 const (
 	SCHEDULE_SQL_SCHEMA string = "CREATE TABLE IF NOT EXISTS tournament_schedule (tournament_id BIGINT PRIMARY KEY,running BOOLEAN NOT NULL)"
-	INSTANCE_SQL_SCHEMA string = "CREATE TABLE IF NOT EXISTS tournament_instance (instance_id BIGINT PRIMARY KEY,tournament_id BIGINT NOT NULL,start_time BIGINT NOT NULL,close_time BIGINT NOT NULL,end_time BIGINT NOT NULL)"
+	INSTANCE_SQL_SCHEMA string = "CREATE TABLE IF NOT EXISTS tournament_instance (instance_id BIGINT PRIMARY KEY,tournament_id BIGINT NOT NULL,start_time BIGINT NOT NULL,close_time BIGINT NOT NULL,end_time BIGINT NOT NULL,total_entries INTEGER NOT NULL)"
 	ENTRY_SQL_SCHEMA    string = "CREATE TABLE IF NOT EXISTS tournament_entry (instance_id BIGINT NOT NULL,system_id BIGINT NOT NULL,score INTEGER NOT NULL,last_updated BIGINT NOT NULL,PRIMARY KEY(instance_id,system_id))"
 
 	INSERT_SCHEDULE string = "INSERT INTO tournament_schedule AS ts (tournament_id,running) VALUES($1,$2) ON CONFLICT (tournament_id) DO UPDATE SET running = true WHERE ts.tournament_id = $3"
-	INSERT_INSTANCE string = "INSERT INTO tournament_instance (instance_id,tournament_id,start_time,close_time,end_time) VALUES($1,$2,$3,$4,$5)"
+	INSERT_INSTANCE string = "INSERT INTO tournament_instance (instance_id,tournament_id,start_time,close_time,end_time,total_entries) VALUES($1,$2,$3,$4,$5,$6)"
 
 	UPDATE_SCHEDULE string = "UPDATE tournament_schedule AS ts SET running = false WHERE ts.tournament_id = $1"
-
+	UPDATE_INSTANCE string = "UPDATE tournament_instance AS ti SET total_entries = ti.total_entries + 1 WHERE ti.instance_id = $1 AND ti.total_entries < $2"
 	SELECT_SCHEDULE string = "SELECT tournament_id FROM tournament_schedule WHERE running = $1"
 	SELECT_INSTANCE string = "SELECT instance_id,start_time,close_time,end_time WHERE tournament_id = $1"
 )
@@ -57,7 +57,7 @@ func (s *TournamentService) updateSegmentSchedule(sc SegementSchedule) error {
 	}
 	for i := range sc.Segments {
 		si := sc.Segments[i]
-		u, err := s.Sql.Exec(INSERT_INSTANCE, si.InstanceId, sc.TournamentId, sc.StartTime.UnixMilli(), sc.CloseTime.UnixMilli(), sc.EndTime.UnixMilli())
+		u, err := s.Sql.Exec(INSERT_INSTANCE, si.InstanceId, sc.TournamentId, sc.StartTime.UnixMilli(), sc.CloseTime.UnixMilli(), sc.EndTime.UnixMilli(), 0)
 		if err != nil {
 			return err
 		}
@@ -89,7 +89,7 @@ func (s *TournamentService) loadSchedule() ([]int64, error) {
 			ids = append(ids, id)
 		}
 		return nil
-	}, SELECT_SCHEDULE,true)
+	}, SELECT_SCHEDULE, true)
 	if err != nil {
 		return ids, err
 	}
