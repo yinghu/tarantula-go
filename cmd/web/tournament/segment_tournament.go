@@ -1,6 +1,10 @@
 package main
 
-import "gameclustering.com/internal/event"
+import (
+	"encoding/json"
+
+	"gameclustering.com/internal/event"
+)
 
 type Segment struct {
 	InstanceId int64  `json:"-"`
@@ -8,17 +12,21 @@ type Segment struct {
 }
 
 type SegementSchedule struct {
-	TournamentId int64  `json:"-"`
+	TournamentId int64  `json:"TournamentId,string"`
 	Name         string `json:"Name"`
 	Schedule
 	Segments []Segment `json:"-"`
 
-	*TournamentService
+	*TournamentService `json:"-"`
 }
 
 func (t SegementSchedule) Join(join event.TournamentEvent) error {
 	seg := t.Segments[0]
 	join.InstanceId = seg.InstanceId
-	t.updateInstance(join)
+	t.updateSegment(join)
 	return nil
+}
+
+func (t SegementSchedule) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t)
 }

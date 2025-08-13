@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"time"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"github.com/jackc/pgx/v5"
 )
@@ -18,6 +20,7 @@ const (
 	INSERT_ENTRY    string = "INSERT INTO tournament_entry (instance_id,system_id,score,last_updated) VALUES($1,$2,$3,$4)"
 
 	UPDATE_SCHEDULE string = "UPDATE tournament_schedule AS ts SET running = false WHERE ts.tournament_id = $1"
+	UPDATE_SEGMENT  string = "UPDATE tournament_instance AS ti SET total_entries = ti.total_entries + 1 WHERE ti.instance_id = $1 RETURNING total_entries"
 	UPDATE_INSTANCE string = "UPDATE tournament_instance AS ti SET total_entries = ti.total_entries + 1 WHERE ti.instance_id = $1 AND ti.total_entries < $2 RETURNING total_entries"
 	UPDATE_ENTRY    string = "UPDATE tournament_entry AS te SET score = te.score + $1, last_updated = $2 WHERE te.instance_id = $3 AND te.system_id = $4 RETURNING score"
 
@@ -101,14 +104,51 @@ func (s *TournamentService) loadSchedule() ([]int64, error) {
 	return ids, nil
 }
 
-func (s *TournamentService) updateInstance(te event.TournamentEvent) error {
-	r, err := s.Sql.Exec(UPDATE_INSTANCE, te.InstanceId, 100)
+func (s *TournamentService) updateInstance(te event.TournamentEvent,limit int32) error {
+	var total int32
+	err := s.Sql.Txn(func(tx pgx.Tx) error {
+		err := tx.QueryRow(context.Background(), UPDATE_INSTANCE, te.InstanceId,limit).Scan(&total)
+		if err != nil {
+			return nil
+		}
+		if total == 0 {
+			return fmt.Errorf("no row updated")
+		}
+		return nil
+	})
 	if err != nil {
 		return err
 	}
-	if r == 0 {
+	if total == 0 {
 		return fmt.Errorf("no instance row updated")
 	}
+	core.AppLog.Printf("Total entries : %d\n", total)
+	e, err := s.Sql.Exec(INSERT_ENTRY, te.InstanceId, te.SystemId, 0, time.Now().UnixMilli())
+	if err != nil {
+		return err
+	}
+	if e == 0 {
+		return fmt.Errorf("no entry row updated")
+	}
+	return nil
+}
+
+func (s *TournamentService) updateSegment(te event.TournamentEvent) error {
+	var total int32
+	err := s.Sql.Txn(func(tx pgx.Tx) error {
+		err := tx.QueryRow(context.Background(), UPDATE_SEGMENT, te.InstanceId).Scan(&total)
+		if err != nil {
+			return nil
+		}
+		if total == 0 {
+			return fmt.Errorf("no row updated")
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	core.AppLog.Printf("Total entries : %d\n", total)
 	e, err := s.Sql.Exec(INSERT_ENTRY, te.InstanceId, te.SystemId, 0, time.Now().UnixMilli())
 	if err != nil {
 		return err
