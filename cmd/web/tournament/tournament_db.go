@@ -40,6 +40,10 @@ func (s *TournamentService) createSchema() error {
 	if err != nil {
 		return err
 	}
+	_, err = s.Sql.Exec(JOIN_SQL_SCHEMA)
+	if err != nil {
+		return err
+	}
 	_, err = s.Sql.Exec(ENTRY_SQL_SCHEMA)
 	if err != nil {
 		return err
