@@ -14,9 +14,11 @@ const (
 	SCHEDULE_SQL_SCHEMA string = "CREATE TABLE IF NOT EXISTS tournament_schedule (tournament_id BIGINT PRIMARY KEY,running BOOLEAN NOT NULL)"
 	INSTANCE_SQL_SCHEMA string = "CREATE TABLE IF NOT EXISTS tournament_instance (instance_id BIGINT PRIMARY KEY,tournament_id BIGINT NOT NULL,start_time BIGINT NOT NULL,close_time BIGINT NOT NULL,end_time BIGINT NOT NULL,total_entries INTEGER NOT NULL)"
 	ENTRY_SQL_SCHEMA    string = "CREATE TABLE IF NOT EXISTS tournament_entry (instance_id BIGINT NOT NULL,system_id BIGINT NOT NULL,score INTEGER NOT NULL,last_updated BIGINT NOT NULL,PRIMARY KEY(instance_id,system_id))"
+	JOIN_SQL_SCHEMA     string = "CREATE TABLE IF NOT EXISTS tournament_join (tournament_id BIGINT NOT NULL,system_id BIGINT NOT NULL,instance_id BIGINT NOT NULL,PRIMARY KEY(tournament_id,system_id))"
 
 	INSERT_SCHEDULE string = "INSERT INTO tournament_schedule AS ts (tournament_id,running) VALUES($1,$2) ON CONFLICT (tournament_id) DO UPDATE SET running = true WHERE ts.tournament_id = $3"
 	INSERT_INSTANCE string = "INSERT INTO tournament_instance (instance_id,tournament_id,start_time,close_time,end_time,total_entries) VALUES($1,$2,$3,$4,$5,$6)"
+	INSERT_JOIN     string = "INSERT INTO tournament_join AS tj (tournament_id,system_id,instance_id) VALUES($1,$2,$3) ON CONFLICT (tournament_id,system_id) DO UPDATE SET instance_id = $4 WHERE tj.tournament_id = $5 AND tj.system_id = $6"
 	INSERT_ENTRY    string = "INSERT INTO tournament_entry (instance_id,system_id,score,last_updated) VALUES($1,$2,$3,$4)"
 
 	UPDATE_SCHEDULE string = "UPDATE tournament_schedule AS ts SET running = false WHERE ts.tournament_id = $1"
@@ -26,6 +28,7 @@ const (
 
 	SELECT_SCHEDULE string = "SELECT tournament_id FROM tournament_schedule WHERE running = $1"
 	SELECT_INSTANCE string = "SELECT instance_id,start_time,close_time,end_time WHERE tournament_id = $1"
+	SELECT_JOIN     string = "SELECT instance_id FROM tournament_join WHERE tournament_id = $1 AND system_id = $2"
 )
 
 func (s *TournamentService) createSchema() error {
@@ -133,6 +136,17 @@ func (s *TournamentService) updateInstance(te event.TournamentEvent, limit int32
 	return total, nil
 }
 
+func (s *TournamentService) checkJoin(te event.TournamentEvent) event.TournamentEvent {
+	s.Sql.Query(func(row pgx.Rows) error {
+		err := row.Scan(&te.InstanceId)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, SELECT_JOIN, te.TournamentId, te.SystemId)
+	return te
+}
+
 func (s *TournamentService) updateSegment(te event.TournamentEvent) (int32, error) {
 	var total int32
 	err := s.Sql.Txn(func(tx pgx.Tx) error {
@@ -142,6 +156,13 @@ func (s *TournamentService) updateSegment(te event.TournamentEvent) (int32, erro
 		}
 		if total == 0 {
 			return fmt.Errorf("no row updated")
+		}
+		r, err := tx.Exec(context.Background(), INSERT_JOIN, te.TournamentId, te.SystemId, te.InstanceId, te.InstanceId, te.TournamentId, te.SystemId)
+		if err != nil {
+			return err
+		}
+		if r.RowsAffected() == 0 {
+			return fmt.Errorf("no join row updated")
 		}
 		return nil
 	})
