@@ -18,7 +18,7 @@ const (
 	INSERT_ENTRY    string = "INSERT INTO tournament_entry (instance_id,system_id,score,last_updated) VALUES($1,$2,$3,$4)"
 
 	UPDATE_SCHEDULE string = "UPDATE tournament_schedule AS ts SET running = false WHERE ts.tournament_id = $1"
-	UPDATE_INSTANCE string = "UPDATE tournament_instance AS ti SET total_entries = ti.total_entries + 1 WHERE ti.instance_id = $1 AND ti.total_entries < $2"
+	UPDATE_INSTANCE string = "UPDATE tournament_instance AS ti SET total_entries = ti.total_entries + 1 WHERE ti.instance_id = $1 AND ti.total_entries < $2 RETURNING total_entries"
 	UPDATE_ENTRY    string = "UPDATE tournament_entry AS te SET score = te.score + $1, last_updated = $2 WHERE te.instance_id = $3 AND te.system_id = $4 RETURNING score"
 
 	SELECT_SCHEDULE string = "SELECT tournament_id FROM tournament_schedule WHERE running = $1"
@@ -109,7 +109,7 @@ func (s *TournamentService) updateInstance(te event.TournamentEvent) error {
 	if r == 0 {
 		return fmt.Errorf("no instance row updated")
 	}
-	e , err := s.Sql.Exec(INSERT_ENTRY, te.InstanceId, te.SystemId, 0, time.Now().UnixMilli())
+	e, err := s.Sql.Exec(INSERT_ENTRY, te.InstanceId, te.SystemId, 0, time.Now().UnixMilli())
 	if err != nil {
 		return err
 	}
