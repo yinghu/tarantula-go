@@ -64,7 +64,7 @@ func (a *TournamentService) scheduleSegment(conf item.Configuration) {
 		core.AppLog.Printf("no header data %s\n", err.Error())
 		return
 	}
-	seg := SegementSchedule{TournamentService: a}
+	seg := SegmentSchedule{TournamentService: a}
 	seg.TournamentId = conf.Id
 	err = json.Unmarshal(header, &seg)
 	if err != nil {
@@ -93,7 +93,7 @@ func (a *TournamentService) scheduleSegment(conf item.Configuration) {
 		core.AppLog.Printf("no segement data\n")
 		return
 	}
-	seg.Segments = make([]Segment, 0)
+	seg.Segments = make([]*Segment, 0)
 	for i := range refs {
 		cf := refs[i]
 		header, err := json.Marshal(cf.Header)
@@ -105,7 +105,7 @@ func (a *TournamentService) scheduleSegment(conf item.Configuration) {
 		if err != nil {
 			continue
 		}
-		seg.Segments = append(seg.Segments, sg)
+		seg.Segments = append(seg.Segments, &sg)
 		core.AppLog.Printf("segement data %d %v\n", sg.InstanceId, sg)
 	}
 	core.AppLog.Printf("SEG SCHEDULE %v\n", seg)

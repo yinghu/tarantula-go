@@ -6,7 +6,6 @@ var Player = (function(){
     };
 
     let _login = function(auth){
-        //if (_query.authenticated) return;
         if (auth.hasOwnProperty("token") && auth.successful){
             _query.authenticated = true;
             _query.token = auth.token;

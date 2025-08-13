@@ -6,7 +6,8 @@ import (
 )
 
 type Tournament interface {
-	Join(join event.TournamentEvent) error
+	Join(join event.TournamentEvent) (event.TournamentEvent, error)
+	Score(score event.TournamentEvent) (event.TournamentEvent, error)
 }
 
 func main() {

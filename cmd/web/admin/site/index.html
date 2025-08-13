@@ -161,6 +161,7 @@
            
             Html.eventWithId({id:'#tx-logout'},()=>{
                 Admin.logout();
+                Player.logout();
                 Html.closeWithId("#tx-info-box");
                 Html.closeWithId("#tx-logout");
                 Html.openWithId("#tx-form-box"); 

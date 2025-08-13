@@ -17,9 +17,21 @@ type InstanceSchedule struct {
 	*TournamentService `json:"-"`
 }
 
-func (t *InstanceSchedule) Join(join event.TournamentEvent) error {
-	t.updateInstance(join, t.MaxEntries)
+func (t *InstanceSchedule) Start() error {
 	return nil
+}
+
+func (t *InstanceSchedule) Score(join event.TournamentEvent) (event.TournamentEvent, error) {
+	return join,nil
+}
+
+func (t *InstanceSchedule) Join(join event.TournamentEvent) (event.TournamentEvent, error) {
+	total, err := t.updateInstance(join, t.MaxEntries)
+	if err != nil {
+		return join, err
+	}
+	t.TotalJoined += total
+	return join, nil
 }
 
 func (t *InstanceSchedule) MarshalJSON() ([]byte, error) {

@@ -8,36 +8,46 @@ import (
 )
 
 type Segment struct {
-	InstanceId int64  `json:"-"`
-	Name       string `json:"Name"`
+	InstanceId  int64  `json:"-"`
+	Name        string `json:"Name"`
+	TotalJoined int32  `json:"TotalJoined"`
 }
 
-type SegementSchedule struct {
+type SegmentSchedule struct {
 	TournamentId int64  `json:"TournamentId,string"`
 	Name         string `json:"Name"`
-	TotalJoined  int32 `json:"TotalJoined"`
+	TotalJoined  int32  `json:"TotalJoined"`
 	Schedule
-	Segments []Segment `json:"-"`
+	Segments []*Segment `json:"-"`
 
 	*TournamentService `json:"-"`
 }
 
-func (t *SegementSchedule) Join(join event.TournamentEvent) error {
-	seg := t.Segments[0]
-	join.InstanceId = seg.InstanceId
-	total, err := t.updateSegment(join)
-	if err != nil {
-		return err
-	}
-	t.TotalJoined = total
+func (t *SegmentSchedule) Start() error {
 	return nil
 }
 
-func (t *SegementSchedule) MarshalJSON() ([]byte, error) {
+func (t *SegmentSchedule) Score(join event.TournamentEvent) (event.TournamentEvent, error) {
+	return join, nil
+}
+func (t *SegmentSchedule) Join(join event.TournamentEvent) (event.TournamentEvent, error) {
+	seg := t.Segments[0]
+	total, err := t.updateSegment(join)
+	if err != nil {
+		return join, err
+	}
+	seg.TotalJoined = total
+	t.TotalJoined += total
+	join.InstanceId = seg.InstanceId
+	return join, nil
+}
+
+func (t *SegmentSchedule) MarshalJSON() ([]byte, error) {
 	data := make(map[string]any)
 	data["TournamentId"] = fmt.Sprintf("%d", t.TournamentId)
 	data["Name"] = t.Name
 	data["Schedule"] = t.Schedule
 	data["TotalJoined"] = t.TotalJoined
+	data["Segments"] = t.Segments
 	return json.Marshal(data)
 }

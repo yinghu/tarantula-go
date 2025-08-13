@@ -8,7 +8,7 @@ import (
 
 func TestToJson(t *testing.T) {
 	mp := make(map[int64]Tournament)
-	seg := SegementSchedule{TournamentId: 100}
+	seg := SegmentSchedule{TournamentId: 100}
 	mp[seg.TournamentId] = &seg
 	d, err := json.Marshal(mp)
 	if err != nil {
