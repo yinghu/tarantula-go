@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"gameclustering.com/internal/event"
 )
@@ -11,8 +12,8 @@ type InstanceSchedule struct {
 	Name              string `json:"Name"`
 	MaxEntries        int32  `json:"MaxEntries"`
 	DurationInMinutes int32  `json:"DurationInMinutes"`
+	TotalJoined       int32  `json:"TotalJoined"`
 	Schedule
-
 	*TournamentService `json:"-"`
 }
 
@@ -22,5 +23,12 @@ func (t InstanceSchedule) Join(join event.TournamentEvent) error {
 }
 
 func (t InstanceSchedule) MarshalJSON() ([]byte, error) {
-	return json.Marshal(t)
+	data := make(map[string]any)
+	data["TournamentId"] = fmt.Sprintf("%d", t.TournamentId)
+	data["Name"] = t.Name
+	data["MaxEntries"] = t.MaxEntries
+	data["DurationInMinutes"] = t.DurationInMinutes
+	data["TotalJoined"] = t.TotalJoined
+	data["Schedule"] = t.Schedule
+	return json.Marshal(data)
 }
