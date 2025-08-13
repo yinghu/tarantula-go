@@ -18,7 +18,7 @@ type SegmentSchedule struct {
 	Name         string `json:"Name"`
 	TotalJoined  int32  `json:"TotalJoined"`
 	Schedule
-	Segments []*Segment `json:"-"`
+	Segments []*Segment `json:"Segments"`
 
 	*TournamentService `json:"-"`
 }
