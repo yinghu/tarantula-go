@@ -12,7 +12,7 @@ import (
 
 type TournamentMap struct {
 	sync.RWMutex
-	tournaments map[int64]any
+	tournaments map[int64]Tournament
 }
 
 type TournamentService struct {
@@ -28,7 +28,7 @@ func (s *TournamentService) Start(f conf.Env, c core.Cluster) error {
 	s.ItemUpdater = s
 	s.AppManager.Start(f, c)
 	s.createSchema()
-	s.tournaments = make(map[int64]any)
+	s.tournaments = make(map[int64]Tournament)
 	ids, err := s.loadSchedule()
 	if err == nil {
 		for i := range ids {

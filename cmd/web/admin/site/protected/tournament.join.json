@@ -4,11 +4,10 @@
     "Description": "tournament join form",
     "Properties":[
         {
-            "Name": "Type",
-            "Type":"enum",
-            "Reference": "inline",
-            "Nullable": false,
-            "Values":[{"Name":"OnInstance","Value":"instance"},{"Name":"OnSegment","Value":"segment"}]
+            "Name": "TournamentId",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false
         }
     ]
 }

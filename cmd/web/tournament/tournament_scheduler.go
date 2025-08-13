@@ -15,25 +15,6 @@ type Schedule struct {
 	EndTime   time.Time `json:"EndTime"`
 }
 
-type InstanceSchedule struct {
-	TournamentId      int64  `json:"-"`
-	Name              string `json:"Name"`
-	MaxEntries        int32  `json:"MaxEntries"`
-	DurationInMinutes int32  `json:"DurationInMinutes"`
-	Schedule
-}
-
-type Segment struct {
-	InstanceId int64  `json:"-"`
-	Name       string `json:"Name"`
-}
-
-type SegementSchedule struct {
-	TournamentId int64  `json:"-"`
-	Name         string `json:"Name"`
-	Schedule
-	Segments []Segment `json:"-"`
-}
 
 func (a *TournamentService) scheduleInstance(conf item.Configuration) {
 	header, err := json.Marshal(conf.Header)
@@ -41,7 +22,7 @@ func (a *TournamentService) scheduleInstance(conf item.Configuration) {
 		core.AppLog.Printf("no header data %s\n", err.Error())
 		return
 	}
-	ins := InstanceSchedule{}
+	ins := InstanceSchedule{TournamentService: a}
 	ins.TournamentId = conf.Id
 	err = json.Unmarshal(header, &ins)
 	if err != nil {
@@ -83,7 +64,7 @@ func (a *TournamentService) scheduleSegment(conf item.Configuration) {
 		core.AppLog.Printf("no header data %s\n", err.Error())
 		return
 	}
-	seg := SegementSchedule{}
+	seg := SegementSchedule{TournamentService: a}
 	seg.TournamentId = conf.Id
 	err = json.Unmarshal(header, &seg)
 	if err != nil {

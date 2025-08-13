@@ -2,16 +2,14 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
 )
-
-type JoinType struct {
-	Type string `json:"Type"`
-}
 
 type TournamentJoin struct {
 	*TournamentService
@@ -23,9 +21,19 @@ func (s *TournamentJoin) AccessControl() int32 {
 
 func (s *TournamentJoin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var join JoinType
+	var join event.TournamentEvent
 	json.NewDecoder(r.Body).Decode(&join)
+	tmnt := s.tournaments[join.TournamentId]
 	w.WriteHeader(http.StatusOK)
+	if tmnt == nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: fmt.Sprintf("tournament not available :%d", join.TournamentId)}))
+		return
+	}
+	join.SystemId = rs.SystemId
+	err := tmnt.Join(join)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
 	w.Write(util.ToJson(join))
 }
-
