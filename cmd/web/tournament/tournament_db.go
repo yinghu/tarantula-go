@@ -104,10 +104,10 @@ func (s *TournamentService) loadSchedule() ([]int64, error) {
 	return ids, nil
 }
 
-func (s *TournamentService) updateInstance(te event.TournamentEvent,limit int32) error {
+func (s *TournamentService) updateInstance(te event.TournamentEvent, limit int32) (int32, error) {
 	var total int32
 	err := s.Sql.Txn(func(tx pgx.Tx) error {
-		err := tx.QueryRow(context.Background(), UPDATE_INSTANCE, te.InstanceId,limit).Scan(&total)
+		err := tx.QueryRow(context.Background(), UPDATE_INSTANCE, te.InstanceId, limit).Scan(&total)
 		if err != nil {
 			return nil
 		}
@@ -117,23 +117,23 @@ func (s *TournamentService) updateInstance(te event.TournamentEvent,limit int32)
 		return nil
 	})
 	if err != nil {
-		return err
+		return total, err
 	}
 	if total == 0 {
-		return fmt.Errorf("no instance row updated")
+		return total, fmt.Errorf("no instance row updated")
 	}
 	core.AppLog.Printf("Total entries : %d\n", total)
 	e, err := s.Sql.Exec(INSERT_ENTRY, te.InstanceId, te.SystemId, 0, time.Now().UnixMilli())
 	if err != nil {
-		return err
+		return total, err
 	}
 	if e == 0 {
-		return fmt.Errorf("no entry row updated")
+		return total, fmt.Errorf("no entry row updated")
 	}
-	return nil
+	return total, nil
 }
 
-func (s *TournamentService) updateSegment(te event.TournamentEvent) error {
+func (s *TournamentService) updateSegment(te event.TournamentEvent) (int32, error) {
 	var total int32
 	err := s.Sql.Txn(func(tx pgx.Tx) error {
 		err := tx.QueryRow(context.Background(), UPDATE_SEGMENT, te.InstanceId).Scan(&total)
@@ -146,15 +146,15 @@ func (s *TournamentService) updateSegment(te event.TournamentEvent) error {
 		return nil
 	})
 	if err != nil {
-		return err
+		return 0, err
 	}
 	core.AppLog.Printf("Total entries : %d\n", total)
 	e, err := s.Sql.Exec(INSERT_ENTRY, te.InstanceId, te.SystemId, 0, time.Now().UnixMilli())
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if e == 0 {
-		return fmt.Errorf("no entry row updated")
+		return 0, fmt.Errorf("no entry row updated")
 	}
-	return nil
+	return total, nil
 }

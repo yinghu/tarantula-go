@@ -17,12 +17,12 @@ type InstanceSchedule struct {
 	*TournamentService `json:"-"`
 }
 
-func (t InstanceSchedule) Join(join event.TournamentEvent) error {
+func (t *InstanceSchedule) Join(join event.TournamentEvent) error {
 	t.updateInstance(join, t.MaxEntries)
 	return nil
 }
 
-func (t InstanceSchedule) MarshalJSON() ([]byte, error) {
+func (t *InstanceSchedule) MarshalJSON() ([]byte, error) {
 	data := make(map[string]any)
 	data["TournamentId"] = fmt.Sprintf("%d", t.TournamentId)
 	data["Name"] = t.Name

@@ -46,7 +46,7 @@ func (a *TournamentService) scheduleInstance(conf item.Configuration) {
 		return
 	}
 	core.AppLog.Printf("Schedule :%d %v\n", ins.TournamentId, ins)
-	a.tournaments[ins.TournamentId] = ins
+	a.tournaments[ins.TournamentId] = &ins
 	err = a.updateInstanceSchedule(ins)
 	if err != nil {
 		core.AppLog.Printf("sql err :%s\n", err.Error())
@@ -109,7 +109,7 @@ func (a *TournamentService) scheduleSegment(conf item.Configuration) {
 		core.AppLog.Printf("segement data %d %v\n", sg.InstanceId, sg)
 	}
 	core.AppLog.Printf("SEG SCHEDULE %v\n", seg)
-	a.tournaments[seg.TournamentId] = seg
+	a.tournaments[seg.TournamentId] = &seg
 	err = a.updateSegmentSchedule(seg)
 	if err != nil {
 		core.AppLog.Printf("sql err :%s\n", err.Error())
