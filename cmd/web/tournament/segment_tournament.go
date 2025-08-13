@@ -32,13 +32,13 @@ func (t *SegmentSchedule) Score(join event.TournamentEvent) (event.TournamentEve
 }
 func (t *SegmentSchedule) Join(join event.TournamentEvent) (event.TournamentEvent, error) {
 	seg := t.Segments[0]
+	join.InstanceId = seg.InstanceId
 	total, err := t.updateSegment(join)
 	if err != nil {
 		return join, err
 	}
 	seg.TotalJoined = total
 	t.TotalJoined += total
-	join.InstanceId = seg.InstanceId
 	return join, nil
 }
 
