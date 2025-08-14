@@ -30,11 +30,12 @@ func (t *SegmentSchedule) Start() error {
 
 func (t *SegmentSchedule) Score(score event.TournamentEvent) (event.TournamentEvent, error) {
 	score.LastUpdated = time.Now().UnixMilli()
-	sc ,err := t.updateEntry(score)
-	if err!=nil{
-		return score,err
+	sc, err := t.updateEntry(score)
+	if err != nil {
+		return score, err
 	}
-	score.Score = sc;
+	score.Score = sc
+	t.Send(&score)
 	return score, nil
 }
 func (t *SegmentSchedule) Join(join event.TournamentEvent) (event.TournamentEvent, error) {
