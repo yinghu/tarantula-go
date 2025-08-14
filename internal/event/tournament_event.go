@@ -94,8 +94,11 @@ func (s *TournamentEvent) Read(buff core.DataBuffer) error {
 }
 
 func (s *TournamentEvent) Outbound(buff core.DataBuffer) error {
-	err := s.Write(buff)
-	if err != nil {
+	if err := s.WriteKey(buff); err != nil {
+		s.Callback.OnError(err)
+		return err
+	}
+	if err := s.Write(buff); err != nil {
 		s.Callback.OnError(err)
 		return err
 	}
@@ -103,8 +106,11 @@ func (s *TournamentEvent) Outbound(buff core.DataBuffer) error {
 }
 
 func (s *TournamentEvent) Inbound(buff core.DataBuffer) error {
-	err := s.Read(buff)
-	if err != nil {
+	if err := s.ReadKey(buff); err != nil {
+		s.Callback.OnError(err)
+		return err
+	}
+	if err := s.Read(buff); err != nil {
 		s.Callback.OnError(err)
 		return err
 	}
