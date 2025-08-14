@@ -15,7 +15,6 @@ type Schedule struct {
 	EndTime   time.Time `json:"EndTime"`
 }
 
-
 func (a *TournamentService) scheduleInstance(conf item.Configuration) {
 	header, err := json.Marshal(conf.Header)
 	if err != nil {
@@ -109,7 +108,9 @@ func (a *TournamentService) scheduleSegment(conf item.Configuration) {
 		core.AppLog.Printf("segement data %d %v\n", sg.InstanceId, sg)
 	}
 	core.AppLog.Printf("SEG SCHEDULE %v\n", seg)
+	seg.Start()
 	a.tournaments[seg.TournamentId] = &seg
+
 	err = a.updateSegmentSchedule(seg)
 	if err != nil {
 		core.AppLog.Printf("sql err :%s\n", err.Error())
