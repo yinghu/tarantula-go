@@ -41,6 +41,7 @@ func (s *TournamentService) Start(f conf.Env, c core.Cluster) error {
 	http.Handle("/tournament/list", bootstrap.Logging(&TournamentList{TournamentService: s}))
 	http.Handle("/tournament/join", bootstrap.Logging(&TournamentJoin{TournamentService: s}))
 	http.Handle("/tournament/score", bootstrap.Logging(&TournamentScore{TournamentService: s}))
+	http.Handle("/tournament/raceboard", bootstrap.Logging(&TournamentRaceBoard{TournamentService: s}))
 	return nil
 }
 
@@ -50,5 +51,5 @@ func (s *TournamentService) OnEvent(e event.Event) {
 		return
 	}
 	tmnt := s.tournaments[te.TournamentId]
-	tmnt.Board(*te)
+	tmnt.OnBoard(*te)
 }

@@ -12,6 +12,7 @@ type Segment struct {
 	InstanceId  int64  `json:"-"`
 	Name        string `json:"Name"`
 	TotalJoined int32  `json:"TotalJoined"`
+	RaceBoard   `json:"-"`
 }
 
 type SegmentSchedule struct {
@@ -20,11 +21,15 @@ type SegmentSchedule struct {
 	TotalJoined  int32  `json:"TotalJoined"`
 	Schedule
 	Segments []*Segment `json:"Segments"`
-    
+
 	*TournamentService `json:"-"`
 }
 
 func (t *SegmentSchedule) Start() error {
+	for i := range t.Segments {
+		t.Segments[i].RaceBoard = RaceBoard{Size: 10}
+		t.Segments[i].RaceBoard.Start()
+	}
 	return nil
 }
 
@@ -56,9 +61,11 @@ func (t *SegmentSchedule) Join(join event.TournamentEvent) (event.TournamentEven
 	t.TotalJoined += total
 	return join, nil
 }
-
-func (t *SegmentSchedule) Board(te event.TournamentEvent) {
-
+func (t *SegmentSchedule) OnBoard(update event.TournamentEvent) {
+	t.Segments[0].OnBoard(update)
+}
+func (t *SegmentSchedule) Listing(te event.TournamentEvent) []RaceEntry {
+	return t.Segments[0].Listing()
 }
 
 func (t *SegmentSchedule) MarshalJSON() ([]byte, error) {

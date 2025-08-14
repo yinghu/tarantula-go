@@ -34,9 +34,14 @@ func (t *InstanceSchedule) Join(join event.TournamentEvent) (event.TournamentEve
 	return join, nil
 }
 
-func (t *InstanceSchedule) Board(te event.TournamentEvent){
-	
+func (t *InstanceSchedule) OnBoard(update event.TournamentEvent){
+
 }
+
+func (t *InstanceSchedule) Listing(te event.TournamentEvent) []RaceEntry {
+	return make([]RaceEntry, 0)
+}
+
 
 func (t *InstanceSchedule) MarshalJSON() ([]byte, error) {
 	data := make(map[string]any)

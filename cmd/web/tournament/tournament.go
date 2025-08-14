@@ -8,7 +8,8 @@ import (
 type Tournament interface {
 	Join(join event.TournamentEvent) (event.TournamentEvent, error)
 	Score(score event.TournamentEvent) (event.TournamentEvent, error)
-	Board(update event.TournamentEvent)
+	OnBoard(update event.TournamentEvent)
+	Listing(query event.TournamentEvent) []RaceEntry
 }
 
 func main() {
