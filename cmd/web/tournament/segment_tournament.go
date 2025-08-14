@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"gameclustering.com/internal/event"
 )
@@ -27,9 +28,14 @@ func (t *SegmentSchedule) Start() error {
 	return nil
 }
 
-func (t *SegmentSchedule) Score(join event.TournamentEvent) (event.TournamentEvent, error) {
-	
-	return join, nil
+func (t *SegmentSchedule) Score(score event.TournamentEvent) (event.TournamentEvent, error) {
+	score.LastUpdated = time.Now().UnixMilli()
+	sc ,err := t.updateEntry(score)
+	if err!=nil{
+		return score,err
+	}
+	score.Score = sc;
+	return score, nil
 }
 func (t *SegmentSchedule) Join(join event.TournamentEvent) (event.TournamentEvent, error) {
 	joined := t.checkJoin(join)

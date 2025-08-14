@@ -183,3 +183,21 @@ func (s *TournamentService) updateSegment(te event.TournamentEvent) (int32, erro
 	}
 	return total, nil
 }
+
+func (s *TournamentService) updateEntry(te event.TournamentEvent) (int64, error) {
+	var score int64
+	err := s.Sql.Txn(func(tx pgx.Tx) error {
+		err := tx.QueryRow(context.Background(), UPDATE_ENTRY, te.Score, te.LastUpdated, te.InstanceId, te.SystemId).Scan(&score)
+		if err != nil {
+			return nil
+		}
+		if score == 0 {
+			return fmt.Errorf("no row updated")
+		}
+		return nil
+	})
+	if err != nil {
+		return 0, err
+	}
+	return score, nil
+}

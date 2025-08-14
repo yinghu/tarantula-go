@@ -30,11 +30,10 @@ func (s *TournamentScore) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		return
 	}
 	join.SystemId = rs.SystemId
-	joined, err := tmnt.Score(join)
+	scored, err := tmnt.Score(join)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	join.InstanceId = joined.InstanceId
-	w.Write(util.ToJson(join))
+	w.Write(util.ToJson(scored))
 }
