@@ -35,7 +35,9 @@ func (t *SegmentSchedule) Score(score event.TournamentEvent) (event.TournamentEv
 		return score, err
 	}
 	score.Score = sc
-	t.Send(&score)
+	e := event.TournamentEvent{TournamentId: score.TournamentId, InstanceId: score.InstanceId, SystemId: score.SystemId, Score: score.Score, LastUpdated: score.LastUpdated}
+	e.Topic("tournament")
+	t.Send(&e)
 	return score, nil
 }
 func (t *SegmentSchedule) Join(join event.TournamentEvent) (event.TournamentEvent, error) {
