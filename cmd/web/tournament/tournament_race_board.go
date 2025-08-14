@@ -4,6 +4,7 @@ import (
 	"slices"
 	"sync"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
 
@@ -45,6 +46,7 @@ func (b *RaceBoard) Start() {
 }
 
 func (b *RaceBoard) OnBoard(te event.TournamentEvent) {
+	core.AppLog.Printf("on board %v\n", te)
 	b.Lock()
 	defer b.Unlock()
 	if te.Score < b.TopListing[b.Size-1].Score {
@@ -61,6 +63,7 @@ func (b *RaceBoard) OnBoard(te event.TournamentEvent) {
 }
 
 func (b *RaceBoard) Listing() []RaceEntry {
+	core.AppLog.Printf("on listing")
 	b.RLock()
 	defer b.RUnlock()
 	listing := make([]RaceEntry, 0)
