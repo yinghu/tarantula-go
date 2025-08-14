@@ -34,6 +34,10 @@ func (t *InstanceSchedule) Join(join event.TournamentEvent) (event.TournamentEve
 	return join, nil
 }
 
+func (t *InstanceSchedule) Board(te event.TournamentEvent){
+	
+}
+
 func (t *InstanceSchedule) MarshalJSON() ([]byte, error) {
 	data := make(map[string]any)
 	data["TournamentId"] = fmt.Sprintf("%d", t.TournamentId)

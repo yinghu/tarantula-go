@@ -45,5 +45,10 @@ func (s *TournamentService) Start(f conf.Env, c core.Cluster) error {
 }
 
 func (s *TournamentService) OnEvent(e event.Event) {
-	core.AppLog.Printf("%v\n", e)
+	te, isTe := e.(*event.TournamentEvent)
+	if !isTe {
+		return
+	}
+	tmnt := s.tournaments[te.TournamentId]
+	tmnt.Board(*te)
 }
