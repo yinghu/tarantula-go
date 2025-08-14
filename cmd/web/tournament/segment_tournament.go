@@ -20,7 +20,7 @@ type SegmentSchedule struct {
 	TotalJoined  int32  `json:"TotalJoined"`
 	Schedule
 	Segments []*Segment `json:"Segments"`
-
+    
 	*TournamentService `json:"-"`
 }
 
@@ -57,8 +57,8 @@ func (t *SegmentSchedule) Join(join event.TournamentEvent) (event.TournamentEven
 	return join, nil
 }
 
-func (t *SegmentSchedule) Board(te event.TournamentEvent){
-	
+func (t *SegmentSchedule) Board(te event.TournamentEvent) {
+
 }
 
 func (t *SegmentSchedule) MarshalJSON() ([]byte, error) {
