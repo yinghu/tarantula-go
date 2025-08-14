@@ -9,6 +9,12 @@ import (
 	"gameclustering.com/internal/event"
 )
 
+const (
+	TID int64 = 100
+	IID int64 = 200
+	SID int64 = 300
+)
+
 func TestTournamentEvent(t *testing.T) {
 	local := BadgerLocal{InMemory: false, Path: "/home/yinghu/local/test"}
 	err := local.Open()
@@ -18,7 +24,7 @@ func TestTournamentEvent(t *testing.T) {
 	defer local.Close()
 	for i := range 5 {
 		sid := 1000 + i
-		tmnt := event.TournamentEvent{Id: int64(sid), TournamentId: 100, InstanceId: 200, SystemId: int64(sid), Score: 100, LastUpdated: time.Now().UnixMilli()}
+		tmnt := event.TournamentEvent{Id: int64(sid), TournamentId: TID, InstanceId: IID, SystemId: SID, Score: 100, LastUpdated: time.Now().UnixMilli()}
 		err = local.Load(&tmnt)
 		if err != nil { //not fount
 			err = local.Save(&tmnt)
@@ -36,7 +42,7 @@ func TestTournamentEvent(t *testing.T) {
 	}
 	for i := range 5 {
 		sid := 1000 + i
-		tmnt := event.TournamentEvent{Id: int64(sid), TournamentId: 100, InstanceId: 300, SystemId: int64(sid), Score: 100, LastUpdated: time.Now().UnixMilli()}
+		tmnt := event.TournamentEvent{Id: int64(sid), TournamentId: TID, InstanceId: IID, SystemId: SID, Score: 100, LastUpdated: time.Now().UnixMilli()}
 		err = local.Load(&tmnt)
 		if err != nil { //not fount
 			err = local.Save(&tmnt)
@@ -64,7 +70,9 @@ func TestTournamentEvent(t *testing.T) {
 	px := BufferProxy{}
 	px.NewProxy(100)
 	px.WriteString(event.TOURNAMENT_ETAG)
-	px.WriteInt64(1000)
+	px.WriteInt64(TID)
+	px.WriteInt64(IID)
+	px.WriteInt64(SID)
 	px.Flip()
 	t1000 := 0
 	local.List(&px, func(k, v core.DataBuffer, rev uint64) bool {
@@ -76,8 +84,8 @@ func TestTournamentEvent(t *testing.T) {
 		t1000++
 		return true
 	})
-	
-	if t1000 != 1 {
+
+	if t1000 != 5 {
 		t.Errorf("t200 should be 5 %d", t1000)
 	}
 

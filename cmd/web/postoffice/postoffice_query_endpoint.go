@@ -44,7 +44,6 @@ func (s *PostofficeQueryer) query(query event.Query) {
 		e.Read(v)
 		e.OnRevision(rev)
 		ret := util.ToJson(e)
-		core.AppLog.Printf("msg %s %d %d\n", string(ret), query.Limit, mc)
 		query.Cc <- event.Chunk{Remaining: true, Data: ret}
 		if query.Limit > 0 && mc > 0 {
 			query.Cc <- event.Chunk{Remaining: true, Data: []byte(",")}
@@ -76,7 +75,6 @@ func (s *PostofficeQueryer) Request(rs core.OnSession, w http.ResponseWriter, r 
 		if err != nil {
 			core.AppLog.Printf("Write error %s Num : %d\n", err.Error(), n)
 		}
-		core.AppLog.Printf("Write Num : %d\n", n)
 		if !c.Remaining {
 			break
 		}
