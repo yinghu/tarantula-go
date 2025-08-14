@@ -28,6 +28,7 @@ func (t *SegmentSchedule) Start() error {
 }
 
 func (t *SegmentSchedule) Score(join event.TournamentEvent) (event.TournamentEvent, error) {
+	
 	return join, nil
 }
 func (t *SegmentSchedule) Join(join event.TournamentEvent) (event.TournamentEvent, error) {

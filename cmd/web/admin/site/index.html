@@ -532,11 +532,11 @@
                 Admin.getJson(job.Form,(resp)=>{
                     let conf ={id:"#tx-form-box",prefix:"player",closeable:true};
                     Html.form(conf,resp,(data)=>{
-                        console.log(data);
-                        Player.postJson(job.Path,data,(resp)=>{
+                        Player.postJson(job.Path,on_payload(data,job),(resp)=>{
                             on_preview("Post View",resp);
                             Player.login(resp);
-                            console.log(Player.query().token);
+                            Player.query()[job.Name]=resp;
+                            console.log(Player.query());
                         });      
                     });
                     Html.openWithId("#tx-form-box");
@@ -548,6 +548,17 @@
                 Player.getJson(job.Path,(resp)=>{
                     on_preview("Get View",resp);
                 });      
+            }
+
+            function on_payload(data,job){
+                if (job.hasOwnProperty("Payload") && Player.query().hasOwnProperty(job.Payload)){
+                    let payload = Player.query()[job.Payload];
+                    Object.entries(data).forEach(([key, value]) => {
+                        payload[key]=value;
+                    });
+                    return payload;
+                }
+                return data;
             }
         </script>
     </body>
