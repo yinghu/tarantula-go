@@ -35,7 +35,8 @@ func (t *SegmentSchedule) Score(score event.TournamentEvent) (event.TournamentEv
 		return score, err
 	}
 	score.Score = sc
-	e := event.TournamentEvent{TournamentId: score.TournamentId, InstanceId: score.InstanceId, SystemId: score.SystemId, Score: score.Score, LastUpdated: score.LastUpdated}
+	id, _ := t.Sequence().Id()
+	e := event.TournamentEvent{Id: id, TournamentId: score.TournamentId, InstanceId: score.InstanceId, SystemId: score.SystemId, Score: score.Score, LastUpdated: score.LastUpdated}
 	e.Topic("tournament")
 	t.Send(&e)
 	return score, nil

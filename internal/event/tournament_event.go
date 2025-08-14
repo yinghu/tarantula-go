@@ -5,6 +5,8 @@ import (
 )
 
 type TournamentEvent struct {
+	Id           int64 `json:"id,string"`
+
 	TournamentId int64 `json:"TournamentId,string"`
 	InstanceId   int64 `json:"InstanceId,string"`
 	SystemId     int64 `json:"SystemId,string"`
@@ -25,6 +27,26 @@ func (s *TournamentEvent) WriteKey(buff core.DataBuffer) error {
 	if err := buff.WriteString(s.ETag()); err != nil {
 		return err
 	}
+	if err := buff.WriteInt64(s.Id); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *TournamentEvent) ReadKey(buff core.DataBuffer) error {
+	_, err := buff.ReadString()
+	if err != nil {
+		return err
+	}
+	id, err := buff.ReadInt64()
+	if err != nil {
+		return err
+	}
+	s.Id = id
+	return nil
+}
+
+func (s *TournamentEvent) Write(buff core.DataBuffer) error {
 	err := buff.WriteInt64(s.TournamentId)
 	if err != nil {
 		return err
@@ -37,13 +59,17 @@ func (s *TournamentEvent) WriteKey(buff core.DataBuffer) error {
 	if err != nil {
 		return err
 	}
-	return nil
-}
-func (s *TournamentEvent) ReadKey(buff core.DataBuffer) error {
-	_, err := buff.ReadString()
+	err = buff.WriteInt64(s.Score)
 	if err != nil {
 		return err
 	}
+	err = buff.WriteInt64(s.LastUpdated)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (s *TournamentEvent) Read(buff core.DataBuffer) error {
 	tournamentId, err := buff.ReadInt64()
 	if err != nil {
 		return err
@@ -59,9 +85,6 @@ func (s *TournamentEvent) ReadKey(buff core.DataBuffer) error {
 		return err
 	}
 	s.SystemId = systemId
-	return nil
-}
-func (s *TournamentEvent) Read(buff core.DataBuffer) error {
 	score, err := buff.ReadInt64()
 	if err != nil {
 		return err
@@ -75,17 +98,6 @@ func (s *TournamentEvent) Read(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *TournamentEvent) Write(buff core.DataBuffer) error {
-	err := buff.WriteInt64(s.Score)
-	if err != nil {
-		return err
-	}
-	err = buff.WriteInt64(s.LastUpdated)
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
 func (s *TournamentEvent) Outbound(buff core.DataBuffer) error {
 	err := s.Write(buff)
