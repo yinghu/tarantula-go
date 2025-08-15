@@ -53,7 +53,7 @@ var Player = (function(){
     };
 
     let _format_json = function(resp){
-        return JSON.parse(resp.replaceAll(",]","]"))
+        return JSON.parse(resp.replaceAll(",]","]"));
     };
 
     return {
