@@ -12,7 +12,7 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-func (s *AppManager) GetJsonAsync(url string, ch chan event.Chunk) {
+func (s *AppManager) PostJsonAsync(url string, payload any, ch chan event.Chunk) {
 	if s.standalone {
 		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: STANDALONE_APP, Message: STANDALONE_APP_MSG})}
 		return
@@ -22,13 +22,17 @@ func (s *AppManager) GetJsonAsync(url string, ch chan event.Chunk) {
 		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: INVALID_TICKET_CODE, Message: err.Error()})}
 		return
 	}
-
+	data, err := json.Marshal(payload)
+	if err != nil {
+		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: err.Error()})}
+		return
+	}
 	tr := &http.Transport{
 		DisableKeepAlives:  true,
 		DisableCompression: true,
 	}
 	client := &http.Client{Transport: tr}
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
 	if err != nil {
 		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: err.Error()})}
 		return

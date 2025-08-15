@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"strconv"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -18,24 +18,26 @@ type CSQueryer struct {
 func (s *CSQueryer) AccessControl() int32 {
 	return bootstrap.ADMIN_ACCESS_CONTROL
 }
-func (s *CSQueryer) query(query event.Query) {
-	s.AdminService.GetJsonAsync(fmt.Sprintf("%s%s/%d", "http://postoffice:8080/postoffice/query/", query.Tag, query.Limit), query.Cc)
-}
+
 func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var me event.Query
-	err := json.NewDecoder(r.Body).Decode(&me)
+	qid, err := strconv.ParseInt(r.PathValue("id"), 10, 32)
+	if err != nil {
+		session := core.OnSession{Successful: false, Message: err.Error()}
+		w.Write(util.ToJson(session))
+		return
+	}
+	me := event.CreateQuery(int32(qid))
+	err = json.NewDecoder(r.Body).Decode(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	listener := make(chan event.Chunk, 3)
-	me.Cc = listener
-	defer close(listener)
-	go s.query(me)
-	for c := range listener {
+	defer close(me.QCc())
+	go s.View(me)
+	for c := range me.QCc() {
 		if len(c.Data) > 0 {
 			w.Write(c.Data)
 		}

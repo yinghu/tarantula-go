@@ -4,11 +4,23 @@
     "Description": "query form",
     "Properties":[
         {
-            "Name": "Tag",
+            "Name": "Id",
             "Type":"enum",
             "Reference": "inline",
             "Nullable": false,
-            "Values":[{"Name":"Message","Value":"msg:"},{"Name":"Tournament","Value":"tmt:"}]
+            "Values":[{"Name":"Message","Value":"0"},{"Name":"Tournament","Value":"1"}]
+        },
+        {
+            "Name": "StartTime",
+            "Type":"dateTime",
+            "Reference": "dateTime-local",
+            "Nullable": false
+        },
+        {
+            "Name": "EndTime",
+            "Type":"dateTime",
+            "Reference": "dateTime-local",
+            "Nullable": false
         },
         {
             "Name": "Limit",

@@ -32,6 +32,7 @@ type Event interface {
 
 type Postoffice interface {
 	Send(e Event) error
+	View(q Query)
 }
 
 type EventObj struct {

@@ -34,6 +34,8 @@ func (s *sampleFactory) VerifyTicket(ticket string) error {
 func (s *sampleFactory) Send(e Event) error {
 	return nil
 }
+func (s *sampleFactory) View(e Query)  {
+}
 
 type sampleEvent struct {
 	Id   int64

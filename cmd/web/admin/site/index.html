@@ -497,7 +497,7 @@
                     let conf ={id:"#tx-form-box",prefix:"admin",closeable:true};
                     Html.form(conf,resp,(data)=>{
                         console.log(data);
-                        Admin.postJson(job.Path,data,(resp)=>{
+                        Admin.postJson(on_path(job.Path,data,job),on_payload(data,job),(resp)=>{
                             on_preview("Post View",resp);
                         });      
                     });
@@ -533,7 +533,7 @@
                     Admin.getJson(job.Form,(resp)=>{
                         let conf ={id:"#tx-form-box",prefix:"player",closeable:true};
                         Html.form(conf,resp,(data)=>{
-                            Player.postJson(job.Path,on_payload(data,job),(resp)=>{
+                            Player.postJson(on_path(job.Path,data,job),on_payload(data,job),(resp)=>{
                                 on_preview("Post View",resp);
                                 Player.login(resp);
                                 Player.query()[job.Name]=resp;
@@ -558,7 +558,19 @@
                     on_preview("Get View",resp);
                 });      
             }
-
+            function on_path(path,data,job){
+                if (job.hasOwnProperty("Query")){
+                    let tem = [];
+                    tem.push(path)
+                    job.Query.forEach(q=>{
+                        tem.push("/"+data[q])
+                    });
+                    let p = tem.join("");
+                    console.log(p)
+                    return p;    
+                }
+                return path;        
+            }
             function on_payload(data,job){
                 if (job.hasOwnProperty("Payload") && Player.query().hasOwnProperty(job.Payload)){
                     let payload = Player.query()[job.Payload];

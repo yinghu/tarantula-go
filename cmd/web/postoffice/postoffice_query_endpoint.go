@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -22,19 +23,19 @@ func (s *PostofficeQueryer) AccessControl() int32 {
 func (s *PostofficeQueryer) query(query event.Query) {
 	buff := persistence.BufferProxy{}
 	buff.NewProxy(100)
-	//buff.WriteString(query.Tag)
-	query.Write(&buff)
+	query.QCriteria(&buff)
 	buff.Flip()
-	stat := event.StatEvent{Tag: query.Tag, Name: event.STAT_TOTAL}
+	stat := event.StatEvent{Tag: query.QTag(), Name: event.STAT_TOTAL}
 	err := s.Ds.Load(&stat)
 	if err != nil {
-		query.Cc <- event.Chunk{Remaining: false, Data: []byte("{\"list\":[]}")}
+		query.QCc() <- event.Chunk{Remaining: false, Data: []byte("{\"list\":[]}")}
 		return
 	}
-	query.Cc <- event.Chunk{Remaining: true, Data: []byte("{\"list\":[")}
+	query.QCc() <- event.Chunk{Remaining: true, Data: []byte("{\"list\":[")}
 	mc := stat.Count
+	lmt := query.QLimit()
 	s.Ds.List(&buff, func(k, v core.DataBuffer, rev uint64) bool {
-		query.Limit--
+		lmt--
 		mc--
 		cid, _ := v.ReadInt32()
 		e := event.CreateEvent(int(cid), nil)
@@ -45,33 +46,34 @@ func (s *PostofficeQueryer) query(query event.Query) {
 		e.Read(v)
 		e.OnRevision(rev)
 		ret := util.ToJson(e)
-		query.Cc <- event.Chunk{Remaining: true, Data: ret}
-		if query.Limit > 0 && mc > 0 {
-			query.Cc <- event.Chunk{Remaining: true, Data: []byte(",")}
+		query.QCc() <- event.Chunk{Remaining: true, Data: ret}
+		if lmt > 0 && mc > 0 {
+			query.QCc() <- event.Chunk{Remaining: true, Data: []byte(",")}
 		}
-		return query.Limit > 0 && mc > 0
+		return lmt > 0 && mc > 0
 	})
-	query.Cc <- event.Chunk{Remaining: false, Data: []byte("]}")}
+	query.QCc() <- event.Chunk{Remaining: false, Data: []byte("]}")}
 }
 
 func (s *PostofficeQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
-	listener := make(chan event.Chunk, 3)
-	defer func() {
-		close(listener)
-		r.Body.Close()
-	}()
-	tag := r.PathValue("tag")
-	limit, err := strconv.ParseInt(r.PathValue("limit"), 10, 32)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	defer r.Body.Close()
+	qid, err := strconv.ParseInt(r.PathValue("id"), 10, 32)
+	if err != nil {
+		session := core.OnSession{Successful: false, Message: err.Error()}
+		w.Write(util.ToJson(session))
+		return
+	}
+	me := event.CreateQuery(int32(qid))
+	err = json.NewDecoder(r.Body).Decode(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	q := event.Query{Tag: tag, Limit: int32(limit)}
-	q.Cc = listener
-	go s.query(q)
-	for c := range listener {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	defer close(me.QCc())
+	go s.query(me)
+	for c := range me.QCc() {
 		n, err := w.Write(c.Data)
 		if err != nil {
 			core.AppLog.Printf("Write error %s Num : %d\n", err.Error(), n)

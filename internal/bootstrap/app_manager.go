@@ -120,6 +120,9 @@ func (s *AppManager) Send(e event.Event) error {
 	}
 	return fmt.Errorf("failed after retries")
 }
+func (s *AppManager) View(query event.Query) {
+	s.PostJsonAsync(fmt.Sprintf("%s/%d", "http://postoffice:8080/postoffice/query", query.QId()), query, query.QCc())
+}
 func (s *AppManager) OnEvent(e event.Event) {
 
 }
