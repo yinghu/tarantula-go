@@ -22,7 +22,7 @@ var Player = (function(){
         aj.responseType = 'text';
         aj.onreadystatechange = function(){
             if(aj.status === 200 && aj.readyState === 4){
-                callback(JSON.parse(aj.responseText));
+                callback(_format_json(aj.responseText));
             }
         };
         aj.open("GET",path,true);
@@ -40,7 +40,7 @@ var Player = (function(){
         aj.responseType = 'text';
         aj.onreadystatechange = function(){
             if(aj.status === 200 && aj.readyState === 4){
-                callback(JSON.parse(aj.responseText));
+                callback(_format_json(aj.responseText));
             }
         };
         aj.open('POST',path,true);
@@ -51,6 +51,11 @@ var Player = (function(){
         }
         aj.send(payload);
     };
+
+    let _format_json = function(resp){
+        return JSON.parse(resp.replaceAll(",]","]"))
+    };
+
     return {
         query : _getQuery,
         login : _login,
