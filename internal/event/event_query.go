@@ -9,18 +9,25 @@ import (
 const (
 	TAG_MESSAGE    int32 = 0
 	TAG_TOURNAMENT int32 = 1
+	Q_TOURNAMENT   int32 = 2
 )
 
 func CreateQuery(qid int32) Query {
 	switch qid {
 	case TAG_MESSAGE:
-		q := QueryObj{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan Chunk, 3)}
+		q := QWithTag{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan Chunk, 3)}
 		return &q
 	case TAG_TOURNAMENT:
-		q := QueryObj{Id: qid, Tag: TOURNAMENT_ETAG, Cc: make(chan Chunk, 3)}
+		q := QWithTag{Id: qid, Tag: TOURNAMENT_ETAG, Cc: make(chan Chunk, 3)}
+		return &q
+	case Q_TOURNAMENT:
+		q := QTournament{}
+		q.Id = qid
+		q.Tag = TOURNAMENT_ETAG
+		q.Cc = make(chan Chunk, 3)
 		return &q
 	default:
-		q := QueryObj{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan Chunk, 3)}
+		q := QWithTag{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan Chunk, 3)}
 		return &q
 	}
 }
@@ -35,7 +42,7 @@ type Query interface {
 	QCc() chan Chunk
 }
 
-type QueryObj struct {
+type QWithTag struct {
 	Id        int32      `json:"-"`
 	Tag       string     `json:"Tag"`
 	Limit     int32      `json:"Limit"`
@@ -44,28 +51,28 @@ type QueryObj struct {
 	Cc        chan Chunk `json:"-"`
 }
 
-func (q *QueryObj) QCriteria(buff core.DataBuffer) error {
+func (q *QWithTag) QCriteria(buff core.DataBuffer) error {
 	buff.WriteString(q.Tag)
 	return nil
 }
 
-func (q *QueryObj) QId() int32 {
+func (q *QWithTag) QId() int32 {
 	return q.Id
 }
 
-func (q *QueryObj) QTag() string {
+func (q *QWithTag) QTag() string {
 	return q.Tag
 }
-func (q *QueryObj) QStartTime() time.Time {
+func (q *QWithTag) QStartTime() time.Time {
 	return q.StartTime
 }
-func (q *QueryObj) QEndTime() time.Time {
+func (q *QWithTag) QEndTime() time.Time {
 	return q.EndTime
 }
-func (q *QueryObj) QLimit() int32 {
+func (q *QWithTag) QLimit() int32 {
 	return q.Limit
 }
 
-func (q *QueryObj) QCc() chan Chunk {
+func (q *QWithTag) QCc() chan Chunk {
 	return q.Cc
 }
