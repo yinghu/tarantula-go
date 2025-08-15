@@ -22,7 +22,8 @@ func (s *PostofficeQueryer) AccessControl() int32 {
 func (s *PostofficeQueryer) query(query event.Query) {
 	buff := persistence.BufferProxy{}
 	buff.NewProxy(100)
-	buff.WriteString(query.Tag)
+	//buff.WriteString(query.Tag)
+	query.Write(&buff)
 	buff.Flip()
 	stat := event.StatEvent{Tag: query.Tag, Name: event.STAT_TOTAL}
 	err := s.Ds.Load(&stat)
