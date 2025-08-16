@@ -42,6 +42,9 @@ func (s *PostofficeRecoverer) recover(query event.Query) {
 		e.ReadKey(k)
 		e.Read(v)
 		e.OnRevision(rev)
+		go func() {
+			s.Publish(e)
+		}()
 		return true
 	})
 	core.AppLog.Printf("Total %d recovered from %d\n", lmt, mc)
