@@ -6,14 +6,16 @@ const (
 	MESSAGE_CID      int = 3
 	TOURNAMENT_CID   int = 4
 	SUBSCRIPTION_CID int = 5
+	NODE_START_CID   int = 6
 
 	LOGIN_ETAG        string = "login:"
 	MESSAGE_ETAG      string = "msg:"
 	TOURNAMENT_ETAG   string = "tmt:"
 	SUBSCRIPTION_ETAG string = "sub:"
 	STAT_ETAG         string = "stat:"
+	NODE_START_ETAG   string = "nst"
 
-	STAT_TOTAL string = "total"
+	STAT_TOTAL        string = "total"
 )
 
 func CreateEvent(cid int, listner EventListener) Event {
@@ -38,6 +40,10 @@ func CreateEvent(cid int, listner EventListener) Event {
 		subscription := SubscriptionEvent{}
 		subscription.Callback = listner
 		return &subscription
+	case NODE_START_CID:
+		nodeStart := NodeStartEvent{}
+		nodeStart.Callback = listner
+		return &nodeStart	
 	default:
 		return nil
 	}
