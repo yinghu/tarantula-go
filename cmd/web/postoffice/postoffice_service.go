@@ -101,6 +101,7 @@ func (s *PostofficeService) Publish(e event.Event) {
 		return
 	}
 	view := s.Cluster().View()
+	core.AppLog.Printf("Event : %v %d\n", e, len(view))
 	for i := range view {
 		v := view[i]
 		core.AppLog.Printf("Sending to : %s,%s,%s,%s\n", v.Name, v.TcpEndpoint, s.Cluster().Local().Name, e.ETag())
