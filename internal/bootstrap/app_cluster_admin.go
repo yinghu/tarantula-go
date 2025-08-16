@@ -41,7 +41,7 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		var join core.Node
 		json.NewDecoder(r.Body).Decode(&join)
 		s.Cluster().OnJoin(s.convert(join))
-		s.startEvent()
+		s.startEvent(join)
 	case "left":
 		var left core.Node
 		json.NewDecoder(r.Body).Decode(&left)
@@ -111,12 +111,13 @@ func (s *AppClusterAdmin) dispatch(kv item.KVUpdate) {
 	s.ItemListener().OnRelease(ins)
 }
 
-func (s *AppClusterAdmin) startEvent() {
-	ste := event.NodeStartEvent{NodeName: s.Cluster().Local().Name, StartTime: time.Now()}
-	id, _ := s.Sequence().Id()
-	ste.Id = id
-	ste.Topic("message")
-	s.Send(&ste)
+func (s *AppClusterAdmin) startEvent(n core.Node) {
+	s.NodeStarted(n)
+	//ste := event.NodeStartEvent{NodeName: s.Cluster().Local().Name, StartTime: time.Now()}
+	//id, _ := s.Sequence().Id()
+	//ste.Id = id
+	//ste.Topic("message")
+	//s.Send(&ste)
 }
 
 func (s *AppClusterAdmin) send(err error) {

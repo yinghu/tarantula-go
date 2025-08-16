@@ -53,3 +53,8 @@ func (s *TournamentService) OnEvent(e event.Event) {
 	tmnt := s.tournaments[te.TournamentId]
 	tmnt.OnBoard(*te)
 }
+
+func (s *TournamentService) NodeStarted(n core.Node) {
+	core.AppLog.Printf("Node started %s\n", n.Name)
+}
+

@@ -55,6 +55,7 @@ type TarantulaService interface {
 	Authenticator() core.Authenticator
 	Sequence() core.Sequence
 	ItemListener() item.ItemListener
+	NodeStarted(n core.Node)
 }
 
 type TarantulaApp interface {

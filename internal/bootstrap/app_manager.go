@@ -125,7 +125,7 @@ func (s *AppManager) List(query event.Query) {
 }
 func (s *AppManager) Recover(query event.Query) {
 	for i := range 5 {
-		ret :=s.PostJsonSync(fmt.Sprintf("%s/%d", "http://postoffice:8080/postoffice/recover", query.QId()), query)
+		ret := s.PostJsonSync(fmt.Sprintf("%s/%d", "http://postoffice:8080/postoffice/recover", query.QId()), query)
 		if ret.ErrorCode == 0 {
 			return
 		}
@@ -148,6 +148,10 @@ func (s *AppManager) Context() string {
 
 func (s *AppManager) Service() TarantulaService {
 	return s
+}
+
+func (s *AppManager) NodeStarted(n core.Node) {
+	core.AppLog.Printf("Node started %s\n", n.Name)
 }
 
 func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
