@@ -50,7 +50,12 @@ func (b *RaceBoard) OnBoard(te event.TournamentEvent) {
 	if te.Score < b.TopListing[b.Size-1].Score {
 		return
 	}
+	
 	delete(b.index, b.TopListing[b.Size-1].SystemId)
+	ev, existing := b.index[te.SystemId]
+	if existing && te.Score < ev.Score{
+		return
+	}
 	b.index[te.SystemId] = te
 	ix := 0
 	for k, v := range b.index {
