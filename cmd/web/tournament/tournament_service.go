@@ -26,6 +26,7 @@ func (s *TournamentService) Config() string {
 
 func (s *TournamentService) Start(f conf.Env, c core.Cluster) error {
 	s.ItemUpdater = s
+	s.Bsl = s
 	s.AppManager.Start(f, c)
 	s.createSchema()
 	s.tournaments = make(map[int64]Tournament)

@@ -55,11 +55,15 @@ type TarantulaService interface {
 	Authenticator() core.Authenticator
 	Sequence() core.Sequence
 	ItemListener() item.ItemListener
-	NodeStarted(n core.Node)
+	BootstrapListener() BootstrapListener
 }
 
 type TarantulaApp interface {
 	TarantulaService
 	AccessControl() int32
 	Request(sesion core.OnSession, w http.ResponseWriter, r *http.Request)
+}
+
+type BootstrapListener interface {
+	NodeStarted(n core.Node)
 }

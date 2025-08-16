@@ -18,6 +18,7 @@ type AppManager struct {
 	metr        metrics.MetricsService
 	imse        item.ItemService
 	auth        core.Authenticator
+	Bsl         BootstrapListener
 	Sql         persistence.Postgresql
 	ctx         string
 	standalone  bool
@@ -46,7 +47,9 @@ func (s *AppManager) Sequence() core.Sequence {
 func (s *AppManager) ItemListener() item.ItemListener {
 	return s.ItemUpdater
 }
-
+func (s *AppManager) BootstrapListener() BootstrapListener {
+	return s.Bsl
+}
 func (s *AppManager) Start(f conf.Env, c core.Cluster) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
 	s.ManagedApps = f.ManagedApps

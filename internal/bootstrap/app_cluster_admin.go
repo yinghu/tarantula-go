@@ -113,7 +113,10 @@ func (s *AppClusterAdmin) dispatch(kv item.KVUpdate) {
 }
 
 func (s *AppClusterAdmin) startEvent(n core.Node) {
-	s.TarantulaService.NodeStarted(n)
+	if s.BootstrapListener() == nil {
+		return
+	}
+	s.BootstrapListener().NodeStarted(n)
 	//ste := event.NodeStartEvent{NodeName: s.Cluster().Local().Name, StartTime: time.Now()}
 	//id, _ := s.Sequence().Id()
 	//ste.Id = id
