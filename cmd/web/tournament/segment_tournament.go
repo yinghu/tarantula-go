@@ -32,6 +32,7 @@ func (t *SegmentSchedule) Start() error {
 		tq := event.QTournament{TournamentId: t.TournamentId, InstanceId: t.Segments[i].InstanceId}
 		tq.Tag = event.TOURNAMENT_ETAG
 		tq.Id = event.Q_TOURNAMENT_QID
+		tq.Topic = "tournament"
 		t.Recover(&tq)
 	}
 	return nil

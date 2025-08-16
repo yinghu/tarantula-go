@@ -35,6 +35,7 @@ func CreateQuery(qid int32) Query {
 type Query interface {
 	QId() int32
 	QTag() string
+	QTopic() string
 	QStartTime() time.Time
 	QEndTime() time.Time
 	QLimit() int32
@@ -45,6 +46,7 @@ type Query interface {
 type QWithTag struct {
 	Id        int32      `json:"-"`
 	Tag       string     `json:"Tag"`
+	Topic     string     `json:"Topic"`
 	Limit     int32      `json:"Limit"`
 	StartTime time.Time  `json:"StartTime"`
 	EndTime   time.Time  `json:"EndTime"`
@@ -62,6 +64,9 @@ func (q *QWithTag) QId() int32 {
 
 func (q *QWithTag) QTag() string {
 	return q.Tag
+}
+func (q *QWithTag) QTopic() string {
+	return q.Topic
 }
 func (q *QWithTag) QStartTime() time.Time {
 	return q.StartTime
