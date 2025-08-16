@@ -73,7 +73,7 @@ func (s *PostofficeService) OnEvent(e event.Event) {
 	err := s.Ds.Save(e)
 	if err != nil {
 		core.AppLog.Printf("Save event error %s\n", err.Error())
-		return
+		//return
 	}
 	s.RLock()
 	defer s.RUnlock()
