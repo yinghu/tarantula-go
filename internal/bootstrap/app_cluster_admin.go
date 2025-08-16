@@ -40,8 +40,9 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 	case "join":
 		var join core.Node
 		json.NewDecoder(r.Body).Decode(&join)
-		s.Cluster().OnJoin(s.convert(join))
-		s.startEvent(join)
+		nd := s.convert(join)
+		s.Cluster().OnJoin(nd)
+		s.startEvent(nd)
 	case "left":
 		var left core.Node
 		json.NewDecoder(r.Body).Decode(&left)
