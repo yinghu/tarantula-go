@@ -7,20 +7,20 @@ import (
 )
 
 const (
-	TAG_MESSAGE    int32 = 0
-	TAG_TOURNAMENT int32 = 1
-	Q_TOURNAMENT   int32 = 2
+	TAG_MESSAGE_QID    int32 = 0
+	TAG_TOURNAMENT_QID int32 = 1
+	Q_TOURNAMENT_QID   int32 = 2
 )
 
 func CreateQuery(qid int32) Query {
 	switch qid {
-	case TAG_MESSAGE:
+	case TAG_MESSAGE_QID:
 		q := QWithTag{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan Chunk, 3)}
 		return &q
-	case TAG_TOURNAMENT:
+	case TAG_TOURNAMENT_QID:
 		q := QWithTag{Id: qid, Tag: TOURNAMENT_ETAG, Cc: make(chan Chunk, 3)}
 		return &q
-	case Q_TOURNAMENT:
+	case Q_TOURNAMENT_QID:
 		q := QTournament{}
 		q.Id = qid
 		q.Tag = TOURNAMENT_ETAG

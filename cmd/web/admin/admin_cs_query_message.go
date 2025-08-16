@@ -36,7 +36,7 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	defer close(me.QCc())
-	go s.View(me)
+	go s.List(me)
 	for c := range me.QCc() {
 		if len(c.Data) > 0 {
 			w.Write(c.Data)

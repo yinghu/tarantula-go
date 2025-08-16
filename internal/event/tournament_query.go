@@ -11,8 +11,14 @@ type QTournament struct {
 
 func (q *QTournament) QCriteria(buff core.DataBuffer) error {
 	buff.WriteString(q.Tag)
-	buff.WriteInt64(q.TournamentId)
-	buff.WriteInt64(q.InstanceId)
-	buff.WriteInt64(q.SystemId)
+	if q.TournamentId > 0 {
+		buff.WriteInt64(q.TournamentId)
+	}
+	if q.InstanceId > 0 {
+		buff.WriteInt64(q.InstanceId)
+	}
+	if q.SystemId > 0 {
+		buff.WriteInt64(q.SystemId)
+	}
 	return nil
 }

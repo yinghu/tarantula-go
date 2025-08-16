@@ -21,7 +21,7 @@ func (s *PostofficePublisher) AccessControl() int32 {
 func (s *PostofficePublisher) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	topic := r.PathValue("topic")
-	cid, err := strconv.ParseInt(r.PathValue("cid"), 10, 64)
+	cid, err := strconv.ParseInt(r.PathValue("cid"), 10, 32)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return

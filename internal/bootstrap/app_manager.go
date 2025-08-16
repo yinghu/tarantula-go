@@ -120,9 +120,20 @@ func (s *AppManager) Send(e event.Event) error {
 	}
 	return fmt.Errorf("failed after retries")
 }
-func (s *AppManager) View(query event.Query) {
+func (s *AppManager) List(query event.Query) {
 	s.PostJsonAsync(fmt.Sprintf("%s/%d", "http://postoffice:8080/postoffice/query", query.QId()), query, query.QCc())
 }
+func (s *AppManager) Recover(query event.Query) {
+	for i := range 5 {
+		ret :=s.PostJsonSync(fmt.Sprintf("%s/%d", "http://postoffice:8080/postoffice/recover", query.QId()), query)
+		if ret.ErrorCode == 0 {
+			return
+		}
+		time.Sleep(1000 * time.Millisecond)
+		core.AppLog.Printf("Retries: %d %v\n", i, ret)
+	}
+}
+
 func (s *AppManager) OnEvent(e event.Event) {
 
 }

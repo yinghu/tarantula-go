@@ -44,6 +44,7 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 	http.Handle("/postoffice/unsubscribe", bootstrap.Logging(&PostofficeUnSubscriber{PostofficeService: s}))
 	http.Handle("/postoffice/publish/{topic}/{cid}", bootstrap.Logging(&PostofficePublisher{PostofficeService: s}))
 	http.Handle("/postoffice/query/{id}", bootstrap.Logging(&PostofficeQueryer{PostofficeService: s}))
+	http.Handle("/postoffice/recover/{id}", bootstrap.Logging(&PostofficeRecoverer{PostofficeService: s}))
 	return nil
 }
 
