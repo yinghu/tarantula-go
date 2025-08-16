@@ -10,6 +10,7 @@ type Tournament interface {
 	Score(score event.TournamentEvent) (event.TournamentEvent, error)
 	OnBoard(update event.TournamentEvent)
 	Listing(query event.TournamentEvent) []RaceEntry
+	Start() error
 }
 
 func main() {
