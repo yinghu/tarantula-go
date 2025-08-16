@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/conf"
@@ -43,11 +42,6 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster) error {
 	if err != nil {
 		core.AppLog.Printf("Root already existed %s\n", err.Error())
 	}
-	ste := event.NodeStartEvent{NodeName: s.Cluster().Local().Name, StartTime: time.Now()}
-	id, _ := s.Sequence().Id()
-	ste.Id = id
-	ste.Topic("message")
-	s.Send(&ste)
 	http.Handle("/admin/webprotected/{name}", bootstrap.Logging(&AdminWebProtected{AdminService: s}))
 	http.Handle("/admin/web/{name}", bootstrap.Logging(&AdminWebIndex{AdminService: s}))
 	//handle / context from nginx proxy
