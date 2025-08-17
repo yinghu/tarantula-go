@@ -63,7 +63,7 @@ func TestTournamentEvent(t *testing.T) {
 	if err != nil {
 		t.Errorf("Local store error %s", err.Error())
 	}
-	fmt.Printf("Count : %d\n", ct.Count)
+	fmt.Printf("Count : %d %s\n", ct.Count,time.UnixMilli(ct.Timestamp()))
 	if ct.Count != 5 {
 		t.Errorf("count should be 5 %d", ct.Count)
 	}
@@ -77,6 +77,7 @@ func TestTournamentEvent(t *testing.T) {
 	local.List(&px, func(k, v core.DataBuffer, rev uint64) bool {
 		t := event.TournamentEvent{}
 		v.ReadInt32()
+		v.ReadInt64()
 		t.Read(v)
 		t.Rev = rev
 		fmt.Printf("Score %d , LastUpdated %d Rev : %d\n", t.Score, t.LastUpdated, t.Revision())
@@ -142,6 +143,7 @@ func TestTournamentQuery(t *testing.T) {
 	local.List(&px, func(k, v core.DataBuffer, rev uint64) bool {
 		t := event.TournamentEvent{}
 		v.ReadInt32()
+		v.ReadInt64()
 		t.Read(v)
 		t.Rev = rev
 		fmt.Printf("Score %d , LastUpdated %d Rev : %d\n", t.Score, t.LastUpdated, t.Revision())
@@ -164,6 +166,7 @@ func TestTournamentQuery(t *testing.T) {
 	local.List(&px, func(k, v core.DataBuffer, rev uint64) bool {
 		t := event.TournamentEvent{}
 		v.ReadInt32()
+		v.ReadInt64()
 		t.Read(v)
 		t.Rev = rev
 		fmt.Printf("Score %d , LastUpdated %d Rev : %d\n", t.Score, t.LastUpdated, t.Revision())
@@ -174,6 +177,5 @@ func TestTournamentQuery(t *testing.T) {
 	if tc != 10 {
 		t.Errorf("tc should be 10 %d", tc)
 	}
-
 
 }

@@ -3,6 +3,7 @@ package persistence
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -29,6 +30,7 @@ func (s *BadgerLocal) Save(t core.Persistentable) error {
 	value.NewProxy(BDG_VALUE_SIZE)
 	t.WriteKey(&key)
 	value.WriteInt32(int32(t.ClassId()))
+	value.WriteInt64(time.Now().UnixMilli())
 	t.Write(&value)
 	key.Flip()
 	value.Flip()
@@ -47,6 +49,11 @@ func (s *BadgerLocal) Load(t core.Persistentable) error {
 		return err
 	}
 	value.ReadInt32()
+	tm, err := value.ReadInt64()
+	if err != nil {
+		return err
+	}
+	t.OnTimestamp(tm)
 	t.Read(&value)
 	t.OnRevision(rev)
 	return nil
@@ -125,6 +132,7 @@ func (s *BadgerLocal) set(key *BufferProxy, value *BufferProxy, t core.Persisten
 			}
 			cvalue.Flip()
 			cvalue.ReadInt32()
+			cvalue.ReadInt64()
 			se.Read(&cvalue)
 			se.Count = se.Count + 1
 		} else {
@@ -132,6 +140,7 @@ func (s *BadgerLocal) set(key *BufferProxy, value *BufferProxy, t core.Persisten
 		}
 		cvalue.Clear()
 		cvalue.WriteInt32(int32(se.ClassId()))
+		cvalue.WriteInt64(time.Now().UnixMilli())
 		se.Write(&cvalue)
 		cvalue.Flip()
 		cv, _ := cvalue.Read(0)

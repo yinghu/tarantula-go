@@ -11,12 +11,15 @@ type Persistentable interface {
 	ReadKey(key DataBuffer) error
 	ClassId() int
 	Revision() uint64
+	Timestamp() int64
+	OnTimestamp(tsp int64)
 	OnRevision(rev uint64)
 	ETag() string
 }
 
 type PersistentableObj struct {
 	Rev uint64 `json:"rev,string"`
+	Tsp int64  `json:"timestamp,string"`
 }
 
 type Stream func(k, v DataBuffer, rev uint64) bool
@@ -43,6 +46,12 @@ func (s *PersistentableObj) ClassId() int {
 
 func (s *PersistentableObj) Revision() uint64 {
 	return s.Rev
+}
+func (s *PersistentableObj) Timestamp() int64 {
+	return s.Tsp
+}
+func (s *PersistentableObj) OnTimestamp(tsp int64) {
+	s.Tsp = tsp
 }
 
 func (s *PersistentableObj) OnRevision(rev uint64) {

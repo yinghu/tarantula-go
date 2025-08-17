@@ -35,12 +35,14 @@ func (s *PostofficeRecoverer) recover(query event.Query) {
 	s.Ds.List(&buff, func(k, v core.DataBuffer, rev uint64) bool {
 		lmt++
 		cid, _ := v.ReadInt32()
+		tm, _ := v.ReadInt64()
 		e := event.CreateEvent(int(cid), nil)
 		if e == nil {
 			return true
 		}
 		e.ReadKey(k)
 		e.Read(v)
+		e.OnTimestamp(tm)
 		//e.OnRevision(rev)
 		e.Topic(query.QTopic())
 		go func() {
