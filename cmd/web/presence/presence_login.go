@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -37,6 +38,17 @@ func (s *PresenceLogin) Login(login Login) {
 	}
 	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: s.Cluster().Local().HttpEndpoint}
 	login.Cc <- event.Chunk{Remaining: false, Data: util.ToJson(session)}
+	go func() {
+		id, err := s.Sequence().Id()
+		if err != nil {
+			return
+		}
+		me := event.LoginEvent{SystemId: login.SystemId, Name: login.Name}
+		me.Id = id
+		me.LoginTime = time.Now()
+		me.Topic("login")
+		s.Send(&me)
+	}()
 }
 
 func (s *PresenceLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {

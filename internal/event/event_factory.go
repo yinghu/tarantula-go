@@ -7,14 +7,13 @@ const (
 	TOURNAMENT_CID   int = 4
 	SUBSCRIPTION_CID int = 5
 
-	LOGIN_ETAG        string = "login:"
+	LOGIN_ETAG        string = "lgn:"
 	MESSAGE_ETAG      string = "msg:"
 	TOURNAMENT_ETAG   string = "tmt:"
 	SUBSCRIPTION_ETAG string = "sub:"
 	STAT_ETAG         string = "stat:"
-	
 
-	STAT_TOTAL        string = "total"
+	STAT_TOTAL string = "total"
 )
 
 func CreateEvent(cid int, listner EventListener) Event {

@@ -1,18 +1,17 @@
 package event
 
 import (
+	"time"
+
 	"gameclustering.com/internal/core"
 )
 
 type LoginEvent struct {
-	Id            int32  `json:"-"`
-	Name          string `json:"login"`
-	Hash          string `json:"password"`
-	ReferenceId   int32  `json:"referenceId"`
-	SystemId      int64
-	AccessControl int32      `json:"accessControl,string"`
-	Cc            chan Chunk `json:"-"`
-	EventObj      `json:"-"`
+	Id        int64     `json:"id"`
+	Name      string    `json:"login"`
+	SystemId  int64     `json:"systemId:string"`
+	LoginTime time.Time `json:"loginTime"`
+	EventObj
 }
 
 func (s *LoginEvent) ClassId() int {
@@ -23,53 +22,55 @@ func (s *LoginEvent) ETag() string {
 	return LOGIN_ETAG
 }
 func (s *LoginEvent) Read(buffer core.DataBuffer) error {
-	hash, err := buffer.ReadString()
+	name, err := buffer.ReadString()
 	if err != nil {
 		return err
 	}
-	s.Hash = hash
-	
-	refId, err := buffer.ReadInt32()
-	if err != nil {
+	s.Name = name
+	lt, err := buffer.ReadInt64()
+	if err!=nil{
 		return err
 	}
-	s.ReferenceId = refId
-	sysId, err := buffer.ReadInt64()
-	if err != nil {
-		return err
-	}
-	s.SystemId = sysId
+	s.LoginTime = time.UnixMilli(lt)
 	return nil
 }
 
 func (s *LoginEvent) Write(buffer core.DataBuffer) error {
-	err := buffer.WriteString(s.Hash)
-	if err != nil {
+	if err := buffer.WriteString(s.Name); err != nil {
 		return err
 	}
-	err = buffer.WriteInt32(s.ReferenceId)
-	if err != nil {
-		return err
-	}
-	err = buffer.WriteInt64(s.SystemId)
-	if err != nil {
+	if err := buffer.WriteInt64(s.LoginTime.UnixMilli()); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (s *LoginEvent) ReadKey(buffer core.DataBuffer) error {
-	name, err := buffer.ReadString()
+	_, err := buffer.ReadString()
 	if err != nil {
 		return err
 	}
-	s.Name = name
+	sid, err := buffer.ReadInt64()
+	if err != nil {
+		return err
+	}
+	s.SystemId = sid
+	id, err := buffer.ReadInt64()
+	if err != nil {
+		return err
+	}
+	s.Id = id
 	return nil
 }
 
 func (s *LoginEvent) WriteKey(buffer core.DataBuffer) error {
-
-	if err := buffer.WriteString(s.Name); err != nil {
+	if err := buffer.WriteString(s.ETag()); err != nil {
+		return err
+	}
+	if err := buffer.WriteInt64(s.SystemId); err != nil {
+		return err
+	}
+	if err := buffer.WriteInt64(s.Id); err != nil {
 		return err
 	}
 	return nil
