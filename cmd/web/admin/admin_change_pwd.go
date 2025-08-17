@@ -6,7 +6,6 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
 )
 
@@ -27,7 +26,7 @@ func (s *AdminChangePwd) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 	defer r.Body.Close()
 	var cp ChangePassword
 	json.NewDecoder(r.Body).Decode(&cp)
-	login := event.LoginEvent{Name:cp.Login}
+	login := bootstrap.Login{Name: cp.Login}
 	err := s.LoadLogin(&login)
 	w.WriteHeader(http.StatusOK)
 	if err != nil {

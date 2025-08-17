@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 
-	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/bootstrap"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -22,7 +22,7 @@ func (s *AdminService) createSchema() error {
 	return nil
 }
 
-func (s *AdminService) SaveLogin(login *event.LoginEvent) error {
+func (s *AdminService) SaveLogin(login *bootstrap.Login) error {
 	inserted, err := s.Sql.Exec(INSERT_LOGIN, login.Name, login.Hash, login.AccessControl)
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func (s *AdminService) SaveLogin(login *event.LoginEvent) error {
 	return nil
 }
 
-func (s *AdminService) LoadLogin(login *event.LoginEvent) error {
+func (s *AdminService) LoadLogin(login *bootstrap.Login) error {
 	err := s.Sql.Query(func(rows pgx.Rows) error {
 		var hash string
 		var id int32
@@ -56,7 +56,7 @@ func (s *AdminService) LoadLogin(login *event.LoginEvent) error {
 	return nil
 }
 
-func (s *AdminService) UpdatePassword(login *event.LoginEvent) error {
+func (s *AdminService) UpdatePassword(login *bootstrap.Login) error {
 	updated, err := s.Sql.Exec(UPDATE_HASH, login.Hash, login.Name)
 	if err != nil {
 		return err

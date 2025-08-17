@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 
+	"gameclustering.com/internal/bootstrap"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -21,7 +22,7 @@ func (s *PresenceService) createSchema() error {
 	return nil
 }
 
-func (s *PresenceService) SaveLogin(login *Login) error {
+func (s *PresenceService) SaveLogin(login *bootstrap.Login) error {
 	inserted, err := s.Sql.Exec(INSERT_LOGIN, login.Name, login.Hash, login.SystemId, login.ReferenceId)
 	if err != nil {
 		return err
@@ -32,7 +33,7 @@ func (s *PresenceService) SaveLogin(login *Login) error {
 	return nil
 }
 
-func (s *PresenceService) LoadLogin(login *Login) error {
+func (s *PresenceService) LoadLogin(login *bootstrap.Login) error {
 	err := s.Sql.Query(func(rows pgx.Rows) error {
 		var hash string
 		var systemId int64
@@ -57,7 +58,7 @@ func (s *PresenceService) LoadLogin(login *Login) error {
 	return nil
 }
 
-func (s *PresenceService) UpdatePassword(login *Login) error {
+func (s *PresenceService) UpdatePassword(login *bootstrap.Login) error {
 	updated, err := s.Sql.Exec(UPDATE_HASH, login.Hash, login.Name)
 	if err != nil {
 		return err

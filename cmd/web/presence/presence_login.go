@@ -19,7 +19,7 @@ func (s *PresenceLogin) AccessControl() int32 {
 	return bootstrap.PUBLIC_ACCESS_CONTROL
 }
 
-func (s *PresenceLogin) Login(login Login) {
+func (s *PresenceLogin) Login(login bootstrap.Login) {
 	pwd := login.Hash
 	err := s.LoadLogin(&login)
 	if err != nil {
@@ -58,7 +58,7 @@ func (s *PresenceLogin) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 		r.Body.Close()
 	}()
 	w.WriteHeader(http.StatusOK)
-	var login Login
+	var login bootstrap.Login
 	json.NewDecoder(r.Body).Decode(&login)
 	login.Cc = listener
 	go s.Login(login)
