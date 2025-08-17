@@ -13,9 +13,9 @@ type PresenceChangePwd struct {
 	*PresenceService
 }
 
-func (s *PresenceChangePwd) chnagePwd(login *event.LoginEvent) {
+func (s *PresenceChangePwd) chnagePwd(login Login) {
 	pwd := login.Hash
-	err := s.LoadLogin(login)
+	err := s.LoadLogin(&login)
 	if err != nil {
 		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
 		return
@@ -26,7 +26,7 @@ func (s *PresenceChangePwd) chnagePwd(login *event.LoginEvent) {
 		return
 	}
 	login.Hash = hash
-	err = s.UpdatePassword(login)
+	err = s.UpdatePassword(&login)
 	if err != nil {
 		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
 		return
@@ -45,10 +45,10 @@ func (s *PresenceChangePwd) Request(rs core.OnSession, w http.ResponseWriter, r 
 		r.Body.Close()
 	}()
 	w.WriteHeader(http.StatusOK)
-	var login event.LoginEvent
+	var login Login
 	json.NewDecoder(r.Body).Decode(&login)
 	login.Cc = listener
-	go s.chnagePwd(&login)
+	go s.chnagePwd(login)
 	for c := range listener {
 		w.Write(c.Data)
 		if !c.Remaining {

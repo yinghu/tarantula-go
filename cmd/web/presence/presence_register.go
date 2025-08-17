@@ -18,13 +18,13 @@ func (s *PresenceRegister) AccessControl() int32 {
 	return bootstrap.PUBLIC_ACCESS_CONTROL
 }
 
-func (s *PresenceRegister) Register(login *event.LoginEvent) {
+func (s *PresenceRegister) Register(login Login) {
 	id, _ := s.Sequence().Id()
 	login.SystemId = id
 	login.AccessControl = bootstrap.PROTECTED_ACCESS_CONTROL
 	hash, _ := s.Authenticator().HashPassword(login.Hash)
 	login.Hash = hash
-	err := s.SaveLogin(login)
+	err := s.SaveLogin(&login)
 	if err != nil {
 		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
 		return
@@ -45,10 +45,10 @@ func (s *PresenceRegister) Request(rs core.OnSession, w http.ResponseWriter, r *
 		r.Body.Close()
 	}()
 	w.WriteHeader(http.StatusOK)
-	var login event.LoginEvent
+	var login Login
 	json.NewDecoder(r.Body).Decode(&login)
 	login.Cc = listener
-	go s.Register(&login)
+	go s.Register(login)
 	for c := range listener {
 		w.Write(c.Data)
 		if !c.Remaining {

@@ -28,6 +28,7 @@ func (s *LoginEvent) Read(buffer core.DataBuffer) error {
 		return err
 	}
 	s.Hash = hash
+	
 	refId, err := buffer.ReadInt32()
 	if err != nil {
 		return err
@@ -67,8 +68,8 @@ func (s *LoginEvent) ReadKey(buffer core.DataBuffer) error {
 }
 
 func (s *LoginEvent) WriteKey(buffer core.DataBuffer) error {
-	err := buffer.WriteString(s.Name)
-	if err != nil {
+
+	if err := buffer.WriteString(s.Name); err != nil {
 		return err
 	}
 	return nil
