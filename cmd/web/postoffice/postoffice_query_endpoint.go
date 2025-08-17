@@ -38,6 +38,7 @@ func (s *PostofficeQueryer) query(query event.Query) {
 		lmt--
 		mc--
 		cid, _ := v.ReadInt32()
+		tm, _ := v.ReadInt64()
 		e := event.CreateEvent(int(cid), nil)
 		if e == nil {
 			return true
@@ -45,6 +46,7 @@ func (s *PostofficeQueryer) query(query event.Query) {
 		e.ReadKey(k)
 		e.Read(v)
 		e.OnRevision(rev)
+		e.OnTimestamp(tm)
 		ret := util.ToJson(e)
 		query.QCc() <- event.Chunk{Remaining: true, Data: ret}
 		if lmt > 0 && mc > 0 {
