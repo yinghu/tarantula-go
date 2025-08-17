@@ -7,9 +7,13 @@ import (
 )
 
 const (
+	//query with tag 
 	TAG_MESSAGE_QID    int32 = 0
-	TAG_TOURNAMENT_QID int32 = 1
-	Q_TOURNAMENT_QID   int32 = 2
+	TAG_LOGIN_QID      int32 = 1
+	TAG_TOURNAMENT_QID int32 = 2
+
+	//query criteria
+	Q_TOURNAMENT_QID int32 = 100
 )
 
 func CreateQuery(qid int32) Query {
@@ -17,9 +21,14 @@ func CreateQuery(qid int32) Query {
 	case TAG_MESSAGE_QID:
 		q := QWithTag{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan Chunk, 3)}
 		return &q
+	case TAG_LOGIN_QID:
+		q := QWithTag{Id: qid, Tag: LOGIN_ETAG, Cc: make(chan Chunk, 3)}
+		return &q
+
 	case TAG_TOURNAMENT_QID:
 		q := QWithTag{Id: qid, Tag: TOURNAMENT_ETAG, Cc: make(chan Chunk, 3)}
 		return &q
+
 	case Q_TOURNAMENT_QID:
 		q := QTournament{}
 		q.Id = qid

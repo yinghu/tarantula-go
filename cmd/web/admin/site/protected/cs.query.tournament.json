@@ -8,7 +8,7 @@
             "Type":"enum",
             "Reference": "inline",
             "Nullable": false,
-            "Values":[{"Name":"Tournament","Value":"2"}]
+            "Values":[{"Name":"Tournament","Value":"100"}]
         },
         {
             "Name": "TournamentId",
