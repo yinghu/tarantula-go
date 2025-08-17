@@ -9,7 +9,7 @@ import (
 type LoginEvent struct {
 	Id        int64     `json:"id"`
 	Name      string    `json:"login"`
-	SystemId  int64     `json:"systemId:string"`
+	SystemId  int64     `json:"systemId,string"`
 	LoginTime time.Time `json:"loginTime"`
 	EventObj
 }
@@ -28,7 +28,7 @@ func (s *LoginEvent) Read(buffer core.DataBuffer) error {
 	}
 	s.Name = name
 	lt, err := buffer.ReadInt64()
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 	s.LoginTime = time.UnixMilli(lt)
