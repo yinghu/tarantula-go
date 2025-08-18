@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
 	"time"
 
 	"gameclustering.com/internal/event"
@@ -23,18 +24,26 @@ type SegmentSchedule struct {
 	Segments []*Segment `json:"Segments"`
 
 	*TournamentService `json:"-"`
+
+	sync.RWMutex `json:"-"`
+	Started      bool `json:"-"`
 }
 
 func (t *SegmentSchedule) Start() error {
+	t.Lock()
+	defer t.Unlock()
 	for i := range t.Segments {
-		t.Segments[i].RaceBoard = RaceBoard{Size: 16}
-		t.Segments[i].RaceBoard.Start()
+		if t.Started {
+			t.Segments[i].RaceBoard = RaceBoard{Size: 16}
+			t.Segments[i].RaceBoard.Start()
+		}
 		tq := event.QTournament{TournamentId: t.TournamentId, InstanceId: t.Segments[i].InstanceId}
 		tq.Tag = event.TOURNAMENT_ETAG
 		tq.Id = event.Q_TOURNAMENT_QID
 		tq.Topic = "tournament"
 		t.Recover(&tq)
 	}
+	t.Started = true
 	return nil
 }
 

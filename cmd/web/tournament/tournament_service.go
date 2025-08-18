@@ -61,9 +61,6 @@ func (s *TournamentService) OnEvent(e event.Event) {
 
 func (s *TournamentService) NodeStarted(n core.Node) {
 	core.AppLog.Printf("Node started %s %s\n", n.Name, s.Cluster().Local().Name)
-	if n.Name != s.Cluster().Local().Name {
-		return
-	}
 	for _, t := range s.tournaments {
 		t.Start()
 	}
