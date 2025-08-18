@@ -1,8 +1,5 @@
 package core
 
-type PersistentableFactory interface {
-	Create(classId int) Persistentable
-}
 
 type Persistentable interface {
 	Write(value DataBuffer) error
@@ -60,10 +57,6 @@ func (s *PersistentableObj) OnRevision(rev uint64) {
 
 func (s *PersistentableObj) ETag() string {
 	return "ent:"
-}
-
-type DataStoreFactory interface {
-	Create(name string) (DataStore, error)
 }
 
 type DataStore interface {
