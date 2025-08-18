@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -33,7 +34,7 @@ func (s *PostofficeQueryer) query(query event.Query) {
 	}
 	mc := stat.Count
 	lmt := query.QLimit()
-	query.QCc() <- event.Chunk{Remaining: true, Data: []byte(`{"list":[`)}
+	query.QCc() <- event.Chunk{Remaining: true, Data: fmt.Appendf(make([]byte, 0), `{"count":%d,"list":[`, mc)}
 	s.Ds.List(&buff, func(k, v core.DataBuffer, rev uint64) bool {
 		lmt--
 		mc--

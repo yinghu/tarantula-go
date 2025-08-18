@@ -2,6 +2,7 @@ package event
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 )
 
@@ -25,4 +26,9 @@ func TestEventJson(t *testing.T) {
 	if pb.App != sub.App {
 		t.Errorf("app not there %s", err.Error())
 	}
+
+	fm := fmt.Sprintf(`"%s":%d`, "count", 10)
+	fmt.Printf("format :%s\n", fm)
+	bm := fmt.Appendf(make([]byte, 0), `"%s":%d`, "count", 10)
+	fmt.Printf("format :%s\n", string(bm))
 }
