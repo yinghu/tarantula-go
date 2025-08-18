@@ -36,12 +36,14 @@ func TestIndexEvent(t *testing.T) {
 	px.Write([]byte("hix"))
 	px.Flip()
 	local.List(&px, func(k, v core.DataBuffer, rev uint64) bool {
-		//fmt.Printf("index :%d\n", rev)
 		v.ReadInt32()
 		v.ReadInt64()
 		ix := event.IndexEvent{}
 		ix.ReadKey(k)
-		fmt.Printf("TAG :%s %d %s\n", ix.Tag, ix.Id, string(ix.Index))
+		if string(ix.Index) != "hix" {
+			t.Errorf("wrong index %s", string(ix.Index))
+			return false
+		}
 		ix.Read(v)
 		ik := string(ix.Key)
 		if !strings.HasPrefix(ik, "hix") {

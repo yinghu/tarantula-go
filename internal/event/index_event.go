@@ -89,31 +89,3 @@ func (s *IndexEvent) Write(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *IndexEvent) Outbound(buff core.DataBuffer) error {
-	err := s.WriteKey(buff)
-	if err != nil {
-		s.Callback.OnError(err)
-		return err
-	}
-	err = s.Write(buff)
-	if err != nil {
-		s.Callback.OnError(err)
-		return err
-	}
-	return nil
-}
-
-func (s *IndexEvent) Inbound(buff core.DataBuffer) error {
-	err := s.ReadKey(buff)
-	if err != nil {
-		s.Callback.OnError(err)
-		return err
-	}
-	err = s.Read(buff)
-	if err != nil {
-		s.Callback.OnError(err)
-		return err
-	}
-	s.Callback.OnEvent(s)
-	return nil
-}
