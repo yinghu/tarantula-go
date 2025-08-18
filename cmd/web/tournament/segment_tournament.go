@@ -27,7 +27,7 @@ type SegmentSchedule struct {
 
 func (t *SegmentSchedule) Start() error {
 	for i := range t.Segments {
-		t.Segments[i].RaceBoard = RaceBoard{Size: 10}
+		t.Segments[i].RaceBoard = RaceBoard{Size: 16}
 		t.Segments[i].RaceBoard.Start()
 		tq := event.QTournament{TournamentId: t.TournamentId, InstanceId: t.Segments[i].InstanceId}
 		tq.Tag = event.TOURNAMENT_ETAG

@@ -47,7 +47,7 @@ func (b *RaceBoard) Start() {
 func (b *RaceBoard) OnBoard(te event.TournamentEvent) {
 	b.Lock()
 	defer b.Unlock()
-	if te.Score < b.TopListing[b.Size-1].Score {
+	if te.Score <= b.TopListing[b.Size-1].Score {
 		return
 	}
 	
