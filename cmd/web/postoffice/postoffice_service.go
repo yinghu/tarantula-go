@@ -71,9 +71,9 @@ func (s *PostofficeService) OnEvent(e event.Event) {
 		return
 	}
 	err := s.Ds.Save(e)
-	if err != nil {
-		core.AppLog.Printf("Save event error %s\n", err.Error())
-		//return
+	if err == nil {
+		core.AppLog.Printf("Save event index %s\n", e.ETag())
+		e.OnIndex(s.Ds)
 	}
 	s.RLock()
 	defer s.RUnlock()

@@ -117,3 +117,8 @@ func (s *TournamentEvent) Inbound(buff core.DataBuffer) error {
 	s.Callback.OnEvent(s)
 	return nil
 }
+
+func (s *TournamentEvent) OnIndex(ds core.DataStore) error {
+	core.AppLog.Printf("create index %d\n", s.TournamentId)
+	return nil
+}

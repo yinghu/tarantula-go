@@ -28,6 +28,7 @@ type Event interface {
 	Listener() EventListener
 	Topic(t string)
 	OnTopic() string
+	OnIndex(ds core.DataStore) error
 }
 
 type Postoffice interface {
@@ -58,4 +59,8 @@ func (s *EventObj) Outbound(buff core.DataBuffer) error {
 }
 func (s *EventObj) Listener() EventListener {
 	return s.Callback
+}
+
+func (s *EventObj) OnIndex(ds core.DataStore) error {
+	return nil
 }
