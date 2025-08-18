@@ -115,35 +115,33 @@ func (s *BadgerLocal) set(key *BufferProxy, value *BufferProxy, t core.Persisten
 		}
 		//update stat total
 		se := event.StatEvent{Tag: t.ETag(), Name: event.STAT_TOTAL}
-		ckey := BufferProxy{}
-		ckey.NewProxy(BDG_KEY_SIZE)
-		cvalue := BufferProxy{}
-		cvalue.NewProxy(BDG_VALUE_SIZE)
-		se.WriteKey(&ckey)
-		ckey.Flip()
-		ck, _ := ckey.Read(0)
+		key.Clear()
+		se.WriteKey(key)
+		key.Flip()
+		value.Clear()
+		ck, _ := key.Read(0)
 		citem, err := txn.Get(ck)
 		if err == nil {
 			err = citem.Value(func(val []byte) error {
-				return cvalue.Write(val)
+				return value.Write(val)
 			})
 			if err != nil {
 				return err //rollback
 			}
-			cvalue.Flip()
-			cvalue.ReadInt32()
-			cvalue.ReadInt64()
-			se.Read(&cvalue)
+			value.Flip()
+			value.ReadInt32()
+			value.ReadInt64()
+			se.Read(value)
 			se.Count = se.Count + 1
 		} else {
 			se.Count = 1
 		}
-		cvalue.Clear()
-		cvalue.WriteInt32(int32(se.ClassId()))
-		cvalue.WriteInt64(time.Now().UnixMilli())
-		se.Write(&cvalue)
-		cvalue.Flip()
-		cv, _ := cvalue.Read(0)
+		value.Clear()
+		value.WriteInt32(int32(se.ClassId()))
+		value.WriteInt64(time.Now().UnixMilli())
+		se.Write(value)
+		value.Flip()
+		cv, _ := value.Read(0)
 		return txn.Set(ck, cv)
 
 	})
