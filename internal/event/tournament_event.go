@@ -119,7 +119,7 @@ func (s *TournamentEvent) Inbound(buff core.DataBuffer) error {
 }
 
 func (s *TournamentEvent) OnIndex(idx IndexListener) {
-	if s.Score == 0 {
+	if s.Score > 0 {
 		return
 	}
 	core.AppLog.Printf("create join index %d\n", s.TournamentId)
