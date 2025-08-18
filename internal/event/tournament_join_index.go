@@ -17,7 +17,7 @@ type TournamentJoinIndex struct {
 }
 
 func (s *TournamentJoinIndex) ClassId() int {
-	return TOURNAMENT_CID
+	return TOURNAMENT_JOIN_CID
 }
 
 func (s *TournamentJoinIndex) ETag() string {
