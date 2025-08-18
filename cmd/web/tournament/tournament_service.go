@@ -48,11 +48,15 @@ func (s *TournamentService) Start(f conf.Env, c core.Cluster) error {
 
 func (s *TournamentService) OnEvent(e event.Event) {
 	te, isTe := e.(*event.TournamentEvent)
-	if !isTe {
+	if isTe {
+		tmnt := s.tournaments[te.TournamentId]
+		tmnt.OnBoard(*te)
 		return
 	}
-	tmnt := s.tournaments[te.TournamentId]
-	tmnt.OnBoard(*te)
+	tj, isTj := e.(*event.TournamentJoinIndex)
+	if isTj {
+		core.AppLog.Printf("Join index %v\n", tj)
+	}
 }
 
 func (s *TournamentService) NodeStarted(n core.Node) {

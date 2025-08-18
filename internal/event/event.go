@@ -9,6 +9,10 @@ type Chunk struct {
 	Data      []byte
 }
 
+type IndexListener interface {
+	Index(idx Index)
+}
+
 type EventListener interface {
 	OnEvent(e Event)
 	OnError(err error)
@@ -28,7 +32,12 @@ type Event interface {
 	Listener() EventListener
 	Topic(t string)
 	OnTopic() string
-	OnIndex(ds core.DataStore) error
+	OnIndex(ix IndexListener)
+}
+
+type Index interface {
+	Event
+	Distributed() bool
 }
 
 type Postoffice interface {
@@ -51,6 +60,10 @@ func (s *EventObj) OnTopic() string {
 	return s.topic
 }
 
+func (s *EventObj) Distributed() bool {
+	return false
+}
+
 func (s *EventObj) Inbound(buff core.DataBuffer) error {
 	return nil
 }
@@ -61,6 +74,6 @@ func (s *EventObj) Listener() EventListener {
 	return s.Callback
 }
 
-func (s *EventObj) OnIndex(ds core.DataStore) error {
-	return nil
+func (s *EventObj) OnIndex(ix IndexListener) {
+
 }

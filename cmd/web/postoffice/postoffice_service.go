@@ -73,7 +73,7 @@ func (s *PostofficeService) OnEvent(e event.Event) {
 	err := s.Ds.Save(e)
 	if err == nil {
 		core.AppLog.Printf("Save event index %s\n", e.ETag())
-		e.OnIndex(s.Ds)
+		e.OnIndex(s)
 	}
 	s.RLock()
 	defer s.RUnlock()
@@ -112,4 +112,16 @@ func (s *PostofficeService) Publish(e event.Event) {
 		pub := event.SocketPublisher{Remote: v.TcpEndpoint}
 		pub.Publish(e, ticket)
 	}
+}
+
+func (s *PostofficeService) Index(idx event.Index) {
+	err := s.Ds.Save(idx)
+	if err!=nil{
+		core.AppLog.Printf("no index saved %s\n",err.Error())
+		return
+	}
+	if !idx.Distributed(){
+		return
+	}
+	s.Publish(idx)	
 }

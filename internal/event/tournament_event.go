@@ -118,7 +118,12 @@ func (s *TournamentEvent) Inbound(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *TournamentEvent) OnIndex(ds core.DataStore) error {
-	core.AppLog.Printf("create index %d\n", s.TournamentId)
-	return nil
+func (s *TournamentEvent) OnIndex(idx IndexListener) {
+	if s.Score == 0 {
+		return
+	}
+	core.AppLog.Printf("create join index %d\n", s.TournamentId)
+	tj := TournamentJoinIndex{Id: s.Id, TournamentId: s.TournamentId, InstanceId: s.InstanceId, SystemId: s.SystemId, JoinTime: s.LastUpdated}
+	tj.Topic("tournament")
+	idx.Index(&tj)
 }
