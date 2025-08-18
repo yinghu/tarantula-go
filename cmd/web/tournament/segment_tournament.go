@@ -45,15 +45,7 @@ func (t *SegmentSchedule) Score(score event.TournamentEvent) (event.TournamentEv
 		return score, err
 	}
 	score.Score = sc
-	go func() {
-		id, _ := t.Sequence().Id()
-		e := event.TournamentEvent{Id: id, TournamentId: score.TournamentId, InstanceId: score.InstanceId, SystemId: score.SystemId, Score: score.Score, LastUpdated: score.LastUpdated}
-		e.Topic("tournament")
-		t.Send(&e)
-		//ix := event.IndexEvent{Tag: event.TOURNAMENT_ETAG,Id: id}
-		//ix.Index = 
-		//t.Send(&ix)
-	}()
+	go t.sendEvent(score)
 	return score, nil
 }
 func (t *SegmentSchedule) Join(join event.TournamentEvent) (event.TournamentEvent, error) {
@@ -69,6 +61,7 @@ func (t *SegmentSchedule) Join(join event.TournamentEvent) (event.TournamentEven
 	}
 	seg.TotalJoined = total
 	t.TotalJoined += total
+	go t.sendEvent(join)
 	return join, nil
 }
 func (t *SegmentSchedule) OnBoard(update event.TournamentEvent) {
@@ -86,4 +79,11 @@ func (t *SegmentSchedule) MarshalJSON() ([]byte, error) {
 	data["TotalJoined"] = t.TotalJoined
 	data["Segments"] = t.Segments
 	return json.Marshal(data)
+}
+
+func (t *SegmentSchedule) sendEvent(te event.TournamentEvent) {
+	id, _ := t.Sequence().Id()
+	e := event.TournamentEvent{Id: id, TournamentId: te.TournamentId, InstanceId: te.InstanceId, SystemId: te.SystemId, Score: te.Score, LastUpdated: te.LastUpdated}
+	e.Topic("tournament")
+	t.Send(&e)
 }
