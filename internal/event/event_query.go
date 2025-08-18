@@ -14,7 +14,6 @@ const (
 
 	//query criteria
 	Q_TOURNAMENT_QID int32 = 100
-	Q_INDEX_QID      int32 = 101
 )
 
 func CreateQuery(qid int32) Query {
@@ -35,11 +34,6 @@ func CreateQuery(qid int32) Query {
 		q.Id = qid
 		q.Tag = TOURNAMENT_ETAG
 		q.Cc = make(chan Chunk, 3)
-		return &q
-	case Q_INDEX_QID:
-		q := QIndex{}
-		q.Id = qid
-		q.Tag = INDEX_ETAG
 		return &q
 	default:
 		q := QWithTag{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan Chunk, 3)}

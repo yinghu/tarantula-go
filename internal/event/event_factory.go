@@ -7,15 +7,13 @@ const (
 	TOURNAMENT_CID   int = 4
 	SUBSCRIPTION_CID int = 5
 
-	INDEX_CID int = 6
-
 	LOGIN_ETAG        string = "lgn:"
 	MESSAGE_ETAG      string = "msg:"
 	TOURNAMENT_ETAG   string = "tmt:"
 	SUBSCRIPTION_ETAG string = "sub:"
 
 	STAT_ETAG  string = "stat:"
-	INDEX_ETAG string = "idx:"
+	
 
 	STAT_TOTAL string = "total"
 )
@@ -42,10 +40,6 @@ func CreateEvent(cid int, listner EventListener) Event {
 		subscription := SubscriptionEvent{}
 		subscription.Callback = listner
 		return &subscription
-	case INDEX_CID:
-		index := IndexEvent{}
-		index.Callback = listner
-		return &index
 	default:
 		return nil
 	}
