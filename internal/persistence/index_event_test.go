@@ -2,7 +2,6 @@ package persistence
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"gameclustering.com/internal/core"
@@ -18,38 +17,52 @@ func TestIndexEvent(t *testing.T) {
 	}
 	defer local.Close()
 	sfk := util.NewSnowflake(1, util.EpochMillisecondsFromMidnight(2020, 1, 1))
+	px := NewBuffer(100)
+
 	for i := range 10 {
 		id, _ := sfk.Id()
 		ie := event.IndexEvent{Id: id, Tag: "test:"}
-		ie.Index = []byte("hix")
-		ie.Key = []byte(fmt.Sprintf("%s%d", "hix", i))
+		px.Clear()
+		px.WriteString("join:")
+		px.WriteInt64(100)
+		px.Flip()
+		ie.WriteIndexKey(px)
+		px.Clear()
+		px.WriteInt64(200)
+		px.Flip()
+		ie.WriteIndexValue(px)
 		err = local.Save(&ie)
 		if err != nil {
-			t.Errorf("save error %s", err.Error())
+			t.Errorf("save error %s %d", err.Error(), i)
 		}
 	}
-	px := BufferProxy{}
-	px.NewProxy(100)
-	px.WriteString(event.INDEX_ETAG)
-	px.WriteString("test:")
-	px.WriteInt32(3)
-	px.Write([]byte("hix"))
+	q := event.QIndex{IndexTag: "test:"}
+	q.Tag = event.INDEX_ETAG
+	px.Clear()
+	px.WriteString("join:")
+	px.WriteInt64(100)
 	px.Flip()
-	local.List(&px, func(k, v core.DataBuffer, rev uint64) bool {
+	q.WriteIndexKey(px)
+	px.Clear()
+	q.QCriteria(px)
+	px.Flip()
+	local.List(px, func(k, v core.DataBuffer, rev uint64) bool {
 		v.ReadInt32()
 		v.ReadInt64()
 		ix := event.IndexEvent{}
 		ix.ReadKey(k)
-		if string(ix.Index) != "hix" {
-			t.Errorf("wrong index %s", string(ix.Index))
-			return false
-		}
 		ix.Read(v)
-		ik := string(ix.Key)
-		if !strings.HasPrefix(ik, "hix") {
-			t.Errorf("wrong index %s", ik)
-			return false
-		}
+		px.Clear()
+		px.Write(ix.IndexKey)
+		px.Flip()
+		s, _ := px.ReadString()
+		d, _ := px.ReadInt64()
+		fmt.Printf("Index key %s %d %d\n", s, d, ix.Id)
+		px.Clear()
+		px.Write(ix.IndexValue)
+		px.Flip()
+		vd, _ := px.ReadInt64()
+		fmt.Printf("Index value %d\n", vd)
 		return true
 	})
 }

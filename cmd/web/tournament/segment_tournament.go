@@ -45,10 +45,15 @@ func (t *SegmentSchedule) Score(score event.TournamentEvent) (event.TournamentEv
 		return score, err
 	}
 	score.Score = sc
-	id, _ := t.Sequence().Id()
-	e := event.TournamentEvent{Id: id, TournamentId: score.TournamentId, InstanceId: score.InstanceId, SystemId: score.SystemId, Score: score.Score, LastUpdated: score.LastUpdated}
-	e.Topic("tournament")
-	t.Send(&e)
+	go func() {
+		id, _ := t.Sequence().Id()
+		e := event.TournamentEvent{Id: id, TournamentId: score.TournamentId, InstanceId: score.InstanceId, SystemId: score.SystemId, Score: score.Score, LastUpdated: score.LastUpdated}
+		e.Topic("tournament")
+		t.Send(&e)
+		//ix := event.IndexEvent{Tag: event.TOURNAMENT_ETAG,Id: id}
+		//ix.Index = 
+		//t.Send(&ix)
+	}()
 	return score, nil
 }
 func (t *SegmentSchedule) Join(join event.TournamentEvent) (event.TournamentEvent, error) {
