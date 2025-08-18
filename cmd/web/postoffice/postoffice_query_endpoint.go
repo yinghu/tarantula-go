@@ -34,7 +34,7 @@ func (s *PostofficeQueryer) query(query event.Query) {
 	}
 	mc := stat.Count
 	lmt := query.QLimit()
-	query.QCc() <- event.Chunk{Remaining: true, Data: fmt.Appendf(make([]byte, 0), `{"count":%d,"list":[`, mc)}
+	query.QCc() <- event.Chunk{Remaining: true, Data: fmt.Appendf(make([]byte, 0), `{"count":%d,"limit":%d,"list":[`, mc, lmt)}
 	s.Ds.List(&buff, func(k, v core.DataBuffer, rev uint64) bool {
 		lmt--
 		mc--
