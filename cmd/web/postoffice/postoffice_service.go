@@ -21,6 +21,7 @@ type PostofficeService struct {
 	bootstrap.AppManager
 	Ds core.DataStore
 	TopicMap
+	eQueue chan event.Event
 }
 
 func (s *PostofficeService) Config() string {
@@ -30,6 +31,7 @@ func (s *PostofficeService) Config() string {
 func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 	s.AppManager.Start(env, c)
 	s.createSchema()
+	s.eQueue = make(chan event.Event, 10)
 	path := env.LocalDir + "/store"
 	ds := persistence.BadgerLocal{InMemory: env.Bdg.InMemory, Path: path, Seq: s.Sequence()}
 	err := ds.Open()
@@ -116,12 +118,16 @@ func (s *PostofficeService) Publish(e event.Event) {
 
 func (s *PostofficeService) Index(idx event.Index) {
 	err := s.Ds.Save(idx)
-	if err!=nil{
-		core.AppLog.Printf("no index saved %s\n",err.Error())
+	if err != nil {
+		core.AppLog.Printf("no index saved %s\n", err.Error())
 		return
 	}
-	if !idx.Distributed(){
+	if !idx.Distributed() {
 		return
 	}
-	s.Publish(idx)	
+	s.Publish(idx)
+}
+
+func (s *PostofficeService) NodeStarted(n core.Node) {
+	core.AppLog.Printf("node started : %s\n", n.TcpEndpoint)
 }

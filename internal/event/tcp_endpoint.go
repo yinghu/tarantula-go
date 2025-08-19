@@ -59,7 +59,6 @@ func (s *TcpEndpoint) handleClient(client net.Conn) {
 			s.Service.OnError(err)
 		}
 	}
-	core.AppLog.Printf("socket connection closed\n")
 }
 
 func (s *TcpEndpoint) Open() error {
