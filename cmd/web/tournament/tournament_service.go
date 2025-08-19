@@ -65,3 +65,7 @@ func (s *TournamentService) NodeStarted(n core.Node) {
 		t.Start()
 	}
 }
+
+func (s *TournamentService) NodeStopped(n core.Node) {
+
+}

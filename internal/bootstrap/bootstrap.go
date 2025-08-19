@@ -66,6 +66,7 @@ type TarantulaApp interface {
 
 type BootstrapListener interface {
 	NodeStarted(n core.Node)
+	NodeStopped(n core.Node)
 }
 
 type Login struct {

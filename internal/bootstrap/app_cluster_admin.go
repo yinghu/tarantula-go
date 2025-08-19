@@ -42,11 +42,13 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		json.NewDecoder(r.Body).Decode(&join)
 		nd := s.convert(join)
 		s.Cluster().OnJoin(nd)
-		s.startEvent(nd)
+		s.nodeStarted(nd)
 	case "left":
 		var left core.Node
 		json.NewDecoder(r.Body).Decode(&left)
-		s.Cluster().OnLeave(s.convert(left))
+		nd := s.convert(left)
+		s.Cluster().OnLeave(nd)
+		s.nodeStopped(nd)
 	case "update":
 		var update item.KVUpdate
 		json.NewDecoder(r.Body).Decode(&update)
@@ -112,16 +114,17 @@ func (s *AppClusterAdmin) dispatch(kv item.KVUpdate) {
 	s.ItemListener().OnRelease(ins)
 }
 
-func (s *AppClusterAdmin) startEvent(n core.Node) {
+func (s *AppClusterAdmin) nodeStarted(n core.Node) {
 	if s.BootstrapListener() == nil {
 		return
 	}
 	s.BootstrapListener().NodeStarted(n)
-	//ste := event.NodeStartEvent{NodeName: s.Cluster().Local().Name, StartTime: time.Now()}
-	//id, _ := s.Sequence().Id()
-	//ste.Id = id
-	//ste.Topic("message")
-	//s.Send(&ste)
+}
+func (s *AppClusterAdmin) nodeStopped(n core.Node) {
+	if s.BootstrapListener() == nil {
+		return
+	}
+	s.BootstrapListener().NodeStopped(n)
 }
 
 func (s *AppClusterAdmin) send(err error) {

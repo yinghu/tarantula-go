@@ -132,3 +132,7 @@ func (s *PostofficeService) Index(idx event.Index) {
 func (s *PostofficeService) NodeStarted(n core.Node) {
 	core.AppLog.Printf("node started : %s\n", n.TcpEndpoint)
 }
+
+func (s *PostofficeService) NodeStopped(n core.Node) {
+	core.AppLog.Printf("node stopped : %s\n", n.TcpEndpoint)
+}
