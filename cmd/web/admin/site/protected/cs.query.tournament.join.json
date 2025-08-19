@@ -1,0 +1,26 @@
+{
+    "Scope": "admin",
+    "Name": "Query",
+    "Description": "query form",
+    "Properties":[
+        {
+            "Name": "Id",
+            "Type":"enum",
+            "Reference": "inline",
+            "Nullable": false,
+            "Values":[{"Name":"Tournament","Value":"101"}]
+        },
+        {
+            "Name": "SystemId",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false
+        },
+        {
+            "Name": "Limit",
+            "Type":"int32",
+            "Reference": "number",
+            "Nullable": false
+        }
+    ]
+}

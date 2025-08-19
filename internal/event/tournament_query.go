@@ -22,3 +22,17 @@ func (q *QTournament) QCriteria(buff core.DataBuffer) error {
 	}
 	return nil
 }
+
+type QJoin struct{
+	SystemId     int64 `json:"SystemId,string"`
+	QWithTag
+}
+
+func (q *QJoin) QCriteria(buff core.DataBuffer) error {
+	buff.WriteString(q.Tag)
+	buff.WriteString(T_JOIN_TAG)
+	if q.SystemId > 0{
+		buff.WriteInt64(q.SystemId)
+	}
+	return nil
+}

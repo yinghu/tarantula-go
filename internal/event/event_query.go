@@ -14,6 +14,7 @@ const (
 
 	//query criteria
 	Q_TOURNAMENT_QID int32 = 100
+	QT_JOIN_QID      int32 = 101
 )
 
 func CreateQuery(qid int32) Query {
@@ -31,6 +32,12 @@ func CreateQuery(qid int32) Query {
 
 	case Q_TOURNAMENT_QID:
 		q := QTournament{}
+		q.Id = qid
+		q.Tag = TOURNAMENT_ETAG
+		q.Cc = make(chan Chunk, 3)
+		return &q
+	case QT_JOIN_QID:
+		q := QJoin{}
 		q.Id = qid
 		q.Tag = TOURNAMENT_ETAG
 		q.Cc = make(chan Chunk, 3)
