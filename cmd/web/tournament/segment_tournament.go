@@ -33,7 +33,7 @@ func (t *SegmentSchedule) Start() error {
 	t.Lock()
 	defer t.Unlock()
 	for i := range t.Segments {
-		if t.Started {
+		if !t.Started {
 			t.Segments[i].RaceBoard = RaceBoard{Size: 16}
 			t.Segments[i].RaceBoard.Start()
 		}
