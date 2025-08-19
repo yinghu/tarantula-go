@@ -29,6 +29,7 @@ func (s *PostofficeService) Config() string {
 }
 
 func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
+	s.Bsl = s
 	s.AppManager.Start(env, c)
 	s.createSchema()
 	s.eQueue = make(chan event.Event, 10)
