@@ -42,6 +42,7 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 	s.Ds = &ds
 	s.topics = make(map[int32]event.SubscriptionEvent)
 	s.loadTopics()
+	go s.dispatchEvent()
 	core.AppLog.Printf("Postoffice service started %s %s\n", env.HttpBinding, env.LocalDir)
 	http.Handle("/postoffice/subscribe", bootstrap.Logging(&PostofficeSubscriber{PostofficeService: s}))
 	http.Handle("/postoffice/unsubscribe", bootstrap.Logging(&PostofficeUnSubscriber{PostofficeService: s}))
@@ -98,23 +99,7 @@ func (s *PostofficeService) OnEvent(e event.Event) {
 }
 
 func (s *PostofficeService) Publish(e event.Event) {
-	ticket, err := s.AppAuth.CreateTicket(0, 0, bootstrap.ADMIN_ACCESS_CONTROL)
-	if err != nil {
-		core.AppLog.Printf("Ticket error %s\n", err.Error())
-		return
-	}
-	view := s.Cluster().View()
-	core.AppLog.Printf("Event : %v %d\n", e, len(view))
-	for i := range view {
-		v := view[i]
-		core.AppLog.Printf("Sending to : %s,%s,%s,%s\n", v.Name, v.TcpEndpoint, s.Cluster().Local().Name, e.ETag())
-		if v.Name == s.Cluster().Local().Name {
-			s.OnEvent(e)
-			continue
-		}
-		pub := event.SocketPublisher{Remote: v.TcpEndpoint}
-		pub.Publish(e, ticket)
-	}
+	s.eQueue <- e
 }
 
 func (s *PostofficeService) Index(idx event.Index) {
@@ -131,8 +116,34 @@ func (s *PostofficeService) Index(idx event.Index) {
 
 func (s *PostofficeService) NodeStarted(n core.Node) {
 	core.AppLog.Printf("node started : %s\n", n.TcpEndpoint)
+	if n.Name == s.Cluster().Local().Name {
+		return
+	}
+
 }
 
 func (s *PostofficeService) NodeStopped(n core.Node) {
 	core.AppLog.Printf("node stopped : %s\n", n.TcpEndpoint)
+}
+
+func (s *PostofficeService) dispatchEvent() {
+	for e := range s.eQueue {
+		ticket, err := s.AppAuth.CreateTicket(0, 0, bootstrap.ADMIN_ACCESS_CONTROL)
+		if err != nil {
+			core.AppLog.Printf("Ticket error %s\n", err.Error())
+			return
+		}
+		view := s.Cluster().View()
+		core.AppLog.Printf("Event : %v %d\n", e, len(view))
+		for i := range view {
+			v := view[i]
+			core.AppLog.Printf("Sending to : %s,%s,%s,%s\n", v.Name, v.TcpEndpoint, s.Cluster().Local().Name, e.ETag())
+			if v.Name == s.Cluster().Local().Name {
+				s.OnEvent(e)
+				continue
+			}
+			pub := event.SocketPublisher{Remote: v.TcpEndpoint}
+			pub.Publish(e, ticket)
+		}
+	}
 }
