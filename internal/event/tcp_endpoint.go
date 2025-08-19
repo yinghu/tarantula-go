@@ -22,8 +22,8 @@ func (s *TcpEndpoint) handleClient(client net.Conn) {
 		client.Close()
 	}()
 	socket := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
-	running := true
-	for running {
+
+	for {
 		cid, err := socket.ReadInt32()
 		if err != nil {
 			core.AppLog.Printf("error on read cid %s\n", err.Error())
@@ -59,6 +59,7 @@ func (s *TcpEndpoint) handleClient(client net.Conn) {
 			s.Service.OnError(err)
 		}
 	}
+	core.AppLog.Printf("socket connection closed\n")
 }
 
 func (s *TcpEndpoint) Open() error {
