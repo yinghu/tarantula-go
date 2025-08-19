@@ -46,6 +46,10 @@ type Postoffice interface {
 	Recover(q Query)
 }
 
+type Publisher interface {
+	Publish(e Event, ticket string)
+}
+
 type EventObj struct {
 	Callback EventListener `json:"-"`
 	core.PersistentableObj

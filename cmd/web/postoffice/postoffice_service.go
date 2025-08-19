@@ -127,11 +127,12 @@ func (s *PostofficeService) NodeStopped(n core.Node) {
 }
 
 func (s *PostofficeService) dispatchEvent() {
+	pubs := make(map[string]event.Publisher)
 	for e := range s.eQueue {
 		ticket, err := s.AppAuth.CreateTicket(0, 0, bootstrap.ADMIN_ACCESS_CONTROL)
 		if err != nil {
 			core.AppLog.Printf("Ticket error %s\n", err.Error())
-			return
+			continue
 		}
 		view := s.Cluster().View()
 		core.AppLog.Printf("Event : %v %d\n", e, len(view))
@@ -142,7 +143,11 @@ func (s *PostofficeService) dispatchEvent() {
 				s.OnEvent(e)
 				continue
 			}
-			pub := event.SocketPublisher{Remote: v.TcpEndpoint}
+			pub, cached := pubs[v.Name]
+			if !cached {
+				pub := event.SocketPublisher{Remote: v.TcpEndpoint}
+				pubs[v.Name] = &pub
+			}
 			pub.Publish(e, ticket)
 		}
 	}
