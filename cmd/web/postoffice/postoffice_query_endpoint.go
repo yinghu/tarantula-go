@@ -39,7 +39,6 @@ func (s *PostofficeQueryer) query(query event.Query) {
 		lmt--
 		mc--
 		cid, _ := v.ReadInt32()
-		core.AppLog.Printf("CID %d\n", cid)
 		tm, _ := v.ReadInt64()
 		e := event.CreateEvent(int(cid), nil)
 		if e == nil {

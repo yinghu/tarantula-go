@@ -70,6 +70,7 @@ func (t *SegmentSchedule) Join(join event.TournamentEvent) (event.TournamentEven
 	}
 	seg.TotalJoined = total
 	t.TotalJoined += total
+	join.LastUpdated = time.Now().UnixMilli()
 	go t.sendEvent(join)
 	return join, nil
 }
