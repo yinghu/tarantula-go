@@ -9,35 +9,50 @@ const SOCKET_DATA_BUFFER_SIZE int = 1024
 
 type SocketPublisher struct {
 	Remote string
+	sb     SocketBuffer
+}
+
+func (s *SocketPublisher) Connect() error {
+	parts := strings.Split(s.Remote, "://")
+	conn, err := net.Dial(parts[0], parts[1])
+	if err != nil {
+		return err
+	}
+	s.sb = SocketBuffer{Socket: conn, Buffer: make([]byte, SOCKET_DATA_BUFFER_SIZE)}
+	return nil
+}
+
+func (s *SocketPublisher) Disconnect() error {
+	return s.sb.Clear()
 }
 
 func (s *SocketPublisher) Publish(e Event, ticket string) {
 
-	parts := strings.Split(s.Remote, "://")
-	conn, err := net.Dial(parts[0], parts[1])
-	if err != nil {
-		e.Listener().OnError(err)
-		return
-	}
-	defer conn.Close()
+	//parts := strings.Split(s.Remote, "://")
+	//conn, err := net.Dial(parts[0], parts[1])
+	//if err != nil {
+	//e.Listener().OnError(err)
+	//return
+	//}
+	//defer conn.Close()
 
-	buffer := SocketBuffer{Socket: conn, Buffer: make([]byte, SOCKET_DATA_BUFFER_SIZE)}
-	err = buffer.WriteInt32(int32(e.ClassId()))
+	//buffer := SocketBuffer{Socket: s.conn, Buffer: make([]byte, SOCKET_DATA_BUFFER_SIZE)}
+	err := s.sb.WriteInt32(int32(e.ClassId()))
 	if err != nil {
 		e.Listener().OnError(err)
 		return
 	}
-	err = buffer.WriteString(ticket)
+	err = s.sb.WriteString(ticket)
 	if err != nil {
 		e.Listener().OnError(err)
 		return
 	}
-	err = buffer.WriteString(e.OnTopic())
+	err = s.sb.WriteString(e.OnTopic())
 	if err != nil {
 		e.Listener().OnError(err)
 		return
 	}
-	err = e.Outbound(&buffer)
+	err = e.Outbound(&s.sb)
 	if err != nil {
 		e.Listener().OnError(err)
 	}

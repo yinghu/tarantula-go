@@ -61,7 +61,7 @@ func (s *SocketBuffer) ReadBool() (bool, error) {
 	if binary.Read(buf, binary.BigEndian, &v) != nil {
 		return false, errors.New("wrong data convert")
 	}
-	return v==1, nil
+	return v == 1, nil
 }
 
 func (s *SocketBuffer) WriteBool(data bool) error {
@@ -364,4 +364,8 @@ func (s *SocketBuffer) Write(data []byte) error {
 		return errors.New(msg)
 	}
 	return nil
+}
+
+func (s *SocketBuffer) Clear() error {
+	return s.Socket.Close()
 }

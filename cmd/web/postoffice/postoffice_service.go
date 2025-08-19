@@ -145,8 +145,9 @@ func (s *PostofficeService) dispatchEvent() {
 			}
 			pub, cached := pubs[v.Name]
 			if !cached {
-				pub := event.SocketPublisher{Remote: v.TcpEndpoint}
-				pubs[v.Name] = &pub
+				sb := event.SocketPublisher{Remote: v.TcpEndpoint}
+				sb.Connect()
+				pubs[v.Name] = &sb
 			}
 			pub.Publish(e, ticket)
 		}
