@@ -15,7 +15,7 @@ type IndexListener interface {
 
 type EventListener interface {
 	OnEvent(e Event)
-	OnError(e Event,err error)
+	OnError(e Event, err error)
 }
 
 type EventService interface {
@@ -48,7 +48,8 @@ type Postoffice interface {
 }
 
 type Publisher interface {
-	Publish(e Event, ticket string)
+	Publish(e Event, ticket string) error
+	Connect() error
 	Close() error
 }
 

@@ -158,7 +158,16 @@ func (s *PostofficeService) dispatchEvent(c chan CChange) {
 			retrying := true
 			for _, pub := range pubs {
 				e.OnListener(&localListener)
-				pub.Publish(e, ticket)
+				for i := range 3 {
+					if err := pub.Publish(e, ticket); err != nil {
+						//break
+						core.AppLog.Printf("reconnect to %s retries: %d", err.Error(), i)
+						time.Sleep(500*time.Millisecond)
+						pub.Connect()
+						continue
+					}
+					break
+				}
 				retrying = false
 			}
 			if retrying {
