@@ -79,12 +79,12 @@ func (s *LoginEvent) WriteKey(buffer core.DataBuffer) error {
 func (s *LoginEvent) Outbound(buff core.DataBuffer) error {
 	err := s.WriteKey(buff)
 	if err != nil {
-		s.Callback.OnError(err)
+		s.Callback.OnError(s,err)
 		return err
 	}
 	err = s.Write(buff)
 	if err != nil {
-		s.Callback.OnError(err)
+		s.Callback.OnError(s,err)
 		return err
 	}
 	return nil
@@ -93,12 +93,12 @@ func (s *LoginEvent) Outbound(buff core.DataBuffer) error {
 func (s *LoginEvent) Inbound(buff core.DataBuffer) error {
 	err := s.ReadKey(buff)
 	if err != nil {
-		s.Callback.OnError(err)
+		s.Callback.OnError(s,err)
 		return err
 	}
 	err = s.Read(buff)
 	if err != nil {
-		s.Callback.OnError(err)
+		s.Callback.OnError(s,err)
 		return err
 	}
 	s.Callback.OnEvent(s)

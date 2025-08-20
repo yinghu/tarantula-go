@@ -99,11 +99,11 @@ func (s *TournamentJoinIndex) Read(buff core.DataBuffer) error {
 
 func (s *TournamentJoinIndex) Outbound(buff core.DataBuffer) error {
 	if err := s.WriteKey(buff); err != nil {
-		s.Callback.OnError(err)
+		s.Callback.OnError(s,err)
 		return err
 	}
 	if err := s.Write(buff); err != nil {
-		s.Callback.OnError(err)
+		s.Callback.OnError(s,err)
 		return err
 	}
 	return nil
@@ -111,11 +111,11 @@ func (s *TournamentJoinIndex) Outbound(buff core.DataBuffer) error {
 
 func (s *TournamentJoinIndex) Inbound(buff core.DataBuffer) error {
 	if err := s.ReadKey(buff); err != nil {
-		s.Callback.OnError(err)
+		s.Callback.OnError(s,err)
 		return err
 	}
 	if err := s.Read(buff); err != nil {
-		s.Callback.OnError(err)
+		s.Callback.OnError(s,err)
 		return err
 	}
 	s.Callback.OnEvent(s)

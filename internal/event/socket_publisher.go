@@ -29,21 +29,22 @@ func (s *SocketPublisher) Close() error {
 func (s *SocketPublisher) Publish(e Event, ticket string) {
 	err := s.sb.WriteInt32(int32(e.ClassId()))
 	if err != nil {
-		e.Listener().OnError(err)
+		e.Listener().OnError(e, err)
 		return
 	}
 	err = s.sb.WriteString(ticket)
 	if err != nil {
-		e.Listener().OnError(err)
+		e.Listener().OnError(e, err)
 		return
 	}
 	err = s.sb.WriteString(e.OnTopic())
 	if err != nil {
-		e.Listener().OnError(err)
+		e.Listener().OnError(e, err)
 		return
 	}
 	err = e.Outbound(&s.sb)
 	if err != nil {
-		e.Listener().OnError(err)
+		e.Listener().OnError(e, err)
 	}
+	e.Listener().OnEvent(e)
 }

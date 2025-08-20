@@ -15,7 +15,7 @@ type IndexListener interface {
 
 type EventListener interface {
 	OnEvent(e Event)
-	OnError(err error)
+	OnError(e Event,err error)
 }
 
 type EventService interface {

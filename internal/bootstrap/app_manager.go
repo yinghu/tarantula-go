@@ -141,7 +141,7 @@ func (s *AppManager) OnEvent(e event.Event) {
 
 }
 
-func (s *AppManager) OnError(e error) {
+func (s *AppManager) OnError(e event.Event, err error) {
 
 }
 

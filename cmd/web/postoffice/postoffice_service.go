@@ -73,8 +73,8 @@ func (s *PostofficeService) Create(classId int, topic string) (event.Event, erro
 	return me, nil
 }
 
-func (s *PostofficeService) OnError(e error) {
-	core.AppLog.Printf("On event error %s\n", e.Error())
+func (s *PostofficeService) OnError(e event.Event, err error) {
+	core.AppLog.Printf("On event error %s\n", err.Error())
 }
 
 func (s *PostofficeService) OnEvent(e event.Event) {
@@ -146,6 +146,7 @@ func (s *PostofficeService) onRetry(e event.Event) {
 
 func (s *PostofficeService) dispatchEvent(c chan CChange) {
 	pubs := make(map[string]event.Publisher)
+	localListener := LocalEventListener{s}
 	for {
 		select {
 		case e := <-s.eQueue:
@@ -156,7 +157,7 @@ func (s *PostofficeService) dispatchEvent(c chan CChange) {
 			}
 			retrying := true
 			for _, pub := range pubs {
-				e.OnListener(s)
+				e.OnListener(&localListener)
 				pub.Publish(e, ticket)
 				retrying = false
 			}

@@ -57,7 +57,7 @@ func (s *SubscriptionEvent) Write(buff core.DataBuffer) error {
 func (s *SubscriptionEvent) Outbound(buff core.DataBuffer) error {
 	err := s.Write(buff)
 	if err != nil {
-		s.Callback.OnError(err)
+		s.Callback.OnError(s,err)
 		return err
 	}
 	return nil
@@ -66,7 +66,7 @@ func (s *SubscriptionEvent) Outbound(buff core.DataBuffer) error {
 func (s *SubscriptionEvent) Inbound(buff core.DataBuffer) error {
 	err := s.Read(buff)
 	if err != nil {
-		s.Callback.OnError(err)
+		s.Callback.OnError(s,err)
 		return err
 	}
 	s.Callback.OnEvent(s)

@@ -27,36 +27,36 @@ func (s *TcpEndpoint) handleClient(client net.Conn) {
 		cid, err := socket.ReadInt32()
 		if err != nil {
 			core.AppLog.Printf("error on read cid %s\n", err.Error())
-			s.Service.OnError(err)
+			s.Service.OnError(nil,err)
 			break
 		}
 		ticket, err := socket.ReadString()
 		if err != nil {
 			core.AppLog.Printf("error on read ticket %s\n", err.Error())
-			s.Service.OnError(err)
+			s.Service.OnError(nil,err)
 			break
 		}
 		err = s.Service.VerifyTicket(ticket)
 		if err != nil {
 			core.AppLog.Printf("invalid ticket %s\n", ticket)
-			s.Service.OnError(err)
+			s.Service.OnError(nil,err)
 			break
 		}
 		topic, err := socket.ReadString()
 		if err != nil {
 			core.AppLog.Printf("error on read topic %s\n", err.Error())
-			s.Service.OnError(err)
+			s.Service.OnError(nil,err)
 			break
 		}
 		e, err := s.Service.Create(int(cid), topic)
 		if err != nil {
 			core.AppLog.Printf("error on create event %s\n", err.Error())
-			s.Service.OnError(err)
+			s.Service.OnError(nil,err)
 			break
 		}
 		err = e.Inbound(&socket)
 		if err != nil {
-			s.Service.OnError(err)
+			s.Service.OnError(e,err)
 		}
 	}
 }
