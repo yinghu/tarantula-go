@@ -167,7 +167,10 @@ func (s *PostofficeService) dispatchEvent(c chan CChange) {
 					pubs[c.nodeName] = &LocalPublisher{s}
 				} else {
 					sb := event.SocketPublisher{Remote: c.endpoint}
-					sb.Connect()
+					err := sb.Connect()
+					if err != nil {
+						core.AppLog.Printf("cannot to dial to %s", err.Error())
+					}
 					pubs[c.nodeName] = &sb
 				}
 			} else {
