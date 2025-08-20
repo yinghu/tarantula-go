@@ -29,6 +29,7 @@ type Event interface {
 	Inbound(buff core.DataBuffer) error
 	Outbound(buff core.DataBuffer) error
 	core.Persistentable
+	OnListener(el EventListener)
 	Listener() EventListener
 	Topic(t string)
 	OnTopic() string
@@ -74,7 +75,10 @@ func (s *EventObj) Inbound(buff core.DataBuffer) error {
 func (s *EventObj) Outbound(buff core.DataBuffer) error {
 	return nil
 }
-func (s *EventObj) Listener() EventListener {
+func (s *EventObj) OnListener(el EventListener) {
+	s.Callback = el
+}
+func (s *EventObj) Listener() EventListener{
 	return s.Callback
 }
 
