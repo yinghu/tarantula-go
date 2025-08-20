@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/conf"
@@ -167,11 +168,16 @@ func (s *PostofficeService) dispatchEvent(c chan CChange) {
 					pubs[c.nodeName] = &LocalPublisher{s}
 				} else {
 					sb := event.SocketPublisher{Remote: c.endpoint}
-					err := sb.Connect()
-					if err != nil {
-						core.AppLog.Printf("cannot to dial to %s", err.Error())
+					for i := range 5 {
+						err := sb.Connect()
+						if err != nil {
+							fmt.Printf("cannot to dial to %s retries: %d", err.Error(), i)
+							time.Sleep(1 * time.Second)
+							continue
+						}
+						fmt.Printf("connected %s\n", c.endpoint)
+						pubs[c.nodeName] = &sb
 					}
-					pubs[c.nodeName] = &sb
 				}
 			} else {
 				delete(pubs, c.nodeName)
