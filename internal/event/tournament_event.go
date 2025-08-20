@@ -98,6 +98,7 @@ func (s *TournamentEvent) Read(buff core.DataBuffer) error {
 func (s *TournamentEvent) Outbound(buff core.DataBuffer) error {
 	if s.Callback == nil {
 		fmt.Printf("Callback is null")
+		s.Callback.OnError(fmt.Errorf("SHOUD BE CRASH"))
 	}
 	if err := s.WriteKey(buff); err != nil {
 		s.Callback.OnError(err)
