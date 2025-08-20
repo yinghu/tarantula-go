@@ -138,6 +138,10 @@ func (s *PostofficeService) NodeStopped(n core.Node) {
 	}
 }
 
+func (s *PostofficeService) onRetry(e event.Event) {
+	core.AppLog.Printf("Retrying %v\n", e)
+}
+
 func (s *PostofficeService) dispatchEvent(c chan CChange) {
 	pubs := make(map[string]event.Publisher)
 	for {
@@ -148,8 +152,13 @@ func (s *PostofficeService) dispatchEvent(c chan CChange) {
 				core.AppLog.Printf("Ticket error %s\n", err.Error())
 				continue
 			}
+			retrying := true
 			for _, pub := range pubs {
 				pub.Publish(e, ticket)
+				retrying = false
+			}
+			if retrying {
+				s.onRetry(e)
 			}
 		case c := <-c:
 			core.AppLog.Printf("Node Updated : %v\n", c)
