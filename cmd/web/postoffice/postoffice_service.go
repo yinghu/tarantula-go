@@ -148,6 +148,7 @@ func (s *PostofficeService) dispatchEvent() {
 				sb := event.SocketPublisher{Remote: v.TcpEndpoint}
 				sb.Connect()
 				pubs[v.Name] = &sb
+				pub = &sb
 			}
 			pub.Publish(e, ticket)
 		}
