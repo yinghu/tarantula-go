@@ -28,7 +28,7 @@ type PostofficeService struct {
 	bootstrap.AppManager
 	Ds core.DataStore
 	TopicMap
-	eQueue   chan event.Event
+	eQueue   chan *event.Event
 	eChanges []chan CChange
 }
 
@@ -40,7 +40,7 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 	s.Bsl = s
 	s.AppManager.Start(env, c)
 	s.createSchema()
-	s.eQueue = make(chan event.Event, 10)
+	s.eQueue = make(chan *event.Event, 10)
 	s.eChanges = make([]chan CChange, 0)
 	path := env.LocalDir + "/store"
 	ds := persistence.BadgerLocal{InMemory: env.Bdg.InMemory, Path: path, Seq: s.Sequence()}
@@ -110,7 +110,7 @@ func (s *PostofficeService) OnEvent(e event.Event) {
 }
 
 func (s *PostofficeService) Publish(e event.Event) {
-	s.eQueue <- e
+	s.eQueue <- &e
 }
 
 func (s *PostofficeService) Index(idx event.Index) {
@@ -155,11 +155,11 @@ func (s *PostofficeService) dispatchEvent(c chan CChange) {
 			}
 			retrying := true
 			for _, pub := range pubs {
-				pub.Publish(e, ticket)
+				pub.Publish(*e, ticket)
 				retrying = false
 			}
 			if retrying {
-				s.onRetry(e)
+				s.onRetry(*e)
 			}
 		case c := <-c:
 			core.AppLog.Printf("Node Updated : %v\n", c)
