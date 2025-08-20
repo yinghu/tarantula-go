@@ -1,5 +1,7 @@
 package event
 
+import "fmt"
+
 const (
 	STAT_CID            int = 1
 	LOGIN_CID           int = 2
@@ -19,7 +21,9 @@ const (
 )
 
 func CreateEvent(cid int, listner EventListener) Event {
-	
+	if listner != nil {
+		fmt.Printf("Listener is ok")
+	}
 	switch cid {
 	case STAT_CID:
 		stat := StatEvent{}
