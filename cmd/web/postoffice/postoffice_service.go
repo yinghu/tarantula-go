@@ -17,11 +17,18 @@ type TopicMap struct {
 	topics map[int32]event.SubscriptionEvent
 }
 
+type CChange struct {
+	nodeName string
+	endpoint string
+	started  bool
+}
+
 type PostofficeService struct {
 	bootstrap.AppManager
 	Ds core.DataStore
 	TopicMap
-	eQueue chan event.Event
+	eQueue   chan event.Event
+	eChanges []chan CChange
 }
 
 func (s *PostofficeService) Config() string {
@@ -33,6 +40,7 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 	s.AppManager.Start(env, c)
 	s.createSchema()
 	s.eQueue = make(chan event.Event, 10)
+	s.eChanges = make([]chan CChange, 0)
 	path := env.LocalDir + "/store"
 	ds := persistence.BadgerLocal{InMemory: env.Bdg.InMemory, Path: path, Seq: s.Sequence()}
 	err := ds.Open()
@@ -42,7 +50,9 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 	s.Ds = &ds
 	s.topics = make(map[int32]event.SubscriptionEvent)
 	s.loadTopics()
-	go s.dispatchEvent()
+	ec := make(chan CChange, 1)
+	s.eChanges = append(s.eChanges, ec)
+	go s.dispatchEvent(ec)
 	core.AppLog.Printf("Postoffice service started %s %s\n", env.HttpBinding, env.LocalDir)
 	http.Handle("/postoffice/subscribe", bootstrap.Logging(&PostofficeSubscriber{PostofficeService: s}))
 	http.Handle("/postoffice/unsubscribe", bootstrap.Logging(&PostofficeUnSubscriber{PostofficeService: s}))
@@ -116,41 +126,44 @@ func (s *PostofficeService) Index(idx event.Index) {
 
 func (s *PostofficeService) NodeStarted(n core.Node) {
 	core.AppLog.Printf("node started : %s\n", n.TcpEndpoint)
-	if n.Name == s.Cluster().Local().Name {
-		return
+	for i := range s.eChanges {
+		s.eChanges[i] <- CChange{nodeName: n.Name, endpoint: n.TcpEndpoint, started: true}
 	}
-
 }
 
 func (s *PostofficeService) NodeStopped(n core.Node) {
 	core.AppLog.Printf("node stopped : %s\n", n.TcpEndpoint)
+	for i := range s.eChanges {
+		s.eChanges[i] <- CChange{nodeName: n.Name, started: false}
+	}
 }
 
-func (s *PostofficeService) dispatchEvent() {
+func (s *PostofficeService) dispatchEvent(c chan CChange) {
 	pubs := make(map[string]event.Publisher)
-	for e := range s.eQueue {
-		ticket, err := s.AppAuth.CreateTicket(0, 0, bootstrap.ADMIN_ACCESS_CONTROL)
-		if err != nil {
-			core.AppLog.Printf("Ticket error %s\n", err.Error())
-			continue
-		}
-		view := s.Cluster().View()
-		core.AppLog.Printf("Event : %v %d\n", e, len(view))
-		for i := range view {
-			v := view[i]
-			core.AppLog.Printf("Sending to : %s,%s,%s,%s\n", v.Name, v.TcpEndpoint, s.Cluster().Local().Name, e.ETag())
-			if v.Name == s.Cluster().Local().Name {
-				s.OnEvent(e)
+	for {
+		select {
+		case e := <-s.eQueue:
+			ticket, err := s.AppAuth.CreateTicket(0, 0, bootstrap.ADMIN_ACCESS_CONTROL)
+			if err != nil {
+				core.AppLog.Printf("Ticket error %s\n", err.Error())
 				continue
 			}
-			pub, cached := pubs[v.Name]
-			if !cached {
-				sb := event.SocketPublisher{Remote: v.TcpEndpoint}
-				sb.Connect()
-				pubs[v.Name] = &sb
-				pub = &sb
+			for _, pub := range pubs {
+				pub.Publish(e, ticket)
 			}
-			pub.Publish(e, ticket)
+		case c := <-c:
+			core.AppLog.Printf("Node Updated : %v\n", c)
+			if c.started {
+				if c.nodeName == s.Cluster().Local().Name {
+					pubs[c.nodeName] = &LocalPublisher{s}
+				} else {
+					sb := event.SocketPublisher{Remote: c.endpoint}
+					sb.Connect()
+					pubs[c.nodeName] = &sb
+				}
+			} else {
+				delete(pubs, c.nodeName)
+			}
 		}
 	}
 }

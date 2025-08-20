@@ -27,16 +27,6 @@ func (s *SocketPublisher) Disconnect() error {
 }
 
 func (s *SocketPublisher) Publish(e Event, ticket string) {
-
-	//parts := strings.Split(s.Remote, "://")
-	//conn, err := net.Dial(parts[0], parts[1])
-	//if err != nil {
-	//e.Listener().OnError(err)
-	//return
-	//}
-	//defer conn.Close()
-
-	//buffer := SocketBuffer{Socket: s.conn, Buffer: make([]byte, SOCKET_DATA_BUFFER_SIZE)}
 	err := s.sb.WriteInt32(int32(e.ClassId()))
 	if err != nil {
 		e.Listener().OnError(err)
