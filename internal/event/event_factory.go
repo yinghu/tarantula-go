@@ -18,31 +18,29 @@ const (
 	STAT_TOTAL string = "total"
 )
 
-func CreateEvent(cid int, listner EventListener) Event {
+func CreateEvent(cid int) Event {
 	switch cid {
 	case STAT_CID:
 		stat := StatEvent{}
-		stat.Callback = listner
 		return &stat
 	case LOGIN_CID:
 		login := LoginEvent{}
-		login.Callback = listner
+		
 		return &login
 	case MESSAGE_CID:
 		message := MessageEvent{}
-		message.Callback = listner
+		
 		return &message
 	case TOURNAMENT_CID:
 		tournament := TournamentEvent{}
-		tournament.Callback = listner
+		
 		return &tournament
 	case SUBSCRIPTION_CID:
 		subscription := SubscriptionEvent{}
-		subscription.Callback = listner
+		
 		return &subscription
 	case TOURNAMENT_JOIN_CID:
 		join := TournamentJoinIndex{}
-		join.Callback = listner
 		return &join
 	default:
 		return nil

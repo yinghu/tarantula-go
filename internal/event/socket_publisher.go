@@ -22,7 +22,7 @@ func (s *SocketPublisher) Connect() error {
 	return nil
 }
 
-func (s *SocketPublisher) Disconnect() error {
+func (s *SocketPublisher) Close() error {
 	return s.sb.Clear()
 }
 

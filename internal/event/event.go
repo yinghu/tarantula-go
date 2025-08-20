@@ -49,6 +49,7 @@ type Postoffice interface {
 
 type Publisher interface {
 	Publish(e Event, ticket string)
+	Close() error
 }
 
 type EventObj struct {
@@ -78,7 +79,7 @@ func (s *EventObj) Outbound(buff core.DataBuffer) error {
 func (s *EventObj) OnListener(el EventListener) {
 	s.Callback = el
 }
-func (s *EventObj) Listener() EventListener{
+func (s *EventObj) Listener() EventListener {
 	return s.Callback
 }
 

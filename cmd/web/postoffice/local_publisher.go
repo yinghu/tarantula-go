@@ -9,3 +9,7 @@ type LocalPublisher struct {
 func (s *LocalPublisher) Publish(e event.Event, ticket string) {
 	s.OnEvent(e)
 }
+
+func (s *LocalPublisher) Close() error{
+	return nil
+}

@@ -36,7 +36,7 @@ func (s *PostofficeRecoverer) recover(query event.Query) {
 		lmt++
 		cid, _ := v.ReadInt32()
 		tm, _ := v.ReadInt64()
-		e := event.CreateEvent(int(cid), nil)
+		e := event.CreateEvent(int(cid))
 		if e == nil {
 			return true
 		}

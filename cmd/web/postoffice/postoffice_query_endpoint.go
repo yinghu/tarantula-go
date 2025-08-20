@@ -40,7 +40,7 @@ func (s *PostofficeQueryer) query(query event.Query) {
 		mc--
 		cid, _ := v.ReadInt32()
 		tm, _ := v.ReadInt64()
-		e := event.CreateEvent(int(cid), nil)
+		e := event.CreateEvent(int(cid))
 		if e == nil {
 			return true
 		}

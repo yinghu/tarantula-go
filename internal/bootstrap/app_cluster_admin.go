@@ -61,7 +61,8 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		}
 		s.dispatch(update)
 	case "event":
-		e := event.CreateEvent(int(cid), s)
+		e := event.CreateEvent(int(cid))
+		e.OnListener(s)
 		json.NewDecoder(r.Body).Decode(&e)
 		s.OnEvent(e)
 	default:
