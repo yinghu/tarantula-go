@@ -3,6 +3,8 @@ package event
 import (
 	"net"
 	"strings"
+
+	"gameclustering.com/internal/core"
 )
 
 const SOCKET_DATA_BUFFER_SIZE int = 1024
@@ -29,21 +31,25 @@ func (s *SocketPublisher) Close() error {
 func (s *SocketPublisher) Publish(e Event, ticket string) {
 	err := s.sb.WriteInt32(int32(e.ClassId()))
 	if err != nil {
+		core.AppLog.Printf("error on write classid %s\n", err.Error())
 		e.Listener().OnError(e, err)
 		return
 	}
 	err = s.sb.WriteString(ticket)
 	if err != nil {
+		core.AppLog.Printf("error on write ticket %s\n", err.Error())
 		e.Listener().OnError(e, err)
 		return
 	}
 	err = s.sb.WriteString(e.OnTopic())
 	if err != nil {
+		core.AppLog.Printf("error on write topic %s\n", err.Error())
 		e.Listener().OnError(e, err)
 		return
 	}
 	err = e.Outbound(&s.sb)
 	if err != nil {
+		core.AppLog.Printf("error on write outbound %s\n", err.Error())
 		e.Listener().OnError(e, err)
 	}
 	e.Listener().OnEvent(e)
