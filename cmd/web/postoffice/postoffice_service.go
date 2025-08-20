@@ -177,6 +177,7 @@ func (s *PostofficeService) dispatchEvent(c chan CChange) {
 						}
 						fmt.Printf("connected %s\n", c.endpoint)
 						pubs[c.nodeName] = &sb
+						break
 					}
 				}
 			} else {

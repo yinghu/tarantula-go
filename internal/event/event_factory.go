@@ -19,6 +19,7 @@ const (
 )
 
 func CreateEvent(cid int, listner EventListener) Event {
+	
 	switch cid {
 	case STAT_CID:
 		stat := StatEvent{}
