@@ -19,6 +19,7 @@ type TcpEndpoint struct {
 
 func (s *TcpEndpoint) handleClient(client net.Conn) {
 	defer func() {
+		core.AppLog.Printf("client socket is closed")
 		client.Close()
 	}()
 	socket := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
@@ -27,36 +28,36 @@ func (s *TcpEndpoint) handleClient(client net.Conn) {
 		cid, err := socket.ReadInt32()
 		if err != nil {
 			core.AppLog.Printf("error on read cid %s\n", err.Error())
-			s.Service.OnError(nil,err)
+			s.Service.OnError(nil, err)
 			break
 		}
 		ticket, err := socket.ReadString()
 		if err != nil {
 			core.AppLog.Printf("error on read ticket %s\n", err.Error())
-			s.Service.OnError(nil,err)
+			s.Service.OnError(nil, err)
 			break
 		}
 		err = s.Service.VerifyTicket(ticket)
 		if err != nil {
 			core.AppLog.Printf("invalid ticket %s\n", ticket)
-			s.Service.OnError(nil,err)
+			s.Service.OnError(nil, err)
 			break
 		}
 		topic, err := socket.ReadString()
 		if err != nil {
 			core.AppLog.Printf("error on read topic %s\n", err.Error())
-			s.Service.OnError(nil,err)
+			s.Service.OnError(nil, err)
 			break
 		}
 		e, err := s.Service.Create(int(cid), topic)
 		if err != nil {
 			core.AppLog.Printf("error on create event %s\n", err.Error())
-			s.Service.OnError(nil,err)
+			s.Service.OnError(nil, err)
 			break
 		}
 		err = e.Inbound(&socket)
 		if err != nil {
-			s.Service.OnError(e,err)
+			s.Service.OnError(e, err)
 		}
 	}
 }
@@ -81,6 +82,7 @@ func (s *TcpEndpoint) Open() error {
 	return nil
 }
 func (s *TcpEndpoint) Close() error {
+	core.AppLog.Printf("endpoint shutting down")
 	s.listener.Close()
 	return nil
 }
