@@ -9,5 +9,5 @@ func (a *ShopService) OnRegister(conf item.Configuration) {
 	core.AppLog.Printf("item reigster %d\n", conf.Id)
 }
 func (a *ShopService) OnRelease(conf item.Configuration) {
-	core.AppLog.Printf("item reigster %d\n", conf.Id)
+	core.AppLog.Printf("item release %d\n", conf.Id)
 }
