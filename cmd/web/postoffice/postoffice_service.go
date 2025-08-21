@@ -28,8 +28,12 @@ type PostofficeService struct {
 	bootstrap.AppManager
 	Ds core.DataStore
 	TopicMap
-	eQueue   chan event.Event
-	eChanges []chan CChange
+	outboundQ chan event.Event
+	cchangeQ  []chan CChange
+
+	inboundQ chan event.Event
+	topicQ   []chan event.SubscriptionEvent
+	ready    sync.WaitGroup
 }
 
 func (s *PostofficeService) Config() string {
@@ -40,8 +44,22 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 	s.Bsl = s
 	s.AppManager.Start(env, c)
 	s.createSchema()
-	s.eQueue = make(chan event.Event, 10)
-	s.eChanges = make([]chan CChange, 0)
+	s.topics = make(map[int32]event.SubscriptionEvent)
+	s.loadTopics()
+	s.ready = sync.WaitGroup{}
+	s.ready.Add(1)
+	s.outboundQ = make(chan event.Event, 10)
+	s.cchangeQ = make([]chan CChange, 0)
+	ec := make(chan CChange, 1)
+	s.cchangeQ = append(s.cchangeQ, ec)
+	go s.outboundEvent(ec)
+
+	s.inboundQ = make(chan event.Event, 10)
+	s.topicQ = make([]chan event.SubscriptionEvent, 0)
+	tc := make(chan event.SubscriptionEvent, 1)
+	s.topicQ = append(s.topicQ, tc)
+	go s.inboundEvent(tc)
+
 	path := env.LocalDir + "/store"
 	ds := persistence.BadgerLocal{InMemory: env.Bdg.InMemory, Path: path, Seq: s.Sequence()}
 	err := ds.Open()
@@ -49,11 +67,8 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 		return err
 	}
 	s.Ds = &ds
-	s.topics = make(map[int32]event.SubscriptionEvent)
-	s.loadTopics()
-	ec := make(chan CChange, 1)
-	s.eChanges = append(s.eChanges, ec)
-	go s.dispatchEvent(ec)
+
+	s.ready.Done()
 	core.AppLog.Printf("Postoffice service started %s %s\n", env.HttpBinding, env.LocalDir)
 	http.Handle("/postoffice/subscribe", bootstrap.Logging(&PostofficeSubscriber{PostofficeService: s}))
 	http.Handle("/postoffice/unsubscribe", bootstrap.Logging(&PostofficeUnSubscriber{PostofficeService: s}))
@@ -80,38 +95,16 @@ func (s *PostofficeService) OnError(e event.Event, err error) {
 func (s *PostofficeService) OnEvent(e event.Event) {
 	se, isSe := e.(*event.SubscriptionEvent)
 	if isSe {
-		core.AppLog.Printf("On event %d %s, %s, %s %d\n", se.Id, se.App, se.Name, se.OnTopic(), se.ClassId())
-		s.RWMutex.Lock()
-		defer s.RWMutex.Unlock()
-		s.topics[se.Id] = *se
+		for i := range s.topicQ {
+			s.topicQ[i] <- *se
+		}
 		return
 	}
-	err := s.Ds.Save(e)
-	if err == nil {
-		//core.AppLog.Printf("Save event index %s\n", e.ETag())
-		e.OnIndex(s)
-	}
-	s.RLock()
-	defer s.RUnlock()
-	apps := make([]string, 0)
-	for i := range s.topics {
-		if s.topics[i].Name != e.OnTopic() {
-			continue
-		}
-		apps = append(apps, s.topics[i].App)
-	}
-	go func() {
-		for x := range apps {
-			url := fmt.Sprintf("%s%s%s%s%s%d", "http://", apps[x], ":8080/", apps[x], "/clusteradmin/event/", e.ClassId())
-			//core.AppLog.Printf("Pushlish to %s\n", url)
-			s.PostJsonSync(url, e)
-		}
-	}()
-
+	s.inboundQ <- e
 }
 
 func (s *PostofficeService) Publish(e event.Event) {
-	s.eQueue <- e
+	s.outboundQ <- e
 }
 
 func (s *PostofficeService) Index(idx event.Index) {
@@ -128,28 +121,56 @@ func (s *PostofficeService) Index(idx event.Index) {
 
 func (s *PostofficeService) NodeStarted(n core.Node) {
 	core.AppLog.Printf("node started : %s\n", n.TcpEndpoint)
-	for i := range s.eChanges {
-		s.eChanges[i] <- CChange{nodeName: n.Name, endpoint: n.TcpEndpoint, started: true}
+	for i := range s.cchangeQ {
+		s.cchangeQ[i] <- CChange{nodeName: n.Name, endpoint: n.TcpEndpoint, started: true}
 	}
 }
 
 func (s *PostofficeService) NodeStopped(n core.Node) {
 	core.AppLog.Printf("node stopped : %s\n", n.TcpEndpoint)
-	for i := range s.eChanges {
-		s.eChanges[i] <- CChange{nodeName: n.Name, started: false}
+	for i := range s.cchangeQ {
+		s.cchangeQ[i] <- CChange{nodeName: n.Name, started: false}
 	}
 }
 
 func (s *PostofficeService) onRetry(e event.Event) {
 	core.AppLog.Printf("Retrying %v\n", e)
 }
-
-func (s *PostofficeService) dispatchEvent(c chan CChange) {
+func (s *PostofficeService) inboundEvent(t chan event.SubscriptionEvent) {
+	topics := make([]event.SubscriptionEvent, 0)
+	s.ready.Wait()
+	core.AppLog.Printf("inbound queue is ready")
+	s.RLock()
+	for _, t := range s.topics {
+		topics = append(topics, t)
+	}
+	s.RUnlock()
+	for {
+		select {
+		case c := <-t:
+			topics = append(topics, c)
+		case e := <-s.inboundQ:
+			if err := s.Ds.Save(e); err == nil {
+				e.OnIndex(s)
+			}
+			for i := range topics {
+				topic := topics[i]
+				if topic.Name != e.OnTopic() {
+					continue
+				}
+				url := fmt.Sprintf("%s%s%s%s%s%d", "http://", topic.App, ":8080/", topic.App, "/clusteradmin/event/", e.ClassId())
+				core.AppLog.Printf("Pushlish to %s\n", url)
+				s.PostJsonSync(url, e)
+			}
+		}
+	}
+}
+func (s *PostofficeService) outboundEvent(c chan CChange) {
 	pubs := make(map[string]event.Publisher)
 	localListener := LocalEventListener{s}
 	for {
 		select {
-		case e := <-s.eQueue:
+		case e := <-s.outboundQ:
 			ticket, err := s.AppAuth.CreateTicket(0, 0, bootstrap.ADMIN_ACCESS_CONTROL)
 			if err != nil {
 				core.AppLog.Printf("Ticket error %s\n", err.Error())
@@ -162,7 +183,7 @@ func (s *PostofficeService) dispatchEvent(c chan CChange) {
 					if err := pub.Publish(e, ticket); err != nil {
 						//break
 						core.AppLog.Printf("reconnect to %s retries: %d", err.Error(), i)
-						time.Sleep(500*time.Millisecond)
+						time.Sleep(500 * time.Millisecond)
 						pub.Connect()
 						continue
 					}
