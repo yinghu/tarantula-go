@@ -139,7 +139,7 @@ func (s *PostofficeService) onRetry(e event.Event) {
 func (s *PostofficeService) inboundEvent(t chan event.SubscriptionEvent) {
 	topics := make([]event.SubscriptionEvent, 0)
 	s.ready.Wait()
-	core.AppLog.Printf("inbound queue is ready")
+	core.AppLog.Printf("inbound queue is ready with pending event size %d\n", len(s.inboundQ))
 	s.RLock()
 	for _, t := range s.topics {
 		topics = append(topics, t)
@@ -159,7 +159,7 @@ func (s *PostofficeService) inboundEvent(t chan event.SubscriptionEvent) {
 					continue
 				}
 				url := fmt.Sprintf("%s%s%s%s%s%d", "http://", topic.App, ":8080/", topic.App, "/clusteradmin/event/", e.ClassId())
-				core.AppLog.Printf("Pushlish to %s\n", url)
+				//core.AppLog.Printf("Pushlish to %s\n", url)
 				s.PostJsonSync(url, e)
 			}
 		}
