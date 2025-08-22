@@ -23,27 +23,19 @@ const (
 func CreateEvent(cid int) Event {
 	switch cid {
 	case STAT_CID:
-		stat := StatEvent{}
-		return &stat
+		return &StatEvent{}
 	case LOGIN_CID:
-		login := LoginEvent{}
-
-		return &login
+		return &LoginEvent{}
 	case MESSAGE_CID:
-		message := MessageEvent{}
-
-		return &message
+		return &MessageEvent{}
 	case TOURNAMENT_CID:
-		tournament := TournamentEvent{}
-
-		return &tournament
+		return &TournamentEvent{}
 	case SUBSCRIPTION_CID:
-		subscription := SubscriptionEvent{}
-
-		return &subscription
+		return &SubscriptionEvent{}
 	case TOURNAMENT_JOIN_CID:
-		join := TournamentJoinIndex{}
-		return &join
+		return &TournamentJoinIndex{}
+	case INVENTORY_CID:
+		return &InventoryEvent{}
 	default:
 		return nil
 	}

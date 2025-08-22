@@ -37,7 +37,7 @@ func (s *TournamentJoinIndex) WriteKey(buff core.DataBuffer) error {
 	if err := buff.WriteInt64(s.SystemId); err != nil {
 		return err
 	}
-	if err := buff.WriteInt64(s.OId()); err != nil {
+	if err := buff.WriteInt64(s.OnOId()); err != nil {
 		return err
 	}
 	return nil
@@ -61,7 +61,7 @@ func (s *TournamentJoinIndex) ReadKey(buff core.DataBuffer) error {
 	if err != nil {
 		return err
 	}
-	s.OnOId(id)
+	s.OId(id)
 	return nil
 }
 

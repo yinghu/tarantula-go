@@ -26,7 +26,7 @@ func (s *MessageEvent) WriteKey(buff core.DataBuffer) error {
 	if err := buff.WriteString(s.ETag()); err != nil {
 		return err
 	}
-	if err := buff.WriteInt64(s.OId()); err != nil {
+	if err := buff.WriteInt64(s.OnOId()); err != nil {
 		return err
 	}
 	return nil
@@ -41,7 +41,7 @@ func (s *MessageEvent) ReadKey(buff core.DataBuffer) error {
 	if err != nil {
 		return err
 	}
-	s.OnOId(id)
+	s.OId(id)
 	return nil
 }
 

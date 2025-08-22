@@ -94,7 +94,7 @@ func (t *SegmentSchedule) MarshalJSON() ([]byte, error) {
 func (t *SegmentSchedule) sendEvent(te event.TournamentEvent) {
 	id, _ := t.Sequence().Id()
 	e := event.TournamentEvent{TournamentId: te.TournamentId, InstanceId: te.InstanceId, SystemId: te.SystemId, Score: te.Score, LastUpdated: te.LastUpdated}
-	e.OnOId(id)
+	e.OId(id)
 	e.Topic("tournament")
 	t.Send(&e)
 }

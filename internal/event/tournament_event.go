@@ -34,7 +34,7 @@ func (s *TournamentEvent) WriteKey(buff core.DataBuffer) error {
 	if err := buff.WriteInt64(s.SystemId); err != nil {
 		return err
 	}
-	if err := buff.WriteInt64(s.OId()); err != nil {
+	if err := buff.WriteInt64(s.OnOId()); err != nil {
 		return err
 	}
 	return nil
@@ -64,7 +64,7 @@ func (s *TournamentEvent) ReadKey(buff core.DataBuffer) error {
 	if err != nil {
 		return err
 	}
-	s.OnOId(id)
+	s.OId(id)
 	return nil
 }
 
@@ -121,7 +121,7 @@ func (s *TournamentEvent) OnIndex(idx IndexListener) {
 		return
 	}
 	tj := TournamentJoinIndex{TournamentId: s.TournamentId, InstanceId: s.InstanceId, SystemId: s.SystemId, JoinTime: s.LastUpdated}
-	tj.OnOId(s.OId())
+	tj.OId(s.OnOId())
 	tj.Topic("tournament")
 	idx.Index(&tj)
 }

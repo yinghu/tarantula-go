@@ -52,7 +52,7 @@ func (a *TournamentService) scheduleInstance(conf item.Configuration) {
 	}
 	info := event.MessageEvent{Title: "info", Message: "tournament registered", Source: a.Context(), DateTime: time.Now()}
 	id, _ := a.Sequence().Id()
-	info.OnOId(id)
+	info.OId(id)
 	info.Topic("message")
 	a.Send(&info)
 }

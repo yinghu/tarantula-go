@@ -34,8 +34,8 @@ type Event interface {
 	Topic(t string)
 	OnTopic() string
 	OnIndex(ix IndexListener)
-	OId() int64
-	OnOId(id int64)
+	OnOId() int64
+	OId(id int64)
 }
 
 type Index interface {
@@ -89,10 +89,10 @@ func (s *EventObj) Listener() EventListener {
 func (s *EventObj) OnIndex(idx IndexListener) {
 
 }
-func (s *EventObj) OnOId(oid int64) {
+func (s *EventObj) OId(oid int64) {
 	s.oid = oid
 }
 
-func (s *EventObj) OId() int64 {
+func (s *EventObj) OnOId() int64 {
 	return s.oid
 }
