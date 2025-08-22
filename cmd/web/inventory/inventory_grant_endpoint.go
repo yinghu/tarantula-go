@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -25,7 +26,7 @@ func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	e := event.InventoryEvent{SystemId: rs.SystemId, InventoryId: 10, ItemId: qid, Source: "web", Description: "event test"}
+	e := event.InventoryEvent{SystemId: rs.SystemId, InventoryId: 10, ItemId: qid, Source: "web", Description: "event test",GrantTime: time.Now()}
 	oid, _ := s.Sequence().Id()
 	e.OId(oid)
 	e.Topic("inventory")
