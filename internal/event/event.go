@@ -34,6 +34,8 @@ type Event interface {
 	Topic(t string)
 	OnTopic() string
 	OnIndex(ix IndexListener)
+	OId() int64
+	OnOId(id int64)
 }
 
 type Index interface {
@@ -57,6 +59,7 @@ type EventObj struct {
 	Callback EventListener `json:"-"`
 	core.PersistentableObj
 	topic string `json:"-"`
+	oid   int64  `json:"-"`
 }
 
 func (s *EventObj) Topic(t string) {
@@ -83,7 +86,13 @@ func (s *EventObj) OnListener(el EventListener) {
 func (s *EventObj) Listener() EventListener {
 	return s.Callback
 }
+func (s *EventObj) OnIndex(idx IndexListener) {
 
-func (s *EventObj) OnIndex(ix IndexListener) {
+}
+func (s *EventObj) OnOId(oid int64) {
+	s.oid = oid
+}
 
+func (s *EventObj) OId() int64 {
+	return s.oid
 }

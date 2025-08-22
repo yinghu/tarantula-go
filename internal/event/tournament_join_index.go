@@ -7,8 +7,7 @@ const (
 )
 
 type TournamentJoinIndex struct {
-	Id int64 `json:"id,string"`
-
+	
 	TournamentId int64 `json:"TournamentId,string"`
 	InstanceId   int64 `json:"InstanceId,string"`
 	SystemId     int64 `json:"SystemId,string"`
@@ -38,7 +37,7 @@ func (s *TournamentJoinIndex) WriteKey(buff core.DataBuffer) error {
 	if err := buff.WriteInt64(s.SystemId); err != nil {
 		return err
 	}
-	if err := buff.WriteInt64(s.Id); err != nil {
+	if err := buff.WriteInt64(s.OId()); err != nil {
 		return err
 	}
 	return nil
@@ -62,7 +61,7 @@ func (s *TournamentJoinIndex) ReadKey(buff core.DataBuffer) error {
 	if err != nil {
 		return err
 	}
-	s.Id = id
+	s.OnOId(id)
 	return nil
 }
 

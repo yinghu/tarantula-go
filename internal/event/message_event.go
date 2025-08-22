@@ -10,7 +10,6 @@ type MessageEvent struct {
 	Title    string    `json:"title"`
 	Message  string    `json:"message"`
 	DateTime time.Time `json:"dataTime"`
-	Id       int64     `json:"id,string"`
 	Source   string    `json:"source"`
 	EventObj
 }
@@ -27,7 +26,7 @@ func (s *MessageEvent) WriteKey(buff core.DataBuffer) error {
 	if err := buff.WriteString(s.ETag()); err != nil {
 		return err
 	}
-	if err := buff.WriteInt64(s.Id); err != nil {
+	if err := buff.WriteInt64(s.OId()); err != nil {
 		return err
 	}
 	return nil
@@ -42,7 +41,7 @@ func (s *MessageEvent) ReadKey(buff core.DataBuffer) error {
 	if err != nil {
 		return err
 	}
-	s.Id = id
+	s.OnOId(id)
 	return nil
 }
 

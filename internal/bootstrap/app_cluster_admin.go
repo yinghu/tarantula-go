@@ -131,7 +131,7 @@ func (s *AppClusterAdmin) nodeStopped(n core.Node) {
 func (s *AppClusterAdmin) send(err error) {
 	msg := event.MessageEvent{Title: "error", Message: err.Error(), Source: s.Cluster().Group(), DateTime: time.Now()}
 	id, _ := s.Sequence().Id()
-	msg.Id = id
+	msg.OnOId(id)
 	msg.Topic("message")
 	s.Send(&msg)
 }

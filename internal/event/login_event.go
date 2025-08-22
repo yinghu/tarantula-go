@@ -7,7 +7,6 @@ import (
 )
 
 type LoginEvent struct {
-	Id        int64     `json:"id"`
 	Name      string    `json:"login"`
 	SystemId  int64     `json:"systemId,string"`
 	LoginTime time.Time `json:"loginTime"`
@@ -59,7 +58,7 @@ func (s *LoginEvent) ReadKey(buffer core.DataBuffer) error {
 	if err != nil {
 		return err
 	}
-	s.Id = id
+	s.OnOId(id)
 	return nil
 }
 
@@ -70,7 +69,7 @@ func (s *LoginEvent) WriteKey(buffer core.DataBuffer) error {
 	if err := buffer.WriteInt64(s.SystemId); err != nil {
 		return err
 	}
-	if err := buffer.WriteInt64(s.Id); err != nil {
+	if err := buffer.WriteInt64(s.OId()); err != nil {
 		return err
 	}
 	return nil
@@ -79,12 +78,12 @@ func (s *LoginEvent) WriteKey(buffer core.DataBuffer) error {
 func (s *LoginEvent) Outbound(buff core.DataBuffer) error {
 	err := s.WriteKey(buff)
 	if err != nil {
-		s.Callback.OnError(s,err)
+		s.Callback.OnError(s, err)
 		return err
 	}
 	err = s.Write(buff)
 	if err != nil {
-		s.Callback.OnError(s,err)
+		s.Callback.OnError(s, err)
 		return err
 	}
 	return nil
@@ -93,12 +92,12 @@ func (s *LoginEvent) Outbound(buff core.DataBuffer) error {
 func (s *LoginEvent) Inbound(buff core.DataBuffer) error {
 	err := s.ReadKey(buff)
 	if err != nil {
-		s.Callback.OnError(s,err)
+		s.Callback.OnError(s, err)
 		return err
 	}
 	err = s.Read(buff)
 	if err != nil {
-		s.Callback.OnError(s,err)
+		s.Callback.OnError(s, err)
 		return err
 	}
 	s.Callback.OnEvent(s)

@@ -20,3 +20,5 @@ func (s *InventoryService) createSchema() error {
 	return nil
 
 }
+
+
