@@ -107,7 +107,7 @@ func (a *TournamentService) scheduleSegment(conf item.Configuration) {
 		seg.Segments = append(seg.Segments, &sg)
 		core.AppLog.Printf("segement data %d %v\n", sg.InstanceId, sg)
 	}
-	core.AppLog.Printf("SEG SCHEDULE %v\n", seg)
+	core.AppLog.Printf("SEG SCHEDULE %s\n", seg.Name)
 	//seg.Start()
 	a.tournaments[seg.TournamentId] = &seg
 

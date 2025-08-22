@@ -14,5 +14,5 @@ func (s *LocalEventListener) OnError(e event.Event, err error) {
 }
 
 func (s *LocalEventListener) OnEvent(e event.Event) {
-	//core.AppLog.Printf("On event %v\n", e)
+	core.AppLog.Printf("On event %v\n", e)
 }
