@@ -532,7 +532,7 @@
                 if (job.hasOwnProperty("Form")){
                     Admin.getJson(job.Form,(resp)=>{
                         let conf ={id:"#tx-form-box",prefix:"player",closeable:true};
-                        Htexml.form(conf,resp,(data)=>{
+                        Html.form(conf,resp,(data)=>{
                             Player.postJson(on_path(job.Path,data,job),on_payload(data,job),(resp)=>{
                                 on_preview("Post View",resp);
                                 Player.login(resp);
