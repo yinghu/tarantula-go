@@ -532,7 +532,7 @@
                 if (job.hasOwnProperty("Form")){
                     Admin.getJson(job.Form,(resp)=>{
                         let conf ={id:"#tx-form-box",prefix:"player",closeable:true};
-                        Html.form(conf,resp,(data)=>{
+                        Htexml.form(conf,resp,(data)=>{
                             Player.postJson(on_path(job.Path,data,job),on_payload(data,job),(resp)=>{
                                 on_preview("Post View",resp);
                                 Player.login(resp);
@@ -554,6 +554,21 @@
 
             function on_player_get(){
                 let job = Html.job(Html.currentTask().Name+"/"+Admin.query().job.name);
+                if (job.hasOwnProperty("Form")){
+                    Admin.getJson(job.Form,(resp)=>{
+                        let conf ={id:"#tx-form-box",prefix:"player",closeable:true};
+                        Htexml.form(conf,resp,(data)=>{
+                            Player.getJson(on_path(job.Path,data,job),(resp)=>{
+                                on_preview("Get View",resp);
+                                //Player.login(resp);
+                                Player.query()[job.Name]=resp;
+                                console.log(Player.query());
+                            });      
+                        });
+                        Html.openWithId("#tx-form-box");
+                    });
+                    return 
+                }
                 Player.getJson(job.Path,(resp)=>{
                     on_preview("Get View",resp);
                 });      
