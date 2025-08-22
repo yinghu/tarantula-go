@@ -2,9 +2,11 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
 )
 
@@ -18,6 +20,14 @@ func (s *InventoryGranter) AccessControl() int32 {
 
 func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-
+	qid, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	e := event.InventoryEvent{SystemId: rs.SystemId, InventoryId: 10, ItemId: qid, Source: "web", Description: "event test"}
+	oid, _ := s.Sequence().Id()
+	e.OnOId(oid)
+	s.Send(&e)
 	w.Write(util.ToJson(core.OnSession{Successful: true, Message: "granted"}))
 }

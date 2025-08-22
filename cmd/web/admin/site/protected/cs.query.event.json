@@ -8,7 +8,7 @@
             "Type":"enum",
             "Reference": "inline",
             "Nullable": false,
-            "Values":[{"Name":"Message","Value":"0"},{"Name":"Login","Value":"1"},{"Name":"Tournament","Value":"2"}]
+            "Values":[{"Name":"Message","Value":"0"},{"Name":"Login","Value":"1"},{"Name":"Tournament","Value":"2"},{"Name":"Inventory","Value":"3"}]
         },
         {
             "Name": "StartTime",
