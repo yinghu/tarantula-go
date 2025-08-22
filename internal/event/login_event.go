@@ -58,7 +58,7 @@ func (s *LoginEvent) ReadKey(buffer core.DataBuffer) error {
 	if err != nil {
 		return err
 	}
-	s.OId(id)
+	s.OnOId(id)
 	return nil
 }
 
@@ -69,7 +69,7 @@ func (s *LoginEvent) WriteKey(buffer core.DataBuffer) error {
 	if err := buffer.WriteInt64(s.SystemId); err != nil {
 		return err
 	}
-	if err := buffer.WriteInt64(s.OnOId()); err != nil {
+	if err := buffer.WriteInt64(s.OId()); err != nil {
 		return err
 	}
 	return nil

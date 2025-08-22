@@ -44,7 +44,7 @@ func (s *PostofficeRecoverer) recover(query event.Query) {
 		e.Read(v)
 		e.OnTimestamp(tm)
 		//e.OnRevision(rev)
-		e.Topic(query.QTopic())
+		e.OnTopic(query.QTopic())
 		go func() {
 			s.Publish(e)
 		}()

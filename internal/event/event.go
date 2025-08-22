@@ -31,11 +31,12 @@ type Event interface {
 	core.Persistentable
 	OnListener(el EventListener)
 	Listener() EventListener
-	Topic(t string)
-	OnTopic() string
 	OnIndex(ix IndexListener)
-	OnOId() int64
-	OId(id int64)
+	
+	OnTopic(t string)
+	Topic() string
+	OId() int64
+	OnOId(id int64)
 }
 
 type Index interface {
@@ -62,11 +63,11 @@ type EventObj struct {
 	oid   int64  `json:"-"`
 }
 
-func (s *EventObj) Topic(t string) {
+func (s *EventObj) OnTopic(t string) {
 	s.topic = t
 }
 
-func (s *EventObj) OnTopic() string {
+func (s *EventObj) Topic() string {
 	return s.topic
 }
 
@@ -89,10 +90,10 @@ func (s *EventObj) Listener() EventListener {
 func (s *EventObj) OnIndex(idx IndexListener) {
 
 }
-func (s *EventObj) OId(oid int64) {
+func (s *EventObj) OnOId(oid int64) {
 	s.oid = oid
 }
 
-func (s *EventObj) OnOId() int64 {
+func (s *EventObj) OId() int64 {
 	return s.oid
 }

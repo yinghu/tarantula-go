@@ -41,7 +41,7 @@ func (s *SocketPublisher) Publish(e Event, ticket string) error {
 		e.Listener().OnError(e, err)
 		return err
 	}
-	err = s.sb.WriteString(e.OnTopic())
+	err = s.sb.WriteString(e.Topic())
 	if err != nil {
 		core.AppLog.Printf("error on write topic %s\n", err.Error())
 		e.Listener().OnError(e, err)

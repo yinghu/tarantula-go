@@ -25,7 +25,7 @@ func TestTournamentEvent(t *testing.T) {
 	for i := range 5 {
 		sid := 1000 + i
 		tmnt := event.TournamentEvent{ TournamentId: TID, InstanceId: IID, SystemId: SID, Score: 100, LastUpdated: time.Now().UnixMilli()}
-		tmnt.OId(int64(sid))
+		tmnt.OnOId(int64(sid))
 		err = local.Load(&tmnt)
 		if err != nil { //not fount
 			err = local.Save(&tmnt)
@@ -44,7 +44,7 @@ func TestTournamentEvent(t *testing.T) {
 	for i := range 5 {
 		sid := 1000 + i
 		tmnt := event.TournamentEvent{TournamentId: TID, InstanceId: IID, SystemId: SID, Score: 100, LastUpdated: time.Now().UnixMilli()}
-		tmnt.OId(int64(sid))
+		tmnt.OnOId(int64(sid))
 		err = local.Load(&tmnt)
 		if err != nil { //not fount
 			err = local.Save(&tmnt)
@@ -102,7 +102,7 @@ func TestTournamentQuery(t *testing.T) {
 	for i := range 10 {
 		sid := 10000 + i
 		tmnt := event.TournamentEvent{TournamentId: 2000, InstanceId: IID, SystemId: SID, Score: 100, LastUpdated: time.Now().UnixMilli()}
-		tmnt.OId(int64(sid))
+		tmnt.OnOId(int64(sid))
 		err = local.Load(&tmnt)
 		if err != nil { //not fount
 			err = local.Save(&tmnt)
@@ -121,7 +121,7 @@ func TestTournamentQuery(t *testing.T) {
 	for i := range 10 {
 		sid := 20000 + i
 		tmnt := event.TournamentEvent{ TournamentId: 3000, InstanceId: IID, SystemId: SID, Score: 100, LastUpdated: time.Now().UnixMilli()}
-		tmnt.OId(int64(sid))
+		tmnt.OnOId(int64(sid))
 		err = local.Load(&tmnt)
 		if err != nil { //not fount
 			err = local.Save(&tmnt)

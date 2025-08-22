@@ -44,9 +44,9 @@ func (s *PresenceLogin) Login(login bootstrap.Login) {
 			return
 		}
 		me := event.LoginEvent{SystemId: login.SystemId, Name: login.Name}
-		me.OId(id)
+		me.OnOId(id)
 		me.LoginTime = time.Now()
-		me.Topic("login")
+		me.OnTopic("login")
 		s.Send(&me)
 	}()
 }

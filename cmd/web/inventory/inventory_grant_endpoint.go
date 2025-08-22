@@ -28,8 +28,8 @@ func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *
 	}
 	e := event.InventoryEvent{SystemId: rs.SystemId, InventoryId: 10, ItemId: qid, Source: "web", Description: "event test",GrantTime: time.Now()}
 	oid, _ := s.Sequence().Id()
-	e.OId(oid)
-	e.Topic("inventory")
+	e.OnOId(oid)
+	e.OnTopic("inventory")
 	s.Send(&e)
 	w.Write(util.ToJson(core.OnSession{Successful: true, Message: "granted"}))
 }

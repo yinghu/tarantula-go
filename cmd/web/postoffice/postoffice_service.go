@@ -81,7 +81,7 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster) error {
 func (s *PostofficeService) Create(classId int, topic string) (event.Event, error) {
 	me := event.CreateEvent(classId)
 	me.OnListener(s)
-	me.Topic(topic)
+	me.OnTopic(topic)
 	if me == nil {
 		return nil, fmt.Errorf("event ( %d ) not supported", classId)
 	}
@@ -156,7 +156,7 @@ func (s *PostofficeService) inboundEvent(t chan event.SubscriptionEvent) {
 			}
 			for i := range topics {
 				topic := topics[i]
-				if topic.Name != e.OnTopic() {
+				if topic.Name != e.Topic() {
 					continue
 				}
 				url := fmt.Sprintf("%s%s%s%s%s%d", "http://", topic.App, ":8080/", topic.App, "/clusteradmin/event/", e.ClassId())

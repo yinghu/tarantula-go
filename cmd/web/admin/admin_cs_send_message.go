@@ -31,10 +31,10 @@ func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	me.OId(id)
+	me.OnOId(id)
 	me.Source = s.Context()
 	me.DateTime = time.Now()
-	me.Topic("message")
+	me.OnTopic("message")
 	err = s.Send(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))

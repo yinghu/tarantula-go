@@ -114,7 +114,7 @@ func (s *AppManager) VerifyTicket(ticket string) error {
 }
 func (s *AppManager) Send(e event.Event) error {
 	for i := range 5 {
-		ret := s.PostJsonSync(fmt.Sprintf("%s/%s/%d", "http://postoffice:8080/postoffice/publish", e.OnTopic(), e.ClassId()), e)
+		ret := s.PostJsonSync(fmt.Sprintf("%s/%s/%d", "http://postoffice:8080/postoffice/publish", e.Topic(), e.ClassId()), e)
 		if ret.ErrorCode == 0 {
 			return nil
 		}
