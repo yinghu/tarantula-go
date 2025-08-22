@@ -150,6 +150,7 @@ func (s *PostofficeService) inboundEvent(t chan event.SubscriptionEvent) {
 		case c := <-t:
 			topics = append(topics, c)
 		case e := <-s.inboundQ:
+			core.AppLog.Printf("Inbound event %v\n", e)
 			if err := s.Ds.Save(e); err == nil {
 				e.OnIndex(s)
 			}
