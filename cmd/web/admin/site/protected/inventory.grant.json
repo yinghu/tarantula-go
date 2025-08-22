@@ -1,0 +1,13 @@
+{
+    "Scope": "admin",
+    "Name": "InventoryGrant",
+    "Description": "inventory grant form",
+    "Properties":[
+        {
+            "Name": "InventoryId",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false
+        }
+    ]
+}

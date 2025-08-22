@@ -98,7 +98,8 @@
                 {"Name":"TournamentList","Callback":"on_player_get","Path":"/tournament/list"},
                 {"Name":"TournamentJoin","Callback":"on_player_post","Form":"/admin/webprotected/tournament.join.json","Path":"/tournament/join"},
                 {"Name":"TournamentScore","Callback":"on_player_post","Form":"/admin/webprotected/tournament.score.json","Path":"/tournament/score","Payload":"TournamentJoin"},
-                {"Name":"TournamentRaceBoard","Callback":"on_player_post","Path":"/tournament/raceboard","Payload":"TournamentJoin"}
+                {"Name":"TournamentRaceBoard","Callback":"on_player_post","Path":"/tournament/raceboard","Payload":"TournamentJoin"},
+                {"Name":"InventroyGrant","Callback":"on_player_get","Form":"/admin/webprotected/inventory.grant.json","Path":"/inventory/grant","Query":["InventoryId"]}
             ]        
         }
         
