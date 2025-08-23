@@ -30,19 +30,23 @@ func (db *GitItemStore) Start() error {
 
 func (db *GitItemStore) SaveCategory(c item.Category) error {
 	fn := fmt.Sprintf("%s/%d.json", db.CategoryDir, c.Id)
-	dest, err := os.OpenFile(fn, os.O_CREATE|os.O_WRONLY, 0644)
+	err := db.writeFile(fn, string(util.ToJson(c)))
 	if err != nil {
 		core.AppLog.Printf("Err %s\n", err.Error())
-		return err
-	}
-	defer dest.Close()
-	_, err = dest.WriteString(string(util.ToJson(c)))
-	if err != nil {
 		return err
 	}
 	gr := util.GitAdd(fn)
 	if !gr.Successful {
 		return errors.New("cannot add file [" + fn + "]")
+	}
+	idx := fmt.Sprintf("%s/%s.index", db.CategoryDir, c.Name)
+	err = db.writeFile(idx, fmt.Sprintf("%d", c.Id))
+	if err != nil {
+		return err
+	}
+	gr = util.GitAdd(idx)
+	if !gr.Successful {
+		return errors.New("cannot add file [" + idx + "]")
 	}
 	gr = util.GitCommit(fmt.Sprintf("save category [ %s : %d]", c.Name, c.Id))
 	if !gr.Successful {
@@ -127,11 +131,16 @@ func (db *GitItemStore) Load(cid int64) (item.Configuration, error) {
 	return conf, nil
 }
 
-func (db *GitItemStore) RemoveCategory(cid int64) error {
+func (db *GitItemStore) RemoveCategory(cid int64, cn string) error {
 	fn := fmt.Sprintf("%s/%d.json", db.CategoryDir, cid)
 	gr := util.GitRemove(fn)
 	if !gr.Successful {
 		return fmt.Errorf("cannot remove file :%s", fn)
+	}
+	idx := fmt.Sprintf("%s/%s.index", db.CategoryDir, cn)
+	gr = util.GitRemove(idx)
+	if !gr.Successful {
+		return fmt.Errorf("cannot remove file :%s", idx)
 	}
 	gr = util.GitCommit(fmt.Sprintf("remove category [%d]", cid))
 	if !gr.Successful {
@@ -168,5 +177,20 @@ func (db *GitItemStore) Reload(kv item.KVUpdate) error {
 	var repo item.RepoUpdate
 	json.Unmarshal([]byte(kv.Value), &repo)
 	core.AppLog.Printf("Repo : %v\n", repo)
+	return nil
+}
+
+func (db *GitItemStore) writeFile(fn string, data string) error {
+	dest, err := os.OpenFile(fn, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		core.AppLog.Printf("open file error %s\n", err.Error())
+		return err
+	}
+	defer dest.Close()
+	_, err = dest.WriteString(data)
+	if err != nil {
+		core.AppLog.Printf("write file error %s\n", err.Error())
+		return err
+	}
 	return nil
 }

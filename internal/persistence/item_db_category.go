@@ -17,7 +17,7 @@ const (
 	SELECT_CATEGORY_WITH_ID          string = "SELECT name,scope,scope_sequence,rechargeable,description FROM item_category WHERE id = $1"
 	SELECT_PROPERTIES_WITH_CID       string = "SELECT name,type,reference,nullable FROM item_category_property WHERE category_id = $1"
 	SELECT_CATEGORIES_WITH_SCOPE     string = "SELECT id,name,scope,scope_sequence,rechargeable,description FROM item_category WHERE scope_sequence < $1 OR scope = $2"
-	DELETE_CATEGORY_WITH_ID          string = "DELETE FROM item_category WHERE id = $1"
+	DELETE_CATEGORY_WITH_ID          string = "DELETE FROM item_category WHERE id = $1 RETURNING name"
 	DELETE_CATEGORY_PROPERTY_WITH_ID string = "DELETE FROM item_category_property WHERE category_id = $1"
 )
 
@@ -142,11 +142,12 @@ func (db *ItemDB) DeleteCategoryWithId(cid int64) error {
 		return err
 	}
 	err = db.Sql.Txn(func(tx pgx.Tx) error {
-		dc, err := tx.Exec(context.Background(), DELETE_CATEGORY_WITH_ID, cid)
+		var cname string
+		err := tx.QueryRow(context.Background(), DELETE_CATEGORY_WITH_ID, cid).Scan(&cname)
 		if err != nil {
 			return err
 		}
-		if dc.RowsAffected() == 0 {
+		if cname == "" {
 			return fmt.Errorf("not existed %d", cid)
 		}
 		pc, err := tx.Exec(context.Background(), DELETE_CATEGORY_PROPERTY_WITH_ID, cid)
@@ -160,7 +161,7 @@ func (db *ItemDB) DeleteCategoryWithId(cid int64) error {
 		if err != nil {
 			return err
 		}
-		err = db.Gis.RemoveCategory(cid)
+		err = db.Gis.RemoveCategory(cid,cname)
 		if err != nil {
 			return err
 		}

@@ -1,6 +1,8 @@
 package main
 
 import (
+	//"fmt"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -39,6 +41,11 @@ func (s *CategoryPreviewer) Request(rs core.OnSession, w http.ResponseWriter, r 
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
+	}
+	for i := range ins {
+		item.ItemView(ins[i], func(prop string, c item.Configuration) {
+			fmt.Printf("Config %s , %s\n", prop, c.Category)
+		})
 	}
 	w.Write(util.ToJson(CategoryPreview{Cat: cat, Ins: ins}))
 
