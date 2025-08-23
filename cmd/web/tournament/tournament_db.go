@@ -116,7 +116,7 @@ func (s *TournamentService) updateInstance(te event.TournamentEvent, limit int32
 	err := s.Sql.Txn(func(tx pgx.Tx) error {
 		err := tx.QueryRow(context.Background(), UPDATE_INSTANCE, te.InstanceId, limit).Scan(&total)
 		if err != nil {
-			return nil
+			return err
 		}
 		if total == 0 {
 			return fmt.Errorf("no row updated")
