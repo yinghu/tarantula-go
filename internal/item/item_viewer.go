@@ -1,16 +1,15 @@
 package item
 
-type Viewer func(prop string, c Configuration)
+type Validator func(prop string, c Configuration)
 
-func ItemView(c Configuration, viewer Viewer) {
+func ItemValidator(c Configuration, validator Validator) {
 	ins := c.Reference
 	for k, v := range ins {
-		//fmt.Printf("Key %s\n", k)
 		ref, ok := v.([]Configuration)
 		if ok {
 			for i := range ref {
-				viewer(k, ref[i])
-				ItemView(ref[i], viewer)
+				validator(k, ref[i])
+				ItemValidator(ref[i], validator)
 			}
 		}
 	}

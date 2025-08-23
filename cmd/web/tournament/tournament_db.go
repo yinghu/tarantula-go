@@ -62,7 +62,7 @@ func (s *TournamentService) updateInstanceSchedule(sc InstanceSchedule) error {
 	return nil
 }
 
-func (s *TournamentService) updateSegmentSchedule(sc SegmentSchedule) error {
+func (s *TournamentService) updateSegmentSchedule(sc *SegmentSchedule) error {
 	r, err := s.Sql.Exec(INSERT_SCHEDULE, sc.TournamentId, true, sc.TournamentId)
 	if err != nil {
 		return err

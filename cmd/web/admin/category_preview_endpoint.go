@@ -43,7 +43,7 @@ func (s *CategoryPreviewer) Request(rs core.OnSession, w http.ResponseWriter, r 
 		return
 	}
 	for i := range ins {
-		item.ItemView(ins[i], func(prop string, c item.Configuration) {
+		item.ItemValidator(ins[i], func(prop string, c item.Configuration) {
 			fmt.Printf("Config %s , %s\n", prop, c.Category)
 		})
 	}

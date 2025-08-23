@@ -111,7 +111,7 @@ func (a *TournamentService) scheduleSegment(conf item.Configuration) {
 	//seg.Start()
 	a.tournaments[seg.TournamentId] = &seg
 
-	err = a.updateSegmentSchedule(seg)
+	err = a.updateSegmentSchedule(&seg)
 	if err != nil {
 		core.AppLog.Printf("sql err :%s\n", err.Error())
 	}
