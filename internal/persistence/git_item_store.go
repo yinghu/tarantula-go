@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
@@ -215,7 +216,7 @@ func (db *GitItemStore) readIndex(fn string) (int64, error) {
 	defer src.Close()
 	scanner := bufio.NewScanner(src)
 	scanner.Scan()
-	cid, err := strconv.ParseInt(scanner.Text(), 10, 64)
+	cid, err := strconv.ParseInt(strings.Split(scanner.Text()," ")[1], 10, 64)
 	if err != nil {
 		return 0, err
 	}
