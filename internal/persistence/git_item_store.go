@@ -182,11 +182,15 @@ func (db *GitItemStore) Reload(kv item.KVUpdate) error {
 func (db *GitItemStore) LoadCategory(name string) (item.Category, error) {
 	cat := item.Category{}
 	fn := fmt.Sprintf("%s/%s.json", db.CategoryDir, name)
-	err := db.readJson(fn, cat)
+	src, err := os.Open(fn)
 	if err != nil {
-		return cat, err
+		return cat,err
 	}
-	core.AppLog.Printf("category %v\n", cat)
+	defer src.Close()
+	err = json.NewDecoder(src).Decode(&cat)
+	if err != nil {
+		return cat,err
+	}
 	return cat, nil
 }
 func (db *GitItemStore) writeFile(fn string, data string) error {
@@ -204,17 +208,3 @@ func (db *GitItemStore) writeFile(fn string, data string) error {
 	return nil
 }
 
-func (db *GitItemStore) readJson(fn string, t any) error {
-	src, err := os.Open(fn)
-	if err != nil {
-		core.AppLog.Printf("Err %s\n", err.Error())
-		return err
-	}
-	defer src.Close()
-	err = json.NewDecoder(src).Decode(&t)
-	if err != nil {
-		return err
-	}
-	core.AppLog.Printf("category %v\n", t)
-	return nil
-}
