@@ -8,7 +8,7 @@ import (
 )
 
 func TestHeader(t *testing.T) {
-	h := `{"ConfigurationName":"Item1","ConfigurationType":"I100","header":{"name":"HP","value":200},"application":{"SkuList":[1],"ItemList":[2]}}`
+	h := `{"ConfigurationName":"Item1","ConfigurationType":"I100","header":{"name":"HP","value":200},"application":{"SkuList":["1"],"ItemList":["2"]}}`
 	var c Configuration
 
 	err := json.Unmarshal([]byte(h), &c)
@@ -19,7 +19,7 @@ func TestHeader(t *testing.T) {
 	for k, v := range c.Application {
 		fmt.Printf("%s %v\n", k, v)
 		for i := range v {
-			fmt.Printf("%d\n", v[i])
+			fmt.Printf("%v\n", v[i])
 		}
 	}
 	r, err := json.Marshal(c)
@@ -41,7 +41,7 @@ func TestApplication(t *testing.T) {
 	for k, v := range c.Application {
 		fmt.Printf("%s %v\n", k, v)
 		for i := range v {
-			fmt.Printf("%d\n", v[i])
+			fmt.Printf("%v\n", v[i])
 		}
 	}
 	r, err := json.Marshal(c)

@@ -1,13 +1,11 @@
 package persistence
 
 import (
-	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
@@ -41,8 +39,8 @@ func (db *GitItemStore) SaveCategory(c item.Category) error {
 	if !gr.Successful {
 		return errors.New("cannot add file [" + fn + "]")
 	}
-	idx := fmt.Sprintf("%s/%s.index", db.CategoryDir, c.Name)
-	err = db.writeFile(idx, fmt.Sprintf("%d", c.Id))
+	idx := fmt.Sprintf("%s/%s.json", db.CategoryDir, c.Name)
+	err = db.writeFile(idx, string(util.ToJson(c)))
 	if err != nil {
 		return err
 	}
@@ -139,7 +137,7 @@ func (db *GitItemStore) RemoveCategory(cid int64, cn string) error {
 	if !gr.Successful {
 		return fmt.Errorf("cannot remove file :%s", fn)
 	}
-	idx := fmt.Sprintf("%s/%s.index", db.CategoryDir, cn)
+	idx := fmt.Sprintf("%s/%s.json", db.CategoryDir, cn)
 	gr = util.GitRemove(idx)
 	if !gr.Successful {
 		return fmt.Errorf("cannot remove file :%s", idx)
@@ -183,13 +181,11 @@ func (db *GitItemStore) Reload(kv item.KVUpdate) error {
 }
 func (db *GitItemStore) LoadCategory(name string) (item.Category, error) {
 	cat := item.Category{}
-	idx := fmt.Sprintf("%s/%s.index", db.CategoryDir, name)
-	id, err := db.readIndex(idx)
+	fn := fmt.Sprintf("%s/%s.json", db.CategoryDir, name)
+	err := db.readJson(fn, cat)
 	if err != nil {
 		return cat, err
 	}
-	fn := fmt.Sprintf("%s/%d.json", db.CategoryDir, id)
-	db.readJson(fn, cat)
 	core.AppLog.Printf("category %v\n", cat)
 	return cat, nil
 }
@@ -206,21 +202,6 @@ func (db *GitItemStore) writeFile(fn string, data string) error {
 		return err
 	}
 	return nil
-}
-func (db *GitItemStore) readIndex(fn string) (int64, error) {
-	src, err := os.Open(fn)
-	if err != nil {
-		core.AppLog.Printf("Err %s\n", err.Error())
-		return 0, err
-	}
-	defer src.Close()
-	scanner := bufio.NewScanner(src)
-	scanner.Scan()
-	cid, err := strconv.ParseInt(strings.Split(scanner.Text()," ")[1], 10, 64)
-	if err != nil {
-		return 0, err
-	}
-	return cid, nil
 }
 
 func (db *GitItemStore) readJson(fn string, t any) error {
