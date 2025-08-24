@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
@@ -17,6 +18,7 @@ type GitItemStore struct {
 	EnumDir          string
 	CategoryDir      string
 	ConfigurationDir string
+	core.JsonRequester
 }
 
 func (db *GitItemStore) Start() error {
@@ -184,12 +186,12 @@ func (db *GitItemStore) LoadCategory(name string) (item.Category, error) {
 	fn := fmt.Sprintf("%s/%s.json", db.CategoryDir, name)
 	src, err := os.Open(fn)
 	if err != nil {
-		return cat,err
+		return cat, err
 	}
 	defer src.Close()
 	err = json.NewDecoder(src).Decode(&cat)
 	if err != nil {
-		return cat,err
+		return cat, err
 	}
 	return cat, nil
 }
@@ -208,3 +210,16 @@ func (db *GitItemStore) writeFile(fn string, data string) error {
 	return nil
 }
 
+func (db *GitItemStore) Grant(inv item.OnInventory) error {
+	var er error
+	for i := range 5 {
+		ret := db.PostJsonSync("http://inventory:8080/inventory/grant", inv)
+		if ret.ErrorCode == 0 {
+			return nil
+		}
+		time.Sleep(1000 * time.Millisecond)
+		core.AppLog.Printf("Retries: %d %v\n", i, ret)
+		er = fmt.Errorf("failed on retries %d : %s", i, ret.Message)
+	}
+	return er
+}

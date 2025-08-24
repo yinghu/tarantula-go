@@ -56,10 +56,16 @@ type ConfigRegistration struct {
 	EndTime    time.Time `json:"EndTime"`
 }
 
-type ItemLoader interface {
+type OnInventory struct {
+	SystemId int64 `json:"SystemId,string"`
+	ItemId   int64 `json:"ItemId,string"`
+}
+
+type InventoryManager interface {
 	Reload(kv KVUpdate) error
 	Load(cid int64) (Configuration, error)
 	LoadCategory(name string) (Category, error)
+	Grant(inv OnInventory) error
 }
 
 type ItemService interface {
@@ -82,7 +88,7 @@ type ItemService interface {
 	Register(reg ConfigRegistration) error
 	Check(itemId int64, app string) (ConfigRegistration, error)
 	Release(regId int32) error
-	Loader() ItemLoader
+	Manager() InventoryManager
 }
 
 type RepoUpdate struct {

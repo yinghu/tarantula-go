@@ -20,6 +20,6 @@ func (s *InventoryService) Start(f conf.Env, c core.Cluster) error {
 	s.ItemUpdater = s
 	s.AppManager.Start(f, c)
 	s.createSchema()
-	http.Handle("/inventory/grant/{id}", bootstrap.Logging(&InventoryGranter{InventoryService: s}))
+	http.Handle("/inventory/grant", bootstrap.Logging(&InventoryGranter{InventoryService: s}))
 	return nil
 }

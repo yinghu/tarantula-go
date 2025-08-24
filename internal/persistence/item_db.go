@@ -32,9 +32,10 @@ type ItemDB struct {
 	Cls core.Cluster
 }
 
-func (db *ItemDB) Loader() item.ItemLoader {
+func (db *ItemDB) Manager() item.InventoryManager {
 	return db.Gis
 }
+
 
 func (db *ItemDB) Start() error {
 	_, err := db.Sql.Exec(ITEM_ENUM_SQL_SCHEMA)

@@ -4,7 +4,13 @@
     "Description": "inventory grant form",
     "Properties":[
         {
-            "Name": "InventoryId",
+            "Name": "SystemId",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false
+        },
+        {
+            "Name": "ItemId",
             "Type":"string",
             "Reference": "text",
             "Nullable": false

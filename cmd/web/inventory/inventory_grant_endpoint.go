@@ -1,13 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
-	"strconv"
 	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
 )
 
@@ -21,17 +22,18 @@ func (s *InventoryGranter) AccessControl() int32 {
 
 func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	qid, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	ivn := item.OnInventory{}
+	err := json.NewDecoder(r.Body).Decode(&ivn)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	err = s.updateInventory(Inventory{SystemId: rs.SystemId, TypeId: "Coin", Rechargeable: true, Amount: 100, UpdateTime: time.Now()}, qid)
+	err = s.updateInventory(Inventory{SystemId: ivn.SystemId, TypeId: "Coin", Rechargeable: true, Amount: 100, UpdateTime: time.Now()}, ivn.ItemId)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: true, Message: err.Error()}))
 		return
 	}
-	e := event.InventoryEvent{SystemId: rs.SystemId, InventoryId: 10, ItemId: qid, Source: "web", Description: "event test", GrantTime: time.Now()}
+	e := event.InventoryEvent{SystemId: ivn.SystemId, InventoryId: 10, ItemId: ivn.ItemId, Source: "web", Description: "event test", GrantTime: time.Now()}
 	oid, _ := s.Sequence().Id()
 	e.OnOId(oid)
 	e.OnTopic("inventory")

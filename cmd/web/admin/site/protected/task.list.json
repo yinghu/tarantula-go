@@ -86,7 +86,8 @@
                 {"Name":"SendMessage","Callback":"on_post","Form":"/admin/webprotected/cs.send.message.json","Path":"/admin/cs/message"},
                 {"Name":"QueryEvent","Callback":"on_post","Form":"/admin/webprotected/cs.query.event.json","Path":"/admin/cs/query","Query":["Id"]},
                 {"Name":"QueryTournament","Callback":"on_post","Form":"/admin/webprotected/cs.query.tournament.json","Path":"/admin/cs/query","Query":["Id"]},
-                {"Name":"QueryTournamentJoin","Callback":"on_post","Form":"/admin/webprotected/cs.query.tournament.join.json","Path":"/admin/cs/query","Query":["Id"]}
+                {"Name":"QueryTournamentJoin","Callback":"on_post","Form":"/admin/webprotected/cs.query.tournament.join.json","Path":"/admin/cs/query","Query":["Id"]},
+                {"Name":"InventroyGrant","Callback":"on_post","Form":"/admin/webprotected/cs.inventory.grant.json","Path":"admin/cs/grant"}
             ]        
         },
         {
@@ -98,8 +99,7 @@
                 {"Name":"TournamentList","Callback":"on_player_get","Path":"/tournament/list"},
                 {"Name":"TournamentJoin","Callback":"on_player_post","Form":"/admin/webprotected/tournament.join.json","Path":"/tournament/join"},
                 {"Name":"TournamentScore","Callback":"on_player_post","Form":"/admin/webprotected/tournament.score.json","Path":"/tournament/score","Payload":"TournamentJoin"},
-                {"Name":"TournamentRaceBoard","Callback":"on_player_post","Path":"/tournament/raceboard","Payload":"TournamentJoin"},
-                {"Name":"InventroyGrant","Callback":"on_player_get","Form":"/admin/webprotected/inventory.grant.json","Path":"/inventory/grant","Query":["InventoryId"]}
+                {"Name":"TournamentRaceBoard","Callback":"on_player_post","Path":"/tournament/raceboard","Payload":"TournamentJoin"}
             ]        
         }
         
