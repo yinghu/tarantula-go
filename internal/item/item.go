@@ -59,6 +59,7 @@ type ConfigRegistration struct {
 type ItemLoader interface {
 	Reload(kv KVUpdate) error
 	Load(cid int64) (Configuration, error)
+	LoadCategory(name string) (Category, error)
 }
 
 type ItemService interface {
