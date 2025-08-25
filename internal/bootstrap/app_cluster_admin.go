@@ -52,7 +52,7 @@ func (s *AppClusterAdmin) Request(rs core.OnSession, w http.ResponseWriter, r *h
 	case "update":
 		var update item.KVUpdate
 		json.NewDecoder(r.Body).Decode(&update)
-		s.ItemService().Manager().Reload(update)
+		s.ItemService().InventoryManager().Reload(update)
 	case "schedule":
 		var update item.KVUpdate
 		json.NewDecoder(r.Body).Decode(&update)
@@ -97,7 +97,7 @@ func (s *AppClusterAdmin) dispatch(kv item.KVUpdate) {
 			s.send(fmt.Errorf("key not matched %d : %d", itemId, reg.ItemId))
 			return
 		}
-		ins, err := s.ItemService().Manager().Load(reg.ItemId)
+		ins, err := s.ItemService().InventoryManager().Load(reg.ItemId)
 		if err != nil {
 			s.send(err)
 			return
@@ -107,7 +107,7 @@ func (s *AppClusterAdmin) dispatch(kv item.KVUpdate) {
 		return
 	}
 	core.AppLog.Printf("Item released %d\n", itemId)
-	ins, err := s.ItemService().Manager().Load(itemId)
+	ins, err := s.ItemService().InventoryManager().Load(itemId)
 	if err != nil {
 		s.send(err)
 		return

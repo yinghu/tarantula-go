@@ -33,7 +33,7 @@ func (s *TournamentService) Start(f conf.Env, c core.Cluster) error {
 	ids, err := s.loadSchedule()
 	if err == nil {
 		for i := range ids {
-			c, err := s.ItemService().Manager().Load(ids[i])
+			c, err := s.ItemService().InventoryManager().Load(ids[i])
 			if err == nil {
 				s.ItemListener().OnRegister(c)
 			}
