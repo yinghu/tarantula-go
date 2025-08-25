@@ -223,3 +223,7 @@ func (db *GitItemStore) Grant(inv item.OnInventory) error {
 	}
 	return er
 }
+
+func (db *GitItemStore) Validate(c item.Configuration, validator item.Validator){
+
+}

@@ -32,7 +32,7 @@ type ItemDB struct {
 	Cls core.Cluster
 }
 
-func (db *ItemDB) Manager() item.InventoryManager {
+func (db *ItemDB) InventoryManager() item.InventoryManager {
 	return db.Gis
 }
 

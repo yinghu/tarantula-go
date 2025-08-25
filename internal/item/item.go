@@ -57,8 +57,9 @@ type ConfigRegistration struct {
 }
 
 type OnInventory struct {
-	SystemId int64 `json:"SystemId,string"`
-	ItemId   int64 `json:"ItemId,string"`
+	SystemId int64  `json:"SystemId,string"`
+	ItemId   int64  `json:"ItemId,string"`
+	Source   string `json:"Source"`
 }
 
 type InventoryManager interface {
@@ -66,6 +67,7 @@ type InventoryManager interface {
 	Load(cid int64) (Configuration, error)
 	LoadCategory(name string) (Category, error)
 	Grant(inv OnInventory) error
+	Validate(c Configuration, validator Validator)
 }
 
 type ItemService interface {
@@ -88,7 +90,7 @@ type ItemService interface {
 	Register(reg ConfigRegistration) error
 	Check(itemId int64, app string) (ConfigRegistration, error)
 	Release(regId int32) error
-	Manager() InventoryManager
+	InventoryManager() InventoryManager
 }
 
 type RepoUpdate struct {

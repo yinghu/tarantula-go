@@ -28,6 +28,15 @@ func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
+	conf, err := s.ItemService().InventoryManager().Load(ivn.ItemId)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: true, Message: err.Error()}))
+		return
+	}
+	core.AppLog.Printf("Granting item %d\n", conf.Id)
+	s.ItemService().InventoryManager().Validate(conf, func(prop string, c item.Configuration) {
+		core.AppLog.Printf("Validating conf %s %s\n", prop, c.Category)
+	})
 	err = s.updateInventory(Inventory{SystemId: ivn.SystemId, TypeId: "Coin", Rechargeable: true, Amount: 100, UpdateTime: time.Now()}, ivn.ItemId)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: true, Message: err.Error()}))

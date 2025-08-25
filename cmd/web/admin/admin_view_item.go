@@ -24,7 +24,7 @@ func (s *AdminItemViewer) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	conf, err := s.ItemService().Manager().Load(cid)
+	conf, err := s.ItemService().InventoryManager().Load(cid)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
