@@ -36,13 +36,19 @@ func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *
 	core.AppLog.Printf("Granting item %d\n", conf.Id)
 	s.ItemService().InventoryManager().Validate(conf, func(prop string, c item.Configuration) {
 		core.AppLog.Printf("Validating conf %s %s\n", prop, c.Category)
+		cat, err := s.ItemService().InventoryManager().LoadCategory(c.Category)
+		if err != nil {
+			core.AppLog.Printf("Error %s\n", err.Error())
+		} else {
+			core.AppLog.Printf("Category :%v\n", cat)
+		}
 	})
 	err = s.updateInventory(Inventory{SystemId: ivn.SystemId, TypeId: "Coin", Rechargeable: true, Amount: 100, UpdateTime: time.Now()}, ivn.ItemId)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: true, Message: err.Error()}))
 		return
 	}
-	e := event.InventoryEvent{SystemId: ivn.SystemId, InventoryId: 10, ItemId: ivn.ItemId, Source: "web", Description: "event test", GrantTime: time.Now()}
+	e := event.InventoryEvent{SystemId: ivn.SystemId, InventoryId: 10, ItemId: ivn.ItemId, Source: ivn.Source, Description: "event test", GrantTime: time.Now()}
 	oid, _ := s.Sequence().Id()
 	e.OnOId(oid)
 	e.OnTopic("inventory")

@@ -31,14 +31,5 @@ func (s *CSGranter) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	//me.OnOId(id)
-	//me.Source = s.Context()
-	//me.DateTime = time.Now()
-	//me.OnTopic("message")
-	//err = s.Send(&me)
-	//if err != nil {
-	//w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
-	//return
-	//}
 	w.Write(util.ToJson(core.OnSession{Successful: true, Message: "granted"}))
 }
