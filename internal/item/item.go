@@ -59,7 +59,7 @@ func (c *Configuration) Amount(cat Category) int32 {
 			v, exists := c.Header["Amount"]
 			if exists {
 				core.AppLog.Printf("Amont %v:\n", v)
-				am, ok := v.(int64)
+				am, ok := v.(float64)
 				if ok {
 					return int32(am)
 				}
