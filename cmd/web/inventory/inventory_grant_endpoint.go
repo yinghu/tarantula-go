@@ -43,7 +43,7 @@ func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *
 		} else {
 			core.AppLog.Printf("Category :%v\n", cat)
 			if cat.Scope == item.GRANTABLE_ITEM {
-				ivs = append(ivs, Inventory{SystemId: ivn.SystemId, TypeId: c.TypeId, Rechargeable: cat.Rechargeable, Amount: c.Amount(), UpdateTime: time.Now(), ItemId: c.Id})
+				ivs = append(ivs, Inventory{SystemId: ivn.SystemId, TypeId: c.TypeId, Rechargeable: cat.Rechargeable, Amount: c.Amount(cat), UpdateTime: time.Now(), ItemId: c.Id})
 			}
 		}
 	})

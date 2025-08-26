@@ -50,8 +50,23 @@ type Configuration struct {
 	Reference   map[string]any      `json:"reference"`
 }
 
-func (c *Configuration) Amount() int32 {
-	return 100
+func (c *Configuration) Amount(cat Category) int32 {
+	if cat.Rechargeable {
+		return 1
+	}
+	for i := range cat.Properties {
+		if cat.Properties[i].Name == "Amount" {
+			v, exists := c.Header["Amount"]
+			if exists {
+				am, ok := v.(int32)
+				if ok {
+					return am
+				}
+				return 0
+			}
+		}
+	}
+	return 0
 }
 
 type ConfigRegistration struct {
