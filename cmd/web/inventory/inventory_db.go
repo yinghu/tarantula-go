@@ -28,7 +28,7 @@ func (s *InventoryService) createSchema() error {
 	return nil
 }
 
-func (s *InventoryService) updateInventory(iv Inventory, itemId int64) error {
+func (s *InventoryService) updateInventory(iv Inventory) error {
 	var id int32
 	err := s.Sql.Txn(func(tx pgx.Tx) error {
 		err := tx.QueryRow(context.Background(), UPDATE_INVENTORY, iv.SystemId, iv.TypeId, iv.Rechargeable, iv.Amount, iv.UpdateTime.UnixMilli(), iv.Amount, iv.UpdateTime.UnixMilli(), iv.SystemId, iv.TypeId).Scan(&id)
@@ -38,7 +38,7 @@ func (s *InventoryService) updateInventory(iv Inventory, itemId int64) error {
 		if id == 0 {
 			return fmt.Errorf("no row updated")
 		}
-		e, err := tx.Conn().Exec(context.Background(), INSERT_INVENTORY_ITEM, id, itemId)
+		e, err := tx.Conn().Exec(context.Background(), INSERT_INVENTORY_ITEM, id, iv.ItemId)
 		if err != nil {
 			return err
 		}

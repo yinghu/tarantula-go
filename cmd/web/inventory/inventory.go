@@ -13,6 +13,7 @@ type Inventory struct {
 	Amount       int32     `json:"Amount"`
 	Rechargeable bool      `json:"Rechargeable"`
 	UpdateTime   time.Time `json:"UpdateTime"`
+	ItemId       int64     `json:"-"`
 }
 
 type InventoryItem struct {

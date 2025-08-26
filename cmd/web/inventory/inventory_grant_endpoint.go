@@ -34,6 +34,7 @@ func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *
 		return
 	}
 	core.AppLog.Printf("Granting item %d\n", conf.Id)
+	ivs := make([]Inventory, 0)
 	s.ItemService().InventoryManager().Validate(conf, func(prop string, c item.Configuration) {
 		core.AppLog.Printf("Validating conf %s %s\n", prop, c.Category)
 		cat, err := s.ItemService().InventoryManager().LoadCategory(c.Category)
@@ -41,12 +42,17 @@ func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *
 			core.AppLog.Printf("Error %s\n", err.Error())
 		} else {
 			core.AppLog.Printf("Category :%v\n", cat)
+			if cat.Scope == "Commodity" {
+				ivs = append(ivs, Inventory{SystemId: ivn.SystemId, TypeId: c.TypeId, Rechargeable: cat.Rechargeable, Amount: 1, UpdateTime: time.Now(), ItemId: c.Id})
+			}
 		}
 	})
-	err = s.updateInventory(Inventory{SystemId: ivn.SystemId, TypeId: "Coin", Rechargeable: true, Amount: 100, UpdateTime: time.Now()}, ivn.ItemId)
-	if err != nil {
-		w.Write(util.ToJson(core.OnSession{Successful: true, Message: err.Error()}))
-		return
+	for i := range ivs {
+		err = s.updateInventory(ivs[i])
+		if err != nil {
+			w.Write(util.ToJson(core.OnSession{Successful: true, Message: err.Error()}))
+			return
+		}
 	}
 	e := event.InventoryEvent{SystemId: ivn.SystemId, InventoryId: 10, ItemId: ivn.ItemId, Source: ivn.Source, Description: "event test", GrantTime: time.Now()}
 	oid, _ := s.Sequence().Id()
