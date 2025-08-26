@@ -26,7 +26,7 @@ func (s *CSGranter) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 		return
 	}
 	me.Source = "cs"
-	s.Service().ItemService().InventoryManager().Grant(me)
+	err = s.Service().ItemService().InventoryManager().Grant(me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return

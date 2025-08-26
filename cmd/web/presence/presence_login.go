@@ -8,6 +8,7 @@ import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
 )
 
@@ -48,6 +49,11 @@ func (s *PresenceLogin) Login(login bootstrap.Login) {
 		me.LoginTime = time.Now()
 		me.OnTopic("login")
 		s.Send(&me)
+		rw := item.OnInventory{SystemId: login.SystemId, ItemId: s.LoginReward.Id, Source: "login"}
+		err = s.ItemService().InventoryManager().Grant(rw)
+		if err != nil {
+			core.AppLog.Printf("grant failed %s\n", err.Error())
+		}
 	}()
 }
 
