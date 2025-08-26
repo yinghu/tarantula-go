@@ -6,6 +6,10 @@ import (
 	"gameclustering.com/internal/core"
 )
 
+const (
+	GRANTABLE_ITEM = "Commodity"
+)
+
 type Enum struct {
 	Id     int64       `json:"Id,string"`
 	Name   string      `json:"Name"`
@@ -44,6 +48,10 @@ type Configuration struct {
 	Header      map[string]any      `json:"header"`
 	Application map[string][]string `json:"application"`
 	Reference   map[string]any      `json:"reference"`
+}
+
+func (c *Configuration) Amount() int32 {
+	return 100
 }
 
 type ConfigRegistration struct {
