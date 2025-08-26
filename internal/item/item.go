@@ -51,14 +51,13 @@ type Configuration struct {
 }
 
 func (c *Configuration) Amount(cat Category) int32 {
-	if cat.Rechargeable {
+	if !cat.Rechargeable {
 		return 1
 	}
 	for i := range cat.Properties {
 		if cat.Properties[i].Name == "Amount" {
 			v, exists := c.Header["Amount"]
 			if exists {
-				core.AppLog.Printf("Amont %v:\n", v)
 				am, ok := v.(float64)
 				if ok {
 					return int32(am)
