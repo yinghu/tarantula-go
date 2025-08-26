@@ -58,6 +58,7 @@ func (c *Configuration) Amount(cat Category) int32 {
 		if cat.Properties[i].Name == "Amount" {
 			v, exists := c.Header["Amount"]
 			if exists {
+				core.AppLog.Printf("Amont %v:\n", v)
 				am, ok := v.(int32)
 				if ok {
 					return am
