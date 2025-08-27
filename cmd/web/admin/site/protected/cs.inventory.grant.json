@@ -14,6 +14,12 @@
             "Type":"string",
             "Reference": "text",
             "Nullable": false
+        },
+        {
+            "Name": "Description",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false
         }
     ]
 }

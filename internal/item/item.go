@@ -80,9 +80,10 @@ type ConfigRegistration struct {
 }
 
 type OnInventory struct {
-	SystemId int64  `json:"SystemId,string"`
-	ItemId   int64  `json:"ItemId,string"`
-	Source   string `json:"Source"`
+	SystemId    int64  `json:"SystemId,string"`
+	ItemId      int64  `json:"ItemId,string"`
+	Source      string `json:"Source"`
+	Description string `json:"Description"`
 }
 
 type InventoryManager interface {

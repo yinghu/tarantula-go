@@ -54,7 +54,7 @@ func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *
 			return
 		}
 	}
-	e := event.InventoryEvent{SystemId: ivn.SystemId, InventoryId: 10, ItemId: ivn.ItemId, Source: ivn.Source, Description: "event test", GrantTime: time.Now()}
+	e := event.InventoryEvent{SystemId: ivn.SystemId, InventoryId: 10, ItemId: ivn.ItemId, Source: ivn.Source, Description: ivn.Description, GrantTime: time.Now()}
 	oid, _ := s.Sequence().Id()
 	e.OnOId(oid)
 	e.OnTopic("inventory")
