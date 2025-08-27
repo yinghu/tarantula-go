@@ -21,5 +21,6 @@ func (s *InventoryService) Start(f conf.Env, c core.Cluster) error {
 	s.AppManager.Start(f, c)
 	s.createSchema()
 	http.Handle("/inventory/grant", bootstrap.Logging(&InventoryGranter{InventoryService: s}))
+	http.Handle("/inventory/load", bootstrap.Logging(&InventoryLoader{InventoryService: s}))
 	return nil
 }

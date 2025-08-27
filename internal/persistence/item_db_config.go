@@ -18,7 +18,7 @@ const (
 	INSERT_CONFIG       string = "INSERT INTO item_configuration (id,name,type,type_id,category,version) VALUES($1,$2,$3,$4,$5,$6)"
 	INSERT_HEADER       string = "INSERT INTO item_header (configuration_id,name,value) VALUES($1,$2,$3)"
 	INSERT_APPLICATION  string = "INSERT INTO item_application (configuration_id,name,reference_id) VALUES($1,$2,$3)"
-	INSERT_REGISTRATION string = "INSERT INTO item_registration (item_id,app,scheduling,start_time,close_time,end_time) VALUES($1,$2,$3,$4,$5,$6)"
+	INSERT_REGISTRATION string = "INSERT INTO item_registration (item_id,app,env,scheduling,start_time,close_time,end_time) VALUES($1,$2,$3,$4,$5,$6,$7)"
 
 	SELECT_CONFIG_WITH_NAME           string = "SELECT id,name,type,type_id,version FROM item_configuration WHERE category = $1 LIMIT $2"
 	SELECT_CONFIG_WITH_ID             string = "SELECT name,type,type_id,category,version FROM item_configuration WHERE id = $1"
@@ -29,9 +29,9 @@ const (
 	DELETE_APPLICATION    string = "DELETE FROM item_application WHERE configuration_id = $1"
 	DELETE_CONFIG_WITH_ID string = "DELETE FROM item_configuration WHERE id = $1"
 
-	SELECT_REGISTRATION_WITH_ITEM_ID_APP string = "SELECT id,scheduling,start_time,close_time,end_time FROM item_registration WHERE item_id = $1 AND app = $2"
+	SELECT_REGISTRATION_WITH_ITEM_ID_APP string = "SELECT id,scheduling,start_time,close_time,end_time FROM item_registration WHERE item_id = $1 AND app = $2 AND env= $3"
 	SELECT_REGISTRATION_WITH_ITEM_ID     string = "SELECT COUNT(*) FROM item_registration WHERE item_id = $1"
-	DELETE_REGISTRATION_WITH_ID          string = "DELETE FROM item_registration AS d WHERE id = $1 RETURNING d.item_id, d.app"
+	DELETE_REGISTRATION_WITH_ID          string = "DELETE FROM item_registration AS d WHERE id = $1 RETURNING d.item_id, d.app, d.env"
 )
 
 func (db *ItemDB) Save(c item.Configuration) error {
@@ -215,14 +215,14 @@ func (db *ItemDB) Register(reg item.ConfigRegistration) error {
 		}
 	}
 	if reg.Scheduling {
-		_, err := db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, true, reg.StartTime.UnixMilli(), reg.CloseTime.UnixMilli(), reg.EndTime.UnixMilli())
+		_, err := db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, reg.Env, true, reg.StartTime.UnixMilli(), reg.CloseTime.UnixMilli(), reg.EndTime.UnixMilli())
 		if err != nil {
 			return err
 		}
 		db.Schedule(reg)
 		return nil
 	}
-	_, err = db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, false, 0, 0, 0)
+	_, err = db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, reg.Env, false, 0, 0, 0)
 	if err != nil {
 		return err
 	}
@@ -248,15 +248,15 @@ func (db *ItemDB) checkRegs(itemId int64) error {
 	return nil
 }
 
-func (db *ItemDB) Check(itemId int64, app string) (item.ConfigRegistration, error) {
-	reg := item.ConfigRegistration{ItemId: itemId, App: app}
+func (db *ItemDB) Check(reg item.ConfigRegistration) (item.ConfigRegistration, error) {
+	//reg := item.ConfigRegistration{ItemId: itemId, App: app}
 	err := db.Sql.Query(func(row pgx.Rows) error {
 		err := row.Scan(&reg.Id, &reg.Scheduling, &reg.StartTime, &reg.CloseTime, &reg.EndTime)
 		if err != nil {
 			return err
 		}
 		return nil
-	}, SELECT_REGISTRATION_WITH_ITEM_ID_APP, itemId, app)
+	}, SELECT_REGISTRATION_WITH_ITEM_ID_APP, reg.ItemId, reg.App, reg.Env)
 	if err != nil {
 		return reg, err
 	}
@@ -268,7 +268,7 @@ func (db *ItemDB) Check(itemId int64, app string) (item.ConfigRegistration, erro
 func (db *ItemDB) Release(regId int32) error {
 	var deleted item.ConfigRegistration
 	err := db.Sql.Txn(func(tx pgx.Tx) error {
-		return tx.QueryRow(context.Background(), DELETE_REGISTRATION_WITH_ID, regId).Scan(&deleted.ItemId, &deleted.App)
+		return tx.QueryRow(context.Background(), DELETE_REGISTRATION_WITH_ID, regId).Scan(&deleted.ItemId, &deleted.App, &deleted.Env)
 	})
 	if err != nil {
 		return err

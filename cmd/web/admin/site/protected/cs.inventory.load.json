@@ -1,0 +1,19 @@
+{
+    "Scope": "admin",
+    "Name": "InventoryLoad",
+    "Description": "inventory load form",
+    "Properties":[
+        {
+            "Name": "SystemId",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false
+        },
+        {
+            "Name": "TypeId",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false
+        }
+    ]
+}

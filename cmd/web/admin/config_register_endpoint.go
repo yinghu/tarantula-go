@@ -42,6 +42,12 @@ func (s *ConfigRegister) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 			w.Write(util.ToJson(core.OnSession{Successful: false, Message: "app not existed"}))
 			return
 		}
+		env := util.GitCurBranch()
+		if !env.Successful {
+			w.Write(util.ToJson(core.OnSession{Successful: false, Message: "env not existed"}))
+			return
+		}
+		reg.Env = env.Message
 		err = s.AdminService.ItemService().Register(reg)
 		if err != nil {
 			w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
@@ -49,7 +55,12 @@ func (s *ConfigRegister) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 		}
 		w.Write(util.ToJson(core.OnSession{Successful: true, Message: "registered"}))
 	case "load":
-		reg, err := s.ItemService().Check(cid, app)
+		env := util.GitCurBranch()
+		if !env.Successful {
+			w.Write(util.ToJson(core.OnSession{Successful: false, Message: "env not existed"}))
+			return
+		}
+		reg, err := s.ItemService().Check(item.ConfigRegistration{ItemId: cid, App: app, Env: env.Message})
 		if err == nil {
 			w.Write(util.ToJson(reg))
 		} else {

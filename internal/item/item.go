@@ -73,6 +73,7 @@ type ConfigRegistration struct {
 	Id         int32     `json:"Id,string"`
 	ItemId     int64     `json:"ItemId,string"`
 	App        string    `json:"App"`
+	Env        string    `json:"Env"`
 	Scheduling bool      `json:"Scheduling"`
 	StartTime  time.Time `json:"StartTime"`
 	CloseTime  time.Time `json:"CloseTime"`
@@ -81,9 +82,26 @@ type ConfigRegistration struct {
 
 type OnInventory struct {
 	SystemId    int64  `json:"SystemId,string"`
+	TypeId      string `json:"TypeId"`
 	ItemId      int64  `json:"ItemId,string"`
 	Source      string `json:"Source"`
 	Description string `json:"Description"`
+}
+
+type Inventory struct {
+	Id           int32     `json:"Id"`
+	SystemId     int64     `json:"SystemId,string"`
+	TypeId       string    `json:"string"`
+	Amount       int32     `json:"Amount"`
+	Rechargeable bool      `json:"Rechargeable"`
+	UpdateTime   time.Time `json:"UpdateTime"`
+	ItemId       int64     `json:"-"`
+}
+
+type InventoryItem struct {
+	Id          int32 `json:"Id"`
+	InventoryId int32 `json:"InventoryId"`
+	ItemId      int64 `json:"ItemId,string"`
 }
 
 type InventoryManager interface {
@@ -92,6 +110,7 @@ type InventoryManager interface {
 	LoadCategory(name string) (Category, error)
 	Grant(inv OnInventory) error
 	Validate(c Configuration, validator Validator)
+	Stock(r OnInventory) ([]Inventory, error)
 }
 
 type ItemService interface {
@@ -112,7 +131,7 @@ type ItemService interface {
 	LoadWithId(cid int64) (Configuration, error)
 	DeleteWithId(cid int64) error
 	Register(reg ConfigRegistration) error
-	Check(itemId int64, app string) (ConfigRegistration, error)
+	Check(reg ConfigRegistration) (ConfigRegistration, error)
 	Release(regId int32) error
 	InventoryManager() InventoryManager
 }

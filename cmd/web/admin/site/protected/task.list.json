@@ -87,7 +87,8 @@
                 {"Name":"QueryEvent","Callback":"on_post","Form":"/admin/webprotected/cs.query.event.json","Path":"/admin/cs/query","Query":["Id"]},
                 {"Name":"QueryTournament","Callback":"on_post","Form":"/admin/webprotected/cs.query.tournament.json","Path":"/admin/cs/query","Query":["Id"]},
                 {"Name":"QueryTournamentJoin","Callback":"on_post","Form":"/admin/webprotected/cs.query.tournament.join.json","Path":"/admin/cs/query","Query":["Id"]},
-                {"Name":"InventroyGrant","Callback":"on_post","Form":"/admin/webprotected/cs.inventory.grant.json","Path":"/admin/cs/grant"}
+                {"Name":"InventroyGrant","Callback":"on_post","Form":"/admin/webprotected/cs.inventory.grant.json","Path":"/admin/cs/inventory/grant"},
+                {"Name":"InventroyLoad","Callback":"on_post","Form":"/admin/webprotected/cs.inventory.load.json","Path":"/admin/cs/inventory/load"}
             ]        
         },
         {

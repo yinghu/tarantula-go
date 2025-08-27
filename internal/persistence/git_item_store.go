@@ -227,3 +227,8 @@ func (db *GitItemStore) Grant(inv item.OnInventory) error {
 func (db *GitItemStore) Validate(c item.Configuration, validator item.Validator) {
 	item.ItemValidator(c, validator)
 }
+
+func (db *GitItemStore) Stock(inv item.OnInventory) ([]item.Inventory, error) {
+	stock := make([]item.Inventory, 0)
+	return stock, nil
+}
