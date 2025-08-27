@@ -302,7 +302,7 @@
 
             function create_new_category(){
                 Html.categoryForm({id:"#tx-form-box"},(data)=>{
-                    let valid ={Name:data.Name,Description:data.Description,Scope:data.Scope,ScopeSequence:data.ScopeSequence,Properties:[]};
+                    let valid ={Name:data.Name,Description:data.Description,Scope:data.Scope,ScopeSequence:data.ScopeSequence,Rechargeable:data.Rechargeable,Properties:[]};
                     for( let i=0;i<data.ix;i++){
                         if("c-entry"+i in data){
                             let ev = data["c-entry"+i];
