@@ -32,8 +32,10 @@ func (s *PresenceService) Start(env conf.Env, c core.Cluster) error {
 		return err
 	}
 	brn := util.GitCurBranch()
+	core.AppLog.Printf("Item registratuin %s %s\n", s.Context(), brn.Message)
 	regs, err := s.ItemService().LoadRegistrations(s.Context(), brn.Message)
 	if err == nil {
+		core.AppLog.Printf("Item %d\n", len(regs))
 		for i := range regs {
 			core.AppLog.Printf("Item %d\n", regs[i].ItemId)
 			c, err := s.ItemService().InventoryManager().Load(regs[i].ItemId)
