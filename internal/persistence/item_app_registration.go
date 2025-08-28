@@ -2,8 +2,8 @@ package persistence
 
 import (
 	"fmt"
+	"time"
 
-	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
 	"github.com/jackc/pgx/v5"
 )
@@ -41,15 +41,19 @@ func (db *ItemDB) LoadRegistrations(app string, env string) ([]item.ConfigRegist
 	regs := make([]item.ConfigRegistration, 0)
 	err := db.Sql.Query(func(row pgx.Rows) error {
 		var reg item.ConfigRegistration
-		var st, ct, ed int64
-		err := row.Scan(&reg.ItemId, &reg.Scheduling, &st, &ct, &ed)
+		var st, ct, et int64
+		err := row.Scan(&reg.ItemId, &reg.Scheduling, &st, &ct, &et)
 		if err != nil {
 			return err
 		}
 		if reg.ItemId == 0 {
 			return fmt.Errorf("no item id associated on %s : %s", app, env)
 		}
-		core.AppLog.Printf("LOADED : %d\n", reg.ItemId)
+		if reg.Scheduling {
+			reg.StartTime = time.UnixMilli(st)
+			reg.CloseTime = time.UnixMilli(ct)
+			reg.EndTime = time.UnixMilli(et)
+		}
 		regs = append(regs, reg)
 		return nil
 	}, SELECT_REGISTRATION_FROM_APP, app, env)
