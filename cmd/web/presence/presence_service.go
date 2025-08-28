@@ -40,6 +40,8 @@ func (s *PresenceService) Start(env conf.Env, c core.Cluster) error {
 				s.ItemListener().OnRegister(c)
 			}
 		}
+	} else {
+		core.AppLog.Printf("Error on load registration %s %s\n", err.Error(), brn.Message)
 	}
 	s.Started = true
 	core.AppLog.Printf("Presence service started %s\n", env.HttpBinding)
