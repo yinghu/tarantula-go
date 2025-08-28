@@ -3,6 +3,7 @@ package persistence
 import (
 	"fmt"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
 	"github.com/jackc/pgx/v5"
 )
@@ -47,6 +48,7 @@ func (db *ItemDB) LoadRegistrations(app string, env string) ([]item.ConfigRegist
 		if reg.ItemId == 0 {
 			return fmt.Errorf("no item id associated on %s : %s", app, env)
 		}
+		core.AppLog.Printf("LOADED : %d\n", reg.ItemId)
 		regs = append(regs, reg)
 		return nil
 	}, SELECT_REGISTRATION_FROM_APP, app, env)
