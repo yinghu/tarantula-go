@@ -8,23 +8,22 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
 )
 
-func (s *AppManager) PostJsonAsync(url string, payload any, ch chan event.Chunk) {
+func (s *AppManager) PostJsonAsync(url string, payload any, ch chan core.Chunk) {
 	if s.standalone {
-		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: STANDALONE_APP, Message: STANDALONE_APP_MSG})}
+		ch <- core.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: STANDALONE_APP, Message: STANDALONE_APP_MSG})}
 		return
 	}
 	tick, err := s.AppAuth.CreateTicket(1, 1, ADMIN_ACCESS_CONTROL)
 	if err != nil {
-		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: INVALID_TICKET_CODE, Message: err.Error()})}
+		ch <- core.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: INVALID_TICKET_CODE, Message: err.Error()})}
 		return
 	}
 	data, err := json.Marshal(payload)
 	if err != nil {
-		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: err.Error()})}
+		ch <- core.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: err.Error()})}
 		return
 	}
 	tr := &http.Transport{
@@ -34,38 +33,38 @@ func (s *AppManager) PostJsonAsync(url string, payload any, ch chan event.Chunk)
 	client := &http.Client{Transport: tr}
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
 	if err != nil {
-		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: err.Error()})}
+		ch <- core.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: err.Error()})}
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+tick)
 	resp, err := client.Do(req)
 	if err != nil {
-		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: err.Error()})}
+		ch <- core.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: err.Error()})}
 		return
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		ch <- event.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: fmt.Sprintf("http code: %d", resp.StatusCode)})}
+		ch <- core.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: BAD_REQUEST_CODE, Message: fmt.Sprintf("http code: %d", resp.StatusCode)})}
 		return
 	}
 	for {
 		buff := make([]byte, 1024)
 		n, err := resp.Body.Read(buff)
 		if n > 0 && err == nil {
-			ch <- event.Chunk{Remaining: true, Data: buff[:n]}
+			ch <- core.Chunk{Remaining: true, Data: buff[:n]}
 			continue
 		}
 		if n > 0 && err != nil && err == io.EOF {
-			ch <- event.Chunk{Remaining: false, Data: buff[:n]}
+			ch <- core.Chunk{Remaining: false, Data: buff[:n]}
 			break
 		}
 		if err == io.EOF {
-			ch <- event.Chunk{Remaining: false, Data: buff[:0]}
+			ch <- core.Chunk{Remaining: false, Data: buff[:0]}
 			break
 		}
 		if err != nil && err != io.EOF {
-			ch <- event.Chunk{Remaining: false, Data: buff[:0]}
+			ch <- core.Chunk{Remaining: false, Data: buff[:0]}
 			core.AppLog.Printf("Resp Error %s\n", err.Error())
 			break
 		}

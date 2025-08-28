@@ -76,5 +76,5 @@ type Login struct {
 	ReferenceId   int32            `json:"referenceId"`
 	SystemId      int64            `json:"systemId:string"`
 	AccessControl int32            `json:"accessControl,string"`
-	Cc            chan event.Chunk `json:"-"`
+	Cc            chan core.Chunk `json:"-"`
 }

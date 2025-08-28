@@ -21,33 +21,33 @@ const (
 func CreateQuery(qid int32) Query {
 	switch qid {
 	case TAG_MESSAGE_QID:
-		q := QWithTag{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan Chunk, 3)}
+		q := QWithTag{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan core.Chunk, 3)}
 		return &q
 	case TAG_LOGIN_QID:
-		q := QWithTag{Id: qid, Tag: LOGIN_ETAG, Cc: make(chan Chunk, 3)}
+		q := QWithTag{Id: qid, Tag: LOGIN_ETAG, Cc: make(chan core.Chunk, 3)}
 		return &q
 
 	case TAG_TOURNAMENT_QID:
-		q := QWithTag{Id: qid, Tag: TOURNAMENT_ETAG, Cc: make(chan Chunk, 3)}
+		q := QWithTag{Id: qid, Tag: TOURNAMENT_ETAG, Cc: make(chan core.Chunk, 3)}
 		return &q
 	case TAG_INVENTORY_QID:
-		q := QWithTag{Id: qid, Tag: INVENTORY_ETAG, Cc: make(chan Chunk, 3)}
+		q := QWithTag{Id: qid, Tag: INVENTORY_ETAG, Cc: make(chan core.Chunk, 3)}
 		return &q
 
 	case Q_TOURNAMENT_QID:
 		q := QTournament{}
 		q.Id = qid
 		q.Tag = TOURNAMENT_ETAG
-		q.Cc = make(chan Chunk, 3)
+		q.Cc = make(chan core.Chunk, 3)
 		return &q
 	case QT_JOIN_QID:
 		q := QJoin{}
 		q.Id = qid
 		q.Tag = TOURNAMENT_ETAG
-		q.Cc = make(chan Chunk, 3)
+		q.Cc = make(chan core.Chunk, 3)
 		return &q
 	default:
-		q := QWithTag{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan Chunk, 3)}
+		q := QWithTag{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan core.Chunk, 3)}
 		return &q
 	}
 }
@@ -60,7 +60,7 @@ type Query interface {
 	QEndTime() time.Time
 	QLimit() int32
 	QCriteria(b core.DataBuffer) error
-	QCc() chan Chunk
+	QCc() chan core.Chunk
 }
 
 type QWithTag struct {
@@ -70,7 +70,7 @@ type QWithTag struct {
 	Limit     int32      `json:"Limit"`
 	StartTime time.Time  `json:"StartTime"`
 	EndTime   time.Time  `json:"EndTime"`
-	Cc        chan Chunk `json:"-"`
+	Cc        chan core.Chunk `json:"-"`
 }
 
 func (q *QWithTag) QCriteria(buff core.DataBuffer) error {
@@ -98,6 +98,6 @@ func (q *QWithTag) QLimit() int32 {
 	return q.Limit
 }
 
-func (q *QWithTag) QCc() chan Chunk {
+func (q *QWithTag) QCc() chan core.Chunk {
 	return q.Cc
 }

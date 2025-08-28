@@ -4,10 +4,6 @@ import (
 	"gameclustering.com/internal/core"
 )
 
-type Chunk struct {
-	Remaining bool
-	Data      []byte
-}
 
 type IndexListener interface {
 	Index(idx Index)

@@ -29,12 +29,12 @@ func (s *PostofficeQueryer) query(query event.Query) {
 	stat := event.StatEvent{Tag: query.QTag(), Name: event.STAT_TOTAL}
 	err := s.Ds.Load(&stat)
 	if err != nil {
-		query.QCc() <- event.Chunk{Remaining: false, Data: []byte(`{"list":[]}`)}
+		query.QCc() <- core.Chunk{Remaining: false, Data: []byte(`{"list":[]}`)}
 		return
 	}
 	mc := stat.Count
 	lmt := query.QLimit()
-	query.QCc() <- event.Chunk{Remaining: true, Data: fmt.Appendf(make([]byte, 0), `{"count":%d,"limit":%d,"list":[`, mc, lmt)}
+	query.QCc() <- core.Chunk{Remaining: true, Data: fmt.Appendf(make([]byte, 0), `{"count":%d,"limit":%d,"list":[`, mc, lmt)}
 	s.Ds.List(&buff, func(k, v core.DataBuffer, rev uint64) bool {
 		lmt--
 		mc--
@@ -49,13 +49,13 @@ func (s *PostofficeQueryer) query(query event.Query) {
 		e.OnRevision(rev)
 		e.OnTimestamp(tm)
 		ret := util.ToJson(e)
-		query.QCc() <- event.Chunk{Remaining: true, Data: ret}
+		query.QCc() <- core.Chunk{Remaining: true, Data: ret}
 		if lmt > 0 && mc > 0 {
-			query.QCc() <- event.Chunk{Remaining: true, Data: []byte(`,`)}
+			query.QCc() <- core.Chunk{Remaining: true, Data: []byte(`,`)}
 		}
 		return lmt > 0 && mc > 0
 	})
-	query.QCc() <- event.Chunk{Remaining: false, Data: []byte(`]}`)}
+	query.QCc() <- core.Chunk{Remaining: false, Data: []byte(`]}`)}
 }
 
 func (s *PostofficeQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {

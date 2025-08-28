@@ -6,7 +6,6 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 )
 
 type PresenceChangePwd struct {
@@ -17,21 +16,21 @@ func (s *PresenceChangePwd) chnagePwd(login bootstrap.Login) {
 	pwd := login.Hash
 	err := s.LoadLogin(&login)
 	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
+		login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
 		return
 	}
 	hash, err := s.Authenticator().HashPassword(pwd)
 	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
+		login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
 		return
 	}
 	login.Hash = hash
 	err = s.UpdatePassword(&login)
 	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
+		login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
 		return
 	}
-	login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.SuccessMessage("password changed")}
+	login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.SuccessMessage("password changed")}
 }
 
 func (s *PresenceChangePwd) AccessControl() int32 {
@@ -39,7 +38,7 @@ func (s *PresenceChangePwd) AccessControl() int32 {
 }
 
 func (s *PresenceChangePwd) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
-	listener := make(chan event.Chunk)
+	listener := make(chan core.Chunk)
 	defer func() {
 		close(listener)
 		r.Body.Close()

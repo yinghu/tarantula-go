@@ -24,21 +24,21 @@ func (s *PresenceLogin) Login(login bootstrap.Login) {
 	pwd := login.Hash
 	err := s.LoadLogin(&login)
 	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
+		login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
 		return
 	}
 	err = util.ValidatePassword(pwd, login.Hash)
 	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.WRONG_PASS_CODE)}
+		login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.WRONG_PASS_CODE)}
 		return
 	}
 	tk, err := s.Authenticator().CreateToken(login.SystemId, login.Id, login.AccessControl)
 	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.INVALID_TOKEN_CODE)}
+		login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.INVALID_TOKEN_CODE)}
 		return
 	}
 	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: s.Cluster().Local().HttpEndpoint}
-	login.Cc <- event.Chunk{Remaining: false, Data: util.ToJson(session)}
+	login.Cc <- core.Chunk{Remaining: false, Data: util.ToJson(session)}
 	go func() {
 		id, err := s.Sequence().Id()
 		if err != nil {
@@ -58,7 +58,7 @@ func (s *PresenceLogin) Login(login bootstrap.Login) {
 }
 
 func (s *PresenceLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
-	listener := make(chan event.Chunk)
+	listener := make(chan core.Chunk)
 	defer func() {
 		close(listener)
 		r.Body.Close()

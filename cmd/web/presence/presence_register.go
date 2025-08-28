@@ -6,7 +6,6 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
 )
 
@@ -26,20 +25,20 @@ func (s *PresenceRegister) Register(login bootstrap.Login) {
 	login.Hash = hash
 	err := s.SaveLogin(&login)
 	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
+		login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
 		return
 	}
 	tk, err := s.Authenticator().CreateToken(login.SystemId, login.Id, login.AccessControl)
 	if err != nil {
-		login.Cc <- event.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.INVALID_TOKEN_CODE)}
+		login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.INVALID_TOKEN_CODE)}
 		return
 	}
 	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: s.Cluster().Local().HttpEndpoint}
-	login.Cc <- event.Chunk{Remaining: false, Data: util.ToJson(session)}
+	login.Cc <- core.Chunk{Remaining: false, Data: util.ToJson(session)}
 }
 
 func (s *PresenceRegister) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
-	listener := make(chan event.Chunk)
+	listener := make(chan core.Chunk)
 	defer func() {
 		close(listener)
 		r.Body.Close()
