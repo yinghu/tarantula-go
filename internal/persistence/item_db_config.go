@@ -32,7 +32,6 @@ const (
 	SELECT_REGISTRATION_WITH_ITEM_ID_APP string = "SELECT id,scheduling,start_time,close_time,end_time FROM item_registration WHERE item_id = $1 AND app = $2 AND env= $3"
 	SELECT_REGISTRATION_WITH_ITEM_ID     string = "SELECT COUNT(*) FROM item_registration WHERE item_id = $1"
 	DELETE_REGISTRATION_WITH_ID          string = "DELETE FROM item_registration AS d WHERE id = $1 RETURNING d.item_id, d.app, d.env"
-	DELETE_REGISTRATION_FROM_APP         string = "DELETE FROM item_registration WHERE item_id = $1 AND app = $2 AND env = $3"
 )
 
 func (db *ItemDB) Save(c item.Configuration) error {
@@ -281,30 +280,6 @@ func (db *ItemDB) Release(regId int32) error {
 	return nil
 }
 
-func (db *ItemDB) DeleteRegistration(itemId int64, app string, env string) error {
-	r, err := db.Sql.Exec(DELETE_REGISTRATION_FROM_APP, itemId, app, env)
-	if err != nil {
-		return err
-	}
-	if r == 0 {
-		return fmt.Errorf("no row deleted")
-	}
-	return nil
-}
-func (db *ItemDB) SaveRegistration(reg item.ConfigRegistration) error{
-	if reg.Scheduling {
-		_, err := db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, reg.Env, true, reg.StartTime.UnixMilli(), reg.CloseTime.UnixMilli(), reg.EndTime.UnixMilli())
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-	_, err := db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, reg.Env, false, 0, 0, 0)
-	if err != nil {
-		return err
-	}
-	return nil
-}
 func (db *ItemDB) loadHeader(c *item.Configuration) error {
 	c.Header = make(map[string]any)
 	return db.Sql.Query(func(row pgx.Rows) error {

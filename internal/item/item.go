@@ -133,8 +133,10 @@ type ItemService interface {
 	Register(reg ConfigRegistration) error
 	Check(reg ConfigRegistration) (ConfigRegistration, error)
 	Release(regId int32) error
+	//app optional save and delete on register / release calls
 	SaveRegistration(reg ConfigRegistration) error
 	DeleteRegistration(itemId int64, app string, env string) error
+	LoadRegistrations(app string, env string) ([]ConfigRegistration, error)
 	InventoryManager() InventoryManager
 }
 

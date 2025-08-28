@@ -8,6 +8,7 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
+	"gameclustering.com/internal/util"
 )
 
 type PresenceService struct {
@@ -29,6 +30,16 @@ func (s *PresenceService) Start(env conf.Env, c core.Cluster) error {
 	err = s.createSchema()
 	if err != nil {
 		return err
+	}
+	brn := util.GitCurBranch()
+	regs, err := s.ItemService().LoadRegistrations(s.Context(), brn.Message)
+	if err == nil {
+		for i := range regs {
+			c, err := s.ItemService().InventoryManager().Load(regs[i].ItemId)
+			if err == nil {
+				s.ItemListener().OnRegister(c)
+			}
+		}
 	}
 	s.Started = true
 	core.AppLog.Printf("Presence service started %s\n", env.HttpBinding)
