@@ -35,9 +35,12 @@ func (s *PresenceService) Start(env conf.Env, c core.Cluster) error {
 	regs, err := s.ItemService().LoadRegistrations(s.Context(), brn.Message)
 	if err == nil {
 		for i := range regs {
+			core.AppLog.Printf("Item %d\n", regs[i].ItemId)
 			c, err := s.ItemService().InventoryManager().Load(regs[i].ItemId)
 			if err == nil {
 				s.ItemListener().OnRegister(c)
+			} else {
+				core.AppLog.Printf("Error on load registration %s %s\n", err.Error(), brn.Message)
 			}
 		}
 	} else {
