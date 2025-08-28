@@ -32,6 +32,7 @@ const (
 	SELECT_REGISTRATION_WITH_ITEM_ID_APP string = "SELECT id,scheduling,start_time,close_time,end_time FROM item_registration WHERE item_id = $1 AND app = $2 AND env= $3"
 	SELECT_REGISTRATION_WITH_ITEM_ID     string = "SELECT COUNT(*) FROM item_registration WHERE item_id = $1"
 	DELETE_REGISTRATION_WITH_ID          string = "DELETE FROM item_registration AS d WHERE id = $1 RETURNING d.item_id, d.app, d.env"
+	DELETE_REGISTRATION_FROM_APP         string = "DELETE FROM item_registration WHERE item_id = $1 AND app = $2 AND env = $3 AND"
 )
 
 func (db *ItemDB) Save(c item.Configuration) error {
@@ -277,6 +278,17 @@ func (db *ItemDB) Release(regId int32) error {
 		return errors.New("no row deleted")
 	}
 	db.Unschedule(deleted)
+	return nil
+}
+
+func (db *ItemDB) DeleteRegistration(itemId int64, app string, env string) error {
+	r, err := db.Sql.Exec(DELETE_REGISTRATION_FROM_APP, itemId, app, env)
+	if err != nil {
+		return err
+	}
+	if r == 0 {
+		return fmt.Errorf("no row deleted")
+	}
 	return nil
 }
 
