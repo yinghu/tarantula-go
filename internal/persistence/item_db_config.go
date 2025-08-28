@@ -291,7 +291,20 @@ func (db *ItemDB) DeleteRegistration(itemId int64, app string, env string) error
 	}
 	return nil
 }
-
+func (db *ItemDB) SaveRegistration(reg item.ConfigRegistration) error{
+	if reg.Scheduling {
+		_, err := db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, reg.Env, true, reg.StartTime.UnixMilli(), reg.CloseTime.UnixMilli(), reg.EndTime.UnixMilli())
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	_, err := db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, reg.Env, false, 0, 0, 0)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func (db *ItemDB) loadHeader(c *item.Configuration) error {
 	c.Header = make(map[string]any)
 	return db.Sql.Query(func(row pgx.Rows) error {
