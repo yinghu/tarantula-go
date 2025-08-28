@@ -40,7 +40,7 @@ func (db *ItemDB) SaveRegistration(reg item.ConfigRegistration) error {
 func (db *ItemDB) LoadRegistrations(app string, env string) ([]item.ConfigRegistration, error) {
 	regs := make([]item.ConfigRegistration, 0)
 	err := db.Sql.Query(func(row pgx.Rows) error {
-		reg := item.ConfigRegistration{}
+		var reg item.ConfigRegistration
 		err := row.Scan(&reg.ItemId, &reg.Scheduling, &reg.StartTime, &reg.CloseTime, &reg.EndTime)
 		if err != nil {
 			return err
