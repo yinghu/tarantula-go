@@ -34,10 +34,30 @@ func (s *InventoryService) createSchema() error {
 
 func (s *InventoryService) loadInventory(iv item.OnInventory) ([]item.Inventory, error) {
 	ilist := make([]item.Inventory, 0)
+	if iv.TypeId == "" {
+		err := s.Sql.Query(func(row pgx.Rows) error {
+			inv := item.Inventory{SystemId: iv.SystemId}
+			var t int64
+			err := row.Scan(&inv.Id, &inv.TypeId, &inv.Rechargeable, &inv.Amount, &t)
+			if err != nil {
+				return err
+			}
+			if inv.Id == 0 {
+				return fmt.Errorf("no row id associated")
+			}
+			inv.UpdateTime = time.UnixMilli(t)
+			ilist = append(ilist, inv)
+			return nil
+		}, SELECT_INVENTORY_WITH_SYSTEM_ID, iv.SystemId)
+		if err != nil {
+			return ilist, err
+		}
+		return ilist, nil
+	}
 	err := s.Sql.Query(func(row pgx.Rows) error {
-		var inv item.Inventory
+		inv := item.Inventory{SystemId: iv.SystemId,TypeId: iv.TypeId}
 		var t int64
-		err := row.Scan(&inv.Id, &inv.TypeId, &inv.Rechargeable, &inv.Amount, &t)
+		err := row.Scan(&inv.Id, &inv.Rechargeable, &inv.Amount, &t)
 		if err != nil {
 			return err
 		}
@@ -47,7 +67,7 @@ func (s *InventoryService) loadInventory(iv item.OnInventory) ([]item.Inventory,
 		inv.UpdateTime = time.UnixMilli(t)
 		ilist = append(ilist, inv)
 		return nil
-	}, SELECT_INVENTORY_WITH_SYSTEM_ID, iv.SystemId)
+	}, SELECT_INVENTORY_WITH_TYPE_ID, iv.SystemId,iv.TypeId)
 	if err != nil {
 		return ilist, err
 	}
