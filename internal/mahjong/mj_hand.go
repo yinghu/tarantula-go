@@ -31,20 +31,11 @@ func (h *Hand) Draw(deck *Deck) error {
 		return err
 	}
 	switch t.Suit {
-	case BAMBOO:
-		h.Tiles = append(h.Tiles, t)
-		slices.SortFunc(h.Tiles, cmp)
-	case DOTS:
-		h.Tiles = append(h.Tiles, t)
-		slices.SortFunc(h.Tiles, cmp)
-	case CHARACTER:
-		h.Tiles = append(h.Tiles, t)
-		slices.SortFunc(h.Tiles, cmp)
-	case HORNOR:
-		h.Tiles = append(h.Tiles, t)
-		slices.SortFunc(h.Tiles, cmp)
-	default:
+	case FLOWER:
 		h.Flowers = append(h.Flowers, t)
+	default:
+		h.Tiles = append(h.Tiles, t)
+		slices.SortFunc(h.Tiles, cmp)
 	}
 	return nil
 }
@@ -55,20 +46,11 @@ func (h *Hand) Knog(deck *Deck) error {
 		return err
 	}
 	switch t.Suit {
-	case BAMBOO:
-		h.Tiles = append(h.Tiles, t)
-		slices.SortFunc(h.Tiles, cmp)
-	case DOTS:
-		h.Tiles = append(h.Tiles, t)
-		slices.SortFunc(h.Tiles, cmp)
-	case CHARACTER:
-		h.Tiles = append(h.Tiles, t)
-		slices.SortFunc(h.Tiles, cmp)
-	case HORNOR:
-		h.Tiles = append(h.Tiles, t)
-		slices.SortFunc(h.Tiles, cmp)
-	default:
+	case FLOWER:
 		h.Flowers = append(h.Flowers, t)
+	default:
+		h.Tiles = append(h.Tiles, t)
+		slices.SortFunc(h.Tiles, cmp)
 	}
 	return nil
 }

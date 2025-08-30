@@ -5,7 +5,8 @@ import (
 )
 
 const (
-	//VALUE 1-9
+	
+	FLOWER string = "F"
 	BAMBOO    string = "B"
 	CHARACTER string = "C"
 	DOTS      string = "D"
