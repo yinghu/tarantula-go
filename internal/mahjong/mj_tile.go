@@ -7,6 +7,11 @@ import (
 
 const (
 	//VALUE 1-9
+	BAMBOO    string = "B"
+	CHARACTER string = "C"
+	DOTS      string = "D"
+	HORNOR    string = "H"
+
 	BAMBOO1 string = "B1"
 	BAMBOO2 string = "B2"
 	BAMBOO3 string = "B3"
@@ -60,17 +65,17 @@ const (
 )
 
 type Tile struct {
-	Suit  string
-	Value uint8
+	Suit string
+	Num  int8
 }
 
 func (t *Tile) From(src string) {
 	if strings.HasPrefix(src, "F") {
 		t.Suit = src
-		t.Value = 0
+		t.Num = 0
 		return
 	}
 	t.Suit = src[:1]
 	v, _ := strconv.ParseUint(src[1:2], 10, 8)
-	t.Value = uint8(v)
+	t.Num = int8(v)
 }
