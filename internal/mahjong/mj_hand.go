@@ -2,29 +2,27 @@ package mahjong
 
 import (
 	"slices"
+	"strings"
 )
 
 type Hand struct {
-	Formed    []Meld
-	Dots      []Tile
-	Bamboo    []Tile
-	Character []Tile
-	Honor     []Tile
-	Flower    []Tile
+	Formed  []Meld
+	Tiles   []Tile
+	Flowers []Tile
 }
 
 func cmp(a, b Tile) int {
-	diff := a.Num - b.Num
-	return int(diff)
+	if a.Suit == b.Suit {
+		diff := a.Rank - b.Rank
+		return int(diff)
+	}
+	return strings.Compare(a.Suit, b.Suit)
 }
 
 func (h *Hand) New() {
 	h.Formed = make([]Meld, 0)
-	h.Dots = make([]Tile, 0)
-	h.Bamboo = make([]Tile, 0)
-	h.Character = make([]Tile, 0)
-	h.Honor = make([]Tile, 0)
-	h.Flower = make([]Tile, 0)
+	h.Tiles = make([]Tile, 0)
+	h.Flowers = make([]Tile, 0)
 }
 
 func (h *Hand) Draw(deck *Deck) error {
@@ -34,19 +32,19 @@ func (h *Hand) Draw(deck *Deck) error {
 	}
 	switch t.Suit {
 	case BAMBOO:
-		h.Bamboo = append(h.Bamboo, t)
-		slices.SortFunc(h.Bamboo, cmp)
+		h.Tiles = append(h.Tiles, t)
+		slices.SortFunc(h.Tiles, cmp)
 	case DOTS:
-		h.Dots = append(h.Dots, t)
-		slices.SortFunc(h.Dots, cmp)
+		h.Tiles = append(h.Tiles, t)
+		slices.SortFunc(h.Tiles, cmp)
 	case CHARACTER:
-		h.Character = append(h.Character, t)
-		slices.SortFunc(h.Character, cmp)
+		h.Tiles = append(h.Tiles, t)
+		slices.SortFunc(h.Tiles, cmp)
 	case HORNOR:
-		h.Honor = append(h.Honor, t)
-		slices.SortFunc(h.Honor, cmp)
+		h.Tiles = append(h.Tiles, t)
+		slices.SortFunc(h.Tiles, cmp)
 	default:
-		h.Flower = append(h.Flower, t)
+		h.Flowers = append(h.Flowers, t)
 	}
 	return nil
 }
@@ -58,19 +56,23 @@ func (h *Hand) Knog(deck *Deck) error {
 	}
 	switch t.Suit {
 	case BAMBOO:
-		h.Bamboo = append(h.Bamboo, t)
-		slices.SortFunc(h.Bamboo, cmp)
+		h.Tiles = append(h.Tiles, t)
+		slices.SortFunc(h.Tiles, cmp)
 	case DOTS:
-		h.Dots = append(h.Dots, t)
-		slices.SortFunc(h.Dots, cmp)
+		h.Tiles = append(h.Tiles, t)
+		slices.SortFunc(h.Tiles, cmp)
 	case CHARACTER:
-		h.Character = append(h.Character, t)
-		slices.SortFunc(h.Character, cmp)
+		h.Tiles = append(h.Tiles, t)
+		slices.SortFunc(h.Tiles, cmp)
 	case HORNOR:
-		h.Honor = append(h.Honor, t)
-		slices.SortFunc(h.Honor, cmp)
+		h.Tiles = append(h.Tiles, t)
+		slices.SortFunc(h.Tiles, cmp)
 	default:
-		h.Flower = append(h.Flower, t)
+		h.Flowers = append(h.Flowers, t)
 	}
 	return nil
+}
+
+func (h *Hand) Mahjong() bool {
+	return false
 }

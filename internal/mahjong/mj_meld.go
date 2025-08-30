@@ -24,7 +24,7 @@ func (m *Meld) Chow() bool {
 	if len(m.Tiles) != 3 {
 		return false
 	}
-	return m.Tiles[0].Suit == m.Tiles[1].Suit && m.Tiles[1].Suit == m.Tiles[2].Suit && m.Tiles[0].Num+1 == m.Tiles[1].Num && m.Tiles[1].Num+1 == m.Tiles[2].Num
+	return m.Tiles[0].Suit == m.Tiles[1].Suit && m.Tiles[1].Suit == m.Tiles[2].Suit && m.Tiles[0].Rank+1 == m.Tiles[1].Rank && m.Tiles[1].Rank+1 == m.Tiles[2].Rank
 }
 
 func (m *Meld) Pong() bool {

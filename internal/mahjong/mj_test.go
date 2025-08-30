@@ -7,16 +7,16 @@ import (
 func TestSuit(t *testing.T) {
 	d1 := Tile{}
 	d1.From(DOTS1)
-	if d1.Num != 1 {
-		t.Errorf("value should be 1 %d", d1.Num)
+	if d1.Rank != 1 {
+		t.Errorf("value should be 1 %d", d1.Rank)
 	}
 	if d1.Suit != "D" {
 		t.Errorf("SUIT should be D %s", d1.Suit)
 	}
 	c9 := Tile{}
 	c9.From(CHARACTER9)
-	if c9.Num != 9 {
-		t.Errorf("value should be 9 %d", c9.Num)
+	if c9.Rank != 9 {
+		t.Errorf("value should be 9 %d", c9.Rank)
 	}
 	if c9.Suit != "C" {
 		t.Errorf("SUIT should be C %s", c9.Suit)
@@ -24,10 +24,10 @@ func TestSuit(t *testing.T) {
 
 	f3 := Tile{}
 	f3.From(F_CHRYSANTHEMUM)
-	if f3.Num != 0 {
-		t.Errorf("value should be 0 %d", f3.Num)
+	if f3.Rank != 3 {
+		t.Errorf("value should be 0 %d", f3.Rank)
 	}
-	if f3.Suit != F_CHRYSANTHEMUM {
+	if f3.Suit != "F" {
 		t.Errorf("SUIT should be F %s", f3.Suit)
 	}
 
@@ -83,7 +83,7 @@ func TestShuffle(t *testing.T) {
 }
 
 func TestEyeMeld(t *testing.T) {
-	d1 := Tile{Suit: "D", Num: 1}
+	d1 := Tile{Suit: "D", Rank: 1}
 	p := []Tile{d1, d1}
 	m := Meld{Tiles: p}
 	if !m.Eye() {
@@ -96,9 +96,9 @@ func TestEyeMeld(t *testing.T) {
 }
 
 func TestChowMeld(t *testing.T) {
-	d1 := Tile{Suit: "D", Num: 1}
-	d2 := Tile{Suit: "D", Num: 2}
-	d3 := Tile{Suit: "D", Num: 3}
+	d1 := Tile{Suit: "D", Rank: 1}
+	d2 := Tile{Suit: "D", Rank: 2}
+	d3 := Tile{Suit: "D", Rank: 3}
 	p := []Tile{d1, d2, d3}
 	m := Meld{Tiles: p}
 	if !m.Chow() {
@@ -116,7 +116,7 @@ func TestChowMeld(t *testing.T) {
 }
 
 func TestPongMeld(t *testing.T) {
-	d1 := Tile{Suit: "D", Num: 1}
+	d1 := Tile{Suit: "D", Rank: 1}
 	p := []Tile{d1, d1, d1}
 	m := Meld{Tiles: p}
 	if !m.Pong() {
@@ -129,7 +129,7 @@ func TestPongMeld(t *testing.T) {
 }
 
 func TestKongMeld(t *testing.T) {
-	d1 := Tile{Suit: "D", Num: 1}
+	d1 := Tile{Suit: "D", Rank: 1}
 	p := []Tile{d1, d1, d1, d1}
 	m := Meld{Tiles: p}
 	if !m.Kong() {

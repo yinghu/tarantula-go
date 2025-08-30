@@ -2,7 +2,6 @@ package mahjong
 
 import (
 	"strconv"
-	"strings"
 )
 
 const (
@@ -66,16 +65,11 @@ const (
 
 type Tile struct {
 	Suit string
-	Num  int8
+	Rank  int8
 }
 
 func (t *Tile) From(src string) {
-	if strings.HasPrefix(src, "F") {
-		t.Suit = src
-		t.Num = 0
-		return
-	}
 	t.Suit = src[:1]
 	v, _ := strconv.ParseUint(src[1:2], 10, 8)
-	t.Num = int8(v)
+	t.Rank = int8(v)
 }
