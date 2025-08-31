@@ -5,6 +5,13 @@ import (
 	"strings"
 )
 
+const (
+	FOUR_SET  int = 0
+	THREE_SET int = 1
+	SEQ_SET   int = 2
+	TWO_SET   int = 3
+)
+
 type Hand struct {
 	Formed  []Meld
 	Tiles   []Tile
@@ -60,7 +67,7 @@ func (h *Hand) Knog(deck *Deck) error {
 }
 
 func (h *Hand) Mahjong() bool {
-	h.Pending = append(h.Pending, NewFourTileSet(h.Sn))
+	h.Pending = append(h.Pending, h.NewTileSet(FOUR_SET))
 	h.Sn++
 	h.evaluate()
 	return false
@@ -78,10 +85,10 @@ func (h *Hand) evaluate() {
 		tset := h.Pending[0]
 		if tset.Full() {
 			if len(h.Tiles) > 2 {
-				h.Pending = slices.Insert(h.Pending, 0, NewFourTileSet(h.Sn))
+				h.Pending = slices.Insert(h.Pending, 0, h.NewTileSet(FOUR_SET))
 				h.Sn++
 			} else {
-				h.Pending = slices.Insert(h.Pending, 0, NewThreeTileSet(h.Sn))
+				h.Pending = slices.Insert(h.Pending, 0, h.NewTileSet(THREE_SET))
 				h.Sn++
 			}
 			h.Pending[0].Append(t)
@@ -122,4 +129,23 @@ func (h *Hand) redo() bool {
 
 	}
 	return true
+}
+
+func (h *Hand) NewTileSet(id int) TileSet {
+	var tset TileSet
+	switch id {
+	case FOUR_SET:
+		tset = NewFourTileSet(h.Sn)
+		h.Sn++
+	case THREE_SET:
+		tset = NewThreeTileSet(h.Sn)
+		h.Sn++
+	case SEQ_SET:
+		tset = NewSequenceTileSet(h.Sn)
+		h.Sn++
+	case TWO_SET:
+		tset = NewTwoTileSet(h.Sn)
+		h.Sn++
+	}
+	return tset
 }

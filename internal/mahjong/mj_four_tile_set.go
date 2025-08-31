@@ -6,10 +6,9 @@ type FourTileSet struct {
 
 
 func (f *FourTileSet) Fallback(h *Hand) TileSet {
-	//tset := NewThreeTileSet(h.Sn)
-	//h.Sn++
+	tset := h.NewTileSet(THREE_SET)
 	
-	return f
+	return tset
 }
 func (f *FourTileSet) Append(t Tile) TileSet {
 	f.TileSet = append(f.TileSet, t)
