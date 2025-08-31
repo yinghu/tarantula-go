@@ -4,9 +4,11 @@ type TileSet interface {
 	Full() bool
 	Fallback(h *Hand) TileSet
 	Append(t Tile) TileSet
+	Pop() Tile
 	Allowed(t Tile) bool
 	Eye() bool
 	Sequence() int
+	Size() int
 	Debug() []Tile
 }
 
@@ -40,10 +42,20 @@ func (f *TileSetObj) Sequence() int {
 	return f.Seq
 }
 
+func (f *TileSetObj) Size() int {
+	return len(f.TileSet)
+}
+func (f *TileSetObj) Pop() Tile {
+	t := f.TileSet[0]
+	f.TileSet = f.TileSet[1:]
+	return t
+}
+
 func NewFourTileSet(sn int) TileSet {
 	tset := FourTileSet{}
 	tset.TileSet = make([]Tile, 0)
 	tset.FullSize = 4
+	tset.Seq = sn
 	return &tset
 }
 
@@ -51,6 +63,7 @@ func NewThreeTileSet(sn int) TileSet {
 	tset := ThreeTileSet{}
 	tset.TileSet = make([]Tile, 0)
 	tset.FullSize = 3
+	tset.Seq = sn
 	return &tset
 }
 
@@ -58,6 +71,7 @@ func NewSequenceTileSet(sn int) TileSet {
 	tset := SequenceTileSet{}
 	tset.TileSet = make([]Tile, 0)
 	tset.FullSize = 3
+	tset.Seq = sn
 	return &tset
 }
 
@@ -65,5 +79,6 @@ func NewTwoTileSet(sn int) TileSet {
 	tset := TwoTileSet{}
 	tset.TileSet = make([]Tile, 0)
 	tset.FullSize = 2
+	tset.Seq = sn
 	return &tset
 }

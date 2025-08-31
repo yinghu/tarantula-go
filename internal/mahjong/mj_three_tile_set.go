@@ -5,7 +5,11 @@ type ThreeTileSet struct {
 }
 
 func (f *ThreeTileSet) Fallback(h *Hand) TileSet {
-	return f
+	tset := h.NewTileSet(SEQ_SET)
+	for f.Size() > 0 {
+		h.PushTile(f.Pop())
+	}
+	return tset.Append(h.PopTile())
 }
 func (f *ThreeTileSet) Append(t Tile) TileSet {
 	f.TileSet = append(f.TileSet, t)

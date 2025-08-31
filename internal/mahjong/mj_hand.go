@@ -76,26 +76,22 @@ func (h *Hand) Mahjong() bool {
 func (h *Hand) evaluate() {
 	var t Tile
 	for {
-		sz := len(h.Tiles)
-		if sz == 0 {
+		if h.TileSize() == 0 {
 			return
 		}
-		t = h.Tiles[0]
-		h.Tiles = h.Tiles[1:]
+		t = h.PopTile()
 		tset := h.Pending[0]
 		if tset.Full() {
-			if len(h.Tiles) > 2 {
-				h.Pending = slices.Insert(h.Pending, 0, h.NewTileSet(FOUR_SET))
-				h.Sn++
+			if h.TileSize() > 2 {
+				h.PushTileSet(h.NewTileSet(FOUR_SET))
 			} else {
-				h.Pending = slices.Insert(h.Pending, 0, h.NewTileSet(THREE_SET))
-				h.Sn++
+				h.PushTileSet(h.NewTileSet(THREE_SET))
 			}
 			h.Pending[0].Append(t)
 		} else if tset.Allowed(t) {
 			tset.Append(t)
 		} else {
-			h.Tiles = slices.Insert(h.Tiles, 0, t)
+			h.PushTile(t)
 			if !h.redo() {
 				return
 			}
@@ -103,19 +99,17 @@ func (h *Hand) evaluate() {
 	}
 }
 func (h *Hand) redo() bool {
-	if len(h.Pending) == 0 {
+	if h.TileSetSize() == 0 {
 		return false
 	}
-	tset1 := h.Pending[0]
-	h.Pending = h.Pending[1:]
+	tset1 := h.PopTileSet()
 	tset2 := tset1.Fallback(h)
 	if tset1.Sequence() != tset2.Sequence() {
-		h.Pending = slices.Insert(h.Pending, 0, tset2)
+		h.PushTileSet(tset2)
 	} else {
 		for {
-			if tset1.Sequence() == tset2.Sequence() && len(h.Pending) != 0 {
-				tset1 = h.Pending[0]
-				h.Pending = h.Pending[1:]
+			if tset1.Sequence() == tset2.Sequence() && h.TileSetSize() != 0 {
+				tset1 = h.PopTileSet()
 				tset2 = tset1.Fallback(h)
 			} else {
 				break
@@ -124,7 +118,7 @@ func (h *Hand) redo() bool {
 		if tset1.Sequence() == tset2.Sequence() {
 			return false
 		} else {
-			h.Pending = slices.Insert(h.Pending, 0, tset2)
+			h.PushTileSet(tset2)
 		}
 
 	}
@@ -148,4 +142,32 @@ func (h *Hand) NewTileSet(id int) TileSet {
 		h.Sn++
 	}
 	return tset
+}
+
+func (h *Hand) PopTile() Tile {
+	t := h.Tiles[0]
+	h.Tiles = h.Tiles[1:]
+	return t
+}
+
+func (h *Hand) PushTile(t Tile) {
+	h.Tiles = slices.Insert(h.Tiles, 0, t)
+}
+
+func (h *Hand) PopTileSet() TileSet {
+	t := h.Pending[0]
+	h.Pending = h.Pending[1:]
+	return t
+}
+
+func (h *Hand) PushTileSet(t TileSet) {
+	h.Pending = slices.Insert(h.Pending, 0, t)
+}
+
+func (h *Hand) TileSize() int {
+	return len(h.Tiles)
+}
+
+func (h *Hand) TileSetSize() int {
+	return len(h.Pending)
 }

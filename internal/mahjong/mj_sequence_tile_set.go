@@ -5,8 +5,11 @@ type SequenceTileSet struct {
 }
 
 func (f *SequenceTileSet) Fallback(h *Hand) TileSet {
-	
-	return f
+	tset := h.NewTileSet(TWO_SET)
+	for f.Size() > 0 {
+		h.PushTile(f.Pop())
+	}
+	return tset.Append(h.PopTile())
 }
 func (f *SequenceTileSet) Append(t Tile) TileSet {
 	f.TileSet = append(f.TileSet, t)
@@ -21,7 +24,7 @@ func (f *SequenceTileSet) Allowed(t Tile) bool {
 	if sz == f.FullSize {
 		return false
 	}
-	if f.TileSet[sz-1].Suit == t.Suit && f.TileSet[sz-1].Rank+1 == t.Rank{
+	if f.TileSet[sz-1].Suit == t.Suit && f.TileSet[sz-1].Rank+1 == t.Rank {
 		return true
 	}
 	return false

@@ -141,7 +141,7 @@ func TestKongMeld(t *testing.T) {
 	}
 }
 
-func TestHand(t *testing.T) {
+func TestHandStart(t *testing.T) {
 	s := Deck{}
 	s.New()
 	s.Shuffle()
