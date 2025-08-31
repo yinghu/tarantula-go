@@ -4,7 +4,8 @@ type TileSet interface {
 	Full() bool
 	Fallback(h *Hand) TileSet
 	Append(t Tile) TileSet
-	Pop() Tile
+	Head() Tile
+	Tail() Tile
 	Allowed(t Tile) bool
 	Eye() bool
 	Sequence() int
@@ -45,9 +46,14 @@ func (f *TileSetObj) Sequence() int {
 func (f *TileSetObj) Size() int {
 	return len(f.TileSet)
 }
-func (f *TileSetObj) Pop() Tile {
+func (f *TileSetObj) Head() Tile {
 	t := f.TileSet[0]
 	f.TileSet = f.TileSet[1:]
+	return t
+}
+func (f *TileSetObj) Tail() Tile {
+	t := f.TileSet[f.Size()-1]
+	f.TileSet = f.TileSet[0 : f.Size()-1]
 	return t
 }
 

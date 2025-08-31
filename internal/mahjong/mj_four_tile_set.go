@@ -7,7 +7,7 @@ type FourTileSet struct {
 func (f *FourTileSet) Fallback(h *Hand) TileSet {
 	tset := h.NewTileSet(THREE_SET)
 	for f.Size() > 0 {
-		h.PushTile(f.Pop())
+		h.PushTile(f.Head())
 	}
 	return tset.Append(h.PopTile())
 }

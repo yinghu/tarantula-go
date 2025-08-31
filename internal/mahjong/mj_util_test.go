@@ -1,7 +1,6 @@
 package mahjong
 
 import (
-	"fmt"
 	"slices"
 	"testing"
 )
@@ -40,7 +39,7 @@ func TestTileMixSort(t *testing.T) {
 	h.New()
 	h.Tiles = append(h.Tiles, ts...)
 	slices.SortFunc(h.Tiles, cmp)
-	fmt.Printf("%v\n", h.Tiles)
+	//fmt.Printf("%v\n", h.Tiles)
 	if h.Tiles[0] != d5 {
 		t.Errorf("first should be d 5")
 	}

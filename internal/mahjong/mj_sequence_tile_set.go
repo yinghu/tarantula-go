@@ -1,5 +1,7 @@
 package mahjong
 
+import "fmt"
+
 type SequenceTileSet struct {
 	TileSetObj
 }
@@ -7,12 +9,15 @@ type SequenceTileSet struct {
 func (f *SequenceTileSet) Fallback(h *Hand) TileSet {
 	tset := h.NewTileSet(TWO_SET)
 	for f.Size() > 0 {
-		h.PushTile(f.Pop())
+		h.PushTile(f.Head())
 	}
 	return tset.Append(h.PopTile())
 }
 func (f *SequenceTileSet) Append(t Tile) TileSet {
 	f.TileSet = append(f.TileSet, t)
+	if len(f.TileSet) == 3 {
+		fmt.Printf("CHOW : %v\n", f.TileSet)
+	}
 	return f
 }
 

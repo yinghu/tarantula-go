@@ -88,6 +88,34 @@ func TestHandTileSet(t *testing.T) {
 	if h.TileSetSize() != 0 {
 		t.Errorf("tile set size should be 0 %d", h.TileSetSize())
 	}
+	d1 := Tile{Suit: "D", Rank: 1}
+	d2 := Tile{Suit: "D", Rank: 2}
+	d3 := Tile{Suit: "D", Rank: 3}
+	d4 := Tile{Suit: "D", Rank: 4}
+	tx := h.NewTileSet(FOUR_SET)
+	tx.Append(d1)
+	tx.Append(d2)
+	tx.Append(d3)
+	tx.Append(d4)
+	if tx.Size() != 4 {
+		t.Errorf("tile size should be 4 %d", tx.Size())
+	}
+	th := tx.Head()
+	if th != d1 {
+		t.Errorf("head should be d1 %v", th)
+	}
+	ti := tx.Tail()
+	if ti != d4 {
+		t.Errorf("tail should be d4 %v", ti)
+	}
+	if tx.Size() != 2 {
+		t.Errorf("tile size should be 2 %d", tx.Size())
+	}
+	tx.Tail()
+	tx.Tail()
+	if tx.Size() != 0 {
+		t.Errorf("tile size should be 0 %d", tx.Size())
+	}
 }
 
 func TestHandFourTileSet(t *testing.T) {
@@ -103,17 +131,90 @@ func TestHandFourTileSet(t *testing.T) {
 	t4set.Append(t2)
 	t4set.Append(t3)
 	t4set.Append(t4)
-	if t4set.Size()!=4{
-		t.Errorf("size should be 4 %d",t4set.Size())
+	if t4set.Size() != 4 {
+		t.Errorf("size should be 4 %d", t4set.Size())
 	}
 	t3set := t4set.Fallback(&h)
-	if t3set.Size() !=1 {
-		t.Errorf("size should be 1 %d",t3set.Size())
+	if t3set.Size() != 1 {
+		t.Errorf("size should be 1 %d", t3set.Size())
 	}
-	if t4set.Size()!=0{
-		t.Errorf("size should be 0 %d",t4set.Size())
+	if t4set.Size() != 0 {
+		t.Errorf("size should be 0 %d", t4set.Size())
 	}
-	if h.TileSize()!=3{
-		t.Errorf("size should be 3 %d",h.TileSize())
+	if h.TileSize() != 3 {
+		t.Errorf("size should be 3 %d", h.TileSize())
+	}
+}
+
+func TestHandThreeTileSet(t *testing.T) {
+	h := Hand{}
+	h.New()
+	t1 := Tile{Suit: "D", Rank: 1}
+	t2 := Tile{Suit: "D", Rank: 1}
+	t3 := Tile{Suit: "D", Rank: 1}
+
+	t4set := h.NewTileSet(THREE_SET)
+	t4set.Append(t1)
+	t4set.Append(t2)
+	t4set.Append(t3)
+
+	if t4set.Size() != 3 {
+		t.Errorf("size should be 3 %d", t4set.Size())
+	}
+	t3set := t4set.Fallback(&h)
+	if t3set.Size() != 1 {
+		t.Errorf("size should be 1 %d", t3set.Size())
+	}
+	if t4set.Size() != 0 {
+		t.Errorf("size should be 0 %d", t4set.Size())
+	}
+	if h.TileSize() != 2 {
+		t.Errorf("size should be 3 %d", h.TileSize())
+	}
+}
+
+func TestHandSeqTileSet(t *testing.T) {
+	h := Hand{}
+	h.New()
+	t1 := Tile{Suit: "D", Rank: 1}
+	t2 := Tile{Suit: "D", Rank: 2}
+	t3 := Tile{Suit: "D", Rank: 3}
+
+	t4set := h.NewTileSet(SEQ_SET)
+	t4set.Append(t1)
+	t4set.Append(t2)
+	t4set.Append(t3)
+
+	if t4set.Size() != 3 {
+		t.Errorf("size should be 3 %d", t4set.Size())
+	}
+	t3set := t4set.Fallback(&h)
+	if t3set.Size() != 1 {
+		t.Errorf("size should be 1 %d", t3set.Size())
+	}
+	if t4set.Size() != 0 {
+		t.Errorf("size should be 0 %d", t4set.Size())
+	}
+	if h.TileSize() != 2 {
+		t.Errorf("size should be 2 %d", h.TileSize())
+	}
+}
+
+func TestHandTwoTileSet(t *testing.T) {
+	h := Hand{}
+	h.New()
+	t1 := Tile{Suit: "D", Rank: 1}
+	t2 := Tile{Suit: "D", Rank: 1}
+
+	t4set := h.NewTileSet(TWO_SET)
+	t4set.Append(t1)
+	t4set.Append(t2)
+
+	if t4set.Size() != 2 {
+		t.Errorf("size should be 2 %d", t4set.Size())
+	}
+	t3set := t4set.Fallback(&h)
+	if t3set.Sequence() != t4set.Sequence() {
+		t.Errorf("should be same %d %d", t3set.Sequence(), t4set.Sequence())
 	}
 }

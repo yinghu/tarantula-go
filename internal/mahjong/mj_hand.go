@@ -1,6 +1,7 @@
 package mahjong
 
 import (
+	"fmt"
 	"slices"
 	"strings"
 )
@@ -67,18 +68,20 @@ func (h *Hand) Knog(deck *Deck) error {
 }
 
 func (h *Hand) Mahjong() bool {
+	slices.SortFunc(h.Tiles, cmp)
+	fmt.Printf("%v\n", h.Tiles)
 	h.Pending = append(h.Pending, h.NewTileSet(FOUR_SET))
-	h.Sn++
 	h.evaluate()
+	fmt.Printf("tile set size : %d\n", h.TileSetSize())
+	for i := range h.Pending {
+		fmt.Printf("X Set size : %d\n", h.Pending[i].Size())
+	}
 	return false
 }
 
 func (h *Hand) evaluate() {
 	var t Tile
-	for {
-		if h.TileSize() == 0 {
-			return
-		}
+	for h.TileSize() > 0 {
 		t = h.PopTile()
 		tset := h.Pending[0]
 		if tset.Full() {
@@ -103,25 +106,21 @@ func (h *Hand) redo() bool {
 		return false
 	}
 	tset1 := h.PopTileSet()
+	fmt.Printf("xpop tile set : %d\n", tset1.Sequence())
 	tset2 := tset1.Fallback(h)
 	if tset1.Sequence() != tset2.Sequence() {
 		h.PushTileSet(tset2)
-	} else {
-		for {
-			if tset1.Sequence() == tset2.Sequence() && h.TileSetSize() != 0 {
-				tset1 = h.PopTileSet()
-				tset2 = tset1.Fallback(h)
-			} else {
-				break
-			}
-		}
-		if tset1.Sequence() == tset2.Sequence() {
-			return false
-		} else {
-			h.PushTileSet(tset2)
-		}
-
+		return true
 	}
+	for tset1.Sequence() == tset2.Sequence() && h.TileSetSize() != 0 {
+		tset1 = h.PopTileSet()
+		tset2 = tset1.Fallback(h)
+		fmt.Printf("pop tile set : %d\n", tset1.Sequence())
+	}
+	if tset1.Sequence() == tset2.Sequence() {
+		return false
+	}
+	h.PushTileSet(tset2)
 	return true
 }
 
@@ -157,10 +156,12 @@ func (h *Hand) PushTile(t Tile) {
 func (h *Hand) PopTileSet() TileSet {
 	t := h.Pending[0]
 	h.Pending = h.Pending[1:]
+	//fmt.Printf("pop tile set : %d\n", t.Sequence())
 	return t
 }
 
 func (h *Hand) PushTileSet(t TileSet) {
+	//fmt.Printf("push tile set : %d\n", t.Sequence())
 	h.Pending = slices.Insert(h.Pending, 0, t)
 }
 
