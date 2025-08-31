@@ -5,7 +5,10 @@ type FourTileSet struct {
 }
 
 
-func (f *FourTileSet) Fallback(tiles []Tile) TileSet {
+func (f *FourTileSet) Fallback(h *Hand) TileSet {
+	//tset := NewThreeTileSet(h.Sn)
+	//h.Sn++
+	
 	return f
 }
 func (f *FourTileSet) Append(t Tile) TileSet {

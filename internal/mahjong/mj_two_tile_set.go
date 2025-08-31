@@ -4,7 +4,7 @@ type TwoTileSet struct {
 	TileSetObj
 }
 
-func (f *TwoTileSet) Fallback(tiles []Tile) TileSet {
+func (f *TwoTileSet) Fallback(h *Hand) TileSet {
 	return f
 }
 func (f *TwoTileSet) Append(t Tile) TileSet {

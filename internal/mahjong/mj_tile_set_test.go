@@ -3,7 +3,7 @@ package mahjong
 import "testing"
 
 func TestFourTileSet(t *testing.T) {
-	t4 := NewFourTileSet()
+	t4 := NewFourTileSet(1)
 	if t4.Eye() {
 		t.Errorf("should not be an eye")
 	}
@@ -45,7 +45,7 @@ func TestFourTileSet(t *testing.T) {
 }
 
 func TestThreeTileSet(t *testing.T) {
-	t4 := NewThreeTileSet()
+	t4 := NewThreeTileSet(1)
 	if t4.Eye() {
 		t.Errorf("should not be an eye")
 	}
@@ -84,7 +84,7 @@ func TestThreeTileSet(t *testing.T) {
 }
 
 func TestTwoTileSet(t *testing.T) {
-	t4 := NewTwoTileSet()
+	t4 := NewTwoTileSet(1)
 	if !t4.Eye() {
 		t.Errorf("should be an eye")
 	}
@@ -119,7 +119,7 @@ func TestTwoTileSet(t *testing.T) {
 }
 
 func TestSequenceTileSet(t *testing.T) {
-	t4 := NewSequenceTileSet()
+	t4 := NewSequenceTileSet(1)
 	if t4.Eye() {
 		t.Errorf("should be an eye")
 	}

@@ -4,7 +4,8 @@ type SequenceTileSet struct {
 	TileSetObj
 }
 
-func (f *SequenceTileSet) Fallback(tiles []Tile) TileSet {
+func (f *SequenceTileSet) Fallback(h *Hand) TileSet {
+	
 	return f
 }
 func (f *SequenceTileSet) Append(t Tile) TileSet {
