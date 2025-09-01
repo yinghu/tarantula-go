@@ -85,12 +85,3 @@ func TestSlice(t *testing.T) {
 	}
 }
 
-func TestSequence(t *testing.T) {
-	t1 := NewFourTileSet(1)
-	ts := make([]TileSet, 0)
-	ts = slices.Insert(ts, 0, t1)
-	t2 := ts[0]
-	if t1.Sequence() != t2.Sequence() {
-		t.Errorf("should be same sequecen %d, %d", t1.Sequence(), t2.Sequence())
-	}
-}

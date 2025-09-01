@@ -2,22 +2,19 @@ package mahjong
 
 type TileSet interface {
 	Full() bool
-	Fallback(h *Hand) TileSet
 	Append(t Tile) TileSet
 	Head() Tile
 	Tail() Tile
 	Allowed(t Tile) bool
 	Eye() bool
-	Sequence() int
 	Size() int
 	Formed() Meld
-	Next(h *Hand) TileSet
+	Next(h *Hand,pending Tile) (TileSet,error)
 }
 
 type TileSetObj struct {
 	TileSet  []Tile
 	FullSize int
-	Seq      int
 }
 
 func (f *TileSetObj) Full() bool {
@@ -42,9 +39,6 @@ func (f *TileSetObj) Eye() bool {
 	return false
 }
 
-func (f *TileSetObj) Sequence() int {
-	return f.Seq
-}
 
 func (f *TileSetObj) Size() int {
 	return len(f.TileSet)
@@ -60,34 +54,31 @@ func (f *TileSetObj) Tail() Tile {
 	return t
 }
 
-func NewFourTileSet(sn int) TileSet {
+func NewFourTileSet() TileSet {
 	tset := FourTileSet{}
 	tset.TileSet = make([]Tile, 0)
 	tset.FullSize = 4
-	tset.Seq = sn
+
 	return &tset
 }
 
-func NewThreeTileSet(sn int) TileSet {
+func NewThreeTileSet() TileSet {
 	tset := ThreeTileSet{}
 	tset.TileSet = make([]Tile, 0)
 	tset.FullSize = 3
-	tset.Seq = sn
 	return &tset
 }
 
-func NewSequenceTileSet(sn int) TileSet {
+func NewSequenceTileSet() TileSet {
 	tset := SequenceTileSet{}
 	tset.TileSet = make([]Tile, 0)
 	tset.FullSize = 3
-	tset.Seq = sn
 	return &tset
 }
 
-func NewTwoTileSet(sn int) TileSet {
+func NewTwoTileSet() TileSet {
 	tset := TwoTileSet{}
 	tset.TileSet = make([]Tile, 0)
 	tset.FullSize = 2
-	tset.Seq = sn
 	return &tset
 }

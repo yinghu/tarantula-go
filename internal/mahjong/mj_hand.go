@@ -17,8 +17,7 @@ type Hand struct {
 	Formed  []Meld
 	Tiles   []Tile
 	Flowers []Tile
-	Pending []TileSet
-	Sn      int
+	Next    TileSet
 }
 
 func cmp(a, b Tile) int {
@@ -33,8 +32,7 @@ func (h *Hand) New() {
 	h.Formed = make([]Meld, 0)
 	h.Tiles = make([]Tile, 0)
 	h.Flowers = make([]Tile, 0)
-	h.Pending = make([]TileSet, 0)
-	h.Sn = 1
+	h.Next = h.NewTileSet(THREE_SET)
 }
 
 func (h *Hand) Draw(deck *Deck) error {
@@ -70,46 +68,65 @@ func (h *Hand) Knog(deck *Deck) error {
 func (h *Hand) Mahjong() bool {
 	slices.SortFunc(h.Tiles, cmp)
 	fmt.Printf("%v\n", h.Tiles)
-	h.PushTileSet(h.NewTileSet(THREE_SET))
-	h.evaluate()
-
+	err := h.evaluate()
+	if err != nil {
+		fmt.Printf("no match %s\n", err.Error())
+		return false
+	}
+	var eyeCount int
+	var formed int
 	for _, v := range h.Formed {
 		fmt.Printf("X Set size : %v\n", v.Tiles)
+		if v.Eye() {
+			eyeCount++
+		}
+		formed++
 	}
-	return false
+	return eyeCount == 1 && formed == 5
 }
 
-func (h *Hand) evaluate() {
-	for h.TileSize()>0{
-		t := h.PopTile()
-		for _, tset := range h.Pending{
-			if tset.Full(){
-				h.Formed = append(h.Formed,tset.Formed())
-				continue
+func (h *Hand) evaluate() error {
+	for h.TileSize() > 0 {
+		next := h.Next
+		for {
+			if next.Full() {
+				h.Formed = append(h.Formed, next.Formed())
+				h.Next = h.NewTileSet(THREE_SET)
+				break
 			}
-			if tset.Allowed(t){
-				tset.Append(t)
+			t := h.PopTile()
+			if next.Allowed(t) {
+				next.Append(t)
+				break
 			}
-			
-		}	
+			fallBack, err := next.Next(h, t)
+			for err == nil {
+				if fallBack.Allowed(t) {
+					fallBack.Append(t)
+					h.Next = fallBack
+					break
+				}
+				fallBack, err = fallBack.Next(h, t)
+			}
+			break
+		}
 	}
+	//last formed
+	h.Formed = append(h.Formed, h.Next.Formed())
+	return nil
 }
 
 func (h *Hand) NewTileSet(id int) TileSet {
 	var tset TileSet
 	switch id {
 	case FOUR_SET:
-		tset = NewFourTileSet(h.Sn)
-		h.Sn++
+		tset = NewFourTileSet()
 	case THREE_SET:
-		tset = NewThreeTileSet(h.Sn)
-		h.Sn++
+		tset = NewThreeTileSet()
 	case SEQ_SET:
-		tset = NewSequenceTileSet(h.Sn)
-		h.Sn++
+		tset = NewSequenceTileSet()
 	case TWO_SET:
-		tset = NewTwoTileSet(h.Sn)
-		h.Sn++
+		tset = NewTwoTileSet()
 	}
 	return tset
 }
@@ -124,22 +141,6 @@ func (h *Hand) PushTile(t Tile) {
 	h.Tiles = slices.Insert(h.Tiles, 0, t)
 }
 
-func (h *Hand) PopTileSet() TileSet {
-	t := h.Pending[0]
-	h.Pending = h.Pending[1:]
-	//fmt.Printf("pop tile set : %d\n", t.Sequence())
-	return t
-}
-
-func (h *Hand) PushTileSet(t TileSet) {
-	//fmt.Printf("push tile set : %d\n", t.Sequence())
-	h.Pending = slices.Insert(h.Pending, 0, t)
-}
-
 func (h *Hand) TileSize() int {
 	return len(h.Tiles)
-}
-
-func (h *Hand) TileSetSize() int {
-	return len(h.Pending)
 }
