@@ -29,7 +29,7 @@ func TestFourTileSet(t *testing.T) {
 	if !t4.Full() {
 		t.Errorf("should be full")
 	}
-	ts := t4.Debug()
+	ts := t4.Formed().Tiles
 	if ts[0] != d1 {
 		t.Errorf("Should be %v", d1)
 	}
@@ -71,7 +71,7 @@ func TestThreeTileSet(t *testing.T) {
 	if !t4.Full() {
 		t.Errorf("should be full")
 	}
-	ts := t4.Debug()
+	ts := t4.Formed().Tiles
 	if ts[0] != d1 {
 		t.Errorf("Should be %v", d1)
 	}
@@ -109,7 +109,7 @@ func TestTwoTileSet(t *testing.T) {
 	if !t4.Full() {
 		t.Errorf("should be full")
 	}
-	ts := t4.Debug()
+	ts := t4.Formed().Tiles
 	if ts[0] != d1 {
 		t.Errorf("Should be %v", d1)
 	}
@@ -153,7 +153,7 @@ func TestSequenceTileSet(t *testing.T) {
 	if t4.Allowed(d4){
 		t.Errorf("should not be allowed")
 	}
-	ts := t4.Debug()
+	ts := t4.Formed().Tiles
 	if ts[0] != d1 {
 		t.Errorf("Should be %v", d1)
 	}

@@ -10,7 +10,8 @@ type TileSet interface {
 	Eye() bool
 	Sequence() int
 	Size() int
-	Debug() []Tile
+	Formed() Meld
+	Next(h *Hand) TileSet
 }
 
 type TileSetObj struct {
@@ -23,8 +24,10 @@ func (f *TileSetObj) Full() bool {
 	return len(f.TileSet) == f.FullSize
 }
 
-func (f *TileSetObj) Debug() []Tile {
-	return f.TileSet
+func (f *TileSetObj) Formed() Meld {
+	m := Meld{Tiles: f.TileSet}
+	f.TileSet = f.TileSet[:0]
+	return m
 }
 
 func (f *TileSetObj) Allowed(t Tile) bool {
@@ -53,7 +56,7 @@ func (f *TileSetObj) Head() Tile {
 }
 func (f *TileSetObj) Tail() Tile {
 	t := f.TileSet[f.Size()-1]
-	f.TileSet = f.TileSet[0 : f.Size()-1]
+	f.TileSet = f.TileSet[:f.Size()-1]
 	return t
 }
 

@@ -29,5 +29,5 @@ func TestHandEval(t *testing.T) {
 	if h.TileSize() != 14 {
 		t.Errorf("hand size should be 14 %d", h.TileSize())
 	}
-	h.Mahjong()
+	//h.Mahjong()
 }

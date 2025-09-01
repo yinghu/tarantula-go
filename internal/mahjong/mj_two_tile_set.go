@@ -23,3 +23,7 @@ func (f *TwoTileSet) Append(t Tile) TileSet {
 func (f *TwoTileSet) Eye() bool {
 	return true
 }
+
+func (f *TwoTileSet) Next(h *Hand) TileSet {
+	return nil
+}

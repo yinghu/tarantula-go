@@ -22,6 +22,9 @@ func (f *SequenceTileSet) Append(t Tile) TileSet {
 }
 
 func (f *SequenceTileSet) Allowed(t Tile) bool {
+	if t.Suit == HORNOR || t.Suit == FLOWER {
+		return false
+	}
 	sz := len(f.TileSet)
 	if sz == 0 {
 		return true
@@ -34,3 +37,8 @@ func (f *SequenceTileSet) Allowed(t Tile) bool {
 	}
 	return false
 }
+
+func (f *SequenceTileSet) Next(h *Hand) TileSet {
+	return h.NewTileSet(TWO_SET)
+}
+

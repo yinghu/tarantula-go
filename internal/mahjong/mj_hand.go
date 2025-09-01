@@ -70,58 +70,29 @@ func (h *Hand) Knog(deck *Deck) error {
 func (h *Hand) Mahjong() bool {
 	slices.SortFunc(h.Tiles, cmp)
 	fmt.Printf("%v\n", h.Tiles)
-	h.Pending = append(h.Pending, h.NewTileSet(FOUR_SET))
+	h.PushTileSet(h.NewTileSet(THREE_SET))
 	h.evaluate()
-	fmt.Printf("tile set size : %d\n", h.TileSetSize())
-	for i := range h.Pending {
-		fmt.Printf("X Set size : %d\n", h.Pending[i].Size())
+
+	for _, v := range h.Formed {
+		fmt.Printf("X Set size : %v\n", v.Tiles)
 	}
 	return false
 }
 
 func (h *Hand) evaluate() {
-	var t Tile
-	for h.TileSize() > 0 {
-		t = h.PopTile()
-		tset := h.Pending[0]
-		if tset.Full() {
-			if h.TileSize() > 2 {
-				h.PushTileSet(h.NewTileSet(FOUR_SET))
-			} else {
-				h.PushTileSet(h.NewTileSet(THREE_SET))
+	for h.TileSize()>0{
+		t := h.PopTile()
+		for _, tset := range h.Pending{
+			if tset.Full(){
+				h.Formed = append(h.Formed,tset.Formed())
+				continue
 			}
-			h.Pending[0].Append(t)
-		} else if tset.Allowed(t) {
-			tset.Append(t)
-		} else {
-			h.PushTile(t)
-			if !h.redo() {
-				return
+			if tset.Allowed(t){
+				tset.Append(t)
 			}
-		}
+			
+		}	
 	}
-}
-func (h *Hand) redo() bool {
-	if h.TileSetSize() == 0 {
-		return false
-	}
-	tset1 := h.PopTileSet()
-	fmt.Printf("xpop tile set : %d\n", tset1.Sequence())
-	tset2 := tset1.Fallback(h)
-	if tset1.Sequence() != tset2.Sequence() {
-		h.PushTileSet(tset2)
-		return true
-	}
-	for tset1.Sequence() == tset2.Sequence() && h.TileSetSize() != 0 {
-		tset1 = h.PopTileSet()
-		tset2 = tset1.Fallback(h)
-		fmt.Printf("pop tile set : %d\n", tset1.Sequence())
-	}
-	if tset1.Sequence() == tset2.Sequence() {
-		return false
-	}
-	h.PushTileSet(tset2)
-	return true
 }
 
 func (h *Hand) NewTileSet(id int) TileSet {

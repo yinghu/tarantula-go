@@ -74,3 +74,4 @@ func (t *Tile) From(src string) {
 	v, _ := strconv.ParseUint(src[1:2], 10, 8)
 	t.Rank = int8(v)
 }
+

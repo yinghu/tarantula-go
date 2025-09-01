@@ -15,3 +15,7 @@ func (f *ThreeTileSet) Append(t Tile) TileSet {
 	f.TileSet = append(f.TileSet, t)
 	return f
 }
+
+func (f *ThreeTileSet) Next(h *Hand) TileSet {
+	return h.NewTileSet(SEQ_SET)
+}
