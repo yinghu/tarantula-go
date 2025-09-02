@@ -17,7 +17,7 @@ type Hand struct {
 	Formed  []Meld
 	Tiles   []Tile
 	Flowers []Tile
-	Next    TileSet
+
 	Stack   []TileSet
 }
 
@@ -33,7 +33,6 @@ func (h *Hand) New() {
 	h.Formed = make([]Meld, 0)
 	h.Tiles = make([]Tile, 0)
 	h.Flowers = make([]Tile, 0)
-	h.Next = h.NewTileSet(THREE_SET)
 	h.Stack = make([]TileSet, 0)
 }
 
@@ -67,6 +66,7 @@ func (h *Hand) Knog(deck *Deck) error {
 	return nil
 }
 
+
 func (h *Hand) Mahjong() bool {
 	slices.SortFunc(h.Tiles, cmp)
 	fmt.Printf("%v\n", h.Tiles)
@@ -87,74 +87,48 @@ func (h *Hand) Mahjong() bool {
 	}
 	return eyeCount == 1 && formed == 5
 }
-
-func (h *Hand) MJ() bool {
-	slices.SortFunc(h.Tiles, cmp)
-	fmt.Printf("%v\n", h.Tiles)
-	err := h.Evaluate()
-	if err != nil {
-		fmt.Printf("no match %s\n", err.Error())
-		return false
-	}
-	var eyeCount int
-	var formed int
-	for _, v := range h.Formed {
-		fmt.Printf("X Set size : %v\n", v.Tiles)
-		if v.Eye() {
-			eyeCount++
-		}
-		formed++
-	}
-	return eyeCount == 1 && formed == 5
-}
-func (h *Hand) Evaluate() error {
+func (h *Hand) evaluate() error {
+	tem := make([]TileSet, 0)
 	for h.TileSize() > 0 {
 		t := h.PopTile()
 		for h.StackSize() > 0 {
 			tset := h.Pop()
-			if tset.Allowed(t){
+			if tset.Allowed(t) {
 				tset.Append(t)
-				if tset.Full(){
+				if tset.Full() {
 					h.Formed = append(h.Formed, tset.Formed())
-				}else{
+					if h.StackSize() == 0 {
+						h.Push(h.NewTileSet(THREE_SET))
+					}
+				} else {
 					h.Push(tset)
 				}
+				slices.Reverse(tem)
+				for _, v := range tem {
+					h.Push(v)
+				}
+				tem = tem[:0]
+				break
 			}
+			if h.StackSize() > 0 {
+				tem = append(tem, tset)
+				continue
+			}
+			slices.Reverse(tem)
+			for _, v := range tem {
+				h.Push(v)
+			}
+			tem = tem[:0]
+			tset.Fallback(h)
 		}
+	}
+	for h.StackSize() > 0 {
+		h.Formed = append(h.Formed,h.Pop().Formed())
 	}
 	return nil
 }
 
-func (h *Hand) evaluate() error {
-	for h.TileSize() > 0 {
-		next := h.Next
-		for {
-			if next.Full() {
-				h.Formed = append(h.Formed, next.Formed())
-				h.Next = h.NewTileSet(THREE_SET)
-				break
-			}
-			t := h.PopTile()
-			if next.Allowed(t) {
-				next.Append(t)
-				break
-			}
-			fallBack, err := next.Next(h, t)
-			for err == nil {
-				if fallBack.Allowed(t) {
-					fallBack.Append(t)
-					h.Next = fallBack
-					break
-				}
-				fallBack, err = fallBack.Next(h, t)
-			}
-			break
-		}
-	}
-	//last formed
-	h.Formed = append(h.Formed, h.Next.Formed())
-	return nil
-}
+
 
 func (h *Hand) NewTileSet(id int) TileSet {
 	var tset TileSet

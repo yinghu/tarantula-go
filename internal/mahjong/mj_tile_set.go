@@ -4,12 +4,11 @@ type TileSet interface {
 	Full() bool
 	Append(t Tile) TileSet
 	Head() Tile
-	Tail() Tile
 	Allowed(t Tile) bool
 	Eye() bool
 	Size() int
 	Formed() Meld
-	Next(h *Hand,pending Tile) (TileSet,error)
+	Fallback(h *Hand)
 }
 
 type TileSetObj struct {
@@ -39,7 +38,6 @@ func (f *TileSetObj) Eye() bool {
 	return false
 }
 
-
 func (f *TileSetObj) Size() int {
 	return len(f.TileSet)
 }
@@ -48,11 +46,7 @@ func (f *TileSetObj) Head() Tile {
 	f.TileSet = f.TileSet[1:]
 	return t
 }
-func (f *TileSetObj) Tail() Tile {
-	t := f.TileSet[f.Size()-1]
-	f.TileSet = f.TileSet[:f.Size()-1]
-	return t
-}
+
 
 func NewFourTileSet() TileSet {
 	tset := FourTileSet{}

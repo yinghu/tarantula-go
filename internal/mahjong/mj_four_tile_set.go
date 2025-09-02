@@ -9,7 +9,6 @@ func (f *FourTileSet) Append(t Tile) TileSet {
 	return f
 }
 
-func (f *FourTileSet) Next(h *Hand,p Tile) (TileSet,error) {
-	return h.NewTileSet(THREE_SET),nil
-}
+func (f *FourTileSet) Fallback(h *Hand) {
 
+}
