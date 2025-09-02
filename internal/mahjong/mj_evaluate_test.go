@@ -91,8 +91,8 @@ func TestHandEval3(t *testing.T) {
 	if h.TileSize() != 14 {
 		t.Errorf("hand size should be 14 %d", h.TileSize())
 	}
-	matched := h.Mahjong()
-	if !matched {
+	matched := h.MJ()
+	if matched {
 		t.Errorf("hand should be a match %v", matched)
 	}
 }

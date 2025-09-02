@@ -85,3 +85,26 @@ func TestSlice(t *testing.T) {
 	}
 }
 
+func TestStack(t *testing.T) {
+	h := Hand{}
+	h.New()
+	ts1 := h.NewTileSet(FOUR_SET)
+	ts2 := h.NewTileSet(THREE_SET)
+	ts3 := h.NewTileSet(SEQ_SET)
+	ts4 := h.NewTileSet(TWO_SET)
+	h.Push(ts1)
+	h.Push(ts2)
+	h.Push(ts3)
+	h.Push(ts4)
+	if h.StackSize() != 4 {
+		t.Errorf("stack side should be 4 %d", h.StackSize())
+	}
+	eye := h.Pop()
+	if h.StackSize() != 3 {
+		t.Errorf("stack side should be 3 %d", h.StackSize())
+	}
+	if !eye.Eye(){
+		t.Errorf("first pop item should be eye %v",eye.Eye())
+	}
+
+}

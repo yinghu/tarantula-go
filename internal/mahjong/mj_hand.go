@@ -18,6 +18,7 @@ type Hand struct {
 	Tiles   []Tile
 	Flowers []Tile
 	Next    TileSet
+	Stack   []TileSet
 }
 
 func cmp(a, b Tile) int {
@@ -33,6 +34,7 @@ func (h *Hand) New() {
 	h.Tiles = make([]Tile, 0)
 	h.Flowers = make([]Tile, 0)
 	h.Next = h.NewTileSet(THREE_SET)
+	h.Stack = make([]TileSet, 0)
 }
 
 func (h *Hand) Draw(deck *Deck) error {
@@ -68,6 +70,7 @@ func (h *Hand) Knog(deck *Deck) error {
 func (h *Hand) Mahjong() bool {
 	slices.SortFunc(h.Tiles, cmp)
 	fmt.Printf("%v\n", h.Tiles)
+	h.Push(h.NewTileSet(THREE_SET))
 	err := h.evaluate()
 	if err != nil {
 		fmt.Printf("no match %s\n", err.Error())
@@ -83,6 +86,43 @@ func (h *Hand) Mahjong() bool {
 		formed++
 	}
 	return eyeCount == 1 && formed == 5
+}
+
+func (h *Hand) MJ() bool {
+	slices.SortFunc(h.Tiles, cmp)
+	fmt.Printf("%v\n", h.Tiles)
+	err := h.Evaluate()
+	if err != nil {
+		fmt.Printf("no match %s\n", err.Error())
+		return false
+	}
+	var eyeCount int
+	var formed int
+	for _, v := range h.Formed {
+		fmt.Printf("X Set size : %v\n", v.Tiles)
+		if v.Eye() {
+			eyeCount++
+		}
+		formed++
+	}
+	return eyeCount == 1 && formed == 5
+}
+func (h *Hand) Evaluate() error {
+	for h.TileSize() > 0 {
+		t := h.PopTile()
+		for h.StackSize() > 0 {
+			tset := h.Pop()
+			if tset.Allowed(t){
+				tset.Append(t)
+				if tset.Full(){
+					h.Formed = append(h.Formed, tset.Formed())
+				}else{
+					h.Push(tset)
+				}
+			}
+		}
+	}
+	return nil
 }
 
 func (h *Hand) evaluate() error {
@@ -143,4 +183,18 @@ func (h *Hand) PushTile(t Tile) {
 
 func (h *Hand) TileSize() int {
 	return len(h.Tiles)
+}
+
+func (h *Hand) Push(ts TileSet) {
+	h.Stack = append(h.Stack, ts)
+}
+
+func (h *Hand) Pop() TileSet {
+	ts := h.Stack[h.StackSize()-1]
+	h.Stack = h.Stack[:h.StackSize()-1]
+	return ts
+}
+
+func (h *Hand) StackSize() int {
+	return len(h.Stack)
 }
