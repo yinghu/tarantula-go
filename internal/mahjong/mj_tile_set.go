@@ -5,7 +5,6 @@ type TileSet interface {
 	Append(t Tile) TileSet
 	Head() Tile
 	Allowed(t Tile) bool
-	//Eye() bool
 	Size() int
 	Formed() Meld
 	Fallback(h *Hand)
@@ -36,9 +35,6 @@ func (f *TileSetObj) Allowed(t Tile) bool {
 	return f.TileSet[sz-1] == t
 }
 
-func (f *TileSetObj) Eye() bool {
-	return false
-}
 
 func (f *TileSetObj) Size() int {
 	return len(f.TileSet)

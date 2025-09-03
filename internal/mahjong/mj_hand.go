@@ -84,7 +84,7 @@ func (h *Hand) Mahjong() bool {
 		}
 		formed++
 	}
-	return eyeCount == 1 && formed == 5
+	return eyeCount == 1 && formed == 5 || formed == 14
 }
 func (h *Hand) evaluate() error {
 	tem := make([]TileSet, 0)
@@ -97,6 +97,7 @@ func (h *Hand) evaluate() error {
 				if tset.Full() {
 					formed := tset.Formed()
 					h.Formed = append(h.Formed, formed)
+
 					if h.StackSize() == 0 {
 						h.Push(h.NewTileSet(THREE_SET))
 					}
@@ -148,6 +149,16 @@ func (h *Hand) NewTileSet(id int) TileSet {
 
 func (h *Hand) NextTile() Tile {
 	return h.Tiles[0]
+}
+
+func (h *Hand) NextTiles(limit int) []Tile {
+	lst := make([]Tile, 0)
+	for i := range limit {
+		if i < h.TileSize() {
+			lst = append(lst, h.Tiles[i])
+		}
+	}
+	return lst
 }
 
 func (h *Hand) PopTile() Tile {
