@@ -1,11 +1,11 @@
 package mahjong
 
-
 type SequenceTileSet struct {
 	TileSetObj
 }
 
 func (f *SequenceTileSet) Append(t Tile) TileSet {
+	f.Name = t.Suit
 	f.TileSet = append(f.TileSet, t)
 	return f
 }
@@ -27,9 +27,7 @@ func (f *SequenceTileSet) Allowed(t Tile) bool {
 	return false
 }
 
-
 func (f *SequenceTileSet) Fallback(h *Hand) {
 	h.Push(h.NewTileSet(THREE_SET))
 	h.Push(f)
 }
-

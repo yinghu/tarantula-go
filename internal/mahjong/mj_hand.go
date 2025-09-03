@@ -75,7 +75,6 @@ func (h *Hand) Mahjong() bool {
 		fmt.Printf("no match %s\n", err.Error())
 		return false
 	}
-	h.merge()
 	var eyeCount int
 	var formed int
 	for _, v := range h.Formed {
@@ -96,7 +95,8 @@ func (h *Hand) evaluate() error {
 			if tset.Allowed(t) {
 				tset.Append(t)
 				if tset.Full() {
-					h.Formed = append(h.Formed, tset.Formed())
+					formed := tset.Formed()
+					h.Formed = append(h.Formed, formed)
 					if h.StackSize() == 0 {
 						h.Push(h.NewTileSet(THREE_SET))
 					}
@@ -122,28 +122,13 @@ func (h *Hand) evaluate() error {
 			tset.Fallback(h)
 		}
 	}
-	return nil
-}
-
-func (h *Hand) merge() {
-	if h.StackSize() == 1 {
-		h.Formed = append(h.Formed, h.Pop().Formed())
-		return
-	}
-	tiles := make([]Tile, 0)
 	for h.StackSize() > 0 {
-		meld := h.Pop().Formed()
-		tiles = append(tiles, meld.Tiles...)
+		merge := h.Pop()
+		if merge.Size() > 0 {
+			h.Formed = append(h.Formed, merge.Formed())
+		}
 	}
-	slices.SortFunc(tiles, cmp)
-	fmt.Printf("Merge %v\n",tiles)
-	//th := Hand{}
-	//th.New()
-	//th.Tiles = tiles
-	//slices.SortFunc(th.Tiles, cmp)
-	//h.Push(h.NewTileSet(THREE_SET))
-	//th.evaluate()
-	//h.Formed = append(h.Formed, th.Formed...)
+	return nil
 }
 
 func (h *Hand) NewTileSet(id int) TileSet {
@@ -159,6 +144,10 @@ func (h *Hand) NewTileSet(id int) TileSet {
 		tset = NewTwoTileSet()
 	}
 	return tset
+}
+
+func (h *Hand) NextTile() Tile {
+	return h.Tiles[0]
 }
 
 func (h *Hand) PopTile() Tile {

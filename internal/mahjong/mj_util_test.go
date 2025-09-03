@@ -99,12 +99,5 @@ func TestStack(t *testing.T) {
 	if h.StackSize() != 4 {
 		t.Errorf("stack side should be 4 %d", h.StackSize())
 	}
-	eye := h.Pop()
-	if h.StackSize() != 3 {
-		t.Errorf("stack side should be 3 %d", h.StackSize())
-	}
-	if !eye.Eye(){
-		t.Errorf("first pop item should be eye %v",eye.Eye())
-	}
 
 }

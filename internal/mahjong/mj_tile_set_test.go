@@ -4,9 +4,6 @@ import "testing"
 
 func TestFourTileSet(t *testing.T) {
 	t4 := NewFourTileSet()
-	if t4.Eye() {
-		t.Errorf("should not be an eye")
-	}
 	if t4.Full() {
 		t.Errorf("should not be full")
 	}
@@ -46,9 +43,6 @@ func TestFourTileSet(t *testing.T) {
 
 func TestThreeTileSet(t *testing.T) {
 	t4 := NewThreeTileSet()
-	if t4.Eye() {
-		t.Errorf("should not be an eye")
-	}
 	if t4.Full() {
 		t.Errorf("should not be full")
 	}
@@ -85,9 +79,7 @@ func TestThreeTileSet(t *testing.T) {
 
 func TestTwoTileSet(t *testing.T) {
 	t4 := NewTwoTileSet()
-	if !t4.Eye() {
-		t.Errorf("should be an eye")
-	}
+
 	if t4.Full() {
 		t.Errorf("should not be full")
 	}
@@ -120,9 +112,6 @@ func TestTwoTileSet(t *testing.T) {
 
 func TestSequenceTileSet(t *testing.T) {
 	t4 := NewSequenceTileSet()
-	if t4.Eye() {
-		t.Errorf("should be an eye")
-	}
 	if t4.Full() {
 		t.Errorf("should not be full")
 	}

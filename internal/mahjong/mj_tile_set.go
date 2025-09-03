@@ -5,15 +5,17 @@ type TileSet interface {
 	Append(t Tile) TileSet
 	Head() Tile
 	Allowed(t Tile) bool
-	Eye() bool
+	//Eye() bool
 	Size() int
 	Formed() Meld
 	Fallback(h *Hand)
+	Suit() string
 }
 
 type TileSetObj struct {
 	TileSet  []Tile
 	FullSize int
+	Name     string
 }
 
 func (f *TileSetObj) Full() bool {
@@ -47,6 +49,9 @@ func (f *TileSetObj) Head() Tile {
 	return t
 }
 
+func (f *TileSetObj) Suit() string {
+	return f.Name
+}
 
 func NewFourTileSet() TileSet {
 	tset := FourTileSet{}

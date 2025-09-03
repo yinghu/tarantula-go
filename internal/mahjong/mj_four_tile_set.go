@@ -5,6 +5,7 @@ type FourTileSet struct {
 }
 
 func (f *FourTileSet) Append(t Tile) TileSet {
+	f.Name = t.Suit
 	f.TileSet = append(f.TileSet, t)
 	return f
 }
