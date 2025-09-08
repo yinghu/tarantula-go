@@ -6,13 +6,16 @@ import (
 	"strings"
 )
 
-
 type Hand struct {
-	Formed  []Meld
-	Tiles   []Tile
-	Flowers []Tile
-
-	Stack []TileSet
+	Formed     []Meld
+	Tiles      []Tile
+	Categories []uint8
+	Flowers    []Tile
+	Dots       []Tile
+	Bamboos    []Tile
+	Characters []Tile
+	Hornors    []Tile
+	Stack      []TileSet
 }
 
 func cmp(a, b Tile) int {
@@ -27,7 +30,67 @@ func (h *Hand) New() {
 	h.Formed = make([]Meld, 0)
 	h.Tiles = make([]Tile, 0)
 	h.Flowers = make([]Tile, 0)
+	h.Dots = make([]Tile, 0)
+	h.Bamboos = make([]Tile, 0)
+	h.Characters = make([]Tile, 0)
+	h.Hornors = make([]Tile, 0)
+	h.Categories = []uint8{0, 0, 0, 0}
 	h.Stack = make([]TileSet, 0)
+}
+
+func (h *Hand) Drop(drop Tile) error {
+	deleted := false
+	switch drop.Suit {
+	case DOTS:
+		for i := range h.Dots{
+			if h.Dots[i]== drop{
+				h.Dots = slices.Delete(h.Dots,i,i)
+				deleted = true
+				break
+			}
+		}
+		if !deleted{
+			return fmt.Errorf("drop not existed %v",drop)
+		}
+		h.Categories[0]--
+	case BAMBOO:
+		for i := range h.Bamboos{
+			if h.Bamboos[i]== drop{
+				h.Bamboos = slices.Delete(h.Bamboos,i,1)
+				deleted = true
+				break
+			}
+		}
+		if !deleted{
+			return fmt.Errorf("drop not existed %v",drop)
+		}
+		h.Categories[1]--
+	case CHARACTER:
+		for i := range h.Characters{
+			if h.Characters[i]== drop{
+				h.Characters = slices.Delete(h.Characters,i,i)
+				deleted = true
+				break
+			}
+		}
+		if !deleted{
+			return fmt.Errorf("drop not existed %v",drop)
+		}
+		h.Categories[2]--
+	case HORNOR:
+		for i := range h.Hornors{
+			if h.Hornors[i]== drop{
+				h.Hornors = slices.Delete(h.Hornors,i,i)
+				deleted = true
+				break
+			}
+		}
+		if !deleted{
+			return fmt.Errorf("drop not existed %v",drop)
+		}
+		h.Categories[3]--
+	}
+	return nil
 }
 
 func (h *Hand) Draw(deck *Deck) error {
@@ -38,6 +101,18 @@ func (h *Hand) Draw(deck *Deck) error {
 	switch t.Suit {
 	case FLOWER:
 		h.Flowers = append(h.Flowers, t)
+	case DOTS:
+		h.Dots = append(h.Dots, t)
+		h.Categories[0]++
+	case BAMBOO:
+		h.Bamboos = append(h.Bamboos, t)
+		h.Categories[1]++
+	case CHARACTER:
+		h.Characters = append(h.Characters, t)
+		h.Categories[2]++
+	case HORNOR:
+		h.Hornors = append(h.Hornors, t)
+		h.Categories[3]++
 	default:
 		h.Tiles = append(h.Tiles, t)
 		slices.SortFunc(h.Tiles, cmp)
