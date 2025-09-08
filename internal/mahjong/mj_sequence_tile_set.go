@@ -28,6 +28,6 @@ func (f *SequenceTileSet) Allowed(t Tile) bool {
 }
 
 func (f *SequenceTileSet) Fallback(h *Hand) {
-	h.Push(h.NewTileSet(THREE_SET))
+	h.Push(h.NewTileSet(PONG))
 	h.Push(f)
 }

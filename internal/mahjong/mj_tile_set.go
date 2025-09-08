@@ -9,6 +9,8 @@ type TileSet interface {
 	Formed() Meld
 	Fallback(h *Hand)
 	Suit() string
+
+	
 }
 
 type TileSetObj struct {

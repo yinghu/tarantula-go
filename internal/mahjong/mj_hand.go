@@ -6,12 +6,6 @@ import (
 	"strings"
 )
 
-const (
-	FOUR_SET  int = 0
-	THREE_SET int = 1
-	SEQ_SET   int = 2
-	TWO_SET   int = 3
-)
 
 type Hand struct {
 	Formed  []Meld
@@ -69,7 +63,7 @@ func (h *Hand) Knog(deck *Deck) error {
 func (h *Hand) Mahjong() bool {
 	slices.SortFunc(h.Tiles, cmp)
 	fmt.Printf("%v\n", h.Tiles)
-	h.Push(h.NewTileSet(THREE_SET))
+	h.Push(h.NewTileSet(PONG))
 	err := h.evaluate()
 	if err != nil {
 		fmt.Printf("no match %s\n", err.Error())
@@ -99,7 +93,7 @@ func (h *Hand) evaluate() error {
 					h.Formed = append(h.Formed, formed)
 
 					if h.StackSize() == 0 {
-						h.Push(h.NewTileSet(THREE_SET))
+						h.Push(h.NewTileSet(PONG))
 					}
 				} else {
 					h.Push(tset)
@@ -132,16 +126,16 @@ func (h *Hand) evaluate() error {
 	return nil
 }
 
-func (h *Hand) NewTileSet(id int) TileSet {
+func (h *Hand) NewTileSet(id uint8) TileSet {
 	var tset TileSet
 	switch id {
-	case FOUR_SET:
+	case KNOG:
 		tset = NewFourTileSet()
-	case THREE_SET:
+	case PONG:
 		tset = NewThreeTileSet()
-	case SEQ_SET:
+	case CHOW:
 		tset = NewSequenceTileSet()
-	case TWO_SET:
+	case EYE:
 		tset = NewTwoTileSet()
 	}
 	return tset

@@ -88,10 +88,10 @@ func TestSlice(t *testing.T) {
 func TestStack(t *testing.T) {
 	h := Hand{}
 	h.New()
-	ts1 := h.NewTileSet(FOUR_SET)
-	ts2 := h.NewTileSet(THREE_SET)
-	ts3 := h.NewTileSet(SEQ_SET)
-	ts4 := h.NewTileSet(TWO_SET)
+	ts1 := h.NewTileSet(KNOG)
+	ts2 := h.NewTileSet(PONG)
+	ts3 := h.NewTileSet(CHOW)
+	ts4 := h.NewTileSet(EYE)
 	h.Push(ts1)
 	h.Push(ts2)
 	h.Push(ts3)
