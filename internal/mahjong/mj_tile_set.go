@@ -9,8 +9,6 @@ type TileSet interface {
 	Formed() Meld
 	Fallback(h *Hand)
 	Suit() string
-
-	
 }
 
 type TileSetObj struct {
@@ -34,9 +32,11 @@ func (f *TileSetObj) Allowed(t Tile) bool {
 	if sz == 0 {
 		return true
 	}
+	if sz == f.FullSize {
+		return false
+	}
 	return f.TileSet[sz-1] == t
 }
-
 
 func (f *TileSetObj) Size() int {
 	return len(f.TileSet)

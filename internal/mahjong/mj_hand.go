@@ -9,7 +9,7 @@ import (
 type Hand struct {
 	Formed     []Meld
 	Tiles      []Tile
-	Categories []uint8
+	Categories []int
 	Flowers    []Tile
 	Dots       []Tile
 	Bamboos    []Tile
@@ -34,7 +34,7 @@ func (h *Hand) New() {
 	h.Bamboos = make([]Tile, 0)
 	h.Characters = make([]Tile, 0)
 	h.Hornors = make([]Tile, 0)
-	h.Categories = []uint8{0, 0, 0, 0}
+	h.Categories = []int{0, 0, 0, 0}
 	h.Stack = make([]TileSet, 0)
 }
 
@@ -42,51 +42,51 @@ func (h *Hand) Drop(drop Tile) error {
 	deleted := false
 	switch drop.Suit {
 	case DOTS:
-		for i := range h.Dots{
-			if h.Dots[i]== drop{
-				h.Dots = slices.Delete(h.Dots,i,i)
+		for i := range h.Dots {
+			if h.Dots[i] == drop {
+				h.Dots = slices.Delete(h.Dots, i, i)
 				deleted = true
 				break
 			}
 		}
-		if !deleted{
-			return fmt.Errorf("drop not existed %v",drop)
+		if !deleted {
+			return fmt.Errorf("drop not existed %v", drop)
 		}
 		h.Categories[0]--
 	case BAMBOO:
-		for i := range h.Bamboos{
-			if h.Bamboos[i]== drop{
-				h.Bamboos = slices.Delete(h.Bamboos,i,1)
+		for i := range h.Bamboos {
+			if h.Bamboos[i] == drop {
+				h.Bamboos = slices.Delete(h.Bamboos, i, 1)
 				deleted = true
 				break
 			}
 		}
-		if !deleted{
-			return fmt.Errorf("drop not existed %v",drop)
+		if !deleted {
+			return fmt.Errorf("drop not existed %v", drop)
 		}
 		h.Categories[1]--
 	case CHARACTER:
-		for i := range h.Characters{
-			if h.Characters[i]== drop{
-				h.Characters = slices.Delete(h.Characters,i,i)
+		for i := range h.Characters {
+			if h.Characters[i] == drop {
+				h.Characters = slices.Delete(h.Characters, i, i)
 				deleted = true
 				break
 			}
 		}
-		if !deleted{
-			return fmt.Errorf("drop not existed %v",drop)
+		if !deleted {
+			return fmt.Errorf("drop not existed %v", drop)
 		}
 		h.Categories[2]--
 	case HORNOR:
-		for i := range h.Hornors{
-			if h.Hornors[i]== drop{
-				h.Hornors = slices.Delete(h.Hornors,i,i)
+		for i := range h.Hornors {
+			if h.Hornors[i] == drop {
+				h.Hornors = slices.Delete(h.Hornors, i, i)
 				deleted = true
 				break
 			}
 		}
-		if !deleted{
-			return fmt.Errorf("drop not existed %v",drop)
+		if !deleted {
+			return fmt.Errorf("drop not existed %v", drop)
 		}
 		h.Categories[3]--
 	}
@@ -98,6 +98,10 @@ func (h *Hand) Draw(deck *Deck) error {
 	if err != nil {
 		return err
 	}
+	return h.draw(t)
+}
+
+func (h *Hand) draw(t Tile) error {
 	switch t.Suit {
 	case FLOWER:
 		h.Flowers = append(h.Flowers, t)
@@ -133,6 +137,24 @@ func (h *Hand) Knog(deck *Deck) error {
 		slices.SortFunc(h.Tiles, cmp)
 	}
 	return nil
+}
+
+func (h *Hand) MJ() bool {
+	slices.SortFunc(h.Categories, func(a, b int) int {
+		return a - b
+	})
+	fmt.Printf("%v\n",h.Categories)
+	
+	var eyeCount int
+	var formed int
+	for _, v := range h.Formed {
+		fmt.Printf("X Set size : %v\n", v.Tiles)
+		if v.Eye() {
+			eyeCount++
+		}
+		formed++
+	}
+	return eyeCount == 1 && formed == 5 || formed == 14
 }
 
 func (h *Hand) Mahjong() bool {
