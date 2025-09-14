@@ -5,8 +5,7 @@ import (
 )
 
 const (
-	
-	FLOWER string = "F"
+	FLOWER    string = "F"
 	BAMBOO    string = "B"
 	CHARACTER string = "C"
 	DOTS      string = "D"
@@ -66,7 +65,7 @@ const (
 
 type Tile struct {
 	Suit string
-	Rank  int8
+	Rank int8
 }
 
 func (t *Tile) From(src string) {
@@ -75,3 +74,6 @@ func (t *Tile) From(src string) {
 	t.Rank = int8(v)
 }
 
+func (t Tile) Name() string {
+	return t.Suit + strconv.FormatInt(int64(t.Rank), 10)
+}

@@ -41,3 +41,15 @@ func (m *Meld) Kong() bool {
 	}
 	return m.Tiles[0] == m.Tiles[1] && m.Tiles[1] == m.Tiles[2] && m.Tiles[2] == m.Tiles[3]
 }
+
+func (m *Meld) Name() string {
+	var nm string
+	sz := len(m.Tiles)
+	for i,v := range m.Tiles {
+		nm += v.Name()
+		if i < sz-1 {
+			nm = nm + "."
+		}
+	}
+	return nm
+}
