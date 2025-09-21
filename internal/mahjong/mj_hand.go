@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+
 type Hand struct {
 	Formed     []Meld
 	Tiles      []Tile
@@ -16,6 +17,7 @@ type Hand struct {
 	Characters []Tile
 	Hornors    []Tile
 	Stack      []TileSet
+	
 }
 
 func cmp(a, b Tile) int {
@@ -143,8 +145,8 @@ func (h *Hand) MJ() bool {
 	slices.SortFunc(h.Categories, func(a, b int) int {
 		return a - b
 	})
-	fmt.Printf("%v\n",h.Categories)
-	
+	fmt.Printf("%v\n", h.Categories)
+
 	var eyeCount int
 	var formed int
 	for _, v := range h.Formed {

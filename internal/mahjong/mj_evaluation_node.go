@@ -1,6 +1,5 @@
 package mahjong
 
-
 type EvaluationNode struct {
 	PendingHand []Tile
 	Formed      []Meld
@@ -40,4 +39,20 @@ func (e *EvaluationNode) OccurrenceOfMeld() map[string]int {
 		}
 	}
 	return occ
+}
+
+func (e *EvaluationNode) Form(m Meld) []Meld {
+	f := make([]Meld, 0)
+	f = append(f, e.Formed...)
+	f = append(f, m)
+	return f
+}
+
+func (e *EvaluationNode) WellFormed() bool {
+	for _, m := range e.Formed {
+		if m.Eye() {
+			return true
+		}
+	}
+	return false
 }

@@ -7,6 +7,7 @@ type EvaluationQueue struct {
 	Formed      []Meld
 }
 
+
 func (q *EvaluationQueue) Poll() (EvaluationNode, error) {
 	if len(q.PendingNode) == 0 {
 		return EvaluationNode{}, fmt.Errorf("no node on queue")
@@ -17,8 +18,8 @@ func (q *EvaluationQueue) Poll() (EvaluationNode, error) {
 }
 
 func (q *EvaluationQueue) Next(e EvaluationNode) {
-	for _,n := range q.PendingNode{
-		if n.FormedIdentically(e){
+	for _, n := range q.PendingNode {
+		if n.FormedIdentically(e) {
 			return
 		}
 	}

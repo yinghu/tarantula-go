@@ -44,34 +44,60 @@ const (
 	DOTS9 string = "D9"
 
 	//VALUE 1 -7
-	EAST  string = "H1"
-	SOUTH string = "H2"
-	WEST  string = "H3"
-	NORTH string = "H4"
-	RED   string = "H5"
-	GREEN string = "H6"
-	WHITE string = "H7"
+	EAST  string = "H31"
+	SOUTH string = "H42"
+	WEST  string = "H53"
+	NORTH string = "H64"
+	RED   string = "H75"
+	GREEN string = "H86"
+	WHITE string = "H97"
 
 	//VALUE = 0
-	F_PLUMBLOSSOM   string = "F1"
-	F_ORCHID        string = "F2"
-	F_CHRYSANTHEMUM string = "F3"
-	F_BAMBOO        string = "F4"
-	F_SPRING        string = "F5"
-	F_SUMMER        string = "F6"
-	F_AUTUMN        string = "F7"
-	F_WINTER        string = "F8"
+	F_PLUMBLOSSOM   string = "F101"
+	F_ORCHID        string = "F102"
+	F_CHRYSANTHEMUM string = "F103"
+	F_BAMBOO        string = "F104"
+	F_SPRING        string = "F105"
+	F_SUMMER        string = "F106"
+	F_AUTUMN        string = "F107"
+	F_WINTER        string = "F108"
 )
+
+func NewTile(src string) Tile {
+	t := Tile{}
+	t.From(src)
+	return t
+}
 
 type Tile struct {
 	Suit string
 	Rank int8
+	Seq  int
 }
 
 func (t *Tile) From(src string) {
 	t.Suit = src[:1]
 	v, _ := strconv.ParseUint(src[1:2], 10, 8)
 	t.Rank = int8(v)
+	t.cn()
+}
+
+func (t *Tile) cn() {
+	if t.Suit == CHARACTER {
+		t.Seq = int(t.Rank)
+		return
+	}
+	if t.Suit == BAMBOO {
+		t.Seq = int(10 + t.Rank)
+		return
+	}
+	if t.Suit == DOTS {
+		t.Seq = int(20 + t.Rank)
+		return
+	}
+	if t.Suit == HORNOR {
+		t.Seq = int(t.Rank)
+	}
 }
 
 func (t Tile) Name() string {
