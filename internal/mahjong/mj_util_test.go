@@ -46,59 +46,6 @@ func TestSlice(t *testing.T) {
 }
 
 
-func TestNextTiles(t *testing.T) {
-	h := Hand{}
-	h.New()
-	b1 := Tile{Suit: "B", Rank: 1}
-	b2 := Tile{Suit: "B", Rank: 2}
-	b3 := Tile{Suit: "B", Rank: 3}
-
-	b4 := Tile{Suit: "B", Rank: 2}
-	b5 := Tile{Suit: "B", Rank: 3}
-	b6 := Tile{Suit: "B", Rank: 4}
-
-	b7 := Tile{Suit: "B", Rank: 3}
-	b8 := Tile{Suit: "B", Rank: 4}
-	b9 := Tile{Suit: "B", Rank: 5}
-
-	c7 := Tile{Suit: "B", Rank: 4}
-	c8 := Tile{Suit: "B", Rank: 5}
-	c9 := Tile{Suit: "B", Rank: 6}
-
-	p1 := Tile{Suit: "B", Rank: 1}
-	p2 := Tile{Suit: "B", Rank: 1}
-	h.Tiles = append(h.Tiles, b1, b2, b3, b4, b5, b6, b7, b8, b9, c7, c8, c9, p1, p2)
-	next := h.NextTile()
-	if next != b1 {
-		t.Errorf("next tile should be b1 %v", b1)
-	}
-	h.PopTile()
-	h.PopTile()
-	h.PopTile()
-	next = h.NextTile()
-	if next != b4 {
-		t.Errorf("next tile should be b4 %v", b4)
-	}
-	nexts := h.NextTiles(100)
-	if len(nexts) != 11 {
-		t.Errorf("remaining list size should be 11 %d",len(h.Tiles))
-	}
-
-	nexts = h.NextTiles(3)
-	if len(nexts) != 3 {
-		t.Errorf("next size should be 3 %d",len(nexts))
-	}
-	if nexts[0] != b4{
-		t.Errorf("first should be b4 %v",nexts[0])
-	}
-	if nexts[1] != b5{
-		t.Errorf("first should be b5 %v",nexts[0])
-	}
-	if nexts[2] != b6{
-		t.Errorf("first should be b6 %v",nexts[0])
-	}
-
-}
 
 func TestSuit(t *testing.T) {
 	d1 := Tile{}

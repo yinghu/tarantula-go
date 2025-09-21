@@ -6,17 +6,17 @@ import (
 )
 
 type Hand struct {
-	Formed  []Meld
-	Tiles   []Tile
-	Flowers []Tile
+	Formed   []Meld
+	Tiles    []Tile
+	Flowers  []Tile
+	MaxForms int
 }
-
-
 
 func (h *Hand) New() {
 	h.Formed = make([]Meld, 0)
 	h.Tiles = make([]Tile, 0)
 	h.Flowers = make([]Tile, 0)
+	h.MaxForms = 4
 }
 
 func (h *Hand) Drop(drop Tile) error {
@@ -64,42 +64,17 @@ func (h *Hand) Knog(deck *Deck) error {
 }
 
 func (h *Hand) Mahjong() bool {
-	e := Evaluatior{Queue: EvaluationQueue{PendingNode: make([]EvaluationNode, 0), Formed: make([]Meld, 0)}}
+	e := Evaluator{Queue: EvaluationQueue{PendingNode: make([]EvaluationNode, 0), Formed: make([]Meld, 0)}}
 	h.Formed = append(h.Formed, e.Evaluate(h)...)
 	var eyeCount int
 	var formed int
 	for _, v := range h.Formed {
-		//fmt.Printf("X Set size : %v\n", v.Tiles)
 		if v.Eye() {
 			eyeCount++
 		}
 		formed++
 	}
 	return eyeCount == 1 && formed == 5
-}
-
-func (h *Hand) NextTile() Tile {
-	return h.Tiles[0]
-}
-
-func (h *Hand) NextTiles(limit int) []Tile {
-	lst := make([]Tile, 0)
-	for i := range limit {
-		if i < h.TileSize() {
-			lst = append(lst, h.Tiles[i])
-		}
-	}
-	return lst
-}
-
-func (h *Hand) PopTile() Tile {
-	t := h.Tiles[0]
-	h.Tiles = h.Tiles[1:]
-	return t
-}
-
-func (h *Hand) PushTile(t Tile) {
-	h.Tiles = slices.Insert(h.Tiles, 0, t)
 }
 
 func (h *Hand) TileSize() int {

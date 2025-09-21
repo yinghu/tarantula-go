@@ -1,10 +1,10 @@
 package mahjong
 
-type Evaluatior struct {
+type Evaluator struct {
 	Queue EvaluationQueue
 }
 
-func (e *Evaluatior) Evaluate(h *Hand) []Meld {
+func (e *Evaluator) Evaluate(h *Hand) []Meld {
 	e.Queue = EvaluationQueue{PendingNode: make([]EvaluationNode, 0), Formed: make([]Meld, 0)}
 	node := EvaluationNode{PendingHand: h.Tiles, Formed: make([]Meld, 0), Type: NONE}
 	e.Queue.Next(node)
@@ -19,7 +19,7 @@ func (e *Evaluatior) Evaluate(h *Hand) []Meld {
 		}
 		hx := HandIndex{}
 		hx.From(n.PendingHand)
-		if len(n.Formed) == 4 {
+		if len(n.Formed) == h.MaxForms {
 			eye, err := hx.Eye()
 			if err == nil {
 				nx := EvaluationNode{PendingHand: hx.AfterFormed(eye), Formed: n.Form(eye), Type: EYE}

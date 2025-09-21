@@ -309,7 +309,7 @@ func TestHandEval11(t *testing.T) {
 	h := Hand{}
 	h.New()
 	h.Tiles = append(h.Tiles, tiles...)
-	e := Evaluatior{Queue: EvaluationQueue{PendingNode: make([]EvaluationNode, 0),Formed: make([]Meld, 0)}}
+	e := Evaluator{Queue: EvaluationQueue{PendingNode: make([]EvaluationNode, 0),Formed: make([]Meld, 0)}}
 	formed := e.Evaluate(&h)
 	if len(formed) != 5{
 		t.Errorf("should be formed %d",len(formed))
