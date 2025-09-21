@@ -5,7 +5,7 @@ import (
 	"slices"
 )
 
-func scmp(a, b Tile) int {
+func cmp(a, b Tile) int {
 	return a.Seq - b.Seq
 }
 
@@ -22,7 +22,7 @@ type HandIndex struct {
 
 func (h *HandIndex) From(tiles []Tile) {
 	h.Hand = tiles
-	slices.SortFunc(h.Hand, scmp)
+	slices.SortFunc(h.Hand, cmp)
 	h.Index = make(map[int]TileIndex)
 	for _, v := range tiles {
 		s, exists := h.Index[v.Seq]

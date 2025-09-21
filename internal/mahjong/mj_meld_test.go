@@ -1,11 +1,8 @@
 package mahjong
 
 import (
-	"fmt"
 	"testing"
 )
-
-
 
 func TestEyeMeld(t *testing.T) {
 	d1 := Tile{Suit: "D", Rank: 1}
@@ -14,7 +11,7 @@ func TestEyeMeld(t *testing.T) {
 	if !m.Eye() {
 		t.Errorf("should be an eye")
 	}
-	fmt.Printf("Name : %s\n",m.Name())
+	//fmt.Printf("Name : %s\n",m.Name())
 	m.Tiles = append(m.Tiles, d1)
 	if m.Eye() {
 		t.Errorf("should not be an eye")
@@ -30,7 +27,7 @@ func TestChowMeld(t *testing.T) {
 	if !m.Chow() {
 		t.Errorf("should be a chow")
 	}
-	fmt.Printf("Name : %s\n",m.Name())
+	
 	m.Tiles = append(m.Tiles, d1)
 	if m.Chow() {
 		t.Errorf("should not be a chow")
@@ -49,12 +46,12 @@ func TestPongMeld(t *testing.T) {
 	if !m.Pong() {
 		t.Errorf("should be a pong")
 	}
-	fmt.Printf("Name : %s\n",m.Name())
+	
 	m.Tiles = append(m.Tiles, d1)
 	if m.Pong() {
 		t.Errorf("should not be a pong")
 	}
-	
+
 }
 
 func TestKongMeld(t *testing.T) {
@@ -64,11 +61,9 @@ func TestKongMeld(t *testing.T) {
 	if !m.Kong() {
 		t.Errorf("should be a kong")
 	}
-	fmt.Printf("Name : %s\n",m.Name())
 	m.Tiles = append(m.Tiles, d1)
 	if m.Kong() {
 		t.Errorf("should not be a kong")
 	}
-	
-}
 
+}

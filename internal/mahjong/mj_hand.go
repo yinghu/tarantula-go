@@ -3,7 +3,6 @@ package mahjong
 import (
 	"fmt"
 	"slices"
-	"strings"
 )
 
 type Hand struct {
@@ -12,13 +11,7 @@ type Hand struct {
 	Flowers []Tile
 }
 
-func cmp(a, b Tile) int {
-	if a.Suit == b.Suit {
-		diff := a.Rank - b.Rank
-		return int(diff)
-	}
-	return strings.Compare(a.Suit, b.Suit)
-}
+
 
 func (h *Hand) New() {
 	h.Formed = make([]Meld, 0)
@@ -76,7 +69,7 @@ func (h *Hand) Mahjong() bool {
 	var eyeCount int
 	var formed int
 	for _, v := range h.Formed {
-		fmt.Printf("X Set size : %v\n", v.Tiles)
+		//fmt.Printf("X Set size : %v\n", v.Tiles)
 		if v.Eye() {
 			eyeCount++
 		}
