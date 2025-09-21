@@ -283,3 +283,36 @@ func TestHandEval10(t *testing.T) {
 		t.Errorf("hand should be a match %v", matched)
 	}
 }
+
+func TestHandEval11(t *testing.T) {
+
+	b1 := NewTile(BAMBOO1)
+	b2 := NewTile(BAMBOO2)
+	b3 := NewTile(BAMBOO3)
+
+	b4 := NewTile(BAMBOO2)
+	b5 := NewTile(BAMBOO3)
+	b6 := NewTile(BAMBOO4)
+
+	b7 := NewTile(BAMBOO3)
+	b8 := NewTile(BAMBOO4)
+	b9 := NewTile(BAMBOO5)
+
+	c7 := NewTile(BAMBOO4)
+	c8 := NewTile(BAMBOO5)
+	c9 := NewTile(BAMBOO6)
+
+	p1 := NewTile(BAMBOO1)
+	p2 := NewTile(BAMBOO1)
+
+	tiles := []Tile{b1, b2, b3, b4, b5, b6, b7, b8, b9, c7, c8, c9, p1, p2}
+	h := Hand{}
+	h.New()
+	h.Tiles = append(h.Tiles, tiles...)
+	e := Evaluatior{Queue: EvaluationQueue{PendingNode: make([]EvaluationNode, 0),Formed: make([]Meld, 0)}}
+	formed := e.Evaluate(&h)
+	if len(formed) != 5{
+		t.Errorf("should be formed %d",len(formed))
+	}
+}
+

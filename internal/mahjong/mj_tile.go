@@ -77,7 +77,7 @@ type Tile struct {
 
 func (t *Tile) From(src string) {
 	t.Suit = src[:1]
-	v, _ := strconv.ParseUint(src[1:2], 10, 8)
+	v, _ := strconv.ParseUint(src[1:], 10, 8)
 	t.Rank = int8(v)
 	t.cn()
 }

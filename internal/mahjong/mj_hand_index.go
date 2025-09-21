@@ -66,12 +66,7 @@ func (h *HandIndex) Pong() []Meld {
 func (h *HandIndex) Chow() []Meld {
 	h.reset()
 	nodes := make([]Meld, 0)
-	for _, t := range h.Hand {
-		c, exists := h.Index[t.Seq]
-		if !exists || c.Count-c.Used == 0 {
-			continue
-		}
-		s := t.Seq
+	for s, c := range h.Index {
 		nc, exsits := h.Index[s+1]
 		if !exsits || nc.Count-nc.Used == 0 {
 			continue
