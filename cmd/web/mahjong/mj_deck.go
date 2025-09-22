@@ -1,4 +1,4 @@
-package mahjong
+package main
 
 import (
 	"errors"

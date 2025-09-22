@@ -1,4 +1,4 @@
-package mahjong
+package main
 
 type Evaluator struct {
 	Queue EvaluationQueue
