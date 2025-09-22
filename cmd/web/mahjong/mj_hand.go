@@ -9,14 +9,14 @@ type Hand struct {
 	Formed   []Meld
 	Tiles    []Tile
 	Flowers  []Tile
-	MaxForms int
+	MaxClaims int
 }
 
 func (h *Hand) New() {
 	h.Formed = make([]Meld, 0)
 	h.Tiles = make([]Tile, 0)
 	h.Flowers = make([]Tile, 0)
-	h.MaxForms = 4
+	h.MaxClaims = 4
 }
 
 func (h *Hand) Drop(drop Tile) error {

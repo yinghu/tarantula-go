@@ -19,7 +19,7 @@ func (e *Evaluator) Evaluate(h *Hand) []Meld {
 		}
 		hx := HandIndex{}
 		hx.From(n.PendingHand)
-		if len(n.Formed) == h.MaxForms {
+		if len(n.Formed) == h.MaxClaims-len(h.Formed) {
 			eye, err := hx.Eye()
 			if err == nil {
 				nx := EvaluationNode{PendingHand: hx.AfterFormed(eye), Formed: n.Form(eye), Type: EYE}
@@ -44,7 +44,7 @@ func (e *Evaluator) Evaluate(h *Hand) []Meld {
 			nx := EvaluationNode{PendingHand: hx.AfterFormed(m), Formed: n.Form(m), Type: CHOW}
 			e.Queue.Next(nx)
 		}
-		
+
 	}
 	return e.Queue.Formed
 }
