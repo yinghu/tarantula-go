@@ -76,7 +76,18 @@ services:
     depends_on:
       - presence    
     networks:
-      - net             
+      - net 
+  mahjong:
+    restart: unless-stopped
+    container_name: mahjong
+    hostname: mahjong
+    image: tarantula.mahjong:v1.0
+    volumes:
+      - volume_mahjong:/home/tarantula/mahjong
+    depends_on:
+      - presence    
+    networks:
+      - net                 
   admin:
     restart: unless-stopped
     container_name: admin
@@ -90,6 +101,7 @@ services:
       - inventory
       - tournament
       - shop
+      - mahjong
       - presence
     networks:
       - net
@@ -120,3 +132,4 @@ volumes:
   volume_tournament:
   volume_admin:
   volume_shop:
+  volume_mahjong:

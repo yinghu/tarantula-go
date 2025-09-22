@@ -1,5 +1,9 @@
 package main
 
-func main() {
+import (
+	"gameclustering.com/internal/bootstrap"
+)
 
+func main() {
+	bootstrap.AppBootstrap(&MahjongService{})
 }

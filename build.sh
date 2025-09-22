@@ -43,6 +43,9 @@ sudo docker build -f ./docker_application_build --tag tarantula.tournament:$vers
 sudo docker build -f ./docker_application_build --tag tarantula.shop:$version --build-arg app=shop --build-arg h=$host --build-arg n=shop$id --build-arg s=$seq --build-arg g=$grp .  
 ((seq++))
 sudo docker build -f ./docker_application_build --tag tarantula.postoffice:$version --build-arg app=postoffice --build-arg h=$host --build-arg n=postoffice$id --build-arg s=$seq --build-arg g=$grp .  
+((seq++))
+sudo docker build -f ./docker_application_build --tag tarantula.mahjong:$version --build-arg app=mahjong --build-arg h=$host --build-arg n=mahjong$id --build-arg s=$seq --build-arg g=$grp .  
+
 sudo docker build -f ./docker_nginx_build --tag tarantula.nginx:$version .
 sudo docker builder prune -af
 rm id_ed25519
