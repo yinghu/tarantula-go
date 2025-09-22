@@ -32,18 +32,7 @@ services:
     depends_on:
       - presence  
     networks:
-      - net
-  profile:
-    restart: unless-stopped
-    container_name: profile
-    hostname: profile
-    image: tarantula.profile:v1.0
-    volumes:
-      - volume_profile:/home/tarantula/profile  
-    depends_on:
-      - presence  
-    networks:
-      - net  
+      - net 
   inventory:
     restart: unless-stopped
     container_name: inventory
@@ -66,17 +55,6 @@ services:
       - presence    
     networks:
       - net
-  shop:
-    restart: unless-stopped
-    container_name: shop
-    hostname: shop
-    image: tarantula.shop:v1.0
-    volumes:
-      - volume_shop:/home/tarantula/shop
-    depends_on:
-      - presence    
-    networks:
-      - net 
   mahjong:
     restart: unless-stopped
     container_name: mahjong
@@ -97,10 +75,8 @@ services:
       - volume_admin:/home/tarantula/admin  
     depends_on:
       - asset
-      - profile
       - inventory
       - tournament
-      - shop
       - mahjong
       - presence
     networks:
@@ -127,9 +103,7 @@ volumes:
   volume_postoffice:
   volume_presence:
   volume_asset:
-  volume_profile:
   volume_inventory:
   volume_tournament:
   volume_admin:
-  volume_shop:
   volume_mahjong:

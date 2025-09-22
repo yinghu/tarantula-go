@@ -27,15 +27,11 @@ docker build -f .\docker_application_build --tag tarantula.admin:%version% --bui
 SET /A seq=%seq%+1
 docker build -f .\docker_application_build --tag tarantula.presence:%version% --build-arg app=presence --build-arg h=%host% --build-arg n=presence%id% --build-arg s=%seq% --build-arg g=%grp% . 
 SET /A seq=%seq%+1
-docker build -f .\docker_application_build --tag tarantula.profile:%version% --build-arg app=profile --build-arg h=%host% --build-arg n=profile%id% --build-arg s=%seq% --build-arg g=%grp% .  
-SET /A seq=%seq%+1
 docker build -f .\docker_application_build --tag tarantula.inventory:%version% --build-arg app=inventory --build-arg h=%host% --build-arg n=inventory%id% --build-arg s=%seq% --build-arg g=%grp% . 
 SET /A seq=%seq%+1
 docker build -f .\docker_application_build --tag tarantula.asset:%version% --build-arg app=asset --build-arg h=%host% --build-arg n=asset%id% --build-arg s=%seq% --build-arg g=%grp% .
 SET /A seq=%seq%+1
 docker build -f .\docker_application_build --tag tarantula.tournament:%version% --build-arg app=tournament --build-arg h=%host% --build-arg n=tournament%id% --build-arg s=%seq% --build-arg g=%grp% . 
-SET /A seq=%seq%+1
-docker build -f .\docker_application_build --tag tarantula.shop:%version% --build-arg app=shop --build-arg h=%host% --build-arg n=shop%id% --build-arg s=%seq% --build-arg g=%grp% . 
 SET /A seq=%seq%+1
 docker build -f .\docker_application_build --tag tarantula.postoffice:%version% --build-arg app=postoffice --build-arg h=%host% --build-arg n=postoffice%id% --build-arg s=%seq% --build-arg g=%grp% .
 SET /A seq=%seq%+1
