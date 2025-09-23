@@ -6,9 +6,9 @@ import (
 )
 
 type Hand struct {
-	Formed   []Meld
-	Tiles    []Tile
-	Flowers  []Tile
+	Formed    []Meld
+	Tiles     []Tile
+	Flowers   []Tile
 	MaxClaims int
 }
 
@@ -16,7 +16,7 @@ func (h *Hand) New() {
 	h.Formed = make([]Meld, 0)
 	h.Tiles = make([]Tile, 0)
 	h.Flowers = make([]Tile, 0)
-	h.MaxClaims = 4
+	h.MaxClaims = CLASSIC_MAX_FORMS
 }
 
 func (h *Hand) Drop(drop Tile) error {

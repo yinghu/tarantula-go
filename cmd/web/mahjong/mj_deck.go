@@ -16,7 +16,7 @@ type Deck struct {
 	header int
 	tail   int
 	Magic  int
-	Stack   []string
+	Stack  []string
 }
 
 func (s *Deck) New() {
@@ -66,4 +66,13 @@ func (s *Deck) Kong() (Tile, error) {
 	t.From(s.Stack[s.tail])
 	s.tail--
 	return t, nil
+}
+
+func (s *Deck) Dice() []int {
+	src := rand.NewSource(time.Now().UnixNano())
+	rnd := rand.New(src)
+	dt := []int{0, 0}
+	dt[0] = rnd.Intn(6) + 1
+	dt[1] = rnd.Intn(6) + 1
+	return dt
 }

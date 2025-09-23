@@ -126,10 +126,6 @@ func TestShuffle(t *testing.T) {
 }
 
 
-
-
-
-
 func TestHandStart(t *testing.T) {
 	s := Deck{}
 	s.New()
@@ -143,6 +139,13 @@ func TestHandStart(t *testing.T) {
 	err = h.Knog(&s)
 	if err != nil {
 		t.Errorf("should be error")
+	}
+	dt := s.Dice()
+	if dt[0]<=0 || dt[1]<=0 {
+		t.Errorf("should not be zero or nagtive %d, %d",dt[0],dt[1])
+	}
+	if dt[0]>6 || dt[1]>6 {
+		t.Errorf("should not be more than 6 %d, %d",dt[0],dt[1])
 	}
 
 }
