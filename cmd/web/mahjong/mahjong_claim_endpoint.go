@@ -7,11 +7,10 @@ import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
-	//"gameclustering.com/internal/util"
 )
 
 type ClaimHand struct {
-	ClaimList string `json:"HandList,string"`
+	ClaimList string `json:"HandList"`
 }
 
 type MahjongClaimer struct {

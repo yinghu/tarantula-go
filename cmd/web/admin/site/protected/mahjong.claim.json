@@ -1,6 +1,6 @@
 {
     "Scope": "admin",
-    "Name": "HandList",
+    "Name": "HandClaim",
     "Description": "hand list form",
     "Properties":[
         {
