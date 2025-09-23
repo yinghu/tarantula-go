@@ -17,6 +17,7 @@ type Deck struct {
 	tail   int
 	Magic  int
 	Stack  []string
+	rnd *rand.Rand
 }
 
 func (s *Deck) New() {
@@ -36,14 +37,15 @@ func (s *Deck) New() {
 			s.Stack = append(s.Stack, F_BAMBOO, F_CHRYSANTHEMUM, F_ORCHID, F_PLUMBLOSSOM, F_SPRING, F_SUMMER, F_AUTUMN, F_WINTER)
 		}
 	}
+	src := rand.NewSource(time.Now().UnixNano())
+	s.rnd = rand.New(src)
+	
 }
 func (s *Deck) Shuffle() {
-	src := rand.NewSource(time.Now().UnixNano())
-	rnd := rand.New(src)
 	s.header = 0
-	cut := rnd.Intn(s.Magic) + 1
+	cut := s.rnd.Intn(s.Magic) + 1
 	s.tail = s.Size - cut
-	rnd.Shuffle(s.Size, func(i, j int) {
+	s.rnd.Shuffle(s.Size, func(i, j int) {
 		s.Stack[i], s.Stack[j] = s.Stack[j], s.Stack[i]
 	})
 }
@@ -69,10 +71,9 @@ func (s *Deck) Kong() (Tile, error) {
 }
 
 func (s *Deck) Dice() []int {
-	src := rand.NewSource(time.Now().UnixNano())
-	rnd := rand.New(src)
+	
 	dt := []int{0, 0}
-	dt[0] = rnd.Intn(6) + 1
-	dt[1] = rnd.Intn(6) + 1
+	dt[0] = s.rnd.Intn(6) + 1
+	dt[1] = s.rnd.Intn(6) + 1
 	return dt
 }

@@ -18,7 +18,7 @@ func (s *MahjongService) Config() string {
 }
 
 func (s *MahjongService) Start(f conf.Env, c core.Cluster) error {
-	//s.ItemUpdater = s
+	s.ItemUpdater = s
 	s.AppManager.Start(f, c)
 	s.ClassicMahjong = ClassicMahjong{}
 	s.ClassicMahjong.New()
