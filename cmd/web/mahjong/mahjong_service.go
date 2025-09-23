@@ -23,5 +23,6 @@ func (s *MahjongService) Start(f conf.Env, c core.Cluster) error {
 	s.ClassicMahjong = ClassicMahjong{}
 	s.ClassicMahjong.New()
 	http.Handle("/mahjong/dice", bootstrap.Logging(&MahjongDicer{MahjongService: s}))
+	http.Handle("/mahjong/claim", bootstrap.Logging(&MahjongClaimer{MahjongService: s}))
 	return nil
 }

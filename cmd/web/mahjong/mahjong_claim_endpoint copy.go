@@ -8,15 +8,15 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-type MahjongDicer struct {
+type MahjongClaimer struct {
 	*MahjongService
 }
 
-func (s *MahjongDicer) AccessControl() int32 {
+func (s *MahjongClaimer) AccessControl() int32 {
 	return bootstrap.PROTECTED_ACCESS_CONTROL
 }
 
-func (s *MahjongDicer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
+func (s *MahjongClaimer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	pts := s.Dice()
 	w.Write(util.ToJson(pts))

@@ -102,7 +102,8 @@
                 {"Name":"TournamentScore","Callback":"on_player_post","Form":"/admin/webprotected/tournament.score.json","Path":"/tournament/score","Payload":"TournamentJoin"},
                 {"Name":"TournamentRaceBoard","Callback":"on_player_post","Path":"/tournament/raceboard","Payload":"TournamentJoin"},
                 {"Name":"InventroyLoad","Callback":"on_player_post","Form":"/admin/webprotected/cs.inventory.load.json","Path":"/inventory/load"},
-                {"Name":"MahjongDice","Callback":"on_player_get","Path":"/mahjong/dice"}
+                {"Name":"MahjongDice","Callback":"on_player_get","Path":"/mahjong/claim"},
+                {"Name":"MahjongClaim","Callback":"on_player_post","Form":"/admin/webprotected/mahjong.claim.json","Path":"/mahjong/claim"}
             ]        
         }
         

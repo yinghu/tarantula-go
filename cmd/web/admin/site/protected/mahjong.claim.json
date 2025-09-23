@@ -1,0 +1,13 @@
+{
+    "Scope": "admin",
+    "Name": "HandList",
+    "Description": "hand list form",
+    "Properties":[
+        {
+            "Name": "HandList",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false
+        }
+    ]
+}
