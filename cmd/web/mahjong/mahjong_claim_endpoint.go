@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -23,11 +24,19 @@ func (s *MahjongClaimer) AccessControl() int32 {
 
 func (s *MahjongClaimer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	h := ClaimHand{}
-	err := json.NewDecoder(r.Body).Decode(&h)
+	ch := ClaimHand{}
+	err := json.NewDecoder(r.Body).Decode(&ch)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	w.Write(util.ToJson(h))
+	h := Hand{}
+	h.New()
+	for _, c := range strings.Split(ch.ClaimList, ",") {
+		t := Tile{}
+		t.From(c)
+		h.Tiles = append(h.Tiles, t)
+	}
+	s.Mahjong(&h)
+	w.Write(util.ToJson(h.Formed))
 }
