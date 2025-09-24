@@ -25,7 +25,7 @@ func AppBootstrap(tcx TarantulaContext) {
 		return
 	}
 	c := cluster.CreateCluster(f, tcx)
-	e := event.EventEndpoint{Endpoint: f.Evp.TcpEndpoint, Service: tcx}
+	e := event.EventEndpoint{Endpoint: f.Evp.TcpEndpoint, Service: tcx, OutboundEnabled: false}
 	if f.Evp.Enabled {
 		go func() {
 			c.Wait()

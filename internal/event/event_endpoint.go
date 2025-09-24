@@ -15,11 +15,17 @@ type EventEndpoint struct {
 	Endpoint string
 	Service  EventService
 	listener net.Listener
+
+	OutboundEnabled bool
+	OutboundQueue   chan Event
 }
 
-func (s *EventEndpoint) handleClient(client net.Conn) {
+func (s *EventEndpoint) Inbound(client net.Conn) {
 	defer func() {
 		core.AppLog.Printf("client socket is closed")
+		if s.OutboundEnabled {
+			s.OutboundQueue <- &CloseEvent{}
+		}
 		client.Close()
 	}()
 	socket := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
@@ -62,6 +68,17 @@ func (s *EventEndpoint) handleClient(client net.Conn) {
 	}
 }
 
+func (s *EventEndpoint) Outbound(client net.Conn) {
+	soc := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
+	for e := range s.OutboundQueue {
+		if e.ClassId() == CLOSE_CID {
+			break
+		}
+		e.Outbound(&soc)
+	}
+	core.AppLog.Panicf("outbound task is closed")
+}
+
 func (s *EventEndpoint) Open() error {
 	parts := strings.Split(s.Endpoint, ":")
 	core.AppLog.Printf("Endpoint %s %s\n", parts[0], parts[2])
@@ -76,7 +93,11 @@ func (s *EventEndpoint) Open() error {
 			core.AppLog.Printf("Error :%s\n", err.Error())
 			break
 		}
-		go s.handleClient(client)
+		go s.Inbound(client)
+		if s.OutboundEnabled {
+			go s.Outbound(client)
+		}
+
 	}
 	core.AppLog.Println("Server closed")
 	return nil

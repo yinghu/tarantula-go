@@ -1,6 +1,7 @@
 package event
 
 const (
+	CLOSE_CID           int = 0
 	STAT_CID            int = 1
 	LOGIN_CID           int = 2
 	MESSAGE_CID         int = 3
