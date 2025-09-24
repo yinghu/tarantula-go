@@ -9,7 +9,7 @@ RUN if [ ${app} = "admin" ]; then cp -r cmd/web/${app}/site site; fi
 RUN go -C cmd/web/${app} build -o main 
 
 # Alpine Linux 
-FROM alpine:latest
+FROM alpine:3.21
 RUN apk add --no-cache openssh
 RUN apk add --no-cache git
 ARG app
