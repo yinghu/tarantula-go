@@ -44,6 +44,12 @@ sudo docker build -f ./docker_application_build --tag tarantula.mahjong:$version
 
 sudo docker build -f ./docker_nginx_build --tag tarantula.nginx:$version .
 sudo docker builder prune -af
-rm id_ed25519
-rm known_hosts
-rm .gitconfig
+
+Clean
+
+function Clean(){
+    echo "deleting build files"
+    rm id_ed25519
+    rm known_hosts
+    rm .gitconfig
+}
