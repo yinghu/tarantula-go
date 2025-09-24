@@ -37,6 +37,11 @@ func (s *MahjongClaimer) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 		t.From(c)
 		h.Tiles = append(h.Tiles, t)
 	}
-	s.Mahjong(&h)
+	claimed := s.Mahjong(&h)
+	if !claimed {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: "not claimed"}))
+		return
+	}
 	w.Write(util.ToJson(h.Formed))
+
 }
