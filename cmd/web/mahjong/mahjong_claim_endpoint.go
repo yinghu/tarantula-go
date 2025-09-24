@@ -32,7 +32,7 @@ func (s *MahjongClaimer) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 	}
 	h := Hand{}
 	h.New()
-	for _, c := range strings.Split(ch.ClaimList, ",") {
+	for c := range strings.SplitSeq(ch.ClaimList, ",") {
 		t := Tile{}
 		t.From(c)
 		h.Tiles = append(h.Tiles, t)
