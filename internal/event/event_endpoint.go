@@ -74,6 +74,7 @@ func (s *EventEndpoint) Outbound(client net.Conn) {
 		if e.ClassId() == CLOSE_CID {
 			break
 		}
+		soc.WriteInt32(int32(e.ClassId()))
 		e.Outbound(&soc)
 	}
 	core.AppLog.Panicf("outbound task is closed")
