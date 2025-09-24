@@ -9,6 +9,7 @@ Clean(){
 Check(){
     if [[ $? -ne 0 ]]; then
         echo "build failed, try again"
+        Clean
         exit $?
     fi
 }
