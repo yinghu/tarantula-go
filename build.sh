@@ -1,4 +1,12 @@
 #!/bin/bash
+
+Clean(){
+    echo "deleting build files"
+    rm id_ed25519
+    rm known_hosts
+    rm .gitconfig
+}
+
 if [[ -n "$1" ]]; then
     version="$1"
 else
@@ -46,10 +54,3 @@ sudo docker build -f ./docker_nginx_build --tag tarantula.nginx:$version .
 sudo docker builder prune -af
 
 Clean
-
-function Clean(){
-    echo "deleting build files"
-    rm id_ed25519
-    rm known_hosts
-    rm .gitconfig
-}
