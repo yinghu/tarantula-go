@@ -25,11 +25,16 @@ type AppManager struct {
 	AppAuth     core.Authenticator
 	seq         core.Sequence
 	ItemUpdater item.ItemListener
+	tcpPusher   event.Pusher
 	ManagedApps []string
 }
 
 func (s *AppManager) ItemService() item.ItemService {
 	return s.imse
+}
+
+func (s *AppManager) Pusher() event.Pusher {
+	return s.tcpPusher
 }
 
 func (s *AppManager) Metrics() metrics.MetricsService {
@@ -50,9 +55,10 @@ func (s *AppManager) ItemListener() item.ItemListener {
 func (s *AppManager) BootstrapListener() BootstrapListener {
 	return s.Bsl
 }
-func (s *AppManager) Start(f conf.Env, c core.Cluster) error {
+func (s *AppManager) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
 	s.ManagedApps = f.ManagedApps
+	s.tcpPusher = p
 	s.cls = c
 	s.ctx = f.GroupName
 	s.standalone = f.Standalone

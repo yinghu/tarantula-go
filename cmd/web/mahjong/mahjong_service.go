@@ -18,9 +18,9 @@ func (s *MahjongService) Config() string {
 	return "/etc/tarantula/mahjong-conf.json"
 }
 
-func (s *MahjongService) Start(f conf.Env, c core.Cluster) error {
+func (s *MahjongService) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 	s.ItemUpdater = s
-	s.AppManager.Start(f, c)
+	s.AppManager.Start(f, c, p)
 	s.ClassicMahjong = ClassicMahjong{}
 	s.ClassicMahjong.New()
 	http.Handle("/mahjong/dice", bootstrap.Logging(&MahjongDicer{MahjongService: s}))
@@ -30,4 +30,5 @@ func (s *MahjongService) Start(f conf.Env, c core.Cluster) error {
 
 func (s *MahjongService) OnEvent(e event.Event) {
 	core.AppLog.Printf("event coming!!!")
+	s.Pusher().Push(e)
 }

@@ -27,8 +27,9 @@ type LocalStore struct {
 }
 
 type EventEndpoint struct {
-	Enabled     bool   `json:"Enabled"`
-	TcpEndpoint string `json:"TcpEndpoint"`
+	Enabled         bool   `json:"Enabled"`
+	OutboundEnabled bool   `json:"OutboundEnabled"`
+	TcpEndpoint     string `json:"TcpEndpoint"`
 }
 
 type Env struct {

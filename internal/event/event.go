@@ -4,7 +4,6 @@ import (
 	"gameclustering.com/internal/core"
 )
 
-
 type IndexListener interface {
 	Index(idx Index)
 }
@@ -28,7 +27,7 @@ type Event interface {
 	OnListener(el EventListener)
 	Listener() EventListener
 	OnIndex(ix IndexListener)
-	
+
 	OnTopic(t string)
 	Topic() string
 	OId() int64
@@ -50,6 +49,10 @@ type Publisher interface {
 	Publish(e Event, ticket string) error
 	Connect() error
 	Close() error
+}
+
+type Pusher interface {
+	Push(e Event)
 }
 
 type EventObj struct {

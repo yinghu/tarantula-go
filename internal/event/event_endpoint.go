@@ -3,6 +3,7 @@ package event
 import (
 	"net"
 	"strings"
+	"sync"
 
 	"gameclustering.com/internal/core"
 )
@@ -17,19 +18,21 @@ type EventEndpoint struct {
 	listener net.Listener
 
 	OutboundEnabled bool
-	OutboundQueue   chan Event
+
+	lock          sync.Mutex
+	outboundQueue chan Event
+	outboundIndex map[string]core.DataBuffer
 }
 
 func (s *EventEndpoint) Inbound(client net.Conn) {
 	defer func() {
 		core.AppLog.Printf("client socket is closed")
 		if s.OutboundEnabled {
-			s.OutboundQueue <- &CloseEvent{}
+			s.removeOutbound(client)
 		}
 		client.Close()
 	}()
 	socket := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
-
 	for {
 		cid, err := socket.ReadInt32()
 		if err != nil {
@@ -68,19 +71,25 @@ func (s *EventEndpoint) Inbound(client net.Conn) {
 	}
 }
 
-func (s *EventEndpoint) Outbound(client net.Conn) {
+func (s *EventEndpoint) addOutbound(client net.Conn) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
 	soc := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
-	for e := range s.OutboundQueue {
-		if e.ClassId() == CLOSE_CID {
-			break
-		}
-		soc.WriteInt32(int32(e.ClassId()))
-		e.Outbound(&soc)
-	}
-	core.AppLog.Panicf("outbound task is closed")
+	s.outboundIndex[client.RemoteAddr().String()] = &soc
+}
+func (s *EventEndpoint) removeOutbound(client net.Conn) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	delete(s.outboundIndex, client.LocalAddr().String())
 }
 
 func (s *EventEndpoint) Open() error {
+	s.lock = sync.Mutex{}
+	s.outboundIndex = make(map[string]core.DataBuffer)
+	if s.OutboundEnabled {
+		s.outboundQueue = make(chan Event, 10)
+		go s.outbound()
+	}
 	parts := strings.Split(s.Endpoint, ":")
 	core.AppLog.Printf("Endpoint %s %s\n", parts[0], parts[2])
 	server, err := net.Listen(parts[0], ":"+parts[2])
@@ -96,9 +105,11 @@ func (s *EventEndpoint) Open() error {
 		}
 		go s.Inbound(client)
 		if s.OutboundEnabled {
-			go s.Outbound(client)
+			s.addOutbound(client)
 		}
-
+	}
+	if s.OutboundEnabled {
+		s.outboundQueue <- &CloseEvent{}
 	}
 	core.AppLog.Println("Server closed")
 	return nil
@@ -107,4 +118,26 @@ func (s *EventEndpoint) Close() error {
 	core.AppLog.Printf("endpoint shutting down")
 	s.listener.Close()
 	return nil
+}
+
+func (s *EventEndpoint) Push(e Event) {
+	s.outboundQueue <- e
+}
+func (s *EventEndpoint) outbound() {
+	for e := range s.outboundQueue {
+		if e.ClassId() == CLOSE_CID {
+			break
+		}
+		s.dispatch(e)
+	}
+	core.AppLog.Printf("outbound event closed")
+}
+
+func (s *EventEndpoint) dispatch(e Event) {
+	core.AppLog.Printf("Dispatch event %v\n", e)
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	for _, soc := range s.outboundIndex {
+		e.Outbound(soc)
+	}
 }

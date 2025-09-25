@@ -40,7 +40,7 @@ const (
 
 type TarantulaContext interface {
 	Config() string
-	Start(f conf.Env, c core.Cluster) error
+	Start(f conf.Env, c core.Cluster, p event.Pusher) error
 	Shutdown()
 	event.EventService
 	core.ClusterListener
@@ -56,6 +56,7 @@ type TarantulaService interface {
 	Sequence() core.Sequence
 	ItemListener() item.ItemListener
 	BootstrapListener() BootstrapListener
+	Pusher() event.Pusher
 }
 
 type TarantulaApp interface {
@@ -70,11 +71,11 @@ type BootstrapListener interface {
 }
 
 type Login struct {
-	Id            int32            `json:"-"`
-	Name          string           `json:"login"`
-	Hash          string           `json:"password"`
-	ReferenceId   int32            `json:"referenceId"`
-	SystemId      int64            `json:"systemId:string"`
-	AccessControl int32            `json:"accessControl,string"`
+	Id            int32           `json:"-"`
+	Name          string          `json:"login"`
+	Hash          string          `json:"password"`
+	ReferenceId   int32           `json:"referenceId"`
+	SystemId      int64           `json:"systemId:string"`
+	AccessControl int32           `json:"accessControl,string"`
 	Cc            chan core.Chunk `json:"-"`
 }
