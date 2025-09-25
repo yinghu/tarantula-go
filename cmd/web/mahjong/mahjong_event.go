@@ -6,6 +6,7 @@ import (
 )
 
 type MahjongEvent struct {
+	Cmd string
 	event.EventObj
 }
 
@@ -14,14 +15,11 @@ func (s *MahjongEvent) ClassId() int {
 }
 
 func (s *MahjongEvent) ETag() string {
-	return "MESSAGE_ETAG"
+	return "mj"
 }
 
 func (s *MahjongEvent) WriteKey(buff core.DataBuffer) error {
 	if err := buff.WriteString(s.ETag()); err != nil {
-		return err
-	}
-	if err := buff.WriteInt64(s.OId()); err != nil {
 		return err
 	}
 	return nil
@@ -32,21 +30,22 @@ func (s *MahjongEvent) ReadKey(buff core.DataBuffer) error {
 	if err != nil {
 		return err
 	}
-	id, err := buff.ReadInt64()
-	if err != nil {
-		return err
-	}
-	s.OnOId(id)
 	return nil
 }
 
 func (s *MahjongEvent) Read(buff core.DataBuffer) error {
-
+	cmd, err := buff.ReadString()
+	if err!=nil {
+		return err
+	}
+	s.Cmd = cmd;
 	return nil
 }
 
 func (s *MahjongEvent) Write(buff core.DataBuffer) error {
-
+	if err := buff.WriteString(s.ETag()); err != nil {
+		return err
+	}
 	return nil
 }
 
