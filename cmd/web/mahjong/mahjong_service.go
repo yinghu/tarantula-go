@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
@@ -28,7 +29,43 @@ func (s *MahjongService) Start(f conf.Env, c core.Cluster, p event.Pusher) error
 	return nil
 }
 
+
+func (s *MahjongService) Create(classId int, topic string) (event.Event, error) {
+	me := event.CreateEvent(classId)
+	me.OnListener(&MahjongEventListener{})//inbound event callback
+	me.OnTopic(topic)
+	if me == nil {
+		return nil, fmt.Errorf("event ( %d ) not supported", classId)
+	}
+	return me, nil
+}
+
+func (s *MahjongService) VerifyTicket(ticket string) error {
+	core.AppLog.Printf("validate ticket %s\n", ticket)
+	//_, err := s.auth.ValidateTicket(ticket)
+	//if err != nil {
+	//return err
+	//}
+	return nil
+}
+
+func (s *MahjongService) OnError(e event.Event, err error) {
+	core.AppLog.Printf("On event error %s\n", err.Error())
+}
+
 func (s *MahjongService) OnEvent(e event.Event) {
-	core.AppLog.Printf("event coming!!!")
-	s.Pusher().Push(e)
+	switch e.ClassId() {
+	case event.MESSAGE_CID:
+		s.Pusher().Push(e)
+	default:
+
+	}
+	//se, isSe := e.(*event.SubscriptionEvent)
+	//if isSe {
+	//for i := range s.topicQ {
+	//s.topicQ[i] <- *se
+	//}
+	//return
+	//}
+	//s.inboundQ <- e
 }
