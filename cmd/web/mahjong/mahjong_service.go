@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
@@ -30,17 +29,17 @@ func (s *MahjongService) Start(f conf.Env, c core.Cluster, p event.Pusher) error
 }
 
 func (s *MahjongService) Create(classId int, topic string) (event.Event, error) {
-	me := event.CreateEvent(classId)
+	me := MahjongEvent{}                   //event.CreateEvent(classId)
 	me.OnListener(&MahjongEventListener{}) //inbound event callback
 	me.OnTopic(topic)
-	if me == nil {
-		return nil, fmt.Errorf("event ( %d ) not supported", classId)
-	}
-	return me, nil
+	//if me == nil {
+	//return nil, fmt.Errorf("event ( %d ) not supported", classId)
+	//}
+	return &me, nil
 }
 
 func (s *MahjongService) VerifyTicket(ticket string) error {
-	
+
 	core.AppLog.Printf("validate ticket %s\n", ticket)
 	session, err := s.Authenticator().ValidateToken(ticket)
 	if err != nil {
