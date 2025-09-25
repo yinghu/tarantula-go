@@ -62,6 +62,8 @@ services:
     image: tarantula.mahjong:v1.0
     volumes:
       - volume_mahjong:/home/tarantula/mahjong
+    ports:
+      - "5000:5000"   
     depends_on:
       - presence    
     networks:
