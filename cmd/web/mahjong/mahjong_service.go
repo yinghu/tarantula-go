@@ -29,10 +29,9 @@ func (s *MahjongService) Start(f conf.Env, c core.Cluster, p event.Pusher) error
 	return nil
 }
 
-
 func (s *MahjongService) Create(classId int, topic string) (event.Event, error) {
 	me := event.CreateEvent(classId)
-	me.OnListener(&MahjongEventListener{})//inbound event callback
+	me.OnListener(&MahjongEventListener{}) //inbound event callback
 	me.OnTopic(topic)
 	if me == nil {
 		return nil, fmt.Errorf("event ( %d ) not supported", classId)
@@ -41,11 +40,13 @@ func (s *MahjongService) Create(classId int, topic string) (event.Event, error) 
 }
 
 func (s *MahjongService) VerifyTicket(ticket string) error {
+	
 	core.AppLog.Printf("validate ticket %s\n", ticket)
-	//_, err := s.auth.ValidateTicket(ticket)
-	//if err != nil {
-	//return err
-	//}
+	session, err := s.Authenticator().ValidateToken(ticket)
+	if err != nil {
+		return err
+	}
+	core.AppLog.Printf("Goood session %v\n", session)
 	return nil
 }
 
