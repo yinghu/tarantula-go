@@ -75,12 +75,16 @@ func (s *EventEndpoint) addOutbound(client net.Conn) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	soc := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
-	s.outboundIndex[client.RemoteAddr().String()] = &soc
+	cid := client.RemoteAddr().String()
+	s.outboundIndex[cid] = &soc
+	core.AppLog.Printf("client added %s\n", cid)
 }
 func (s *EventEndpoint) removeOutbound(client net.Conn) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
-	delete(s.outboundIndex, client.LocalAddr().String())
+	cid := client.RemoteAddr().String()
+	delete(s.outboundIndex, cid)
+	core.AppLog.Printf("client removed %s\n", cid)
 }
 
 func (s *EventEndpoint) Open() error {
