@@ -12,7 +12,7 @@ const (
 	TCP_READ_BUFFER_SIZE int = 1024
 )
 
-type EventEndpoint struct {
+type SocketEndpoint struct {
 	Endpoint string
 	Service  EventService
 	listener net.Listener
@@ -25,7 +25,7 @@ type EventEndpoint struct {
 	outboundListener EndpointListener
 }
 
-func (s *EventEndpoint) Inbound(client net.Conn, systemId int64) {
+func (s *SocketEndpoint) Inbound(client net.Conn, systemId int64) {
 	defer func() {
 		core.AppLog.Printf("client socket is closed")
 		if s.OutboundEnabled {
@@ -73,7 +73,7 @@ func (s *EventEndpoint) Inbound(client net.Conn, systemId int64) {
 		}
 	}
 }
-func (s *EventEndpoint) Join(client net.Conn) {
+func (s *SocketEndpoint) Join(client net.Conn) {
 	socket := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
 	cid, err := socket.ReadInt32()
 	if err != nil {
@@ -107,7 +107,7 @@ func (s *EventEndpoint) Join(client net.Conn) {
 	s.outboundEQ <- &e
 }
 
-func (s *EventEndpoint) Open() error {
+func (s *SocketEndpoint) Open() error {
 	s.outboundIndex = make(map[int64]core.DataBuffer)
 	if s.OutboundEnabled {
 		s.outboundEQ = make(chan Event, 10)
@@ -141,19 +141,19 @@ func (s *EventEndpoint) Open() error {
 	core.AppLog.Println("Server closed")
 	return nil
 }
-func (s *EventEndpoint) Close() error {
+func (s *SocketEndpoint) Close() error {
 	core.AppLog.Printf("endpoint shutting down")
 	s.listener.Close()
 	return nil
 }
 
-func (s *EventEndpoint) Push(e Event) {
+func (s *SocketEndpoint) Push(e Event) {
 	s.outboundEQ <- e
 }
-func (s *EventEndpoint) Register(li EndpointListener) {
+func (s *SocketEndpoint) Register(li EndpointListener) {
 	s.outboundListener = li
 }
-func (s *EventEndpoint) outbound() {
+func (s *SocketEndpoint) outbound() {
 	running := true
 	for running {
 		select {
@@ -181,7 +181,7 @@ func (s *EventEndpoint) outbound() {
 	core.AppLog.Printf("outbound event closed")
 }
 
-func (s *EventEndpoint) dispatch(e Event) {
+func (s *SocketEndpoint) dispatch(e Event) {
 	core.AppLog.Printf("Dispatch event %v\n", e)
 	for _, soc := range s.outboundIndex {
 		e.Outbound(soc)
