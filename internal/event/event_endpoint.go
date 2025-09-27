@@ -1,9 +1,9 @@
 package event
 
 import (
+	"fmt"
 	"net"
 	"strings"
-	"sync"
 
 	"gameclustering.com/internal/core"
 )
@@ -19,16 +19,19 @@ type EventEndpoint struct {
 
 	OutboundEnabled bool
 
-	lock          sync.Mutex
-	outboundQueue chan Event
-	outboundIndex map[string]core.DataBuffer
+	outboundCQ       chan net.Conn
+	outboundEQ       chan Event
+	outboundIndex    map[int64]core.DataBuffer
+	outboundListener EndpointListener
 }
 
-func (s *EventEndpoint) Inbound(client net.Conn) {
+func (s *EventEndpoint) Inbound(client net.Conn, systemId int64) {
 	defer func() {
 		core.AppLog.Printf("client socket is closed")
 		if s.OutboundEnabled {
-			s.removeOutbound(client)
+			ce := CloseEvent{}
+			ce.oid = systemId
+			s.outboundEQ <- &ce
 		}
 		client.Close()
 	}()
@@ -46,7 +49,7 @@ func (s *EventEndpoint) Inbound(client net.Conn) {
 			s.Service.OnError(nil, err)
 			break
 		}
-		err = s.Service.VerifyTicket(ticket)
+		_, err = s.Service.VerifyTicket(ticket)
 		if err != nil {
 			core.AppLog.Printf("invalid ticket %s\n", ticket)
 			s.Service.OnError(nil, err)
@@ -70,28 +73,44 @@ func (s *EventEndpoint) Inbound(client net.Conn) {
 		}
 	}
 }
-
-func (s *EventEndpoint) addOutbound(client net.Conn) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-	soc := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
-	cid := client.RemoteAddr().String()
-	s.outboundIndex[cid] = &soc
-	core.AppLog.Printf("client added %s\n", cid)
-}
-func (s *EventEndpoint) removeOutbound(client net.Conn) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-	cid := client.RemoteAddr().String()
-	delete(s.outboundIndex, cid)
-	core.AppLog.Printf("client removed %s\n", cid)
+func (s *EventEndpoint) Join(client net.Conn) {
+	socket := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
+	cid, err := socket.ReadInt32()
+	if err != nil {
+		core.AppLog.Printf("error on read cid %s\n", err.Error())
+		s.Service.OnError(nil, err)
+		client.Close()
+		return
+	}
+	if cid != int32(JOIN_CID) {
+		core.AppLog.Printf("wrong cid %d\n", cid)
+		s.Service.OnError(nil, fmt.Errorf("wrong cid %d", cid))
+		client.Close()
+		return
+	}
+	e := JoinEvent{}
+	err = e.Inbound(&socket)
+	if err != nil {
+		s.Service.OnError(&e, err)
+		client.Close()
+		return
+	}
+	session, err := s.Service.VerifyTicket(e.Token)
+	if err != nil {
+		client.Close()
+		return
+	}
+	e.Client = client
+	e.Pending = &socket
+	e.SystemId = session.SystemId
+	s.outboundEQ <- &e
 }
 
 func (s *EventEndpoint) Open() error {
-	s.lock = sync.Mutex{}
-	s.outboundIndex = make(map[string]core.DataBuffer)
+	s.outboundIndex = make(map[int64]core.DataBuffer)
 	if s.OutboundEnabled {
-		s.outboundQueue = make(chan Event, 10)
+		s.outboundEQ = make(chan Event, 10)
+		s.outboundCQ = make(chan net.Conn, 10)
 		go s.outbound()
 	}
 	parts := strings.Split(s.Endpoint, ":")
@@ -107,13 +126,16 @@ func (s *EventEndpoint) Open() error {
 			core.AppLog.Printf("Error :%s\n", err.Error())
 			break
 		}
-		go s.Inbound(client)
 		if s.OutboundEnabled {
-			s.addOutbound(client)
+			s.outboundCQ <- client
+		} else {
+			go s.Inbound(client, 0)
 		}
 	}
 	if s.OutboundEnabled {
-		s.outboundQueue <- &CloseEvent{}
+		ce := CloseEvent{}
+		ce.oid = 0
+		s.outboundEQ <- &ce
 	}
 	core.AppLog.Println("Server closed")
 	return nil
@@ -125,22 +147,41 @@ func (s *EventEndpoint) Close() error {
 }
 
 func (s *EventEndpoint) Push(e Event) {
-	s.outboundQueue <- e
+	s.outboundEQ <- e
+}
+func (s *EventEndpoint) Register(li EndpointListener) {
+	s.outboundListener = li
 }
 func (s *EventEndpoint) outbound() {
-	for e := range s.outboundQueue {
-		if e.ClassId() == CLOSE_CID {
-			break
+	running := true
+	for running {
+		select {
+		case c := <-s.outboundCQ:
+			go s.Join(c)
+		case e := <-s.outboundEQ:
+			if e.ClassId() == CLOSE_CID {
+				if e.OId() == 0 {
+					running = false
+					continue
+				}
+				core.AppLog.Printf("remove connection %d\n", e.OId())
+				delete(s.outboundIndex, e.OId())
+				continue
+			}
+			if e.ClassId() == JOIN_CID {
+				join, _ := e.(*JoinEvent)
+				s.outboundIndex[join.SystemId] = join.Pending
+				go s.Inbound(join.Client, join.SystemId)
+				continue
+			}
+			s.dispatch(e)
 		}
-		s.dispatch(e)
 	}
 	core.AppLog.Printf("outbound event closed")
 }
 
 func (s *EventEndpoint) dispatch(e Event) {
 	core.AppLog.Printf("Dispatch event %v\n", e)
-	s.lock.Lock()
-	defer s.lock.Unlock()
 	for _, soc := range s.outboundIndex {
 		e.Outbound(soc)
 	}

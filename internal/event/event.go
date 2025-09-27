@@ -15,7 +15,7 @@ type EventListener interface {
 
 type EventService interface {
 	Create(classId int, topic string) (Event, error)
-	VerifyTicket(ticket string) error
+	VerifyTicket(ticket string) (core.OnSession, error)
 	EventListener
 	Postoffice
 }
@@ -53,6 +53,11 @@ type Publisher interface {
 
 type Pusher interface {
 	Push(e Event)
+}
+
+type EndpointListener interface {
+	Connected(buff core.DataBuffer)
+	Disconnected(buff core.DataBuffer)
 }
 
 type EventObj struct {

@@ -111,15 +111,15 @@ func (s *AppManager) Create(classId int, topic string) (event.Event, error) {
 	return nil, nil
 }
 
-func (s *AppManager) VerifyTicket(ticket string) error {
+func (s *AppManager) VerifyTicket(ticket string) (core.OnSession, error) {
 	session, err := s.auth.ValidateTicket(ticket)
 	if err != nil {
-		return err
+		return session, err
 	}
 	if session.AccessControl < ADMIN_ACCESS_CONTROL {
-		return fmt.Errorf("admin access control required %d", session.AccessControl)
+		return session, fmt.Errorf("admin access control required %d", session.AccessControl)
 	}
-	return nil
+	return session, nil
 }
 func (s *AppManager) Send(e event.Event) error {
 	for i := range 5 {

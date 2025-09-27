@@ -9,12 +9,14 @@ const (
 	SUBSCRIPTION_CID    int = 5
 	TOURNAMENT_JOIN_CID int = 6
 	INVENTORY_CID       int = 7
+	JOIN_CID            int = 8
 
 	LOGIN_ETAG        string = "lgn:"
 	MESSAGE_ETAG      string = "msg:"
 	TOURNAMENT_ETAG   string = "tmt:"
 	SUBSCRIPTION_ETAG string = "sub:"
 	INVENTORY_ETAG    string = "inv"
+	JOIN_ETAG         string = "join"
 
 	STAT_ETAG string = "stat:"
 
@@ -37,6 +39,8 @@ func CreateEvent(cid int) Event {
 		return &TournamentJoinIndex{}
 	case INVENTORY_CID:
 		return &InventoryEvent{}
+	case JOIN_CID:
+		return &JoinEvent{}
 	default:
 		return nil
 	}
