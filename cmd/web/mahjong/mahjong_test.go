@@ -23,7 +23,7 @@ func TestClient(t *testing.T) {
 	}
 	for range 3 {
 		me := MahjongEvent{Cmd: "drop"}
-		e.OnListener(&MahjongEventListener{})
+		me.OnListener(&MahjongEventListener{})
 		sb.Publish(&me, "validated")
 	}
 	sb.Close()
