@@ -76,6 +76,7 @@ func (s *SocketEndpoint) Inbound(client net.Conn, systemId int64) {
 	}
 }
 func (s *SocketEndpoint) Join(client net.Conn) {
+	time.Sleep(100 * time.Millisecond)
 	socket := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
 	cid, err := socket.ReadInt32()
 	if err != nil {
@@ -185,7 +186,14 @@ func (s *SocketEndpoint) outbound() {
 
 func (s *SocketEndpoint) dispatch(e Event) {
 	core.AppLog.Printf("Dispatch event %v\n", e)
-	for _, soc := range s.outboundIndex {
-		e.Outbound(soc)
+	for sid, soc := range s.outboundIndex {
+		err := soc.WriteInt32(int32(e.ClassId()))
+		if err != nil {
+			delete(s.outboundIndex, sid)
+		}
+		err = e.Outbound(soc)
+		if err != nil {
+			delete(s.outboundIndex, sid)
+		}
 	}
 }

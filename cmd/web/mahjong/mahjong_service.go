@@ -35,6 +35,7 @@ func (s *MahjongService) Create(classId int, topic string) (event.Event, error) 
 	//if me == nil {
 	//return nil, fmt.Errorf("event ( %d ) not supported", classId)
 	//}
+	s.Pusher().Push(&me)
 	return &me, nil
 }
 

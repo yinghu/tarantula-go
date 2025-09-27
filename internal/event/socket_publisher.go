@@ -1,8 +1,10 @@
 package event
 
 import (
+	"fmt"
 	"net"
 	"strings"
+	"time"
 
 	"gameclustering.com/internal/core"
 )
@@ -30,9 +32,27 @@ func (s *SocketPublisher) Close() error {
 	return s.client.Close()
 }
 
-func (s *SocketPublisher) Subscriber(ec EventListener){
-	//sub := SocketBuffer{Socket: s.client, Buffer: make([]byte, SOCKET_DATA_BUFFER_SIZE)}
-	
+func (s *SocketPublisher) Subscribe(ec EventListener) {
+	sub := SocketBuffer{Socket: s.client, Buffer: make([]byte, SOCKET_DATA_BUFFER_SIZE)}
+	for {
+		cid, err := sub.ReadInt32()
+		if err != nil {
+			ec.OnError(nil, err)
+			break
+		}
+		e := CreateEvent(int(cid))
+		if e == nil {
+			ec.OnError(nil, fmt.Errorf("event not supported %d", cid))
+			break
+		}
+		err = e.Inbound(&sub)
+		if err != nil {
+			ec.OnError(nil, err)
+			break
+		}
+		ec.OnEvent(e)
+		time.Sleep(500 * time.Millisecond)
+	}
 }
 
 func (s *SocketPublisher) Join(e Event) error {

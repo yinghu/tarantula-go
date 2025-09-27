@@ -21,6 +21,7 @@ func TestClient(t *testing.T) {
 		sb.Close()
 		return
 	}
+	go sb.Subscribe(&MahjongEventListener{})
 	for range 3 {
 		me := MahjongEvent{Cmd: "drop"}
 		me.OnListener(&MahjongEventListener{})
