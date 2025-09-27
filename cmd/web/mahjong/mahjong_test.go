@@ -12,13 +12,19 @@ func TestClient(t *testing.T) {
 	if err != nil {
 		t.Errorf("conn error %s", err.Error())
 	}
-	for range 3{
-		e := MahjongEvent{Cmd: "drop"}
+
+	e := event.JoinEvent{Token: "test token"}
+	e.OnListener(&MahjongEventListener{})
+	err = sb.Join(&e)
+	if err != nil {
+		t.Errorf("send error %s", err.Error())
+		sb.Close()
+		return
+	}
+	for range 3 {
+		me := MahjongEvent{Cmd: "drop"}
 		e.OnListener(&MahjongEventListener{})
-		err = sb.Publish(&e, "test")
-		if err != nil {
-			t.Errorf("send error %s", err.Error())
-		}
+		sb.Publish(&me, "validated")
 	}
 	sb.Close()
 }

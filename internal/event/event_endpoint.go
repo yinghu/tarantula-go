@@ -89,6 +89,7 @@ func (s *EventEndpoint) Join(client net.Conn) {
 		return
 	}
 	e := JoinEvent{}
+	e.OnListener(s.Service)
 	err = e.Inbound(&socket)
 	if err != nil {
 		s.Service.OnError(&e, err)
