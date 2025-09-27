@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"time"
 
 	"gameclustering.com/internal/core"
 )
@@ -71,6 +72,7 @@ func (s *SocketEndpoint) Inbound(client net.Conn, systemId int64) {
 		if err != nil {
 			s.Service.OnError(e, err)
 		}
+		time.Sleep(500 * time.Millisecond)
 	}
 }
 func (s *SocketEndpoint) Join(client net.Conn) {

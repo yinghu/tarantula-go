@@ -11,7 +11,8 @@ const SOCKET_DATA_BUFFER_SIZE int = 1024
 
 type SocketPublisher struct {
 	Remote string
-	sb     SocketBuffer
+	client net.Conn
+	pub    SocketBuffer
 }
 
 func (s *SocketPublisher) Connect() error {
@@ -20,22 +21,28 @@ func (s *SocketPublisher) Connect() error {
 	if err != nil {
 		return err
 	}
-	s.sb = SocketBuffer{Socket: conn, Buffer: make([]byte, SOCKET_DATA_BUFFER_SIZE)}
+	s.client = conn
+	s.pub = SocketBuffer{Socket: conn, Buffer: make([]byte, SOCKET_DATA_BUFFER_SIZE)}
 	return nil
 }
 
 func (s *SocketPublisher) Close() error {
-	return s.sb.Clear()
+	return s.client.Close()
+}
+
+func (s *SocketPublisher) Subscriber(ec EventListener){
+	//sub := SocketBuffer{Socket: s.client, Buffer: make([]byte, SOCKET_DATA_BUFFER_SIZE)}
+	
 }
 
 func (s *SocketPublisher) Join(e Event) error {
-	err := s.sb.WriteInt32(int32(e.ClassId()))
+	err := s.pub.WriteInt32(int32(e.ClassId()))
 	if err != nil {
 		core.AppLog.Printf("error on write classid %s\n", err.Error())
 		e.Listener().OnError(e, err)
 		return err
 	}
-	err = e.Outbound(&s.sb)
+	err = e.Outbound(&s.pub)
 	if err != nil {
 		core.AppLog.Printf("error on write outbound %s\n", err.Error())
 		e.Listener().OnError(e, err)
@@ -45,25 +52,25 @@ func (s *SocketPublisher) Join(e Event) error {
 }
 
 func (s *SocketPublisher) Publish(e Event, ticket string) error {
-	err := s.sb.WriteInt32(int32(e.ClassId()))
+	err := s.pub.WriteInt32(int32(e.ClassId()))
 	if err != nil {
 		core.AppLog.Printf("error on write classid %s\n", err.Error())
 		e.Listener().OnError(e, err)
 		return err
 	}
-	err = s.sb.WriteString(ticket)
+	err = s.pub.WriteString(ticket)
 	if err != nil {
 		core.AppLog.Printf("error on write ticket %s\n", err.Error())
 		e.Listener().OnError(e, err)
 		return err
 	}
-	err = s.sb.WriteString(e.Topic())
+	err = s.pub.WriteString(e.Topic())
 	if err != nil {
 		core.AppLog.Printf("error on write topic %s\n", err.Error())
 		e.Listener().OnError(e, err)
 		return err
 	}
-	err = e.Outbound(&s.sb)
+	err = e.Outbound(&s.pub)
 	if err != nil {
 		core.AppLog.Printf("error on write outbound %s\n", err.Error())
 		e.Listener().OnError(e, err)
