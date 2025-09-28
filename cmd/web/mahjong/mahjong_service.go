@@ -42,14 +42,11 @@ func (s *MahjongService) Create(classId int, topic string) (event.Event, error) 
 }
 
 func (s *MahjongService) VerifyTicket(ticket string) (core.OnSession, error) {
-
-	core.AppLog.Printf("validate ticket %s\n", ticket)
-	//session, err := s.Authenticator().ValidateToken(ticket)
-	//if err != nil {
-	//return err
-	//}
-	//core.AppLog.Printf("Goood session %v\n", session)
-	return core.OnSession{SystemId: 100}, nil
+	session, err := s.Authenticator().ValidateToken(ticket)
+	if err != nil {
+		return session, err
+	}
+	return session, nil
 }
 
 func (s *MahjongService) OnError(e event.Event, err error) {
