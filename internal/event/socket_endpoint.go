@@ -142,6 +142,8 @@ func (s *SocketEndpoint) Open() error {
 		s.outboundEQ <- &ce
 	}
 	core.AppLog.Println("Server closed")
+	close(s.outboundCQ)
+	close(s.outboundEQ)
 	return nil
 }
 func (s *SocketEndpoint) Close() error {
@@ -169,7 +171,7 @@ func (s *SocketEndpoint) outbound() {
 					continue
 				}
 				oc, exists := s.outboundIndex[e.OId()]
-				if exists{
+				if exists {
 					core.AppLog.Printf("remove connection %d\n", e.OId())
 					close(oc.Pending)
 					delete(s.outboundIndex, e.OId())
