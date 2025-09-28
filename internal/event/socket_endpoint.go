@@ -174,10 +174,10 @@ func (s *SocketEndpoint) outbound() {
 			}
 			if e.ClassId() == JOIN_CID {
 				join, _ := e.(*JoinEvent)
-				cout := OutboundSocket{Soc:join.Pending,Pending: make(chan Event,10)}
+				cout := OutboundSocket{Soc: join.Pending, Pending: make(chan Event, 10)}
 				go cout.Subscribe()
-				s.outboundIndex[join.SystemId] = &cout}
-				
+				s.outboundIndex[join.SystemId] = &cout
+
 				go s.Inbound(join.Client, join.SystemId)
 				continue
 			}
