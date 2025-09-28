@@ -31,7 +31,7 @@ func TestClient(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		hc.Token = session.Token
+		hc.Token = session.Ticket
 		return nil
 	})
 	if err != nil {
@@ -41,6 +41,7 @@ func TestClient(t *testing.T) {
 	fmt.Printf("token %s\n",hc.Token)
 	sb := event.SocketPublisher{Remote: "tcp://192.168.1.11:5050"}
 	err = sb.Connect()
+	
 	if err != nil {
 		t.Errorf("conn error %s", err.Error())
 	}

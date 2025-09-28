@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
@@ -40,13 +41,23 @@ func (s *MahjongService) Create(classId int, topic string) (event.Event, error) 
 	s.Pusher().Push(&mx)
 	return &me, nil
 }
+func (s *MahjongService) VerifyTicket(ticket string) (core.OnSession, error) {
+	session, err := s.AppAuth.ValidateTicket(ticket)
+	if err != nil {
+		return session, err
+	}
+	if session.AccessControl < bootstrap.PROTECTED_ACCESS_CONTROL {
+		return session, fmt.Errorf("player access control required %d", session.AccessControl)
+	}
+	return session, nil
+}
 
 //func (s *MahjongService) VerifyTicket(ticket string) (core.OnSession, error) {
-	//session, err := s.Authenticator().ValidateToken(ticket)
-	//if err != nil {
-		//return session, err
-	//}
-	//return session, nil
+//session, err := s.Authenticator().ValidateToken(ticket)
+//if err != nil {
+//return session, err
+//}
+//return session, nil
 //}
 
 func (s *MahjongService) OnError(e event.Event, err error) {
