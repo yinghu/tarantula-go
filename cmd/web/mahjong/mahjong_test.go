@@ -2,9 +2,17 @@ package main
 
 import (
 	"testing"
+	"time"
 
 	"gameclustering.com/internal/event"
 )
+
+type SampleCreator struct {
+}
+
+func (s *SampleCreator) Create(cid int, topic string) (event.Event, error) {
+	return &MahjongEvent{}, nil
+}
 
 func TestClient(t *testing.T) {
 	sb := event.SocketPublisher{Remote: "tcp://192.168.1.11:5050"}
@@ -21,11 +29,12 @@ func TestClient(t *testing.T) {
 		sb.Close()
 		return
 	}
-	go sb.Subscribe(&MahjongEventListener{})
+	go sb.Subscribe(&SampleCreator{}, &MahjongEventListener{})
 	for range 3 {
 		me := MahjongEvent{Cmd: "drop"}
 		me.OnListener(&MahjongEventListener{})
 		sb.Publish(&me, "validated")
 	}
+	time.Sleep(5 * time.Second)
 	sb.Close()
 }

@@ -14,7 +14,8 @@ type EventListener interface {
 }
 
 type EventService interface {
-	Create(classId int, topic string) (Event, error)
+	//Create(classId int, topic string) (Event, error)
+	EventCreator
 	VerifyTicket(ticket string) (core.OnSession, error)
 	EventListener
 	Postoffice
@@ -32,6 +33,10 @@ type Event interface {
 	Topic() string
 	OId() int64
 	OnOId(id int64)
+}
+
+type EventCreator interface{
+	Create(classId int, topic string) (Event, error)
 }
 
 type Index interface {

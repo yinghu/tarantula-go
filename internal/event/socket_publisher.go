@@ -32,7 +32,7 @@ func (s *SocketPublisher) Close() error {
 	return s.client.Close()
 }
 
-func (s *SocketPublisher) Subscribe(ec EventListener) {
+func (s *SocketPublisher) Subscribe(cr EventCreator, ec EventListener) {
 	sub := SocketBuffer{Socket: s.client, Buffer: make([]byte, SOCKET_DATA_BUFFER_SIZE)}
 	for {
 		cid, err := sub.ReadInt32()
@@ -40,8 +40,8 @@ func (s *SocketPublisher) Subscribe(ec EventListener) {
 			ec.OnError(nil, err)
 			break
 		}
-		e := CreateEvent(int(cid))
-		if e == nil {
+		e, err := cr.Create(int(cid),"")
+		if err == nil {
 			ec.OnError(nil, fmt.Errorf("event not supported %d", cid))
 			break
 		}
