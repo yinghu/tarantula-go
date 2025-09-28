@@ -22,7 +22,7 @@ type SocketEndpoint struct {
 
 	outboundCQ       chan net.Conn
 	outboundEQ       chan Event
-	outboundIndex    map[int64]OutboundSocket
+	outboundIndex    map[int64]*OutboundSocket
 	outboundListener EndpointListener
 }
 
@@ -111,7 +111,7 @@ func (s *SocketEndpoint) Join(client net.Conn) {
 }
 
 func (s *SocketEndpoint) Open() error {
-	s.outboundIndex = make(map[int64]OutboundSocket)
+	s.outboundIndex = make(map[int64]*OutboundSocket)
 	if s.OutboundEnabled {
 		s.outboundEQ = make(chan Event, 10)
 		s.outboundCQ = make(chan net.Conn, 10)
@@ -174,7 +174,7 @@ func (s *SocketEndpoint) outbound() {
 			}
 			if e.ClassId() == JOIN_CID {
 				join, _ := e.(*JoinEvent)
-				s.outboundIndex[join.SystemId] = OutboundSocket{Soc:join.Pending,Pending: make(chan Event,10)}
+				s.outboundIndex[join.SystemId] = &OutboundSocket{Soc:join.Pending,Pending: make(chan Event,10)}
 				go s.Inbound(join.Client, join.SystemId)
 				continue
 			}
