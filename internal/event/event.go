@@ -14,7 +14,7 @@ type EventListener interface {
 }
 
 type EventService interface {
-	//Create(classId int, topic string) (Event, error)
+	
 	EventCreator
 	VerifyTicket(ticket string) (core.OnSession, error)
 	EventListener
