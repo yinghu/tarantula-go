@@ -83,12 +83,14 @@ func (s *AuthManager) ValidateToken(token string) (core.OnSession, error) {
 
 func (s *AuthManager) CreateTicket(systemId int64, stub int32, accessControl int32) (string, error) {
 	exp := time.Now().Add(time.Hour * time.Duration(TICKET_TIME_OUT_SECONDS)).UTC()
-	aud := fmt.Sprintf("%d.%d.%d.%d", systemId, stub, accessControl, exp)
+	aud := fmt.Sprintf("%d.%d.%d.%d", systemId, stub, accessControl, exp.UnixMilli())
+	core.AppLog.Printf("ticket %s\n", aud)
 	ticket := s.Cipher.Encrypt(aud)
 	return ticket, nil
 }
 func (s *AuthManager) ValidateTicket(ticket string) (core.OnSession, error) {
 	data, err := s.Cipher.Decrypt(ticket)
+	core.AppLog.Printf("ticket : %s\n", data)
 	session := core.OnSession{}
 	if err != nil {
 		return session, err
