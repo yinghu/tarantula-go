@@ -1,8 +1,8 @@
 package main
 
 import (
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 )
 
 type MahjongEvent struct {
@@ -35,15 +35,15 @@ func (s *MahjongEvent) ReadKey(buff core.DataBuffer) error {
 
 func (s *MahjongEvent) Read(buff core.DataBuffer) error {
 	cmd, err := buff.ReadString()
-	if err!=nil {
+	if err != nil {
 		return err
 	}
-	s.Cmd = cmd;
+	s.Cmd = cmd
 	return nil
 }
 
 func (s *MahjongEvent) Write(buff core.DataBuffer) error {
-	if err := buff.WriteString(s.ETag()); err != nil {
+	if err := buff.WriteString(s.Cmd); err != nil {
 		return err
 	}
 	return nil
