@@ -168,8 +168,12 @@ func (s *SocketEndpoint) outbound() {
 					running = false
 					continue
 				}
-				core.AppLog.Printf("remove connection %d\n", e.OId())
-				delete(s.outboundIndex, e.OId())
+				oc, exists := s.outboundIndex[e.OId()]
+				if exists{
+					core.AppLog.Printf("remove connection %d\n", e.OId())
+					close(oc.Pending)
+					delete(s.outboundIndex, e.OId())
+				}
 				continue
 			}
 			if e.ClassId() == JOIN_CID {
@@ -177,7 +181,6 @@ func (s *SocketEndpoint) outbound() {
 				cout := OutboundSocket{Soc: join.Pending, Pending: make(chan Event, 10)}
 				go cout.Subscribe()
 				s.outboundIndex[join.SystemId] = &cout
-
 				go s.Inbound(join.Client, join.SystemId)
 				continue
 			}

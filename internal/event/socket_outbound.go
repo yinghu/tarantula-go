@@ -13,9 +13,14 @@ type OutboundSocket struct {
 
 func (out *OutboundSocket) Subscribe() {
 	for e := range out.Pending {
-		core.AppLog.Printf("outbound message %d\n",e.ClassId())
-		out.Soc.WriteInt32(int32(e.ClassId()))
-		e.Outbound(out.Soc)
-		time.Sleep(10 * time.Millisecond)
+		err := out.Soc.WriteInt32(int32(e.ClassId()))
+		if err != nil {
+			break
+		}
+		err = e.Outbound(out.Soc)
+		if err != nil {
+			break
+		}
+		time.Sleep(3 * time.Millisecond)
 	}
 }
