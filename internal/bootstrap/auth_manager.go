@@ -82,15 +82,44 @@ func (s *AuthManager) ValidateToken(token string) (core.OnSession, error) {
 }
 
 func (s *AuthManager) CreateTicket(systemId int64, stub int32, accessControl int32) (string, error) {
-	return s.Tkn.Token(func(h *core.JwtHeader, p *core.JwtPayload) error {
-		h.Kid = s.Kid
-		exp := time.Now().Add(time.Hour * time.Duration(TICKET_TIME_OUT_SECONDS)).UTC()
-		p.Exp = exp.UnixMilli()
-		aud := fmt.Sprintf("%d.%d.%d.%d", systemId, stub, accessControl, p.Exp)
-		p.Aud = s.Cipher.Encrypt(aud)
-		return nil
-	})
+	exp := time.Now().Add(time.Hour * time.Duration(TICKET_TIME_OUT_SECONDS)).UTC()
+	aud := fmt.Sprintf("%d.%d.%d.%d", systemId, stub, accessControl, exp)
+	ticket := s.Cipher.Encrypt(aud)
+	return ticket, nil
 }
 func (s *AuthManager) ValidateTicket(ticket string) (core.OnSession, error) {
-	return s.ValidateToken(ticket)
+	data, err := s.Cipher.Decrypt(ticket)
+	session := core.OnSession{}
+	if err != nil {
+		return session, err
+	}
+	parts := strings.Split(data, ".")
+	if len(parts) != 4 {
+		return session, fmt.Errorf("wrong ticket format %s", data)
+	}
+	sysId, err := strconv.ParseInt(parts[0], 10, 64)
+	if err != nil {
+		return session, err
+	}
+	session.SystemId = sysId
+	stub, err := strconv.ParseInt(parts[1], 10, 32)
+	if err != nil {
+		return session, err
+	}
+	session.Stub = int32(stub)
+	acc, err := strconv.ParseInt(parts[2], 10, 32)
+	if err != nil {
+		return session, err
+	}
+	session.AccessControl = int32(acc)
+	exp, err := strconv.ParseInt(parts[3], 10, 64)
+	if err != nil {
+		return session, err
+	}
+	tm := time.UnixMilli(exp)
+	if tm.UTC().Before(time.Now().UTC()) {
+		return session, errors.New("token timeout")
+	}
+	return session, nil
+	//return s.ValidateToken(ticket)
 }

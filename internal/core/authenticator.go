@@ -13,6 +13,7 @@ type OnSession struct {
 	SystemId      int64  `json:"systemId"`
 	Stub          int32  `json:"-"`
 	Token         string `json:"token"`
+	Ticket        string `json:"ticket"`
 	Home          string `json:"home"`
 	AccessControl int32  `json:"-"`
 }
