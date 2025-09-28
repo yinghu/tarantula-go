@@ -1,7 +1,6 @@
 package event
 
 import (
-	"fmt"
 	"net"
 	"strings"
 	"time"
@@ -40,9 +39,9 @@ func (s *SocketPublisher) Subscribe(cr EventCreator, ec EventListener) {
 			ec.OnError(nil, err)
 			break
 		}
-		e, err := cr.Create(int(cid),"")
-		if err == nil {
-			ec.OnError(nil, fmt.Errorf("event not supported %d", cid))
+		e, err := cr.Create(int(cid), "")
+		if err != nil {
+			ec.OnError(nil, err)
 			break
 		}
 		err = e.Inbound(&sub)

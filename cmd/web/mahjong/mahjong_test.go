@@ -11,7 +11,9 @@ type SampleCreator struct {
 }
 
 func (s *SampleCreator) Create(cid int, topic string) (event.Event, error) {
-	return &MahjongEvent{}, nil
+	me := MahjongEvent{}
+	me.Callback = &MahjongEventListener{}
+	return &me, nil
 }
 
 func TestClient(t *testing.T) {
