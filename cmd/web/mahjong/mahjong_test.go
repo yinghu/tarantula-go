@@ -57,7 +57,7 @@ func TestClient(t *testing.T) {
 	for range 3 {
 		me := MahjongEvent{Cmd: "drop"}
 		me.OnListener(&MahjongEventListener{})
-		sb.Publish(&me, "validated")
+		sb.Publish(&me,hc.Token)
 	}
 	time.Sleep(5 * time.Second)
 	sb.Close()
