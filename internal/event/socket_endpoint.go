@@ -74,7 +74,7 @@ func (s *SocketEndpoint) Inbound(client net.Conn, systemId int64) {
 		time.Sleep(500 * time.Millisecond)
 	}
 }
-func (s *SocketEndpoint) Join(client net.Conn) {
+func (s *SocketEndpoint) join(client net.Conn) {
 	time.Sleep(100 * time.Millisecond)
 	socket := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
 	cid, err := socket.ReadInt32()
@@ -85,8 +85,8 @@ func (s *SocketEndpoint) Join(client net.Conn) {
 		return
 	}
 	if cid != int32(JOIN_CID) {
-		core.AppLog.Printf("wrong cid %d\n", cid)
-		s.Service.OnError(nil, fmt.Errorf("wrong cid %d", cid))
+		core.AppLog.Printf("wrong join cid %d\n", cid)
+		s.Service.OnError(nil, fmt.Errorf("wrong join cid %d", cid))
 		client.Close()
 		return
 	}
@@ -161,7 +161,7 @@ func (s *SocketEndpoint) outbound() {
 	for running {
 		select {
 		case c := <-s.outboundCQ:
-			go s.Join(c)
+			go s.join(c)
 		case e := <-s.outboundEQ:
 			if e.ClassId() == CLOSE_CID {
 				if e.OId() == 0 {

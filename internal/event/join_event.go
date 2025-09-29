@@ -7,7 +7,7 @@ import (
 )
 
 type JoinEvent struct {
-	Ticket    string `json:"Ticket"`
+	Ticket   string `json:"Ticket"`
 	Client   net.Conn
 	Pending  core.DataBuffer
 	SystemId int64
@@ -80,4 +80,8 @@ func (s *JoinEvent) Inbound(buff core.DataBuffer) error {
 	}
 	s.Callback.OnEvent(s)
 	return nil
+}
+
+func (s *JoinEvent) RecipientId() int64 {
+	return s.SystemId
 }

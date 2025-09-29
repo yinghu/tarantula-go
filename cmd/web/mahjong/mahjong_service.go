@@ -30,7 +30,13 @@ func (s *MahjongService) Start(f conf.Env, c core.Cluster, p event.Pusher) error
 }
 
 func (s *MahjongService) Create(classId int, topic string) (event.Event, error) {
-	me := MahjongEvent{}                   
+	e := event.CreateEvent(classId)
+	if e != nil {
+		e.OnTopic(topic)
+		//e.OnListener()
+		return e, nil
+	}
+	me := MahjongEvent{}
 	me.OnListener(&MahjongEventListener{})
 	return &me, nil
 }
@@ -53,6 +59,8 @@ func (s *MahjongService) OnEvent(e event.Event) {
 	switch e.ClassId() {
 	case event.MESSAGE_CID:
 		s.Pusher().Push(e)
+	case event.JOIN_CID:
+		core.AppLog.Printf("joined from %d\n", e.RecipientId())
 	default:
 
 	}

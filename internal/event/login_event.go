@@ -103,3 +103,4 @@ func (s *LoginEvent) Inbound(buff core.DataBuffer) error {
 	s.Callback.OnEvent(s)
 	return nil
 }
+
