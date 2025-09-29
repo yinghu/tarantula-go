@@ -36,6 +36,7 @@ func (s *MahjongService) Create(classId int, topic string) (event.Event, error) 
 		e.OnListener(s)
 		return e, nil
 	}
+	core.AppLog.Printf("Create event %d %s\n",classId,topic)
 	me := MahjongEvent{}
 	me.OnListener(&MahjongEventListener{})
 	return &me, nil

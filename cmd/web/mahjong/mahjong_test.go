@@ -58,6 +58,7 @@ func TestClient(t *testing.T) {
 	go sb.Subscribe(&SampleCreator{}, &MahjongEventListener{})
 	for range 3 {
 		me := MahjongEvent{Cmd: "drop"}
+		me.OnTopic("mahjong")
 		me.OnListener(&MahjongEventListener{})
 		sb.Publish(&me, hc.Ticket)
 	}
