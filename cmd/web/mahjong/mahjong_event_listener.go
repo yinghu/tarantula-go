@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
 
@@ -11,9 +12,10 @@ type MahjongEventListener struct {
 }
 
 func (s *MahjongEventListener) OnError(e event.Event, err error) {
-	fmt.Printf("On event error %v %s\n", e, err.Error())
+	core.AppLog.Printf("On event error %v %s\n", e, err.Error())
 }
 
 func (s *MahjongEventListener) OnEvent(e event.Event) {
-	fmt.Printf("On event %v\n", e)
+	core.AppLog.Printf("On event %v\n", e)
+
 }

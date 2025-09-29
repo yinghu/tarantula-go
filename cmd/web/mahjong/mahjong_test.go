@@ -22,6 +22,15 @@ func (s *SampleCreator) Create(cid int, topic string) (event.Event, error) {
 	return &me, nil
 }
 
+func (s *SampleCreator) OnError(e event.Event, err error) {
+	fmt.Printf("On event error %v %s\n", e, err.Error())
+}
+
+func (s *SampleCreator) OnEvent(e event.Event) {
+	fmt.Printf("On event %v\n", e)
+
+}
+
 func TestClient(t *testing.T) {
 	hc := util.HttpCaller{Host: "http://192.168.1.11"}
 	login := bootstrap.Login{Name: "player1", Hash: "aaa"}
@@ -48,7 +57,7 @@ func TestClient(t *testing.T) {
 	}
 
 	e := event.JoinEvent{Ticket: hc.Ticket}
-	e.OnListener(&MahjongEventListener{})
+	e.OnListener(&SampleCreator{})
 	err = sb.Join(&e)
 	if err != nil {
 		t.Errorf("send error %s", err.Error())
@@ -59,7 +68,7 @@ func TestClient(t *testing.T) {
 	for range 3 {
 		me := MahjongEvent{Cmd: "drop"}
 		me.OnTopic("mahjong")
-		me.OnListener(&MahjongEventListener{})
+		me.OnListener(&SampleCreator{})
 		sb.Publish(&me, hc.Ticket)
 	}
 	time.Sleep(5 * time.Second)
