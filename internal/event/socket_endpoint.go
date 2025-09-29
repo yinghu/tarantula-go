@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	TCP_READ_BUFFER_SIZE int = 1024
+	TCP_READ_BUFFER_SIZE int    = 1024
+	JOIN_TOPIC           string = "join"
 )
 
 type SocketEndpoint struct {
@@ -84,7 +85,7 @@ func (s *SocketEndpoint) join(client net.Conn) {
 		client.Close()
 		return
 	}
-	e, err := s.Service.Create(int(cid), "join")
+	e, err := s.Service.Create(int(cid), JOIN_TOPIC)
 	if err != nil {
 		core.AppLog.Printf("wrong join cid %d\n", cid)
 		s.Service.OnError(nil, fmt.Errorf("wrong join cid %d", cid))
@@ -97,7 +98,13 @@ func (s *SocketEndpoint) join(client net.Conn) {
 		client.Close()
 		return
 	}
-	join,_ := e.(*JoinEvent)
+	join, ok := e.(*JoinEvent)
+	if !ok {
+		core.AppLog.Printf("wrong join event %d\n", cid)
+		s.Service.OnError(nil, fmt.Errorf("wrong join cid %d", cid))
+		client.Close()
+		return
+	}
 	session, err := s.Service.VerifyTicket(join.Ticket)
 	if err != nil {
 		core.AppLog.Printf("wrong permission %s\n", err.Error())
