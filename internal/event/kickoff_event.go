@@ -7,11 +7,11 @@ type KickoffEvent struct {
 }
 
 func (s *KickoffEvent) ClassId() int {
-	return JOIN_CID
+	return KICKOFF_CID
 }
 
 func (s *KickoffEvent) ETag() string {
-	return JOIN_ETAG
+	return KICKOFF_ETAG
 }
 
 func (s *KickoffEvent) RecipientId() int64 {
