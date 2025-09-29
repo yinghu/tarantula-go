@@ -201,16 +201,13 @@ func (s *SocketEndpoint) outbound() {
 }
 
 func (s *SocketEndpoint) dispatch(e Event) {
-	core.AppLog.Printf("dispatching %v\n", e)
 	if e.RecipientId() > 0 {
 		soc, exists := s.outboundIndex[e.RecipientId()]
-		core.AppLog.Printf("dispatching %v %v\n", e, exists)
 		if exists {
 			soc.Pending <- e
 		}
 		return
 	}
-	core.AppLog.Printf("all dispatching %v\n", e)
 	for _, soc := range s.outboundIndex {
 		soc.Pending <- e
 	}

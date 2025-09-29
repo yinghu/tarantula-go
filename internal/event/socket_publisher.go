@@ -49,8 +49,7 @@ func (s *SocketPublisher) Subscribe(cr EventCreator, ec EventListener) {
 			ec.OnError(nil, err)
 			break
 		}
-		ec.OnEvent(e)
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(10 * time.Millisecond)
 	}
 }
 
