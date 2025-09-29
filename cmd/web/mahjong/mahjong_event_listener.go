@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
