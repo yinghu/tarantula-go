@@ -15,6 +15,11 @@ func (s *MahjongEventListener) OnError(e event.Event, err error) {
 
 func (s *MahjongEventListener) OnEvent(e event.Event) {
 	core.AppLog.Printf("On event %v\n", e)
-	s.Pusher().Push(e)
+	ex, y := e.(*MahjongEvent)
+	if !y {
+		return
+	}
+	ex.Cmd = "kong"
+	s.Pusher().Push(ex)
 
 }
