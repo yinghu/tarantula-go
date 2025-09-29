@@ -78,7 +78,7 @@ func (s *JoinEvent) Inbound(buff core.DataBuffer) error {
 		s.Callback.OnError(s, err)
 		return err
 	}
-	s.Callback.OnEvent(s)
+	//s.Callback.OnEvent(s)
 	return nil
 }
 

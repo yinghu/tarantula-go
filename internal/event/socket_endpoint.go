@@ -114,6 +114,7 @@ func (s *SocketEndpoint) join(client net.Conn) {
 	join.Client = client
 	join.Pending = &socket
 	join.SystemId = session.SystemId
+	s.Service.OnEvent(join)
 	s.outboundEQ <- join
 }
 
