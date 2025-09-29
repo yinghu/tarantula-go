@@ -6,7 +6,8 @@ import (
 )
 
 type MahjongEvent struct {
-	Cmd string
+	Cmd      string
+	SystemId int64
 	event.EventObj
 }
 
@@ -34,6 +35,11 @@ func (s *MahjongEvent) ReadKey(buff core.DataBuffer) error {
 }
 
 func (s *MahjongEvent) Read(buff core.DataBuffer) error {
+	sysId, err := buff.ReadInt64()
+	if err != nil {
+		return err
+	}
+	s.SystemId = sysId
 	cmd, err := buff.ReadString()
 	if err != nil {
 		return err
@@ -43,6 +49,9 @@ func (s *MahjongEvent) Read(buff core.DataBuffer) error {
 }
 
 func (s *MahjongEvent) Write(buff core.DataBuffer) error {
+	if err := buff.WriteInt64(s.SystemId); err != nil {
+		return err
+	}
 	if err := buff.WriteString(s.Cmd); err != nil {
 		return err
 	}
@@ -76,4 +85,8 @@ func (s *MahjongEvent) Inbound(buff core.DataBuffer) error {
 	}
 	s.Callback.OnEvent(s)
 	return nil
+}
+
+func (s *MahjongEvent) RecipientId() int64 {
+	return s.SystemId
 }

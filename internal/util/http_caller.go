@@ -10,9 +10,10 @@ import (
 type Callback func(resp *http.Response) error
 
 type HttpCaller struct {
-	Host   string
-	Token  string
-	Ticket string
+	Host     string
+	SystemId int64
+	Token    string
+	Ticket   string
 }
 
 func (h *HttpCaller) PostJson(path string, payload any, cb Callback) error {

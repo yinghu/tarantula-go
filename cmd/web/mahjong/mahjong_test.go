@@ -42,6 +42,7 @@ func TestClient(t *testing.T) {
 		}
 		hc.Token = session.Token
 		hc.Ticket = session.Ticket
+		hc.SystemId = session.SystemId
 		return nil
 	})
 	if err != nil {
@@ -64,8 +65,8 @@ func TestClient(t *testing.T) {
 		sb.Close()
 		return
 	}
-	go sb.Subscribe(&SampleCreator{}, &MahjongEventListener{})
-	for range 3 {
+	go sb.Subscribe(&SampleCreator{}, &SampleCreator{})
+	for range 10 {
 		me := MahjongEvent{Cmd: "drop"}
 		me.OnTopic("mahjong")
 		me.OnListener(&SampleCreator{})
