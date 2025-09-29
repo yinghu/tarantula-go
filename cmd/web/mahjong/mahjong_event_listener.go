@@ -1,7 +1,6 @@
 package main
 
 import (
-
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
@@ -16,5 +15,6 @@ func (s *MahjongEventListener) OnError(e event.Event, err error) {
 
 func (s *MahjongEventListener) OnEvent(e event.Event) {
 	core.AppLog.Printf("On event %v\n", e)
+	s.Pusher().Push(e)
 
 }
