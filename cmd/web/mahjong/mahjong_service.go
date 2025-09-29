@@ -36,9 +36,9 @@ func (s *MahjongService) Create(classId int, topic string) (event.Event, error) 
 		e.OnListener(s)
 		return e, nil
 	}
-	core.AppLog.Printf("Create event %d %s\n",classId,topic)
+	core.AppLog.Printf("Create event %d %s\n", classId, topic)
 	me := MahjongEvent{}
-	me.OnListener(&MahjongEventListener{})
+	me.OnListener(&MahjongEventListener{MahjongService: s})
 	return &me, nil
 }
 func (s *MahjongService) VerifyTicket(ticket string) (core.OnSession, error) {
