@@ -20,9 +20,9 @@ type SocketEndpoint struct {
 
 	OutboundEnabled bool
 
-	outboundCQ       chan net.Conn
-	outboundEQ       chan Event
-	outboundIndex    map[int64]*OutboundSocket
+	outboundCQ    chan net.Conn
+	outboundEQ    chan Event
+	outboundIndex map[int64]*OutboundSocket
 }
 
 func (s *SocketEndpoint) Inbound(client net.Conn, systemId int64) {
@@ -84,30 +84,30 @@ func (s *SocketEndpoint) join(client net.Conn) {
 		client.Close()
 		return
 	}
-	if cid != int32(JOIN_CID) {
+	e, err := s.Service.Create(int(cid), "join")
+	if err != nil {
 		core.AppLog.Printf("wrong join cid %d\n", cid)
 		s.Service.OnError(nil, fmt.Errorf("wrong join cid %d", cid))
 		client.Close()
 		return
 	}
-	e := JoinEvent{}
-	e.OnListener(s.Service)
 	err = e.Inbound(&socket)
 	if err != nil {
-		s.Service.OnError(&e, err)
+		s.Service.OnError(e, err)
 		client.Close()
 		return
 	}
-	session, err := s.Service.VerifyTicket(e.Ticket)
+	join,_ := e.(*JoinEvent)
+	session, err := s.Service.VerifyTicket(join.Ticket)
 	if err != nil {
 		core.AppLog.Printf("wrong permission %s\n", err.Error())
 		client.Close()
 		return
 	}
-	e.Client = client
-	e.Pending = &socket
-	e.SystemId = session.SystemId
-	s.outboundEQ <- &e
+	join.Client = client
+	join.Pending = &socket
+	join.SystemId = session.SystemId
+	s.outboundEQ <- join
 }
 
 func (s *SocketEndpoint) Open() error {

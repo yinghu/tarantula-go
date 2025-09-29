@@ -33,7 +33,7 @@ func (s *MahjongService) Create(classId int, topic string) (event.Event, error) 
 	e := event.CreateEvent(classId)
 	if e != nil {
 		e.OnTopic(topic)
-		//e.OnListener()
+		e.OnListener(s)
 		return e, nil
 	}
 	me := MahjongEvent{}

@@ -11,7 +11,7 @@ type MahjongEvent struct {
 }
 
 func (s *MahjongEvent) ClassId() int {
-	return 1
+	return 100
 }
 
 func (s *MahjongEvent) ETag() string {
