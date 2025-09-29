@@ -30,15 +30,8 @@ func (s *MahjongService) Start(f conf.Env, c core.Cluster, p event.Pusher) error
 }
 
 func (s *MahjongService) Create(classId int, topic string) (event.Event, error) {
-	me := MahjongEvent{}                   //event.CreateEvent(classId)
-	me.OnListener(&MahjongEventListener{}) //inbound event callback
-	me.OnTopic(topic)
-	//if me == nil {
-	//return nil, fmt.Errorf("event ( %d ) not supported", classId)
-	//}
-	//me.Cmd = "pong"
-	mx := MahjongEvent{Cmd: "PONG"}
-	s.Pusher().Push(&mx)
+	me := MahjongEvent{}                   
+	me.OnListener(&MahjongEventListener{})
 	return &me, nil
 }
 func (s *MahjongService) VerifyTicket(ticket string) (core.OnSession, error) {
@@ -52,14 +45,6 @@ func (s *MahjongService) VerifyTicket(ticket string) (core.OnSession, error) {
 	return session, nil
 }
 
-//func (s *MahjongService) VerifyTicket(ticket string) (core.OnSession, error) {
-//session, err := s.Authenticator().ValidateToken(ticket)
-//if err != nil {
-//return session, err
-//}
-//return session, nil
-//}
-
 func (s *MahjongService) OnError(e event.Event, err error) {
 	core.AppLog.Printf("On event error %s\n", err.Error())
 }
@@ -71,12 +56,4 @@ func (s *MahjongService) OnEvent(e event.Event) {
 	default:
 
 	}
-	//se, isSe := e.(*event.SubscriptionEvent)
-	//if isSe {
-	//for i := range s.topicQ {
-	//s.topicQ[i] <- *se
-	//}
-	//return
-	//}
-	//s.inboundQ <- e
 }

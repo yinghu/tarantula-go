@@ -14,7 +14,6 @@ type EventListener interface {
 }
 
 type EventService interface {
-	
 	EventCreator
 	VerifyTicket(ticket string) (core.OnSession, error)
 	EventListener
@@ -33,9 +32,10 @@ type Event interface {
 	Topic() string
 	OId() int64
 	OnOId(id int64)
+	RecipientId() int64
 }
 
-type EventCreator interface{
+type EventCreator interface {
 	Create(classId int, topic string) (Event, error)
 }
 
@@ -60,10 +60,6 @@ type Pusher interface {
 	Push(e Event)
 }
 
-type EndpointListener interface {
-	Connected(buff core.DataBuffer)
-	Disconnected(buff core.DataBuffer)
-}
 
 type EventObj struct {
 	Callback EventListener `json:"-"`
@@ -105,4 +101,8 @@ func (s *EventObj) OnOId(oid int64) {
 
 func (s *EventObj) OId() int64 {
 	return s.oid
+}
+
+func (s *EventObj) RecipientId() int64 {
+	return 0
 }

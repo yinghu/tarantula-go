@@ -23,7 +23,6 @@ type SocketEndpoint struct {
 	outboundCQ       chan net.Conn
 	outboundEQ       chan Event
 	outboundIndex    map[int64]*OutboundSocket
-	outboundListener EndpointListener
 }
 
 func (s *SocketEndpoint) Inbound(client net.Conn, systemId int64) {
@@ -156,9 +155,7 @@ func (s *SocketEndpoint) Close() error {
 func (s *SocketEndpoint) Push(e Event) {
 	s.outboundEQ <- e
 }
-func (s *SocketEndpoint) Register(li EndpointListener) {
-	s.outboundListener = li
-}
+
 func (s *SocketEndpoint) outbound() {
 	running := true
 	for running {
@@ -194,7 +191,13 @@ func (s *SocketEndpoint) outbound() {
 }
 
 func (s *SocketEndpoint) dispatch(e Event) {
-	core.AppLog.Printf("Dispatch event %v\n", e)
+	if e.RecipientId() > 0 {
+		soc, exists := s.outboundIndex[e.RecipientId()]
+		if exists {
+			soc.Pending <- e
+		}
+		return
+	}
 	for _, soc := range s.outboundIndex {
 		soc.Pending <- e
 	}
