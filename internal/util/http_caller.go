@@ -10,8 +10,9 @@ import (
 type Callback func(resp *http.Response) error
 
 type HttpCaller struct {
-	Host  string
-	Token string
+	Host   string
+	Token  string
+	Ticket string
 }
 
 func (h *HttpCaller) PostJson(path string, payload any, cb Callback) error {
@@ -29,7 +30,28 @@ func (h *HttpCaller) PostJson(path string, payload any, cb Callback) error {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	//req.Header.Set()
+	if h.Token != "" {
+		req.Header.Set("Authorization", "Bearer "+h.Token)
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return cb(resp)
+}
+func (h *HttpCaller) GetJson(path string, cb Callback) error {
+
+	tr := &http.Transport{
+		DisableKeepAlives:  true,
+		DisableCompression: true,
+	}
+	client := &http.Client{Transport: tr}
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s", h.Host, path), nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
 	if h.Token != "" {
 		req.Header.Set("Authorization", "Bearer "+h.Token)
 	}

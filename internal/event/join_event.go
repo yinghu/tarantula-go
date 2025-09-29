@@ -7,7 +7,7 @@ import (
 )
 
 type JoinEvent struct {
-	Token    string `json:"Token"`
+	Ticket    string `json:"Ticket"`
 	Client   net.Conn
 	Pending  core.DataBuffer
 	SystemId int64
@@ -38,16 +38,16 @@ func (s *JoinEvent) ReadKey(buff core.DataBuffer) error {
 }
 
 func (s *JoinEvent) Read(buff core.DataBuffer) error {
-	token, err := buff.ReadString()
+	ticket, err := buff.ReadString()
 	if err != nil {
 		return err
 	}
-	s.Token = token
+	s.Ticket = ticket
 	return nil
 }
 
 func (s *JoinEvent) Write(buff core.DataBuffer) error {
-	if err := buff.WriteString(s.Token); err != nil {
+	if err := buff.WriteString(s.Ticket); err != nil {
 		return err
 	}
 	return nil

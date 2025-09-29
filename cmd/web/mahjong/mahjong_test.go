@@ -31,22 +31,23 @@ func TestClient(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		hc.Token = session.Ticket
+		hc.Token = session.Token
+		hc.Ticket = session.Ticket
 		return nil
 	})
 	if err != nil {
 		t.Errorf("login error %s", err.Error())
 		return
 	}
-	fmt.Printf("token %s\n",hc.Token)
+	fmt.Printf("ticket %s\n", hc.Ticket)
 	sb := event.SocketPublisher{Remote: "tcp://192.168.1.11:5050"}
 	err = sb.Connect()
-	
+
 	if err != nil {
 		t.Errorf("conn error %s", err.Error())
 	}
 
-	e := event.JoinEvent{Token: hc.Token}
+	e := event.JoinEvent{Ticket: hc.Ticket}
 	e.OnListener(&MahjongEventListener{})
 	err = sb.Join(&e)
 	if err != nil {
@@ -58,7 +59,7 @@ func TestClient(t *testing.T) {
 	for range 3 {
 		me := MahjongEvent{Cmd: "drop"}
 		me.OnListener(&MahjongEventListener{})
-		sb.Publish(&me,hc.Token)
+		sb.Publish(&me, hc.Ticket)
 	}
 	time.Sleep(5 * time.Second)
 	sb.Close()

@@ -98,7 +98,7 @@ func (s *SocketEndpoint) Join(client net.Conn) {
 		client.Close()
 		return
 	}
-	session, err := s.Service.VerifyTicket(e.Token)
+	session, err := s.Service.VerifyTicket(e.Ticket)
 	if err != nil {
 		core.AppLog.Printf("wrong permission %s\n", err.Error())
 		client.Close()
