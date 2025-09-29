@@ -21,6 +21,6 @@ func (out *OutboundSocket) Subscribe() {
 		if err != nil {
 			break
 		}
-		time.Sleep(3 * time.Millisecond)
+		time.Sleep(10 * time.Millisecond)
 	}
 }

@@ -69,9 +69,11 @@ func TestClient(t *testing.T) {
 	for range 10 {
 		me := MahjongEvent{Cmd: "drop"}
 		me.OnTopic("mahjong")
+		me.SystemId = hc.SystemId
 		me.OnListener(&SampleCreator{})
 		sb.Publish(&me, hc.Ticket)
+		time.Sleep(100*time.Millisecond)
 	}
-	time.Sleep(5 * time.Second)
+	time.Sleep(10 * time.Second)
 	sb.Close()
 }

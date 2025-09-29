@@ -73,11 +73,11 @@ func (s *SocketEndpoint) Inbound(client net.Conn, systemId int64) {
 		if err != nil {
 			s.Service.OnError(e, err)
 		}
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(10 * time.Millisecond)
 	}
 }
 func (s *SocketEndpoint) join(client net.Conn) {
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 	socket := SocketBuffer{Socket: client, Buffer: make([]byte, TCP_READ_BUFFER_SIZE)}
 	cid, err := socket.ReadInt32()
 	if err != nil {
