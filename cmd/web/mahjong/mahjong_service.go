@@ -61,6 +61,9 @@ func (s *MahjongService) OnEvent(e event.Event) {
 		s.Pusher().Push(e)
 	case event.JOIN_CID:
 		core.AppLog.Printf("joined from %d\n", e.RecipientId())
+	case event.KICKOFF_CID:
+		core.AppLog.Printf("kickoff from %d\n", e.RecipientId())
+
 	default:
 
 	}

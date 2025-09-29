@@ -30,8 +30,9 @@ func (s *SocketEndpoint) Inbound(client net.Conn, systemId int64) {
 	defer func() {
 		core.AppLog.Printf("client socket is closed")
 		if s.OutboundEnabled {
-			ce := CloseEvent{}
-			ce.oid = systemId
+			ce := KickoffEvent{}
+			ce.SystemId = systemId
+			ce.Source = "disconnected"
 			s.outboundEQ <- &ce
 		}
 		client.Close()
@@ -172,15 +173,16 @@ func (s *SocketEndpoint) outbound() {
 			go s.join(c)
 		case e := <-s.outboundEQ:
 			if e.ClassId() == CLOSE_CID {
-				if e.OId() == 0 {
-					running = false
-					continue
-				}
-				oc, exists := s.outboundIndex[e.OId()]
+				running = false
+				continue
+			}
+			if e.ClassId() == KICKOFF_CID {
+				oc, exists := s.outboundIndex[e.RecipientId()]
 				if exists {
-					core.AppLog.Printf("remove connection %d\n", e.OId())
+					core.AppLog.Printf("remove connection from %d\n", e.RecipientId())
 					close(oc.Pending)
-					delete(s.outboundIndex, e.OId())
+					delete(s.outboundIndex, e.RecipientId())
+					s.Service.OnEvent(e)
 				}
 				continue
 			}
