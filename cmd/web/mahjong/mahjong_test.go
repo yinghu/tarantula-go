@@ -17,6 +17,12 @@ type SampleCreator struct {
 }
 
 func (s *SampleCreator) Create(cid int, topic string) (event.Event, error) {
+	e := event.CreateEvent(cid)
+	if e != nil {
+		e.OnTopic(topic)
+		e.OnListener(s)
+		return e, nil
+	}
 	me := MahjongEvent{}
 	me.Callback = s
 	return &me, nil
@@ -43,13 +49,14 @@ func TestClient(t *testing.T) {
 		hc.Token = session.Token
 		hc.Ticket = session.Ticket
 		hc.SystemId = session.SystemId
+		hc.Home = session.Home
 		return nil
 	})
 	if err != nil {
 		t.Errorf("login error %s", err.Error())
 		return
 	}
-	fmt.Printf("ticket %s\n", hc.Ticket)
+	fmt.Printf("home %s\n", hc.Home)
 	sb := event.SocketPublisher{Remote: "tcp://192.168.1.11:5050"}
 	err = sb.Connect()
 
@@ -72,8 +79,8 @@ func TestClient(t *testing.T) {
 		me.SystemId = hc.SystemId
 		me.OnListener(&SampleCreator{})
 		sb.Publish(&me, hc.Ticket)
-		time.Sleep(100*time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
-	time.Sleep(10 * time.Second)
+	time.Sleep(20 * time.Second)
 	sb.Close()
 }

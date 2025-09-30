@@ -13,6 +13,7 @@ import (
 type MahjongService struct {
 	bootstrap.AppManager
 	ClassicMahjong
+	
 }
 
 func (s *MahjongService) Config() string {
@@ -36,7 +37,6 @@ func (s *MahjongService) Create(classId int, topic string) (event.Event, error) 
 		e.OnListener(s)
 		return e, nil
 	}
-	core.AppLog.Printf("Create event %d %s\n", classId, topic)
 	me := MahjongEvent{}
 	me.OnListener(&MahjongEventListener{MahjongService: s})
 	return &me, nil

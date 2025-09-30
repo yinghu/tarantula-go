@@ -14,6 +14,7 @@ type HttpCaller struct {
 	SystemId int64
 	Token    string
 	Ticket   string
+	Home     string
 }
 
 func (h *HttpCaller) PostJson(path string, payload any, cb Callback) error {
