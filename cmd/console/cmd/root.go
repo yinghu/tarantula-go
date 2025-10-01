@@ -6,9 +6,9 @@ import (
 
 var (
 	rootCmd = &cobra.Command{
-		Use:   "cobra-cli",
-		Short: "A generator for Cobra based Applications",
-		Long:  "Cobra is a CLI library for Go that empowers applications.",
+		Use:   "tarantula-console",
+		Short: "tarantula console",
+		Long:  "tarantula console",
 	}
 )
 
