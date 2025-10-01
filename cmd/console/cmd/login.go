@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -30,6 +31,7 @@ var loginCmd = &cobra.Command{
 		host, _ := cmd.Flags().GetString("host")
 		hc := util.HttpCaller{Host: host}
 		login := bootstrap.Login{Name: user, Hash: password}
+		start := time.Now()
 		err := hc.PostJson("presence/login", login, func(resp *http.Response) error {
 			session := core.OnSession{}
 			err := json.NewDecoder(resp.Body).Decode(&session)
@@ -45,10 +47,11 @@ var loginCmd = &cobra.Command{
 			hc.Home = session.Home
 			return nil
 		})
+		dur := time.Since(start)
 		if err != nil {
 			fmt.Printf("authencation failed %s\n", err.Error())
 			return
 		}
-		fmt.Printf("Authenticated %d\n", hc.SystemId)
+		fmt.Printf("Authenticated as system id %d timed (ms) :[%d]\n", hc.SystemId, dur.Milliseconds())
 	},
 }
