@@ -13,7 +13,6 @@ import (
 type MahjongService struct {
 	bootstrap.AppManager
 	ClassicMahjong
-	
 }
 
 func (s *MahjongService) Config() string {
@@ -64,7 +63,9 @@ func (s *MahjongService) OnEvent(e event.Event) {
 		core.AppLog.Printf("joined from %d\n", e.RecipientId())
 	case event.KICKOFF_CID:
 		core.AppLog.Printf("kickoff from %d\n", e.RecipientId())
-
+		id, _ := s.Sequence().Id()
+		e.OnOId(id)
+		s.Send(e)
 	default:
 
 	}

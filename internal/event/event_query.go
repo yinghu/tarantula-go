@@ -12,6 +12,7 @@ const (
 	TAG_LOGIN_QID      int32 = 1
 	TAG_TOURNAMENT_QID int32 = 2
 	TAG_INVENTORY_QID  int32 = 3
+	TAG_KICKOFF_QID    int32 = 4
 
 	//query criteria
 	Q_TOURNAMENT_QID int32 = 100
@@ -32,6 +33,9 @@ func CreateQuery(qid int32) Query {
 		return &q
 	case TAG_INVENTORY_QID:
 		q := QWithTag{Id: qid, Tag: INVENTORY_ETAG, Cc: make(chan core.Chunk, 3)}
+		return &q
+	case TAG_KICKOFF_QID:
+		q := QWithTag{Id: qid, Tag: KICKOFF_ETAG, Cc: make(chan core.Chunk, 3)}
 		return &q
 
 	case Q_TOURNAMENT_QID:
@@ -64,12 +68,12 @@ type Query interface {
 }
 
 type QWithTag struct {
-	Id        int32      `json:"-"`
-	Tag       string     `json:"Tag"`
-	Topic     string     `json:"Topic"`
-	Limit     int32      `json:"Limit"`
-	StartTime time.Time  `json:"StartTime"`
-	EndTime   time.Time  `json:"EndTime"`
+	Id        int32           `json:"-"`
+	Tag       string          `json:"Tag"`
+	Topic     string          `json:"Topic"`
+	Limit     int32           `json:"Limit"`
+	StartTime time.Time       `json:"StartTime"`
+	EndTime   time.Time       `json:"EndTime"`
 	Cc        chan core.Chunk `json:"-"`
 }
 

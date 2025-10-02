@@ -57,7 +57,7 @@ func TestClient(t *testing.T) {
 		return
 	}
 	fmt.Printf("home %s\n", hc.Home)
-	sb := event.SocketPublisher{Remote: "tcp://192.168.1.11:5050"}
+	sb := event.SocketPublisher{Remote: fmt.Sprintf("tcp://%s:5050",hc.Home)}
 	err = sb.Connect()
 
 	if err != nil {
@@ -80,6 +80,7 @@ func TestClient(t *testing.T) {
 		me.OnListener(&SampleCreator{})
 		sb.Publish(&me, hc.Ticket)
 		time.Sleep(100 * time.Millisecond)
+		
 	}
 	time.Sleep(20 * time.Second)
 	sb.Close()

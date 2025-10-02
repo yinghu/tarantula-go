@@ -52,6 +52,6 @@ var loginCmd = &cobra.Command{
 			fmt.Printf("authencation failed %s\n", err.Error())
 			return
 		}
-		fmt.Printf("Authenticated as system id %d timed (ms) :[%d]\n", hc.SystemId, dur.Milliseconds())
+		fmt.Printf("Authenticated as system id %d : %s timed (ms) :[%d]\n", hc.SystemId,hc.Home, dur.Milliseconds())
 	},
 }

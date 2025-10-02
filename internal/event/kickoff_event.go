@@ -24,6 +24,12 @@ func (s *KickoffEvent) WriteKey(buff core.DataBuffer) error {
 	if err := buff.WriteString(s.ETag()); err != nil {
 		return err
 	}
+	if err := buff.WriteInt64(s.SystemId); err != nil {
+		return err
+	}
+	if err := buff.WriteInt64(s.OId()); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -32,6 +38,16 @@ func (s *KickoffEvent) ReadKey(buff core.DataBuffer) error {
 	if err != nil {
 		return err
 	}
+	sysId, err := buff.ReadInt64()
+	if err != nil {
+		return err
+	}
+	s.SystemId = sysId
+	id, err := buff.ReadInt64()
+	if err != nil {
+		return err
+	}
+	s.OnOId(id)
 	return nil
 }
 
@@ -41,19 +57,11 @@ func (s *KickoffEvent) Read(buff core.DataBuffer) error {
 		return err
 	}
 	s.Source = source
-	sysId, err := buff.ReadInt64()
-	if err != nil {
-		return err
-	}
-	s.SystemId = sysId
 	return nil
 }
 
 func (s *KickoffEvent) Write(buff core.DataBuffer) error {
 	if err := buff.WriteString(s.Source); err != nil {
-		return err
-	}
-	if err := buff.WriteInt64(s.SystemId); err != nil {
 		return err
 	}
 	return nil
