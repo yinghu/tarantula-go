@@ -3,8 +3,8 @@ package event
 import "gameclustering.com/internal/core"
 
 type KickoffEvent struct {
-	Source   string
-	SystemId int64
+	Source   string `json:"source"`
+	SystemId int64  `json:"systemId,string"`
 	EventObj
 }
 
