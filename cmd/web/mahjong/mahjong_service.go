@@ -65,6 +65,7 @@ func (s *MahjongService) OnEvent(e event.Event) {
 		core.AppLog.Printf("kickoff from %d\n", e.RecipientId())
 		id, _ := s.Sequence().Id()
 		e.OnOId(id)
+		e.OnTopic("mahjong")
 		err := s.Send(e)
 		if err != nil {
 			core.AppLog.Printf("failed to send event %s\n", err.Error())
