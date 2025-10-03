@@ -64,7 +64,7 @@ type EventObj struct {
 	Callback EventListener `json:"-"`
 	core.PersistentableObj
 	ETopic string `json:"ETopic"`
-	EOid   int64  `json:"EOid"`
+	EOid   int64  `json:"EOid,string"`
 }
 
 func (s *EventObj) OnTopic(t string) {
