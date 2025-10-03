@@ -1,42 +1,39 @@
-module gameclustering.com/cmd
+module gameclustering.com/player
 
 go 1.24.2
 
-replace gameclustering.com/player => ./player
+replace gameclustering.com/internal/bootstrap => ../../../../internal/bootstrap
 
-replace gameclustering.com/internal/bootstrap => ../../../internal/bootstrap
+replace gameclustering.com/internal/persistence => ../../../../internal/persistence
 
-replace gameclustering.com/internal/persistence => ../../../internal/persistence
+replace gameclustering.com/internal/util => ../../../../internal/util
 
-replace gameclustering.com/internal/util => ../../../internal/util
+replace gameclustering.com/internal/cluster => ../../../../internal/cluster
 
-replace gameclustering.com/internal/cluster => ../../../internal/cluster
+replace gameclustering.com/internal/conf => ../../../../internal/conf
 
-replace gameclustering.com/internal/conf => ../../../internal/conf
+replace gameclustering.com/internal/event => ../../../../internal/event
 
-replace gameclustering.com/internal/event => ../../../internal/event
+replace gameclustering.com/internal/core => ../../../../internal/core
 
-replace gameclustering.com/internal/core => ../../../internal/core
+replace gameclustering.com/internal/metrics => ../../../../internal/metrics
 
-replace gameclustering.com/internal/metrics => ../../../internal/metrics
-
-replace gameclustering.com/internal/item => ../../../internal/item
+replace gameclustering.com/internal/item => ../../../../internal/item
 
 require (
-	gameclustering.com/player v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/bootstrap v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
 	github.com/spf13/cobra v1.10.1
 )
 
 require (
-	gameclustering.com/internal/bootstrap v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/cluster v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/conf v0.0.0-00010101000000-000000000000 // indirect
-	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000 // indirect
-	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
@@ -55,7 +52,7 @@ require (
 	github.com/jackc/pgx/v5 v5.7.4 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
-	github.com/spf13/pflag v1.0.10 // indirect
+	github.com/spf13/pflag v1.0.9 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.21 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.21 // indirect
 	go.etcd.io/etcd/client/v3 v3.5.21 // indirect

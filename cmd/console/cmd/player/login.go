@@ -1,4 +1,4 @@
-package cmd
+package player
 
 import (
 	"encoding/json"
@@ -13,7 +13,6 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(loginCmd)
 	loginCmd.Flags().StringP("user", "U", "", "user (required)")
 	loginCmd.MarkFlagRequired("user")
 	loginCmd.Flags().StringP("password", "P", "", "password (required)")
@@ -52,6 +51,6 @@ var loginCmd = &cobra.Command{
 			fmt.Printf("authencation failed %s\n", err.Error())
 			return
 		}
-		fmt.Printf("Authenticated as system id %d : %s timed (ms) :[%d]\n", hc.SystemId,hc.Home, dur.Milliseconds())
+		fmt.Printf("Authenticated as system id %d : %s timed (ms) :[%d]\n", hc.SystemId, hc.Home, dur.Milliseconds())
 	},
 }

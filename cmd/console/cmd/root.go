@@ -1,14 +1,15 @@
 package cmd
 
 import (
+	"gameclustering.com/player"
 	"github.com/spf13/cobra"
 )
 
 var (
 	rootCmd = &cobra.Command{
-		Use:   "tarantula-console",
-		Short: "tarantula console",
-		Long:  "tarantula console",
+		Use:   "tarantula",
+		Short: "tarantula",
+		Long:  "tarantula",
 	}
 )
 
@@ -17,7 +18,5 @@ func Execute() error {
 }
 
 func init() {
-	cobra.OnInitialize(func() {
-			
-	})
+	rootCmd.AddCommand(player.PlayerCmd)
 }
