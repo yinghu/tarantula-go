@@ -17,5 +17,7 @@ func Execute() error {
 }
 
 func init() {
-
+	cobra.OnInitialize(func() {
+			
+	})
 }
