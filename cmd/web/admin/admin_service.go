@@ -49,7 +49,8 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 
 	http.Handle("/admin/cs/message", bootstrap.Logging(&CSMessager{AdminService: s}))
 	http.Handle("/admin/cs/query/{id}", bootstrap.Logging(&CSQueryer{AdminService: s}))
-	http.Handle("/admin/cs/grant", bootstrap.Logging(&CSGranter{AdminService: s}))
+	http.Handle("/admin/cs/inventory/grant", bootstrap.Logging(&CSGranter{AdminService: s}))
+	http.Handle("/admin/cs/inventory/load", bootstrap.Logging(&CSInventoryLoader{AdminService: s}))
 
 	http.Handle("/admin/enum/load/{name}", bootstrap.Logging(&EnumLoader{AdminService: s}))
 	http.Handle("/admin/file/save", bootstrap.Logging(&FileSaver{AdminService: s}))
