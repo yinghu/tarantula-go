@@ -147,7 +147,7 @@ func (s *SocketEndpoint) Open() error {
 	}
 	if s.OutboundEnabled {
 		ce := CloseEvent{}
-		ce.oid = 0
+		ce.EOid = 0
 		s.outboundEQ <- &ce
 	}
 	core.AppLog.Println("Server closed")

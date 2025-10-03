@@ -60,20 +60,19 @@ type Pusher interface {
 	Push(e Event)
 }
 
-
 type EventObj struct {
 	Callback EventListener `json:"-"`
 	core.PersistentableObj
-	topic string `json:"-"`
-	oid   int64  `json:"-"`
+	ETopic string `json:"ETopic"`
+	EOid   int64  `json:"EOid"`
 }
 
 func (s *EventObj) OnTopic(t string) {
-	s.topic = t
+	s.ETopic = t
 }
 
 func (s *EventObj) Topic() string {
-	return s.topic
+	return s.ETopic
 }
 
 func (s *EventObj) Distributed() bool {
@@ -96,11 +95,11 @@ func (s *EventObj) OnIndex(idx IndexListener) {
 
 }
 func (s *EventObj) OnOId(oid int64) {
-	s.oid = oid
+	s.EOid = oid
 }
 
 func (s *EventObj) OId() int64 {
-	return s.oid
+	return s.EOid
 }
 
 func (s *EventObj) RecipientId() int64 {
