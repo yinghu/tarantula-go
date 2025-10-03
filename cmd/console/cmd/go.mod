@@ -2,7 +2,9 @@ module gameclustering.com/cmd
 
 go 1.24.2
 
-replace gameclustering.com/player => ./player
+replace gameclustering.com/cmd/player => ./player
+
+replace gameclustering.com/cmd/admin => ./admin
 
 replace gameclustering.com/internal/bootstrap => ../../../internal/bootstrap
 
@@ -23,7 +25,8 @@ replace gameclustering.com/internal/metrics => ../../../internal/metrics
 replace gameclustering.com/internal/item => ../../../internal/item
 
 require (
-	gameclustering.com/player v0.0.0-00010101000000-000000000000
+	gameclustering.com/cmd/admin v0.0.0-00010101000000-000000000000
+	gameclustering.com/cmd/player v0.0.0-00010101000000-000000000000
 	github.com/spf13/cobra v1.10.1
 )
 

@@ -1,4 +1,4 @@
-module gameclustering.com/player
+module gameclustering.com/cmd/player
 
 go 1.24.2
 
