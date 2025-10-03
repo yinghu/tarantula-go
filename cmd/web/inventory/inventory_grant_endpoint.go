@@ -48,16 +48,19 @@ func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *
 		}
 	})
 	for i := range ivs {
-		err = s.updateInventory(ivs[i])
+		id, err := s.updateInventory(ivs[i])
 		if err != nil {
 			w.Write(util.ToJson(core.OnSession{Successful: true, Message: err.Error()}))
 			return
 		}
+		e := event.InventoryEvent{SystemId: ivn.SystemId, InventoryId: id, ItemId: ivn.ItemId, Source: ivn.Source, Description: ivn.Description, GrantTime: time.Now()}
+		go s.sendEvent(&e)
 	}
-	e := event.InventoryEvent{SystemId: ivn.SystemId, InventoryId: 10, ItemId: ivn.ItemId, Source: ivn.Source, Description: ivn.Description, GrantTime: time.Now()}
+	w.Write(util.ToJson(core.OnSession{Successful: true, Message: "granted"}))
+}
+func (s *InventoryGranter) sendEvent(e event.Event) {
 	oid, _ := s.Sequence().Id()
 	e.OnOId(oid)
 	e.OnTopic("inventory")
-	s.Send(&e)
-	w.Write(util.ToJson(core.OnSession{Successful: true, Message: "granted"}))
+	s.Send(e)
 }

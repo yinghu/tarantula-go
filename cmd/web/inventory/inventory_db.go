@@ -74,7 +74,7 @@ func (s *InventoryService) loadInventory(iv item.OnInventory) ([]item.Inventory,
 	return ilist, nil
 }
 
-func (s *InventoryService) updateInventory(iv item.Inventory) error {
+func (s *InventoryService) updateInventory(iv item.Inventory) (int32,error) {
 	var id int32
 	var amount int32
 	err := s.Sql.Txn(func(tx pgx.Tx) error {
@@ -95,8 +95,8 @@ func (s *InventoryService) updateInventory(iv item.Inventory) error {
 		return nil
 	})
 	if err != nil {
-		return err
+		return id,err
 	}
 	core.AppLog.Printf("Id %d\n", id)
-	return nil
+	return id,nil
 }
