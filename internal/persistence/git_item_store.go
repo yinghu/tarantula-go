@@ -13,6 +13,11 @@ import (
 	"gameclustering.com/internal/util"
 )
 
+type InventoryResp struct {
+	core.OnSession
+	Stock []item.Inventory
+}
+
 type GitItemStore struct {
 	RepositoryDir    string
 	EnumDir          string
@@ -230,5 +235,14 @@ func (db *GitItemStore) Validate(c item.Configuration, validator item.Validator)
 
 func (db *GitItemStore) Stock(inv item.OnInventory) ([]item.Inventory, error) {
 	stock := make([]item.Inventory, 0)
+	for i := range 5 {
+		ret := db.PostJsonSync("http://inventory:8080/inventory/load", inv)
+		if ret.ErrorCode == 0 {
+			//return nil
+		}
+		time.Sleep(1000 * time.Millisecond)
+		core.AppLog.Printf("Retries: %d %v\n", i, ret)
+		//er = fmt.Errorf("failed on retries %d : %s", i, ret.Message)
+	}
 	return stock, nil
 }

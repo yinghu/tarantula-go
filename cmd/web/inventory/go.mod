@@ -22,17 +22,18 @@ replace gameclustering.com/internal/item => ../../../internal/item
 
 require (
 	gameclustering.com/internal/bootstrap v0.0.0-00010101000000-000000000000
-	gameclustering.com/internal/cluster v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/conf v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
+	github.com/jackc/pgx/v5 v5.7.4
 )
 
 require (
-	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000 // indirect
-	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000 // indirect
-	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000 // indirect
+	gameclustering.com/internal/cluster v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
-	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000 // indirect
-	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
@@ -47,7 +48,6 @@ require (
 	github.com/google/flatbuffers v25.2.10+incompatible // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgx/v5 v5.7.4 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.21 // indirect

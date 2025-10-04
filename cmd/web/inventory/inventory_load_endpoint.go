@@ -7,6 +7,7 @@ import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
+	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
 )
 
@@ -31,5 +32,7 @@ func (s *InventoryLoader) Request(rs core.OnSession, w http.ResponseWriter, r *h
 		w.Write(util.ToJson(core.OnSession{Successful: true, Message: err.Error()}))
 		return
 	}
-	w.Write(util.ToJson(list))
+	stock := persistence.InventoryResp{Stock: list}
+	stock.ErrorCode = 0
+	w.Write(util.ToJson(stock))
 }
