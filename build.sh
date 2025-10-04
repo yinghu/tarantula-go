@@ -46,27 +46,30 @@ cp ~/.gitconfig .
 apps=("admin" "presence" "inventory" "asset" "tournament" "postoffice" "mahjong")
 for app in "${apps[@]}"; do
   echo "Current build target : $app"
+  sudo docker build -f ./docker_application_build --tag tarantula.$app:$version --build-arg app=$app --build-arg h=$host --build-arg n=$app$id --build-arg s=$seq --build-arg g=$grp .
+  Check
+  ((seq++))
 done
-sudo docker build -f ./docker_application_build --tag tarantula.admin:$version --build-arg app=admin --build-arg h=$host --build-arg n=admin$id --build-arg s=$seq --build-arg g=$grp .
-Check
-((seq++))
-sudo docker build -f ./docker_application_build --tag tarantula.presence:$version --build-arg app=presence --build-arg h=$host --build-arg n=presence$id --build-arg s=$seq --build-arg g=$grp . 
-Check
-((seq++))
-sudo docker build -f ./docker_application_build --tag tarantula.inventory:$version --build-arg app=inventory --build-arg h=$host --build-arg n=inventory$id --build-arg s=$seq --build-arg g=$grp .
-Check
-((seq++))
-sudo docker build -f ./docker_application_build --tag tarantula.asset:$version --build-arg app=asset --build-arg h=$host --build-arg n=asset$id --build-arg s=$id --build-arg g=$grp . 
-Check
-((seq++))
-sudo docker build -f ./docker_application_build --tag tarantula.tournament:$version --build-arg app=tournament --build-arg h=$host --build-arg n=tournament$id --build-arg s=$seq --build-arg g=$grp .   
-Check
-((seq++))
-sudo docker build -f ./docker_application_build --tag tarantula.postoffice:$version --build-arg app=postoffice --build-arg h=$host --build-arg n=postoffice$id --build-arg s=$seq --build-arg g=$grp .  
-Check
-((seq++))
-sudo docker build -f ./docker_application_build --tag tarantula.mahjong:$version --build-arg app=mahjong --build-arg h=$host --build-arg n=mahjong$id --build-arg s=$seq --build-arg g=$grp .  
-Check
+#sudo docker build -f ./docker_application_build --tag tarantula.admin:$version --build-arg app=admin --build-arg h=$host --build-arg n=admin$id --build-arg s=$seq --build-arg g=$grp .
+#Check
+#((seq++))
+#sudo docker build -f ./docker_application_build --tag tarantula.presence:$version --build-arg app=presence --build-arg h=$host --build-arg n=presence$id --build-arg s=$seq --build-arg g=$grp . 
+#Check
+#((seq++))
+#sudo docker build -f ./docker_application_build --tag tarantula.inventory:$version --build-arg app=inventory --build-arg h=$host --build-arg n=inventory$id --build-arg s=$seq --build-arg g=$grp .
+#Check
+#((seq++))
+#sudo docker build -f ./docker_application_build --tag tarantula.asset:$version --build-arg app=asset --build-arg h=$host --build-arg n=asset$id --build-arg s=$id --build-arg g=$grp . 
+#Check
+#((seq++))
+#sudo docker build -f ./docker_application_build --tag tarantula.tournament:$version --build-arg app=tournament --build-arg h=$host --build-arg n=tournament$id --build-arg s=$seq --build-arg g=$grp .   
+#Check
+#((seq++))
+#sudo docker build -f ./docker_application_build --tag tarantula.postoffice:$version --build-arg app=postoffice --build-arg h=$host --build-arg n=postoffice$id --build-arg s=$seq --build-arg g=$grp .  
+#Check
+#((seq++))
+#sudo docker build -f ./docker_application_build --tag tarantula.mahjong:$version --build-arg app=mahjong --build-arg h=$host --build-arg n=mahjong$id --build-arg s=$seq --build-arg g=$grp .  
+#Check
 sudo docker build -f ./docker_nginx_build --tag tarantula.nginx:$version .
 Check
 sudo docker builder prune -af
