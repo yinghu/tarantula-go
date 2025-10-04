@@ -242,11 +242,11 @@ func (db *GitItemStore) Stock(inv item.OnInventory) ([]item.Inventory, error) {
 	db.PostJsonAsync("http://inventory:8080/inventory/load", inv, ch)
 	for c := range ch {
 		if !c.Remaining {
+			data = append(data, c.Data...)
 			break
 		}
 		data = append(data, c.Data...)
 	}
-
 	err := json.Unmarshal(data, &stock)
 	if err != nil {
 		core.AppLog.Printf("error on stock %s\n", err.Error())
