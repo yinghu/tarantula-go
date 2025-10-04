@@ -234,15 +234,22 @@ func (db *GitItemStore) Validate(c item.Configuration, validator item.Validator)
 }
 
 func (db *GitItemStore) Stock(inv item.OnInventory) ([]item.Inventory, error) {
-	stock := make([]item.Inventory, 0)
-	for i := range 5 {
-		ret := db.PostJsonSync("http://inventory:8080/inventory/load", inv)
-		if ret.ErrorCode == 0 {
-			//return nil
+	stock := InventoryResp{}
+
+	ch := make(chan core.Chunk, 3)
+	defer close(ch)
+	data := make([]byte, 0)
+	db.PostJsonAsync("http://inventory:8080/inventory/load", inv, ch)
+	for c := range ch {
+		if !c.Remaining {
+			break
 		}
-		time.Sleep(1000 * time.Millisecond)
-		core.AppLog.Printf("Retries: %d %v\n", i, ret)
-		//er = fmt.Errorf("failed on retries %d : %s", i, ret.Message)
+		data = append(data, c.Data...)
 	}
-	return stock, nil
+
+	err := json.Unmarshal(data, &stock)
+	if err != nil {
+		core.AppLog.Printf("error on stock %s\n", err.Error())
+	}
+	return stock.Stock, nil
 }
