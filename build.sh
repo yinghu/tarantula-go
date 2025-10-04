@@ -43,6 +43,10 @@ echo "Build params : ${version} ${host} ${id} ${seq} ${grp}"
 cp ~/.ssh/id_ed25519 .
 cp ~/.ssh/known_hosts .
 cp ~/.gitconfig .
+apps=("admin" "presence" "inventory" "asset" "tournament" "postoffice" "mahjong")
+for app in "${apps[@]}"; do
+  echo "Current build target : $app"
+done
 sudo docker build -f ./docker_application_build --tag tarantula.admin:$version --build-arg app=admin --build-arg h=$host --build-arg n=admin$id --build-arg s=$seq --build-arg g=$grp .
 Check
 ((seq++))
