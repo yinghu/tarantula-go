@@ -250,6 +250,7 @@ func (db *GitItemStore) Stock(inv item.OnInventory) ([]item.Inventory, error) {
 	err := json.Unmarshal(data, &stock)
 	if err != nil {
 		core.AppLog.Printf("error on stock %s\n", err.Error())
+		return stock.Stock, err
 	}
 	return stock.Stock, nil
 }
