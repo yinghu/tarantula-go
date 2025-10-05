@@ -7,8 +7,8 @@ import (
 var (
 	NodeCmd = &cobra.Command{
 		Use:   "node",
-		Short: "tarantula node",
-		Long:  "tarantula node",
+		Short: "tarantula admin node",
+		Long:  "tarantula admin node",
 	}
 )
 
@@ -19,4 +19,5 @@ func Execute() error {
 func init() {
 	NodeCmd.AddCommand(addCmd)
 	NodeCmd.AddCommand(removeCmd)
+	NodeCmd.AddCommand(viewCmd)
 }
