@@ -105,6 +105,7 @@ func (s *AppManager) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 func (s *AppManager) Shutdown() {
 	util.GitPush()
 	s.Sql.Close()
+	fmt.Printf("shut down callback %s\n", s.ctx)
 }
 
 func (s *AppManager) Create(classId int, topic string) (event.Event, error) {

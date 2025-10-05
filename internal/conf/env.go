@@ -67,9 +67,13 @@ func (f *Env) Load(fn string) error {
 	defer conf.Close()
 	data, _ := io.ReadAll(conf)
 	json.Unmarshal(data, f)
+	if f.Prefix == "" {
+		f.Prefix = "dev"
+	}
 	cx := core.EtcdAtomic{Endpoints: f.EtcdEndpoints}
-	cx.Execute(f.GroupName, func(ctx core.Ctx) error {
-		fmt.Printf("Loading config from etcd cluster : %s\n", f.GroupName)
+	lockPrefix := fmt.Sprintf("%s.config", f.Prefix)
+	cx.Execute(lockPrefix, func(ctx core.Ctx) error {
+		fmt.Printf("Loading config from etcd cluster : %s\n", lockPrefix)
 		return nil
 	})
 	if f.HttpBinding == "" {
@@ -113,9 +117,6 @@ func (f *Env) Load(fn string) error {
 	if eg {
 		fmt.Printf("Using node group prefix : %s\n", g)
 		f.Prefix = g
-	}
-	if f.Prefix == "" {
-		f.Prefix = "dev"
 	}
 	core.CreateAppLog(f.LocalDir)
 	wd, err := os.Getwd()
