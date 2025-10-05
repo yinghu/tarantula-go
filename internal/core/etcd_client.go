@@ -1,4 +1,4 @@
-package cluster
+package core
 
 import (
 	"context"
@@ -8,13 +8,13 @@ import (
 )
 
 type EtcdClient struct {
-	cli    *clientv3.Client
-	prefix string
+	Cli    *clientv3.Client
+	Prefix string
 }
 
 func (c *EtcdClient) Put(key string, value string) error {
 	ctx := context.Background()
-	_, err := c.cli.Put(ctx, c.prefix+"#"+key, value)
+	_, err := c.Cli.Put(ctx, c.Prefix+"#"+key, value)
 	if err != nil {
 		return err
 	}
@@ -22,7 +22,7 @@ func (c *EtcdClient) Put(key string, value string) error {
 }
 func (c *EtcdClient) Get(key string) (string, error) {
 	ctx := context.Background()
-	r, err := c.cli.Get(ctx, c.prefix+"#"+key)
+	r, err := c.Cli.Get(ctx, c.Prefix+"#"+key)
 	if err != nil {
 		return "", err
 	}
@@ -33,7 +33,7 @@ func (c *EtcdClient) Get(key string) (string, error) {
 }
 func (c *EtcdClient) Del(key string) error {
 	ctx := context.Background()
-	r, err := c.cli.Delete(ctx, c.prefix+"#"+key)
+	r, err := c.Cli.Delete(ctx, c.Prefix+"#"+key)
 	if err != nil {
 		return err
 	}

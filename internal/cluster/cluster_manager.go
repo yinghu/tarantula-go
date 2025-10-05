@@ -66,7 +66,7 @@ func (c *ClusterManager) Atomic(prefix string, t core.Exec) error {
 	ctx := context.Background()
 	mutex.Lock(ctx)
 	defer mutex.Unlock(ctx)
-	return t(&EtcdClient{cli: cli, prefix: prefix})
+	return t(&core.EtcdClient{Cli: cli, Prefix: prefix})
 }
 
 func (c *ClusterManager) Listener() core.ClusterListener {

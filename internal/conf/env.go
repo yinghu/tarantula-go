@@ -67,6 +67,11 @@ func (f *Env) Load(fn string) error {
 	defer conf.Close()
 	data, _ := io.ReadAll(conf)
 	json.Unmarshal(data, f)
+	cx := core.EtcdAtomic{Endpoints: f.EtcdEndpoints}
+	cx.Execute(f.GroupName, func(ctx core.Ctx) error {
+		fmt.Printf("Loading config from etcd cluster : %s\n", f.GroupName)
+		return nil
+	})
 	if f.HttpBinding == "" {
 		f.HttpBinding = ":8080"
 	}
