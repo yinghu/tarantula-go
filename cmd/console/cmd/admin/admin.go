@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"gameclustering.com/cmd/admin/node"
 	"github.com/spf13/cobra"
 )
 
@@ -18,4 +19,5 @@ func Execute() error {
 
 func init() {
 	AdminCmd.AddCommand(loginCmd)
+	AdminCmd.AddCommand(node.NodeCmd)
 }
