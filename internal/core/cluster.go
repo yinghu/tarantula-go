@@ -14,6 +14,9 @@ type Ctx interface {
 	Put(key string, value string) error
 	Get(key string) (string, error)
 	Del(key string) error
+
+	AppIndex(env string) AppIndex
+	SaveAppIndex(apps AppIndex) error
 }
 
 type Exec func(ctx Ctx) error
