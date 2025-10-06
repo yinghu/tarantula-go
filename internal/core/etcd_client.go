@@ -45,8 +45,22 @@ func (c *EtcdClient) Del(key string) error {
 	return nil
 }
 
+func (c *EtcdClient) List(prefix string, loaded KVLoad) ([]string, error) {
+	vs := make([]string, 0)
+	ctx := context.Background()
+	r, err := c.Cli.Get(ctx, c.Prefix+"#"+prefix, clientv3.WithPrefix())
+	if err != nil {
+		return vs, err
+	}
+	for _, ev := range r.Kvs {
+		loaded(string(ev.Key), string(ev.Value))
+		vs = append(vs, string(ev.Value))
+	}
+	return vs, nil
+}
+
 func (c *EtcdClient) AppIndex(env string) AppIndex {
-	apps := AppIndex{Index: make([]int,0), Env: env}
+	apps := AppIndex{Index: make([]int, 0), Env: env}
 	ctx := context.Background()
 	k := fmt.Sprintf("%s.%s", c.Prefix, env)
 	data, err := c.Cli.Get(ctx, k)
@@ -62,17 +76,16 @@ func (c *EtcdClient) AppIndex(env string) AppIndex {
 	return apps
 }
 
-func (c *EtcdClient) SaveAppIndex(apps AppIndex) error{
-	data,err :=json.Marshal(apps)
-	if err!=nil{
+func (c *EtcdClient) SaveAppIndex(apps AppIndex) error {
+	data, err := json.Marshal(apps)
+	if err != nil {
 		return err
 	}
 	ctx := context.Background()
 	k := fmt.Sprintf("%s.%s", c.Prefix, apps.Env)
-	_ ,err = c.Cli.Put(ctx,k,string(data))
-	if err!=nil{
+	_, err = c.Cli.Put(ctx, k, string(data))
+	if err != nil {
 		return err
 	}
 	return nil
 }
-

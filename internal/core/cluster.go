@@ -9,12 +9,13 @@ type Node struct {
 	HttpEndpoint string `json:"http"`
 	TcpEndpoint  string `json:"tcp"`
 }
+type KVLoad func(k, v string)
 
 type Ctx interface {
 	Put(key string, value string) error
 	Get(key string) (string, error)
 	Del(key string) error
-
+	List(prefix string, loaded KVLoad) ([]string, error)
 	AppIndex(env string) AppIndex
 	SaveAppIndex(apps AppIndex) error
 }
