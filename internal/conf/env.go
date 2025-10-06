@@ -68,36 +68,6 @@ func (f *Env) Load(fn string) error {
 	defer conf.Close()
 	data, _ := io.ReadAll(conf)
 	json.Unmarshal(data, f)
-	if f.Prefix == "" {
-		f.Prefix = "dev"
-	}
-	cx := core.EtcdAtomic{Endpoints: f.EtcdEndpoints}
-	lockPrefix := fmt.Sprintf("%s/node", f.Prefix)
-	cnf := Config{}
-	err = cx.Execute(lockPrefix, func(ctx core.Ctx) error {
-		selected := false
-		ctx.List(f.GroupName, func(k, v string) bool {
-			err = json.Unmarshal([]byte(v), &cnf)
-			if err != nil {
-				return true
-			}
-			if !cnf.Used {
-				selected = true
-				cnf.Name = k
-				return false
-			}
-			return true
-		})
-		if !selected {
-			return fmt.Errorf("no node config selected")
-		}
-		fmt.Printf("config selected from etcd cluster : %s\n", cnf.Name)
-		cnf.Used = true
-		return ctx.Put(cnf.Name, string(util.ToJson(cnf)))
-	})
-	if err != nil {
-		fmt.Printf("error from etcd cluster : %s\n", err.Error())
-	}
 	if f.HttpBinding == "" {
 		f.HttpBinding = ":8080"
 	}
@@ -140,11 +110,45 @@ func (f *Env) Load(fn string) error {
 		fmt.Printf("Using node group prefix : %s\n", g)
 		f.Prefix = g
 	}
+	if f.Prefix == "" {
+		f.Prefix = "dev"
+	}
 	core.CreateAppLog(f.LocalDir)
 	wd, err := os.Getwd()
 	if err != nil {
 		return err
 	}
 	f.Bin = wd
+	//overide from etcd cluster
+	cx := core.EtcdAtomic{Endpoints: f.EtcdEndpoints}
+	lockPrefix := fmt.Sprintf("%s/node", f.Prefix)
+	cnf := Config{}
+	err = cx.Execute(lockPrefix, func(ctx core.Ctx) error {
+		selected := false
+		ctx.List(f.GroupName, func(k, v string) bool {
+			err = json.Unmarshal([]byte(v), &cnf)
+			if err != nil {
+				return true
+			}
+			if !cnf.Used {
+				selected = true
+				cnf.Name = k
+				return false
+			}
+			return true
+		})
+		if !selected {
+			return fmt.Errorf("no node config selected")
+		}
+		core.AppLog.Printf("config selected from etcd cluster : %s\n", cnf.Name)
+		cnf.Used = true
+		return ctx.Put(cnf.Name, string(util.ToJson(cnf)))
+	})
+	if err != nil {
+		core.AppLog.Printf("error from etcd cluster : %s\n", err.Error())
+		return nil
+	}
+	f.NodeId = int64(cnf.Sequence)
+	core.AppLog.Printf("Overiding node id with %d\n", f.NodeId)
 	return nil
 }
