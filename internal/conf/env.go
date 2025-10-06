@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/util"
 )
 
 const (
@@ -71,11 +72,25 @@ func (f *Env) Load(fn string) error {
 		f.Prefix = "dev"
 	}
 	cx := core.EtcdAtomic{Endpoints: f.EtcdEndpoints}
-	lockPrefix := fmt.Sprintf("%s.config", f.Prefix)
-	cx.Execute(lockPrefix, func(ctx core.Ctx) error {
+	lockPrefix := fmt.Sprintf("%s/node", f.Prefix)
+	err = cx.Execute(lockPrefix, func(ctx core.Ctx) error {
 		fmt.Printf("Loading config from etcd cluster : %s\n", lockPrefix)
-		return nil
+		data, err := ctx.Get("admin.0")
+		if err != nil {
+			return err
+		}
+		cnf := Config{}
+		err = json.Unmarshal([]byte(data), &cnf)
+		if err != nil {
+			return err
+		}
+		cnf.Used = true
+		return ctx.Put("admin.0", string(util.ToJson(cnf)))
+
 	})
+	if err != nil {
+		fmt.Printf("error from etcd cluster : %s\n", err.Error())
+	}
 	if f.HttpBinding == "" {
 		f.HttpBinding = ":8080"
 	}
