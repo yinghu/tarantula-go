@@ -117,7 +117,7 @@ func (s *AppManager) Shutdown() {
 		if err != nil {
 			return err
 		}
-		cnf.Used = true
+		cnf.Used = false
 		return ctx.Put("admin.0", string(util.ToJson(cnf)))
 	})
 }
