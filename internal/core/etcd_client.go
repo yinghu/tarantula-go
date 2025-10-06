@@ -2,9 +2,8 @@ package core
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
+	"strings"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
@@ -45,47 +44,16 @@ func (c *EtcdClient) Del(key string) error {
 	return nil
 }
 
-func (c *EtcdClient) List(prefix string, loaded KVLoad) ([]string, error) {
-	vs := make([]string, 0)
+func (c *EtcdClient) List(prefix string, loaded KVLoad) error {
+
 	ctx := context.Background()
 	r, err := c.Cli.Get(ctx, c.Prefix+"#"+prefix, clientv3.WithPrefix())
 	if err != nil {
-		return vs, err
+		return err
 	}
 	for _, ev := range r.Kvs {
-		loaded(string(ev.Key), string(ev.Value))
-		vs = append(vs, string(ev.Value))
-	}
-	return vs, nil
-}
-
-func (c *EtcdClient) AppIndex(env string) AppIndex {
-	apps := AppIndex{Index: make([]int, 0), Env: env}
-	ctx := context.Background()
-	k := fmt.Sprintf("%s.%s", c.Prefix, env)
-	data, err := c.Cli.Get(ctx, k)
-	if err != nil {
-		return apps
-	}
-	for _, ev := range data.Kvs {
-		err = json.Unmarshal(ev.Value, &apps)
-		if err != nil {
-			fmt.Printf("app index parse error %s\n", err.Error())
-		}
-	}
-	return apps
-}
-
-func (c *EtcdClient) SaveAppIndex(apps AppIndex) error {
-	data, err := json.Marshal(apps)
-	if err != nil {
-		return err
-	}
-	ctx := context.Background()
-	k := fmt.Sprintf("%s.%s", c.Prefix, apps.Env)
-	_, err = c.Cli.Put(ctx, k, string(data))
-	if err != nil {
-		return err
+		keys := strings.Split(string(ev.Key), "#")
+		loaded(keys[1], string(ev.Value))
 	}
 	return nil
 }

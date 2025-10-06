@@ -24,18 +24,18 @@ var viewCmd = &cobra.Command{
 		app, _ := cmd.Flags().GetString("app")
 		etcds := []string{host}
 		cx := core.EtcdAtomic{Endpoints: etcds}
-		prefix := fmt.Sprintf("%s.%s", env, app)
-		//cnf := conf.Config{Sequence: 1}
-		cx.Execute(prefix, func(ctx core.Ctx) error {
-			nds, err := ctx.List(app, func(k, v string) {
-				fmt.Printf("%k : %v\n", k, v)
+		prefix := fmt.Sprintf("%s/node", env)
+		err := cx.Execute(prefix, func(ctx core.Ctx) error {
+			err := ctx.List(app, func(k, v string) {
+				fmt.Printf("%s : %s\n", k, v)
 			})
 			if err != nil {
 				return err
 			}
-			fmt.Printf("LIST : %v\n", nds)
 			return nil
 		})
-
+		if err != nil {
+			fmt.Printf("view command failed %s\n", err.Error())
+		}
 	},
 }

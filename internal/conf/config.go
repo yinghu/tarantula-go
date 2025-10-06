@@ -1,6 +1,7 @@
 package conf
 
 type Config struct {
-	Sequence int `json:"Sequence"`
+	Used     bool `json:"Used"`
+	Sequence int  `json:"Sequence"`
 	Sql
 }

@@ -15,9 +15,7 @@ type Ctx interface {
 	Put(key string, value string) error
 	Get(key string) (string, error)
 	Del(key string) error
-	List(prefix string, loaded KVLoad) ([]string, error)
-	AppIndex(env string) AppIndex
-	SaveAppIndex(apps AppIndex) error
+	List(prefix string, loaded KVLoad) error
 }
 
 type Exec func(ctx Ctx) error

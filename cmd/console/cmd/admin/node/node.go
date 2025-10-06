@@ -18,6 +18,6 @@ func Execute() error {
 
 func init() {
 	NodeCmd.AddCommand(addCmd)
-	NodeCmd.AddCommand(removeCmd)
+	NodeCmd.AddCommand(updateCmd)
 	NodeCmd.AddCommand(viewCmd)
 }
