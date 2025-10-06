@@ -73,20 +73,27 @@ func (f *Env) Load(fn string) error {
 	}
 	cx := core.EtcdAtomic{Endpoints: f.EtcdEndpoints}
 	lockPrefix := fmt.Sprintf("%s/node", f.Prefix)
+	cnf := Config{}
 	err = cx.Execute(lockPrefix, func(ctx core.Ctx) error {
-		fmt.Printf("Loading config from etcd cluster : %s\n", lockPrefix)
-		data, err := ctx.Get("admin.0")
-		if err != nil {
-			return err
+		selected := false
+		ctx.List(f.GroupName, func(k, v string) bool {
+			err = json.Unmarshal([]byte(v), &cnf)
+			if err != nil {
+				return true
+			}
+			if !cnf.Used {
+				selected = true
+				cnf.Name = k
+				return false
+			}
+			return true
+		})
+		if !selected {
+			return fmt.Errorf("no node config selected")
 		}
-		cnf := Config{}
-		err = json.Unmarshal([]byte(data), &cnf)
-		if err != nil {
-			return err
-		}
+		fmt.Printf("config selected from etcd cluster : %s\n", cnf.Name)
 		cnf.Used = true
-		return ctx.Put("admin.0", string(util.ToJson(cnf)))
-
+		return ctx.Put(cnf.Name, string(util.ToJson(cnf)))
 	})
 	if err != nil {
 		fmt.Printf("error from etcd cluster : %s\n", err.Error())

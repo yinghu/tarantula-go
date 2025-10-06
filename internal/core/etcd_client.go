@@ -53,7 +53,9 @@ func (c *EtcdClient) List(prefix string, loaded KVLoad) error {
 	}
 	for _, ev := range r.Kvs {
 		keys := strings.Split(string(ev.Key), "#")
-		loaded(keys[1], string(ev.Value))
+		if !loaded(keys[1], string(ev.Value)){
+			break
+		}
 	}
 	return nil
 }

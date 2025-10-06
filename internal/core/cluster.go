@@ -9,7 +9,7 @@ type Node struct {
 	HttpEndpoint string `json:"http"`
 	TcpEndpoint  string `json:"tcp"`
 }
-type KVLoad func(k, v string)
+type KVLoad func(k, v string) bool
 
 type Ctx interface {
 	Put(key string, value string) error

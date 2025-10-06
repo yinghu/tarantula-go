@@ -1,7 +1,6 @@
 package bootstrap
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -106,20 +105,6 @@ func (s *AppManager) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 func (s *AppManager) Shutdown() {
 	util.GitPush()
 	s.Sql.Close()
-	cx := core.EtcdAtomic{}
-	cx.Execute("dev/node", func(ctx core.Ctx) error {
-		data, err := ctx.Get("admin.0")
-		if err != nil {
-			return err
-		}
-		cnf := conf.Config{}
-		err = json.Unmarshal([]byte(data), &cnf)
-		if err != nil {
-			return err
-		}
-		cnf.Used = false
-		return ctx.Put("admin.0", string(util.ToJson(cnf)))
-	})
 }
 
 func (s *AppManager) Create(classId int, topic string) (event.Event, error) {

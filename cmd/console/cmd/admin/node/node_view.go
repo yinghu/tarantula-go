@@ -26,8 +26,9 @@ var viewCmd = &cobra.Command{
 		cx := core.EtcdAtomic{Endpoints: etcds}
 		prefix := fmt.Sprintf("%s/node", env)
 		err := cx.Execute(prefix, func(ctx core.Ctx) error {
-			err := ctx.List(app, func(k, v string) {
+			err := ctx.List(app, func(k, v string) bool{
 				fmt.Printf("%s : %s\n", k, v)
+				return true
 			})
 			if err != nil {
 				return err
