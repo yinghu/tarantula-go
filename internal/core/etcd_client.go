@@ -32,8 +32,18 @@ func (c *EtcdClient) Get(key string) (string, error) {
 	}
 	return "", errors.New("no value getted")
 }
-func (c *EtcdClient) Del(key string) error {
+func (c *EtcdClient) Del(key string, withPrefix bool) error {
 	ctx := context.Background()
+	if withPrefix {
+		r, err := c.Cli.Delete(ctx, c.Prefix+"#"+key, clientv3.WithPrefix())
+		if err != nil {
+			return err
+		}
+		if r.Deleted == 0 {
+			return errors.New("no value deleted")
+		}
+		return nil
+	}
 	r, err := c.Cli.Delete(ctx, c.Prefix+"#"+key)
 	if err != nil {
 		return err
@@ -53,7 +63,7 @@ func (c *EtcdClient) List(prefix string, loaded KVLoad) error {
 	}
 	for _, ev := range r.Kvs {
 		keys := strings.Split(string(ev.Key), "#")
-		if !loaded(keys[1], string(ev.Value)){
+		if !loaded(keys[1], string(ev.Value)) {
 			break
 		}
 	}

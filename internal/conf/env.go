@@ -148,7 +148,11 @@ func (f *Env) Load(fn string) error {
 		core.AppLog.Printf("error from etcd cluster : %s\n", err.Error())
 		return nil
 	}
+	f.NodeName = cnf.Name
+	core.AppLog.Printf("Overiding node name with %s\n", cnf.Name)
 	f.NodeId = int64(cnf.Sequence)
-	core.AppLog.Printf("Overiding node id with %d\n", f.NodeId)
+	core.AppLog.Printf("Overiding node id with %d\n", cnf.Sequence)
+	f.Pgs.DatabaseURL = cnf.DatabaseURL
+	core.AppLog.Printf("Overiding sql with %s\n", cnf.DatabaseURL)
 	return nil
 }

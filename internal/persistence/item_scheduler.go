@@ -18,7 +18,7 @@ func (db *ItemDB) Schedule(reg item.ConfigRegistration) error {
 
 func (db *ItemDB) Unschedule(reg item.ConfigRegistration) error {
 	db.Cls.Atomic(db.Cls.Group(), func(ctx core.Ctx) error {
-		ctx.Del(fmt.Sprintf("%d:%s", reg.ItemId, reg.App))
+		ctx.Del(fmt.Sprintf("%d:%s", reg.ItemId, reg.App),false)
 		return nil
 	})
 	return nil

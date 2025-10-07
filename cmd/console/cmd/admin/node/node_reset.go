@@ -6,6 +6,7 @@ import (
 
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/util"
 	"github.com/spf13/cobra"
 )
 
@@ -28,15 +29,18 @@ var resetCmd = &cobra.Command{
 		cx := core.EtcdAtomic{Endpoints: etcds}
 		prefix := fmt.Sprintf("%s/node", env)
 		err := cx.Execute(prefix, func(ctx core.Ctx) error {
-			clist := make([]conf.Config, 0)
 			err := ctx.List(app, func(k, v string) bool {
-				fmt.Printf("%s : %s\n", k, v)
 				c := conf.Config{}
 				err := json.Unmarshal([]byte(v), &c)
 				if err != nil {
 					return true
 				}
-				clist = append(clist, c)
+				if !c.Used {
+					return true
+				}
+				fmt.Printf("Reset used to false %s : %s\n", k, v)
+				c.Used = false
+				ctx.Put(k, string(util.ToJson(c)))
 				return true
 			})
 			if err != nil {

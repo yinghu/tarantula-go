@@ -14,7 +14,7 @@ type KVLoad func(k, v string) bool
 type Ctx interface {
 	Put(key string, value string) error
 	Get(key string) (string, error)
-	Del(key string) error
+	Del(key string,withPrefix bool) error
 	List(prefix string, loaded KVLoad) error
 }
 
