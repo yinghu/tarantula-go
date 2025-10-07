@@ -53,7 +53,7 @@ func TestCluster(t *testing.T) {
 func TestTransaction(t *testing.T) {
 	core.CreateTestLog()
 	lc := core.Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"}
-	c := newCluster("tarantula", []string{"192.168.1.7:2379"}, LocalNode{Node: lc},nil)
+	c := newCluster("tarantula", []string{"192.168.1.7:2379"}, LocalNode{Node: lc}, nil)
 	c.Atomic("", func(c core.Ctx) error {
 		k := "jwkkey"
 		v := util.KeyToBase64(util.Key(32))
@@ -70,7 +70,7 @@ func TestTransaction(t *testing.T) {
 		if gv != v {
 			t.Errorf("value not same error %s", gv)
 		}
-		err = c.Del(k)
+		err = c.Del(k, false)
 		if err != nil {
 			t.Errorf("Del error %s", err.Error())
 		}
