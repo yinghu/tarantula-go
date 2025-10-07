@@ -6,6 +6,7 @@ const (
 
 type Node struct {
 	Name         string `json:"name"`
+	Local        bool   `json:"local"`
 	HttpEndpoint string `json:"http"`
 	TcpEndpoint  string `json:"tcp"`
 }
@@ -14,7 +15,7 @@ type KVLoad func(k, v string) bool
 type Ctx interface {
 	Put(key string, value string) error
 	Get(key string) (string, error)
-	Del(key string,withPrefix bool) error
+	Del(key string, withPrefix bool) error
 	List(prefix string, loaded KVLoad) error
 }
 

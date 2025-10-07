@@ -13,6 +13,7 @@ func (s *AppManager) MemberJoined(joined core.Node) {
 		return
 	}
 	core.AppLog.Printf("Member joined %v\n", joined)
+	joined.Local = s.cls.Local().Name == joined.Name
 	for i := range s.ManagedApps {
 		go s.sendToApp(s.ManagedApps[i], "join", joined)
 	}
