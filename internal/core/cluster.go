@@ -6,7 +6,6 @@ const (
 
 type Node struct {
 	Name         string `json:"name"`
-	Local        bool   `json:"local"`
 	HttpEndpoint string `json:"http"`
 	TcpEndpoint  string `json:"tcp"`
 }

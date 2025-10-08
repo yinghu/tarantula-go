@@ -163,6 +163,8 @@ func (f *Env) Load(fn string) error {
 	}
 	f.NodeId = int64(cnf.Sequence)
 	core.AppLog.Printf("Overiding node id with %d\n", cnf.Sequence)
+	f.HttpEndpoint = cnf.HttpEndpoint
+	core.AppLog.Printf("Overiding http with %s\n", cnf.HttpEndpoint)
 	f.Pgs.DatabaseURL = cnf.SqlEndpoint
 	core.AppLog.Printf("Overiding sql with %s\n", cnf.SqlEndpoint)
 	core.AppLog.Printf("Overiding tcp with %s\n", cnf.TcpEndpoint)
