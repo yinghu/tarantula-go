@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/util"
 )
 
 const (
@@ -83,81 +82,79 @@ func (f *Env) Load(fn string) error {
 			return err
 		}
 	}
-	h, eh := os.LookupEnv(NODE_HOST)
-	if eh {
-		fmt.Printf("Using http endpoint : %s\n", h)
-		f.HttpEndpoint = h
+	core.CreateAppLog(f.LocalDir)
+	c, exists := os.LookupEnv(NODE_HOST)
+	if exists {
+		core.AppLog.Printf("Using http endpoint : %s\n", c)
+		f.HttpEndpoint = c
 		parts := strings.Split(f.Evp.TcpEndpoint, ":")
-		f.Evp.TcpEndpoint = parts[0] + "://" + h + ":" + parts[2]
+		f.Evp.TcpEndpoint = parts[0] + "://" + c + ":" + parts[2]
 		fmt.Printf("Using tcp endpoint : %s\n", f.Evp.TcpEndpoint)
 	}
-	n, en := os.LookupEnv(NODE_NAME)
-	if en {
-		fmt.Printf("Using node name : %s\n", n)
-		f.NodeName = n
+	c, exists = os.LookupEnv(NODE_NAME)
+	if exists {
+		core.AppLog.Printf("Using node name : %s\n", c)
+		f.NodeName = c
 	}
-	d, ed := os.LookupEnv(NODE_ID)
-	if ed {
-		fmt.Printf("Using node id : %s\n", d)
-		id, err := strconv.Atoi(d)
+	c, exists = os.LookupEnv(NODE_ID)
+	if exists {
+		core.AppLog.Printf("Using node id : %s\n", c)
+		id, err := strconv.Atoi(c)
 		if err == nil {
 			f.NodeId = int64(id)
 			fmt.Printf("Node id : %d %d\n", id, f.NodeId)
 		}
 	}
-	g, eg := os.LookupEnv(NODE_GROUP)
-	if eg {
-		fmt.Printf("Using node group prefix : %s\n", g)
-		f.Prefix = g
+	c, exists = os.LookupEnv(NODE_GROUP)
+	if exists {
+		core.AppLog.Printf("Using node group prefix : %s\n", c)
+		f.Prefix = c
 	}
 	if f.Prefix == "" {
 		f.Prefix = "dev"
 	}
-	core.CreateAppLog(f.LocalDir)
 	wd, err := os.Getwd()
 	if err != nil {
 		return err
 	}
 	f.Bin = wd
-	//overide from etcd cluster
-	ps, ex := os.LookupEnv("SEQ")
-	if ex {
-		core.AppLog.Printf("Using SEQ : %s\n", ps)
+	//overriding configs
+	c, exists = os.LookupEnv("ENV")
+	if exists {
+		core.AppLog.Printf("Overriding ENV : %s\n", c)
+		f.Prefix = c
 	}
-	pd, ex := os.LookupEnv("ETCD_ENDPOINTS")
-	if ex {
-		core.AppLog.Printf("Using PD : %s\n", pd)
+	c, exists = os.LookupEnv("SEQ")
+	if exists {
+		core.AppLog.Printf("Overriding SEQ : %s\n", c)
+		f.NodeName = fmt.Sprintf("%s.%s", f.GroupName, c)
+	}
+	c, exists = os.LookupEnv("ETCD_ENDPOINTS")
+	if exists {
+		core.AppLog.Printf("Overriding ETCD : %s\n", c)
+		f.EtcdEndpoints = f.EtcdEndpoints[:0]
+		parts := strings.Split(c, ",")
+		f.EtcdEndpoints = append(f.EtcdEndpoints, parts...)
 	}
 	cx := core.EtcdAtomic{Endpoints: f.EtcdEndpoints}
 	lockPrefix := fmt.Sprintf("%s/node", f.Prefix)
 	cnf := Config{}
 	err = cx.Execute(lockPrefix, func(ctx core.Ctx) error {
-		selected := false
-		ctx.List(f.GroupName, func(k, v string) bool {
-			err = json.Unmarshal([]byte(v), &cnf)
-			if err != nil {
-				return true
-			}
-			if !cnf.Used {
-				selected = true
-				cnf.Name = k
-				return false
-			}
-			return true
-		})
-		if !selected {
-			return fmt.Errorf("no node config selected")
+		v, err := ctx.Get(f.GroupName)
+		if err != nil {
+			return err
+		}
+		err = json.Unmarshal([]byte(v), &cnf)
+		if err != nil {
+			return err
 		}
 		core.AppLog.Printf("config selected from etcd cluster : %s\n", cnf.Name)
-		cnf.Used = true
-		return ctx.Put(cnf.Name, string(util.ToJson(cnf)))
+		return nil
 	})
 	if err != nil {
 		core.AppLog.Printf("error from etcd cluster : %s\n", err.Error())
 		return nil
 	}
-	f.NodeName = cnf.Name
-	core.AppLog.Printf("Overiding node name with %s\n", cnf.Name)
 	f.NodeId = int64(cnf.Sequence)
 	core.AppLog.Printf("Overiding node id with %d\n", cnf.Sequence)
 	f.Pgs.DatabaseURL = cnf.DatabaseURL

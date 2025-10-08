@@ -4,7 +4,7 @@ services:
     restart: unless-stopped
     container_name: postoffice
     hostname: postoffice
-    image: tarantula.postoffice:v1.0
+    image: tarantula.postoffice:${VERSION}
     volumes:
       - volume_postoffice:/home/tarantula/postoffice
     ports:
@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
     container_name: presence
     hostname: presence
-    image: tarantula.presence:v1.0
+    image: tarantula.presence:${VERSION}
     volumes:
       - volume_presence:/home/tarantula/presence  
     depends_on:
@@ -30,7 +30,7 @@ services:
     restart: unless-stopped
     container_name: asset
     hostname: asset
-    image: tarantula.asset:v1.0
+    image: tarantula.asset:${VERSION}
     volumes:
       - volume_asset:/home/tarantula/asset  
     depends_on:
@@ -43,7 +43,7 @@ services:
     restart: unless-stopped
     container_name: inventory
     hostname: inventory
-    image: tarantula.inventory:v1.0
+    image: tarantula.inventory:${VERSION}
     volumes:
       - volume_inventory:/home/tarantula/inventory  
     depends_on:
@@ -56,7 +56,7 @@ services:
     restart: unless-stopped
     container_name: tournament
     hostname: tournament
-    image: tarantula.tournament:v1.0
+    image: tarantula.tournament:${VERSION}
     volumes:
       - volume_tournament:/home/tarantula/tournament
     depends_on:
@@ -69,7 +69,7 @@ services:
     restart: unless-stopped
     container_name: mahjong
     hostname: mahjong
-    image: tarantula.mahjong:v1.0
+    image: tarantula.mahjong:${VERSION}
     volumes:
       - volume_mahjong:/home/tarantula/mahjong
     ports:
@@ -84,7 +84,7 @@ services:
     restart: unless-stopped
     container_name: admin
     hostname: admin
-    image: tarantula.admin:v1.0
+    image: tarantula.admin:${VERSION}
     volumes:
       - volume_admin:/home/tarantula/admin  
     depends_on:
@@ -101,7 +101,7 @@ services:
     restart: unless-stopped
     container_name: web
     hostname: web
-    image: tarantula.nginx:v1.0
+    image: tarantula.nginx:${VERSION}
     ports:
       - "80:80"
     depends_on:
