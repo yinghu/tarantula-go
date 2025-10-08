@@ -11,6 +11,8 @@ services:
       - "5000:5000"          
     networks:
       - net
+    env_file:
+      - .env  
   presence:
     restart: unless-stopped
     container_name: presence
@@ -22,6 +24,8 @@ services:
       - postoffice
     networks:
       - net
+    env_file:
+      - .env 
   asset:
     restart: unless-stopped
     container_name: asset
@@ -32,7 +36,9 @@ services:
     depends_on:
       - presence  
     networks:
-      - net 
+      - net
+    env_file:
+      - .env  
   inventory:
     restart: unless-stopped
     container_name: inventory
@@ -44,6 +50,8 @@ services:
       - presence  
     networks:
       - net
+    env_file:
+      - .env  
   tournament:
     restart: unless-stopped
     container_name: tournament
@@ -55,6 +63,8 @@ services:
       - presence    
     networks:
       - net
+    env_file:
+      - .env  
   mahjong:
     restart: unless-stopped
     container_name: mahjong
@@ -67,7 +77,9 @@ services:
     depends_on:
       - presence    
     networks:
-      - net                 
+      - net
+    env_file:
+      - .env                   
   admin:
     restart: unless-stopped
     container_name: admin
@@ -83,6 +95,8 @@ services:
       - presence
     networks:
       - net
+    env_file:
+      - .env  
   web:
     restart: unless-stopped
     container_name: web
