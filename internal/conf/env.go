@@ -167,5 +167,8 @@ func (f *Env) Load(fn string) error {
 	core.AppLog.Printf("Overiding sql with %s\n", cnf.SqlEndpoint)
 	f.Evp.TcpEndpoint = cnf.TcpEndpoint
 	core.AppLog.Printf("Overiding tcp with %s\n", cnf.TcpEndpoint)
+	parts := strings.Split(f.Evp.TcpEndpoint, ":")
+	f.Evp.TcpEndpoint = parts[0] + "://" + cnf.TcpEndpoint + ":" + parts[2]
+	fmt.Printf("Using tcp endpoint : %s\n", f.Evp.TcpEndpoint)
 	return nil
 }
