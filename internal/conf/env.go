@@ -120,9 +120,9 @@ func (f *Env) Load(fn string) error {
 	}
 	f.Bin = wd
 	//overide from etcd cluster
-	ps, ex := os.LookupEnv("PS_UPSTREAM")
+	ps, ex := os.LookupEnv("SEQ")
 	if ex {
-		core.AppLog.Printf("Using ps endpoint : %s\n", ps)
+		core.AppLog.Printf("Using SEQ : %s\n", ps)
 	}
 	cx := core.EtcdAtomic{Endpoints: f.EtcdEndpoints}
 	lockPrefix := fmt.Sprintf("%s/node", f.Prefix)

@@ -8,9 +8,7 @@ services:
     volumes:
       - volume_postoffice:/home/tarantula/postoffice
     ports:
-      - "5000:5000"
-    environment:
-      PS_UPSTREAM: http://${DOCKER_GATEWAY_HOST:-host.docker.internal}          
+      - "5000:5000"          
     networks:
       - net
   presence:
