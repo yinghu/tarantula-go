@@ -12,10 +12,12 @@ import (
 
 func init() {
 	updateCmd.Flags().StringP("env", "E", "dev", "env")
-	updateCmd.Flags().StringP("host", "H", "192.168.1.7:2379", "etcd host")
-	updateCmd.Flags().StringP("name", "A", "", "name (required)")
+	updateCmd.Flags().String("etcd", "192.168.1.7:2379", "etcd host")
+	updateCmd.Flags().StringP("app", "A", "", "app (required)")
 	updateCmd.Flags().StringP("sql", "S", "postgres://postgres:password@192.168.1.7:5432", "sql url")
-	updateCmd.MarkFlagRequired("name")
+	updateCmd.Flags().StringP("http", "H", "192.168.1.11", "http host")
+	updateCmd.Flags().StringP("tcp", "T", "192.168.1.11", "tcp host")
+	updateCmd.MarkFlagRequired("app")
 }
 
 var updateCmd = &cobra.Command{
@@ -24,15 +26,16 @@ var updateCmd = &cobra.Command{
 	Long:  "update node",
 	Run: func(cmd *cobra.Command, args []string) {
 		env, _ := cmd.Flags().GetString("env")
-		host, _ := cmd.Flags().GetString("host")
-		name, _ := cmd.Flags().GetString("name")
+		host, _ := cmd.Flags().GetString("etcd")
+		app, _ := cmd.Flags().GetString("app")
 		sql, _ := cmd.Flags().GetString("sql")
-
+		http, _ := cmd.Flags().GetString("http")
+		tcp, _ := cmd.Flags().GetString("tcp")
 		etcds := []string{host}
 		prefix := fmt.Sprintf("%s/node", env)
 		cx := core.EtcdAtomic{Endpoints: etcds}
 		err := cx.Execute(prefix, func(ctx core.Ctx) error {
-			v, err := ctx.Get(name)
+			v, err := ctx.Get(app)
 			if err != nil {
 				return err
 			}
@@ -41,8 +44,10 @@ var updateCmd = &cobra.Command{
 			if err != nil {
 				return err
 			}
-			cnf.DatabaseURL = sql
-			return ctx.Put(name, string(util.ToJson(cnf)))
+			cnf.SqlEndpoint = sql
+			cnf.HttpEndpoint = http
+			cnf.TcpEndpoint = tcp
+			return ctx.Put(app, string(util.ToJson(cnf)))
 		})
 		if err != nil {
 			fmt.Printf("view command failed %s\n", err.Error())

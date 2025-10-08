@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/util"
 )
 
 const (
@@ -148,6 +149,11 @@ func (f *Env) Load(fn string) error {
 		if err != nil {
 			return err
 		}
+		cnf.Used = true
+		err = ctx.Put(f.NodeName, string(util.ToJson(cnf)))
+		if err != nil {
+			return err
+		}
 		core.AppLog.Printf("config selected from etcd cluster : %s\n", f.NodeName)
 		return nil
 	})
@@ -157,7 +163,7 @@ func (f *Env) Load(fn string) error {
 	}
 	f.NodeId = int64(cnf.Sequence)
 	core.AppLog.Printf("Overiding node id with %d\n", cnf.Sequence)
-	f.Pgs.DatabaseURL = cnf.DatabaseURL
-	core.AppLog.Printf("Overiding sql with %s\n", cnf.DatabaseURL)
+	f.Pgs.DatabaseURL = cnf.SqlEndpoint
+	core.AppLog.Printf("Overiding sql with %s\n", cnf.SqlEndpoint)
 	return nil
 }

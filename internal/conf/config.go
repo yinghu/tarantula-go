@@ -4,6 +4,6 @@ type Config struct {
 	Used         bool   `json:"Used"`
 	Sequence     int    `json:"Sequence"`
 	HttpEndpoint string `json:"HttpEndpoint"`
-	Sql
-	EventEndpoint
+	TcpEndpoint  string `json:"TcpEndpoint"`
+	SqlEndpoint string `json:"SqlEndpoint"`
 }

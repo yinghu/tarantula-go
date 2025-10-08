@@ -12,10 +12,11 @@ import (
 
 func init() {
 	addCmd.Flags().StringP("env", "E", "dev", "env")
-	addCmd.Flags().StringP("host", "H", "192.168.1.7:2379", "etcd host")
+	addCmd.Flags().String("etcd", "192.168.1.7:2379", "etcd host")
 	addCmd.Flags().StringP("app", "A", "", "app (required)")
 	addCmd.Flags().StringP("sql", "S", "postgres://postgres:password@192.168.1.7:5432", "sql url")
-	addCmd.Flags().IntP("count", "C", 10, "app count")
+	addCmd.Flags().StringP("http", "H", "192.168.1.11", "http host")
+	addCmd.Flags().StringP("tcp", "T", "192.168.1.11", "tcp host")
 	addCmd.MarkFlagRequired("app")
 }
 
@@ -25,10 +26,11 @@ var addCmd = &cobra.Command{
 	Long:  "add node",
 	Run: func(cmd *cobra.Command, args []string) {
 		env, _ := cmd.Flags().GetString("env")
-		host, _ := cmd.Flags().GetString("host")
+		host, _ := cmd.Flags().GetString("etcd")
 		app, _ := cmd.Flags().GetString("app")
 		sql, _ := cmd.Flags().GetString("sql")
-		count, _ := cmd.Flags().GetInt("count")
+		http, _ := cmd.Flags().GetString("http")
+		tcp, _ := cmd.Flags().GetString("tcp")
 		etcds := []string{host}
 		prefix := fmt.Sprintf("%s/node", env)
 		cx := core.EtcdAtomic{Endpoints: etcds}
@@ -52,19 +54,21 @@ var addCmd = &cobra.Command{
 				}
 				id = int(ic)
 			}
-
-			for range count {
-
-				cnf := conf.Config{Sequence: id}
-				cnf.DatabaseURL = sql
-				name := fmt.Sprintf("%s.%d", app, nid)
-				err = ctx.Put(name, string(util.ToJson(cnf)))
-				if err != nil {
-					return err
-				}
-				nid++
-				id++
+			if id > 1023 {
+				return fmt.Errorf("snowflake id sequence must be 0 - 1023 %d", id)
 			}
+			cnf := conf.Config{Sequence: id}
+			cnf.SqlEndpoint = sql
+			cnf.HttpEndpoint = http
+			cnf.TcpEndpoint = tcp
+			name := fmt.Sprintf("%s.%d", app, nid)
+			err = ctx.Put(name, string(util.ToJson(cnf)))
+			if err != nil {
+				return err
+			}
+			nid++
+			id++
+
 			err = ctx.Put(nidKey, strconv.Itoa(nid))
 			if err != nil {
 				return err
@@ -79,6 +83,6 @@ var addCmd = &cobra.Command{
 			fmt.Printf("failed to add node %s\n", err.Error())
 			return
 		}
-		fmt.Printf("add nodes %d on env %s\n", count, env)
+		fmt.Printf("add node config %s on env %s\n", app, env)
 	},
 }
