@@ -16,7 +16,7 @@ func init() {
 	updateCmd.Flags().StringP("app", "A", "", "app (required)")
 	updateCmd.Flags().StringP("sql", "S", "postgres://postgres:password@192.168.1.7:5432", "sql url")
 	updateCmd.Flags().StringP("http", "H", "192.168.1.11", "http host")
-	updateCmd.Flags().StringP("tcp", "T", "192.168.1.11", "tcp host")
+	updateCmd.Flags().StringP("tcp", "T", "tcp://192.168.1.11:5050", "tcp url")
 	updateCmd.MarkFlagRequired("app")
 }
 
