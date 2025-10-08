@@ -90,7 +90,7 @@ func (f *Env) Load(fn string) error {
 		f.HttpEndpoint = c
 		parts := strings.Split(f.Evp.TcpEndpoint, ":")
 		f.Evp.TcpEndpoint = parts[0] + "://" + c + ":" + parts[2]
-		fmt.Printf("Using tcp endpoint : %s\n", f.Evp.TcpEndpoint)
+		core.AppLog.Printf("Using tcp endpoint : %s\n", f.Evp.TcpEndpoint)
 	}
 	c, exists = os.LookupEnv(NODE_NAME)
 	if exists {
@@ -103,7 +103,7 @@ func (f *Env) Load(fn string) error {
 		id, err := strconv.Atoi(c)
 		if err == nil {
 			f.NodeId = int64(id)
-			fmt.Printf("Node id : %d %d\n", id, f.NodeId)
+			core.AppLog.Printf("Node id : %d %d\n", id, f.NodeId)
 		}
 	}
 	c, exists = os.LookupEnv(NODE_GROUP)
@@ -168,6 +168,6 @@ func (f *Env) Load(fn string) error {
 	core.AppLog.Printf("Overiding tcp with %s\n", cnf.TcpEndpoint)
 	parts := strings.Split(f.Evp.TcpEndpoint, ":")
 	f.Evp.TcpEndpoint = parts[0] + "://" + cnf.TcpEndpoint + ":" + parts[2]
-	fmt.Printf("Using tcp endpoint : %s\n", f.Evp.TcpEndpoint)
+	core.AppLog.Printf("Using tcp endpoint : %s\n", f.Evp.TcpEndpoint)
 	return nil
 }
