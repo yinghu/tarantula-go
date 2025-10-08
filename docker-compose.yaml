@@ -10,7 +10,7 @@ services:
     ports:
       - "5000:5000"
     environment:
-      PS_UPSTREAM: http://${DOCKER_GATEWAY_HOST:-host.docker.internal}:3000          
+      PS_UPSTREAM: http://${DOCKER_GATEWAY_HOST:-host.docker.internal}          
     networks:
       - net
   presence:
