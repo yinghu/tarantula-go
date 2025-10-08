@@ -124,6 +124,10 @@ func (f *Env) Load(fn string) error {
 	if ex {
 		core.AppLog.Printf("Using SEQ : %s\n", ps)
 	}
+	pd, ex := os.LookupEnv("ETCD_ENDPOINTS")
+	if ex {
+		core.AppLog.Printf("Using PD : %s\n", pd)
+	}
 	cx := core.EtcdAtomic{Endpoints: f.EtcdEndpoints}
 	lockPrefix := fmt.Sprintf("%s/node", f.Prefix)
 	cnf := Config{}
