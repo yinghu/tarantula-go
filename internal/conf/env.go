@@ -140,7 +140,7 @@ func (f *Env) Load(fn string) error {
 	lockPrefix := fmt.Sprintf("%s/node", f.Prefix)
 	cnf := Config{}
 	err = cx.Execute(lockPrefix, func(ctx core.Ctx) error {
-		v, err := ctx.Get(f.GroupName)
+		v, err := ctx.Get(f.NodeName)
 		if err != nil {
 			return err
 		}
@@ -148,7 +148,7 @@ func (f *Env) Load(fn string) error {
 		if err != nil {
 			return err
 		}
-		core.AppLog.Printf("config selected from etcd cluster : %s\n", cnf.Name)
+		core.AppLog.Printf("config selected from etcd cluster : %s\n", f.NodeName)
 		return nil
 	})
 	if err != nil {
