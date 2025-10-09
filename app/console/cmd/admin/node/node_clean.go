@@ -9,7 +9,7 @@ import (
 
 func init() {
 	cleanCmd.Flags().StringP("env", "E", "dev", "env")
-	cleanCmd.Flags().StringP("host", "H", "192.168.1.7:2379", "etcd host")
+	cleanCmd.Flags().String("etcd", "192.168.1.7:2379", "etcd host")
 }
 
 var cleanCmd = &cobra.Command{
@@ -18,7 +18,7 @@ var cleanCmd = &cobra.Command{
 	Long:  "clean nodes",
 	Run: func(cmd *cobra.Command, args []string) {
 		env, _ := cmd.Flags().GetString("env")
-		host, _ := cmd.Flags().GetString("host")
+		host, _ := cmd.Flags().GetString("etcd")
 		etcds := []string{host}
 		cx := core.EtcdAtomic{Endpoints: etcds}
 		prefix := fmt.Sprintf("%s/node", env)

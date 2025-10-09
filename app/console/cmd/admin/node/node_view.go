@@ -9,7 +9,7 @@ import (
 
 func init() {
 	viewCmd.Flags().StringP("env", "E", "dev", "env")
-	viewCmd.Flags().StringP("host", "H", "192.168.1.7:2379", "etcd host")
+	viewCmd.Flags().String("etcd","192.168.1.7:2379", "etcd host")
 	viewCmd.Flags().StringP("app", "A", "", "view app")
 }
 
@@ -19,7 +19,7 @@ var viewCmd = &cobra.Command{
 	Long:  "view node",
 	Run: func(cmd *cobra.Command, args []string) {
 		env, _ := cmd.Flags().GetString("env")
-		host, _ := cmd.Flags().GetString("host")
+		host, _ := cmd.Flags().GetString("etcd")
 		app, _ := cmd.Flags().GetString("app")
 		etcds := []string{host}
 		cx := core.EtcdAtomic{Endpoints: etcds}
