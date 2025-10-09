@@ -21,4 +21,5 @@ func init() {
 	NodeCmd.AddCommand(updateCmd)
 	NodeCmd.AddCommand(viewCmd)
 	NodeCmd.AddCommand(resetCmd)
+	NodeCmd.AddCommand(cleanCmd)
 }

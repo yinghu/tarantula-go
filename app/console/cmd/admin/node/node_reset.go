@@ -1,18 +1,15 @@
 package node
 
 import (
-	"encoding/json"
 	"fmt"
 
-	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/util"
 	"github.com/spf13/cobra"
 )
 
 func init() {
 	resetCmd.Flags().StringP("env", "E", "dev", "env")
-	resetCmd.Flags().StringP("host", "H", "192.168.1.7:2379", "etcd host")
+	resetCmd.Flags().String("etcd", "192.168.1.7:2379", "etcd host")
 	resetCmd.Flags().StringP("app", "A", "", "app (required)")
 	resetCmd.MarkFlagRequired("app")
 }
@@ -23,30 +20,18 @@ var resetCmd = &cobra.Command{
 	Long:  "reset node",
 	Run: func(cmd *cobra.Command, args []string) {
 		env, _ := cmd.Flags().GetString("env")
-		host, _ := cmd.Flags().GetString("host")
+		host, _ := cmd.Flags().GetString("etcd")
 		app, _ := cmd.Flags().GetString("app")
 		etcds := []string{host}
 		cx := core.EtcdAtomic{Endpoints: etcds}
 		prefix := fmt.Sprintf("%s/node", env)
 		err := cx.Execute(prefix, func(ctx core.Ctx) error {
-			err := ctx.List(app, func(k, v string) bool {
-				c := conf.Config{}
-				err := json.Unmarshal([]byte(v), &c)
-				if err != nil {
-					return true
-				}
-				if !c.Used {
-					return true
-				}
-				fmt.Printf("Reset used to false %s : %s\n", k, v)
-				c.Used = false
-				ctx.Put(k, string(util.ToJson(c)))
-				return true
-			})
+			nidKey := fmt.Sprintf("app.%s.nid", app)
+			err := ctx.Del(nidKey, false)
 			if err != nil {
 				return err
 			}
-			return nil
+			return ctx.Del(app, true)
 		})
 		if err != nil {
 			fmt.Printf("reset command failed %s\n", err.Error())

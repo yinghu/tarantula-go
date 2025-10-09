@@ -10,8 +10,7 @@ import (
 func init() {
 	viewCmd.Flags().StringP("env", "E", "dev", "env")
 	viewCmd.Flags().StringP("host", "H", "192.168.1.7:2379", "etcd host")
-	viewCmd.Flags().StringP("app", "A", "", "app (required)")
-	viewCmd.MarkFlagRequired("app")
+	viewCmd.Flags().StringP("app", "A", "", "view app")
 }
 
 var viewCmd = &cobra.Command{
