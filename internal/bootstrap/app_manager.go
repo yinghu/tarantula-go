@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -21,6 +22,7 @@ type AppManager struct {
 	Bsl         BootstrapListener
 	Sql         persistence.Postgresql
 	ctx         string
+	prefix      string
 	standalone  bool
 	AppAuth     core.Authenticator
 	seq         core.Sequence
@@ -61,6 +63,7 @@ func (s *AppManager) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 	s.tcpPusher = p
 	s.cls = c
 	s.ctx = f.GroupName
+	s.prefix = f.Prefix
 	s.standalone = f.Standalone
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
@@ -105,6 +108,21 @@ func (s *AppManager) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 func (s *AppManager) Shutdown() {
 	util.GitPush()
 	s.Sql.Close()
+	lockPrefix := fmt.Sprintf("%s/node", s.prefix)
+	s.cls.Atomic(lockPrefix, func(ctx core.Ctx) error {
+		v, err := ctx.Get(s.cls.Local().Name)
+		if err != nil {
+			return err
+		}
+		c := conf.Config{}
+		err = json.Unmarshal([]byte(v), &c)
+		if err != nil {
+			return err
+		}
+		c.Used = false
+		ctx.Put(s.cls.Local().Name, string(util.ToJson(c)))
+		return nil
+	})
 }
 
 func (s *AppManager) Create(classId int, topic string) (event.Event, error) {
