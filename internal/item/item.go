@@ -91,7 +91,7 @@ type OnInventory struct {
 type Inventory struct {
 	Id           int32     `json:"Id"`
 	SystemId     int64     `json:"SystemId,string"`
-	TypeId       string    `json:"string"`
+	TypeId       string    `json:"TypeId"`
 	Amount       int32     `json:"Amount"`
 	Rechargeable bool      `json:"Rechargeable"`
 	UpdateTime   time.Time `json:"UpdateTime"`
