@@ -34,5 +34,6 @@ func (s *InventoryLoader) Request(rs core.OnSession, w http.ResponseWriter, r *h
 	}
 	stock := persistence.InventoryResp{Stock: list}
 	stock.ErrorCode = 0
+	stock.Successful = true
 	w.Write(util.ToJson(stock))
 }
