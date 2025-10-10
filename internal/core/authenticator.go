@@ -9,11 +9,11 @@ type Authenticator interface {
 type OnSession struct {
 	Successful    bool   `json:"successful"`
 	ErrorCode     int    `json:"errorCode"`
-	Message       string `json:"message"`
-	SystemId      int64  `json:"systemId"`
+	Message       string `json:"message,omitempty"`
+	SystemId      int64  `json:"systemId,omitempty"`
 	Stub          int32  `json:"-"`
-	Token         string `json:"token"`
-	Ticket        string `json:"ticket"`
-	Home          string `json:"home"`
+	Token         string `json:"token,omitempty"`
+	Ticket        string `json:"ticket,omitempty"`
+	Home          string `json:"home,omitempty"`
 	AccessControl int32  `json:"-"`
 }
