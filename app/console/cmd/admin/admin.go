@@ -19,5 +19,6 @@ func Execute() error {
 
 func init() {
 	AdminCmd.AddCommand(loginCmd)
+	AdminCmd.AddCommand(sshCmd)
 	AdminCmd.AddCommand(node.NodeCmd)
 }
