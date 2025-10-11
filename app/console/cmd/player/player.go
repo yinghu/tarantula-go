@@ -18,4 +18,5 @@ func Execute() error {
 
 func init() {
 	PlayerCmd.AddCommand(loginCmd)
+	PlayerCmd.AddCommand(simuCmd)
 }

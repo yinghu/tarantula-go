@@ -39,7 +39,7 @@ func (s *SampleCreator) OnEvent(e event.Event) {
 
 func TestClient(t *testing.T) {
 	hc := util.HttpCaller{Host: "http://192.168.1.11"}
-	login := bootstrap.Login{Name: "load1", Hash: "aaa"}
+	login := bootstrap.Login{Name: "load3", Hash: "aaa"}
 	err := hc.PostJson("presence/register", login, func(resp *http.Response) error {
 		session := core.OnSession{}
 		err := json.NewDecoder(resp.Body).Decode(&session)
@@ -84,6 +84,6 @@ func TestClient(t *testing.T) {
 		time.Sleep(10 * time.Millisecond)
 
 	}
-	time.Sleep(20 * time.Second)
+	time.Sleep(5 * time.Second)
 	sb.Close()
 }
