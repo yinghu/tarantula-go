@@ -2,7 +2,6 @@ package player
 
 import (
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -12,6 +11,7 @@ func init() {
 	simuCmd.Flags().StringP("prefix", "P", "", "user (required)")
 	simuCmd.MarkFlagRequired("prefix")
 	simuCmd.Flags().IntP("count", "C", 10, "simulator count")
+	simuCmd.Flags().IntP("batch", "B", 10, "simulator batch")
 	simuCmd.Flags().StringP("host", "H", "http://192.168.1.11", "use default")
 }
 
@@ -22,22 +22,50 @@ var simuCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		prefix, _ := cmd.Flags().GetString("prefix")
 		count, _ := cmd.Flags().GetInt("count")
+		batch, _ := cmd.Flags().GetInt("batch")
 		host, _ := cmd.Flags().GetString("host")
-		var wt sync.WaitGroup
-		wt.Add(count)
+		wt := make(chan bool, 1)
+		bt := make(chan int, 1)
+		done := false
+		suc := 0
+		fail := 0
+		sub := 0
+		tc := 0
 		start := time.Now()
-		for i := range count {
-			go func() {
-				sim := Simulator{Player: fmt.Sprintf("%s_%d", prefix, i), Host: host}
-				err := sim.Play()
-				if err != nil {
-					fmt.Printf("Failed from %d %s\n", i,err.Error())
+		bt <- 1
+		for {
+			if done {
+				break
+			}
+			select {
+			case t := <-wt:
+				sub++
+				if t {
+					suc++
+				} else {
+					fail++
 				}
-				wt.Done()
-			}()
+				if sub == count {
+					tc++
+					if tc == batch {
+						done = true
+					} else {
+						sub = 0
+						bt <- 1
+					}
+				}
+			case <-bt:
+				for i := range count {
+					go func() {
+						sim := Simulator{Player: fmt.Sprintf("%s_%d", prefix, i), Host: host}
+						err := sim.Play()
+						wt <- err == nil
+					}()
+				}
+			}
 		}
-		wt.Wait()
 		dur := time.Since(start)
-		fmt.Printf("Total duration %d\n", dur.Milliseconds())
+		avg := dur.Milliseconds() / int64(count*batch)
+		fmt.Printf("avg dur per call (ms) :%d with success [%d] failure [%d]\n", avg, suc, fail)
 	},
 }
