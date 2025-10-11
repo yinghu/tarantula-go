@@ -39,8 +39,8 @@ func (s *SampleCreator) OnEvent(e event.Event) {
 
 func TestClient(t *testing.T) {
 	hc := util.HttpCaller{Host: "http://192.168.1.11"}
-	login := bootstrap.Login{Name: "player1", Hash: "aaa"}
-	err := hc.PostJson("presence/login", login, func(resp *http.Response) error {
+	login := bootstrap.Login{Name: "load1", Hash: "aaa"}
+	err := hc.PostJson("presence/register", login, func(resp *http.Response) error {
 		session := core.OnSession{}
 		err := json.NewDecoder(resp.Body).Decode(&session)
 		if err != nil {
@@ -57,7 +57,7 @@ func TestClient(t *testing.T) {
 		return
 	}
 	fmt.Printf("home %s\n", hc.Home)
-	sb := event.SocketPublisher{Remote: fmt.Sprintf("tcp://%s:5050",hc.Home)}
+	sb := event.SocketPublisher{Remote: fmt.Sprintf("tcp://%s:5050", hc.Home)}
 	err = sb.Connect()
 
 	if err != nil {
@@ -73,14 +73,16 @@ func TestClient(t *testing.T) {
 		return
 	}
 	go sb.Subscribe(&SampleCreator{}, &SampleCreator{})
+
 	for range 10 {
+
 		me := MahjongEvent{Cmd: "drop"}
 		me.OnTopic("mahjong")
 		me.SystemId = hc.SystemId
 		me.OnListener(&SampleCreator{})
 		sb.Publish(&me, hc.Ticket)
-		time.Sleep(100 * time.Millisecond)
-		
+		time.Sleep(10 * time.Millisecond)
+
 	}
 	time.Sleep(20 * time.Second)
 	sb.Close()
