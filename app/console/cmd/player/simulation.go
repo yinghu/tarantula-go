@@ -57,7 +57,7 @@ var simuCmd = &cobra.Command{
 			case <-bt:
 				for i := range count {
 					go func() {
-						sim := Simulator{Player: fmt.Sprintf("%s_%d", prefix, i), Host: host}
+						sim := Simulator{Player: fmt.Sprintf("%s_%d_%d", prefix, tc, i), Host: host}
 						err := sim.Play()
 						wt <- err == nil
 					}()
