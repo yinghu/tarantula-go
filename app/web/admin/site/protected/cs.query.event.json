@@ -8,7 +8,7 @@
             "Type":"enum",
             "Reference": "inline",
             "Nullable": false,
-            "Values":[{"Name":"Message","Value":"0"},{"Name":"Login","Value":"1"},{"Name":"Tournament","Value":"2"},{"Name":"Inventory","Value":"3"},{"Name":"Kickoff","Value":"4"}]
+            "Values":[{"Name":"Message","Value":"0"},{"Name":"Login","Value":"1"},{"Name":"Tournament","Value":"2"},{"Name":"Inventory","Value":"3"},{"Name":"Kickoff","Value":"4"},{"Name":"Register","Value":"5"}]
         },
         {
             "Name": "StartTime",

@@ -3,9 +3,12 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
 )
 
@@ -37,6 +40,22 @@ func (s *PresenceRegister) Register(login bootstrap.Login) {
 	ticket, _ := s.AppAuth.CreateTicket(login.SystemId, login.Id, login.AccessControl)
 	session.Ticket = ticket
 	login.Cc <- core.Chunk{Remaining: false, Data: util.ToJson(session)}
+	go func() {
+		id, err := s.Sequence().Id()
+		if err != nil {
+			return
+		}
+		me := event.RegisterEvent{SystemId: login.SystemId, Name: login.Name}
+		me.OnOId(id)
+		me.RegisterTime = time.Now()
+		me.OnTopic("login")
+		s.Send(&me)
+		rw := item.OnInventory{SystemId: login.SystemId, ItemId: s.LoginReward.Id, Source: "login"}
+		err = s.ItemService().InventoryManager().Grant(rw)
+		if err != nil {
+			core.AppLog.Printf("grant failed %s\n", err.Error())
+		}
+	}()
 }
 
 func (s *PresenceRegister) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {

@@ -13,6 +13,7 @@ const (
 	TAG_TOURNAMENT_QID int32 = 2
 	TAG_INVENTORY_QID  int32 = 3
 	TAG_KICKOFF_QID    int32 = 4
+	TAG_REGISTER_QID   int32 = 5
 
 	//query criteria
 	Q_TOURNAMENT_QID int32 = 100
@@ -37,7 +38,9 @@ func CreateQuery(qid int32) Query {
 	case TAG_KICKOFF_QID:
 		q := QWithTag{Id: qid, Tag: KICKOFF_ETAG, Cc: make(chan core.Chunk, 3)}
 		return &q
-
+	case TAG_REGISTER_QID:
+		q := QWithTag{Id: qid, Tag: REGISTER_ETAG, Cc: make(chan core.Chunk, 3)}
+		return &q
 	case Q_TOURNAMENT_QID:
 		q := QTournament{}
 		q.Id = qid
