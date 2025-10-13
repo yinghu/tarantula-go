@@ -122,7 +122,7 @@ func (s *sample) Read(value core.DataBuffer) error {
 }
 
 func TestDatatBuffer(t *testing.T) {
-	local := BadgerLocal{InMemory: false, Path: "/home/yinghu/local/test"}
+	local := BadgerLocal{InMemory: true}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("Local store error %s", err.Error())
@@ -198,12 +198,12 @@ func TestDatatBuffer(t *testing.T) {
 	local.List(&px, func(k, v core.DataBuffer, rev uint64) bool {
 		d := sample{}
 		d.ReadKey(k)
-		cid, _ := v.ReadInt32()
-		fmt.Printf("header %d %d\n", cid, rev)
+		v.ReadInt32()
+		//fmt.Printf("header %d %d\n", cid, rev)
 		d.Read(v)
 		d.OnRevision(rev)
-		fmt.Printf("streaming %s, %d\n", d.Tag, d.Id)
-		fmt.Printf("streaming %s, %d\n", d.Str, d.I64)
+		//fmt.Printf("streaming %s, %d\n", d.Tag, d.Id)
+		//fmt.Printf("streaming %s, %d\n", d.Str, d.I64)
 		ct++
 		return true
 	})
@@ -215,5 +215,5 @@ func TestDatatBuffer(t *testing.T) {
 	if err != nil {
 		fmt.Printf("se load err %s\n", err.Error())
 	}
-	fmt.Printf("Total count : %d\n", se.Count)
+	//fmt.Printf("Total count : %d\n", se.Count)
 }

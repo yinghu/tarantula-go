@@ -16,7 +16,7 @@ const (
 )
 
 func TestTournamentEvent(t *testing.T) {
-	local := BadgerLocal{InMemory: true, Path: "/home/yinghu/local/t1"}
+	local := BadgerLocal{InMemory: true}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("Local store error %s", err.Error())
@@ -82,7 +82,7 @@ func TestTournamentEvent(t *testing.T) {
 		v.ReadInt64()
 		t.Read(v)
 		t.Rev = rev
-		fmt.Printf("Score %d , LastUpdated %d Rev : %d\n", t.Score, t.LastUpdated, t.Revision())
+		//fmt.Printf("Score %d , LastUpdated %d Rev : %d\n", t.Score, t.LastUpdated, t.Revision())
 		t1000++
 		return true
 	})
@@ -93,7 +93,7 @@ func TestTournamentEvent(t *testing.T) {
 }
 
 func TestTournamentQuery(t *testing.T) {
-	local := BadgerLocal{InMemory: true, Path: "/home/yinghu/local/t2"}
+	local := BadgerLocal{InMemory: true}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("Local store error %s", err.Error())
@@ -150,7 +150,7 @@ func TestTournamentQuery(t *testing.T) {
 		v.ReadInt64()
 		t.Read(v)
 		t.Rev = rev
-		fmt.Printf("Score %d , LastUpdated %d Rev : %d\n", t.Score, t.LastUpdated, t.Revision())
+		//fmt.Printf("Score %d , LastUpdated %d Rev : %d\n", t.Score, t.LastUpdated, t.Revision())
 		t2000++
 		return true
 	})
@@ -173,7 +173,7 @@ func TestTournamentQuery(t *testing.T) {
 		v.ReadInt64()
 		t.Read(v)
 		t.Rev = rev
-		fmt.Printf("Score %d , LastUpdated %d Rev : %d\n", t.Score, t.LastUpdated, t.Revision())
+		//fmt.Printf("Score %d , LastUpdated %d Rev : %d\n", t.Score, t.LastUpdated, t.Revision())
 		tc++
 		return true
 	})
