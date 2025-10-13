@@ -16,7 +16,7 @@ const (
 )
 
 func TestTournamentEvent(t *testing.T) {
-	local := BadgerLocal{InMemory: false, Path: "/home/yinghu/local/t1"}
+	local := BadgerLocal{InMemory: true, Path: "/home/yinghu/local/t1"}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("Local store error %s", err.Error())
@@ -93,7 +93,7 @@ func TestTournamentEvent(t *testing.T) {
 }
 
 func TestTournamentQuery(t *testing.T) {
-	local := BadgerLocal{InMemory: false, Path: "/home/yinghu/local/t2"}
+	local := BadgerLocal{InMemory: true, Path: "/home/yinghu/local/t2"}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("Local store error %s", err.Error())

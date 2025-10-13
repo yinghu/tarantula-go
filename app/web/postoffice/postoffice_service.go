@@ -61,7 +61,7 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster, p event.Pusher) 
 	go s.inboundEvent(tc)
 
 	path := env.LocalDir + "/store"
-	ds := persistence.BadgerLocal{InMemory: env.Bdg.InMemory, Path: path, Seq: s.Sequence()}
+	ds := persistence.BadgerLocal{InMemory: env.Bdg.InMemory, Path: path}
 	err := ds.Open()
 	if err != nil {
 		return err

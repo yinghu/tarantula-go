@@ -20,7 +20,6 @@ type BadgerLocal struct {
 	InMemory bool
 	Path     string
 	Db       *badger.DB
-	Seq      core.Sequence
 }
 
 func (s *BadgerLocal) Save(t core.Persistentable) error {
@@ -189,6 +188,9 @@ func (s *BadgerLocal) Open() error {
 }
 
 func (s *BadgerLocal) Close() error {
+	if s.InMemory {
+		return s.Db.Close()
+	}
 	s.Db.Sync()
 	return s.Db.Close()
 }
