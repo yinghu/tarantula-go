@@ -16,8 +16,6 @@ replace gameclustering.com/internal/event => ../../../internal/event
 
 replace gameclustering.com/internal/core => ../../../internal/core
 
-replace gameclustering.com/internal/metrics => ../../../internal/metrics
-
 replace gameclustering.com/internal/item => ../../../internal/item
 
 replace gameclustering.com/internal/mj => ../../../internal/mj
@@ -34,7 +32,6 @@ require (
 
 require (
 	gameclustering.com/internal/cluster v0.0.0-00010101000000-000000000000 // indirect
-	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect

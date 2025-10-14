@@ -13,7 +13,6 @@ import (
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
-	"gameclustering.com/internal/metrics"
 	"gameclustering.com/internal/util"
 )
 
@@ -94,7 +93,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 		var code int32 = 0
 		defer func() {
 			dur := time.Since(start)
-			ms := metrics.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.Cluster().Local().Name, ReqId: stub, ReqCode: code}
+			ms := core.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.Cluster().Local().Name, ReqId: stub, ReqCode: code}
 			s.Metrics().WebRequest(ms)
 		}()
 		if s.AccessControl() == PUBLIC_ACCESS_CONTROL {

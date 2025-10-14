@@ -7,7 +7,6 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
-	"gameclustering.com/internal/metrics"
 )
 
 const (
@@ -50,7 +49,7 @@ type TarantulaContext interface {
 
 type TarantulaService interface {
 	ItemService() item.ItemService
-	Metrics() metrics.MetricsService
+	Metrics() core.MetricsService
 	Cluster() core.Cluster
 	Authenticator() core.Authenticator
 	Sequence() core.Sequence

@@ -9,14 +9,13 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
-	"gameclustering.com/internal/metrics"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
 )
 
 type AppManager struct {
 	cls         core.Cluster
-	metr        metrics.MetricsService
+	metr        core.MetricsService
 	imse        item.ItemService
 	auth        core.Authenticator
 	Bsl         BootstrapListener
@@ -39,7 +38,7 @@ func (s *AppManager) Pusher() event.Pusher {
 	return s.tcpPusher
 }
 
-func (s *AppManager) Metrics() metrics.MetricsService {
+func (s *AppManager) Metrics() core.MetricsService {
 	return s.metr
 }
 func (s *AppManager) Cluster() core.Cluster {

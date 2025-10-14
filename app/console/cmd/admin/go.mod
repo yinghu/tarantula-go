@@ -16,8 +16,6 @@ replace gameclustering.com/internal/event => ../../../../internal/event
 
 replace gameclustering.com/internal/core => ../../../../internal/core
 
-replace gameclustering.com/internal/metrics => ../../../../internal/metrics
-
 replace gameclustering.com/internal/item => ../../../../internal/item
 
 replace gameclustering.com/cmd/admin/node => ./node
@@ -28,6 +26,7 @@ require (
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
 	github.com/spf13/cobra v1.10.1
+	golang.org/x/crypto v0.37.0
 )
 
 require (
@@ -35,7 +34,6 @@ require (
 	gameclustering.com/internal/conf v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000 // indirect
-	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
@@ -66,7 +64,6 @@ require (
 	go.opentelemetry.io/otel/trace v1.35.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sync v0.13.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect

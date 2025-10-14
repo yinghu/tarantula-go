@@ -1,11 +1,9 @@
-package metrics
+package core
 
-import (
-	"gameclustering.com/internal/core"
-)
+
 
 type MetricsService interface {
-	core.SetUp
+	SetUp
 	WebRequest(m ReqMetrics) error
 }
 

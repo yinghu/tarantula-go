@@ -3,7 +3,7 @@ package persistence
 import (
 	"errors"
 
-	"gameclustering.com/internal/metrics"
+	"gameclustering.com/internal/core"
 )
 
 const (
@@ -23,7 +23,7 @@ func (s *MetricsDB) Start() error {
 	return nil
 }
 
-func (s *MetricsDB) WebRequest(m metrics.ReqMetrics) error {
+func (s *MetricsDB) WebRequest(m core.ReqMetrics) error {
 	inserted, err := s.Sql.Exec(INSERT_METRICS, m.Path, m.ReqTimed, m.Node, m.ReqId, m.ReqCode)
 	if err != nil {
 		return err

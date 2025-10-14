@@ -6,8 +6,6 @@ replace gameclustering.com/internal/core => ../core
 
 replace gameclustering.com/internal/util => ../util
 
-replace gameclustering.com/internal/metrics => ../metrics
-
 replace gameclustering.com/internal/item => ../item
 
 replace gameclustering.com/internal/event => ../event
@@ -16,7 +14,6 @@ require (
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000
-	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
 	github.com/0xc0d/encoding v0.1.0
 	github.com/dgraph-io/badger/v4 v4.7.0
