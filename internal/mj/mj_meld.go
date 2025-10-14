@@ -1,4 +1,4 @@
-package main
+package mj
 
 //2 to 4 tiles, or 14 if 13 orphans
 const (

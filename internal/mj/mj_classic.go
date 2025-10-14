@@ -1,4 +1,4 @@
-package main
+package mj
 
 const (
 	CLASSIC_MAX_FORMS int = 4

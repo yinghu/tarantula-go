@@ -8,6 +8,7 @@ import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
+	"gameclustering.com/internal/mj"
 )
 
 type ClaimHand struct {
@@ -30,10 +31,10 @@ func (s *MahjongClaimer) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	h := Hand{}
+	h := mj.Hand{}
 	h.New()
 	for c := range strings.SplitSeq(ch.ClaimList, ",") {
-		t := Tile{}
+		t := mj.Tile{}
 		t.From(c)
 		h.Tiles = append(h.Tiles, t)
 	}

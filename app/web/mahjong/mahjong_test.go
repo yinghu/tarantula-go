@@ -39,8 +39,8 @@ func (s *SampleCreator) OnEvent(e event.Event) {
 
 func TestClient(t *testing.T) {
 	hc := util.HttpCaller{Host: "http://192.168.1.11"}
-	login := bootstrap.Login{Name: "load3", Hash: "aaa"}
-	err := hc.PostJson("presence/register", login, func(resp *http.Response) error {
+	login := bootstrap.Login{Name: "player1", Hash: "aaa"}
+	err := hc.PostJson("presence/login", login, func(resp *http.Response) error {
 		session := core.OnSession{}
 		err := json.NewDecoder(resp.Body).Decode(&session)
 		if err != nil {

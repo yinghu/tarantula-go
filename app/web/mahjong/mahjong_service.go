@@ -8,11 +8,12 @@ import (
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/mj"
 )
 
 type MahjongService struct {
 	bootstrap.AppManager
-	ClassicMahjong
+	mj.ClassicMahjong
 }
 
 func (s *MahjongService) Config() string {
@@ -22,7 +23,7 @@ func (s *MahjongService) Config() string {
 func (s *MahjongService) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 	s.ItemUpdater = s
 	s.AppManager.Start(f, c, p)
-	s.ClassicMahjong = ClassicMahjong{}
+	s.ClassicMahjong = mj.ClassicMahjong{}
 	s.ClassicMahjong.New()
 	http.Handle("/mahjong/dice", bootstrap.Logging(&MahjongDicer{MahjongService: s}))
 	http.Handle("/mahjong/claim", bootstrap.Logging(&MahjongClaimer{MahjongService: s}))
