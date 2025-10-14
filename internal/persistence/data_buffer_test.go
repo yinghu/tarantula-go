@@ -122,7 +122,7 @@ func (s *sample) Read(value core.DataBuffer) error {
 }
 
 func TestDatatBuffer(t *testing.T) {
-	local := BadgerLocal{InMemory: true}
+	local := BadgerLocal{InMemory: true,LogDisabled: true}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("Local store error %s", err.Error())

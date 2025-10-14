@@ -16,7 +16,7 @@ const (
 )
 
 func TestTournamentEvent(t *testing.T) {
-	local := BadgerLocal{InMemory: true}
+	local := BadgerLocal{InMemory: true,LogDisabled: true}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("Local store error %s", err.Error())
@@ -65,7 +65,7 @@ func TestTournamentEvent(t *testing.T) {
 	if err != nil {
 		t.Errorf("Local store error %s", err.Error())
 	}
-	fmt.Printf("Count : %d %s\n", ct.Count, time.UnixMilli(ct.Timestamp()))
+	//fmt.Printf("Count : %d %s\n", ct.Count, time.UnixMilli(ct.Timestamp()))
 	if ct.Count != 5 {
 		t.Errorf("count should be 5 %d", ct.Count)
 	}
@@ -93,7 +93,7 @@ func TestTournamentEvent(t *testing.T) {
 }
 
 func TestTournamentQuery(t *testing.T) {
-	local := BadgerLocal{InMemory: true}
+	local := BadgerLocal{InMemory: true,LogDisabled: true}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("Local store error %s", err.Error())

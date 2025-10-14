@@ -10,7 +10,7 @@ import (
 )
 
 func TestStringKey(t *testing.T) {
-	local := BadgerLocal{InMemory: true}
+	local := BadgerLocal{InMemory: true,LogDisabled: true}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
@@ -73,7 +73,7 @@ func TestStringKey(t *testing.T) {
 }
 
 func TestBufferKey(t *testing.T) {
-	local := BadgerLocal{InMemory: true}
+	local := BadgerLocal{InMemory: true,LogDisabled: true}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
@@ -222,7 +222,7 @@ func TestBufferKey(t *testing.T) {
 }
 
 func TestStreming(t *testing.T) {
-	local := BadgerLocal{InMemory: true}
+	local := BadgerLocal{InMemory: true,LogDisabled: true}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())

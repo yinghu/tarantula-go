@@ -17,9 +17,10 @@ const (
 )
 
 type BadgerLocal struct {
-	InMemory bool
-	Path     string
-	Db       *badger.DB
+	InMemory    bool
+	Path        string
+	Db          *badger.DB
+	LogDisabled bool
 }
 
 func (s *BadgerLocal) Save(t core.Persistentable) error {
@@ -175,9 +176,15 @@ func (s *BadgerLocal) Open() error {
 	var opt badger.Options
 	if s.InMemory {
 		opt = badger.DefaultOptions("").WithInMemory(true)
+		if s.LogDisabled {
+			opt.Logger = nil
+		}
 	} else {
 		opt = badger.DefaultOptions(s.Path)
 		opt.SyncWrites = false
+		if s.LogDisabled {
+			opt.Logger = nil
+		}
 	}
 	db, err := badger.Open(opt)
 	if err != nil {
