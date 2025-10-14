@@ -167,11 +167,11 @@ func TestBufferKey(t *testing.T) {
 				buff.Clear()
 				buff.Write(val)
 				buff.Flip()
-				s1, _ := buff.ReadString()
-				s2, _ := buff.ReadString()
-				s3, _ := buff.ReadInt32()
-				s4, _ := buff.ReadString()
-				fmt.Printf("%s%s%d%s\n", s1, s2, s3, s4)
+				//s1, _ := buff.ReadString()
+				//s2, _ := buff.ReadString()
+				//s3, _ := buff.ReadInt32()
+				//s4, _ := buff.ReadString()
+				//fmt.Printf("%s%s%d%s\n", s1, s2, s3, s4)
 				return nil
 			})
 		}
@@ -180,7 +180,7 @@ func TestBufferKey(t *testing.T) {
 	if ct != 500 {
 		t.Errorf("should be 100 item %d", ct)
 	}
-	fmt.Println("Reverse")
+	//fmt.Println("Reverse")
 	ct = 0
 	local.Db.View(func(txn *badger.Txn) error {
 		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: true}
@@ -206,11 +206,11 @@ func TestBufferKey(t *testing.T) {
 				buff.Clear()
 				buff.Write(val)
 				buff.Flip()
-				s1, _ := buff.ReadString()
-				s2, _ := buff.ReadString()
-				s3, _ := buff.ReadInt32()
-				s4, _ := buff.ReadString()
-				fmt.Printf("%s%s%d%s\n", s1, s2, s3, s4)
+				//s1, _ := buff.ReadString()
+				//s2, _ := buff.ReadString()
+				//s3, _ := buff.ReadInt32()
+				//s4, _ := buff.ReadString()
+				//fmt.Printf("%s%s%d%s\n", s1, s2, s3, s4)
 				return nil
 			})
 		}
@@ -230,7 +230,7 @@ func TestStreming(t *testing.T) {
 	defer local.Close()
 	local.Db.Update(func(txn *badger.Txn) error {
 		buff := NewBuffer(100)
-		for i := range 10 {
+		for i := range 1000 {
 			buff.Clear()
 			buff.WriteString("etg")
 			buff.WriteString("user")
@@ -242,27 +242,28 @@ func TestStreming(t *testing.T) {
 		}
 		return nil
 	})
+	ct := 0
 	stream := local.Db.NewStream()
-	stream.NumGo = 2
+	stream.NumGo = 3
 	stream.ChooseKey = func(item *badger.Item) bool {
 		buff := NewBuffer(100)
 		buff.Clear()
 		buff.Write(item.Key())
 		buff.Flip()
-		s1, _ := buff.ReadString()
-		s2, _ := buff.ReadString()
-		s3, _ := buff.ReadInt32()
-		s4, _ := buff.ReadString()
-		fmt.Printf("Streaming : %s%s%d%s\n", s1, s2, s3, s4)
+		//s1, _ := buff.ReadString()
+		//s2, _ := buff.ReadString()
+		//s3, _ := buff.ReadInt32()
+		//s4, _ := buff.ReadString()
+		//fmt.Printf("Streaming : %s%s%d%s\n", s1, s2, s3, s4)
+		ct++
 		return true
 	}
 	stream.KeyToList = nil
-	//= func(key []byte, itr *badger.Iterator) (*pb.KVList, error) {
-	//return
-	//}
 	stream.Send = func(buf *z.Buffer) error {
 		return nil
 	}
 	stream.Orchestrate(context.Background())
-
+	if ct != 1000 {
+		t.Errorf("should be 1000 item %d", ct)
+	}
 }

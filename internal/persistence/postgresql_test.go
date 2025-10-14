@@ -45,8 +45,8 @@ func TestPool(t *testing.T) {
 	query1 := "SELECT name, hash FROM login"
 	pool.Query(doNext, query1)
 
-	ct, _ := pool.Exec("INSERT INTO login (name,hash,system_id) VALUES($1,$2,$3)", "adrun", "hash", 4)
-	fmt.Printf("CT %d : \n", ct)
+	pool.Exec("INSERT INTO login (name,hash,system_id) VALUES($1,$2,$3)", "adrun", "hash", 4)
+	//fmt.Printf("CT %d : \n", ct)
 
 	pool.Txn(doTransaction)
 

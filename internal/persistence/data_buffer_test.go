@@ -177,7 +177,7 @@ func TestDatatBuffer(t *testing.T) {
 	if load1.F64 != 64.09 {
 		t.Errorf("no load %f", load1.F64)
 	}
-	fmt.Printf("Rev :%d\n", load1.Revision())
+	//fmt.Printf("Rev :%d\n", load1.Revision())
 	sample2 := sample{Id: 1000, Tag: "sample:"}
 	sample2.Str = "test"
 	local.Save(&sample2)
