@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	badger "github.com/dgraph-io/badger/v4"
 	"github.com/dgraph-io/ristretto/v2/z"
 )
 
 func TestStringKey(t *testing.T) {
-	local := BadgerLocal{InMemory: true,LogDisabled: true}
+	local := BadgerLocal{InMemory: true, LogDisabled: true}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
@@ -73,7 +74,7 @@ func TestStringKey(t *testing.T) {
 }
 
 func TestBufferKey(t *testing.T) {
-	local := BadgerLocal{InMemory: true,LogDisabled: true}
+	local := BadgerLocal{InMemory: true, LogDisabled: true}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
@@ -222,7 +223,7 @@ func TestBufferKey(t *testing.T) {
 }
 
 func TestStreming(t *testing.T) {
-	local := BadgerLocal{InMemory: true,LogDisabled: true}
+	local := BadgerLocal{InMemory: true, LogDisabled: true}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
@@ -266,4 +267,121 @@ func TestStreming(t *testing.T) {
 	if ct != 1000 {
 		t.Errorf("should be 1000 item %d", ct)
 	}
+}
+
+func TestVersioning(t *testing.T) {
+	local := BadgerLocal{InMemory: true, LogDisabled: true}
+	err := local.Open()
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+	}
+	defer local.Close()
+	k := []byte("key")
+	local.Db.Update(func(txn *badger.Txn) error {
+		e := badger.NewEntry(k, []byte("v1"))
+		txn.SetEntry(e)
+
+		return nil
+	})
+	local.Db.Update(func(txn *badger.Txn) error {
+		txn.Set(k, []byte("v2"))
+		return nil
+	})
+	local.Db.Update(func(txn *badger.Txn) error {
+		txn.Set(k, []byte("v3"))
+		return nil
+	})
+	local.Db.Update(func(txn *badger.Txn) error {
+		txn.Set(k, []byte("v4"))
+		return nil
+	})
+	k1 := []byte("key1")
+	local.Db.Update(func(txn *badger.Txn) error {
+		e := badger.NewEntry(k1, []byte("v1"))
+		txn.SetEntry(e)
+
+		return nil
+	})
+	local.Db.Update(func(txn *badger.Txn) error {
+		txn.Set(k1, []byte("v2"))
+		return nil
+	})
+	local.Db.Update(func(txn *badger.Txn) error {
+		txn.Set(k1, []byte("v3"))
+		return nil
+	})
+	local.Db.Update(func(txn *badger.Txn) error {
+		txn.Set(k1, []byte("v4"))
+		return nil
+	})
+	var v string
+	err = local.Db.View(func(txn *badger.Txn) error {
+		item, err := txn.Get(k)
+		if err != nil {
+			return err
+		}
+		item.Value(func(val []byte) error {
+			v = string(val)
+			return nil
+		})
+		return nil
+	})
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+		return
+	}
+	if v != "v4" {
+		t.Errorf("should be v4 %s", v)
+	}
+
+	local.Db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchSize = 10
+		//opts.PrefetchValues = false
+		opts.AllVersions = true
+		it := txn.NewIterator(opts)
+		defer it.Close()
+		for it.Seek(k1); it.Valid(); it.Next() {
+			item := it.Item()
+			if string(item.Key()) != string(k1) {
+				break
+			}
+			err := item.Value(func(v []byte) error {
+				fmt.Printf("key=%s, value=%s, version=%d\n", k1, v, item.Version())
+				return nil
+			})
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+}
+
+func TestMerging(t *testing.T) {
+	local := BadgerLocal{InMemory: true, LogDisabled: true}
+	err := local.Open()
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+	}
+	defer local.Close()
+	k := []byte("key")
+	local.Db.Update(func(txn *badger.Txn) error {
+		e := badger.NewEntry(k, []byte("v1"))
+		txn.SetEntry(e)
+
+		return nil
+	})
+	m := local.Db.GetMergeOperator(k, func(old, new []byte) []byte {
+		old = append(old, new...)
+		return old
+	}, 100*time.Millisecond)
+	defer m.Stop()
+	m.Add( []byte("v2"))
+	m.Add( []byte("v3"))
+	m.Add( []byte("v4"))
+	res,_ := m.Get()
+	v := string(res)
+	fmt.Printf("Merged %s\n",v)	
 }
