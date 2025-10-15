@@ -114,6 +114,7 @@ func (s *BadgerLocal) set(key *BufferProxy, value *BufferProxy, t core.Persisten
 		k, _ := key.Read(0)
 		v, _ := value.Read(0)
 		var riv int64 = 0
+		updating := true
 		item, err := txn.Get(k)
 		if err == nil {
 			value.Clear()
@@ -127,12 +128,17 @@ func (s *BadgerLocal) set(key *BufferProxy, value *BufferProxy, t core.Persisten
 				}
 				return nil
 			})
+		} else { //no record existed
+			updating = false
 		}
 		if riv > 0 && riv != t.Revision() {
 			return fmt.Errorf("revison number not matched %d %d", riv, t.Revision())
 		}
 		if err := txn.Set(k, v); err != nil {
 			return err
+		}
+		if updating {
+			return nil
 		}
 		//update stat total
 		se := event.StatEvent{Tag: t.ETag(), Name: event.STAT_TOTAL}
