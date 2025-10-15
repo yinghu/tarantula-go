@@ -32,9 +32,10 @@ func (s *PostofficeRecoverer) recover(query event.Query) {
 	}
 	mc := stat.Count
 	lmt := 0
-	s.Ds.List(&buff, func(k, v core.DataBuffer, rev uint64) bool {
+	s.Ds.List(&buff, func(k, v core.DataBuffer) bool {
 		lmt++
 		cid, _ := v.ReadInt32()
+		rev, _ := v.ReadInt64()
 		tm, _ := v.ReadInt64()
 		e := event.CreateEvent(int(cid))
 		if e == nil {
@@ -43,7 +44,7 @@ func (s *PostofficeRecoverer) recover(query event.Query) {
 		e.ReadKey(k)
 		e.Read(v)
 		e.OnTimestamp(tm)
-		//e.OnRevision(rev)
+		e.OnRevision(rev)
 		e.OnTopic(query.QTopic())
 		go func() {
 			s.Publish(e)

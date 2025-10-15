@@ -195,13 +195,15 @@ func TestDatatBuffer(t *testing.T) {
 	px.WriteString("sample:")
 	px.Flip()
 	ct := 0
-	local.List(&px, func(k, v core.DataBuffer, rev uint64) bool {
+	local.List(&px, func(k, v core.DataBuffer) bool {
 		d := sample{}
 		d.ReadKey(k)
 		v.ReadInt32()
+		v.ReadInt64()
+		v.ReadInt64()
 		//fmt.Printf("header %d %d\n", cid, rev)
 		d.Read(v)
-		d.OnRevision(rev)
+		//d.OnRevision(rev)
 		//fmt.Printf("streaming %s, %d\n", d.Tag, d.Id)
 		//fmt.Printf("streaming %s, %d\n", d.Str, d.I64)
 		ct++

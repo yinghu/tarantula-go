@@ -66,8 +66,8 @@ func TestTournamentEvent(t *testing.T) {
 		t.Errorf("Local store error %s", err.Error())
 	}
 	//fmt.Printf("Count : %d %s\n", ct.Count, time.UnixMilli(ct.Timestamp()))
-	if ct.Count != 5 {
-		t.Errorf("count should be 5 %d", ct.Count)
+	if ct.Count != 10 {
+		t.Errorf("count should be 10 %d", ct.Count)
 	}
 	tq := event.QTournament{TournamentId: TID, InstanceId: IID, SystemId: SID}
 	tq.Tag = event.TOURNAMENT_ETAG
@@ -76,12 +76,12 @@ func TestTournamentEvent(t *testing.T) {
 	tq.QCriteria(&px)
 	px.Flip()
 	t1000 := 0
-	local.List(&px, func(k, v core.DataBuffer, rev uint64) bool {
+	local.List(&px, func(k, v core.DataBuffer) bool {
 		t := event.TournamentEvent{}
 		v.ReadInt32()
 		v.ReadInt64()
 		t.Read(v)
-		t.Rev = rev
+		//t.Rev = rev
 		//fmt.Printf("Score %d , LastUpdated %d Rev : %d\n", t.Score, t.LastUpdated, t.Revision())
 		t1000++
 		return true
@@ -144,12 +144,12 @@ func TestTournamentQuery(t *testing.T) {
 	tq.QCriteria(&px)
 	px.Flip()
 	t2000 := 0
-	local.List(&px, func(k, v core.DataBuffer, rev uint64) bool {
+	local.List(&px, func(k, v core.DataBuffer) bool {
 		t := event.TournamentEvent{}
 		v.ReadInt32()
 		v.ReadInt64()
 		t.Read(v)
-		t.Rev = rev
+		//t.Rev = rev
 		//fmt.Printf("Score %d , LastUpdated %d Rev : %d\n", t.Score, t.LastUpdated, t.Revision())
 		t2000++
 		return true
@@ -167,12 +167,12 @@ func TestTournamentQuery(t *testing.T) {
 	tq.QCriteria(&px)
 	px.Flip()
 	tc := 0
-	local.List(&px, func(k, v core.DataBuffer, rev uint64) bool {
+	local.List(&px, func(k, v core.DataBuffer) bool {
 		t := event.TournamentEvent{}
 		v.ReadInt32()
 		v.ReadInt64()
 		t.Read(v)
-		t.Rev = rev
+		//t.Rev = rev
 		//fmt.Printf("Score %d , LastUpdated %d Rev : %d\n", t.Score, t.LastUpdated, t.Revision())
 		tc++
 		return true

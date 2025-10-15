@@ -30,6 +30,7 @@ func (s *BadgerLocal) Save(t core.Persistentable) error {
 	value.NewProxy(BDG_VALUE_SIZE)
 	t.WriteKey(&key)
 	value.WriteInt32(int32(t.ClassId()))
+	value.WriteInt64(int64(t.Revision()))
 	value.WriteInt64(time.Now().UnixMilli())
 	t.Write(&value)
 	key.Flip()
@@ -44,18 +45,28 @@ func (s *BadgerLocal) Load(t core.Persistentable) error {
 	key.Flip()
 	value := BufferProxy{}
 	value.NewProxy(BDG_VALUE_SIZE)
-	rev, err := s.get(&key, &value)
+	err := s.get(&key, &value)
 	if err != nil {
 		return err
 	}
-	value.ReadInt32()
+	cid, err := value.ReadInt32()
+	if err != nil {
+		return err
+	}
+	if cid != int32(t.ClassId()) {
+		return fmt.Errorf("class id not matched %d , %d", cid, t.ClassId())
+	}
+	rv, err := value.ReadInt64()
+	if err != nil {
+		return err
+	}
 	tm, err := value.ReadInt64()
 	if err != nil {
 		return err
 	}
 	t.OnTimestamp(tm)
+	t.OnRevision(rv)
 	t.Read(&value)
-	t.OnRevision(rev)
 	return nil
 }
 
@@ -87,7 +98,7 @@ func (s *BadgerLocal) List(prefix core.DataBuffer, stream core.Stream) error {
 			}
 			key.Flip()
 			value.Flip()
-			if !stream(&key, &value, kv.Version()) {
+			if !stream(&key, &value) {
 				break
 			}
 		}
@@ -97,20 +108,30 @@ func (s *BadgerLocal) List(prefix core.DataBuffer, stream core.Stream) error {
 
 func (s *BadgerLocal) set(key *BufferProxy, value *BufferProxy, t core.Persistentable) error {
 	if key.Remaining() == 0 || value.Remaining() == 0 {
-		return errors.New("bad key/value")
+		return fmt.Errorf("bad key/value")
 	}
 	return s.Db.Update(func(txn *badger.Txn) error {
 		k, _ := key.Read(0)
 		v, _ := value.Read(0)
+		var riv int64 = 0
 		item, err := txn.Get(k)
-		if err == nil && t.Revision() != item.Version() {
-			return fmt.Errorf("rev not match %d %d", t.Revision(), item.Version())
+		if err == nil {
+			value.Clear()
+			item.Value(func(val []byte) error {
+				value.Write(val)
+				value.Flip()
+				value.ReadInt32()
+				v, err := value.ReadInt64()
+				if err != nil {
+					riv = v
+				}
+				return nil
+			})
 		}
-		if err == nil && t.Revision() == item.Version() {
-			return txn.Set(k, v)
+		if riv > 0 && riv != t.Revision() {
+			return fmt.Errorf("revison number not matched %d %d", riv, t.Revision())
 		}
-		//new entry
-		if err = txn.Set(k, v); err != nil {
+		if err := txn.Set(k, v); err != nil {
 			return err
 		}
 		//update stat total
@@ -131,6 +152,7 @@ func (s *BadgerLocal) set(key *BufferProxy, value *BufferProxy, t core.Persisten
 			value.Flip()
 			value.ReadInt32()
 			value.ReadInt64()
+			value.ReadInt64()
 			se.Read(value)
 			se.Count = se.Count + 1
 		} else {
@@ -138,6 +160,7 @@ func (s *BadgerLocal) set(key *BufferProxy, value *BufferProxy, t core.Persisten
 		}
 		value.Clear()
 		value.WriteInt32(int32(se.ClassId()))
+		value.WriteInt64(se.Revision())
 		value.WriteInt64(time.Now().UnixMilli())
 		se.Write(value)
 		value.Flip()
@@ -147,18 +170,16 @@ func (s *BadgerLocal) set(key *BufferProxy, value *BufferProxy, t core.Persisten
 	})
 }
 
-func (s *BadgerLocal) get(key *BufferProxy, value *BufferProxy) (uint64, error) {
+func (s *BadgerLocal) get(key *BufferProxy, value *BufferProxy) error {
 	if key.Remaining() == 0 {
-		return 0, errors.New("bad key/value")
+		return errors.New("bad key/value")
 	}
-	var rev uint64
 	err := s.Db.View(func(txn *badger.Txn) error {
 		k, _ := key.Read(0)
 		item, err := txn.Get(k)
 		if err != nil {
 			return err
 		}
-		rev = item.Version()
 		item.Value(func(val []byte) error {
 			value.Write(val)
 			value.Flip()
@@ -167,9 +188,9 @@ func (s *BadgerLocal) get(key *BufferProxy, value *BufferProxy) (uint64, error) 
 		return nil
 	})
 	if err != nil {
-		return 0, err
+		return err
 	}
-	return rev, nil
+	return nil
 }
 
 func (s *BadgerLocal) Open() error {

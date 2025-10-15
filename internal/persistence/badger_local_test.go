@@ -333,11 +333,10 @@ func TestVersioning(t *testing.T) {
 	if v != "v4" {
 		t.Errorf("should be v4 %s", v)
 	}
-
+	ct := 0
 	local.Db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
 		opts.PrefetchSize = 10
-		//opts.PrefetchValues = false
 		opts.AllVersions = true
 		it := txn.NewIterator(opts)
 		defer it.Close()
@@ -347,7 +346,8 @@ func TestVersioning(t *testing.T) {
 				break
 			}
 			err := item.Value(func(v []byte) error {
-				fmt.Printf("key=%s, value=%s, version=%d\n", k1, v, item.Version())
+				ct++
+				//fmt.Printf("key=%s, value=%s, version=%d\n", k1, v, item.Version())
 				return nil
 			})
 			if err != nil {
@@ -356,7 +356,9 @@ func TestVersioning(t *testing.T) {
 		}
 		return nil
 	})
-
+	if ct != 4 {
+		t.Errorf("should be 4 item %d", ct)
+	}
 }
 
 func TestMerging(t *testing.T) {
@@ -378,10 +380,13 @@ func TestMerging(t *testing.T) {
 		return old
 	}, 100*time.Millisecond)
 	defer m.Stop()
-	m.Add( []byte("v2"))
-	m.Add( []byte("v3"))
-	m.Add( []byte("v4"))
-	res,_ := m.Get()
+	m.Add([]byte("v2"))
+	m.Add([]byte("v3"))
+	m.Add([]byte("v4"))
+	res, _ := m.Get()
 	v := string(res)
-	fmt.Printf("Merged %s\n",v)	
+	if v!= "v1v2v3v4"{
+		t.Errorf("should be v1v2v3v4 %s",v)
+	}
+	//fmt.Printf("Merged %s\n", v)
 }
