@@ -7,7 +7,7 @@ const (
 	MESSAGE_CID         int = 3
 	TOURNAMENT_CID      int = 4
 	SUBSCRIPTION_CID    int = 5
-	TOURNAMENT_JOIN_CID int = 6
+	TOURNAMENT_SCORE_CID int = 6
 	INVENTORY_CID       int = 7
 	JOIN_CID            int = 8
 	KICKOFF_CID         int = 9
@@ -17,10 +17,10 @@ const (
 	MESSAGE_ETAG      string = "msg:"
 	TOURNAMENT_ETAG   string = "tmt:"
 	SUBSCRIPTION_ETAG string = "sub:"
-	INVENTORY_ETAG    string = "inv"
-	JOIN_ETAG         string = "join"
-	KICKOFF_ETAG      string = "koff"
-	REGISTER_ETAG     string = "reg"
+	INVENTORY_ETAG    string = "inv:"
+	JOIN_ETAG         string = "join:"
+	KICKOFF_ETAG      string = "koff:"
+	REGISTER_ETAG     string = "reg:"
 
 	STAT_ETAG string = "stat:"
 
@@ -39,8 +39,8 @@ func CreateEvent(cid int) Event {
 		return &TournamentEvent{}
 	case SUBSCRIPTION_CID:
 		return &SubscriptionEvent{}
-	case TOURNAMENT_JOIN_CID:
-		return &TournamentJoinIndex{}
+	case TOURNAMENT_SCORE_CID:
+		return &TournamentScoreIndex{}
 	case INVENTORY_CID:
 		return &InventoryEvent{}
 	case JOIN_CID:

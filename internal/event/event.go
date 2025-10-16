@@ -63,8 +63,8 @@ type Pusher interface {
 type EventObj struct {
 	Callback EventListener `json:"-"`
 	core.PersistentableObj
-	ETopic string `json:"ETopic"`
-	EOid   int64  `json:"EOid,string"`
+	ETopic string `json:"-"`
+	EOid   int64  `json:"-"`
 }
 
 func (s *EventObj) OnTopic(t string) {

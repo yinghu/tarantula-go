@@ -3,10 +3,10 @@ package event
 import "gameclustering.com/internal/core"
 
 const (
-	T_JOIN_TAG string = "join:"
+	T_SCORE_TAG string = "score:"
 )
 
-type TournamentJoinIndex struct {
+type TournamentScoreIndex struct {
 	
 	TournamentId int64 `json:"TournamentId,string"`
 	InstanceId   int64 `json:"InstanceId,string"`
@@ -15,23 +15,23 @@ type TournamentJoinIndex struct {
 	EventObj     `json:"-"`
 }
 
-func (s *TournamentJoinIndex) ClassId() int {
-	return TOURNAMENT_JOIN_CID
+func (s *TournamentScoreIndex) ClassId() int {
+	return TOURNAMENT_SCORE_CID
 }
 
-func (s *TournamentJoinIndex) ETag() string {
+func (s *TournamentScoreIndex) ETag() string {
 	return TOURNAMENT_ETAG
 }
 
-func (s *TournamentJoinIndex) Distributed() bool {
+func (s *TournamentScoreIndex) Distributed() bool {
 	return true
 }
 
-func (s *TournamentJoinIndex) WriteKey(buff core.DataBuffer) error {
+func (s *TournamentScoreIndex) WriteKey(buff core.DataBuffer) error {
 	if err := buff.WriteString(s.ETag()); err != nil {
 		return err
 	}
-	if err := buff.WriteString(T_JOIN_TAG); err != nil {
+	if err := buff.WriteString(T_SCORE_TAG); err != nil {
 		return err
 	}
 	if err := buff.WriteInt64(s.SystemId); err != nil {
@@ -43,7 +43,7 @@ func (s *TournamentJoinIndex) WriteKey(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *TournamentJoinIndex) ReadKey(buff core.DataBuffer) error {
+func (s *TournamentScoreIndex) ReadKey(buff core.DataBuffer) error {
 	_, err := buff.ReadString()
 	if err != nil {
 		return err
@@ -65,7 +65,7 @@ func (s *TournamentJoinIndex) ReadKey(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *TournamentJoinIndex) Write(buff core.DataBuffer) error {
+func (s *TournamentScoreIndex) Write(buff core.DataBuffer) error {
 	if err := buff.WriteInt64(s.TournamentId); err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func (s *TournamentJoinIndex) Write(buff core.DataBuffer) error {
 	}
 	return nil
 }
-func (s *TournamentJoinIndex) Read(buff core.DataBuffer) error {
+func (s *TournamentScoreIndex) Read(buff core.DataBuffer) error {
 	tid, err := buff.ReadInt64()
 	if err != nil {
 		return err
@@ -96,7 +96,7 @@ func (s *TournamentJoinIndex) Read(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *TournamentJoinIndex) Outbound(buff core.DataBuffer) error {
+func (s *TournamentScoreIndex) Outbound(buff core.DataBuffer) error {
 	if err := s.WriteKey(buff); err != nil {
 		s.Callback.OnError(s,err)
 		return err
@@ -108,7 +108,7 @@ func (s *TournamentJoinIndex) Outbound(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *TournamentJoinIndex) Inbound(buff core.DataBuffer) error {
+func (s *TournamentScoreIndex) Inbound(buff core.DataBuffer) error {
 	if err := s.ReadKey(buff); err != nil {
 		s.Callback.OnError(s,err)
 		return err

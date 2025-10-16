@@ -30,7 +30,7 @@ func (s *BadgerLocal) Save(t core.Persistentable) error {
 	value.NewProxy(BDG_VALUE_SIZE)
 	t.WriteKey(&key)
 	value.WriteInt32(int32(t.ClassId()))
-	value.WriteInt64(int64(t.Revision()))
+	value.WriteInt64(int64(t.Revision() + 1))
 	value.WriteInt64(time.Now().UnixMilli())
 	t.Write(&value)
 	key.Flip()

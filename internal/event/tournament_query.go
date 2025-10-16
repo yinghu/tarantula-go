@@ -23,14 +23,14 @@ func (q *QTournament) QCriteria(buff core.DataBuffer) error {
 	return nil
 }
 
-type QJoin struct{
+type QScore struct{
 	SystemId     int64 `json:"SystemId,string"`
 	QWithTag
 }
 
-func (q *QJoin) QCriteria(buff core.DataBuffer) error {
+func (q *QScore) QCriteria(buff core.DataBuffer) error {
 	buff.WriteString(q.Tag)
-	buff.WriteString(T_JOIN_TAG)
+	buff.WriteString(T_SCORE_TAG)
 	if q.SystemId > 0{
 		buff.WriteInt64(q.SystemId)
 	}
