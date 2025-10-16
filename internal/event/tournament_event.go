@@ -112,8 +112,8 @@ func (s *TournamentEvent) OnIndex(idx IndexListener) {
 	if s.Score > 0 {
 		return
 	}
-	tj := TournamentScoreIndex{TournamentId: s.TournamentId, InstanceId: s.InstanceId, SystemId: s.SystemId, JoinTime: s.LastUpdated}
-	tj.OnOId(s.OId())
-	tj.OnTopic("tournament")
-	idx.Index(&tj)
+	//tj := TournamentScoreIndex{TournamentId: s.TournamentId, InstanceId: s.InstanceId, SystemId: s.SystemId, JoinTime: s.LastUpdated}
+	//tj.OnOId(s.OId())
+	//tj.OnTopic("tournament")
+	//idx.Index(&tj)
 }

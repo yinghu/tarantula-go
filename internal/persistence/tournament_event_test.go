@@ -16,11 +16,13 @@ const (
 )
 
 type SampleIndexListener struct {
-	local *BadgerLocal
+	BadgerLocal
 }
+func (s *SampleIndexListener) LocalStore() core.DataStore{
+	return s
+}
+func (s *SampleIndexListener) Publish(e event.Event){
 
-func (s *SampleIndexListener) Index(idx event.Index) {
-	fmt.Printf("indexing %v\n", idx)
 }
 
 func TestTournamentEvent(t *testing.T) {
@@ -30,7 +32,7 @@ func TestTournamentEvent(t *testing.T) {
 		t.Errorf("Local store error %s", err.Error())
 	}
 	defer local.Close()
-	index := SampleIndexListener{local: &local}
+	index := SampleIndexListener{BadgerLocal: local}
 	for i := range 5 {
 		sid := 1000 + i
 		tmnt := event.TournamentEvent{TournamentId: TID, InstanceId: IID, SystemId: int64(sid), Score: 0, LastUpdated: time.Now().UnixMilli()}

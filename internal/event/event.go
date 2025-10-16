@@ -5,7 +5,8 @@ import (
 )
 
 type IndexListener interface {
-	Index(idx Index)
+	LocalStore() core.DataStore
+	Publish(e Event)
 }
 
 type EventListener interface {
