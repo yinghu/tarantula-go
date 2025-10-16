@@ -53,7 +53,7 @@ func (s *TournamentService) OnEvent(e event.Event) {
 		tmnt.OnBoard(*te)
 		return
 	}
-	tj, isTj := e.(*event.TournamentJoinIndex)
+	tj, isTj := e.(*event.TournamentScoreIndex)
 	if isTj {
 		core.AppLog.Printf("Join index %v\n", tj)
 	}
