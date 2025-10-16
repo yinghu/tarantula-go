@@ -71,7 +71,11 @@ func (s *BadgerLocal) Load(t core.Persistentable) error {
 }
 
 func (s *BadgerLocal) Query(opt core.ListingOpt, stream core.Stream) ([]byte, error) {
+	if opt.Prefix == nil {
+		return nil, fmt.Errorf("query prefix cannot be nil")
+	}
 	err := s.Db.View(func(txn *badger.Txn) error {
+
 		op := badger.DefaultIteratorOptions
 		op.Reverse = opt.Reverse
 		if opt.PrefetchValues {
