@@ -109,18 +109,6 @@ func (s *PostofficeService) Publish(e event.Event) {
 	s.outboundQ <- e
 }
 
-func (s *PostofficeService) Index(idx event.Index) {
-	err := s.Ds.Save(idx)
-	if err != nil {
-		core.AppLog.Printf("no index saved %s\n", err.Error())
-		return
-	}
-	if !idx.Distributed() {
-		return
-	}
-	s.Publish(idx)
-}
-
 func (s *PostofficeService) NodeStarted(n core.Node) {
 	core.AppLog.Printf("node started : %s\n", n.TcpEndpoint)
 	for i := range s.cchangeQ {

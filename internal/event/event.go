@@ -40,10 +40,6 @@ type EventCreator interface {
 	Create(classId int, topic string) (Event, error)
 }
 
-type Index interface {
-	Event
-	Distributed() bool
-}
 
 type Postoffice interface {
 	Send(e Event) error
@@ -76,9 +72,6 @@ func (s *EventObj) Topic() string {
 	return s.ETopic
 }
 
-func (s *EventObj) Distributed() bool {
-	return false
-}
 
 func (s *EventObj) Inbound(buff core.DataBuffer) error {
 	return nil

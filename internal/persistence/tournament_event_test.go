@@ -18,11 +18,12 @@ const (
 type SampleIndexListener struct {
 	BadgerLocal
 }
-func (s *SampleIndexListener) LocalStore() core.DataStore{
+
+func (s *SampleIndexListener) LocalStore() core.DataStore {
 	return s
 }
-func (s *SampleIndexListener) Publish(e event.Event){
-
+func (s *SampleIndexListener) Publish(e event.Event) {
+	fmt.Printf("Event : %v\n", e)
 }
 
 func TestTournamentEvent(t *testing.T) {
