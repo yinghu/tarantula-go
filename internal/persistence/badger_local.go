@@ -70,17 +70,19 @@ func (s *BadgerLocal) Load(t core.Persistentable) error {
 	return nil
 }
 
-func (s *BadgerLocal) List(prefix core.DataBuffer, stream core.Stream, opt core.ListingOpt) error {
+
+func (s *BadgerLocal) Query(opt core.ListingOpt, stream core.Stream) error {
 	return s.Db.View(func(txn *badger.Txn) error {
-		//opt := badger.DefaultIteratorOptions
-		opt := badger.IteratorOptions{PrefetchSize: 10, PrefetchValues: false, Reverse: false}
-		//opt.Reverse = true
-		it := txn.NewIterator(opt)
-		defer it.Close()
-		p, err := prefix.Read(0)
-		if err != nil {
-			return err
+		op := badger.DefaultIteratorOptions
+		op.Reverse = opt.Reverse
+		if opt.PrefetchValues {
+			op.PrefetchValues = opt.PrefetchValues
+			op.PrefetchSize = opt.PrefetchSize
 		}
+		op.AllVersions = opt.VersionedValues
+		it := txn.NewIterator(op)
+		defer it.Close()
+		p := opt.Prefix
 		key := BufferProxy{}
 		key.NewProxy(BDG_KEY_SIZE)
 		value := BufferProxy{}
@@ -88,7 +90,7 @@ func (s *BadgerLocal) List(prefix core.DataBuffer, stream core.Stream, opt core.
 		for it.Seek(p); it.ValidForPrefix(p); it.Next() {
 			kv := it.Item()
 			key.Clear()
-			err = key.Write(kv.Key())
+			err := key.Write(kv.Key())
 			if err != nil {
 				return err
 			}

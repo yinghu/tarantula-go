@@ -195,7 +195,8 @@ func TestDatatBuffer(t *testing.T) {
 	px.WriteString("sample:")
 	px.Flip()
 	ct := 0
-	local.List(&px, func(k, v core.DataBuffer) bool {
+	kp, _ := px.Read(0)
+	local.Query(core.ListingOpt{Prefix: kp}, func(k, v core.DataBuffer) bool {
 		d := sample{}
 		d.ReadKey(k)
 		v.ReadInt32()
@@ -208,7 +209,7 @@ func TestDatatBuffer(t *testing.T) {
 		//fmt.Printf("streaming %s, %d\n", d.Str, d.I64)
 		ct++
 		return true
-	}, core.ListingOpt{})
+	})
 	if ct != 4 {
 		t.Errorf("should be 3 items %d", ct)
 	}

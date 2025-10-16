@@ -69,12 +69,14 @@ func TestTournamentEvent(t *testing.T) {
 	prefix := NewBuffer(100)
 	tq.QCriteria(prefix)
 	prefix.Flip()
-	err = local.List(prefix, func(k, v core.DataBuffer) bool {
+	kp, _ := prefix.Read(0)
+	opt := core.ListingOpt{Prefix: kp}
+	err = local.Query(opt, func(k, v core.DataBuffer) bool {
 		tc := event.TournamentScoreIndex{}
 		tc.ReadKey(k)
 		fmt.Printf("TID : %d , INS : %d , SCORE : %d , TM : %d , SYS : %d\n", tc.TournamentId, tc.InstanceId, tc.Score, tc.UpdateTime, tc.SystemId)
 		return true
-	}, core.ListingOpt{})
+	})
 	if err != nil {
 		t.Errorf("should be error %s", err.Error())
 	}

@@ -32,7 +32,8 @@ func (s *PostofficeRecoverer) recover(query event.Query) {
 	}
 	mc := stat.Count
 	lmt := 0
-	s.Ds.List(&buff, func(k, v core.DataBuffer) bool {
+	kp, _ := buff.Read(0)
+	s.Ds.Query(core.ListingOpt{Prefix: kp}, func(k, v core.DataBuffer) bool {
 		lmt++
 		cid, _ := v.ReadInt32()
 		rev, _ := v.ReadInt64()
@@ -50,7 +51,7 @@ func (s *PostofficeRecoverer) recover(query event.Query) {
 			s.Publish(e)
 		}()
 		return true
-	}, core.ListingOpt{})
+	})
 	core.AppLog.Printf("Total %d recovered from %d\n", lmt, mc)
 }
 

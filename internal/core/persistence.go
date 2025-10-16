@@ -55,15 +55,22 @@ func (s *PersistentableObj) OnRevision(rev int64) {
 }
 
 func (s *PersistentableObj) ETag() string {
-	return "ent:"
+	return "ent"
 }
 
 type ListingOpt struct {
+	Prefix          []byte
+	StartCursor     []byte
+	Reverse         bool
+	PrefetchSize    int
+	PrefetchValues  bool
+	VersionedValues bool
 }
 
 type DataStore interface {
 	Load(p Persistentable) error
 	Save(p Persistentable) error
-	List(prefix DataBuffer, s Stream, opt ListingOpt) error
+	//List(prefix DataBuffer, s Stream, opt ListingOpt) error
+	Query(opt ListingOpt, s Stream) error
 	Close() error
 }
