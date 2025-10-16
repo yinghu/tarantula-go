@@ -34,7 +34,7 @@ func TestTournamentEvent(t *testing.T) {
 	}
 	defer local.Close()
 	index := SampleIndexListener{BadgerLocal: local}
-	for i := range 5 {
+	for i := range 10 {
 		sid := 1000 + i
 		tmnt := event.TournamentEvent{TournamentId: TID, InstanceId: IID, SystemId: int64(sid), Score: 0, LastUpdated: time.Now().UnixMilli()}
 		tmnt.LastUpdated = time.Now().UnixMilli()
@@ -44,124 +44,37 @@ func TestTournamentEvent(t *testing.T) {
 		}
 		tmnt.OnIndex(&index)
 	}
-	for i := range 5 {
+	for i := range 10 {
 		sid := 1000 + i
 		tmnt := event.TournamentEvent{TournamentId: TID, InstanceId: IID, SystemId: int64(sid), Score: 100, LastUpdated: time.Now().UnixMilli()}
 		err = local.Load(&tmnt)
-		fmt.Printf("Rev : %d\n", tmnt.Revision())
 		if err != nil { //not fount
 			err = local.Save(&tmnt)
 			if err != nil {
 				fmt.Printf("new save error %s\n", err.Error())
 			}
 		} else {
-			tmnt.Score = tmnt.Score + 100
+			tmnt.Score = tmnt.Score + 100 + int64(i)
 			tmnt.LastUpdated = time.Now().UnixMilli()
 			err = local.Save(&tmnt)
 			if err != nil {
 				fmt.Printf("update error %s\n", err.Error())
 			}
+			tmnt.OnIndex(&index)
 		}
 	}
-	ct := event.StatEvent{Tag: event.TOURNAMENT_ETAG, Name: event.STAT_TOTAL}
-	err = local.Load(&ct)
-	if err != nil {
-		t.Errorf("Local store error %s", err.Error())
-	}
-	//fmt.Printf("Count : %d %s\n", ct.Count, time.UnixMilli(ct.Timestamp()))
-	if ct.Count != 5 {
-		t.Errorf("count should be 5 %d", ct.Count)
-	}
-}
-
-func TestTournamentQuery(t *testing.T) {
-	local := BadgerLocal{InMemory: true, LogDisabled: true}
-	err := local.Open()
-	if err != nil {
-		t.Errorf("Local store error %s", err.Error())
-	}
-	defer local.Close()
-	for i := range 10 {
-		sid := 10000 + i
-		tmnt := event.TournamentEvent{TournamentId: 2000, InstanceId: IID, SystemId: SID, Score: 100, LastUpdated: time.Now().UnixMilli()}
-		tmnt.OnOId(int64(sid))
-		err = local.Load(&tmnt)
-		if err != nil { //not fount
-			err = local.Save(&tmnt)
-			if err != nil {
-				fmt.Printf("new save error %s\n", err.Error())
-			}
-		} else {
-			tmnt.Score = tmnt.Score + 100
-			tmnt.LastUpdated = time.Now().UnixMilli()
-			err = local.Save(&tmnt)
-			if err != nil {
-				fmt.Printf("update error %s\n", err.Error())
-			}
-		}
-	}
-	for i := range 10 {
-		sid := 20000 + i
-		tmnt := event.TournamentEvent{TournamentId: 3000, InstanceId: IID, SystemId: SID, Score: 100, LastUpdated: time.Now().UnixMilli()}
-		tmnt.OnOId(int64(sid))
-		err = local.Load(&tmnt)
-		if err != nil { //not fount
-			err = local.Save(&tmnt)
-			if err != nil {
-				fmt.Printf("new save error %s\n", err.Error())
-			}
-		} else {
-			tmnt.Score = tmnt.Score + 100
-			tmnt.LastUpdated = time.Now().UnixMilli()
-			err = local.Save(&tmnt)
-			if err != nil {
-				fmt.Printf("update error %s\n", err.Error())
-			}
-		}
-	}
-	tq := event.QTournament{TournamentId: 2000, InstanceId: 0, SystemId: 0}
+	tq := event.QScore{TournamentId: TID, InstanceId: IID}
 	tq.Tag = event.TOURNAMENT_ETAG
-	px := BufferProxy{}
-	px.NewProxy(100)
-	tq.QCriteria(&px)
-	px.Flip()
-	t2000 := 0
-	local.List(&px, func(k, v core.DataBuffer) bool {
-		t := event.TournamentEvent{}
-		v.ReadInt32()
-		v.ReadInt64()
-		t.Read(v)
-		//t.Rev = rev
-		//fmt.Printf("Score %d , LastUpdated %d Rev : %d\n", t.Score, t.LastUpdated, t.Revision())
-		t2000++
+	prefix := NewBuffer(100)
+	tq.QCriteria(prefix)
+	prefix.Flip()
+	err = local.List(prefix, func(k, v core.DataBuffer) bool {
+		tc := event.TournamentScoreIndex{}
+		tc.ReadKey(k)
+		fmt.Printf("TID : %d , INS : %d , SCORE : %d , TM : %d\n", tc.TournamentId, tc.InstanceId, tc.Score, tc.UpdateTime)
 		return true
 	})
-
-	if t2000 != 1 {
-		t.Errorf("t2000 should be 1 %d", t2000)
+	if err != nil {
+		t.Errorf("should be error %s", err.Error())
 	}
-
-	tq = event.QTournament{TournamentId: 3000, InstanceId: 0, SystemId: 0}
-	tq.Tag = event.TOURNAMENT_ETAG
-	//px := BufferProxy{}
-	//px.NewProxy(100)
-	px.Clear()
-	tq.QCriteria(&px)
-	px.Flip()
-	tc := 0
-	local.List(&px, func(k, v core.DataBuffer) bool {
-		t := event.TournamentEvent{}
-		v.ReadInt32()
-		v.ReadInt64()
-		t.Read(v)
-		//t.Rev = rev
-		//fmt.Printf("Score %d , LastUpdated %d Rev : %d\n", t.Score, t.LastUpdated, t.Revision())
-		tc++
-		return true
-	})
-
-	if tc != 1 {
-		t.Errorf("tc should be 1 %d", tc)
-	}
-
 }

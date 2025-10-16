@@ -109,11 +109,16 @@ func (s *TournamentEvent) Inbound(buff core.DataBuffer) error {
 }
 
 func (s *TournamentEvent) OnIndex(idx IndexListener) {
-	if s.Score > 0 {
+	if s.Score == 0 {
 		return
 	}
-	tj := TournamentScoreIndex{TournamentId: s.TournamentId, InstanceId: s.InstanceId, SystemId: s.SystemId, JoinTime: s.LastUpdated}
-	tj.OnOId(s.OId())
+	tj := TournamentScoreIndex{TournamentId: s.TournamentId, InstanceId: s.InstanceId, Score: s.Score, UpdateTime: s.LastUpdated, SystemId: s.SystemId}
 	tj.OnTopic("tournament")
-	idx.Publish(&tj)
+	err := idx.LocalStore().Load(&tj)
+	if err != nil {
+		err := idx.LocalStore().Save(&tj)
+		if err == nil {
+			idx.Publish(&tj)
+		}
+	}
 }

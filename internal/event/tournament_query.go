@@ -24,15 +24,19 @@ func (q *QTournament) QCriteria(buff core.DataBuffer) error {
 }
 
 type QScore struct{
-	SystemId     int64 `json:"SystemId,string"`
+	TournamentId int64 `json:"TournamentId,string"`
+	InstanceId   int64 `json:"InstanceId,string"`
 	QWithTag
 }
 
 func (q *QScore) QCriteria(buff core.DataBuffer) error {
 	buff.WriteString(q.Tag)
 	buff.WriteString(T_SCORE_TAG)
-	if q.SystemId > 0{
-		buff.WriteInt64(q.SystemId)
+	if q.TournamentId > 0 {
+		buff.WriteInt64(q.TournamentId)
+	}
+	if q.InstanceId > 0 {
+		buff.WriteInt64(q.InstanceId)
 	}
 	return nil
 }

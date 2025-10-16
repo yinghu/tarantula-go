@@ -13,16 +13,16 @@ const (
 	KICKOFF_CID         int = 9
 	REGISTER_CID        int = 10
 
-	LOGIN_ETAG        string = "lgn:"
-	MESSAGE_ETAG      string = "msg:"
-	TOURNAMENT_ETAG   string = "tmt:"
-	SUBSCRIPTION_ETAG string = "sub:"
-	INVENTORY_ETAG    string = "inv:"
-	JOIN_ETAG         string = "join:"
-	KICKOFF_ETAG      string = "koff:"
-	REGISTER_ETAG     string = "reg:"
+	LOGIN_ETAG        string = "lgn"
+	MESSAGE_ETAG      string = "msg"
+	TOURNAMENT_ETAG   string = "tmt"
+	SUBSCRIPTION_ETAG string = "sub"
+	INVENTORY_ETAG    string = "inv"
+	JOIN_ETAG         string = "join"
+	KICKOFF_ETAG      string = "koff"
+	REGISTER_ETAG     string = "reg"
 
-	STAT_ETAG string = "stat:"
+	STAT_ETAG string = "stat"
 
 	STAT_TOTAL string = "total"
 )

@@ -74,6 +74,7 @@ func (s *BadgerLocal) List(prefix core.DataBuffer, stream core.Stream) error {
 	return s.Db.View(func(txn *badger.Txn) error {
 		it := txn.NewIterator(badger.DefaultIteratorOptions)
 		defer it.Close()
+		
 		p, err := prefix.Read(0)
 		if err != nil {
 			return err
