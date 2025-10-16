@@ -70,9 +70,8 @@ func (s *BadgerLocal) Load(t core.Persistentable) error {
 	return nil
 }
 
-
-func (s *BadgerLocal) Query(opt core.ListingOpt, stream core.Stream) error {
-	return s.Db.View(func(txn *badger.Txn) error {
+func (s *BadgerLocal) Query(opt core.ListingOpt, stream core.Stream) ([]byte, error) {
+	err := s.Db.View(func(txn *badger.Txn) error {
 		op := badger.DefaultIteratorOptions
 		op.Reverse = opt.Reverse
 		if opt.PrefetchValues {
@@ -87,7 +86,11 @@ func (s *BadgerLocal) Query(opt core.ListingOpt, stream core.Stream) error {
 		key.NewProxy(BDG_KEY_SIZE)
 		value := BufferProxy{}
 		value.NewProxy(BDG_VALUE_SIZE)
-		for it.Seek(p); it.ValidForPrefix(p); it.Next() {
+		seek := p
+		if opt.StartCursor != nil {
+			seek = opt.StartCursor
+		}
+		for it.Seek(seek); it.ValidForPrefix(p); it.Next() {
 			kv := it.Item()
 			key.Clear()
 			err := key.Write(kv.Key())
@@ -109,6 +112,7 @@ func (s *BadgerLocal) Query(opt core.ListingOpt, stream core.Stream) error {
 		}
 		return nil
 	})
+	return nil, err
 }
 
 func (s *BadgerLocal) set(key *BufferProxy, value *BufferProxy, t core.Persistentable) error {

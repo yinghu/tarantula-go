@@ -10,7 +10,7 @@ type QTournament struct {
 }
 
 func (q *QTournament) QCriteria(buff core.DataBuffer) error {
-	buff.WriteString(q.Tag)
+	buff.WriteString(TOURNAMENT_ETAG)
 	if q.TournamentId > 0 {
 		buff.WriteInt64(q.TournamentId)
 	}
@@ -30,7 +30,7 @@ type QScore struct{
 }
 
 func (q *QScore) QCriteria(buff core.DataBuffer) error {
-	buff.WriteString(q.Tag)
+	buff.WriteString(TOURNAMENT_ETAG)
 	buff.WriteString(T_SCORE_TAG)
 	if q.TournamentId > 0 {
 		buff.WriteInt64(q.TournamentId)

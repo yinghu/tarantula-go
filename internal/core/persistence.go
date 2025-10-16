@@ -65,12 +65,12 @@ type ListingOpt struct {
 	PrefetchSize    int
 	PrefetchValues  bool
 	VersionedValues bool
+	Limit           int
 }
 
 type DataStore interface {
 	Load(p Persistentable) error
 	Save(p Persistentable) error
-	//List(prefix DataBuffer, s Stream, opt ListingOpt) error
-	Query(opt ListingOpt, s Stream) error
+	Query(opt ListingOpt, s Stream) ([]byte, error)
 	Close() error
 }
