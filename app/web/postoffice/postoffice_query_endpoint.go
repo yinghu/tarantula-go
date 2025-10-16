@@ -55,7 +55,7 @@ func (s *PostofficeQueryer) query(query event.Query) {
 			query.QCc() <- core.Chunk{Remaining: true, Data: []byte(`,`)}
 		}
 		return lmt > 0 && mc > 0
-	})
+	},core.ListingOpt{})
 	query.QCc() <- core.Chunk{Remaining: false, Data: []byte(`]}`)}
 }
 

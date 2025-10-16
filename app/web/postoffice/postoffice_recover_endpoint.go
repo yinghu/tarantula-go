@@ -50,7 +50,7 @@ func (s *PostofficeRecoverer) recover(query event.Query) {
 			s.Publish(e)
 		}()
 		return true
-	})
+	}, core.ListingOpt{})
 	core.AppLog.Printf("Total %d recovered from %d\n", lmt, mc)
 }
 

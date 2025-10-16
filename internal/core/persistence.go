@@ -1,6 +1,5 @@
 package core
 
-
 type Persistentable interface {
 	Write(value DataBuffer) error
 	WriteKey(key DataBuffer) error
@@ -16,7 +15,7 @@ type Persistentable interface {
 
 type PersistentableObj struct {
 	Rev int64 `json:"rev,string"`
-	Tsp int64  `json:"timestamp,string"`
+	Tsp int64 `json:"timestamp,string"`
 }
 
 type Stream func(k, v DataBuffer) bool
@@ -59,9 +58,12 @@ func (s *PersistentableObj) ETag() string {
 	return "ent:"
 }
 
+type ListingOpt struct {
+}
+
 type DataStore interface {
 	Load(p Persistentable) error
 	Save(p Persistentable) error
-	List(prefix DataBuffer, s Stream) error
+	List(prefix DataBuffer, s Stream, opt ListingOpt) error
 	Close() error
 }

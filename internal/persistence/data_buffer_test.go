@@ -122,7 +122,7 @@ func (s *sample) Read(value core.DataBuffer) error {
 }
 
 func TestDatatBuffer(t *testing.T) {
-	local := BadgerLocal{InMemory: true,LogDisabled: true}
+	local := BadgerLocal{InMemory: true, LogDisabled: true}
 	err := local.Open()
 	if err != nil {
 		t.Errorf("Local store error %s", err.Error())
@@ -208,9 +208,9 @@ func TestDatatBuffer(t *testing.T) {
 		//fmt.Printf("streaming %s, %d\n", d.Str, d.I64)
 		ct++
 		return true
-	})
+	}, core.ListingOpt{})
 	if ct != 4 {
-		t.Errorf("should be 3 items %s", err.Error())
+		t.Errorf("should be 3 items %d", ct)
 	}
 	se := event.StatEvent{Tag: sample1.ETag(), Name: "total"}
 	err = local.Load(&se)

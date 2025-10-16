@@ -70,11 +70,13 @@ func (s *BadgerLocal) Load(t core.Persistentable) error {
 	return nil
 }
 
-func (s *BadgerLocal) List(prefix core.DataBuffer, stream core.Stream) error {
+func (s *BadgerLocal) List(prefix core.DataBuffer, stream core.Stream, opt core.ListingOpt) error {
 	return s.Db.View(func(txn *badger.Txn) error {
-		it := txn.NewIterator(badger.DefaultIteratorOptions)
+		//opt := badger.DefaultIteratorOptions
+		opt := badger.IteratorOptions{PrefetchSize: 10, PrefetchValues: false, Reverse: false}
+		//opt.Reverse = true
+		it := txn.NewIterator(opt)
 		defer it.Close()
-		
 		p, err := prefix.Read(0)
 		if err != nil {
 			return err
