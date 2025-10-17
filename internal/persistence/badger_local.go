@@ -324,6 +324,10 @@ func (s *BadgerLocal) Close() error {
 	if s.InMemory {
 		return s.Db.Close()
 	}
+	if s.Db.IsClosed() {
+		core.AppLog.Printf("local db already closed")
+		return nil
+	}
 	s.Db.Sync()
 	return s.Db.Close()
 }
