@@ -20,8 +20,6 @@ func CreateAppLog(dir string) {
 		return
 	}
 	file, err := os.OpenFile(dir + "/log/tarantula.log",os.O_WRONLY|os.O_CREATE|os.O_APPEND,0644)
-
-	//file, err := os.Create(dir + "/log/tarantula.log")
 	if err != nil {
 		AppLog = log.New(os.Stdout, "", log.LstdFlags)
 		return

@@ -77,6 +77,12 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster, p event.Pusher) 
 	return nil
 }
 
+func (s *PostofficeService) Shutdown() {
+	s.Ds.Close()
+	s.AppManager.Shutdown()
+	core.AppLog.Println("psotoffice service shutdown")
+}
+
 func (s *PostofficeService) Create(classId int, topic string) (event.Event, error) {
 	me := event.CreateEvent(classId)
 	me.OnListener(s)
