@@ -122,6 +122,7 @@ func (s *AppManager) Shutdown() {
 		ctx.Put(s.cls.Local().Name, string(util.ToJson(c)))
 		return nil
 	})
+	core.AppLog.Println("app manager shutting down ...")
 }
 
 func (s *AppManager) Create(classId int, topic string) (event.Event, error) {
