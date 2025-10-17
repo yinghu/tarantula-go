@@ -104,6 +104,23 @@ func TestTournamentEvent(t *testing.T) {
 		return true
 	})
 	if err != nil {
-		t.Errorf("should be error %s", err.Error())
+		t.Errorf("should not be error %s", err.Error())
 	}
+
+	te := event.TournamentEvent{TournamentId: TID, InstanceId: IID, SystemId: 1001}
+	err = local.Load(&te)
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+	}
+	fmt.Println("TE")
+	fmt.Printf("TID : %d , INS : %d , SCORE : %d , TM : %d , SYS : %d\n", te.TournamentId, te.InstanceId, te.Score, te.LastUpdated, te.SystemId)
+
+	tc := event.TournamentScoreIndex{TournamentId: te.TournamentId, InstanceId: te.InstanceId, Score: te.Score, UpdateTime: te.LastUpdated, SystemId: te.SystemId}
+	err = local.Load(&tc)
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+	}
+	fmt.Println("TC")
+	fmt.Printf("TID : %d , INS : %d , SCORE : %d , TM : %d , SYS : %d\n", tc.TournamentId, tc.InstanceId, tc.Score, tc.UpdateTime, tc.SystemId)
+
 }
