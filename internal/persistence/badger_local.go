@@ -312,3 +312,4 @@ func (s *BadgerLocal) Close() error {
 func (s *BadgerLocal) GC() error {
 	return s.Db.RunValueLogGC(0.7)
 }
+

@@ -114,11 +114,9 @@ func (s *TournamentEvent) OnIndex(idx IndexListener) {
 	}
 	tj := TournamentScoreIndex{TournamentId: s.TournamentId, InstanceId: s.InstanceId, Score: s.Score, UpdateTime: s.LastUpdated, SystemId: s.SystemId}
 	tj.OnTopic("tournament")
-	err := idx.LocalStore().Load(&tj)
-	if err != nil {
-		err := idx.LocalStore().Save(&tj)
-		if err == nil {
-			idx.Publish(&tj)
-		}
+	err := idx.LocalStore().Save(&tj)
+	if err == nil {
+		idx.Publish(&tj)
 	}
+
 }
