@@ -116,7 +116,7 @@ func (s *TournamentEvent) OnIndex(idx IndexListener) {
 	tj.OnTopic("tournament")
 	err := idx.LocalStore().Save(&tj)
 	if err == nil {
-		idx.Publish(&tj)
+		idx.Index(&tj)
 	}
 
 }

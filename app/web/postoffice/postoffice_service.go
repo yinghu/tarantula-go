@@ -97,6 +97,10 @@ func (s *PostofficeService) OnError(e event.Event, err error) {
 	core.AppLog.Printf("On event error %s\n", err.Error())
 }
 
+func (s *PostofficeService) Index(e event.Event) {
+	core.AppLog.Printf("On event index %v\n", e)
+}
+
 func (s *PostofficeService) OnEvent(e event.Event) {
 	se, isSe := e.(*event.SubscriptionEvent)
 	if isSe {
@@ -155,7 +159,7 @@ func (s *PostofficeService) inboundEvent(t chan event.SubscriptionEvent) {
 					continue
 				}
 				url := fmt.Sprintf("%s%s%s%s%s%d", "http://", topic.App, ":8080/", topic.App, "/clusteradmin/event/", e.ClassId())
-				//core.AppLog.Printf("Pushlish to %s\n", url)
+				core.AppLog.Printf("Pushlish to %s\n", url)
 				s.PostJsonSync(url, e)
 			}
 		}

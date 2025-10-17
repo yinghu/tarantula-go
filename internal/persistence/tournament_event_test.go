@@ -22,7 +22,7 @@ type SampleIndexListener struct {
 func (s *SampleIndexListener) LocalStore() core.DataStore {
 	return s
 }
-func (s *SampleIndexListener) Publish(e event.Event) {
+func (s *SampleIndexListener) Index(e event.Event) {
 	fmt.Printf("Event : %v\n", e)
 }
 

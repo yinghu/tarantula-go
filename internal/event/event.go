@@ -6,7 +6,7 @@ import (
 
 type IndexListener interface {
 	LocalStore() core.DataStore
-	Publish(e Event)
+	Index(e Event)
 }
 
 type EventListener interface {
