@@ -38,7 +38,13 @@ func (s *BadgerLocal) Save(t core.Persistentable) error {
 	value.Flip()
 	return s.set(&key, &value, t)
 }
-
+func (s *BadgerLocal) Delete(t core.Persistentable) error {
+	key := BufferProxy{}
+	key.NewProxy(BDG_KEY_SIZE)
+	t.WriteKey(&key)
+	key.Flip()
+	return s.del(&key)
+}
 func (s *BadgerLocal) Load(t core.Persistentable) error {
 	key := BufferProxy{}
 	key.NewProxy(BDG_KEY_SIZE)
@@ -230,6 +236,24 @@ func (s *BadgerLocal) set(key *BufferProxy, value *BufferProxy, t core.Persisten
 		return txn.Set(ck, cv)
 
 	})
+}
+
+func (s *BadgerLocal) del(key *BufferProxy) error {
+	if key.Remaining() == 0 {
+		return errors.New("bad key/value")
+	}
+	err := s.Db.Update(func(txn *badger.Txn) error {
+		k, _ := key.Read(0)
+		err := txn.Delete(k)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *BadgerLocal) get(key *BufferProxy, value *BufferProxy) error {
