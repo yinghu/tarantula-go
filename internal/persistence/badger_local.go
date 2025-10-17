@@ -22,6 +22,8 @@ type BadgerLocal struct {
 	Path        string
 	Db          *badger.DB
 	LogDisabled bool
+	GcEnabled   bool
+	gcTick      time.Ticker
 }
 
 func (s *BadgerLocal) Save(t core.Persistentable) error {
@@ -298,18 +300,30 @@ func (s *BadgerLocal) Open() error {
 		return err
 	}
 	s.Db = db
+	if !s.GcEnabled {
+		return nil
+	}
+	s.gcTick = *time.NewTicker(10 * time.Minute)
+	go func() {
+		for range s.gcTick.C {
+		gc:
+			core.AppLog.Printf("running gc at %v\n", time.Now())
+			err := s.Db.RunValueLogGC(0.7)
+			if err == nil {
+				goto gc
+			}
+		}
+	}()
 	return nil
 }
 
 func (s *BadgerLocal) Close() error {
+	if s.GcEnabled {
+		s.gcTick.Stop()
+	}
 	if s.InMemory {
 		return s.Db.Close()
 	}
 	s.Db.Sync()
 	return s.Db.Close()
 }
-
-func (s *BadgerLocal) GC() error {
-	return s.Db.RunValueLogGC(0.7)
-}
-

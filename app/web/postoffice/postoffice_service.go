@@ -61,13 +61,12 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster, p event.Pusher) 
 	go s.inboundEvent(tc)
 
 	path := env.LocalDir + "/store"
-	ds := persistence.BadgerLocal{InMemory: env.Bdg.InMemory, Path: path}
+	ds := persistence.BadgerLocal{InMemory: env.Bdg.InMemory, Path: path, GcEnabled: true}
 	err := ds.Open()
 	if err != nil {
 		return err
 	}
 	s.Ds = &ds
-
 	s.ready.Done()
 	core.AppLog.Printf("Postoffice service started %s %s\n", env.HttpBinding, env.LocalDir)
 	http.Handle("/postoffice/subscribe", bootstrap.Logging(&PostofficeSubscriber{PostofficeService: s}))
@@ -102,7 +101,7 @@ func (s *PostofficeService) OnEvent(e event.Event) {
 	}
 	s.inboundQ <- e
 }
-func (s *PostofficeService) LocalStore() core.DataStore{
+func (s *PostofficeService) LocalStore() core.DataStore {
 	return s.Ds
 }
 func (s *PostofficeService) Publish(e event.Event) {
