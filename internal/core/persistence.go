@@ -64,13 +64,13 @@ type ListingOpt struct {
 	Reverse         bool
 	PrefetchSize    int
 	PrefetchValues  bool
-	VersionedValues bool
 	Limit           int
 }
 
 type DataStore interface {
 	Load(p Persistentable) error
 	Save(p Persistentable) error
-	Query(opt ListingOpt, s Stream) ([]byte, error)
+	Version(key []byte, s Stream) error
+	Query(opt ListingOpt, s Stream) error
 	Close() error
 }

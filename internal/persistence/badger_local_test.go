@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"gameclustering.com/internal/core"
 	badger "github.com/dgraph-io/badger/v4"
 	"github.com/dgraph-io/ristretto/v2/z"
 )
@@ -359,6 +360,12 @@ func TestVersioning(t *testing.T) {
 	if ct != 4 {
 		t.Errorf("should be 4 item %d", ct)
 	}
+	local.Version(k, func(k, v core.DataBuffer) bool {
+		bk , _ := k.Read(0)
+		bv , _ := v.Read(0)
+		fmt.Printf("%s %s\n",string(bk),string(bv))
+		return true
+	})
 }
 
 func TestMerging(t *testing.T) {
@@ -385,8 +392,8 @@ func TestMerging(t *testing.T) {
 	m.Add([]byte("v4"))
 	res, _ := m.Get()
 	v := string(res)
-	if v!= "v1v2v3v4"{
-		t.Errorf("should be v1v2v3v4 %s",v)
+	if v != "v1v2v3v4" {
+		t.Errorf("should be v1v2v3v4 %s", v)
 	}
 	//fmt.Printf("Merged %s\n", v)
 }

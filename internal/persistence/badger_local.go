@@ -3,6 +3,7 @@ package persistence
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -70,30 +71,35 @@ func (s *BadgerLocal) Load(t core.Persistentable) error {
 	return nil
 }
 
-func (s *BadgerLocal) Query(opt core.ListingOpt, stream core.Stream) ([]byte, error) {
+func (s *BadgerLocal) Query(opt core.ListingOpt, stream core.Stream) error {
 	if opt.Prefix == nil {
-		return nil, fmt.Errorf("query prefix cannot be nil")
+		return fmt.Errorf("query prefix cannot be nil")
 	}
-	err := s.Db.View(func(txn *badger.Txn) error {
-
-		op := badger.DefaultIteratorOptions
-		op.Reverse = opt.Reverse
-		if opt.PrefetchValues {
-			op.PrefetchValues = opt.PrefetchValues
-			op.PrefetchSize = opt.PrefetchSize
-		}
-		op.AllVersions = opt.VersionedValues
+	op := badger.DefaultIteratorOptions
+	op.Reverse = opt.Reverse
+	if op.Reverse && opt.StartCursor == nil {
+		opt.StartCursor = append(opt.Prefix, 0xFF)
+	}
+	if opt.PrefetchValues {
+		op.PrefetchValues = true
+		op.PrefetchSize = opt.PrefetchSize
+	}
+	p := opt.Prefix
+	seek := p
+	if opt.StartCursor != nil {
+		seek = opt.StartCursor
+	}
+	key := BufferProxy{}
+	key.NewProxy(BDG_KEY_SIZE)
+	value := BufferProxy{}
+	value.NewProxy(BDG_VALUE_SIZE)
+	limit := -1
+	if opt.Limit > 0 {
+		limit = opt.Limit
+	}
+	return s.Db.View(func(txn *badger.Txn) error {
 		it := txn.NewIterator(op)
 		defer it.Close()
-		p := opt.Prefix
-		key := BufferProxy{}
-		key.NewProxy(BDG_KEY_SIZE)
-		value := BufferProxy{}
-		value.NewProxy(BDG_VALUE_SIZE)
-		seek := p
-		if opt.StartCursor != nil {
-			seek = opt.StartCursor
-		}
 		for it.Seek(seek); it.ValidForPrefix(p); it.Next() {
 			kv := it.Item()
 			key.Clear()
@@ -110,13 +116,50 @@ func (s *BadgerLocal) Query(opt core.ListingOpt, stream core.Stream) ([]byte, er
 			}
 			key.Flip()
 			value.Flip()
-			if !stream(&key, &value) {
+			limit--
+			if !stream(&key, &value) || limit == 0 {
 				break
 			}
 		}
 		return nil
 	})
-	return nil, err
+}
+
+func (s *BadgerLocal) Version(key []byte, stream core.Stream) error {
+	op := badger.DefaultIteratorOptions
+	op.AllVersions = true
+	k := BufferProxy{}
+	k.NewProxy(BDG_KEY_SIZE)
+	v := BufferProxy{}
+	v.NewProxy(BDG_VALUE_SIZE)
+	return s.Db.View(func(txn *badger.Txn) error {
+		it := txn.NewIterator(op)
+		defer it.Close()
+		for it.Seek(key); it.Valid(); it.Next() {
+			kv := it.Item()
+			if !slices.Equal(kv.Key(), key) {
+				break
+			}
+			k.Clear()
+			err := k.Write(kv.Key())
+			if err != nil {
+				return err
+			}
+			err = kv.Value(func(val []byte) error {
+				v.Clear()
+				return v.Write(val)
+			})
+			if err != nil {
+				return err
+			}
+			k.Flip()
+			v.Flip()
+			if !stream(&k, &v) {
+				break
+			}
+		}
+		return nil
+	})
 }
 
 func (s *BadgerLocal) set(key *BufferProxy, value *BufferProxy, t core.Persistentable) error {
