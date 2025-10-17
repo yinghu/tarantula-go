@@ -1,6 +1,7 @@
 name: tarantula
 services:
   postoffice:
+    stop_grace_period: 30s
     restart: unless-stopped
     container_name: postoffice
     hostname: postoffice
