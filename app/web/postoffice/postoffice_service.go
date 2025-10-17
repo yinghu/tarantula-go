@@ -79,7 +79,6 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster, p event.Pusher) 
 
 func (s *PostofficeService) Shutdown() {
 	core.AppLog.Println("postoffice service shutting down ...")
-	s.Ds.Close()
 	s.AppManager.Shutdown()
 }
 
