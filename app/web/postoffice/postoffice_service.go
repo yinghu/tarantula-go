@@ -32,6 +32,7 @@ type PostofficeService struct {
 	cchangeQ  []chan CChange
 
 	inboundQ chan event.Event
+	indexQ   chan event.Event
 	topicQ   []chan event.SubscriptionEvent
 	ready    sync.WaitGroup
 }
@@ -53,7 +54,7 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster, p event.Pusher) 
 	ec := make(chan CChange, 1)
 	s.cchangeQ = append(s.cchangeQ, ec)
 	go s.outboundEvent(ec)
-
+	s.indexQ = make(chan event.Event, 10)
 	s.inboundQ = make(chan event.Event, 10)
 	s.topicQ = make([]chan event.SubscriptionEvent, 0)
 	tc := make(chan event.SubscriptionEvent, 1)
@@ -99,6 +100,7 @@ func (s *PostofficeService) OnError(e event.Event, err error) {
 
 func (s *PostofficeService) Index(e event.Event) {
 	core.AppLog.Printf("On event index %v\n", e)
+	s.indexQ <- e
 }
 
 func (s *PostofficeService) OnEvent(e event.Event) {
@@ -150,9 +152,8 @@ func (s *PostofficeService) inboundEvent(t chan event.SubscriptionEvent) {
 			topics = append(topics, c)
 		case e := <-s.inboundQ:
 			core.AppLog.Printf("Inbound event %v\n", e)
-			if err := s.Ds.Save(e); err == nil {
-				e.OnIndex(s)
-			}
+			e.OnIndex(s)
+		case e := <-s.indexQ:
 			for i := range topics {
 				topic := topics[i]
 				if topic.Name != e.Topic() {
