@@ -50,6 +50,7 @@ type Env struct {
 	Bdg           LocalStore    `json:"LocalStore"`
 	Bin           string        `json:"-"`
 	HomeDir       string        `json:"-"`
+	LogTruncated  bool          `json:"LogTruncated"`
 }
 
 func (f *Env) ClusterCtx() string {
@@ -83,7 +84,7 @@ func (f *Env) Load(fn string) error {
 			return err
 		}
 	}
-	core.CreateAppLog(f.LocalDir)
+	core.CreateAppLog(f.LocalDir, f.LogTruncated)
 	c, exists := os.LookupEnv(NODE_HOST)
 	if exists {
 		core.AppLog.Printf("Using http endpoint : %s\n", c)

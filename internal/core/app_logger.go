@@ -11,7 +11,7 @@ var (
 	AppLog *log.Logger
 )
 
-func CreateAppLog(dir string) {
+func CreateAppLog(dir string, truncated bool) {
 	fmt.Printf("Creating app log %s\n", dir)
 	flag.Parse()
 	err := os.MkdirAll(dir+"/log", 0755)
@@ -19,7 +19,11 @@ func CreateAppLog(dir string) {
 		AppLog = log.New(os.Stdout, "", log.LstdFlags)
 		return
 	}
-	file, err := os.OpenFile(dir + "/log/tarantula.log",os.O_WRONLY|os.O_CREATE|os.O_APPEND,0644)
+	opt := os.O_WRONLY | os.O_CREATE | os.O_APPEND
+	if truncated {
+		opt = os.O_WRONLY | os.O_CREATE | os.O_TRUNC
+	}
+	file, err := os.OpenFile(dir+"/log/tarantula.log", opt, 0644)
 	if err != nil {
 		AppLog = log.New(os.Stdout, "", log.LstdFlags)
 		return

@@ -1,5 +1,6 @@
 {
-    "GroupName" :"postoffice",
+    "LogTruncated":true,
+	"GroupName" :"postoffice",
 	"NodeName" :   "a01",
 	"NodeId"     :   1,
 	"HttpBinding":  ":8080",

@@ -1,5 +1,6 @@
 {
-    "GroupName" :"inventory",
+    "LogTruncated":true,
+	"GroupName" :"inventory",
 	"NodeName" :   "i01",
 	"NodeId"     :   1,
 	"HttpBinding":  ":8080",

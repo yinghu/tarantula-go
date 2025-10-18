@@ -1,5 +1,6 @@
 {
-    "GroupName" :"mahjong",
+    "LogTruncated":true,
+	"GroupName" :"mahjong",
 	"NodeName" :   "i01",
 	"NodeId"     :   1,
 	"HttpBinding":  ":8080",

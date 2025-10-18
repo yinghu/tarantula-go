@@ -1,5 +1,6 @@
 {
-    "GroupName" :"tournament",
+    "LogTruncated":true,
+	"GroupName" :"tournament",
 	"NodeName" :   "t01",
 	"NodeId"     :   1,
 	"HttpBinding":  ":8080",

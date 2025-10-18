@@ -1,7 +1,7 @@
 name: tarantula
 services:
   postoffice:
-    stop_grace_period: 30s
+    stop_grace_period: 20s
     restart: unless-stopped
     container_name: postoffice
     hostname: postoffice
@@ -15,6 +15,7 @@ services:
     env_file:
       - .env  
   presence:
+    stop_grace_period: 20s
     restart: unless-stopped
     container_name: presence
     hostname: presence
@@ -28,6 +29,7 @@ services:
     env_file:
       - .env 
   asset:
+    stop_grace_period: 20s
     restart: unless-stopped
     container_name: asset
     hostname: asset
@@ -41,6 +43,7 @@ services:
     env_file:
       - .env  
   inventory:
+    stop_grace_period: 20s
     restart: unless-stopped
     container_name: inventory
     hostname: inventory
@@ -54,6 +57,7 @@ services:
     env_file:
       - .env  
   tournament:
+    stop_grace_period: 20s
     restart: unless-stopped
     container_name: tournament
     hostname: tournament
@@ -67,6 +71,7 @@ services:
     env_file:
       - .env  
   mahjong:
+    stop_grace_period: 20s
     restart: unless-stopped
     container_name: mahjong
     hostname: mahjong
@@ -82,6 +87,7 @@ services:
     env_file:
       - .env                   
   admin:
+    stop_grace_period: 20s
     restart: unless-stopped
     container_name: admin
     hostname: admin

@@ -1,5 +1,6 @@
 {
-    "GroupName" :"presence",
+    "LogTruncated":true,
+	"GroupName" :"presence",
 	"NodeName" :   "a01",
 	"NodeId"     :   1,
 	"HttpBinding":  ":8080",

@@ -1,5 +1,6 @@
 {
-    "GroupName" :"asset",
+    "LogTruncated":true,
+	"GroupName" :"asset",
 	"NodeName" :   "i01",
 	"NodeId"     :   1,
 	"HttpBinding":  ":8080",
