@@ -88,12 +88,12 @@ func (s *MessageEvent) Write(buff core.DataBuffer) error {
 func (s *MessageEvent) Outbound(buff core.DataBuffer) error {
 	err := s.WriteKey(buff)
 	if err != nil {
-		s.Callback.OnError(s,err)
+		s.Callback.OnError(s, err)
 		return err
 	}
 	err = s.Write(buff)
 	if err != nil {
-		s.Callback.OnError(s,err)
+		s.Callback.OnError(s, err)
 		return err
 	}
 	return nil
@@ -102,14 +102,19 @@ func (s *MessageEvent) Outbound(buff core.DataBuffer) error {
 func (s *MessageEvent) Inbound(buff core.DataBuffer) error {
 	err := s.ReadKey(buff)
 	if err != nil {
-		s.Callback.OnError(s,err)
+		s.Callback.OnError(s, err)
 		return err
 	}
 	err = s.Read(buff)
 	if err != nil {
-		s.Callback.OnError(s,err)
+		s.Callback.OnError(s, err)
 		return err
 	}
 	s.Callback.OnEvent(s)
 	return nil
+}
+
+func (s *MessageEvent) OnIndex(idx IndexListener) {
+	idx.LocalStore().Save(s)
+	idx.Index(s)
 }
