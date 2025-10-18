@@ -331,3 +331,8 @@ func (s *BadgerLocal) Close() error {
 	s.Db.Sync()
 	return s.Db.Close()
 }
+
+func (s *BadgerLocal) Tx() core.Transaction{
+	tx := BadgerLocalTransaction{s.Db.NewTransaction(true)}
+	return &tx
+}

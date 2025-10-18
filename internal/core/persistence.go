@@ -67,7 +67,13 @@ type ListingOpt struct {
 	Limit          int
 }
 
-
+type Transaction interface {
+	Get(key []byte) ([]byte, error)
+	Set(key []byte, value []byte) error
+	Del(key []byte) error
+	Commit() error
+	Rollback()
+}
 
 type DataStore interface {
 	Load(p Persistentable) error
@@ -76,4 +82,5 @@ type DataStore interface {
 	Version(key []byte, s Stream) error
 	Query(opt ListingOpt, s Stream) error
 	Close() error
+	Tx() Transaction
 }

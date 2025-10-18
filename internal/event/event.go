@@ -84,8 +84,7 @@ func (s *EventObj) Listener() EventListener {
 	return s.Callback
 }
 func (s *EventObj) OnIndex(idx IndexListener) {
-	idx.LocalStore().Save(s)
-	idx.Index(s)
+	
 }
 func (s *EventObj) OnOId(oid int64) {
 	s.EOid = oid
