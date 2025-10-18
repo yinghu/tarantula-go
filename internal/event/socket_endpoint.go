@@ -127,7 +127,7 @@ func (s *SocketEndpoint) Open() error {
 		go s.outbound()
 	}
 	parts := strings.Split(s.Endpoint, ":")
-	core.AppLog.Printf("Endpoint %s %s\n", parts[0], parts[2])
+	core.AppLog.Printf("Endpoint %s :%s\n", parts[0], parts[2])
 	server, err := net.Listen(parts[0], ":"+parts[2])
 	if err != nil {
 		return err
