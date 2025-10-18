@@ -109,6 +109,8 @@ func (s *TournamentEvent) Inbound(buff core.DataBuffer) error {
 }
 
 func (s *TournamentEvent) OnIndex(idx IndexListener) {
+	//tx := idx.LocalStore().Tx()
+	//defer tx.Rollback()
 	if s.Score == 0 {
 		return
 	}

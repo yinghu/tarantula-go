@@ -68,9 +68,9 @@ type ListingOpt struct {
 }
 
 type Transaction interface {
-	Get(key []byte) ([]byte, error)
-	Set(key []byte, value []byte) error
-	Del(key []byte) error
+	Get(p Persistentable) error
+	Set(p Persistentable) error
+	Del(p Persistentable) error	
 	Commit() error
 	Rollback()
 }

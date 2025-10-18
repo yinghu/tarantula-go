@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	badger "github.com/dgraph-io/badger/v4"
 	"github.com/dgraph-io/ristretto/v2/z"
 )
@@ -397,3 +398,100 @@ func TestMerging(t *testing.T) {
 	}
 	//fmt.Printf("Merged %s\n", v)
 }
+
+func TestLocalTransactionSet(t *testing.T) {
+	local := BadgerLocal{InMemory: true, LogDisabled: true}
+	err := local.Open()
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+	}
+	defer local.Close()
+	tx := local.Tx()
+	defer tx.Rollback()
+	me := event.MessageEvent{Message: "test",Source: "test",DateTime: time.Now()}
+	me.OnOId(100)
+	me.OnTopic("message")
+	tx.Set(&me)
+	me.OnOId(200)
+	tx.Set(&me)
+	err = tx.Commit()
+	if err!=nil{
+		t.Errorf("should not be error %s", err.Error())
+	}
+	err = local.Load(&me)
+	if err!=nil{
+		t.Errorf("should not be error %s", err.Error())
+	}
+	if me.Revision() !=1 {
+		t.Errorf("should be 1 %d", me.Revision())
+	}
+}
+
+func TestLocalTransactionDel(t *testing.T) {
+	local := BadgerLocal{InMemory: true, LogDisabled: true}
+	err := local.Open()
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+	}
+	defer local.Close()
+	tx := local.Tx()
+	defer tx.Rollback()
+	me := event.MessageEvent{Message: "test",Source: "test",DateTime: time.Now()}
+	me.OnOId(100)
+	me.OnTopic("message")
+	tx.Set(&me)
+	tx.Del(&me)
+	err = tx.Commit()
+	if err!=nil{
+		t.Errorf("should not be error %s", err.Error())
+	}
+	err = local.Load(&me)
+	if err == nil{
+		t.Errorf("should be error")
+	}
+}
+
+func TestLocalTransactionGet(t *testing.T) {
+	local := BadgerLocal{InMemory: true, LogDisabled: true}
+	err := local.Open()
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+	}
+	defer local.Close()
+	tx := local.Tx()
+	defer tx.Rollback()
+	me := event.MessageEvent{Message: "test",Source: "test",DateTime: time.Now()}
+	me.OnOId(100)
+	me.OnTopic("message")
+	tx.Set(&me)
+	err = tx.Commit()
+	if err!=nil{
+		t.Errorf("should not be error %s", err.Error())
+	}
+	tr := local.Tx()
+	defer tr.Rollback()
+	mex := event.MessageEvent{}
+	mex.OnOId(100)
+	err = tr.Get(&mex)
+	if err != nil{
+		t.Errorf("should not be error %s",err.Error())
+	}
+	if mex.Message != me.Message{
+		t.Errorf("should be same %s : %s",mex.Message,me.Message)
+	}
+	if mex.Source != me.Source{
+		t.Errorf("should be same %s : %s",mex.Source,me.Source)
+	}
+	if mex.Revision() != 1{
+		t.Errorf("should be 1 %d",mex.Revision())
+	}
+	se := event.StatEvent{Tag:me.ETag(),Name: event.STAT_TOTAL}
+	err = tr.Get(&se)
+	if err != nil{
+		t.Errorf("should not be error %s",err.Error())
+	}
+	if se.Count != 1{
+		t.Errorf("should be 1 %d",se.Count)
+	}
+}
+

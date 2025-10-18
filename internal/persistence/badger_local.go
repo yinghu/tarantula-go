@@ -332,7 +332,11 @@ func (s *BadgerLocal) Close() error {
 	return s.Db.Close()
 }
 
-func (s *BadgerLocal) Tx() core.Transaction{
-	tx := BadgerLocalTransaction{s.Db.NewTransaction(true)}
+func (s *BadgerLocal) Tx() core.Transaction {
+	k := BufferProxy{}
+	k.NewProxy(BDG_KEY_SIZE)
+	v := BufferProxy{}
+	v.NewProxy(BDG_VALUE_SIZE)
+	tx := BadgerLocalTransaction{ctx: s.Db.NewTransaction(true),key: &k,value: &v}
 	return &tx
 }
