@@ -1,0 +1,13 @@
+{
+    "Scope": "admin",
+    "Name": "Load",
+    "Description": "Load form",
+    "Properties":[
+        {
+            "Name": "Oid",
+            "Type":"string",
+            "Reference": "text",
+            "Nullable": false
+        }
+    ]
+}

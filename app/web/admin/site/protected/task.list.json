@@ -83,7 +83,8 @@
         {
             "Name":"CSTool","ScopeSequence":0,"Icon":"support",
             "Jobs":[
-                {"Name":"SendMessage","Callback":"on_post","Form":"/admin/webprotected/cs.send.message.json","Path":"/admin/cs/message"},
+                {"Name":"SendMessage","Callback":"on_post","Form":"/admin/webprotected/cs.send.message.json","Path":"/admin/cs/message/send"},
+                {"Name":"LoadMessage","Callback":"on_post","Form":"/admin/webprotected/cs.load.message.json","Path":"/admin/cs/message/load"},
                 {"Name":"QueryEvent","Callback":"on_post","Form":"/admin/webprotected/cs.query.event.json","Path":"/admin/cs/query","Query":["Id"]},
                 {"Name":"QueryTournament","Callback":"on_post","Form":"/admin/webprotected/cs.query.tournament.json","Path":"/admin/cs/query","Query":["Id"]},
                 {"Name":"QueryTournamentJoin","Callback":"on_post","Form":"/admin/webprotected/cs.query.tournament.join.json","Path":"/admin/cs/query","Query":["Id"]},
