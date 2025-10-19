@@ -37,8 +37,24 @@ func TestTournamentEvent(t *testing.T) {
 	endTime := time.Now().Add(1 * time.Hour).UnixMilli()
 	for i := range 10 {
 		sid := 1000 + i
-		tmnt := event.TournamentEvent{TournamentId: TID, InstanceId: IID, SystemId: int64(sid), Score:0, LastUpdated: endTime - time.Now().UnixMilli()}
+		tmnt := event.TournamentEvent{TournamentId: TID, InstanceId: IID, SystemId: int64(sid), Score:10, LastUpdated: endTime - time.Now().UnixMilli()}
 		tmnt.LastUpdated = endTime - time.Now().UnixMilli()
 		tmnt.OnIndex(&index)
 	}
+	tq := event.QScore{TournamentId: TID,InstanceId: IID}
+	prx := NewBuffer(100)
+	tq.QCriteria(prx)
+	prx.Flip()
+	q,_:=prx.Read(0)
+	opt := core.ListingOpt{Prefix: q,Reverse: true}
+	local.Query(opt,func(k, v core.DataBuffer) bool {
+		v.ReadInt32()
+		v.ReadInt64()
+		v.ReadInt64()
+		tc := event.TournamentScoreIndex{}
+		tc.ReadKey(k)
+		tc.Read(v)
+		fmt.Printf("%d : %d : %d : %d\n",tc.TournamentId,tc.InstanceId,tc.Score,tc.UpdateTime)
+		return true
+	})
 }
