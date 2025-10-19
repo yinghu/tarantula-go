@@ -164,6 +164,11 @@ func (s *AppManager) Recover(query event.Query) {
 	}
 }
 
+func (s AppManager) Load(query event.Query) {
+	e := query.QEvent()  
+	s.PostJsonAsync(fmt.Sprintf("%s/%d", "http://postoffice:8080/postoffice/load",e.ClassId()),e,query.QCc())
+}
+
 func (s *AppManager) OnEvent(e event.Event) {
 
 }

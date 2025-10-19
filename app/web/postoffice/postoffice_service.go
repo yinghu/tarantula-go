@@ -75,6 +75,7 @@ func (s *PostofficeService) Start(env conf.Env, c core.Cluster, p event.Pusher) 
 	http.Handle("/postoffice/publish/{topic}/{cid}", bootstrap.Logging(&PostofficePublisher{PostofficeService: s}))
 	http.Handle("/postoffice/query/{id}", bootstrap.Logging(&PostofficeQueryer{PostofficeService: s}))
 	http.Handle("/postoffice/recover/{id}", bootstrap.Logging(&PostofficeRecoverer{PostofficeService: s}))
+	http.Handle("/postoffice/load/{id}", bootstrap.Logging(&PostofficeLoader{PostofficeService: s}))
 	return nil
 }
 

@@ -68,6 +68,7 @@ type Query interface {
 	QLimit() int32
 	QCriteria(b core.DataBuffer) error
 	QCc() chan core.Chunk
+	QEvent() Event
 }
 
 type QWithTag struct {
@@ -78,6 +79,7 @@ type QWithTag struct {
 	StartTime time.Time       `json:"StartTime"`
 	EndTime   time.Time       `json:"EndTime"`
 	Cc        chan core.Chunk `json:"-"`
+	Ee        Event
 }
 
 func (q *QWithTag) QCriteria(buff core.DataBuffer) error {
@@ -107,4 +109,8 @@ func (q *QWithTag) QLimit() int32 {
 
 func (q *QWithTag) QCc() chan core.Chunk {
 	return q.Cc
+}
+
+func (q *QWithTag) QEvent() Event {
+	return q.Ee
 }

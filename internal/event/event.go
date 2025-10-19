@@ -44,6 +44,7 @@ type Postoffice interface {
 	Send(e Event) error
 	List(q Query)
 	Recover(q Query)
+	Load(e Query)
 }
 
 type Publisher interface {
@@ -59,8 +60,8 @@ type Pusher interface {
 type EventObj struct {
 	Callback EventListener `json:"-"`
 	core.PersistentableObj
-	ETopic string `json:"-"`
-	EOid   int64  `json:"-"`
+	ETopic string `json:"ETopic"`
+	EOid   int64  `json:"EOid"`
 }
 
 func (s *EventObj) OnTopic(t string) {
@@ -84,7 +85,7 @@ func (s *EventObj) Listener() EventListener {
 	return s.Callback
 }
 func (s *EventObj) OnIndex(idx IndexListener) {
-	
+
 }
 func (s *EventObj) OnOId(oid int64) {
 	s.EOid = oid
