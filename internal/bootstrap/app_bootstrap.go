@@ -45,7 +45,7 @@ func AppBootstrap(tcx TarantulaContext) {
 			c.Listener().MemberJoined(view[i])
 		}
 		metrics.Register()
-		http.Handle("/"+tcx.Context()+"/metrics", promhttp.Handler())
+		http.Handle("/"+tcx.Context()+"/metrics", metricsHandler(promhttp.Handler()))
 		if tcx.Context() != "admin" {
 			http.Handle("/"+tcx.Context()+"/clusteradmin/{cmd}/{cid}", Logging(&AppClusterAdmin{tcx, tcx.Service()}))
 			core.AppLog.Printf("Register app cluster admin endpoint %s\n", tcx.Context())
@@ -87,6 +87,13 @@ func illegalAccess(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	session := core.OnSession{Successful: false, Message: ILLEGAL_ACCESS_MSG, ErrorCode: ILLEGAL_ACCESS_CODE}
 	w.Write(util.ToJson(session))
+}
+
+func metricsHandler(h http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		core.AppLog.Printf("metrics validation ...")
+		h.ServeHTTP(w, r)
+	}
 }
 
 func Logging(s TarantulaApp) http.HandlerFunc {
