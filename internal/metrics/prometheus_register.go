@@ -7,13 +7,14 @@ var (
 		Name: "tarantula_http_request_total",
 		Help: "Tarantual total request number",
 	})
-	TG_HTTP_REQUEST_DRUTAION prometheus.Gauge = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "tarantula_http_request_duration",
-		Help: "Tarantual request duration",
+	TG_SOCKET_CONCURRENT_NUMBER prometheus.Gauge = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "tarantula_socket_concurrent_number",
+		Help: "Tarantual socket concurrent number",
 	})
 )
 
 func Register() {
 	prometheus.Register(TC_HTTP_REQUEST_TOTAL)
-	prometheus.Register(TG_HTTP_REQUEST_DRUTAION)
+	prometheus.Register(TG_SOCKET_CONCURRENT_NUMBER)
+
 }

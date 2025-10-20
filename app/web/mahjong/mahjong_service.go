@@ -8,6 +8,7 @@ import (
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/metrics"
 	"gameclustering.com/internal/mj"
 )
 
@@ -62,8 +63,10 @@ func (s *MahjongService) OnEvent(e event.Event) {
 		s.Pusher().Push(e)
 	case event.JOIN_CID:
 		core.AppLog.Printf("joined from %d\n", e.RecipientId())
+		metrics.TG_SOCKET_CONCURRENT_NUMBER.Inc()
 	case event.KICKOFF_CID:
 		core.AppLog.Printf("kickoff from %d\n", e.RecipientId())
+		metrics.TG_SOCKET_CONCURRENT_NUMBER.Dec()
 		id, _ := s.Sequence().Id()
 		e.OnOId(id)
 		e.OnTopic("mahjong")
