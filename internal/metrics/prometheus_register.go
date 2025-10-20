@@ -2,7 +2,9 @@ package metrics
 
 import "github.com/prometheus/client_golang/prometheus"
 
-var Counter prometheus.Counter
+var (
+	Counter prometheus.Counter
+)
 
 func Register() {
 	Counter = prometheus.NewCounter(prometheus.CounterOpts{
