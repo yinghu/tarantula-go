@@ -13,7 +13,9 @@ import (
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/metrics"
 	"gameclustering.com/internal/util"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func AppBootstrap(tcx TarantulaContext) {
@@ -42,7 +44,8 @@ func AppBootstrap(tcx TarantulaContext) {
 			core.AppLog.Printf("View :%v\n", view[i])
 			c.Listener().MemberJoined(view[i])
 		}
-		http.Handle("/"+tcx.Context()+"/health", Logging(&AppHealth{tcx.Service()}))
+		metrics.Register()
+		http.Handle("/"+tcx.Context()+"/metrics", promhttp.Handler())
 		if tcx.Context() != "admin" {
 			http.Handle("/"+tcx.Context()+"/clusteradmin/{cmd}/{cid}", Logging(&AppClusterAdmin{tcx, tcx.Service()}))
 			core.AppLog.Printf("Register app cluster admin endpoint %s\n", tcx.Context())
@@ -91,6 +94,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 		start := time.Now()
 		var stub int32 = 0
 		var code int32 = 0
+		metrics.Counter.Inc()
 		defer func() {
 			dur := time.Since(start)
 			ms := core.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.Cluster().Local().Name, ReqId: stub, ReqCode: code}
