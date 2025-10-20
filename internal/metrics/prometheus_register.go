@@ -3,13 +3,17 @@ package metrics
 import "github.com/prometheus/client_golang/prometheus"
 
 var (
-	Counter prometheus.Counter
+	TC_HTTP_REQUEST_TOTAL prometheus.Counter = prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "tarantula_http_request_total",
+		Help: "Tarantual total request number",
+	})
+	TG_HTTP_REQUEST_DRUTAION prometheus.Gauge = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "tarantula_http_request_duration",
+		Help: "Tarantual request duration",
+	})
 )
 
 func Register() {
-	Counter = prometheus.NewCounter(prometheus.CounterOpts{
-		Name: "http_request_total",
-		Help: "Total request number",
-	})
-	prometheus.MustRegister(Counter)
+	prometheus.Register(TC_HTTP_REQUEST_TOTAL)
+	prometheus.Register(TG_HTTP_REQUEST_DRUTAION)
 }
