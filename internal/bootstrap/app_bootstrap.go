@@ -91,7 +91,8 @@ func illegalAccess(w http.ResponseWriter, r *http.Request) {
 
 func metricsHandler(h http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		core.AppLog.Printf("metrics validation ...")
+		tkn := r.Header.Get("Authorization")
+		core.AppLog.Printf("metrics validation ... %s\n", tkn)
 		h.ServeHTTP(w, r)
 	}
 }
