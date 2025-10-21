@@ -144,4 +144,4 @@ volumes:
   volume_tournament:
   volume_admin:
   volume_mahjong:
-  tarantula_prometheus:
+  volume_prometheus:
