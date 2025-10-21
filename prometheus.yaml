@@ -9,12 +9,12 @@
       - job_name: 'tarantula.postoffice'
         metrics_path: /postoffice/metrics
         static_configs:
-          - targets: ['postoffice:8000']
+          - targets: ['postoffice:8080']
         bearer_token: 'tarantula_token'
 
       - job_name: 'tarantula.presence'
         metrics_path: /presence/metrics
         static_configs:
-          - targets: ['presence:8000']
+          - targets: ['presence:8080']
         bearer_token: 'tarantula_token'      
           
