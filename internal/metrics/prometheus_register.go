@@ -22,5 +22,4 @@ func Register() {
 	prometheus.Register(TC_HTTP_REQUEST_TOTAL)
 	prometheus.Register(TG_SOCKET_CONCURRENT_NUMBER)
 	prometheus.Register(TH_HTTP_REQUEST_DURATION)
-
 }

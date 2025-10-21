@@ -104,6 +104,19 @@ services:
       - net
     env_file:
       - .env  
+  prometheus:
+    restart: unless-stopped
+    container_name: prometheus
+    hostname: prometheus
+    image: tarantula.prometheus:${VERSION}
+    volumes:
+      - volume_prometheus:/var/tarantula/prometheus
+    ports:
+      - "80:80"
+    depends_on:
+      - admin
+    networks:
+      - net  
   web:
     restart: unless-stopped
     container_name: web
@@ -115,6 +128,7 @@ services:
       - admin
     networks:
       - net
+
 networks:
   net:
     driver: bridge 
@@ -130,3 +144,4 @@ volumes:
   volume_tournament:
   volume_admin:
   volume_mahjong:
+  tarantula_prometheus:
