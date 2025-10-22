@@ -2,7 +2,6 @@ package metrics
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/collectors"
 )
 
 var (
@@ -20,7 +19,7 @@ var (
 )
 
 func init() {
-	prometheus.MustRegister(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
+	//prometheus.MustRegister(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
 	prometheus.Register(TG_SOCKET_CONCURRENCY)
 	prometheus.Register(TH_HTTP_REQUEST)
 }
