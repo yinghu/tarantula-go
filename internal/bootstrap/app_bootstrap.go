@@ -44,7 +44,6 @@ func AppBootstrap(tcx TarantulaContext) {
 			core.AppLog.Printf("View :%v\n", view[i])
 			c.Listener().MemberJoined(view[i])
 		}
-		metrics.Register()
 		http.Handle("/"+tcx.Context()+"/metrics", metricsHandler(promhttp.Handler()))
 		if tcx.Context() != "admin" {
 			http.Handle("/"+tcx.Context()+"/clusteradmin/{cmd}/{cid}", Logging(&AppClusterAdmin{tcx, tcx.Service()}))
