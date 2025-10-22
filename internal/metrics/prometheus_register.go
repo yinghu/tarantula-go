@@ -2,11 +2,11 @@ package metrics
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
 )
 
 var (
 	BUCKET_TH_HTTP_REQUEST_DURATION = []float64{50, 100, 200, 300, 400, 500}
-	
 
 	TH_HTTP_REQUEST prometheus.Histogram = prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name:    "tarantula_http_request",
@@ -20,6 +20,7 @@ var (
 )
 
 func init() {
+	prometheus.MustRegister(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
 	prometheus.Register(TG_SOCKET_CONCURRENCY)
 	prometheus.Register(TH_HTTP_REQUEST)
 }
