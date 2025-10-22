@@ -17,8 +17,8 @@ var (
 		Help: "Tarantual socket concurrent number",
 	})
 	TS_HTTP_REQUEST prometheus.Summary = prometheus.NewSummary(prometheus.SummaryOpts{
-		Name:       "tarantula_http_request",
-		Help:       "Tarantula http request duration",
+		Name:       "tarantula_http_request_summary",
+		Help:       "Tarantula http request duration summary",
 		Objectives: QUANTILE_TS_REQUESTION_DURATION,
 	})
 )
