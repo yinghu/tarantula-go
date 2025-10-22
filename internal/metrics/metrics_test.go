@@ -73,7 +73,20 @@ func TestHistogram(t *testing.T) {
 	hg.Observe(306)
 	hg.Observe(306)
 	ct := testutil.CollectAndCount(hg, `test_histogram_bucket{le="500"}`)
-	
+	fmt.Printf("Error %d\n", ct)
+
+}
+
+func TestSummay(t *testing.T) {
+	pct := map[float64]float64{0.5: 0.02, 0.9: 0.01}
+	hg := prometheus.NewSummary(prometheus.SummaryOpts{
+		Name:       "test_summary",
+		Help:       "Test summary",
+		Objectives: pct,
+	})
+	hg.Observe(200)
+	hg.Observe(160)
+	ct := testutil.CollectAndCount(hg, `test_histogram_bucket{le="500"}`)
 	fmt.Printf("Error %d\n", ct)
 
 }
