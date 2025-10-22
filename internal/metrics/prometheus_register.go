@@ -1,26 +1,25 @@
 package metrics
 
-import "github.com/prometheus/client_golang/prometheus"
+import (
+	"github.com/prometheus/client_golang/prometheus"
+)
 
 var (
-	BUCKET_TH_HTTP_REQUEST_DURATION                    = []float64{50, 100, 200, 300, 400, 500}
-	TC_HTTP_REQUEST_TOTAL           prometheus.Counter = prometheus.NewCounter(prometheus.CounterOpts{
-		Name: "tarantula_http_request_total",
-		Help: "Tarantual total request number",
-	})
-	TH_HTTP_REQUEST_DURATION prometheus.Histogram = prometheus.NewHistogram(prometheus.HistogramOpts{
-		Name:    "tarantula_http_request_duration",
+	BUCKET_TH_HTTP_REQUEST_DURATION = []float64{50, 100, 200, 300, 400, 500}
+	
+
+	TH_HTTP_REQUEST prometheus.Histogram = prometheus.NewHistogram(prometheus.HistogramOpts{
+		Name:    "tarantula_http_request",
 		Help:    "Tarantula http request duration",
 		Buckets: BUCKET_TH_HTTP_REQUEST_DURATION,
 	})
-	TG_SOCKET_CONCURRENT_NUMBER prometheus.Gauge = prometheus.NewGauge(prometheus.GaugeOpts{
+	TG_SOCKET_CONCURRENCY prometheus.Gauge = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: "tarantula_socket_concurrent_number",
 		Help: "Tarantual socket concurrent number",
 	})
 )
 
 func init() {
-	prometheus.Register(TC_HTTP_REQUEST_TOTAL)
-	prometheus.Register(TG_SOCKET_CONCURRENT_NUMBER)
-	prometheus.Register(TH_HTTP_REQUEST_DURATION)
+	prometheus.Register(TG_SOCKET_CONCURRENCY)
+	prometheus.Register(TH_HTTP_REQUEST)
 }
