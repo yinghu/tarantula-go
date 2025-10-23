@@ -24,7 +24,7 @@ var (
 )
 
 func init() {
-	prometheus.Register(TG_SOCKET_CONCURRENCY)
-	prometheus.Register(TH_HTTP_REQUEST)
-	prometheus.Register(TS_HTTP_REQUEST)
+	prometheus.MustRegister(TG_SOCKET_CONCURRENCY)
+	prometheus.MustRegister(TH_HTTP_REQUEST)
+	prometheus.MustRegister(TS_HTTP_REQUEST)
 }

@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -64,17 +65,31 @@ func TestGauge(t *testing.T) {
 }
 
 func TestHistogram(t *testing.T) {
-	bkt := []float64{50, 100, 200, 300, 400, 500}
+	bkt := []float64{0.1, 0.5, 1.0}
 	hg := prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name:    "test_histogram",
 		Help:    "Test histogram",
 		Buckets: bkt,
 	})
-	hg.Observe(306)
-	hg.Observe(306)
-	ct := testutil.CollectAndCount(hg, `test_histogram_bucket{le="500"}`)
-	fmt.Printf("Error %d\n", ct)
-
+	prometheus.Register(hg)
+	hg.Observe(0.05)
+	hg.Observe(0.2)
+	hg.Observe(0.7)
+	hg.Observe(1.5)
+	expected := `
+			# HELP test_histogram Test histogram
+    		# TYPE test_histogram histogram
+    		test_histogram_bucket{le="0.1"} 1
+    		test_histogram_bucket{le="0.5"} 2
+    		test_histogram_bucket{le="1.0"} 3
+    		test_histogram_bucket{le="+Inf"} 4 
+    		test_histogram_sum 2.45
+    		test_histogram_count 4
+    	`
+	err := testutil.CollectAndCompare(hg, strings.NewReader(expected))
+	if err != nil {
+		fmt.Printf("Error %s\n", err.Error())
+	}
 }
 
 func TestSummay(t *testing.T) {
