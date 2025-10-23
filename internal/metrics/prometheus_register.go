@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	BUCKET_TH_HTTP_REQUEST_DURATION                      = []float64{50, 100, 200, 300, 400, 500}
+	BUCKET_TH_HTTP_REQUEST_DURATION                      = []float64{0.01, 0.05, 0.1, 0.5, 1, 5, 10}
 	QUANTILE_TS_REQUESTION_DURATION                      = map[float64]float64{0.5: 0.02, 0.9: 0.02}
 	TH_HTTP_REQUEST                 prometheus.Histogram = prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name:    "tarantula_http_request",
