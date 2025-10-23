@@ -90,6 +90,12 @@ func TestHistogram(t *testing.T) {
 	if err != nil {
 		fmt.Printf("Error %s\n", err.Error())
 	}
+	var vec *prometheus.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Name:    "",
+		Help:    "",
+		Buckets: bkt,
+	}, []string{"path"})
+	vec.WithLabelValues("/abc").Observe(10)
 }
 
 func TestSummay(t *testing.T) {

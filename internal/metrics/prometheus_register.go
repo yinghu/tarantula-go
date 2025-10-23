@@ -21,9 +21,15 @@ var (
 		Help:       "Tarantula http request duration summary",
 		Objectives: QUANTILE_TS_REQUESTION_DURATION,
 	})
+	THVC_HTTP_REQUEST prometheus.HistogramVec = *prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Name:    "tarantula_http_request_vec",
+		Help:    "Tarantula http request duration vec",
+		Buckets: BUCKET_TH_HTTP_REQUEST_DURATION,
+	}, []string{"path"})
 )
 
 func init() {
+	prometheus.MustRegister(THVC_HTTP_REQUEST)
 	prometheus.MustRegister(TG_SOCKET_CONCURRENCY)
 	prometheus.MustRegister(TH_HTTP_REQUEST)
 	prometheus.MustRegister(TS_HTTP_REQUEST)

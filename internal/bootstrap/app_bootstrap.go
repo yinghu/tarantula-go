@@ -107,6 +107,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			s.Metrics().WebRequest(ms)
 			metrics.TH_HTTP_REQUEST.Observe(float64(dur.Milliseconds()))
 			metrics.TS_HTTP_REQUEST.Observe(float64(dur.Milliseconds()))
+			metrics.THVC_HTTP_REQUEST.WithLabelValues(r.URL.Path).Observe(float64(dur.Milliseconds()))
 
 		}()
 		if s.AccessControl() == PUBLIC_ACCESS_CONTROL {
