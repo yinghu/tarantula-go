@@ -29,22 +29,50 @@ func (s *SampleCreator) Create(cid int, topic string) (event.Event, error) {
 }
 
 func (s *SampleCreator) OnError(e event.Event, err error) {
-	fmt.Printf("On event error %v %s\n", e, err.Error())
+	//fmt.Printf("On event error %v %s\n", e, err.Error())
 }
 
 func (s *SampleCreator) OnEvent(e event.Event) {
-	fmt.Printf("On event %v\n", e)
+	//fmt.Printf("On event %v\n", e)
 
 }
 
-func TestClient(t *testing.T) {
+func TestSimulation(t *testing.T) {
+	ch := make(chan bool)
+	pn := 100
+	pf := "forker"
+	for i := range pn {
+		go simulate(fmt.Sprintf("%s%d", pf, i), ch)
+		time.Sleep(100 * time.Millisecond)
+	}
+	failed := 0
+	done := 0
+	for b := range ch {
+		done++
+		if !b {
+			failed++
+		}
+		if done == pn {
+			break
+		}
+	}
+	close(ch)
+	if failed > 0 {
+		t.Errorf("failed count %d", failed)
+	}
+}
+
+func simulate(player string, ch chan bool) {
 	hc := util.HttpCaller{Host: "http://192.168.1.11"}
-	login := bootstrap.Login{Name: "player1", Hash: "aaa"}
+	login := bootstrap.Login{Name: player, Hash: "password"}
 	err := hc.PostJson("presence/login", login, func(resp *http.Response) error {
 		session := core.OnSession{}
 		err := json.NewDecoder(resp.Body).Decode(&session)
 		if err != nil {
 			return err
+		}
+		if !session.Successful {
+			return fmt.Errorf("error : %s", session.Message)
 		}
 		hc.Token = session.Token
 		hc.Ticket = session.Ticket
@@ -53,22 +81,38 @@ func TestClient(t *testing.T) {
 		return nil
 	})
 	if err != nil {
-		t.Errorf("login error %s", err.Error())
-		return
+		err = hc.PostJson("presence/register", login, func(resp *http.Response) error {
+			session := core.OnSession{}
+			err := json.NewDecoder(resp.Body).Decode(&session)
+			if err != nil {
+				return err
+			}
+			if !session.Successful {
+				return fmt.Errorf("error : %s", session.Message)
+			}
+			hc.Token = session.Token
+			hc.Ticket = session.Ticket
+			hc.SystemId = session.SystemId
+			hc.Home = session.Home
+			return nil
+		})
+		if err != nil {
+			ch <- false
+			return
+		}
 	}
-	fmt.Printf("home %s\n", hc.Home)
 	sb := event.SocketPublisher{Remote: fmt.Sprintf("tcp://%s:5050", hc.Home)}
 	err = sb.Connect()
 
 	if err != nil {
-		t.Errorf("conn error %s", err.Error())
+		ch <- false
 	}
 
 	e := event.JoinEvent{Ticket: hc.Ticket}
 	e.OnListener(&SampleCreator{})
 	err = sb.Join(&e)
 	if err != nil {
-		t.Errorf("send error %s", err.Error())
+		ch <- false
 		sb.Close()
 		return
 	}
@@ -81,9 +125,10 @@ func TestClient(t *testing.T) {
 		me.SystemId = hc.SystemId
 		me.OnListener(&SampleCreator{})
 		sb.Publish(&me, hc.Ticket)
-		time.Sleep(10 * time.Millisecond)
+		time.Sleep(1000 * time.Millisecond)
 
 	}
-	time.Sleep(5 * time.Second)
+	time.Sleep(10 * time.Second)
 	sb.Close()
+	ch <- true
 }

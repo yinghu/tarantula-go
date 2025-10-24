@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
+	"gameclustering.com/internal/event"
 )
 
 type Simulator struct {
@@ -29,7 +31,17 @@ func (s *Simulator) Play() error {
 			return err
 		}
 	}
-	return s.inventory()
+	err = s.inventory()
+	if err != nil {
+		return err
+	}
+	done := make(chan bool)
+	go s.tcp(done)
+	b := <-done
+	if b {
+		return nil
+	}
+	return fmt.Errorf("tcp error")
 }
 
 func (s *Simulator) register() error {
@@ -95,4 +107,37 @@ func (s *Simulator) inventory() error {
 		return err
 	}
 	return nil
+}
+
+func (s *Simulator) tcp(ch chan bool) {
+	sb := event.SocketPublisher{Remote: fmt.Sprintf("tcp://%s:5050", s.Home)}
+	err := sb.Connect()
+
+	if err != nil {
+		ch <- false
+	}
+
+	e := event.JoinEvent{Ticket: s.Ticket}
+	e.OnListener(&SampleCreator{})
+	err = sb.Join(&e)
+	if err != nil {
+		ch <- false
+		sb.Close()
+		return
+	}
+	go sb.Subscribe(&SampleCreator{}, &SampleCreator{})
+
+	for range 10 {
+
+		me := MahjongEvent{Cmd: "drop"}
+		me.OnTopic("mahjong")
+		me.SystemId = s.SystemId
+		me.OnListener(&SampleCreator{})
+		sb.Publish(&me, s.Ticket)
+		time.Sleep(1000 * time.Millisecond)
+
+	}
+	time.Sleep(1 * time.Second)
+	sb.Close()
+	ch <- true
 }
