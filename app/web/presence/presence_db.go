@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"gameclustering.com/internal/bootstrap"
+	"gameclustering.com/internal/metrics"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -25,9 +26,11 @@ func (s *PresenceService) createSchema() error {
 func (s *PresenceService) SaveLogin(login *bootstrap.Login) error {
 	inserted, err := s.Sql.Exec(INSERT_LOGIN, login.Name, login.Hash, login.SystemId, login.ReferenceId)
 	if err != nil {
+		metrics.APP_ERROR_METRICS.WithLabelValues("login", err.Error()).Inc()
 		return err
 	}
 	if inserted == 0 {
+		metrics.APP_ERROR_METRICS.WithLabelValues("login", "cannot be saved").Inc()
 		return errors.New("login cannot be saved")
 	}
 	return nil
