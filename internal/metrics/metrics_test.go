@@ -20,7 +20,6 @@ func TestCouner(t *testing.T) {
 	if n != 102 {
 		t.Errorf("should be 102 %.f\n", n)
 	}
-
 	vct := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: "test_counter",
 		Help: "Test counter",

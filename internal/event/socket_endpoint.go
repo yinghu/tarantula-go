@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/metrics"
 )
 
 const (
@@ -183,10 +184,12 @@ func (s *SocketEndpoint) outbound() {
 					close(oc.Pending)
 					delete(s.outboundIndex, e.RecipientId())
 					s.Service.OnEvent(e)
+					metrics.SOCKET_CONCURRENCY_METRICS.Dec()
 				}
 				continue
 			}
 			if e.ClassId() == JOIN_CID {
+				metrics.SOCKET_CONCURRENCY_METRICS.Inc()
 				join, _ := e.(*JoinEvent)
 				cout := OutboundSocket{Soc: join.Pending, Pending: make(chan Event, 10)}
 				go cout.Subscribe()
