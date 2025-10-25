@@ -128,14 +128,12 @@ func (s *Simulator) tcp(ch chan bool) {
 	go sb.Subscribe(&SampleCreator{}, &SampleCreator{})
 
 	for range 10 {
-
 		me := MahjongEvent{Cmd: "drop"}
 		me.OnTopic("mahjong")
 		me.SystemId = s.SystemId
 		me.OnListener(&SampleCreator{})
 		sb.Publish(&me, s.Ticket)
 		time.Sleep(1000 * time.Millisecond)
-
 	}
 	time.Sleep(1 * time.Second)
 	sb.Close()
