@@ -2,7 +2,7 @@ FROM alpine:3.21
 
 RUN mkdir -p /var/tarantula/prometheus/data
 
-RUN apk add --no-cache prometheus
+RUN apk add --no-cache grafana
 
 # Add your Prometheus configuration and other necessary files
 COPY prometheus.yaml /etc/prometheus/prometheus.yml

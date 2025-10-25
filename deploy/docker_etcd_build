@@ -1,10 +1,10 @@
 FROM alpine:3.21
 
-RUN mkdir -p /var/tarantula/prometheus/data
+RUN mkdir -p /var/tarantula/etcd/data
+RUN mkdir -p /etc/tarantula/etcd
+RUN apk add --no-cache etcd
 
-RUN apk add --no-cache prometheus
+# copy configuration
+COPY etcd.config /etc/tarantula/etcd/etcd.config
 
-# Add your Prometheus configuration and other necessary files
-COPY prometheus.yaml /etc/prometheus/prometheus.yml
-
-ENTRYPOINT ["prometheus", "--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/var/tarantula/prometheus/data"]
+ENTRYPOINT ["etcd", "--config-file=/etc/tarantula/etcd/etcd.config"]
