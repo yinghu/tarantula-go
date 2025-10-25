@@ -7,4 +7,4 @@ RUN apk add --no-cache prometheus
 # Add your Prometheus configuration and other necessary files
 COPY prometheus.yaml /etc/prometheus/prometheus.yml
 
-ENTRYPOINT ["prometheus", "--config.file=/etc/prometheus/prometheus.yml","--storage.tsdb.path=/var/tarantula/prometheus/data"]
+ENTRYPOINT ["prometheus", "--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/var/tarantula/prometheus/data"]

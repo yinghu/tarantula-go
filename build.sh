@@ -51,6 +51,9 @@ for app in "${apps[@]}"; do
   ((seq++))
 done
 
+sudo docker build -f ./docker_prometheus_node_exporter_build --tag tarantula.exporter:$version .
+Check
+
 sudo docker build -f ./docker_prometheus_build --tag tarantula.prometheus:$version .
 Check
 

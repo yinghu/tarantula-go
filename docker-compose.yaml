@@ -104,6 +104,18 @@ services:
       - net
     env_file:
       - .env  
+  exporter:
+    stop_grace_period: 20s
+    restart: unless-stopped
+    container_name: exporter
+    hostname: exporter
+    image: tarantula.exporter:${VERSION}
+    ports:
+      - "9100:9100"
+    depends_on:
+      - admin
+    networks:
+      - net     
   prometheus:
     stop_grace_period: 20s
     restart: unless-stopped
