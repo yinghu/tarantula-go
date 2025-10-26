@@ -92,6 +92,7 @@ func metricsHandler(h http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tkn := r.Header.Get("Authorization")
 		core.AppLog.Printf("metrics validation ... %s\n", tkn)
+		
 		h.ServeHTTP(w, r)
 	}
 }

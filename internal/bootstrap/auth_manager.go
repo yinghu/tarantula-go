@@ -121,5 +121,4 @@ func (s *AuthManager) ValidateTicket(ticket string) (core.OnSession, error) {
 		return session, errors.New("token timeout")
 	}
 	return session, nil
-	//return s.ValidateToken(ticket)
 }
