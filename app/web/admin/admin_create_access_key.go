@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -31,7 +32,7 @@ func (s *AdminCreateAccessKey) Request(rs core.OnSession, w http.ResponseWriter,
 		return
 	}
 	if cp.ExpiryTime.Before(time.Now()) {
-		w.Write(util.ToJson(core.OnSession{Successful: false, Message: "time already expired"}))
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: fmt.Sprintf("time already expired :%v", cp.ExpiryTime)}))
 		return
 	}
 	dur := int(time.Until(cp.ExpiryTime).Seconds())
