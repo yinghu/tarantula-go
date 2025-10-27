@@ -76,6 +76,7 @@ func (s *AppManager) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 	}
 	s.auth = au
 	ap, err := s.LoadAuth(f.PresenceCtx())
+	
 	if err != nil {
 		return err
 	}
