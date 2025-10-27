@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"regexp"
 	"strings"
 	"syscall"
 	"time"
@@ -92,9 +91,14 @@ func illegalAccess(w http.ResponseWriter, r *http.Request) {
 func metricsHandler(auth core.Authenticator, h http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tkn := r.Header.Get("Authorization")
-		reg := regexp.MustCompile("[^0-9a-fA-F]")
-		cleaned := reg.ReplaceAllString(tkn, "")
-		oss, err := auth.ValidateTicket(cleaned)
+		parts := strings.Split(tkn, " ")
+		if len(parts) != 2 {
+			invalidToken(w, r)
+			return
+		}
+		//reg := regexp.MustCompile("[^0-9a-fA-F]")
+		//cleaned := reg.ReplaceAllString(tkn, "")
+		oss, err := auth.ValidateTicket(parts[1])
 		if err != nil {
 			core.AppLog.Printf("metrics validation failed %s\n", err.Error())
 		} else {
