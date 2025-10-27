@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -17,6 +16,7 @@ type AdminCreateAccessKey struct {
 
 type KeyExpiration struct {
 	ExpiryTime time.Time `json:"ExpiryTime"`
+	Key        string    `json:"AccessKey"`
 }
 
 func (s *AdminCreateAccessKey) AccessControl() int32 {
@@ -32,6 +32,6 @@ func (s *AdminCreateAccessKey) Request(rs core.OnSession, w http.ResponseWriter,
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	session := core.OnSession{Successful: true, Message: fmt.Sprintf("%s : %d", key, dur)}
-	w.Write(util.ToJson(session))
+	cp.Key = key
+	w.Write(util.ToJson(cp))
 }
