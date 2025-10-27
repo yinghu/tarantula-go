@@ -25,7 +25,15 @@ func (s *AdminCreateAccessKey) AccessControl() int32 {
 func (s *AdminCreateAccessKey) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var cp KeyExpiration
-	json.NewDecoder(r.Body).Decode(&cp)
+	err := json.NewDecoder(r.Body).Decode(&cp)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	if cp.ExpiryTime.Before(time.Now()) {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: "time already expired"}))
+		return
+	}
 	dur := int(time.Until(cp.ExpiryTime).Seconds())
 	key, err := s.AppAuth.CreateTicket(rs.SystemId, rs.Stub, rs.AccessControl, dur)
 	if err != nil {
