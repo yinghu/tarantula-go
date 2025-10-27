@@ -14,42 +14,42 @@
         metrics_path: /postoffice/metrics
         static_configs:
           - targets: ['postoffice:8080']
-        bearer_token_file: 'tarantula_token'
+        bearer_token_file: '/etc/prometheus/token.txt'
 
       - job_name: 'tarantula.presence'
         metrics_path: /presence/metrics
         static_configs:
           - targets: ['presence:8080']
-        bearer_token_file: 'tarantula_token'
+        bearer_token_file: '/etc/prometheus/token.txt'
 
       - job_name: 'tarantula.admin'
         metrics_path: /admin/metrics
         static_configs:
           - targets: ['admin:8080']
-        bearer_token_file: 'tarantula_token'
+        bearer_token_file: '/etc/prometheus/token.txt'
 
       - job_name: 'tarantula.asset'
         metrics_path: /asset/metrics
         static_configs:
           - targets: ['asset:8080']
-        bearer_token_file: 'tarantula_token'
+        bearer_token_file: '/etc/prometheus/token.txt'
 
       - job_name: 'tarantula.inventory'
         metrics_path: /inventory/metrics
         static_configs:
           - targets: ['inventory:8080']
-        bearer_token_file: 'tarantula_token'
+        bearer_token_file: '/etc/prometheus/token.txt'
 
       - job_name: 'tarantula.tournament'
         metrics_path: /tournament/metrics
         static_configs:
           - targets: ['tournament:8080']
-        bearer_token_file: 'tarantula_token'
+        bearer_token_file: '/etc/prometheus/token.txt'
 
       - job_name: 'tarantula.mahjong'
         metrics_path: /mahjong/metrics
         static_configs:
           - targets: ['mahjong:8080']
-        bearer_token_file: 'tarantula_token'  
+        bearer_token_file: '/etc/prometheus/token.txt'  
 
           
