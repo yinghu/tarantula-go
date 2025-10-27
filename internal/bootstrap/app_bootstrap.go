@@ -44,7 +44,7 @@ func AppBootstrap(tcx TarantulaContext) {
 			core.AppLog.Printf("View :%v\n", view[i])
 			c.Listener().MemberJoined(view[i])
 		}
-		http.Handle("/"+tcx.Context()+"/metrics", metricsHandler(promhttp.Handler()))
+		http.Handle("/"+tcx.Context()+"/metrics", metricsHandler(tcx.Service().Authenticator(),promhttp.Handler()))
 		if tcx.Context() != "admin" {
 			http.Handle("/"+tcx.Context()+"/clusteradmin/{cmd}/{cid}", Logging(&AppClusterAdmin{tcx, tcx.Service()}))
 			core.AppLog.Printf("Register app cluster admin endpoint %s\n", tcx.Context())
@@ -88,11 +88,15 @@ func illegalAccess(w http.ResponseWriter, r *http.Request) {
 	w.Write(util.ToJson(session))
 }
 
-func metricsHandler(h http.Handler) http.HandlerFunc {
+func metricsHandler(auth core.Authenticator,h http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tkn := r.Header.Get("Authorization")
-		core.AppLog.Printf("metrics validation ... %s\n", tkn)
-		
+		oss, err := auth.ValidateTicket(tkn)
+		if err!=nil{
+			core.AppLog.Printf("metrics validation failed %s\n", err.Error())
+		}else{
+			core.AppLog.Printf("metrics validation ... %v\n",oss)	
+		}
 		h.ServeHTTP(w, r)
 	}
 }
