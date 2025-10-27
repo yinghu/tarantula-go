@@ -5,6 +5,7 @@ Clean(){
     rm id_ed25519
     rm known_hosts
     rm .gitconfig
+    rm token.txt
 }
 Check(){
     if [[ $? -ne 0 ]]; then
@@ -43,6 +44,7 @@ echo "Build params : ${version} ${host} ${id} ${seq} ${grp}"
 cp ~/.ssh/id_ed25519 .
 cp ~/.ssh/known_hosts .
 cp ~/.gitconfig .
+cp ~/token.txt
 apps=("admin" "presence" "inventory" "asset" "tournament" "postoffice" "mahjong")
 for app in "${apps[@]}"; do
   echo "Current build target : $app"
