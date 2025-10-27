@@ -96,13 +96,11 @@ func metricsHandler(auth core.Authenticator, h http.Handler) http.HandlerFunc {
 			invalidToken(w, r)
 			return
 		}
-		//reg := regexp.MustCompile("[^0-9a-fA-F]")
-		//cleaned := reg.ReplaceAllString(tkn, "")
-		oss, err := auth.ValidateTicket(parts[1])
+		_, err := auth.ValidateTicket(parts[1])
 		if err != nil {
 			core.AppLog.Printf("metrics validation failed %s\n", err.Error())
-		} else {
-			core.AppLog.Printf("metrics validation ... %v\n", oss)
+			invalidToken(w, r)
+			return
 		}
 		h.ServeHTTP(w, r)
 	}
