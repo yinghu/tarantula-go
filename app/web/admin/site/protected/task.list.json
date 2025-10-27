@@ -77,7 +77,8 @@
                 {"Name":"AddLogin","Callback":"on_post","Form":"/admin/webprotected/add.login.json","Path":"/admin/login/add"},
                 {"Name":"ParseSnowFlakeId","Callback":"on_post","Form":"/admin/webprotected/parse.snow.flake.id.json","Path":"/admin/snowflake/parse"},
                 {"Name":"SyncRepo","Callback":"on_post","Form":"/admin/webprotected/sync.repository.json","Path":"/admin/repo/sync"},
-                {"Name":"AddTopic","Callback":"on_post","Form":"/admin/webprotected/admin.add.topic.json","Path":"/admin/topic/subscribe"}
+                {"Name":"AddTopic","Callback":"on_post","Form":"/admin/webprotected/admin.add.topic.json","Path":"/admin/topic/subscribe"},
+                {"Name":"CreateKey","Callback":"on_post","Form":"/admin/webprotected/admin.create.access.key.json","Path":"/admin/accesskey"}
             ]        
         },
         {

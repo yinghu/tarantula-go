@@ -72,6 +72,7 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 	http.Handle("/admin/snowflake/parse", bootstrap.Logging(&AdminParseSnowFlakeId{AdminService: s}))
 	http.Handle("/admin/login/add", bootstrap.Logging(&SudoAddLogin{AdminService: s}))
 	http.Handle("/admin/password", bootstrap.Logging(&AdminChangePwd{AdminService: s}))
+	http.Handle("/admin/accesskey", bootstrap.Logging(&AdminCreateAccessKey{AdminService: s}))
 	http.Handle("/admin/login", bootstrap.Logging(&AdminLogin{AdminService: s}))
 	fmt.Printf("Admin service started %s\n", f.HttpBinding)
 	return nil
