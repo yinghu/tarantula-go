@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -25,6 +26,12 @@ func (s *AdminCreateAccessKey) Request(rs core.OnSession, w http.ResponseWriter,
 	defer r.Body.Close()
 	var cp KeyExpiration
 	json.NewDecoder(r.Body).Decode(&cp)
-	session := core.OnSession{Successful: true, Message: "key created"}
+	dur := int(time.Until(cp.ExpiryTime).Seconds())
+	key, err := s.AppAuth.CreateTicket(rs.SystemId, rs.Stub, rs.AccessControl, dur)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	session := core.OnSession{Successful: true, Message: fmt.Sprintf("%s : %d", key, dur)}
 	w.Write(util.ToJson(session))
 }
