@@ -13,7 +13,7 @@ import (
 
 const (
 	TOKEN_TIME_OUT_HOURS    int = 24
-	TICKET_TIME_OUT_SECONDS int = 10
+	TICKET_TIME_OUT_SECONDS int = 100
 )
 
 type AuthManager struct {

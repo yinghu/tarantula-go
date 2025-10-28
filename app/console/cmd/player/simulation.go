@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"gameclustering.com/internal/core"
 	"github.com/spf13/cobra"
 )
 
@@ -20,6 +21,7 @@ var simuCmd = &cobra.Command{
 	Short: "simulation",
 	Long:  "simulation load test",
 	Run: func(cmd *cobra.Command, args []string) {
+		core.CreateTestLog()
 		prefix, _ := cmd.Flags().GetString("prefix")
 		count, _ := cmd.Flags().GetInt("count")
 		batch, _ := cmd.Flags().GetInt("batch")

@@ -1,6 +1,8 @@
 package player
 
 import (
+	"fmt"
+
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
@@ -107,10 +109,10 @@ func (s *SampleCreator) Create(cid int, topic string) (event.Event, error) {
 }
 
 func (s *SampleCreator) OnError(e event.Event, err error) {
-	//fmt.Printf("On event error %v %s\n", e, err.Error())
+	fmt.Printf("On event error %v %s\n", e, err.Error())
 }
 
 func (s *SampleCreator) OnEvent(e event.Event) {
-	//fmt.Printf("On event %v\n", e)
+	fmt.Printf("On event %v\n", e)
 
 }
