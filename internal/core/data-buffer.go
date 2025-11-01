@@ -1,5 +1,7 @@
 package core
 
+import "fmt"
+
 type DataBuffer interface {
 	WriteBool(data bool) error
 
@@ -44,6 +46,7 @@ type DataBuffer interface {
 	ReadBool() (bool, error)
 
 	Read(sz int) ([]byte, error)
+	Export(delimit byte) ([]byte, error)
 
 	Remaining() int
 
@@ -154,4 +157,7 @@ func (s *DataBufferHook) Rewind() error {
 }
 func (s *DataBufferHook) Clear() error {
 	return nil
+}
+func (s *DataBufferHook) Export(delimit byte) ([]byte, error) {
+	return nil, fmt.Errorf("unsupported")
 }

@@ -263,6 +263,17 @@ func (s *BufferProxy) Read(sz int) ([]byte, error) {
 	return k, nil
 }
 
+func (s *BufferProxy) Export(delimit byte) ([]byte, error) {
+	sz := s.data.Remaining()
+	v := make([]byte, sz+1)
+	err := s.data.GetBytes(v, 0, sz)
+	if err != nil {
+		return v, err
+	}
+	v[sz] = delimit
+	return v, nil
+}
+
 func (s *BufferProxy) Write(data []byte) error {
 	return s.data.PutBytes(data, 0, len(data))
 }

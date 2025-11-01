@@ -220,3 +220,21 @@ func TestDatatBuffer(t *testing.T) {
 	}
 	//fmt.Printf("Total count : %d\n", se.Count)
 }
+
+func TestDatatBufferExport(t *testing.T) {
+	buff := core.NewBuffer(10)
+	buff.WriteInt32(10)
+	buff.Flip()
+	v, err := buff.Export('|')
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+	}
+	sz := len(v)
+	if sz != 5 {
+		t.Errorf("should be 5 %d", sz)
+	}
+	if v[4] != '|' {
+		t.Errorf("should be | %v", v[4])
+	}
+	fmt.Printf("value %v\n",v)
+}
