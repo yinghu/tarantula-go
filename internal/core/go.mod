@@ -2,7 +2,10 @@ module gameclustering.com/intenal/core
 
 go 1.24.2
 
-require go.etcd.io/etcd/client/v3 v3.6.5
+require (
+	github.com/0xc0d/encoding v0.1.0
+	go.etcd.io/etcd/client/v3 v3.6.5
+)
 
 require (
 	github.com/coreos/go-semver v0.3.1 // indirect

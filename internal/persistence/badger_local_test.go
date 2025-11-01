@@ -82,7 +82,7 @@ func TestBufferKey(t *testing.T) {
 		t.Errorf("should not be error %s", err.Error())
 	}
 	defer local.Close()
-	buff := NewBuffer(100)
+	buff := core.NewBuffer(100)
 	local.Db.Update(func(txn *badger.Txn) error {
 		for i := range 1000 {
 			buff.Clear()
@@ -232,7 +232,7 @@ func TestStreming(t *testing.T) {
 	}
 	defer local.Close()
 	local.Db.Update(func(txn *badger.Txn) error {
-		buff := NewBuffer(100)
+		buff := core.NewBuffer(100)
 		for i := range 1000 {
 			buff.Clear()
 			buff.WriteString("etg")
@@ -249,7 +249,7 @@ func TestStreming(t *testing.T) {
 	stream := local.Db.NewStream()
 	stream.NumGo = 3
 	stream.ChooseKey = func(item *badger.Item) bool {
-		buff := NewBuffer(100)
+		buff := core.NewBuffer(100)
 		buff.Clear()
 		buff.Write(item.Key())
 		buff.Flip()

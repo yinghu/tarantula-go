@@ -1,14 +1,13 @@
-package persistence
+package core
 
 import (
 	"bytes"
 	"encoding/binary"
 
-	"gameclustering.com/internal/core"
 	buffer "github.com/0xc0d/encoding/bytebuffer"
 )
 
-func NewBuffer(size int) core.DataBuffer {
+func NewBuffer(size int) DataBuffer {
 	bf := BufferProxy{}
 	bf.NewProxy(size)
 	return &bf

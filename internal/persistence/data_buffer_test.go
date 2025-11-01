@@ -190,7 +190,7 @@ func TestDatatBuffer(t *testing.T) {
 	sample4.Str = "lower"
 	local.Save(&sample4)
 
-	px := BufferProxy{}
+	px := core.BufferProxy{}
 	px.NewProxy(100)
 	px.WriteString("sample:")
 	px.Flip()

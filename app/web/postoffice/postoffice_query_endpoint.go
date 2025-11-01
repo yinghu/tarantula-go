@@ -9,7 +9,6 @@ import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
-	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
 )
 
@@ -22,7 +21,7 @@ func (s *PostofficeQueryer) AccessControl() int32 {
 }
 
 func (s *PostofficeQueryer) query(query event.Query) {
-	buff := persistence.BufferProxy{}
+	buff := core.BufferProxy{}
 	buff.NewProxy(100)
 	query.QCriteria(&buff)
 	buff.Flip()

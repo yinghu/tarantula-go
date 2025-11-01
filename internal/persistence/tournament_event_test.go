@@ -42,7 +42,7 @@ func TestTournamentEvent(t *testing.T) {
 		tmnt.OnIndex(&index)
 	}
 	tq := event.QScore{TournamentId: TID,InstanceId: IID}
-	prx := NewBuffer(100)
+	prx := core.NewBuffer(100)
 	tq.QCriteria(prx)
 	prx.Flip()
 	q,_:=prx.Read(0)

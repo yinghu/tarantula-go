@@ -17,7 +17,6 @@ require (
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
-	github.com/0xc0d/encoding v0.1.0
 	github.com/dgraph-io/badger/v4 v4.7.0
 	github.com/dgraph-io/ristretto/v2 v2.2.0
 	github.com/jackc/pgx/v5 v5.7.4
@@ -25,6 +24,7 @@ require (
 
 require (
 	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
+	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/coreos/go-semver v0.3.1 // indirect

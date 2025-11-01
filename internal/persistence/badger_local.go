@@ -27,9 +27,9 @@ type BadgerLocal struct {
 }
 
 func (s *BadgerLocal) Save(t core.Persistentable) error {
-	key := BufferProxy{}
+	key := core.BufferProxy{}
 	key.NewProxy(BDG_KEY_SIZE)
-	value := BufferProxy{}
+	value := core.BufferProxy{}
 	value.NewProxy(BDG_VALUE_SIZE)
 	t.WriteKey(&key)
 	value.WriteInt32(int32(t.ClassId()))
@@ -41,18 +41,18 @@ func (s *BadgerLocal) Save(t core.Persistentable) error {
 	return s.set(&key, &value, t)
 }
 func (s *BadgerLocal) Delete(t core.Persistentable) error {
-	key := BufferProxy{}
+	key := core.BufferProxy{}
 	key.NewProxy(BDG_KEY_SIZE)
 	t.WriteKey(&key)
 	key.Flip()
 	return s.del(&key)
 }
 func (s *BadgerLocal) Load(t core.Persistentable) error {
-	key := BufferProxy{}
+	key := core.BufferProxy{}
 	key.NewProxy(BDG_KEY_SIZE)
 	t.WriteKey(&key)
 	key.Flip()
-	value := BufferProxy{}
+	value := core.BufferProxy{}
 	value.NewProxy(BDG_VALUE_SIZE)
 	err := s.get(&key, &value)
 	if err != nil {
@@ -97,9 +97,9 @@ func (s *BadgerLocal) Query(opt core.ListingOpt, stream core.Stream) error {
 	if opt.StartCursor != nil {
 		seek = opt.StartCursor
 	}
-	key := BufferProxy{}
+	key := core.BufferProxy{}
 	key.NewProxy(BDG_KEY_SIZE)
-	value := BufferProxy{}
+	value := core.BufferProxy{}
 	value.NewProxy(BDG_VALUE_SIZE)
 	limit := -1
 	if opt.Limit > 0 {
@@ -136,9 +136,9 @@ func (s *BadgerLocal) Query(opt core.ListingOpt, stream core.Stream) error {
 func (s *BadgerLocal) Version(key []byte, stream core.Stream) error {
 	op := badger.DefaultIteratorOptions
 	op.AllVersions = true
-	k := BufferProxy{}
+	k := core.BufferProxy{}
 	k.NewProxy(BDG_KEY_SIZE)
-	v := BufferProxy{}
+	v := core.BufferProxy{}
 	v.NewProxy(BDG_VALUE_SIZE)
 	return s.Db.View(func(txn *badger.Txn) error {
 		it := txn.NewIterator(op)
@@ -170,7 +170,7 @@ func (s *BadgerLocal) Version(key []byte, stream core.Stream) error {
 	})
 }
 
-func (s *BadgerLocal) set(key *BufferProxy, value *BufferProxy, t core.Persistentable) error {
+func (s *BadgerLocal) set(key *core.BufferProxy, value *core.BufferProxy, t core.Persistentable) error {
 	if key.Remaining() == 0 || value.Remaining() == 0 {
 		return fmt.Errorf("bad key/value")
 	}
@@ -240,7 +240,7 @@ func (s *BadgerLocal) set(key *BufferProxy, value *BufferProxy, t core.Persisten
 	})
 }
 
-func (s *BadgerLocal) del(key *BufferProxy) error {
+func (s *BadgerLocal) del(key *core.BufferProxy) error {
 	if key.Remaining() == 0 {
 		return errors.New("bad key/value")
 	}
@@ -258,7 +258,7 @@ func (s *BadgerLocal) del(key *BufferProxy) error {
 	return nil
 }
 
-func (s *BadgerLocal) get(key *BufferProxy, value *BufferProxy) error {
+func (s *BadgerLocal) get(key *core.BufferProxy, value *core.BufferProxy) error {
 	if key.Remaining() == 0 {
 		return errors.New("bad key/value")
 	}
@@ -333,9 +333,9 @@ func (s *BadgerLocal) Close() error {
 }
 
 func (s *BadgerLocal) Tx() core.Transaction {
-	k := BufferProxy{}
+	k := core.BufferProxy{}
 	k.NewProxy(BDG_KEY_SIZE)
-	v := BufferProxy{}
+	v := core.BufferProxy{}
 	v.NewProxy(BDG_VALUE_SIZE)
 	tx := BadgerLocalTransaction{ctx: s.Db.NewTransaction(true),key: &k,value: &v}
 	return &tx
