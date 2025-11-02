@@ -54,6 +54,7 @@ func (s *TcpPublisher) Subscribe(cr EventCreator, ec EventListener) {
 }
 
 func (s *TcpPublisher) Join(e Event) error {
+	s.pub.Clear()
 	err := s.pub.WriteInt32(int32(e.ClassId()))
 	if err != nil {
 		core.AppLog.Printf("error on write classid %s\n", err.Error())
@@ -82,6 +83,7 @@ func (s *TcpPublisher) Join(e Event) error {
 }
 
 func (s *TcpPublisher) Publish(e Event, ticket string) error {
+	s.pub.Clear()
 	err := s.pub.WriteInt32(int32(e.ClassId()))
 	if err != nil {
 		core.AppLog.Printf("error on write classid %s\n", err.Error())
@@ -105,6 +107,18 @@ func (s *TcpPublisher) Publish(e Event, ticket string) error {
 		core.AppLog.Printf("error on write outbound %s\n", err.Error())
 		e.Listener().OnError(e, err)
 	}
+	s.pub.Flip()
+	data, err := s.pub.Export('|')
+	if err != nil {
+		core.AppLog.Printf("error on export %s\n", err.Error())
+		e.Listener().OnError(e, err)
+	}
+	n, err := s.client.Write(data)
+	if err != nil {
+		core.AppLog.Printf("error on write socket %s\n", err.Error())
+		e.Listener().OnError(e, err)
+	}
+	core.AppLog.Printf("write socket number %d\n", n)
 	//e.Listener().OnEvent(e)
 	return nil
 }
