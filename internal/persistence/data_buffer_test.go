@@ -222,19 +222,57 @@ func TestDatatBuffer(t *testing.T) {
 }
 
 func TestDatatBufferExport(t *testing.T) {
-	buff := core.NewBuffer(10)
+	buff := core.NewBuffer(100)
 	buff.WriteInt32(10)
+	buff.WriteString("hello")
 	buff.Flip()
 	v, err := buff.Export('|')
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
+
 	sz := len(v)
-	if sz != 5 {
+	if sz != 14 {
 		t.Errorf("should be 5 %d", sz)
 	}
-	if v[4] != '|' {
-		t.Errorf("should be | %v", v[4])
+	if v[sz-1] != '|' {
+		t.Errorf("should be | %v", v[13])
 	}
-	fmt.Printf("value %v\n",v)
+	buff.Clear()
+	buff.Write(v)
+	buff.Flip()
+	d, err := buff.ReadInt32()
+	if err!=nil{
+		t.Errorf("should not be error %s", err.Error())
+	}
+	if d != 10 {
+		t.Errorf("should be 10 %d", d)
+	}
+	h,err := buff.ReadString();
+	if err!=nil{
+		t.Errorf("should be hello %s", err.Error())
+	}
+	if h!= "hello"{
+		t.Errorf("should be hello %s", h)
+	}
+	delimit, err := buff.Read(1)
+	if err!=nil{
+		t.Errorf("should be hello %s", err.Error())
+	}
+	fmt.Printf("delimit %s\n",string(delimit))
+}
+
+func TestWriteArry(t *testing.T) {
+	buff := core.NewBuffer(100)
+	buff.Write([]byte("hello"))
+	buff.Write([]byte("world"))
+	buff.Flip()
+	h,_ := buff.Read(5)
+	if string(h)!="hello"{
+		t.Errorf("shoul be hello %s",string(h))
+	}
+	w,_ := buff.Read(5)
+	if string(w)!="world"{
+		t.Errorf("shoul be world %s",string(w))
+	}
 }

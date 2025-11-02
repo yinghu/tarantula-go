@@ -17,11 +17,11 @@ type TcpEndpoint struct {
 
 	outboundCQ    chan net.Conn
 	outboundEQ    chan Event
-	outboundIndex map[int64]*OutboundSocket
+	outboundIndex map[int64]*OutboundSoc
 }
 
 func (s *TcpEndpoint) Open() error {
-	s.outboundIndex = make(map[int64]*OutboundSocket)
+	s.outboundIndex = make(map[int64]*OutboundSoc)
 	if s.OutboundEnabled {
 		s.outboundEQ = make(chan Event, 10)
 		s.outboundCQ = make(chan net.Conn, 10)
@@ -58,7 +58,48 @@ func (s *TcpEndpoint) Open() error {
 }
 
 func (s *TcpEndpoint) inbound(client net.Conn, systemId int64) {
-
+	defer func() {
+		core.AppLog.Printf("client socket is closed")
+		if s.OutboundEnabled {
+			ce := KickoffEvent{}
+			ce.SystemId = systemId
+			ce.Source = "disconnected"
+			s.outboundEQ <- &ce
+		}
+		client.Close()
+	}()
+	data := make([]byte, TCP_READ_BUFFER_SIZE)
+	buff := core.NewBuffer(TCP_READ_BUFFER_SIZE)
+	for {
+		num, err := client.Read(data)
+		if err != nil {
+			s.Service.OnError(nil, err)
+			client.Close()
+			return
+		}
+		core.AppLog.Printf("RC %d\n", num)
+		err = buff.Write(data[:num])
+		if err != nil {
+			core.AppLog.Printf("write buff error %s\n", err.Error())
+			return
+		}
+		if data[num-1] != '|' {
+			continue
+		}
+		buff.Flip()
+		cid, err := buff.ReadInt32()
+		if err != nil {
+			buff.Clear()
+			continue
+		}
+		e, err := s.Service.Create(int(cid), "")
+		if err != nil {
+			buff.Clear()
+			continue
+		}
+		e.Inbound(buff)
+		e.Listener().OnEvent(e)
+	}
 }
 
 func (s *TcpEndpoint) outbound() {
@@ -84,10 +125,10 @@ func (s *TcpEndpoint) outbound() {
 				continue
 			}
 			if e.ClassId() == JOIN_CID {
-				metrics.SOCKET_CONCURRENCY_METRICS.Inc()
+				//metrics.SOCKET_CONCURRENCY_METRICS.Inc()
 				join, _ := e.(*JoinEvent)
-				cout := OutboundSocket{Soc: join.Pending, Pending: make(chan Event, 10)}
-				go cout.Subscribe()
+				cout := OutboundSoc{C: join.Client, Pending: make(chan Event, 10)}
+				go cout.Sub()
 				s.outboundIndex[join.SystemId] = &cout
 				go s.inbound(join.Client, join.SystemId)
 				continue
@@ -97,9 +138,38 @@ func (s *TcpEndpoint) outbound() {
 	}
 	core.AppLog.Printf("outbound event closed")
 }
-
+func (s *TcpEndpoint) Push(e Event) {
+	s.outboundEQ <- e
+}
 func (s *TcpEndpoint) join(client net.Conn) {
-
+	data := make([]byte, TCP_READ_BUFFER_SIZE)
+	buff := core.NewBuffer(TCP_READ_BUFFER_SIZE)
+	for {
+		num, err := client.Read(data)
+		if err != nil {
+			s.Service.OnError(nil, err)
+			client.Close()
+			return
+		}
+		core.AppLog.Printf("RC %d\n", num)
+		err = buff.Write(data[:num])
+		if err != nil {
+			core.AppLog.Printf("write buff error %s\n", err.Error())
+			return
+		}
+		if data[num-1] == '|' {
+			break
+		}
+	}
+	buff.Flip()
+	cid, _ := buff.ReadInt32()
+	e := JoinEvent{}
+	e.Inbound(buff)
+	v, _ := buff.Read(1)
+	core.AppLog.Printf("ticket %s %v %d\n", e.Ticket, string(v), cid)
+	e.Client = client
+	e.SystemId = 100
+	s.outboundEQ <- &e
 }
 
 func (s *TcpEndpoint) dispatch(e Event) {
