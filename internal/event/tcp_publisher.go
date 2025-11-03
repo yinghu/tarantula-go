@@ -35,12 +35,10 @@ func (s *TcpPublisher) Subscribe(cr EventCreator, ec EventListener) {
 	for {
 		num, err := s.client.Read(data)
 		if err != nil {
-			core.AppLog.Printf("close SUB inbound")
 			ec.OnError(nil, err)
 			s.client.Close()
 			return
 		}
-		core.AppLog.Printf("SRC %d\n", num)
 		err = buff.Write(data[:num])
 		if err != nil {
 			core.AppLog.Printf("write buff error %s\n", err.Error())
@@ -55,17 +53,6 @@ func (s *TcpPublisher) Subscribe(cr EventCreator, ec EventListener) {
 			buff.Clear()
 			continue
 		}
-		//tick, err := buff.ReadString()
-		//if err != nil {
-			//buff.Clear()
-			//continue
-		//}
-		//topic, err := buff.ReadString()
-		//if err != nil {
-			//buff.Clear()
-			//continue
-		//}
-		//core.AppLog.Printf("%d %s %s\n", cid, tick, topic)
 		e, err := cr.Create(int(cid),"local")
 		if err != nil {
 			buff.Clear()
@@ -96,13 +83,12 @@ func (s *TcpPublisher) Join(e Event) error {
 		core.AppLog.Printf("error on export %s\n", err.Error())
 		e.Listener().OnError(e, err)
 	}
-	n, err := s.client.Write(data)
+	_, err = s.client.Write(data)
 	if err != nil {
 		core.AppLog.Printf("error on write socket %s\n", err.Error())
 		e.Listener().OnError(e, err)
 	}
-	core.AppLog.Printf("write socket number %d\n", n)
-	//e.Listener().OnEvent(e)
+	
 	return nil
 }
 
@@ -137,12 +123,10 @@ func (s *TcpPublisher) Publish(e Event, ticket string) error {
 		core.AppLog.Printf("error on export %s\n", err.Error())
 		e.Listener().OnError(e, err)
 	}
-	n, err := s.client.Write(data)
+	_, err = s.client.Write(data)
 	if err != nil {
 		core.AppLog.Printf("error on write socket %s\n", err.Error())
 		e.Listener().OnError(e, err)
 	}
-	core.AppLog.Printf("write socket number %d\n", n)
-	//e.Listener().OnEvent(e)
 	return nil
 }
