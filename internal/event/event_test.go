@@ -3,7 +3,7 @@ package event
 import (
 	"encoding/json"
 	"fmt"
-	
+
 	"testing"
 	"time"
 
@@ -21,7 +21,7 @@ func (s *SampleCreator) Create(cid int, topic string) (Event, error) {
 
 }
 func (s *SampleCreator) VerifyTicket(ticket string) (core.OnSession, error) {
-	sess := core.OnSession{Successful: true,SystemId: 100}
+	sess := core.OnSession{Successful: true, SystemId: 100}
 	return sess, nil
 }
 func (s *SampleCreator) OnError(e Event, err error) {
@@ -45,7 +45,7 @@ func createEvent() Event {
 }
 func TestEventJson(t *testing.T) {
 	core.CreateTestLog()
-	
+
 	sub := SubscriptionEvent{App: "presence", Name: "ban"}
 	data, err := json.Marshal(sub)
 	if err != nil {
@@ -72,6 +72,7 @@ func TestEventJson(t *testing.T) {
 	time.Sleep(10 * time.Second)
 	cpp := TcpPublisher{Remote: "tcp://localhost:5050"}
 	cpp.Connect()
+	go cpp.Subscribe(&SampleCreator{},&SampleCreator{})
 	je := JoinEvent{Ticket: "xticket"}
 	je.OnTopic("tpp")
 	cpp.Join(&je)

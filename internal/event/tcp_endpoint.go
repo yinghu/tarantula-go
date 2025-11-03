@@ -141,10 +141,11 @@ func (s *TcpEndpoint) outbound() {
 			if e.ClassId() == JOIN_CID {
 				metrics.SOCKET_CONCURRENCY_METRICS.Inc()
 				join, _ := e.(*JoinEvent)
-				cout := OutboundSoc{C: join.Client, Pending: make(chan Event, 10)}
+				cout := OutboundSoc{C: join.Client, Pending: make(chan Event, 10), B: core.NewBuffer(SOCKET_DATA_BUFFER_SIZE)}
 				go cout.Sub()
 				s.outboundIndex[join.SystemId] = &cout
 				go s.inbound(join.Client, join.SystemId)
+				s.Push(&LoginEvent{SystemId: 1, Name: "X100"})
 				continue
 			}
 			s.dispatch(e)

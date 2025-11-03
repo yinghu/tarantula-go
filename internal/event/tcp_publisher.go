@@ -3,7 +3,6 @@ package event
 import (
 	"net"
 	"strings"
-	"time"
 
 	"gameclustering.com/internal/core"
 )
@@ -32,24 +31,50 @@ func (s *TcpPublisher) Close() error {
 }
 
 func (s *TcpPublisher) Subscribe(cr EventCreator, ec EventListener) {
-	sub := SocketBuffer{Socket: s.client, Buffer: make([]byte, SOCKET_DATA_BUFFER_SIZE)}
+	buff := core.NewBuffer(SOCKET_DATA_BUFFER_SIZE)
+	data := make([]byte, TCP_READ_BUFFER_SIZE)
 	for {
-		cid, err := sub.ReadInt32()
+		num, err := s.client.Read(data)
 		if err != nil {
+			core.AppLog.Printf("close SUB inbound")
 			ec.OnError(nil, err)
-			break
+			s.client.Close()
+			return
 		}
-		e, err := cr.Create(int(cid), "")
+		core.AppLog.Printf("SRC %d\n", num)
+		err = buff.Write(data[:num])
 		if err != nil {
-			ec.OnError(nil, err)
-			break
+			core.AppLog.Printf("write buff error %s\n", err.Error())
+			return
 		}
-		err = e.Inbound(&sub)
+		if data[num-1] != '|' {
+			continue
+		}
+		buff.Flip()
+		cid, err := buff.ReadInt32()
 		if err != nil {
-			ec.OnError(nil, err)
-			break
+			buff.Clear()
+			continue
 		}
-		time.Sleep(10 * time.Millisecond)
+		//tick, err := buff.ReadString()
+		//if err != nil {
+			//buff.Clear()
+			//continue
+		//}
+		//topic, err := buff.ReadString()
+		//if err != nil {
+			//buff.Clear()
+			//continue
+		//}
+		//core.AppLog.Printf("%d %s %s\n", cid, tick, topic)
+		e, err := cr.Create(int(cid),"local")
+		if err != nil {
+			buff.Clear()
+			continue
+		}
+		e.Inbound(buff)
+		buff.Clear()
+		e.Listener().OnEvent(e)
 	}
 }
 
