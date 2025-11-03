@@ -111,7 +111,7 @@ func (s *TcpEndpoint) inbound(client net.Conn, systemId int64) {
 		}
 		e.Inbound(buff)
 		buff.Clear()
-		e.Listener().OnEvent(e)
+		//e.Listener().OnEvent(e)
 	}
 }
 
@@ -145,7 +145,6 @@ func (s *TcpEndpoint) outbound() {
 				go cout.Sub()
 				s.outboundIndex[join.SystemId] = &cout
 				go s.inbound(join.Client, join.SystemId)
-				s.Push(&LoginEvent{SystemId: 1, Name: "X100"})
 				continue
 			}
 			s.dispatch(e)
@@ -202,4 +201,10 @@ func (s *TcpEndpoint) dispatch(e Event) {
 	for _, soc := range s.outboundIndex {
 		soc.Pending <- e
 	}
+}
+
+func (s *TcpEndpoint) Close() error {
+	core.AppLog.Printf("endpoint shutting down")
+	s.listener.Close()
+	return nil
 }
