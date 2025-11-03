@@ -7,7 +7,6 @@ import (
 	"gameclustering.com/internal/core"
 )
 
-//const SOCKET_DATA_BUFFER_SIZE int = 1024
 
 type TcpPublisher struct {
 	Remote string
@@ -22,7 +21,7 @@ func (s *TcpPublisher) Connect() error {
 		return err
 	}
 	s.client = conn
-	s.pub = core.NewBuffer(SOCKET_DATA_BUFFER_SIZE)
+	s.pub = core.NewBuffer(TCP_READ_BUFFER_SIZE)
 	return nil
 }
 
@@ -31,7 +30,7 @@ func (s *TcpPublisher) Close() error {
 }
 
 func (s *TcpPublisher) Subscribe(cr EventCreator, ec EventListener) {
-	buff := core.NewBuffer(SOCKET_DATA_BUFFER_SIZE)
+	buff := core.NewBuffer(TCP_READ_BUFFER_SIZE)
 	data := make([]byte, TCP_READ_BUFFER_SIZE)
 	for {
 		num, err := s.client.Read(data)

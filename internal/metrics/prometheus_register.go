@@ -12,6 +12,8 @@ var (
 		Help: "Tarantual socket concurrency",
 	})
 
+	
+
 	HTTP_REQUEST_METRICS prometheus.HistogramVec = *prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "tarantula_http_request_duration",
 		Help:    "Tarantula http request duration",

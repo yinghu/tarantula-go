@@ -8,6 +8,10 @@ import (
 	"gameclustering.com/internal/metrics"
 )
 
+const (
+	TCP_READ_BUFFER_SIZE int = 1024
+)
+
 type TcpEndpoint struct {
 	Endpoint string
 	Service  EventService
@@ -17,11 +21,11 @@ type TcpEndpoint struct {
 
 	outboundCQ    chan net.Conn
 	outboundEQ    chan Event
-	outboundIndex map[int64]*OutboundSoc
+	outboundIndex map[int64]*OutboundSocket
 }
 
 func (s *TcpEndpoint) Open() error {
-	s.outboundIndex = make(map[int64]*OutboundSoc)
+	s.outboundIndex = make(map[int64]*OutboundSocket)
 	if s.OutboundEnabled {
 		s.outboundEQ = make(chan Event, 10)
 		s.outboundCQ = make(chan net.Conn, 10)
@@ -141,8 +145,8 @@ func (s *TcpEndpoint) outbound() {
 			if e.ClassId() == JOIN_CID {
 				metrics.SOCKET_CONCURRENCY_METRICS.Inc()
 				join, _ := e.(*JoinEvent)
-				cout := OutboundSoc{C: join.Client, Pending: make(chan Event, 10), B: core.NewBuffer(SOCKET_DATA_BUFFER_SIZE)}
-				go cout.Sub()
+				cout := OutboundSocket{C: join.Client, Pending: make(chan Event, 10), B: core.NewBuffer(TCP_READ_BUFFER_SIZE)}
+				go cout.Subscribe()
 				s.outboundIndex[join.SystemId] = &cout
 				go s.inbound(join.Client, join.SystemId)
 				continue

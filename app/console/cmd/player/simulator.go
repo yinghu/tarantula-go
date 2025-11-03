@@ -110,7 +110,7 @@ func (s *Simulator) inventory() error {
 }
 
 func (s *Simulator) tcp(ch chan bool) {
-	sb := event.SocketPublisher{Remote: fmt.Sprintf("tcp://%s:5050", s.Home)}
+	sb := event.TcpPublisher{Remote: fmt.Sprintf("tcp://%s:5050", s.Home)}
 	err := sb.Connect()
 
 	if err != nil {
