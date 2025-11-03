@@ -77,12 +77,10 @@ func (s *TcpEndpoint) inbound(client net.Conn, systemId int64) {
 	for {
 		num, err := client.Read(data)
 		if err != nil {
-			core.AppLog.Printf("close inbound")
 			s.Service.OnError(nil, err)
 			client.Close()
 			return
 		}
-		core.AppLog.Printf("RC %d\n", num)
 		err = buff.Write(data[:num])
 		if err != nil {
 			core.AppLog.Printf("write buff error %s\n", err.Error())
@@ -107,7 +105,11 @@ func (s *TcpEndpoint) inbound(client net.Conn, systemId int64) {
 			buff.Clear()
 			continue
 		}
-		core.AppLog.Printf("%d %s %s\n", cid, tick, topic)
+		_, err = s.Service.VerifyTicket(tick)
+		if err != nil {
+			buff.Clear()
+			continue
+		}
 		e, err := s.Service.Create(int(cid), topic)
 		if err != nil {
 			buff.Clear()
@@ -131,7 +133,6 @@ func (s *TcpEndpoint) outbound() {
 				continue
 			}
 			if e.ClassId() == KICKOFF_CID {
-				core.AppLog.Printf("KICK OFF")
 				oc, exists := s.outboundIndex[e.RecipientId()]
 				if exists {
 					core.AppLog.Printf("remove connection from %d\n", e.RecipientId())
@@ -169,7 +170,6 @@ func (s *TcpEndpoint) join(client net.Conn) {
 			client.Close()
 			return
 		}
-		core.AppLog.Printf("RC %d\n", num)
 		err = buff.Write(data[:num])
 		if err != nil {
 			core.AppLog.Printf("write buff error %s\n", err.Error())
