@@ -202,7 +202,7 @@ func (s *PostofficeService) outboundEvent(c chan CChange) {
 				if c.nodeName == s.Cluster().Local().Name {
 					pubs[c.nodeName] = &LocalPublisher{s}
 				} else {
-					sb := event.SocketPublisher{Remote: c.endpoint}
+					sb := event.TcpPublisher{Remote: c.endpoint}
 					for i := range 5 {
 						err := sb.Connect()
 						if err != nil {

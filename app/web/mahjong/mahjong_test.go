@@ -101,7 +101,7 @@ func simulate(player string, ch chan bool) {
 			return
 		}
 	}
-	sb := event.SocketPublisher{Remote: fmt.Sprintf("tcp://%s:5050", hc.Home)}
+	sb := event.TcpPublisher{Remote: fmt.Sprintf("tcp://%s:5050", hc.Home)}
 	err = sb.Connect()
 
 	if err != nil {
