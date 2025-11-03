@@ -9,4 +9,7 @@
 
   build.bat|build.sh [version]
 
+# Setup etcd and postgresql before run docker compose 
+  
+
 windows stop 80 : NET stop HTTP 
