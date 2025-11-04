@@ -191,6 +191,7 @@ func (s *TcpEndpoint) join(client net.Conn) {
 	}
 	e.Client = client
 	e.SystemId = session.SystemId
+	s.Service.OnEvent(&e)
 	s.outboundEQ <- &e
 }
 
