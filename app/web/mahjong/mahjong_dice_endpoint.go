@@ -18,7 +18,6 @@ func (s *MahjongDicer) AccessControl() int32 {
 
 func (s *MahjongDicer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	pts := s.Dice()
+	pts := s.Table.Setup.Dice()
 	w.Write(util.ToJson(pts))
 }
-

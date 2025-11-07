@@ -25,6 +25,7 @@ func (c *ClassicMahjong) New() {
 	c.North = Hand{}
 	c.North.New()
 	c.Shuffle()
+	
 }
 
 func (c *ClassicMahjong) Mahjong(h *Hand) bool {
