@@ -120,7 +120,7 @@ func simulate(player string, ch chan bool) {
 
 	for range 10 {
 
-		me := MahjongEvent{Cmd: "drop"}
+		me := MahjongEvent{Cmd: DROP}
 		me.OnTopic("mahjong")
 		me.SystemId = hc.SystemId
 		me.OnListener(&SampleCreator{})

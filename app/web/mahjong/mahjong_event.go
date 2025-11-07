@@ -5,8 +5,14 @@ import (
 	"gameclustering.com/internal/event"
 )
 
+const(
+	SIT int32 = 0
+	DICE int32 = 1
+	DROP int32 = 2
+)
+
 type MahjongEvent struct {
-	Cmd      string
+	Cmd      int32
 	SystemId int64
 	event.EventObj
 }
@@ -40,7 +46,7 @@ func (s *MahjongEvent) Read(buff core.DataBuffer) error {
 		return err
 	}
 	s.SystemId = sysId
-	cmd, err := buff.ReadString()
+	cmd, err := buff.ReadInt32()
 	if err != nil {
 		return err
 	}
@@ -52,7 +58,7 @@ func (s *MahjongEvent) Write(buff core.DataBuffer) error {
 	if err := buff.WriteInt64(s.SystemId); err != nil {
 		return err
 	}
-	if err := buff.WriteString(s.Cmd); err != nil {
+	if err := buff.WriteInt32(s.Cmd); err != nil {
 		return err
 	}
 	return nil

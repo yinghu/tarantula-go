@@ -128,7 +128,7 @@ func (s *Simulator) tcp(ch chan bool) {
 	go sb.Subscribe(&SampleCreator{}, &SampleCreator{})
 
 	for range 10 {
-		me := MahjongEvent{Cmd: "drop"}
+		me := MahjongEvent{Cmd: 0}
 		me.OnTopic("mahjong")
 		me.SystemId = s.SystemId
 		me.OnListener(&SampleCreator{})

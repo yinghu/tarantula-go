@@ -14,12 +14,13 @@ func (s *MahjongEventListener) OnError(e event.Event, err error) {
 }
 
 func (s *MahjongEventListener) OnEvent(e event.Event) {
-	core.AppLog.Printf("On event %v\n", e)
 	ex, y := e.(*MahjongEvent)
 	if !y {
 		return
 	}
-	ex.Cmd = "kong"
-	s.Pusher().Push(ex)
+	core.AppLog.Printf("On event %v\n", ex)
+	dice := s.Table.Setup.Dice()
+	me := MahjongDiceEvent{Dice1: int32(dice[0]), Dice2: int32(dice[1])}
+	s.Pusher().Push(&me)
 
 }
