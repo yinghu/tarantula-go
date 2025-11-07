@@ -7,6 +7,72 @@ import (
 	"gameclustering.com/internal/event"
 )
 
+type MahjongDiceEvent struct {
+	Dice1 int32
+	Dice2 int32
+	event.EventObj
+}
+
+func (s *MahjongDiceEvent) ClassId() int {
+	return 101
+}
+
+func (s *MahjongDiceEvent) ETag() string {
+	return "dice"
+}
+
+func (s *MahjongDiceEvent) Write(buff core.DataBuffer) error {
+	if err := buff.WriteInt32(s.Dice1); err != nil {
+		return err
+	}
+	if err := buff.WriteInt32(s.Dice2); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *MahjongDiceEvent) Read(buff core.DataBuffer) error {
+	dice1, err := buff.ReadInt32()
+	if err != nil {
+		return err
+	}
+	s.Dice1 = dice1
+	dice2, err := buff.ReadInt32()
+	if err != nil {
+		return err
+	}
+	s.Dice2 = dice2
+	return nil
+}
+
+func (s *MahjongDiceEvent) Outbound(buff core.DataBuffer) error {
+	err := s.WriteKey(buff)
+	if err != nil {
+		s.Callback.OnError(s, err)
+		return err
+	}
+	err = s.Write(buff)
+	if err != nil {
+		s.Callback.OnError(s, err)
+		return err
+	}
+	return nil
+}
+func (s *MahjongDiceEvent) Inbound(buff core.DataBuffer) error {
+	err := s.ReadKey(buff)
+	if err != nil {
+		s.Callback.OnError(s, err)
+		return err
+	}
+	err = s.Read(buff)
+	if err != nil {
+		s.Callback.OnError(s, err)
+		return err
+	}
+	s.Callback.OnEvent(s)
+	return nil
+}
+
 type MahjongEvent struct {
 	Cmd      int32
 	SystemId int64
@@ -103,7 +169,7 @@ func (s *SampleCreator) Create(cid int, topic string) (event.Event, error) {
 		e.OnListener(s)
 		return e, nil
 	}
-	me := MahjongEvent{}
+	me := MahjongDiceEvent{}
 	me.Callback = s
 	return &me, nil
 }

@@ -53,6 +53,7 @@ func (s *TcpPublisher) Subscribe(cr EventCreator, ec EventListener) {
 			buff.Clear()
 			continue
 		}
+		
 		e, err := cr.Create(int(cid),"local")
 		if err != nil {
 			buff.Clear()
