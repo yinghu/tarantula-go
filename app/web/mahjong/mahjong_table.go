@@ -11,6 +11,8 @@ const (
 	SEAT_S = 1
 	SEAT_W = 2
 	SEAT_N = 3
+
+	HAND_SIZE_THRESHHOLD int = 13
 )
 
 type MahjongTable struct {
@@ -104,12 +106,30 @@ func (m *MahjongTable) Deal() error {
 	return nil
 }
 
-func (m *MahjongTable) Discharge() error {
+func (m *MahjongTable) Draw(seat int) error {
+	mp := m.Players[seat]
+	sz := len(mp.Tiles)
+	if sz > HAND_SIZE_THRESHHOLD {
+		return fmt.Errorf("no more draw %d", sz)
+	}
+	return m.deal(seat)
+}
+
+func (m *MahjongTable) Discharge(seat int, t mj.Tile) error {
+	mp := m.Players[seat]
+	sz := len(mp.Tiles)
+	if sz == 1 {
+		return fmt.Errorf("no more discharge %d", sz)
+	}
+	return mp.Drop(t)
+}
+
+func (m *MahjongTable) Chow(seat int, t mj.Tile) error {
 	return nil
 }
 
-func (m *MahjongTable) Chow() error {
-	return nil
+func (m *MahjongTable) Mahjong(seat int) bool {
+	return m.Setup.Mahjong(&m.Players[seat].Hand)
 }
 
 func (m *MahjongTable) deal(p int) error {
@@ -131,7 +151,7 @@ func (m *MahjongTable) deal(p int) error {
 			return err
 		}
 		sz = len(mp.Flowers)
-		if fz==sz{
+		if fz == sz {
 			break
 		}
 		fz = sz

@@ -18,11 +18,24 @@ func TestMahjongTable(t *testing.T) {
 	if dz != 14 {
 		t.Errorf("dealer hand should be 14 %d", dz)
 	}
+	mt.Mahjong(dealer)
+	err := mt.Draw(dealer)
+	if err == nil {
+		t.Errorf("should be error")
+	}
 	for i := range 4 {
 		if i != dealer {
 			pz := len(mt.Players[i].Tiles)
 			if pz != 13 {
-				t.Errorf("player hand should be 12 %d", pz)
+				t.Errorf("player hand should be 13 %d", pz)
+			}
+			err = mt.Draw(i)
+			if err != nil {
+				t.Errorf("shoud not be error %s", err.Error())
+			}
+			hz := len(mt.Players[i].Tiles)
+			if hz != 14 {
+				t.Errorf("hand size should be 14 %d",hz)
 			}
 		}
 	}
