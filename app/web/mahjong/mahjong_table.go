@@ -67,14 +67,14 @@ func (m *MahjongTable) Deal() error {
 	r := 3
 	for {
 		if r == 0 {
-			m.Players[dealer].Draw(&m.Setup.Deck)
-			m.Players[dealer].Draw(&m.Setup.Deck)
+			m.deal(dealer)
+			m.deal(dealer)
 
 		} else {
-			m.Players[dealer].Draw(&m.Setup.Deck)
-			m.Players[dealer].Draw(&m.Setup.Deck)
-			m.Players[dealer].Draw(&m.Setup.Deck)
-			m.Players[dealer].Draw(&m.Setup.Deck)
+			m.deal(dealer)
+			m.deal(dealer)
+			m.deal(dealer)
+			m.deal(dealer)
 		}
 		x := 2
 		p := dealer + 1
@@ -83,27 +83,12 @@ func (m *MahjongTable) Deal() error {
 				p = 0
 			}
 			if r == 0 {
-				err := m.Players[p].Draw(&m.Setup.Deck)
-				if err != nil {
-					return err
-				}
+				m.deal(p)
 			} else {
-				err := m.Players[p].Draw(&m.Setup.Deck)
-				if err != nil {
-					return err
-				}
-				err = m.Players[p].Draw(&m.Setup.Deck)
-				if err != nil {
-					return err
-				}
-				err = m.Players[p].Draw(&m.Setup.Deck)
-				if err != nil {
-					return err
-				}
-				err = m.Players[p].Draw(&m.Setup.Deck)
-				if err != nil {
-					return err
-				}
+				m.deal(p)
+				m.deal(p)
+				m.deal(p)
+				m.deal(p)
 			}
 			p++
 			if x == 0 {
@@ -124,5 +109,33 @@ func (m *MahjongTable) Discharge() error {
 }
 
 func (m *MahjongTable) Chow() error {
+	return nil
+}
+
+func (m *MahjongTable) deal(p int) error {
+	mp := m.Players[p]
+	fz := len(mp.Flowers)
+	err := mp.Draw(&m.Setup.Deck)
+	if err != nil {
+		return err
+	}
+	sz := len(mp.Flowers)
+	if fz == sz {
+		m.Players[p] = mp
+		return nil
+	}
+	fz = sz
+	for {
+		err = mp.Knog(&m.Setup.Deck)
+		if err != nil {
+			return err
+		}
+		sz = len(mp.Flowers)
+		if fz==sz{
+			break
+		}
+		fz = sz
+	}
+	m.Players[p] = mp
 	return nil
 }

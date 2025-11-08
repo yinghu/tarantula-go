@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -14,7 +13,17 @@ func TestMahjongTable(t *testing.T) {
 	mt.Sit(4, SEAT_N)
 	mt.Dice()
 	mt.Deal()
+	dealer := (mt.Pts - 1) % 4
+	dz := len(mt.Players[dealer].Hand.Tiles)
+	if dz != 14 {
+		t.Errorf("dealer hand should be 14 %d", dz)
+	}
 	for i := range 4 {
-		fmt.Printf("HND SIZE : %d\n", len(mt.Players[i].Hand.Tiles)+ len(mt.Players[i].Flowers))
+		if i != dealer {
+			pz := len(mt.Players[i].Tiles)
+			if pz != 13 {
+				t.Errorf("player hand should be 12 %d", pz)
+			}
+		}
 	}
 }
