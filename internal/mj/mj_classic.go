@@ -1,31 +1,31 @@
 package mj
 
 const (
-	CLASSIC_MAX_FORMS int = 4
+	CLASSIC_MAX_FORMS int = 4	
 )
 
 type ClassicMahjong struct {
 	Deck
-	East  Hand
-	South Hand
-	West  Hand
-	North Hand
+	//East  Hand
+	//South Hand
+	//West  Hand
+	//North Hand
 	Evaluator
 }
 
 func (c *ClassicMahjong) New() {
 	c.Deck = Deck{}
 	c.Deck.New()
-	c.East = Hand{}
-	c.East.New()
-	c.South = Hand{}
-	c.South.New()
-	c.West = Hand{}
-	c.West.New()
-	c.North = Hand{}
-	c.North.New()
+	//c.East = Hand{}
+	//c.East.New()
+	//c.South = Hand{}
+	//c.South.New()
+	//c.West = Hand{}
+	//c.West.New()
+	//c.North = Hand{}
+	//c.North.New()
 	c.Shuffle()
-	
+
 }
 
 func (c *ClassicMahjong) Mahjong(h *Hand) bool {
@@ -38,5 +38,5 @@ func (c *ClassicMahjong) Mahjong(h *Hand) bool {
 		}
 		formed++
 	}
-	return eyeCount == 1 && formed == 5
+	return eyeCount == 1 && formed == h.MaxClaims
 }
