@@ -16,17 +16,19 @@ const (
 )
 
 type MahjongTable struct {
-	Setup   mj.ClassicMahjong
-	Players [4]MahjongPlayer
-	Pts     int
+	Setup      mj.ClassicMahjong
+	Players    [4]MahjongPlayer
+	Pts        int
+	Discharged []mj.Tile
 }
 
-func (m *MahjongTable) New() {
+func (m *MahjongTable) Reset() {
 	m.Setup.New()
-	m.Players[SEAT_E] = NewPlayer()
-	m.Players[SEAT_S] = NewPlayer()
-	m.Players[SEAT_W] = NewPlayer()
-	m.Players[SEAT_N] = NewPlayer()
+	m.Players[SEAT_E] = NewPlayer("East")
+	m.Players[SEAT_S] = NewPlayer("South")
+	m.Players[SEAT_W] = NewPlayer("West")
+	m.Players[SEAT_N] = NewPlayer("North")
+	m.Discharged = make([]mj.Tile, 0)
 }
 
 func (m *MahjongTable) Sit(systemId int64, seatNumber int) error {
@@ -36,24 +38,28 @@ func (m *MahjongTable) Sit(systemId int64, seatNumber int) error {
 			return fmt.Errorf("seat already occupied %d", seatNumber)
 		}
 		m.Players[SEAT_E].SystemId = systemId
+		m.Players[SEAT_E].Auto = false
 		return nil
 	case SEAT_S:
 		if m.Players[SEAT_S].SystemId != 0 {
 			return fmt.Errorf("seat already occupied %d", seatNumber)
 		}
 		m.Players[SEAT_S].SystemId = systemId
+		m.Players[SEAT_S].Auto = false
 		return nil
 	case SEAT_W:
 		if m.Players[SEAT_W].SystemId != 0 {
 			return fmt.Errorf("seat already occupied %d", seatNumber)
 		}
 		m.Players[SEAT_W].SystemId = systemId
+		m.Players[SEAT_W].Auto = false
 		return nil
 	case SEAT_N:
 		if m.Players[SEAT_N].SystemId != 0 {
 			return fmt.Errorf("seat already occupied %d", seatNumber)
 		}
 		m.Players[SEAT_N].SystemId = systemId
+		m.Players[SEAT_N].Auto = false
 		return nil
 	}
 	return fmt.Errorf("invalid seat number %d", seatNumber)
@@ -121,7 +127,13 @@ func (m *MahjongTable) Discharge(seat int, t mj.Tile) error {
 	if sz == 1 {
 		return fmt.Errorf("no more discharge %d", sz)
 	}
-	return mp.Drop(t)
+	err := mp.Drop(t)
+	if err != nil {
+		return err
+	}
+	m.Players[seat] = mp
+	m.Discharged = append(m.Discharged, t)
+	return nil
 }
 
 func (m *MahjongTable) Chow(seat int, t mj.Tile) error {
