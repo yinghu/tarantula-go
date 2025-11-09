@@ -19,7 +19,7 @@ func TestMahjongTable(t *testing.T) {
 		t.Errorf("dealer hand should be 14 %d", dz)
 	}
 	//fmt.Printf("F Hand %v\n",mt.Players[dealer].Tiles)
-	mt.Mahjong(dealer)
+	mt.Claim(dealer)
 	//fmt.Printf("X Hand %v\n",mt.Players[dealer].Tiles)
 	err := mt.Draw(dealer)
 	if err == nil {
@@ -58,7 +58,7 @@ func TestMahjongAutoTable(t *testing.T) {
 		t.Errorf("dealer hand should be 14 %d", dz)
 	}
 	//fmt.Printf("F Hand %v\n",mt.Players[dealer].Tiles)
-	mt.Mahjong(dealer)
+	mt.Claim(dealer)
 	//fmt.Printf("X Hand %v\n",mt.Players[dealer].Tiles)
 	err := mt.Draw(dealer)
 	if err == nil {

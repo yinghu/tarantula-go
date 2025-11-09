@@ -140,7 +140,7 @@ func (m *MahjongTable) Chow(seat int, t mj.Tile) error {
 	return nil
 }
 
-func (m *MahjongTable) Mahjong(seat int) bool {
+func (m *MahjongTable) Claim(seat int) bool {
 	return m.Setup.Mahjong(&m.Players[seat].Hand)
 }
 
