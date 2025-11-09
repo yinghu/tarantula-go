@@ -5,11 +5,19 @@ import (
 	"slices"
 )
 
+type HandListener interface {
+	OnDraw(t Tile)
+	OnDrop(t Tile)
+	OnKnog(t Tile)
+	OnFormed(m Meld)
+}
+
 type Hand struct {
 	Formed    []Meld
 	Tiles     []Tile
 	Flowers   []Tile
 	MaxClaims int
+	Listener  HandListener
 }
 
 func (h *Hand) New() {
@@ -23,6 +31,10 @@ func (h *Hand) Drop(drop Tile) error {
 	for i := range h.Tiles {
 		if h.Tiles[i] == drop {
 			h.Tiles = slices.Delete(h.Tiles, i, i)
+			if h.Listener == nil {
+				return nil
+			}
+			h.Listener.OnDrop(drop)
 			return nil
 		}
 	}
@@ -45,6 +57,10 @@ func (h *Hand) draw(t Tile) error {
 		h.Tiles = append(h.Tiles, t)
 		slices.SortFunc(h.Tiles, cmp)
 	}
+	if h.Listener == nil {
+		return nil
+	}
+	h.Listener.OnDraw(t)
 	return nil
 }
 
@@ -60,6 +76,10 @@ func (h *Hand) Knog(deck *Deck) error {
 		h.Tiles = append(h.Tiles, t)
 		slices.SortFunc(h.Tiles, cmp)
 	}
+	if h.Listener == nil {
+		return nil
+	}
+	h.Listener.OnKnog(t)
 	return nil
 }
 
@@ -73,6 +93,9 @@ func (h *Hand) Mahjong() bool {
 			eyeCount++
 		}
 		formed++
+		if h.Listener != nil {
+			h.Listener.OnFormed(v)
+		}
 	}
 	return eyeCount == 1 && formed == 5
 }

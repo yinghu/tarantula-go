@@ -57,9 +57,9 @@ func TestMahjongAutoTable(t *testing.T) {
 	if dz != 14 {
 		t.Errorf("dealer hand should be 14 %d", dz)
 	}
-	//fmt.Printf("F Hand %v\n",mt.Players[dealer].Tiles)
+	//fmt.Printf("F Hand %v\n", mt.Players[dealer].Tiles)
 	mt.Claim(dealer)
-	//fmt.Printf("X Hand %v\n",mt.Players[dealer].Tiles)
+	//fmt.Printf("X Hand %v\n", mt.Players[dealer].Tiles)
 	err := mt.Draw(dealer)
 	if err == nil {
 		t.Errorf("should be error")
