@@ -28,6 +28,7 @@ func (s *MahjongDiceEvent) Write(buff core.DataBuffer) error {
 	return nil
 }
 
+
 func (s *MahjongDiceEvent) Outbound(buff core.DataBuffer) error {
 	err := s.WriteKey(buff)
 	if err != nil {

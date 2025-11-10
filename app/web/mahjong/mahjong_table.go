@@ -20,6 +20,7 @@ type MahjongTable struct {
 	Players    [4]MahjongPlayer
 	Pts        int
 	Discharged []mj.Tile
+	Started    bool
 }
 
 func (m *MahjongTable) Reset() {
@@ -109,6 +110,7 @@ func (m *MahjongTable) Deal() error {
 		}
 		r--
 	}
+	m.Started = true
 	return nil
 }
 
