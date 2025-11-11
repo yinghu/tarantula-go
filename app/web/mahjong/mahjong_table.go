@@ -16,10 +16,10 @@ const (
 )
 
 type MahjongTable struct {
-	Setup      mj.ClassicMahjong
-	Players    [4]MahjongPlayer
-	Pts        int `json:"Pts"`
-	Discharged []mj.Tile
+	Setup      mj.ClassicMahjong `json:"-"`
+	Players    [4]MahjongPlayer  `json:"-"`
+	Pts        int               `json:"Pts"`
+	Discharged []mj.Tile         `json:"-"`
 	Started    bool
 }
 
