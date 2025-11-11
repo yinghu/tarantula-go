@@ -19,7 +19,7 @@ type MahjongTable struct {
 	Setup      mj.ClassicMahjong `json:"-"`
 	Players    [4]MahjongPlayer  `json:"-"`
 	Pts        int               `json:"Pts"`
-	Discharged []mj.Tile         `json:"-"`
+	Discharged []mj.Tile         `json:"Discharged"`
 	Started    bool
 }
 
