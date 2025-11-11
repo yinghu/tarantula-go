@@ -8,8 +8,8 @@ import (
 )
 
 type MahjongPlayer struct {
-	SystemId int64
-	Seat     string
+	SystemId int64  `json:"SystemId,string"`
+	Seat     string `json:"Seat"`
 	mj.Hand
 	Auto bool
 	B    []mj.Tile //bamboo

@@ -18,7 +18,7 @@ const (
 type MahjongTable struct {
 	Setup      mj.ClassicMahjong
 	Players    [4]MahjongPlayer
-	Pts        int
+	Pts        int `json:"Pts"`
 	Discharged []mj.Tile
 	Started    bool
 }
