@@ -70,9 +70,9 @@ func NewTile(src string) Tile {
 }
 
 type Tile struct {
-	Suit string
-	Rank int8
-	Seq  int
+	Suit string `json:"Suit"`
+	Rank int8   `json:"Rank"`
+	Seq  int    `json:"Seq"`
 }
 
 func (t *Tile) From(src string) {

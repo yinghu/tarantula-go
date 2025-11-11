@@ -10,7 +10,7 @@ const (
 )
 
 type Meld struct {
-	Tiles []Tile
+	Tiles []Tile `json:"Tiles"`
 }
 
 func (m *Meld) Eye() bool {
@@ -45,7 +45,7 @@ func (m *Meld) Kong() bool {
 func (m *Meld) Name() string {
 	var nm string
 	sz := len(m.Tiles)
-	for i,v := range m.Tiles {
+	for i, v := range m.Tiles {
 		nm += v.Name()
 		if i < sz-1 {
 			nm = nm + "."

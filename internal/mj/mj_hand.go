@@ -13,11 +13,11 @@ type HandListener interface {
 }
 
 type Hand struct {
-	Formed    []Meld
-	Tiles     []Tile
-	Flowers   []Tile
-	MaxClaims int
-	Listener  HandListener
+	Formed    []Meld       `json:"Formed"`
+	Tiles     []Tile       `json:"Tiles"`
+	Flowers   []Tile       `json:"Flowers"`
+	MaxClaims int          `json:"-"`
+	Listener  HandListener `json:"-"`
 }
 
 func (h *Hand) New() {

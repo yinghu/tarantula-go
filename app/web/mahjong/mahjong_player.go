@@ -10,19 +10,19 @@ import (
 type MahjongPlayer struct {
 	SystemId int64  `json:"SystemId,string"`
 	Seat     string `json:"Seat"`
-	mj.Hand
-	Auto bool
-	B    []mj.Tile //bamboo
-	C    []mj.Tile //character
-	D    []mj.Tile //dots
-	HE   []mj.Tile //east
-	HS   []mj.Tile //south
-	HW   []mj.Tile //west
-	HN   []mj.Tile //north
-	R    []mj.Tile //red
-	G    []mj.Tile //green
-	W    []mj.Tile //white
-	Turn chan MahjongPlayToken
+	mj.Hand  `json:"Hand"`
+	Auto     bool                  `json:"Auto"`
+	B        []mj.Tile             `json:"-"` //bamboo
+	C        []mj.Tile             `json:"-"` //character
+	D        []mj.Tile             `json:"-"` //dots
+	HE       []mj.Tile             `json:"-"` //east
+	HS       []mj.Tile             `json:"-"` //south
+	HW       []mj.Tile             `json:"-"` //west
+	HN       []mj.Tile             `json:"-"` //north
+	R        []mj.Tile             `json:"-"` //red
+	G        []mj.Tile             `json:"-"` //green
+	W        []mj.Tile             `json:"-"` //white
+	Turn     chan MahjongPlayToken `json:"-"`
 }
 
 func (mp *MahjongPlayer) Play(table *MahjongTable) {
