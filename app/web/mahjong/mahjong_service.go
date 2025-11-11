@@ -24,6 +24,8 @@ func (s *MahjongService) Start(f conf.Env, c core.Cluster, p event.Pusher) error
 	s.AppManager.Start(f, c, p)
 	s.Table = MahjongTable{}
 	s.Table.Setup.New()
+	s.Table.Dice()
+	s.Table.Deal()
 	http.Handle("/mahjong/table", bootstrap.Logging(&MahjongTableSelector{MahjongService: s}))
 	return nil
 }
