@@ -3,6 +3,8 @@ package mj
 import (
 	"fmt"
 	"slices"
+
+	"gameclustering.com/internal/core"
 )
 
 type HandListener interface {
@@ -102,4 +104,8 @@ func (h *Hand) Mahjong() bool {
 
 func (h *Hand) TileSize() int {
 	return len(h.Tiles)
+}
+
+func (h *Hand) Write(buff core.DataBuffer) {
+	
 }
