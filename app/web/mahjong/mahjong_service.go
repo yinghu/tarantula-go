@@ -22,10 +22,11 @@ func (s *MahjongService) Config() string {
 func (s *MahjongService) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 	s.ItemUpdater = s
 	s.AppManager.Start(f, c, p)
-	s.Table = MahjongTable{}
+	s.Table = MahjongTable{MahjongService: s}
 	s.Table.Reset()
 	s.Table.Dice()
 	s.Table.Deal()
+	go s.Table.Play()
 	http.Handle("/mahjong/table", bootstrap.Logging(&MahjongTableSelector{MahjongService: s}))
 	return nil
 }

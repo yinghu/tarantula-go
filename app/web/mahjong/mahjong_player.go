@@ -22,21 +22,8 @@ type MahjongPlayer struct {
 	R        []mj.Tile             `json:"-"` //red
 	G        []mj.Tile             `json:"-"` //green
 	W        []mj.Tile             `json:"-"` //white
-	Turn     chan MahjongPlayToken `json:"-"`
 }
 
-func (mp *MahjongPlayer) Play(table *MahjongTable) {
-	for t := range mp.Turn {
-		switch t.Cmd {
-		case CMD_DICE:
-			//table.Dice()
-		case CMD_PLAY:
-		case CMD_END:
-			return
-		}
-	}
-	fmt.Printf("end play")
-}
 
 func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
 	if !mp.Auto {
@@ -172,7 +159,7 @@ func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
 	fmt.Printf("tile melt %v\n", m)
 }
 func NewPlayer(seat string) MahjongPlayer {
-	mp := MahjongPlayer{Seat: seat, Auto: true, Turn: make(chan MahjongPlayToken, 1)}
+	mp := MahjongPlayer{Seat: seat, Auto: true}
 	mp.Hand = mj.Hand{Listener: &mp}
 	mp.Hand.New()
 	mp.B = make([]mj.Tile, 0)

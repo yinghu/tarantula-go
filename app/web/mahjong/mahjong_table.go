@@ -16,11 +16,13 @@ const (
 )
 
 type MahjongTable struct {
-	Setup      mj.ClassicMahjong `json:"-"`
-	Players    [4]MahjongPlayer  `json:"Players"`
-	Pts        int               `json:"Pts"`
-	Discharged []mj.Tile         `json:"Discharged"`
-	Started    bool
+	Setup           mj.ClassicMahjong `json:"-"`
+	Players         [4]MahjongPlayer  `json:"Players"`
+	Pts             int               `json:"Pts"`
+	Discharged      []mj.Tile         `json:"Discharged"`
+	Started         bool
+	Turn            chan MahjongPlayToken `json:"-"`
+	*MahjongService `json:"-"`
 }
 
 func (m *MahjongTable) Reset() {
@@ -30,6 +32,25 @@ func (m *MahjongTable) Reset() {
 	m.Players[SEAT_W] = NewPlayer("West")
 	m.Players[SEAT_N] = NewPlayer("North")
 	m.Discharged = make([]mj.Tile, 0)
+}
+
+func (m *MahjongTable) Play() {
+	for t := range m.Turn {
+		switch t.Cmd {
+		case CMD_SIT:
+			mt := MahjongTableEvent{Table: m}
+			m.MahjongService.Pusher().Push(&mt)
+		case CMD_DICE:
+			mt := MahjongTableEvent{Table: m}
+			m.MahjongService.Pusher().Push(&mt)
+		case CMD_DEAL:
+			mt := MahjongTableEvent{Table: m}
+			m.MahjongService.Pusher().Push(&mt)
+		case CMD_END:
+			return
+		}
+	}
+	//fmt.Printf("end play")
 }
 
 func (m *MahjongTable) Sit(systemId int64, seatNumber int) error {
