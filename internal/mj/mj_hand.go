@@ -106,6 +106,15 @@ func (h *Hand) TileSize() int {
 	return len(h.Tiles)
 }
 
-func (h *Hand) Write(buff core.DataBuffer) {
-	
+func (h *Hand) Write(buff core.DataBuffer) error {
+	sz := len(h.Tiles)
+	if err := buff.WriteInt32(int32(sz)); err != nil {
+		return err
+	}
+	for i := range h.Tiles {
+		if err := h.Tiles[i].Write(buff); err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -106,6 +106,6 @@ func (t Tile) Name() string {
 	return t.Suit + strconv.FormatInt(int64(t.Rank), 10)
 }
 
-func (h *Tile) Write(buff core.DataBuffer) {
-	buff.WriteInt32(int32(h.Seq))	
+func (h *Tile) Write(buff core.DataBuffer) error {
+	return buff.WriteInt32(int32(h.Seq))	
 }

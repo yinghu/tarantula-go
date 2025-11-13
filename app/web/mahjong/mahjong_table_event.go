@@ -19,8 +19,7 @@ func (s *MahjongTableEvent) ETag() string {
 }
 
 func (s *MahjongTableEvent) Write(buff core.DataBuffer) error {
-	
-	return nil
+	return s.Table.Players[SEAT_E].Hand.Write(buff)
 }
 
 func (s *MahjongTableEvent) Outbound(buff core.DataBuffer) error {
