@@ -22,7 +22,7 @@ func (s *MahjongService) Config() string {
 func (s *MahjongService) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 	s.ItemUpdater = s
 	s.AppManager.Start(f, c, p)
-	s.Table = MahjongTable{MahjongService: s}
+	s.Table = MahjongTable{MahjongService: s, Turn: make(chan MahjongPlayToken, 10)}
 	s.Table.Reset()
 	s.Table.Dice()
 	s.Table.Deal()
