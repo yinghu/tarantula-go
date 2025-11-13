@@ -1,8 +1,23 @@
 package main
 
 import (
+	"fmt"
 	"testing"
+
+	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 )
+
+type SampleCallback struct {
+}
+
+func (s *SampleCallback) OnError(e event.Event, err error) {
+	fmt.Printf("On event error %v %s\n", e, err.Error())
+}
+
+func (s *SampleCallback) OnEvent(e event.Event) {
+	fmt.Printf("On event %v\n", e)
+}
 
 func TestMahjongTable(t *testing.T) {
 	mt := MahjongTable{}
@@ -78,5 +93,19 @@ func TestMahjongAutoTable(t *testing.T) {
 			}
 		}
 	}
+}
 
+func TestMahjongToken(t *testing.T) {
+	lis := SampleCallback{}
+	me := MahjongEvent{Token: MahjongPlayToken{Cmd: CMD_DICE, SystemId: 100}, SystemId: 101}
+	me.Callback = &lis
+	buff := core.NewBuffer(100)
+	me.Outbound(buff)
+	mx := MahjongEvent{Token: MahjongPlayToken{}}
+	mx.Callback = &lis
+	buff.Flip()
+	mx.Inbound(buff)
+	if me.Token != mx.Token{
+		t.Errorf("token should be same %v %v", me.Token,mx.Token)
+	}
 }
