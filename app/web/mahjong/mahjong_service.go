@@ -64,6 +64,8 @@ func (s *MahjongService) OnEvent(e event.Event) {
 		s.Pusher().Push(e)
 	case event.JOIN_CID:
 		core.AppLog.Printf("joined from %d\n", e.RecipientId())
+		mt := MahjongTableEvent{TableId: s.Table.Id, SystemId: e.RecipientId()}
+		s.Pusher().Push(&mt)
 	case event.KICKOFF_CID:
 		core.AppLog.Printf("kickoff from %d\n", e.RecipientId())
 		id, _ := s.Sequence().Id()

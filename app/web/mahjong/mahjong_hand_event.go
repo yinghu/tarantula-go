@@ -11,7 +11,7 @@ type MahjongHandEvent struct {
 }
 
 func (s *MahjongHandEvent) ClassId() int {
-	return 102
+	return M_HAND_CID
 }
 
 func (s *MahjongHandEvent) ETag() string {
