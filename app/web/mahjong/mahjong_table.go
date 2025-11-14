@@ -36,6 +36,7 @@ func (m *MahjongTable) Reset() {
 
 func (m *MahjongTable) Play() {
 	for t := range m.Turn {
+		m.Reset()
 		m.Dice()
 		m.Deal()
 		switch t.Cmd {
