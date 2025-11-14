@@ -20,11 +20,4 @@ func (s *MahjongEventListener) OnEvent(e event.Event) {
 	}
 	core.AppLog.Printf("On event %v\n", ex)
 	s.Table.Turn <- ex.Token
-	//dice := s.Table.Setup.Dice()
-	//me := MahjongDiceEvent{Dice1: int32(dice[0]), Dice2: int32(dice[1])}
-	//s.Table.Setup.Draw()
-	//s.Pusher().Push(&me)
-	//mt :=  MahjongTableEvent{Table:&s.Table}
-	//s.Pusher().Push(&mt)
-
 }
