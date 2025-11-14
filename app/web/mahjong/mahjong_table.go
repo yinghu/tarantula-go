@@ -42,9 +42,14 @@ func (m *MahjongTable) Play() {
 		m.Deal()
 		switch t.Cmd {
 		case CMD_SIT:
-			//err := m.Sit(t.SystemId,t.Seat)
-			mt := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: "seat already occupaied"}
-			m.MahjongService.Pusher().Push(&mt)
+			err := m.Sit(t.SystemId, t.Seat)
+			if err != nil {
+				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
+				m.MahjongService.Pusher().Push(&mr)
+			}else{
+				mt := MahjongSitEvent{SystemId: t.SystemId,TableId: m.Id}
+				m.MahjongService.Pusher().Push(&mt)
+			}
 		case CMD_DICE:
 			mt := MahjongHandEvent{Table: m}
 			m.MahjongService.Pusher().Push(&mt)

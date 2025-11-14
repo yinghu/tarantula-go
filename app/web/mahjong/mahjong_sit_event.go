@@ -6,7 +6,8 @@ import (
 )
 
 type MahjongSitEvent struct {
-	TableId int64
+	SystemId int64
+	TableId  int64
 	event.EventObj
 }
 
@@ -19,6 +20,9 @@ func (s *MahjongSitEvent) ETag() string {
 }
 
 func (s *MahjongSitEvent) Write(buff core.DataBuffer) error {
+	if err := buff.WriteInt64(s.SystemId); err != nil {
+		return err
+	}
 	if err := buff.WriteInt64(s.TableId); err != nil {
 		return err
 	}
