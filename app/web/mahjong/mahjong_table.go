@@ -42,13 +42,13 @@ func (m *MahjongTable) Play() {
 		m.Deal()
 		switch t.Cmd {
 		case CMD_SIT:
-			mt := MahjongTableEvent{Table: m}
+			mt := MahjongHandEvent{Table: m}
 			m.MahjongService.Pusher().Push(&mt)
 		case CMD_DICE:
-			mt := MahjongTableEvent{Table: m}
+			mt := MahjongHandEvent{Table: m}
 			m.MahjongService.Pusher().Push(&mt)
 		case CMD_DEAL:
-			mt := MahjongTableEvent{Table: m}
+			mt := MahjongHandEvent{Table: m}
 			m.MahjongService.Pusher().Push(&mt)
 		case CMD_END:
 			return

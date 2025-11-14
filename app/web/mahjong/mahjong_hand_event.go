@@ -5,24 +5,24 @@ import (
 	"gameclustering.com/internal/event"
 )
 
-type MahjongTableEvent struct {
+type MahjongHandEvent struct {
 	Table *MahjongTable
 	event.EventObj
 }
 
-func (s *MahjongTableEvent) ClassId() int {
+func (s *MahjongHandEvent) ClassId() int {
 	return 102
 }
 
-func (s *MahjongTableEvent) ETag() string {
+func (s *MahjongHandEvent) ETag() string {
 	return "table"
 }
 
-func (s *MahjongTableEvent) Write(buff core.DataBuffer) error {
+func (s *MahjongHandEvent) Write(buff core.DataBuffer) error {
 	return s.Table.Players[SEAT_E].Hand.Write(buff)
 }
 
-func (s *MahjongTableEvent) Outbound(buff core.DataBuffer) error {
+func (s *MahjongHandEvent) Outbound(buff core.DataBuffer) error {
 	err := s.WriteKey(buff)
 	if err != nil {
 		s.Callback.OnError(s, err)
