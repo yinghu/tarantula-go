@@ -15,7 +15,7 @@ func (s *MahjongHandEvent) ClassId() int {
 }
 
 func (s *MahjongHandEvent) ETag() string {
-	return "table"
+	return "hand"
 }
 
 func (s *MahjongHandEvent) Write(buff core.DataBuffer) error {
