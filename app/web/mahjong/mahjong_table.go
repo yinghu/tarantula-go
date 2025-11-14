@@ -42,7 +42,8 @@ func (m *MahjongTable) Play() {
 		m.Deal()
 		switch t.Cmd {
 		case CMD_SIT:
-			mt := MahjongHandEvent{Table: m}
+			//err := m.Sit(t.SystemId,t.Seat)
+			mt := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: "seat already occupaied"}
 			m.MahjongService.Pusher().Push(&mt)
 		case CMD_DICE:
 			mt := MahjongHandEvent{Table: m}

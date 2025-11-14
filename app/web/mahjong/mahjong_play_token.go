@@ -13,6 +13,7 @@ type MahjongPlayToken struct {
 	Table    int64
 	SystemId int64
 	Cmd      int
+	Seat     int
 }
 
 func (mp *MahjongPlayToken) Write(buff core.DataBuffer) error {
@@ -23,6 +24,9 @@ func (mp *MahjongPlayToken) Write(buff core.DataBuffer) error {
 		return err
 	}
 	if err := buff.WriteInt32(int32(mp.Cmd)); err != nil {
+		return err
+	}
+	if err := buff.WriteInt32(int32(mp.Seat)); err != nil {
 		return err
 	}
 	return nil
@@ -44,5 +48,10 @@ func (mp *MahjongPlayToken) Read(buff core.DataBuffer) error {
 		return err
 	}
 	mp.Cmd = int(cmd)
+	seat, err := buff.ReadInt32()
+	if err != nil {
+		return err
+	}
+	mp.Seat = int(seat)
 	return nil
 }

@@ -5,12 +5,13 @@ import (
 	"gameclustering.com/internal/event"
 )
 
-const(
+const (
 	M_TOKEN_CID int = 100
-	M_DICE_CID int = 101
-	M_HAND_CID int = 102
+	M_DICE_CID  int = 101
+	M_HAND_CID  int = 102
 	M_TABLE_CID int = 103
-	M_SIT_CID int = 104
+	M_SIT_CID   int = 104
+	M_ERR_CID   int = 911
 )
 
 type MahjongEvent struct {
