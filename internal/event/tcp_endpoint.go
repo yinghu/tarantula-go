@@ -150,6 +150,7 @@ func (s *TcpEndpoint) outbound() {
 				go cout.Subscribe()
 				s.outboundIndex[join.SystemId] = &cout
 				go s.inbound(join.Client, join.SystemId)
+				s.Service.OnEvent(e)
 				continue
 			}
 			s.dispatch(e)
@@ -191,7 +192,7 @@ func (s *TcpEndpoint) join(client net.Conn) {
 	}
 	e.Client = client
 	e.SystemId = session.SystemId
-	s.Service.OnEvent(&e)
+	//s.Service.OnEvent(&e)
 	s.outboundEQ <- &e
 }
 
