@@ -35,8 +35,10 @@ func (m *MahjongTable) Reset() {
 }
 
 func (m *MahjongTable) Play() {
+	m.Reset()
+	m.Dice()
+	m.Deal()
 	for t := range m.Turn {
-		fmt.Printf("play %v", t)
 		switch t.Cmd {
 		case CMD_SIT:
 			mt := MahjongTableEvent{Table: m}
