@@ -61,13 +61,11 @@ func (m *MahjongTable) Play() {
 			mt := MahjongHandEvent{Table: m}
 			m.MahjongService.Pusher().Push(&mt)
 		case CMD_DRAW:
-			mp := m.Players[t.Seat]
-			mp.Hand.Draw(&m.Setup.Deck)
+			m.Draw(t.Seat)
 			mt := MahjongHandEvent{Table: m}
 			m.MahjongService.Pusher().Push(&mt)
 		case CMD_DISCHARGE:
-			mp := m.Players[t.Seat]
-			mp.Hand.Discharge(t.Discharged)
+			m.Discharge(t.Seat, t.Discharged)
 			mt := MahjongHandEvent{Table: m}
 			m.MahjongService.Pusher().Push(&mt)
 		case CMD_CLAIM:
@@ -151,18 +149,18 @@ func (m *MahjongTable) Draw(seat int) error {
 	return m.deal(seat)
 }
 
-func (m *MahjongTable) Discharge(seat int, t mj.Tile) error {
+func (m *MahjongTable) Discharge(seat int, t int) error {
 	mp := m.Players[seat]
 	sz := len(mp.Tiles)
 	if sz == 1 {
 		return fmt.Errorf("no more discharge %d", sz)
 	}
-	err := mp.Drop(t)
+	err := mp.Discharge(t)
 	if err != nil {
 		return err
 	}
 	m.Players[seat] = mp
-	m.Discharged = append(m.Discharged, t)
+	//m.Discharged = append(m.Discharged, t)
 	return nil
 }
 
