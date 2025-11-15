@@ -8,6 +8,7 @@ import (
 type MahjongSitEvent struct {
 	SystemId int64
 	TableId  int64
+	Seat     int32
 	event.EventObj
 }
 
@@ -24,6 +25,9 @@ func (s *MahjongSitEvent) Write(buff core.DataBuffer) error {
 		return err
 	}
 	if err := buff.WriteInt64(s.TableId); err != nil {
+		return err
+	}
+	if err := buff.WriteInt32(s.Seat); err != nil {
 		return err
 	}
 	return nil

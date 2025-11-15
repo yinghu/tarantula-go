@@ -42,6 +42,20 @@ func (h *Hand) Drop(drop Tile) error {
 	}
 	return fmt.Errorf("drop not existed %v", drop)
 }
+func (h *Hand) Discharge(discharged int) error {
+	for i := range h.Tiles {
+		if h.Tiles[i].Seq == discharged {
+			drop := h.Tiles[i]
+			h.Tiles = slices.Delete(h.Tiles, i, i)
+			if h.Listener == nil {
+				return nil
+			}
+			h.Listener.OnDrop(drop)
+			return nil
+		}
+	}
+	return fmt.Errorf("drop not existed %v", discharged)
+}
 
 func (h *Hand) Draw(deck *Deck) error {
 	t, err := deck.Draw()

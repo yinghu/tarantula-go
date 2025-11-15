@@ -39,9 +39,6 @@ func (m *MahjongTable) Reset() {
 
 func (m *MahjongTable) Play() {
 	for t := range m.Turn {
-		//m.Reset()
-		//m.Dice()
-		//m.Deal()
 		if t.Cmd == CMD_END {
 			break
 		}
@@ -52,7 +49,7 @@ func (m *MahjongTable) Play() {
 				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
 				m.MahjongService.Pusher().Push(&mr)
 			} else {
-				mt := MahjongSitEvent{SystemId: t.SystemId, TableId: m.Id}
+				mt := MahjongSitEvent{SystemId: t.SystemId, TableId: m.Id, Seat: int32(t.Seat)}
 				m.MahjongService.Pusher().Push(&mt)
 			}
 		case CMD_DICE:
@@ -63,7 +60,19 @@ func (m *MahjongTable) Play() {
 			m.Deal()
 			mt := MahjongHandEvent{Table: m}
 			m.MahjongService.Pusher().Push(&mt)
+		case CMD_DRAW:
+			mp := m.Players[t.Seat]
+			mp.Hand.Draw(&m.Setup.Deck)
+			mt := MahjongHandEvent{Table: m}
+			m.MahjongService.Pusher().Push(&mt)
+		case CMD_DISCHARGE:
+			mp := m.Players[t.Seat]
+			mp.Hand.Discharge(t.Discharged)
+			mt := MahjongHandEvent{Table: m}
+			m.MahjongService.Pusher().Push(&mt)
+		case CMD_CLAIM:
 		}
+
 	}
 	close(m.Turn)
 	core.AppLog.Printf("table closed %d\n", m.Id)
