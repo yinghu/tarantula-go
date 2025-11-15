@@ -55,9 +55,11 @@ func (m *MahjongTable) Play() {
 				m.MahjongService.Pusher().Push(&mt)
 			}
 		case CMD_DICE:
-			mt := MahjongHandEvent{Table: m}
+			dice := m.Dice()
+			mt := MahjongDiceEvent{Dice1: int32(dice[0]), Dice2: int32(dice[1])}
 			m.MahjongService.Pusher().Push(&mt)
 		case CMD_DEAL:
+			m.Deal()
 			mt := MahjongHandEvent{Table: m}
 			m.MahjongService.Pusher().Push(&mt)
 		}
