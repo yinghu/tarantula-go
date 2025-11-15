@@ -8,6 +8,7 @@ import (
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/mj"
 )
 
 type MahjongService struct {
@@ -96,7 +97,7 @@ func (s *MahjongService) dispatch() {
 
 func (s *MahjongService) onTable(systemId int64) {
 	tid, _ := s.Sequence().Id()
-	table := MahjongTable{Id: tid}
+	table := MahjongTable{Id: tid, MahjongService: s, Setup: mj.ClassicMahjong{}}
 	table.Reset()
 	s.TableIndex[systemId] = &table
 	go table.Play()
