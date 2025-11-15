@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/mj"
 )
 
@@ -18,7 +19,7 @@ const (
 type MahjongTable struct {
 	Id              int64             `json:"Id,string"`
 	Setup           mj.ClassicMahjong `json:"-"`
-	Players         [4]*MahjongPlayer  `json:"Players"`
+	Players         [4]*MahjongPlayer `json:"Players"`
 	Pts             int               `json:"Pts"`
 	Discharged      []mj.Tile         `json:"Discharged"`
 	Started         bool
@@ -46,8 +47,8 @@ func (m *MahjongTable) Play() {
 			if err != nil {
 				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
 				m.MahjongService.Pusher().Push(&mr)
-			}else{
-				mt := MahjongSitEvent{SystemId: t.SystemId,TableId: m.Id}
+			} else {
+				mt := MahjongSitEvent{SystemId: t.SystemId, TableId: m.Id}
 				m.MahjongService.Pusher().Push(&mt)
 			}
 		case CMD_DICE:
@@ -63,6 +64,7 @@ func (m *MahjongTable) Play() {
 }
 
 func (m *MahjongTable) Sit(systemId int64, seatNumber int) error {
+	core.AppLog.Printf("Sit : %d > %d >%d", systemId, seatNumber, m.Players[seatNumber].SystemId)
 	switch seatNumber {
 	case SEAT_E:
 		if m.Players[SEAT_E].SystemId != 0 {
