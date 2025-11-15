@@ -65,7 +65,7 @@ func (m *MahjongTable) Play() {
 			m.MahjongService.Pusher().Push(&mt)
 		}
 	}
-	close(m.Dispatcher)
+	close(m.Turn)
 	core.AppLog.Printf("table closed %d\n", m.Id)
 }
 
