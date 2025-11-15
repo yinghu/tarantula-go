@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/mj"
 )
 
@@ -80,12 +81,14 @@ func (m *MahjongTable) Sit(systemId int64, seatNumber int) error {
 		return nil
 	case SEAT_W:
 		mp := m.Players[SEAT_W]
+		core.AppLog.Printf("P %v\n", mp)
 		if mp.SystemId != 0 {
 			return fmt.Errorf("seat already occupied %d", seatNumber)
 		}
 		mp.SystemId = systemId
 		mp.Auto = false
 		m.Players[SEAT_W] = mp
+		core.AppLog.Printf("P %v\n", m.Players[SEAT_W])
 		return nil
 	case SEAT_N:
 		if m.Players[SEAT_N].SystemId != 0 {
