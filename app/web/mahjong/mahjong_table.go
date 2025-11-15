@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	SEAT_E = 0
-	SEAT_S = 1
-	SEAT_W = 2
-	SEAT_N = 3
+	SEAT_E int = 0
+	SEAT_S int = 1
+	SEAT_W int = 2
+	SEAT_N int = 3
 
 	HAND_SIZE_THRESHHOLD int = 13
 )
