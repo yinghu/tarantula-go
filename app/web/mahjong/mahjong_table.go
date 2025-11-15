@@ -64,7 +64,7 @@ func (m *MahjongTable) Play() {
 }
 
 func (m *MahjongTable) Sit(systemId int64, seatNumber int) error {
-	core.AppLog.Printf("Sit : %d > %d >%d", systemId, seatNumber, m.Players[seatNumber].SystemId)
+	
 	switch seatNumber {
 	case SEAT_E:
 		if m.Players[SEAT_E].SystemId != 0 {
@@ -81,6 +81,7 @@ func (m *MahjongTable) Sit(systemId int64, seatNumber int) error {
 		m.Players[SEAT_S].Auto = false
 		return nil
 	case SEAT_W:
+		core.AppLog.Printf("Sit : %d > %d >%d", systemId, seatNumber, m.Players[SEAT_W].SystemId)
 		if m.Players[SEAT_W].SystemId != 0 {
 			return fmt.Errorf("seat already occupied %d", seatNumber)
 		}
