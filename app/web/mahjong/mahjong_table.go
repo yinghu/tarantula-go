@@ -38,9 +38,9 @@ func (m *MahjongTable) Reset() {
 
 func (m *MahjongTable) Play() {
 	for t := range m.Turn {
-		m.Reset()
-		m.Dice()
-		m.Deal()
+		//m.Reset()
+		//m.Dice()
+		//m.Deal()
 		switch t.Cmd {
 		case CMD_SIT:
 			err := m.Sit(t.SystemId, t.Seat)
