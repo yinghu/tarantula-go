@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 
-	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/mj"
 )
 
@@ -19,7 +18,7 @@ const (
 type MahjongTable struct {
 	Id              int64             `json:"Id,string"`
 	Setup           mj.ClassicMahjong `json:"-"`
-	Players         [4]MahjongPlayer  `json:"Players"`
+	Players         [4]*MahjongPlayer `json:"Players"`
 	Pts             int               `json:"Pts"`
 	Discharged      []mj.Tile         `json:"Discharged"`
 	Started         bool
@@ -64,41 +63,19 @@ func (m *MahjongTable) Play() {
 }
 
 func (m *MahjongTable) Sit(systemId int64, seatNumber int) error {
-	switch seatNumber {
-	case SEAT_E:
-		if m.Players[SEAT_E].SystemId != 0 {
-			return fmt.Errorf("seat already occupied %d", seatNumber)
-		}
-		m.Players[SEAT_E].SystemId = systemId
-		m.Players[SEAT_E].Auto = false
-		return nil
-	case SEAT_S:
-		if m.Players[SEAT_S].SystemId != 0 {
-			return fmt.Errorf("seat already occupied %d", seatNumber)
-		}
-		m.Players[SEAT_S].SystemId = systemId
-		m.Players[SEAT_S].Auto = false
-		return nil
-	case SEAT_W:
-		mp := m.Players[SEAT_W]
-		core.AppLog.Printf("P %v\n", mp)
-		if mp.SystemId != 0 {
-			return fmt.Errorf("seat already occupied %d", seatNumber)
-		}
-		mp.SystemId = systemId
-		mp.Auto = false
-		m.Players[SEAT_W] = mp
-		core.AppLog.Printf("P %v\n", m.Players[SEAT_W])
-		return nil
-	case SEAT_N:
-		if m.Players[SEAT_N].SystemId != 0 {
-			return fmt.Errorf("seat already occupied %d", seatNumber)
-		}
-		m.Players[SEAT_N].SystemId = systemId
-		m.Players[SEAT_N].Auto = false
-		return nil
+	if seatNumber < SEAT_E || seatNumber > SEAT_N {
+		return fmt.Errorf("invalid seat number %d", seatNumber)
 	}
-	return fmt.Errorf("invalid seat number %d", seatNumber)
+	if m.Players[SEAT_E].SystemId == systemId || m.Players[SEAT_S].SystemId == systemId || m.Players[SEAT_W].SystemId == systemId || m.Players[SEAT_N].SystemId == systemId {
+		return fmt.Errorf("already has a seat %d", seatNumber)
+	}
+	if m.Players[seatNumber].SystemId != 0 {
+		return fmt.Errorf("seat already occupied %d", seatNumber)
+	}
+	m.Players[seatNumber].SystemId = systemId
+	m.Players[seatNumber].Auto = false
+	return nil
+
 }
 
 func (m *MahjongTable) Dice() []int {
