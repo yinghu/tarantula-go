@@ -42,6 +42,7 @@ func (m *MahjongTable) Play() {
 		if t.Cmd == CMD_END {
 			break
 		}
+		core.AppLog.Printf("Token seat: %d discharged: %d cmd: %d \n", t.Seat, t.Discharged, t.Cmd)
 		switch t.Cmd {
 		case CMD_SIT:
 			err := m.Sit(t.SystemId, t.Seat)
