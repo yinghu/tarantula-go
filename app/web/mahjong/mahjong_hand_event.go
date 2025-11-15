@@ -3,10 +3,11 @@ package main
 import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/mj"
 )
 
 type MahjongHandEvent struct {
-	Table *MahjongTable
+	H mj.Hand
 	event.EventObj
 }
 
@@ -19,7 +20,7 @@ func (s *MahjongHandEvent) ETag() string {
 }
 
 func (s *MahjongHandEvent) Write(buff core.DataBuffer) error {
-	return s.Table.Players[SEAT_E].Hand.Write(buff)
+	return s.H.Write(buff)
 }
 
 func (s *MahjongHandEvent) Outbound(buff core.DataBuffer) error {

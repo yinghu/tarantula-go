@@ -58,7 +58,7 @@ func (m *MahjongTable) Play() {
 			m.MahjongService.Pusher().Push(&mt)
 		case CMD_DEAL:
 			m.Deal()
-			mt := MahjongHandEvent{Table: m}
+			mt := MahjongHandEvent{H: m.Players[t.Seat].Hand}
 			m.MahjongService.Pusher().Push(&mt)
 		case CMD_DRAW:
 			err := m.Draw(t.Seat)
@@ -66,7 +66,7 @@ func (m *MahjongTable) Play() {
 				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
 				m.MahjongService.Pusher().Push(&mr)
 			} else {
-				mt := MahjongHandEvent{Table: m}
+				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand}
 				m.MahjongService.Pusher().Push(&mt)
 			}
 		case CMD_DISCHARGE:
@@ -75,7 +75,7 @@ func (m *MahjongTable) Play() {
 				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
 				m.MahjongService.Pusher().Push(&mr)
 			} else {
-				mt := MahjongHandEvent{Table: m}
+				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand}
 				m.MahjongService.Pusher().Push(&mt)
 			}
 		case CMD_CLAIM:
