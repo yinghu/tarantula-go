@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 
-	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/mj"
 )
 
@@ -19,7 +18,7 @@ const (
 type MahjongTable struct {
 	Id              int64             `json:"Id,string"`
 	Setup           mj.ClassicMahjong `json:"-"`
-	Players         [4]*MahjongPlayer `json:"Players"`
+	Players         [4]MahjongPlayer  `json:"Players"`
 	Pts             int               `json:"Pts"`
 	Discharged      []mj.Tile         `json:"Discharged"`
 	Started         bool
@@ -64,7 +63,6 @@ func (m *MahjongTable) Play() {
 }
 
 func (m *MahjongTable) Sit(systemId int64, seatNumber int) error {
-	
 	switch seatNumber {
 	case SEAT_E:
 		if m.Players[SEAT_E].SystemId != 0 {
@@ -81,12 +79,13 @@ func (m *MahjongTable) Sit(systemId int64, seatNumber int) error {
 		m.Players[SEAT_S].Auto = false
 		return nil
 	case SEAT_W:
-		core.AppLog.Printf("Sit : %d > %d >%d", systemId, seatNumber, m.Players[SEAT_W].SystemId)
-		if m.Players[SEAT_W].SystemId != 0 {
+		mp := m.Players[SEAT_W]
+		if mp.SystemId != 0 {
 			return fmt.Errorf("seat already occupied %d", seatNumber)
 		}
-		m.Players[SEAT_W].SystemId = systemId
-		m.Players[SEAT_W].Auto = false
+		mp.SystemId = systemId
+		mp.Auto = false
+		m.Players[SEAT_W] = mp
 		return nil
 	case SEAT_N:
 		if m.Players[SEAT_N].SystemId != 0 {

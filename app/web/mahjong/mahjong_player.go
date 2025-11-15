@@ -158,7 +158,7 @@ func (mp *MahjongPlayer) OnKnog(t mj.Tile) {
 func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
 	fmt.Printf("tile melt %v\n", m)
 }
-func NewPlayer(seat string) *MahjongPlayer {
+func NewPlayer(seat string) MahjongPlayer {
 	mp := MahjongPlayer{Seat: seat, Auto: true}
 	mp.Hand = mj.Hand{Listener: &mp}
 	mp.Hand.New()
@@ -172,5 +172,5 @@ func NewPlayer(seat string) *MahjongPlayer {
 	mp.R = make([]mj.Tile, 0)
 	mp.G = make([]mj.Tile, 0)
 	mp.W = make([]mj.Tile, 0)
-	return &mp
+	return mp
 }
