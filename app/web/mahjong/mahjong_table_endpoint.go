@@ -5,7 +5,6 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/util"
 )
 
 type MahjongTableSelector struct {
@@ -18,5 +17,5 @@ func (s *MahjongTableSelector) AccessControl() int32 {
 
 func (s *MahjongTableSelector) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	w.Write(util.ToJson(s.Table))
+	//w.Write(util.ToJson(s.Table))
 }

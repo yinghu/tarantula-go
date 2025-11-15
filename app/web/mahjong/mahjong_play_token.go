@@ -7,6 +7,10 @@ const (
 	CMD_DICE int = 1
 	CMD_DEAL int = 2
 	CMD_END  int = 3
+
+	//internal
+	CMD_JOINED int = 100
+	CMD_LEFT   int = 101
 )
 
 type MahjongPlayToken struct {

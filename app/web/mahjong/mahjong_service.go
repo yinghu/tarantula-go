@@ -12,7 +12,8 @@ import (
 
 type MahjongService struct {
 	bootstrap.AppManager
-	Table MahjongTable
+	TableIndex map[int64]*MahjongTable
+	Dispatcher chan MahjongPlayToken
 }
 
 func (s *MahjongService) Config() string {
@@ -22,14 +23,17 @@ func (s *MahjongService) Config() string {
 func (s *MahjongService) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 	s.ItemUpdater = s
 	s.AppManager.Start(f, c, p)
-	tid, _ := s.Sequence().Id()
-	s.Table = MahjongTable{MahjongService: s, Turn: make(chan MahjongPlayToken, 10), Id: tid}
-	s.Table.Reset()
-	s.Table.Dice()
-	s.Table.Deal()
-	go s.Table.Play()
+	s.TableIndex = make(map[int64]*MahjongTable)
+	s.Dispatcher = make(chan MahjongPlayToken, 10)
+	go s.dispatch()
 	http.Handle("/mahjong/table", bootstrap.Logging(&MahjongTableSelector{MahjongService: s}))
 	return nil
+}
+
+func (s *MahjongService) Shutdown() {
+	core.AppLog.Println("majong service shutting down ...")
+	close(s.Dispatcher)
+	s.AppManager.Shutdown()
 }
 
 func (s *MahjongService) Create(classId int, topic string) (event.Event, error) {
@@ -64,10 +68,10 @@ func (s *MahjongService) OnEvent(e event.Event) {
 		s.Pusher().Push(e)
 	case event.JOIN_CID:
 		core.AppLog.Printf("joined from %d\n", e.RecipientId())
-		mt := MahjongTableEvent{TableId: s.Table.Id, SystemId: e.RecipientId()}
-		s.Pusher().Push(&mt)
+		s.Dispatcher <- MahjongPlayToken{SystemId: e.RecipientId(), Cmd: CMD_JOINED}
 	case event.KICKOFF_CID:
 		core.AppLog.Printf("kickoff from %d\n", e.RecipientId())
+		s.Dispatcher <- MahjongPlayToken{SystemId: e.RecipientId(), Cmd: CMD_LEFT}
 		id, _ := s.Sequence().Id()
 		e.OnOId(id)
 		e.OnTopic("mahjong")
@@ -76,6 +80,35 @@ func (s *MahjongService) OnEvent(e event.Event) {
 			core.AppLog.Printf("failed to send event %s\n", err.Error())
 		}
 	default:
-
 	}
+}
+
+func (s *MahjongService) dispatch() {
+	for t := range s.Dispatcher {
+		switch t.Cmd {
+		case CMD_JOINED:
+			s.onTable(t.SystemId)
+		case CMD_LEFT:
+			s.offTable(t.SystemId)
+		}
+	}
+}
+
+func (s *MahjongService) onTable(systemId int64) {
+	tid, _ := s.Sequence().Id()
+	table := MahjongTable{Id: tid}
+	table.Reset()
+	s.TableIndex[systemId] = &table
+	go table.Play()
+	mt := MahjongTableEvent{TableId: table.Id, SystemId: systemId}
+	s.Pusher().Push(&mt)
+}
+func (s *MahjongService) offTable(systemId int64) {
+	table, exists := s.TableIndex[systemId]
+	if !exists {
+		return
+	}
+	delete(s.TableIndex, systemId)
+	table.Dispatcher <- MahjongPlayToken{Cmd: CMD_END}
+
 }

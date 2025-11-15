@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/mj"
 )
 
@@ -40,6 +41,9 @@ func (m *MahjongTable) Play() {
 		//m.Reset()
 		//m.Dice()
 		//m.Deal()
+		if t.Cmd == CMD_END {
+			break
+		}
 		switch t.Cmd {
 		case CMD_SIT:
 			err := m.Sit(t.SystemId, t.Seat)
@@ -56,10 +60,10 @@ func (m *MahjongTable) Play() {
 		case CMD_DEAL:
 			mt := MahjongHandEvent{Table: m}
 			m.MahjongService.Pusher().Push(&mt)
-		case CMD_END:
-			return
 		}
 	}
+	close(m.Dispatcher)
+	core.AppLog.Printf("table closed %d\n", m.Id)
 }
 
 func (m *MahjongTable) Sit(systemId int64, seatNumber int) error {
