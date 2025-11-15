@@ -109,6 +109,6 @@ func (s *MahjongService) offTable(systemId int64) {
 		return
 	}
 	delete(s.TableIndex, systemId)
-	table.Dispatcher <- MahjongPlayToken{Cmd: CMD_END}
+	table.Turn <- MahjongPlayToken{Cmd: CMD_END}
 
 }
