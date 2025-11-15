@@ -34,6 +34,7 @@ func (m *MahjongTable) Reset() {
 	m.Players[SEAT_W] = NewPlayer("West")
 	m.Players[SEAT_N] = NewPlayer("North")
 	m.Discharged = make([]mj.Tile, 0)
+	m.Turn = make(chan MahjongPlayToken, 3)
 }
 
 func (m *MahjongTable) Play() {
