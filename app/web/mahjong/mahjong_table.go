@@ -166,7 +166,7 @@ func (m *MahjongTable) Discharge(seat int, t int) error {
 	if sz == 1 {
 		return fmt.Errorf("no more discharge %d", sz)
 	}
-	err := mp.Discharge(t)
+	err := mp.Hand.Discharge(t)
 	if err != nil {
 		return err
 	}

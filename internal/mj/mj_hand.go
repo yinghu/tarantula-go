@@ -44,7 +44,6 @@ func (h *Hand) Drop(drop Tile) error {
 }
 func (h *Hand) Discharge(discharged int) error {
 	for i := range h.Tiles {
-		core.AppLog.Printf("Tile %d\n", h.Tiles[i].Seq)
 		if h.Tiles[i].Seq == discharged {
 			drop := h.Tiles[i]
 			h.Tiles = slices.Delete(h.Tiles, i, i)
