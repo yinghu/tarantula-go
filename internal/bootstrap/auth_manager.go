@@ -81,8 +81,8 @@ func (s *AuthManager) ValidateToken(token string) (core.OnSession, error) {
 	return session, nil
 }
 
-func (s *AuthManager) CreateTicket(systemId int64, stub int32, accessControl int32, durationSeconds int) (string, error) {
-	exp := time.Now().Add(time.Minute * time.Duration(durationSeconds)).UTC()
+func (s *AuthManager) CreateTicket(systemId int64, stub int32, accessControl int32, durationMinutes int) (string, error) {
+	exp := time.Now().Add(time.Minute * time.Duration(durationMinutes)).UTC()
 	aud := fmt.Sprintf("%d.%d.%d.%d", systemId, stub, accessControl, exp.UnixMilli())
 	ticket := s.Cipher.Encrypt(aud)
 	return ticket, nil
