@@ -15,20 +15,20 @@ type Meld struct {
 	Tiles []Tile `json:"Tiles"`
 }
 
-func (m *Meld) Type() uint8 {
+func (m *Meld) Type() int32 {
 	if m.Eye() {
-		return EYE
+		return 1
 	}
 	if m.Chow() {
-		return CHOW
+		return 2
 	}
 	if m.Pong() {
-		return PONG
+		return 3
 	}
 	if m.Kong() {
-		return KNOG
+		return 4
 	}
-	return NONE
+	return 0
 }
 
 func (m *Meld) Eye() bool {
@@ -73,7 +73,7 @@ func (m *Meld) Name() string {
 }
 
 func (m *Meld) Write(buff core.DataBuffer) error {
-	if err := buff.WriteInt32(int32(m.Type())); err != nil {
+	if err := buff.WriteInt32(m.Type()); err != nil {
 		return err
 	}
 	sz := len(m.Tiles)
