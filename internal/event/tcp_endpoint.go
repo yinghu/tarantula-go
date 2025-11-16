@@ -88,6 +88,7 @@ func (s *TcpEndpoint) inbound(client net.Conn, systemId int64) {
 			return
 		}
 		if data[num-1] != '|' {
+			core.AppLog.Printf("not delimted")
 			continue
 		}
 		buff.Flip()
