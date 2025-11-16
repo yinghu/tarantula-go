@@ -80,6 +80,9 @@ func (m *MahjongTable) Play() {
 				m.MahjongService.Pusher().Push(&mt)
 			}
 		case CMD_CLAIM:
+			claimed := m.Claim(t.Seat)
+			mt := MahjongClaimEvent{SystemId: t.SystemId, TableId: m.Id, Seat: int32(t.Seat), Claimed: claimed}
+			m.MahjongService.Pusher().Push(&mt)
 		}
 
 	}

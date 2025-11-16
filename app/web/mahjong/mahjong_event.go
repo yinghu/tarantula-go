@@ -11,6 +11,7 @@ const (
 	M_HAND_CID  int = 102
 	M_TABLE_CID int = 103
 	M_SIT_CID   int = 104
+	M_CLAIM_CID int = 105
 	M_ERR_CID   int = 911
 )
 
