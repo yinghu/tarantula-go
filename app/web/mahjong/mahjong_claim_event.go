@@ -3,6 +3,7 @@ package main
 import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/mj"
 )
 
 type MahjongClaimEvent struct {
@@ -10,6 +11,7 @@ type MahjongClaimEvent struct {
 	TableId  int64
 	Seat     int32
 	Claimed  bool
+	Formed   []mj.Meld
 	event.EventObj
 }
 
@@ -33,6 +35,18 @@ func (s *MahjongClaimEvent) Write(buff core.DataBuffer) error {
 	}
 	if err := buff.WriteBool(s.Claimed); err != nil {
 		return err
+	}
+	if !s.Claimed {
+		return nil
+	}
+	sz := len(s.Formed)
+	if err := buff.WriteInt32(int32(sz)); err != nil {
+		return err
+	}
+	for _, m := range s.Formed {
+		if err := m.Write(buff); err != nil {
+			return err
+		}
 	}
 	return nil
 }

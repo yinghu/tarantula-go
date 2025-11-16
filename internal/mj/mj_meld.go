@@ -1,5 +1,7 @@
 package mj
 
+import "gameclustering.com/internal/core"
+
 //2 to 4 tiles, or 14 if 13 orphans
 const (
 	NONE uint8 = 0
@@ -11,6 +13,22 @@ const (
 
 type Meld struct {
 	Tiles []Tile `json:"Tiles"`
+}
+
+func (m *Meld) Type() uint8 {
+	if m.Eye() {
+		return EYE
+	}
+	if m.Chow() {
+		return CHOW
+	}
+	if m.Pong() {
+		return PONG
+	}
+	if m.Kong() {
+		return KNOG
+	}
+	return NONE
 }
 
 func (m *Meld) Eye() bool {
@@ -52,4 +70,20 @@ func (m *Meld) Name() string {
 		}
 	}
 	return nm
+}
+
+func (m *Meld) Write(buff core.DataBuffer) error {
+	if err := buff.WriteInt32(int32(m.Type())); err != nil {
+		return err
+	}
+	sz := len(m.Tiles)
+	if err := buff.WriteInt32(int32(sz)); err != nil {
+		return err
+	}
+	for _, v := range m.Tiles {
+		if err := v.Write(buff); err != nil {
+			return err
+		}
+	}
+	return nil
 }
