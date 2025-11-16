@@ -99,16 +99,16 @@ func TestMahjongAutoTable(t *testing.T) {
 		t.Errorf("should not be error %s", err.Error())
 	}
 	sz := len(mt.Players[dealer].Hand.Tiles)
-	if sz!=13{
-		t.Errorf("hand size should be 13 %d",sz)
+	if sz != 13 {
+		t.Errorf("hand size should be 13 %d", sz)
 	}
 	err = mt.Draw(dealer)
 	if err != nil {
-		t.Errorf("should not be error %s",err.Error())
+		t.Errorf("should not be error %s", err.Error())
 	}
 	sz = len(mt.Players[dealer].Hand.Tiles)
-	if sz!=14{
-		t.Errorf("hand size should be 14 %d",sz)
+	if sz != 14 {
+		t.Errorf("hand size should be 14 %d", sz)
 	}
 }
 
@@ -125,4 +125,21 @@ func TestMahjongToken(t *testing.T) {
 	if me.Token != mx.Token {
 		t.Errorf("token should be same %v %v", me.Token, mx.Token)
 	}
+}
+
+func TestMahjongTableIndex(t *testing.T) {
+	ix := make(map[int64]*MahjongTable)
+	mt := MahjongTable{}
+	mt.Reset()
+	ix[10] = &mt
+	mx := ix[10]
+	mx.Dice()
+	mx.Deal()
+	tx := mt.Players[SEAT_E].Hand.Tiles[0]
+	fmt.Printf("%v\n",mt.Players[SEAT_E].Hand.Tiles)
+	fmt.Printf("%v\n",mx.Players[SEAT_E].Hand.Tiles)
+	mx.Discharge(SEAT_E,tx.Seq)
+	fmt.Printf("%v\n",mt.Players[SEAT_E].Hand.Tiles)
+	fmt.Printf("%v\n",mx.Players[SEAT_E].Hand.Tiles)
+	
 }

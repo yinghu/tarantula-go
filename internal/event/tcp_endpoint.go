@@ -3,6 +3,7 @@ package event
 import (
 	"net"
 	"strings"
+	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/metrics"
@@ -118,6 +119,7 @@ func (s *TcpEndpoint) inbound(client net.Conn, systemId int64) {
 		e.Inbound(buff)
 		buff.Clear()
 		//e.Listener().OnEvent(e)
+		time.Sleep(10 * time.Millisecond)
 	}
 }
 
