@@ -94,26 +94,31 @@ func (s *TcpEndpoint) inbound(client net.Conn, systemId int64) {
 		buff.Flip()
 		cid, err := buff.ReadInt32()
 		if err != nil {
+			core.AppLog.Printf("read class id error %s\n", err.Error())
 			buff.Clear()
 			continue
 		}
 		tick, err := buff.ReadString()
 		if err != nil {
+			core.AppLog.Printf("read ticket error %s\n", err.Error())
 			buff.Clear()
 			continue
 		}
 		topic, err := buff.ReadString()
 		if err != nil {
+			core.AppLog.Printf("read topic error %s\n", err.Error())
 			buff.Clear()
 			continue
 		}
 		_, err = s.Service.VerifyTicket(tick)
 		if err != nil {
+			core.AppLog.Printf("invalid ticket error %s\n", err.Error())
 			buff.Clear()
 			continue
 		}
 		e, err := s.Service.Create(int(cid), topic)
 		if err != nil {
+			core.AppLog.Printf("invalid class id error %s\n", err.Error())
 			buff.Clear()
 			continue
 		}
