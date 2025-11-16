@@ -19,7 +19,7 @@ const (
 type MahjongTable struct {
 	Id              int64             `json:"Id,string"`
 	Setup           mj.ClassicMahjong `json:"-"`
-	Players         [4]MahjongPlayer `json:"Players"`
+	Players         [4]*MahjongPlayer `json:"Players"`
 	Pts             int               `json:"Pts"`
 	Discharged      []mj.Tile         `json:"Discharged"`
 	Started         bool
@@ -166,12 +166,12 @@ func (m *MahjongTable) Discharge(seat int, t int) error {
 	if sz == 1 {
 		return fmt.Errorf("no more discharge %d", sz)
 	}
-	err := mp.Hand.Discharge(t)
+	drop, err := mp.Hand.Discharge(t)
 	if err != nil {
 		return err
 	}
-	m.Players[seat] = mp
-	//m.Discharged = append(m.Discharged, t)
+	//m.Players[seat] = mp
+	m.Discharged = append(m.Discharged, drop)
 	return nil
 }
 
@@ -192,7 +192,7 @@ func (m *MahjongTable) deal(p int) error {
 	}
 	sz := len(mp.Flowers)
 	if fz == sz {
-		m.Players[p] = mp
+		//m.Players[p] = mp
 		return nil
 	}
 	fz = sz
@@ -207,6 +207,6 @@ func (m *MahjongTable) deal(p int) error {
 		}
 		fz = sz
 	}
-	m.Players[p] = mp
+	//m.Players[p] = mp
 	return nil
 }

@@ -93,6 +93,23 @@ func TestMahjongAutoTable(t *testing.T) {
 			}
 		}
 	}
+	tx := mt.Players[dealer].Hand.Tiles[0]
+	err = mt.Discharge(dealer, tx.Seq)
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+	}
+	sz := len(mt.Players[dealer].Hand.Tiles)
+	if sz!=13{
+		t.Errorf("hand size should be 13 %d",sz)
+	}
+	err = mt.Draw(dealer)
+	if err != nil {
+		t.Errorf("should not be error %s",err.Error())
+	}
+	sz = len(mt.Players[dealer].Hand.Tiles)
+	if sz!=14{
+		t.Errorf("hand size should be 14 %d",sz)
+	}
 }
 
 func TestMahjongToken(t *testing.T) {
@@ -105,7 +122,7 @@ func TestMahjongToken(t *testing.T) {
 	mx.Callback = &lis
 	buff.Flip()
 	mx.Inbound(buff)
-	if me.Token != mx.Token{
-		t.Errorf("token should be same %v %v", me.Token,mx.Token)
+	if me.Token != mx.Token {
+		t.Errorf("token should be same %v %v", me.Token, mx.Token)
 	}
 }

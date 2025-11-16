@@ -32,7 +32,7 @@ func (h *Hand) New() {
 func (h *Hand) Drop(drop Tile) error {
 	for i := range h.Tiles {
 		if h.Tiles[i] == drop {
-			h.Tiles = slices.Delete(h.Tiles, i, i)
+			h.Tiles = slices.Delete(h.Tiles, i, i+1)
 			if h.Listener == nil {
 				return nil
 			}
@@ -42,19 +42,19 @@ func (h *Hand) Drop(drop Tile) error {
 	}
 	return fmt.Errorf("drop not existed %v", drop)
 }
-func (h *Hand) Discharge(discharged int) error {
+func (h *Hand) Discharge(discharged int) (Tile, error) {
 	for i := range h.Tiles {
 		if h.Tiles[i].Seq == discharged {
 			drop := h.Tiles[i]
-			h.Tiles = slices.Delete(h.Tiles, i, i)
+			h.Tiles = slices.Delete(h.Tiles, i, i+1)
 			if h.Listener == nil {
-				return nil
+				return drop, nil
 			}
 			h.Listener.OnDrop(drop)
-			return nil
+			return drop, nil
 		}
 	}
-	return fmt.Errorf("discharged not existed %d", discharged)
+	return Tile{}, fmt.Errorf("discharged not existed %d", discharged)
 }
 
 func (h *Hand) Draw(deck *Deck) error {
