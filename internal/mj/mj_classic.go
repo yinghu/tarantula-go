@@ -1,7 +1,8 @@
 package mj
 
+
 const (
-	CLASSIC_MAX_FORMS int = 4	
+	CLASSIC_MAX_FORMS int = 4
 )
 
 type ClassicMahjong struct {
@@ -13,7 +14,7 @@ func (c *ClassicMahjong) New() {
 	c.Deck = Deck{}
 	c.Deck.New()
 	c.Shuffle()
-
+	c.Queue = EvaluationQueue{PendingNode: make([]EvaluationNode, 0), Formed: make([]Meld, 0)}
 }
 
 func (c *ClassicMahjong) Mahjong(h *Hand) bool {
@@ -26,5 +27,5 @@ func (c *ClassicMahjong) Mahjong(h *Hand) bool {
 		}
 		formed++
 	}
-	return eyeCount == 1 && formed == h.MaxClaims
+	return eyeCount == 1 && formed == h.MaxClaims+1
 }
