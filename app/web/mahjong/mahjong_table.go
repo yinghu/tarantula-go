@@ -170,7 +170,7 @@ func (m *MahjongTable) Discharge(seat int, t int) error {
 	if err != nil {
 		return err
 	}
-	m.Players[seat] = mp
+	//m.Players[seat] = mp
 	//m.Discharged = append(m.Discharged, t)
 	return nil
 }
