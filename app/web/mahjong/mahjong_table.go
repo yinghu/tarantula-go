@@ -87,7 +87,16 @@ func (m *MahjongTable) Play() {
 			} else {
 				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand}
 				m.MahjongService.Pusher().Push(&mt)
-				core.AppLog.Printf("discharged %v\n", m.Discharged)
+				dz := len(m.Discharged)
+				if dz <= 3 {
+					core.AppLog.Printf("discharged %v\n", m.Discharged)
+					md := MahjongDischargeEvent{D: m.Discharged}
+					m.MahjongService.Pusher().Push(&md)
+				} else {
+					core.AppLog.Printf("x discharged %v\n", m.Discharged[(dz-3):])
+					md := MahjongDischargeEvent{D: m.Discharged[(dz - 3):]}
+					m.MahjongService.Pusher().Push(&md)
+				}
 			}
 		case CMD_CLAIM:
 			claimed := m.Claim(t.Seat)
