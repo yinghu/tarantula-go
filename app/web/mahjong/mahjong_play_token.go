@@ -9,7 +9,7 @@ const (
 	CMD_DRAW      int = 3
 	CMD_DISCHARGE int = 4
 	CMD_CLAIM     int = 5
-	CMD_RESET     int = 6
+	CMD_RESET     int = 98
 	CMD_END       int = 99
 
 	//internal
