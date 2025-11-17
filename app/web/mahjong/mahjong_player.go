@@ -11,19 +11,22 @@ type MahjongPlayer struct {
 	SystemId int64  `json:"SystemId,string"`
 	Seat     string `json:"Seat"`
 	mj.Hand  `json:"Hand"`
-	Auto     bool                  `json:"Auto"`
-	B        []mj.Tile             `json:"-"` //bamboo
-	C        []mj.Tile             `json:"-"` //character
-	D        []mj.Tile             `json:"-"` //dots
-	HE       []mj.Tile             `json:"-"` //east
-	HS       []mj.Tile             `json:"-"` //south
-	HW       []mj.Tile             `json:"-"` //west
-	HN       []mj.Tile             `json:"-"` //north
-	R        []mj.Tile             `json:"-"` //red
-	G        []mj.Tile             `json:"-"` //green
-	W        []mj.Tile             `json:"-"` //white
+	Auto     bool      `json:"Auto"`
+	B        []mj.Tile `json:"-"` //bamboo
+	C        []mj.Tile `json:"-"` //character
+	D        []mj.Tile `json:"-"` //dots
+	HE       []mj.Tile `json:"-"` //east
+	HS       []mj.Tile `json:"-"` //south
+	HW       []mj.Tile `json:"-"` //west
+	HN       []mj.Tile `json:"-"` //north
+	R        []mj.Tile `json:"-"` //red
+	G        []mj.Tile `json:"-"` //green
+	W        []mj.Tile `json:"-"` //white
 }
 
+func (mp *MahjongPlayer) Reset() {
+	mp.Clear()
+}
 
 func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
 	if !mp.Auto {
@@ -158,6 +161,7 @@ func (mp *MahjongPlayer) OnKnog(t mj.Tile) {
 func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
 	fmt.Printf("tile melt %v\n", m)
 }
+
 func NewPlayer(seat string) *MahjongPlayer {
 	mp := MahjongPlayer{Seat: seat, Auto: true}
 	mp.Hand = mj.Hand{Listener: &mp}

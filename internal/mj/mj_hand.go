@@ -28,6 +28,11 @@ func (h *Hand) New() {
 	h.Flowers = make([]Tile, 0)
 	h.MaxClaims = CLASSIC_MAX_FORMS
 }
+func (h *Hand) Clear() {
+	h.Formed = h.Formed[:0]
+	h.Tiles = h.Tiles[:0]
+	h.Flowers = h.Flowers[:0]
+}
 
 func (h *Hand) Drop(drop Tile) error {
 	for i := range h.Tiles {
