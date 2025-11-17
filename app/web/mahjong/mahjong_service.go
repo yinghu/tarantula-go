@@ -98,7 +98,7 @@ func (s *MahjongService) dispatch() {
 func (s *MahjongService) onTable(systemId int64) {
 	tid, _ := s.Sequence().Id()
 	table := MahjongTable{Id: tid, MahjongService: s, Setup: mj.ClassicMahjong{}}
-	table.Reset()
+	table.New()
 	s.TableIndex[systemId] = &table
 	go table.Play()
 	mt := MahjongTableEvent{TableId: table.Id, SystemId: systemId}

@@ -27,7 +27,7 @@ type MahjongTable struct {
 	*MahjongService `json:"-"`
 }
 
-func (m *MahjongTable) Reset() {
+func (m *MahjongTable) New() {
 	m.Setup.New()
 	m.Players[SEAT_E] = NewPlayer("East")
 	m.Players[SEAT_S] = NewPlayer("South")
@@ -35,6 +35,15 @@ func (m *MahjongTable) Reset() {
 	m.Players[SEAT_N] = NewPlayer("North")
 	m.Discharged = make([]mj.Tile, 0)
 	m.Turn = make(chan MahjongPlayToken, 3)
+}
+
+func (m *MahjongTable) Reset() {
+	m.Setup.New()
+	//m.Players[SEAT_E] = NewPlayer("East")
+	//m.Players[SEAT_S] = NewPlayer("South")
+	//m.Players[SEAT_W] = NewPlayer("West")
+	//m.Players[SEAT_N] = NewPlayer("North")
+	m.Discharged = m.Discharged[:0]
 }
 
 func (m *MahjongTable) Play() {
