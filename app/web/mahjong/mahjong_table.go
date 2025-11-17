@@ -171,11 +171,6 @@ func (m *MahjongTable) Deal() error {
 }
 
 func (m *MahjongTable) Draw(seat int) error {
-	mp := m.Players[seat]
-	sz := len(mp.Tiles)
-	if sz > HAND_SIZE_THRESHHOLD {
-		return fmt.Errorf("no more draw %d", sz)
-	}
 	return m.deal(seat)
 }
 
@@ -204,12 +199,16 @@ func (m *MahjongTable) Claim(seat int) bool {
 
 func (m *MahjongTable) deal(p int) error {
 	mp := m.Players[p]
+	sz := len(mp.Tiles)
+	if sz > HAND_SIZE_THRESHHOLD {
+		return fmt.Errorf("no more draw %d", sz)
+	}
 	fz := len(mp.Flowers)
 	err := mp.Draw(&m.Setup.Deck)
 	if err != nil {
 		return err
 	}
-	sz := len(mp.Flowers)
+	sz = len(mp.Flowers)
 	if fz == sz {
 		//m.Players[p] = mp
 		return nil
