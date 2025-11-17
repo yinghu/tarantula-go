@@ -8,9 +8,14 @@ const (
 	CMD_DEAL      int = 2
 	CMD_DRAW      int = 3
 	CMD_DISCHARGE int = 4
-	CMD_CLAIM     int = 5
-	CMD_RESET     int = 98
-	CMD_END       int = 99
+	CMD_PONG      int = 5
+	CMD_KONG      int = 6
+	CMD_CHOW      int = 7
+
+	CMD_CLAIM int = 8
+
+	CMD_RESET int = 98
+	CMD_END   int = 99
 
 	//internal
 	CMD_JOINED int = 100

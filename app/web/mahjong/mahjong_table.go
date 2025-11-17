@@ -87,6 +87,7 @@ func (m *MahjongTable) Play() {
 			} else {
 				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand}
 				m.MahjongService.Pusher().Push(&mt)
+				core.AppLog.Printf("discharged %v\n", m.Discharged)
 			}
 		case CMD_CLAIM:
 			claimed := m.Claim(t.Seat)

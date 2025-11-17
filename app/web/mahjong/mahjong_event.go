@@ -6,14 +6,15 @@ import (
 )
 
 const (
-	M_TOKEN_CID int = 100
-	M_DICE_CID  int = 101
-	M_HAND_CID  int = 102
-	M_TABLE_CID int = 103
-	M_SIT_CID   int = 104
-	M_CLAIM_CID int = 105
-	M_RESET_CID int = 106
-	M_ERR_CID   int = 911
+	M_TOKEN_CID     int = 100
+	M_DICE_CID      int = 101
+	M_HAND_CID      int = 102
+	M_TABLE_CID     int = 103
+	M_SIT_CID       int = 104
+	M_CLAIM_CID     int = 105
+	M_RESET_CID     int = 106
+	M_DISCHARGE_CID int = 107
+	M_ERR_CID       int = 911
 )
 
 type MahjongEvent struct {
