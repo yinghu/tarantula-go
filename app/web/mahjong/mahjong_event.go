@@ -12,6 +12,7 @@ const (
 	M_TABLE_CID int = 103
 	M_SIT_CID   int = 104
 	M_CLAIM_CID int = 105
+	M_RESET_CID int = 106
 	M_ERR_CID   int = 911
 )
 

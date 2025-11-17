@@ -86,6 +86,10 @@ func (m *MahjongTable) Play() {
 				mt.Formed = append(mt.Formed, m.Players[t.Seat].Formed...)
 			}
 			m.MahjongService.Pusher().Push(&mt)
+		case CMD_RESET:
+			m.Reset()
+			mt := MahjongResetEvent{Started: false}
+			m.MahjongService.Pusher().Push(&mt)
 		}
 
 	}
