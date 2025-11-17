@@ -39,10 +39,10 @@ func (m *MahjongTable) New() {
 
 func (m *MahjongTable) Reset() {
 	m.Setup.New()
-	//m.Players[SEAT_E] = NewPlayer("East")
-	//m.Players[SEAT_S] = NewPlayer("South")
-	//m.Players[SEAT_W] = NewPlayer("West")
-	//m.Players[SEAT_N] = NewPlayer("North")
+	m.Players[SEAT_E].Reset()
+	m.Players[SEAT_S].Reset()
+	m.Players[SEAT_W].Reset()
+	m.Players[SEAT_N].Reset()
 	m.Discharged = m.Discharged[:0]
 }
 
