@@ -173,5 +173,14 @@ func (h *Hand) Write(buff core.DataBuffer) error {
 			return err
 		}
 	}
+	sz = len(h.Formed)
+	if err := buff.WriteInt32(int32(sz)); err != nil {
+		return err
+	}
+	for i := range h.Formed {
+		if err := h.Formed[i].Write(buff); err != nil {
+			return err
+		}
+	}
 	return nil
 }
