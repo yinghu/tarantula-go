@@ -47,22 +47,22 @@ const (
 
 	//VALUE 1 -7
 	EAST  string = "H31"
-	SOUTH string = "H42"
-	WEST  string = "H53"
-	NORTH string = "H64"
-	RED   string = "H75"
-	GREEN string = "H86"
-	WHITE string = "H97"
+	SOUTH string = "H33"
+	WEST  string = "H35"
+	NORTH string = "H37"
+	RED   string = "H39"
+	GREEN string = "H41"
+	WHITE string = "H43"
 
 	//VALUE = 0
-	F_PLUMBLOSSOM   string = "F101"
-	F_ORCHID        string = "F103"
-	F_CHRYSANTHEMUM string = "F105"
-	F_BAMBOO        string = "F107"
-	F_SPRING        string = "F109"
-	F_SUMMER        string = "F111"
-	F_AUTUMN        string = "F113"
-	F_WINTER        string = "F115"
+	F_PLUMBLOSSOM   string = "F45"
+	F_ORCHID        string = "F47"
+	F_CHRYSANTHEMUM string = "F49"
+	F_BAMBOO        string = "F51"
+	F_SPRING        string = "F53"
+	F_SUMMER        string = "F55"
+	F_AUTUMN        string = "F57"
+	F_WINTER        string = "F59"
 )
 
 func NewTile(src string) Tile {
@@ -100,6 +100,9 @@ func (t *Tile) cn() {
 	if t.Suit == HORNOR {
 		t.Seq = int(t.Rank)
 	}
+	if t.Suit == FLOWER {
+		t.Seq = int(t.Rank)
+	}
 }
 
 func (t Tile) Name() string {
@@ -107,5 +110,5 @@ func (t Tile) Name() string {
 }
 
 func (h *Tile) Write(buff core.DataBuffer) error {
-	return buff.WriteInt32(int32(h.Seq))	
+	return buff.WriteInt32(int32(h.Seq))
 }
