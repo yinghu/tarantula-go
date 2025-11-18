@@ -40,6 +40,9 @@ func (h *Hand) Drop(drop Tile) error {
 	for i := range h.Tiles {
 		if h.Tiles[i] == drop {
 			h.Tiles = slices.Delete(h.Tiles, i, i+1)
+			if drop.Suit == FLOWER {
+				h.Flowers = append(h.Flowers, drop)
+			}
 			if h.Listener == nil {
 				return nil
 			}
@@ -54,6 +57,9 @@ func (h *Hand) Discharge(discharged int) (Tile, error) {
 		if h.Tiles[i].Seq == discharged {
 			drop := h.Tiles[i]
 			h.Tiles = slices.Delete(h.Tiles, i, i+1)
+			if drop.Suit == FLOWER {
+				h.Flowers = append(h.Flowers, drop)
+			}
 			if h.Listener == nil {
 				return drop, nil
 			}
@@ -155,6 +161,15 @@ func (h *Hand) Write(buff core.DataBuffer) error {
 	}
 	for i := range h.Tiles {
 		if err := h.Tiles[i].Write(buff); err != nil {
+			return err
+		}
+	}
+	sz = len(h.Flowers)
+	if err := buff.WriteInt32(int32(sz)); err != nil {
+		return err
+	}
+	for i := range h.Flowers {
+		if err := h.Flowers[i].Write(buff); err != nil {
 			return err
 		}
 	}
