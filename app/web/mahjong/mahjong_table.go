@@ -29,10 +29,10 @@ type MahjongTable struct {
 
 func (m *MahjongTable) New() {
 	m.Setup.New()
-	m.Players[SEAT_E] = NewPlayer("East")
-	m.Players[SEAT_S] = NewPlayer("South")
-	m.Players[SEAT_W] = NewPlayer("West")
-	m.Players[SEAT_N] = NewPlayer("North")
+	m.Players[SEAT_E] = NewPlayer("East",true)
+	m.Players[SEAT_S] = NewPlayer("South",true)
+	m.Players[SEAT_W] = NewPlayer("West",true)
+	m.Players[SEAT_N] = NewPlayer("North",true)
 	m.Discharged = make([]mj.Tile, 0)
 	m.Turn = make(chan MahjongPlayToken, 3)
 }

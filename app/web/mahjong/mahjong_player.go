@@ -26,6 +26,16 @@ type MahjongPlayer struct {
 
 func (mp *MahjongPlayer) Reset() {
 	mp.Clear()
+	mp.B = mp.B[:0]
+	mp.C = mp.C[:0]
+	mp.D = mp.D[:0]
+	mp.HE = mp.HE[:0]
+	mp.HS = mp.HS[:0]
+	mp.HW = mp.HW[:0]
+	mp.HN = mp.HN[:0]
+	mp.R = mp.R[:0]
+	mp.G = mp.G[:0]
+	mp.W = mp.W[:0]
 }
 
 func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
@@ -162,9 +172,9 @@ func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
 	fmt.Printf("tile melt %v\n", m)
 }
 
-func NewPlayer(seat string) *MahjongPlayer {
+func NewPlayer(seat string,sorting bool) *MahjongPlayer {
 	mp := MahjongPlayer{Seat: seat, Auto: true}
-	mp.Hand = mj.Hand{Listener: &mp}
+	mp.Hand = mj.Hand{Listener: &mp, Sorting: sorting}
 	mp.Hand.New()
 	mp.B = make([]mj.Tile, 0)
 	mp.C = make([]mj.Tile, 0)
