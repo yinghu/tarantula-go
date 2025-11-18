@@ -56,13 +56,13 @@ const (
 
 	//VALUE = 0
 	F_PLUMBLOSSOM   string = "F101"
-	F_ORCHID        string = "F102"
-	F_CHRYSANTHEMUM string = "F103"
-	F_BAMBOO        string = "F104"
-	F_SPRING        string = "F105"
-	F_SUMMER        string = "F106"
-	F_AUTUMN        string = "F107"
-	F_WINTER        string = "F108"
+	F_ORCHID        string = "F103"
+	F_CHRYSANTHEMUM string = "F105"
+	F_BAMBOO        string = "F107"
+	F_SPRING        string = "F109"
+	F_SUMMER        string = "F111"
+	F_AUTUMN        string = "F113"
+	F_WINTER        string = "F115"
 )
 
 func NewTile(src string) Tile {

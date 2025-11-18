@@ -89,11 +89,9 @@ func (m *MahjongTable) Play() {
 				m.MahjongService.Pusher().Push(&mt)
 				dz := len(m.Discharged)
 				if dz <= 3 {
-					core.AppLog.Printf("discharged %v\n", m.Discharged)
 					md := MahjongDischargeEvent{D: m.Discharged}
 					m.MahjongService.Pusher().Push(&md)
 				} else {
-					core.AppLog.Printf("x discharged %v\n", m.Discharged[(dz-3):])
 					md := MahjongDischargeEvent{D: m.Discharged[(dz - 3):]}
 					m.MahjongService.Pusher().Push(&md)
 				}
@@ -194,7 +192,6 @@ func (m *MahjongTable) Discharge(seat int, t int) error {
 	if err != nil {
 		return err
 	}
-	//m.Players[seat] = mp
 	m.Discharged = append(m.Discharged, drop)
 	return nil
 }
@@ -220,7 +217,6 @@ func (m *MahjongTable) deal(p int) error {
 	}
 	sz = len(mp.Flowers)
 	if fz == sz {
-		//m.Players[p] = mp
 		return nil
 	}
 	fz = sz
@@ -235,6 +231,5 @@ func (m *MahjongTable) deal(p int) error {
 		}
 		fz = sz
 	}
-	//m.Players[p] = mp
 	return nil
 }

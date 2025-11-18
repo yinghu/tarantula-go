@@ -15,11 +15,13 @@ type HandListener interface {
 }
 
 type Hand struct {
-	Formed    []Meld       `json:"Formed"`
-	Tiles     []Tile       `json:"Tiles"`
-	Flowers   []Tile       `json:"Flowers"`
-	MaxClaims int          `json:"-"`
-	Listener  HandListener `json:"-"`
+	Formed         []Meld       `json:"Formed"`
+	Tiles          []Tile       `json:"Tiles"`
+	Flowers        []Tile       `json:"Flowers"`
+	MaxClaims      int          `json:"-"`
+	Listener       HandListener `json:"-"`
+	FlowerExcluded bool
+	Sorting        bool
 }
 
 func (h *Hand) New() {
@@ -62,6 +64,18 @@ func (h *Hand) Discharge(discharged int) (Tile, error) {
 	return Tile{}, fmt.Errorf("discharged not existed %d", discharged)
 }
 
+func (h *Hand) Chow() error {
+	return nil
+}
+
+func (h *Hand) Pong() error {
+	return nil
+}
+
+//func (h *Hand) Kong() error{
+//return nil
+//}
+
 func (h *Hand) Draw(deck *Deck) error {
 	t, err := deck.Draw()
 	if err != nil {
@@ -71,12 +85,21 @@ func (h *Hand) Draw(deck *Deck) error {
 }
 
 func (h *Hand) draw(t Tile) error {
-	switch t.Suit {
-	case FLOWER:
-		h.Flowers = append(h.Flowers, t)
-	default:
+	if h.FlowerExcluded {
+		switch t.Suit {
+		case FLOWER:
+			h.Flowers = append(h.Flowers, t)
+		default:
+			h.Tiles = append(h.Tiles, t)
+			if h.Sorting {
+				slices.SortFunc(h.Tiles, cmp)
+			}
+		}
+	} else {
 		h.Tiles = append(h.Tiles, t)
-		slices.SortFunc(h.Tiles, cmp)
+		if h.Sorting {
+			slices.SortFunc(h.Tiles, cmp)
+		}
 	}
 	if h.Listener == nil {
 		return nil

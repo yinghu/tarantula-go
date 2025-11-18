@@ -67,8 +67,8 @@ func TestSuit(t *testing.T) {
 
 	f3 := Tile{}
 	f3.From(F_CHRYSANTHEMUM)
-	if f3.Rank != 103 {
-		t.Errorf("value should be 103 %d", f3.Rank)
+	if f3.Rank != 105 {
+		t.Errorf("value should be 105 %d", f3.Rank)
 	}
 	if f3.Suit != "F" {
 		t.Errorf("SUIT should be F %s", f3.Suit)
