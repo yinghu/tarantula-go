@@ -1,10 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"slices"
 
-	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
 
@@ -23,6 +22,8 @@ type MahjongPlayer struct {
 	R        []mj.Tile `json:"-"` //red
 	G        []mj.Tile `json:"-"` //green
 	W        []mj.Tile `json:"-"` //white
+
+	Pusher event.Pusher
 }
 
 func (mp *MahjongPlayer) Reset() {
@@ -40,7 +41,6 @@ func (mp *MahjongPlayer) Reset() {
 }
 
 func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
-	core.AppLog.Printf("Draw %v\n", t)
 	if !mp.Auto {
 		return
 	}
@@ -71,8 +71,12 @@ func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
 	}
 }
 func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
-	core.AppLog.Printf("Drop %v\n", t)
 	if !mp.Auto {
+		if t.Suit == mj.FLOWER {
+			//KNOG EVENT TO PLAYER
+			mt := MahjongKnogEvent{SystemId: mp.SystemId, Knog: t.Seq}
+			mp.Pusher.Push(&mt)
+		}
 		return
 	}
 
@@ -143,7 +147,6 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 	}
 }
 func (mp *MahjongPlayer) OnKnog(t mj.Tile) {
-	core.AppLog.Printf("Know %v\n", t)
 	if !mp.Auto {
 		return
 	}
@@ -175,11 +178,11 @@ func (mp *MahjongPlayer) OnKnog(t mj.Tile) {
 	}
 }
 func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
-	fmt.Printf("tile melt %v\n", m)
+
 }
 
-func NewPlayer(seat string, sorting bool) *MahjongPlayer {
-	mp := MahjongPlayer{Seat: seat, Auto: true}
+func NewPlayer(seat string, sorting bool, pusher event.Pusher) *MahjongPlayer {
+	mp := MahjongPlayer{Seat: seat, Auto: true, Pusher: pusher}
 	mp.Hand = mj.Hand{Listener: &mp, Sorting: sorting}
 	mp.Hand.New()
 	mp.B = make([]mj.Tile, 0)
