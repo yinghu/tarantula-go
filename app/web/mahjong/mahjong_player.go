@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/mj"
 )
 
@@ -67,11 +68,13 @@ func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
 			mp.W = append(mp.W, t)
 		}
 	}
+	core.AppLog.Printf("Draw %v\n", t)
 }
 func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 	if !mp.Auto {
 		return
 	}
+	core.AppLog.Printf("Drop %v\n", t)
 	switch t.Suit {
 	case mj.BAMBOO:
 		for i := range mp.B {
@@ -142,6 +145,7 @@ func (mp *MahjongPlayer) OnKnog(t mj.Tile) {
 	if !mp.Auto {
 		return
 	}
+	core.AppLog.Printf("Know %v\n", t)
 	switch t.Suit {
 	case mj.BAMBOO:
 		mp.B = append(mp.B, t)
@@ -172,7 +176,7 @@ func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
 	fmt.Printf("tile melt %v\n", m)
 }
 
-func NewPlayer(seat string,sorting bool) *MahjongPlayer {
+func NewPlayer(seat string, sorting bool) *MahjongPlayer {
 	mp := MahjongPlayer{Seat: seat, Auto: true}
 	mp.Hand = mj.Hand{Listener: &mp, Sorting: sorting}
 	mp.Hand.New()

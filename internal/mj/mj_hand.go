@@ -78,19 +78,15 @@ func (h *Hand) Pong() error {
 	return nil
 }
 
-//func (h *Hand) Kong() error{
-//return nil
-//}
-
 func (h *Hand) Draw(deck *Deck) error {
 	t, err := deck.Draw()
 	if err != nil {
 		return err
 	}
-	return h.draw(t)
+	return h.draw(t, false)
 }
 
-func (h *Hand) draw(t Tile) error {
+func (h *Hand) draw(t Tile, knog bool) error {
 	if h.FlowerExcluded {
 		switch t.Suit {
 		case FLOWER:
@@ -110,27 +106,19 @@ func (h *Hand) draw(t Tile) error {
 	if h.Listener == nil {
 		return nil
 	}
-	h.Listener.OnDraw(t)
+	if knog {
+		h.Listener.OnKnog(t)
+	} else {
+		h.Listener.OnDraw(t)
+	}
 	return nil
 }
-
 func (h *Hand) Knog(deck *Deck) error {
 	t, err := deck.Kong()
 	if err != nil {
 		return err
 	}
-	switch t.Suit {
-	case FLOWER:
-		h.Flowers = append(h.Flowers, t)
-	default:
-		h.Tiles = append(h.Tiles, t)
-		slices.SortFunc(h.Tiles, cmp)
-	}
-	if h.Listener == nil {
-		return nil
-	}
-	h.Listener.OnKnog(t)
-	return nil
+	return h.draw(t, true)
 }
 
 func (h *Hand) Mahjong() bool {
