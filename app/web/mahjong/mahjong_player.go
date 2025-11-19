@@ -3,6 +3,7 @@ package main
 import (
 	"slices"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
@@ -41,32 +42,39 @@ func (mp *MahjongPlayer) Reset() {
 }
 
 func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
-	if !mp.Auto {
-		return
-	}
 	switch t.Suit {
 	case mj.BAMBOO:
 		mp.B = append(mp.B, t)
+		mp.checkKong(mp.B, false)
 	case mj.CHARACTER:
 		mp.C = append(mp.C, t)
+		mp.checkKong(mp.C, false)
 	case mj.DOTS:
 		mp.D = append(mp.D, t)
+		mp.checkKong(mp.D, false)
 	case mj.HORNOR:
 		switch t.Name() {
 		case mj.EAST:
 			mp.HE = append(mp.HE, t)
+			mp.checkKong(mp.HE, true)
 		case mj.SOUTH:
 			mp.HS = append(mp.HS, t)
+			mp.checkKong(mp.HS, true)
 		case mj.WEST:
 			mp.HW = append(mp.HW, t)
+			mp.checkKong(mp.HW, true)
 		case mj.NORTH:
 			mp.HN = append(mp.HN, t)
+			mp.checkKong(mp.HN, true)
 		case mj.RED:
 			mp.R = append(mp.R, t)
+			mp.checkKong(mp.R, true)
 		case mj.GREEN:
 			mp.G = append(mp.G, t)
+			mp.checkKong(mp.G, true)
 		case mj.WHITE:
 			mp.W = append(mp.W, t)
+			mp.checkKong(mp.W, true)
 		}
 	}
 }
@@ -78,9 +86,7 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 			mt := MahjongKnogEvent{SystemId: mp.SystemId, Knog: t.Seq}
 			mp.Pusher.Push(&mt)
 		}
-		return
 	}
-
 	switch t.Suit {
 	case mj.BAMBOO:
 		for i := range mp.B {
@@ -148,10 +154,6 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 	}
 }
 func (mp *MahjongPlayer) OnKnog(t mj.Tile) {
-	if !mp.Auto {
-		return
-	}
-
 	switch t.Suit {
 	case mj.BAMBOO:
 		mp.B = append(mp.B, t)
@@ -179,6 +181,20 @@ func (mp *MahjongPlayer) OnKnog(t mj.Tile) {
 	}
 }
 func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
+
+}
+
+func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
+	core.AppLog.Printf("Check list %v\n", clist)
+	if !hornor {
+		
+		return
+	}
+	if len(clist) == 4 {
+		mp.PendingKong = clist[0].Seq
+		mt := MahjongKnogEvent{SystemId: mp.SystemId, Knog: clist[0].Seq}
+		mp.Pusher.Push(&mt)	
+	}
 
 }
 
