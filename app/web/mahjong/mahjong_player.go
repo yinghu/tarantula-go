@@ -40,6 +40,7 @@ func (mp *MahjongPlayer) Reset() {
 }
 
 func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
+	core.AppLog.Printf("Draw %v\n", t)
 	if !mp.Auto {
 		return
 	}
@@ -68,13 +69,13 @@ func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
 			mp.W = append(mp.W, t)
 		}
 	}
-	core.AppLog.Printf("Draw %v\n", t)
 }
 func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
+	core.AppLog.Printf("Drop %v\n", t)
 	if !mp.Auto {
 		return
 	}
-	core.AppLog.Printf("Drop %v\n", t)
+
 	switch t.Suit {
 	case mj.BAMBOO:
 		for i := range mp.B {
@@ -142,10 +143,11 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 	}
 }
 func (mp *MahjongPlayer) OnKnog(t mj.Tile) {
+	core.AppLog.Printf("Know %v\n", t)
 	if !mp.Auto {
 		return
 	}
-	core.AppLog.Printf("Know %v\n", t)
+
 	switch t.Suit {
 	case mj.BAMBOO:
 		mp.B = append(mp.B, t)
