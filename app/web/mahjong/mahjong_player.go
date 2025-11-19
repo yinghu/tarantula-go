@@ -91,19 +91,19 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 	case mj.BAMBOO:
 		for i := range mp.B {
 			if mp.B[i] == t {
-				mp.B = slices.Delete(mp.B, i, i)
+				mp.B = slices.Delete(mp.B, i, i+1)
 			}
 		}
 	case mj.CHARACTER:
 		for i := range mp.C {
 			if mp.C[i] == t {
-				mp.C = slices.Delete(mp.C, i, i)
+				mp.C = slices.Delete(mp.C, i, i+1)
 			}
 		}
 	case mj.DOTS:
 		for i := range mp.D {
 			if mp.D[i] == t {
-				mp.D = slices.Delete(mp.D, i, i)
+				mp.D = slices.Delete(mp.D, i, i+1)
 			}
 		}
 	case mj.HORNOR:
@@ -111,74 +111,50 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 		case mj.EAST:
 			for i := range mp.HE {
 				if mp.HE[i] == t {
-					mp.HE = slices.Delete(mp.HE, i, i)
+					mp.HE = slices.Delete(mp.HE, i, i+1)
 				}
 			}
 		case mj.SOUTH:
 			for i := range mp.HS {
 				if mp.HS[i] == t {
-					mp.HS = slices.Delete(mp.HS, i, i)
+					mp.HS = slices.Delete(mp.HS, i, i+1)
 				}
 			}
 		case mj.WEST:
 			for i := range mp.HW {
 				if mp.HW[i] == t {
-					mp.HW = slices.Delete(mp.HW, i, i)
+					mp.HW = slices.Delete(mp.HW, i, i+1)
 				}
 			}
 		case mj.NORTH:
 			for i := range mp.HN {
 				if mp.HN[i] == t {
-					mp.HN = slices.Delete(mp.HN, i, i)
+					mp.HN = slices.Delete(mp.HN, i, i+1)
 				}
 			}
 		case mj.RED:
 			for i := range mp.R {
 				if mp.R[i] == t {
-					mp.R = slices.Delete(mp.R, i, i)
+					mp.R = slices.Delete(mp.R, i, i+1)
 				}
 			}
 		case mj.GREEN:
 			for i := range mp.G {
 				if mp.G[i] == t {
-					mp.G = slices.Delete(mp.G, i, i)
+					mp.G = slices.Delete(mp.G, i, i+1)
 				}
 			}
 		case mj.WHITE:
 			for i := range mp.W {
 				if mp.W[i] == t {
-					mp.W = slices.Delete(mp.W, i, i)
+					mp.W = slices.Delete(mp.W, i, i+1)
 				}
 			}
 		}
 	}
 }
 func (mp *MahjongPlayer) OnKnog(t mj.Tile) {
-	switch t.Suit {
-	case mj.BAMBOO:
-		mp.B = append(mp.B, t)
-	case mj.CHARACTER:
-		mp.C = append(mp.C, t)
-	case mj.DOTS:
-		mp.D = append(mp.D, t)
-	case mj.HORNOR:
-		switch t.Name() {
-		case mj.EAST:
-			mp.HE = append(mp.HE, t)
-		case mj.SOUTH:
-			mp.HS = append(mp.HS, t)
-		case mj.WEST:
-			mp.HW = append(mp.HW, t)
-		case mj.NORTH:
-			mp.HN = append(mp.HN, t)
-		case mj.RED:
-			mp.R = append(mp.R, t)
-		case mj.GREEN:
-			mp.G = append(mp.G, t)
-		case mj.WHITE:
-			mp.W = append(mp.W, t)
-		}
-	}
+	mp.OnDraw(t)
 }
 func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
 
@@ -187,13 +163,13 @@ func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
 func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
 	core.AppLog.Printf("Check list %v\n", clist)
 	if !hornor {
-		
+
 		return
 	}
 	if len(clist) == 4 {
 		mp.PendingKong = clist[0].Seq
 		mt := MahjongKnogEvent{SystemId: mp.SystemId, Knog: clist[0].Seq}
-		mp.Pusher.Push(&mt)	
+		mp.Pusher.Push(&mt)
 	}
 
 }
