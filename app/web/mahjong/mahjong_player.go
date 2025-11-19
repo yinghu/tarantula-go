@@ -8,22 +8,22 @@ import (
 )
 
 type MahjongPlayer struct {
-	SystemId int64  `json:"SystemId,string"`
-	Seat     string `json:"Seat"`
-	mj.Hand  `json:"Hand"`
-	Auto     bool      `json:"Auto"`
-	B        []mj.Tile `json:"-"` //bamboo
-	C        []mj.Tile `json:"-"` //character
-	D        []mj.Tile `json:"-"` //dots
-	HE       []mj.Tile `json:"-"` //east
-	HS       []mj.Tile `json:"-"` //south
-	HW       []mj.Tile `json:"-"` //west
-	HN       []mj.Tile `json:"-"` //north
-	R        []mj.Tile `json:"-"` //red
-	G        []mj.Tile `json:"-"` //green
-	W        []mj.Tile `json:"-"` //white
-
-	Pusher event.Pusher
+	SystemId    int64  `json:"SystemId,string"`
+	Seat        string `json:"Seat"`
+	mj.Hand     `json:"Hand"`
+	Auto        bool      `json:"Auto"`
+	B           []mj.Tile `json:"-"` //bamboo
+	C           []mj.Tile `json:"-"` //character
+	D           []mj.Tile `json:"-"` //dots
+	HE          []mj.Tile `json:"-"` //east
+	HS          []mj.Tile `json:"-"` //south
+	HW          []mj.Tile `json:"-"` //west
+	HN          []mj.Tile `json:"-"` //north
+	R           []mj.Tile `json:"-"` //red
+	G           []mj.Tile `json:"-"` //green
+	W           []mj.Tile `json:"-"` //white
+	PendingKong int
+	Pusher      event.Pusher
 }
 
 func (mp *MahjongPlayer) Reset() {
@@ -74,6 +74,7 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 	if !mp.Auto {
 		if t.Suit == mj.FLOWER {
 			//KNOG EVENT TO PLAYER
+			mp.PendingKong = t.Seq
 			mt := MahjongKnogEvent{SystemId: mp.SystemId, Knog: t.Seq}
 			mp.Pusher.Push(&mt)
 		}

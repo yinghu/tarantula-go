@@ -79,6 +79,15 @@ func (m *MahjongTable) Play() {
 				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand}
 				m.MahjongService.Pusher().Push(&mt)
 			}
+		case CMD_KONG:
+			err := m.Knog(t.Seat)
+			if err != nil {
+				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
+				m.MahjongService.Pusher().Push(&mr)
+			} else {
+				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand}
+				m.MahjongService.Pusher().Push(&mt)
+			}
 		case CMD_DISCHARGE:
 			err := m.Discharge(t.Seat, t.Discharged)
 			if err != nil {
@@ -180,6 +189,18 @@ func (m *MahjongTable) Deal() error {
 
 func (m *MahjongTable) Draw(seat int) error {
 	return m.deal(seat)
+}
+func (m *MahjongTable) Knog(seat int) error {
+	mp := m.Players[seat]
+	if mp.PendingKong == 0 {
+		return fmt.Errorf("no pending kong %d", mp.PendingKong)
+	}
+	err := mp.Knog(&m.Setup.Deck)
+	if err != nil {
+		return err
+	}
+	mp.PendingKong = 0
+	return nil
 }
 
 func (m *MahjongTable) Discharge(seat int, t int) error {
