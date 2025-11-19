@@ -1,12 +1,10 @@
 package mj
 
 import (
+	"fmt"
 	"slices"
 	"testing"
 )
-
-
-
 
 func TestSlice(t *testing.T) {
 	ts := make([]Tile, 0)
@@ -43,9 +41,20 @@ func TestSlice(t *testing.T) {
 	if xs[2] != d1 {
 		t.Errorf("third should be d 1")
 	}
+	//xs = slices.Delete(2)
+	for i := range xs {
+		fmt.Printf("%d %v\n", i, xs[i])
+		if xs[i] == d2 {
+			if i == xz-1 {
+				xs = xs[:xz-1]
+			} else {
+				xs = slices.Delete(xs, i, i+1)
+			}
+			break
+		}
+	}
+	fmt.Printf("DEL %v\n", xs)
 }
-
-
 
 func TestSuit(t *testing.T) {
 	d1 := Tile{}
@@ -125,7 +134,6 @@ func TestShuffle(t *testing.T) {
 	}
 }
 
-
 func TestHandStart(t *testing.T) {
 	s := Deck{}
 	s.New()
@@ -141,12 +149,11 @@ func TestHandStart(t *testing.T) {
 		t.Errorf("should be error")
 	}
 	dt := s.Dice()
-	if dt[0]<=0 || dt[1]<=0 {
-		t.Errorf("should not be zero or nagtive %d, %d",dt[0],dt[1])
+	if dt[0] <= 0 || dt[1] <= 0 {
+		t.Errorf("should not be zero or nagtive %d, %d", dt[0], dt[1])
 	}
-	if dt[0]>6 || dt[1]>6 {
-		t.Errorf("should not be more than 6 %d, %d",dt[0],dt[1])
+	if dt[0] > 6 || dt[1] > 6 {
+		t.Errorf("should not be more than 6 %d, %d", dt[0], dt[1])
 	}
 
 }
-

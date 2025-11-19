@@ -24,6 +24,7 @@ func (s *SampleCallback) Push(e event.Event) {
 }
 
 func TestMahjongTable(t *testing.T) {
+	core.CreateTestLog()
 	mt := MahjongTable{Pusher: &SampleCallback{}}
 	mt.New()
 	mt.Sit(1, SEAT_E)

@@ -98,6 +98,7 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 					} else {
 						mp.B = slices.Delete(mp.B, i, i+1)
 					}
+					break
 				}
 			}
 		}
@@ -111,6 +112,7 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 					} else {
 						mp.C = slices.Delete(mp.C, i, i+1)
 					}
+					break
 				}
 			}
 		}
@@ -124,6 +126,7 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 					} else {
 						mp.D = slices.Delete(mp.D, i, i+1)
 					}
+					break
 				}
 			}
 		}
@@ -139,6 +142,7 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 						} else {
 							mp.HE = slices.Delete(mp.HE, i, i+1)
 						}
+						break
 					}
 				}
 			}
@@ -152,6 +156,7 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 						} else {
 							mp.HS = slices.Delete(mp.HS, i, i+1)
 						}
+						break
 					}
 				}
 			}
@@ -165,6 +170,7 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 						} else {
 							mp.HW = slices.Delete(mp.HW, i, i+1)
 						}
+						break
 					}
 				}
 			}
@@ -178,6 +184,7 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 						} else {
 							mp.HN = slices.Delete(mp.HN, i, i+1)
 						}
+						break
 					}
 				}
 			}
@@ -191,6 +198,7 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 						} else {
 							mp.R = slices.Delete(mp.R, i, i+1)
 						}
+						break
 					}
 				}
 			}
@@ -204,6 +212,7 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 						} else {
 							mp.G = slices.Delete(mp.G, i, i+1)
 						}
+						break
 					}
 				}
 			}
@@ -217,6 +226,7 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 						} else {
 							mp.W = slices.Delete(mp.W, i, i+1)
 						}
+						break
 					}
 				}
 			}
