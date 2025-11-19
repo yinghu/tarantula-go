@@ -7,7 +7,7 @@ import (
 
 type MahjongKnogEvent struct {
 	SystemId int64
-	Knog     int
+	Knog     []int
 	event.EventObj
 }
 
@@ -23,8 +23,14 @@ func (s *MahjongKnogEvent) Write(buff core.DataBuffer) error {
 	if err := buff.WriteInt64(s.SystemId); err != nil {
 		return err
 	}
-	if err := buff.WriteInt32(int32(s.Knog)); err != nil {
+	sz := len(s.Knog)
+	if err := buff.WriteInt32(int32(sz)); err != nil {
 		return err
+	}
+	for i := range s.Knog {
+		if err := buff.WriteInt32(int32(s.Knog[i])); err != nil {
+			return err
+		}
 	}
 	return nil
 }

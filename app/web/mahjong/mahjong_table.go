@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -52,7 +53,7 @@ func (m *MahjongTable) Play() {
 		if t.Cmd == CMD_END {
 			break
 		}
-		core.AppLog.Printf("Token seat: %d discharged: %d cmd: %d \n", t.Seat, t.Discharged, t.Cmd)
+		core.AppLog.Printf("Token seat: %d selected : %d cmd: %d \n", t.Seat, t.Selected, t.Cmd)
 		switch t.Cmd {
 		case CMD_SIT:
 			err := m.Sit(t.SystemId, t.Seat)
@@ -81,7 +82,7 @@ func (m *MahjongTable) Play() {
 				m.Push(&mt)
 			}
 		case CMD_KONG:
-			err := m.Knog(t.Seat)
+			err := m.Knog(t.Seat, t.Selected)
 			if err != nil {
 				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
 				m.Push(&mr)
@@ -90,7 +91,7 @@ func (m *MahjongTable) Play() {
 				m.Push(&mt)
 			}
 		case CMD_DISCHARGE:
-			err := m.Discharge(t.Seat, t.Discharged)
+			err := m.Discharge(t.Seat, t.Selected)
 			if err != nil {
 				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
 				m.Push(&mr)
@@ -191,17 +192,28 @@ func (m *MahjongTable) Deal() error {
 func (m *MahjongTable) Draw(seat int) error {
 	return m.deal(seat)
 }
-func (m *MahjongTable) Knog(seat int) error {
+func (m *MahjongTable) Knog(seat int, knog int) error {
 	mp := m.Players[seat]
-	if mp.PendingKong == 0 {
-		return fmt.Errorf("no pending kong %d", mp.PendingKong)
+	sz := len(mp.PendingKongs)
+	if sz == 0 {
+		return fmt.Errorf("no pending kong %d", sz)
 	}
-	err := mp.Knog(&m.Setup.Deck)
-	if err != nil {
-		return err
+	deleted := false
+	for i := range mp.PendingKongs {
+		if knog == mp.PendingKongs[i] {
+			if i == sz-1 {
+				mp.PendingKongs = mp.PendingKongs[:sz-1]
+			} else {
+				mp.PendingKongs = slices.Delete(mp.PendingKongs, i, i+1)
+			}
+			deleted = true
+			break
+		}
 	}
-	mp.PendingKong = 0
-	return nil
+	if !deleted {
+		return fmt.Errorf("no pending kong %d", knog)
+	}
+	return mp.Knog(&m.Setup.Deck)
 }
 
 func (m *MahjongTable) Discharge(seat int, t int) error {
