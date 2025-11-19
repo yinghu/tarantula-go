@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
 
@@ -17,22 +18,22 @@ const (
 )
 
 type MahjongTable struct {
-	Id              int64             `json:"Id,string"`
-	Setup           mj.ClassicMahjong `json:"-"`
-	Players         [4]*MahjongPlayer `json:"Players"`
-	Pts             int               `json:"Pts"`
-	Discharged      []mj.Tile         `json:"Discharged"`
-	Started         bool
-	Turn            chan MahjongPlayToken `json:"-"`
-	*MahjongService `json:"-"`
+	Id           int64             `json:"Id,string"`
+	Setup        mj.ClassicMahjong `json:"-"`
+	Players      [4]*MahjongPlayer `json:"Players"`
+	Pts          int               `json:"Pts"`
+	Discharged   []mj.Tile         `json:"Discharged"`
+	Started      bool
+	Turn         chan MahjongPlayToken `json:"-"`
+	event.Pusher `json:"-"`
 }
 
 func (m *MahjongTable) New() {
 	m.Setup.New()
-	m.Players[SEAT_E] = NewPlayer("East", true, m.Pusher())
-	m.Players[SEAT_S] = NewPlayer("South", true, m.Pusher())
-	m.Players[SEAT_W] = NewPlayer("West", true, m.Pusher())
-	m.Players[SEAT_N] = NewPlayer("North", true, m.Pusher())
+	m.Players[SEAT_E] = NewPlayer("East", true, m)
+	m.Players[SEAT_S] = NewPlayer("South", true, m)
+	m.Players[SEAT_W] = NewPlayer("West", true, m)
+	m.Players[SEAT_N] = NewPlayer("North", true, m)
 	m.Discharged = make([]mj.Tile, 0)
 	m.Turn = make(chan MahjongPlayToken, 3)
 }
@@ -57,52 +58,52 @@ func (m *MahjongTable) Play() {
 			err := m.Sit(t.SystemId, t.Seat)
 			if err != nil {
 				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
-				m.MahjongService.Pusher().Push(&mr)
+				m.Push(&mr)
 			} else {
 				mt := MahjongSitEvent{SystemId: t.SystemId, TableId: m.Id, Seat: int32(t.Seat)}
-				m.MahjongService.Pusher().Push(&mt)
+				m.Push(&mt)
 			}
 		case CMD_DICE:
 			dice := m.Dice()
 			mt := MahjongDiceEvent{Dice1: int32(dice[0]), Dice2: int32(dice[1])}
-			m.MahjongService.Pusher().Push(&mt)
+			m.Push(&mt)
 		case CMD_DEAL:
 			m.Deal()
 			mt := MahjongHandEvent{H: m.Players[t.Seat].Hand}
-			m.MahjongService.Pusher().Push(&mt)
+			m.Push(&mt)
 		case CMD_DRAW:
 			err := m.Draw(t.Seat)
 			if err != nil {
 				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
-				m.MahjongService.Pusher().Push(&mr)
+				m.Push(&mr)
 			} else {
 				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand}
-				m.MahjongService.Pusher().Push(&mt)
+				m.Push(&mt)
 			}
 		case CMD_KONG:
 			err := m.Knog(t.Seat)
 			if err != nil {
 				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
-				m.MahjongService.Pusher().Push(&mr)
+				m.Push(&mr)
 			} else {
 				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand}
-				m.MahjongService.Pusher().Push(&mt)
+				m.Push(&mt)
 			}
 		case CMD_DISCHARGE:
 			err := m.Discharge(t.Seat, t.Discharged)
 			if err != nil {
 				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
-				m.MahjongService.Pusher().Push(&mr)
+				m.Push(&mr)
 			} else {
 				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand}
-				m.MahjongService.Pusher().Push(&mt)
+				m.Push(&mt)
 				dz := len(m.Discharged)
 				if dz <= 3 {
 					md := MahjongDischargeEvent{D: m.Discharged}
-					m.MahjongService.Pusher().Push(&md)
+					m.Push(&md)
 				} else {
 					md := MahjongDischargeEvent{D: m.Discharged[(dz - 3):]}
-					m.MahjongService.Pusher().Push(&md)
+					m.Push(&md)
 				}
 			}
 		case CMD_CLAIM:
@@ -111,11 +112,11 @@ func (m *MahjongTable) Play() {
 			if claimed {
 				mt.Formed = append(mt.Formed, m.Players[t.Seat].Formed...)
 			}
-			m.MahjongService.Pusher().Push(&mt)
+			m.Push(&mt)
 		case CMD_RESET:
 			m.Reset()
 			mt := MahjongResetEvent{Started: false}
-			m.MahjongService.Pusher().Push(&mt)
+			m.Push(&mt)
 		}
 
 	}

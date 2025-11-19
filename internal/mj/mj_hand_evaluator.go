@@ -35,7 +35,7 @@ func (e *Evaluator) Evaluate(h *Hand) []Meld {
 
 		pong := hx.Pong()
 		for _, m := range pong {
-			nx := EvaluationNode{PendingHand: hx.AfterFormed(m), Formed: n.Form(m), Type: PONG}
+			nx := EvaluationNode{PendingHand: hx.AfterFormed(m), Formed: n.Form(m), Type: PUNG}
 			e.Queue.Next(nx)
 		}
 

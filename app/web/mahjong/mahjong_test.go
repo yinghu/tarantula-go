@@ -19,8 +19,12 @@ func (s *SampleCallback) OnEvent(e event.Event) {
 	fmt.Printf("On event %v\n", e)
 }
 
+func (s *SampleCallback) Push(e event.Event) {
+
+}
+
 func TestMahjongTable(t *testing.T) {
-	mt := MahjongTable{}
+	mt := MahjongTable{Pusher: &SampleCallback{}}
 	mt.New()
 	mt.Sit(1, SEAT_E)
 	mt.Sit(2, SEAT_S)
@@ -83,12 +87,12 @@ func TestMahjongAutoTable(t *testing.T) {
 			if pz != 13 {
 				t.Errorf("player hand should be 13 %d", pz)
 			}
-			fmt.Printf("X Tiles %v\n",mt.Players[i].Tiles)
+			fmt.Printf("X Tiles %v\n", mt.Players[i].Tiles)
 			err = mt.Draw(i)
 			if err != nil {
 				t.Errorf("shoud not be error %s", err.Error())
 			}
-			fmt.Printf("Y Tiles %v\n",mt.Players[i].Tiles)
+			fmt.Printf("Y Tiles %v\n", mt.Players[i].Tiles)
 			hz := len(mt.Players[i].Tiles)
 			if hz != 14 {
 				t.Errorf("hand size should be 14 %d", hz)
@@ -138,12 +142,10 @@ func TestMahjongTableIndex(t *testing.T) {
 	mx.Dice()
 	mx.Deal()
 	tx := mt.Players[SEAT_E].Hand.Tiles[0]
-	fmt.Printf("%v\n",mt.Players[SEAT_E].Hand.Tiles)
-	fmt.Printf("%v\n",mx.Players[SEAT_E].Hand.Tiles)
-	mx.Discharge(SEAT_E,tx.Seq)
-	fmt.Printf("%v\n",mt.Players[SEAT_E].Hand.Tiles)
-	fmt.Printf("%v\n",mx.Players[SEAT_E].Hand.Tiles)
+	fmt.Printf("%v\n", mt.Players[SEAT_E].Hand.Tiles)
+	fmt.Printf("%v\n", mx.Players[SEAT_E].Hand.Tiles)
+	mx.Discharge(SEAT_E, tx.Seq)
+	fmt.Printf("%v\n", mt.Players[SEAT_E].Hand.Tiles)
+	fmt.Printf("%v\n", mx.Players[SEAT_E].Hand.Tiles)
 
-
-	
 }

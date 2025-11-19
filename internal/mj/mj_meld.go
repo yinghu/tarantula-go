@@ -7,7 +7,7 @@ const (
 	NONE uint8 = 0
 	EYE  uint8 = 1
 	CHOW uint8 = 2
-	PONG uint8 = 3
+	PUNG uint8 = 3
 	KNOG uint8 = 4
 )
 
@@ -22,7 +22,7 @@ func (m *Meld) Type() int32 {
 	if m.Chow() {
 		return 2
 	}
-	if m.Pong() {
+	if m.Pung() {
 		return 3
 	}
 	if m.Kong() {
@@ -45,7 +45,7 @@ func (m *Meld) Chow() bool {
 	return m.Tiles[0].Suit == m.Tiles[1].Suit && m.Tiles[1].Suit == m.Tiles[2].Suit && m.Tiles[0].Rank+1 == m.Tiles[1].Rank && m.Tiles[1].Rank+1 == m.Tiles[2].Rank
 }
 
-func (m *Meld) Pong() bool {
+func (m *Meld) Pung() bool {
 	if len(m.Tiles) != 3 {
 		return false
 	}

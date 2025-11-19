@@ -43,12 +43,12 @@ func TestPongMeld(t *testing.T) {
 	d1 := Tile{Suit: "D", Rank: 1}
 	p := []Tile{d1, d1, d1}
 	m := Meld{Tiles: p}
-	if !m.Pong() {
+	if !m.Pung() {
 		t.Errorf("should be a pong")
 	}
 	
 	m.Tiles = append(m.Tiles, d1)
-	if m.Pong() {
+	if m.Pung() {
 		t.Errorf("should not be a pong")
 	}
 

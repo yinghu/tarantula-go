@@ -74,7 +74,7 @@ func (h *Hand) Chow() error {
 	return nil
 }
 
-func (h *Hand) Pong() error {
+func (h *Hand) Pung() error {
 	return nil
 }
 
