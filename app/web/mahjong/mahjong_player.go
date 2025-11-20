@@ -77,15 +77,20 @@ func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
 			mp.W = append(mp.W, t)
 			mp.checkKong(mp.W, true)
 		}
+	case mj.FLOWER:
+		mp.PendingKongs = append(mp.PendingKongs, t.Seq)
+		mt := MahjongKnogEvent{SystemId: mp.SystemId, Knog: mp.PendingKongs}
+		mp.Pusher.Push(&mt)
 	}
+
 }
 func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 	if !mp.Auto {
 		if t.Suit == mj.FLOWER {
 			//KNOG EVENT TO PLAYER
-			mp.PendingKongs = append(mp.PendingKongs, t.Seq)
-			mt := MahjongKnogEvent{SystemId: mp.SystemId, Knog: mp.PendingKongs}
-			mp.Pusher.Push(&mt)
+			//mp.PendingKongs = append(mp.PendingKongs, t.Seq)
+			//mt := MahjongKnogEvent{SystemId: mp.SystemId, Knog: mp.PendingKongs}
+			//mp.Pusher.Push(&mt)
 		}
 	}
 	switch t.Suit {
