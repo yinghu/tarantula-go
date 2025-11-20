@@ -27,6 +27,17 @@ type MahjongPlayer struct {
 	Pusher       event.Pusher
 }
 
+func (mp *MahjongPlayer) StartTurn(t *MahjongTable){
+	if !mp.Auto{
+		//mt := MahjongTurnEvent{SystemId: mp.SystemId}
+	}
+}
+func (mp *MahjongPlayer) EndTurn(t *MahjongTable){
+	if !mp.Auto{
+		//mt := MahjongTurnEvent{SystemId: mp.SystemId}
+	}
+}
+
 func (mp *MahjongPlayer) Reset() {
 	mp.Clear()
 	mp.B = mp.B[:0]

@@ -17,6 +17,7 @@ const (
 	SEAT_N int = 3
 
 	HAND_SIZE_THRESHHOLD int = 13
+	TURN_TICKER_SECONDS  int = 30
 )
 
 type MahjongTable struct {
@@ -49,12 +50,20 @@ func (m *MahjongTable) Reset() {
 	m.Discharged = m.Discharged[:0]
 }
 func (m *MahjongTable) Play() {
-	tick := time.NewTicker(10 * time.Second)
+	tick := time.NewTicker(time.Duration(TURN_TICKER_SECONDS) * time.Second)
 	running := true
+	started := false
+	nextTurn := SEAT_E
 	for running {
 		select {
 		case c := <-tick.C:
 			core.AppLog.Printf("Ticker %v\n", c)
+			if !started {
+				continue
+			}
+			core.AppLog.Printf("Turn %d\n", nextTurn%4)
+			//m.Players[nextTurn%4].StartTurn(m)
+			nextTurn++
 		case t := <-m.Turn:
 			if t.Cmd == CMD_END {
 				running = false
@@ -71,6 +80,8 @@ func (m *MahjongTable) Play() {
 					mt := MahjongSitEvent{SystemId: t.SystemId, TableId: m.Id, Seat: int32(t.Seat)}
 					m.Push(&mt)
 				}
+				started = true
+				nextTurn = t.Seat
 			case CMD_DICE:
 				dice := m.Dice()
 				mt := MahjongDiceEvent{Dice1: int32(dice[0]), Dice2: int32(dice[1])}
@@ -129,84 +140,6 @@ func (m *MahjongTable) Play() {
 		}
 	}
 	tick.Stop()
-	close(m.Turn)
-	core.AppLog.Printf("table closed %d\n", m.Id)
-}
-func (m *MahjongTable) Playx() {
-	//tick := time.NewTicker(10*time.Second)
-
-	for t := range m.Turn {
-		if t.Cmd == CMD_END {
-			break
-		}
-		core.AppLog.Printf("Token seat: %d selected : %d cmd: %d \n", t.Seat, t.Selected, t.Cmd)
-		switch t.Cmd {
-		case CMD_SIT:
-			err := m.Sit(t.SystemId, t.Seat)
-			if err != nil {
-				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
-				m.Push(&mr)
-			} else {
-				mt := MahjongSitEvent{SystemId: t.SystemId, TableId: m.Id, Seat: int32(t.Seat)}
-				m.Push(&mt)
-			}
-		case CMD_DICE:
-			dice := m.Dice()
-			mt := MahjongDiceEvent{Dice1: int32(dice[0]), Dice2: int32(dice[1])}
-			m.Push(&mt)
-		case CMD_DEAL:
-			m.Deal()
-			mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
-			m.Push(&mt)
-		case CMD_DRAW:
-			err := m.Draw(t.Seat)
-			if err != nil {
-				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
-				m.Push(&mr)
-			} else {
-				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
-				m.Push(&mt)
-			}
-		case CMD_KONG:
-			err := m.Knog(t.Seat, t.Selected)
-			if err != nil {
-				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
-				m.Push(&mr)
-			} else {
-				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
-				m.Push(&mt)
-			}
-		case CMD_DISCHARGE:
-			err := m.Discharge(t.Seat, t.Selected)
-			if err != nil {
-				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
-				m.Push(&mr)
-			} else {
-				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
-				m.Push(&mt)
-				dz := len(m.Discharged)
-				if dz <= 3 {
-					md := MahjongDischargeEvent{D: m.Discharged}
-					m.Push(&md)
-				} else {
-					md := MahjongDischargeEvent{D: m.Discharged[(dz - 3):]}
-					m.Push(&md)
-				}
-			}
-		case CMD_CLAIM:
-			claimed := m.Claim(t.Seat)
-			mt := MahjongClaimEvent{SystemId: t.SystemId, TableId: m.Id, Seat: int32(t.Seat), Claimed: claimed}
-			if claimed {
-				mt.Formed = append(mt.Formed, m.Players[t.Seat].Formed...)
-			}
-			m.Push(&mt)
-		case CMD_RESET:
-			m.Reset()
-			mt := MahjongResetEvent{Started: false}
-			m.Push(&mt)
-		}
-
-	}
 	close(m.Turn)
 	core.AppLog.Printf("table closed %d\n", m.Id)
 }

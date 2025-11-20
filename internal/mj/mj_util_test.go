@@ -1,6 +1,7 @@
 package mj
 
 import (
+	"fmt"
 	"slices"
 	"testing"
 )
@@ -45,9 +46,9 @@ func TestSlice(t *testing.T) {
 
 		if xs[i] == d1 {
 			//if i == xz-1 {
-				//xs = xs[:xz-1]
+			//xs = xs[:xz-1]
 			//} else {
-				xs = slices.Delete(xs, i, i+1)
+			xs = slices.Delete(xs, i, i+1)
 			//}
 			break
 		}
@@ -55,7 +56,11 @@ func TestSlice(t *testing.T) {
 	if len(xs) != 2 {
 		t.Errorf("len should be 2")
 	}
-	//fmt.Printf("DEL %v\n", xs)
+	turn := 3
+	for i := range 10 {
+		fmt.Printf("turn %d > %d \n", i, turn%4)
+		turn++
+	}
 }
 
 func TestSuit(t *testing.T) {
