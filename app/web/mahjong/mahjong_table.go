@@ -57,7 +57,6 @@ func (m *MahjongTable) Play() {
 	for running {
 		select {
 		case <-tick.C:
-			//core.AppLog.Printf("Ticker %v\n", c)
 			if !started {
 				continue
 			}

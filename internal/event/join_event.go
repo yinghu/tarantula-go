@@ -9,8 +9,9 @@ import (
 type JoinEvent struct {
 	Ticket   string `json:"Ticket"`
 	Client   net.Conn
-	Pending  core.DataBuffer
+	//Pending  core.DataBuffer
 	SystemId int64
+	
 	EventObj
 }
 
