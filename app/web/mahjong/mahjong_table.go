@@ -70,7 +70,7 @@ func (m *MahjongTable) Play() {
 			m.Push(&mt)
 		case CMD_DEAL:
 			m.Deal()
-			mt := MahjongHandEvent{H: m.Players[t.Seat].Hand}
+			mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
 			m.Push(&mt)
 		case CMD_DRAW:
 			err := m.Draw(t.Seat)
@@ -78,7 +78,7 @@ func (m *MahjongTable) Play() {
 				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
 				m.Push(&mr)
 			} else {
-				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand}
+				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
 				m.Push(&mt)
 			}
 		case CMD_KONG:
@@ -87,7 +87,7 @@ func (m *MahjongTable) Play() {
 				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
 				m.Push(&mr)
 			} else {
-				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand}
+				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
 				m.Push(&mt)
 			}
 		case CMD_DISCHARGE:
@@ -96,7 +96,7 @@ func (m *MahjongTable) Play() {
 				mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
 				m.Push(&mr)
 			} else {
-				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand}
+				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
 				m.Push(&mt)
 				dz := len(m.Discharged)
 				if dz <= 3 {
@@ -216,7 +216,7 @@ func (m *MahjongTable) Knog(seat int, knog int) error {
 	if knog > mj.FS_LIMIT {
 		m.Discharge(seat, knog)
 	} else {
-		//4 kind knog / or pung to knog 
+		//4 kind knog / or pung to knog
 	}
 	return mp.Knog(&m.Setup.Deck)
 }
