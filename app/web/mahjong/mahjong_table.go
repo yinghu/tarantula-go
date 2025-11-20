@@ -56,8 +56,8 @@ func (m *MahjongTable) Play() {
 	nextTurn := SEAT_E
 	for running {
 		select {
-		case c := <-tick.C:
-			core.AppLog.Printf("Ticker %v\n", c)
+		case <-tick.C:
+			//core.AppLog.Printf("Ticker %v\n", c)
 			if !started {
 				continue
 			}
