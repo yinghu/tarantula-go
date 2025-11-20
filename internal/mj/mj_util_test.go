@@ -1,7 +1,6 @@
 package mj
 
 import (
-	"fmt"
 	"slices"
 	"testing"
 )
@@ -43,17 +42,20 @@ func TestSlice(t *testing.T) {
 	}
 	//xs = slices.Delete(2)
 	for i := range xs {
-		fmt.Printf("%d %v\n", i, xs[i])
-		if xs[i] == d2 {
-			if i == xz-1 {
-				xs = xs[:xz-1]
-			} else {
+
+		if xs[i] == d1 {
+			//if i == xz-1 {
+				//xs = xs[:xz-1]
+			//} else {
 				xs = slices.Delete(xs, i, i+1)
-			}
+			//}
 			break
 		}
 	}
-	fmt.Printf("DEL %v\n", xs)
+	if len(xs) != 2 {
+		t.Errorf("len should be 2")
+	}
+	//fmt.Printf("DEL %v\n", xs)
 }
 
 func TestSuit(t *testing.T) {

@@ -98,148 +98,97 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 	}
 	switch t.Suit {
 	case mj.BAMBOO:
-		sz := len(mp.B)
-		if sz > 0 {
-			for i := range mp.B {
-				if mp.B[i] == t {
-					if i == sz-1 {
-						mp.B = mp.B[:sz-1]
-					} else {
-						mp.B = slices.Delete(mp.B, i, i+1)
-					}
-					break
-				}
+		for i := range mp.B {
+			if mp.B[i] == t {
+				mp.B = slices.Delete(mp.B, i, i+1)
+				break
 			}
 		}
+
 	case mj.CHARACTER:
-		sz := len(mp.C)
-		if sz > 0 {
-			for i := range mp.C {
-				if mp.C[i] == t {
-					if i == sz-1 {
-						mp.C = mp.C[:sz-1]
-					} else {
-						mp.C = slices.Delete(mp.C, i, i+1)
-					}
-					break
-				}
+
+		for i := range mp.C {
+			if mp.C[i] == t {
+				mp.C = slices.Delete(mp.C, i, i+1)
+				break
 			}
 		}
+
 	case mj.DOTS:
-		sz := len(mp.D)
-		if sz > 0 {
-			for i := range mp.D {
-				if mp.D[i] == t {
-					if i == sz-1 {
-						mp.D = mp.D[:sz-1]
-					} else {
-						mp.D = slices.Delete(mp.D, i, i+1)
-					}
-					break
-				}
+
+		for i := range mp.D {
+			if mp.D[i] == t {
+				mp.D = slices.Delete(mp.D, i, i+1)
+				break
 			}
 		}
+
 	case mj.HORNOR:
 		switch t.Name() {
 		case mj.EAST:
-			sz := len(mp.HE)
-			if sz > 0 {
-				for i := range mp.HE {
-					if mp.HE[i] == t {
-						if i == sz-1 {
-							mp.HE = mp.HE[:sz-1]
-						} else {
-							mp.HE = slices.Delete(mp.HE, i, i+1)
-						}
-						break
-					}
+
+			for i := range mp.HE {
+				if mp.HE[i] == t {
+					mp.HE = slices.Delete(mp.HE, i, i+1)
+					break
 				}
 			}
+
 		case mj.SOUTH:
-			sz := len(mp.HS)
-			if sz > 0 {
-				for i := range mp.HS {
-					if mp.HS[i] == t {
-						if i == sz-1 {
-							mp.HS = mp.HS[:sz-1]
-						} else {
-							mp.HS = slices.Delete(mp.HS, i, i+1)
-						}
-						break
-					}
+
+			for i := range mp.HS {
+				if mp.HS[i] == t {
+					mp.HS = slices.Delete(mp.HS, i, i+1)
+					break
 				}
 			}
+
 		case mj.WEST:
-			sz := len(mp.HW)
-			if sz > 0 {
-				for i := range mp.HW {
-					if mp.HW[i] == t {
-						if i == sz-1 {
-							mp.HW = mp.HW[:sz-1]
-						} else {
-							mp.HW = slices.Delete(mp.HW, i, i+1)
-						}
-						break
-					}
+
+			for i := range mp.HW {
+				if mp.HW[i] == t {
+					mp.HW = slices.Delete(mp.HW, i, i+1)
+					break
 				}
 			}
+
 		case mj.NORTH:
-			sz := len(mp.HN)
-			if sz > 0 {
-				for i := range mp.HN {
-					if mp.HN[i] == t {
-						if i == sz-1 {
-							mp.HN = mp.HN[:sz-1]
-						} else {
-							mp.HN = slices.Delete(mp.HN, i, i+1)
-						}
-						break
-					}
+
+			for i := range mp.HN {
+				if mp.HN[i] == t {
+					mp.HN = slices.Delete(mp.HN, i, i+1)
+					break
 				}
 			}
+
 		case mj.RED:
-			sz := len(mp.R)
-			if sz > 0 {
-				for i := range mp.R {
-					if mp.R[i] == t {
-						if i == sz-1 {
-							mp.R = mp.R[:sz-1]
-						} else {
-							mp.R = slices.Delete(mp.R, i, i+1)
-						}
-						break
-					}
+
+			for i := range mp.R {
+				if mp.R[i] == t {
+					mp.R = slices.Delete(mp.R, i, i+1)
+					break
 				}
 			}
+
 		case mj.GREEN:
-			sz := len(mp.G)
-			if sz > 0 {
-				for i := range mp.G {
-					if mp.G[i] == t {
-						if i == sz-1 {
-							mp.G = mp.G[:sz-1]
-						} else {
-							mp.G = slices.Delete(mp.G, i, i+1)
-						}
-						break
-					}
+
+			for i := range mp.G {
+				if mp.G[i] == t {
+					mp.G = slices.Delete(mp.G, i, i+1)
+					break
 				}
 			}
+
 		case mj.WHITE:
-			sz := len(mp.W)
-			if sz > 0 {
-				for i := range mp.W {
-					if mp.W[i] == t {
-						if i == sz-1 {
-							mp.W = mp.W[:sz-1]
-						} else {
-							mp.W = slices.Delete(mp.W, i, i+1)
-						}
-						break
-					}
+
+			for i := range mp.W {
+				if mp.W[i] == t {
+					mp.W = slices.Delete(mp.W, i, i+1)
+					break
 				}
 			}
 		}
+
 	}
 }
 func (mp *MahjongPlayer) OnKnog(t mj.Tile) {

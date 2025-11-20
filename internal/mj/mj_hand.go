@@ -55,6 +55,7 @@ func (h *Hand) Drop(drop Tile) error {
 func (h *Hand) Discharge(discharged int) (Tile, error) {
 	for i := range h.Tiles {
 		if h.Tiles[i].Seq == discharged {
+			fmt.Printf("index : %d",i)
 			drop := h.Tiles[i]
 			h.Tiles = slices.Delete(h.Tiles, i, i+1)
 			if drop.Suit == FLOWER {
@@ -83,10 +84,10 @@ func (h *Hand) Draw(deck *Deck) error {
 	if err != nil {
 		return err
 	}
-	return h.draw(t, false)
+	return h.append(t, false)
 }
 
-func (h *Hand) draw(t Tile, knog bool) error {
+func (h *Hand) append(t Tile, knog bool) error {
 	if h.FlowerExcluded {
 		switch t.Suit {
 		case FLOWER:
@@ -118,7 +119,7 @@ func (h *Hand) Knog(deck *Deck) error {
 	if err != nil {
 		return err
 	}
-	return h.draw(t, true)
+	return h.append(t, true)
 }
 
 func (h *Hand) Mahjong() bool {

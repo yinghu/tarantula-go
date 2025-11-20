@@ -10,15 +10,18 @@ func TestHand(t *testing.T) {
 	cm.New()
 	h := Hand{}
 	h.New()
-	i := 14
-	for{
-		if i==0{
-			break
-		}
-		h.Draw(&cm.Deck)
-		i--
-	}
+	h.append(NewTile("B1"),false)
+	h.append(NewTile("B2"),false)
+	h.append(NewTile("B3"),false)
 	fmt.Printf("Hand %v\n",h.Tiles)
+	tx := NewTile("B3")
+	td,err := h.Discharge(tx.Seq)
+	if err!=nil{
+		fmt.Printf("Err %s\n",err.Error())
+		return
+	}
+	fmt.Printf("Deleted %v %v\n",td,h.Tiles)
+	
 	//claimed := cm.Mahjong(&h)
 	//if !claimed{
 		//t.Errorf("should be claimed %v",claimed)
