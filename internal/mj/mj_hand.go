@@ -55,7 +55,6 @@ func (h *Hand) Drop(drop Tile) error {
 func (h *Hand) Discharge(discharged int) (Tile, error) {
 	for i := range h.Tiles {
 		if h.Tiles[i].Seq == discharged {
-			fmt.Printf("index : %d",i)
 			drop := h.Tiles[i]
 			h.Tiles = slices.Delete(h.Tiles, i, i+1)
 			if drop.Suit == FLOWER {
