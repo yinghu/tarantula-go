@@ -81,8 +81,8 @@ func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
 		if !mp.Auto {
 			core.AppLog.Printf("Knog %d %d\n", mp.SystemId, t.Seq)
 			mp.PendingKongs = append(mp.PendingKongs, t.Seq)
-			mt := MahjongKnogEvent{SystemId: mp.SystemId, Knog: mp.PendingKongs}
-			mp.Pusher.Push(&mt)
+			//mt := MahjongKnogEvent{SystemId: mp.SystemId, Knog: mp.PendingKongs}
+			//mp.Pusher.Push(&mt)
 		}
 	}
 
