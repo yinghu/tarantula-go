@@ -7,11 +7,11 @@ import (
 )
 
 type JoinEvent struct {
-	Ticket   string `json:"Ticket"`
-	Client   net.Conn
+	Ticket string `json:"Ticket"`
+	Client net.Conn
 	//Pending  core.DataBuffer
 	SystemId int64
-	
+	Flag     int32
 	EventObj
 }
 
@@ -44,11 +44,19 @@ func (s *JoinEvent) Read(buff core.DataBuffer) error {
 		return err
 	}
 	s.Ticket = ticket
+	flag, err := buff.ReadInt32()
+	if err != nil {
+		return err
+	}
+	s.Flag = flag
 	return nil
 }
 
 func (s *JoinEvent) Write(buff core.DataBuffer) error {
 	if err := buff.WriteString(s.Ticket); err != nil {
+		return err
+	}
+	if err := buff.WriteInt32(s.Flag); err != nil {
 		return err
 	}
 	return nil
