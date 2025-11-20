@@ -35,6 +35,7 @@ func (s *MahjongHandEvent) Write(buff core.DataBuffer) error {
 			return err
 		}
 	}
+	core.AppLog.Printf("b sz : %d\n", sz)
 	return nil
 }
 
