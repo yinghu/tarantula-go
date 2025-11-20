@@ -26,7 +26,6 @@ func (s *MahjongHandEvent) Write(buff core.DataBuffer) error {
 		return err
 	}
 	sz := len(s.K)
-	core.AppLog.Printf("sz : %d\n", sz)
 	if err := buff.WriteInt32(int32(sz)); err != nil {
 		return err
 	}
@@ -35,7 +34,6 @@ func (s *MahjongHandEvent) Write(buff core.DataBuffer) error {
 			return err
 		}
 	}
-	core.AppLog.Printf("b sz : %d\n", sz)
 	return nil
 }
 
