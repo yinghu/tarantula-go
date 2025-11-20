@@ -213,6 +213,7 @@ func (m *MahjongTable) Knog(seat int, knog int) error {
 	if !deleted {
 		return fmt.Errorf("no pending kong %d", knog)
 	}
+	m.Discharge(seat, knog)
 	return mp.Knog(&m.Setup.Deck)
 }
 
