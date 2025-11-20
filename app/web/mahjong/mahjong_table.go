@@ -70,6 +70,7 @@ func (m *MahjongTable) Play() {
 			m.Push(&mt)
 		case CMD_DEAL:
 			m.Deal()
+			core.AppLog.Printf("Pending knogs %v\n", m.Players[t.Seat].PendingKongs)
 			mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
 			m.Push(&mt)
 		case CMD_DRAW:
