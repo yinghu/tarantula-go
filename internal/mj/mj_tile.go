@@ -54,6 +54,7 @@ const (
 	GREEN string = "H41"
 	WHITE string = "H43"
 
+	FS_LIMIT int = 44
 	//VALUE = 0
 	F_PLUMBLOSSOM   string = "F45"
 	F_ORCHID        string = "F47"

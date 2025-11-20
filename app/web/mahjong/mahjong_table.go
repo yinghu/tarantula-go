@@ -213,7 +213,11 @@ func (m *MahjongTable) Knog(seat int, knog int) error {
 	if !deleted {
 		return fmt.Errorf("no pending kong %d", knog)
 	}
-	m.Discharge(seat, knog)
+	if knog > mj.FS_LIMIT {
+		m.Discharge(seat, knog)
+	} else {
+		//4 kind knog / or pung to knog 
+	}
 	return mp.Knog(&m.Setup.Deck)
 }
 
