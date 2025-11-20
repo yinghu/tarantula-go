@@ -14,7 +14,8 @@ const (
 	M_CLAIM_CID     int = 105
 	M_RESET_CID     int = 106
 	M_DISCHARGE_CID int = 107
-	M_KNOG_CID      int = 108 
+	M_KNOG_CID      int = 108
+	M_TURN_CID      int = 109
 	M_ERR_CID       int = 911
 )
 
