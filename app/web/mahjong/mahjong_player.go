@@ -9,8 +9,8 @@ import (
 )
 
 type MahjongPlayer struct {
-	SystemId     int64  `json:"SystemId,string"`
-	Seat         string `json:"Seat"`
+	SystemId     int64 `json:"SystemId,string"`
+	Seat         int   `json:"Seat"`
 	mj.Hand      `json:"Hand"`
 	Auto         bool      `json:"Auto"`
 	B            []mj.Tile `json:"-"` //bamboo
@@ -27,15 +27,13 @@ type MahjongPlayer struct {
 	Pusher       event.Pusher
 }
 
-func (mp *MahjongPlayer) StartTurn(t *MahjongTable){
-	if !mp.Auto{
-		//mt := MahjongTurnEvent{SystemId: mp.SystemId}
+func (mp *MahjongPlayer) StartTurn(t *MahjongTable) {
+	if mp.Auto && !t.Started {
+		pt := MahjongPlayToken{Seat: mp.Seat, Cmd: CMD_END_TURN}
+		t.Turn <- pt
+		return
 	}
-}
-func (mp *MahjongPlayer) EndTurn(t *MahjongTable){
-	if !mp.Auto{
-		//mt := MahjongTurnEvent{SystemId: mp.SystemId}
-	}
+
 }
 
 func (mp *MahjongPlayer) Reset() {
@@ -223,7 +221,7 @@ func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
 
 }
 
-func NewPlayer(seat string, sorting bool, pusher event.Pusher) *MahjongPlayer {
+func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
 	mp := MahjongPlayer{Seat: seat, Auto: true, Pusher: pusher}
 	mp.Hand = mj.Hand{Listener: &mp, Sorting: sorting}
 	mp.Hand.New()

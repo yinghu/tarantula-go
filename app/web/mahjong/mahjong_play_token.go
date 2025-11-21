@@ -11,22 +11,23 @@ const (
 	CMD_PONG      int = 5
 	CMD_KONG      int = 6
 	CMD_CHOW      int = 7
+	CMD_CLAIM     int = 8
 
-	CMD_CLAIM int = 8
-
-	CMD_RESET int = 98
-	CMD_END   int = 99
+	CMD_END_TURN int = 97
+	CMD_RESET    int = 98
+	CMD_END      int = 99
 
 	//internal
+
 	CMD_JOINED int = 100
 	CMD_LEFT   int = 101
 )
 
 type MahjongPlayToken struct {
-	Table      int64
-	SystemId   int64
-	Cmd        int
-	Seat       int
+	Table    int64
+	SystemId int64
+	Cmd      int
+	Seat     int
 	Selected int
 }
 

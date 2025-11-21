@@ -6,9 +6,9 @@ import (
 )
 
 type MahjongTurnEvent struct {
-	SystemId int64
-	TableId  int64
-	Seat     int32
+	SystemId  int64
+	TableId   int64
+	CountDown int32
 	event.EventObj
 }
 
@@ -27,7 +27,7 @@ func (s *MahjongTurnEvent) Write(buff core.DataBuffer) error {
 	if err := buff.WriteInt64(s.TableId); err != nil {
 		return err
 	}
-	if err := buff.WriteInt32(s.Seat); err != nil {
+	if err := buff.WriteInt32(s.CountDown); err != nil {
 		return err
 	}
 	return nil

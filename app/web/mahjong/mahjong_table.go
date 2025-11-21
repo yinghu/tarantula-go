@@ -18,6 +18,8 @@ const (
 
 	HAND_SIZE_THRESHHOLD int = 13
 	TURN_TICKER_SECONDS  int = 30
+
+	SOLO int = 1
 )
 
 type MahjongTable struct {
@@ -27,16 +29,17 @@ type MahjongTable struct {
 	Pts          int               `json:"Pts"`
 	Discharged   []mj.Tile         `json:"Discharged"`
 	Started      bool
+	Solo         bool
 	Turn         chan MahjongPlayToken `json:"-"`
 	event.Pusher `json:"-"`
 }
 
 func (m *MahjongTable) New() {
 	m.Setup.New()
-	m.Players[SEAT_E] = NewPlayer("East", true, m)
-	m.Players[SEAT_S] = NewPlayer("South", true, m)
-	m.Players[SEAT_W] = NewPlayer("West", true, m)
-	m.Players[SEAT_N] = NewPlayer("North", true, m)
+	m.Players[SEAT_E] = NewPlayer(SEAT_E, true, m)
+	m.Players[SEAT_S] = NewPlayer(SEAT_S, true, m)
+	m.Players[SEAT_W] = NewPlayer(SEAT_W, true, m)
+	m.Players[SEAT_N] = NewPlayer(SEAT_N, true, m)
 	m.Discharged = make([]mj.Tile, 0)
 	m.Turn = make(chan MahjongPlayToken, 3)
 }
@@ -49,24 +52,24 @@ func (m *MahjongTable) Reset() {
 	m.Players[SEAT_N].Reset()
 	m.Discharged = m.Discharged[:0]
 }
+
 func (m *MahjongTable) Play() {
 	tick := time.NewTicker(time.Duration(TURN_TICKER_SECONDS) * time.Second)
 	running := true
-	started := false
 	nextTurn := SEAT_E
 	for running {
 		select {
 		case <-tick.C:
-			if !started {
-				continue
-			}
 			core.AppLog.Printf("Turn %d\n", nextTurn%4)
-			//m.Players[nextTurn%4].StartTurn(m)
-			nextTurn++
+			m.Players[nextTurn%4].StartTurn(m)
 		case t := <-m.Turn:
 			if t.Cmd == CMD_END {
 				running = false
 				break
+			}
+			if t.Cmd == CMD_END_TURN {
+				nextTurn++
+				continue
 			}
 			core.AppLog.Printf("Token seat: %d selected : %d cmd: %d \n", t.Seat, t.Selected, t.Cmd)
 			switch t.Cmd {
@@ -79,8 +82,6 @@ func (m *MahjongTable) Play() {
 					mt := MahjongSitEvent{SystemId: t.SystemId, TableId: m.Id, Seat: int32(t.Seat)}
 					m.Push(&mt)
 				}
-				started = true
-				nextTurn = t.Seat
 			case CMD_DICE:
 				dice := m.Dice()
 				mt := MahjongDiceEvent{Dice1: int32(dice[0]), Dice2: int32(dice[1])}
