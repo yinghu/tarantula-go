@@ -57,11 +57,12 @@ func (m *MahjongTable) Play() {
 	tick := time.NewTicker(time.Duration(TURN_TICKER_SECONDS) * time.Second)
 	running := true
 	nextTurn := SEAT_E
+	go m.Players[nextTurn%4].StartTurn(m)
 	for running {
 		select {
 		case <-tick.C:
 			core.AppLog.Printf("Turn %d\n", nextTurn%4)
-			m.Players[nextTurn%4].StartTurn(m)
+			m.Players[nextTurn%4].EndTurn(m)
 		case t := <-m.Turn:
 			if t.Cmd == CMD_END {
 				running = false
@@ -69,6 +70,9 @@ func (m *MahjongTable) Play() {
 			}
 			if t.Cmd == CMD_END_TURN {
 				nextTurn++
+				tick.Reset(time.Duration(TURN_TICKER_SECONDS) * time.Second)
+				go m.Players[nextTurn%4].StartTurn(m)
+				core.AppLog.Printf("Next Turn %d\n", nextTurn%4)
 				continue
 			}
 			core.AppLog.Printf("Token seat: %d selected : %d cmd: %d \n", t.Seat, t.Selected, t.Cmd)

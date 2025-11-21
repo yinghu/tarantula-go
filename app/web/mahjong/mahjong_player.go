@@ -2,6 +2,7 @@ package main
 
 import (
 	"slices"
+	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -29,13 +30,15 @@ type MahjongPlayer struct {
 
 func (mp *MahjongPlayer) StartTurn(t *MahjongTable) {
 	if mp.Auto && !t.Started {
+		time.Sleep(5 * time.Second)
 		pt := MahjongPlayToken{Seat: mp.Seat, Cmd: CMD_END_TURN}
 		t.Turn <- pt
 		return
 	}
-
 }
-
+func (mp *MahjongPlayer) EndTurn(t *MahjongTable) {
+	core.AppLog.Printf("End turn %d\n", mp.Seat)
+}
 func (mp *MahjongPlayer) Reset() {
 	mp.Clear()
 	mp.B = mp.B[:0]
