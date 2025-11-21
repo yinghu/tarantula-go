@@ -70,7 +70,7 @@ func (s *MahjongService) OnEvent(e event.Event) {
 	case event.JOIN_CID:
 		join, _ := e.(*event.JoinEvent)
 		core.AppLog.Printf("joined from %d %d\n", join.RecipientId(), join.Flag)
-		s.Dispatcher <- MahjongPlayToken{SystemId: e.RecipientId(), Cmd: CMD_JOINED, Selected: int(join.Flag)}
+		s.Dispatcher <- MahjongPlayToken{SystemId: e.RecipientId(), Cmd: CMD_JOINED, Table: join.Flag}
 	case event.KICKOFF_CID:
 		core.AppLog.Printf("kickoff from %d\n", e.RecipientId())
 		s.Dispatcher <- MahjongPlayToken{SystemId: e.RecipientId(), Cmd: CMD_LEFT}
@@ -89,17 +89,17 @@ func (s *MahjongService) dispatch() {
 	for t := range s.Dispatcher {
 		switch t.Cmd {
 		case CMD_JOINED:
-			go s.onTable(t.SystemId, t.Selected)
+			go s.onTable(t.SystemId, t.Table)
 		case CMD_LEFT:
 			go s.offTable(t.SystemId)
 		}
 	}
 }
 
-func (s *MahjongService) onTable(systemId int64, flag int) {
+func (s *MahjongService) onTable(systemId int64, flag int64) {
 	core.AppLog.Printf("table flag %d\n", flag)
 	tid, _ := s.Sequence().Id()
-	table := MahjongTable{Id: tid, Pusher: s.Pusher(), Setup: mj.ClassicMahjong{}, Solo: flag == SOLO}
+	table := MahjongTable{Id: tid, Pusher: s.Pusher(), Setup: mj.ClassicMahjong{}, Solo: flag == systemId}
 	table.New()
 	s.TableIndex[systemId] = &table
 	go table.Play()

@@ -57,7 +57,6 @@ func (m *MahjongTable) Play() {
 	tick := time.NewTicker(time.Duration(TURN_TICKER_SECONDS) * time.Second)
 	running := true
 	nextTurn := SEAT_E
-	go m.Players[nextTurn%4].StartTurn(m)
 	for running {
 		select {
 		case <-tick.C:
@@ -95,6 +94,7 @@ func (m *MahjongTable) Play() {
 				m.Deal()
 				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
 				m.Push(&mt)
+				
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
 				if err != nil {
