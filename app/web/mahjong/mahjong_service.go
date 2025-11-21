@@ -103,7 +103,7 @@ func (s *MahjongService) onTable(systemId int64, flag int64) {
 	table.New()
 	s.TableIndex[systemId] = &table
 	go table.Play()
-	mt := MahjongTableEvent{TableId: table.Id, SystemId: systemId}
+	mt := MahjongTableEvent{TableId: table.Id, SystemId: systemId, CountDown: TURN_TICKER_SECONDS}
 	s.Pusher().Push(&mt)
 }
 func (s *MahjongService) offTable(systemId int64) {
