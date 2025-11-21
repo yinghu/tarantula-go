@@ -65,6 +65,7 @@ func (m *MahjongTable) Play() {
 			m.Players[nextTurn%4].EndTurn(m)
 		case t := <-m.Turn:
 			if t.Cmd == CMD_END {
+				m.Started = false
 				running = false
 				break
 			}
@@ -143,6 +144,7 @@ func (m *MahjongTable) Play() {
 			}
 		}
 	}
+	time.Sleep(10 * time.Second)
 	tick.Stop()
 	close(m.Turn)
 	core.AppLog.Printf("table closed %d\n", m.Id)

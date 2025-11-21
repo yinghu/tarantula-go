@@ -89,9 +89,9 @@ func (s *MahjongService) dispatch() {
 	for t := range s.Dispatcher {
 		switch t.Cmd {
 		case CMD_JOINED:
-			s.onTable(t.SystemId, t.Selected)
+			go s.onTable(t.SystemId, t.Selected)
 		case CMD_LEFT:
-			s.offTable(t.SystemId)
+			go s.offTable(t.SystemId)
 		}
 	}
 }
@@ -107,6 +107,7 @@ func (s *MahjongService) onTable(systemId int64, flag int) {
 	s.Pusher().Push(&mt)
 }
 func (s *MahjongService) offTable(systemId int64) {
+
 	table, exists := s.TableIndex[systemId]
 	if !exists {
 		return
