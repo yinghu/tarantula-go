@@ -6,12 +6,13 @@ import (
 )
 
 type MahjongTableEvent struct {
-	SystemId int64
-	TableId  int64
-	East     int64
-	South    int64
-	West     int64
-	North    int64
+	SystemId  int64
+	TableId   int64
+	East      int64
+	South     int64
+	West      int64
+	North     int64
+	CountDown int
 	event.EventObj
 }
 
@@ -40,6 +41,9 @@ func (s *MahjongTableEvent) Write(buff core.DataBuffer) error {
 		return err
 	}
 	if err := buff.WriteInt64(s.North); err != nil {
+		return err
+	}
+	if err := buff.WriteInt32(int32(s.CountDown)); err != nil {
 		return err
 	}
 	return nil
