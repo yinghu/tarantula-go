@@ -64,11 +64,8 @@ func (s *TcpEndpoint) Open() error {
 
 func (s *TcpEndpoint) inbound(client net.Conn, systemId int64) {
 	defer func() {
-		core.AppLog.Printf("client socket is closed")
 		if s.OutboundEnabled {
-			ce := KickoffEvent{}
-			ce.SystemId = systemId
-			ce.Source = "disconnected"
+			ce := KickoffEvent{SystemId: systemId, Source: "disconnected"}
 			s.outboundEQ <- &ce
 		}
 		client.Close()
