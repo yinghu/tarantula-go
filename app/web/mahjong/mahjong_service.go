@@ -108,7 +108,8 @@ func (s *MahjongService) onTable(systemId int64, flag int64) {
 		mt := MahjongTableEvent{TableId: table.Id, SystemId: systemId, CountDown: TURN_TICKER_SECONDS}
 		mt.OnOId(id)
 		s.Pusher().Push(&mt)
-		go mt.Timeout()
+		table.Timer <- &mt
+		//go mt.Timeout()
 	} else {
 		//4 players
 	}

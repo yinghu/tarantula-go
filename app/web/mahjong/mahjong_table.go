@@ -32,7 +32,7 @@ type MahjongTable struct {
 	Solo         bool
 	Turn         chan MahjongPlayToken `json:"-"`
 	event.Pusher `json:"-"`
-	
+	Timer        chan MahjongTimeout
 }
 
 func (m *MahjongTable) New() {
@@ -43,6 +43,7 @@ func (m *MahjongTable) New() {
 	m.Players[SEAT_N] = NewPlayer(SEAT_N, true, m)
 	m.Discharged = make([]mj.Tile, 0)
 	m.Turn = make(chan MahjongPlayToken, 3)
+	m.Timer = make(chan MahjongTimeout, 3)
 }
 
 func (m *MahjongTable) Reset() {
@@ -62,6 +63,9 @@ func (m *MahjongTable) Play() {
 		select {
 		case tm := <-tk.C:
 			core.AppLog.Printf("Ticker fired %v\n", tm)
+		case to := <-m.Timer:
+			go to.Start()
+			core.AppLog.Printf("Timer %d\n", to.OId())
 		case t := <-m.Turn:
 			if t.Cmd == CMD_END {
 				m.Started = false
