@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
@@ -61,4 +63,10 @@ func (s *MahjongTableEvent) Outbound(buff core.DataBuffer) error {
 		return err
 	}
 	return nil
+}
+
+func (s *MahjongTableEvent) Timeout() {
+	tm := time.NewTimer(10 * time.Second)
+	t := <-tm.C
+	core.AppLog.Printf("Timeout %v\n", t)
 }

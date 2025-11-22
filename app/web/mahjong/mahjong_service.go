@@ -98,13 +98,18 @@ func (s *MahjongService) dispatch() {
 
 func (s *MahjongService) onTable(systemId int64, flag int64) {
 	core.AppLog.Printf("table flag %d\n", flag)
-	tid, _ := s.Sequence().Id()
-	table := MahjongTable{Id: tid, Pusher: s.Pusher(), Setup: mj.ClassicMahjong{}, Solo: flag == systemId}
-	table.New()
-	s.TableIndex[systemId] = &table
-	go table.Play()
-	mt := MahjongTableEvent{TableId: table.Id, SystemId: systemId, CountDown: TURN_TICKER_SECONDS}
-	s.Pusher().Push(&mt)
+	if flag == systemId { //solo player with 3 auto players
+		tid, _ := s.Sequence().Id()
+		table := MahjongTable{Id: tid, Pusher: s.Pusher(), Setup: mj.ClassicMahjong{}, Solo: flag == systemId}
+		table.New()
+		s.TableIndex[systemId] = &table
+		go table.Play()
+		mt := MahjongTableEvent{TableId: table.Id, SystemId: systemId, CountDown: TURN_TICKER_SECONDS}
+		s.Pusher().Push(&mt)
+		go mt.Timeout()
+	} else {
+		//4 players
+	}
 }
 func (s *MahjongService) offTable(systemId int64) {
 
