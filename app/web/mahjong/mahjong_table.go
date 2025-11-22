@@ -56,13 +56,10 @@ func (m *MahjongTable) Reset() {
 }
 
 func (m *MahjongTable) Play() {
-
+	//timerIndex := make(map[int64]MahjongTimeout)
 	running := true
-	tk := time.NewTicker(10 * time.Second)
 	for running {
 		select {
-		case tm := <-tk.C:
-			core.AppLog.Printf("Ticker fired %v\n", tm)
 		case to := <-m.Timer:
 			go to.Start()
 			core.AppLog.Printf("Timer %d\n", to.OId())
@@ -141,8 +138,8 @@ func (m *MahjongTable) Play() {
 			}
 		}
 	}
-	tk.Stop()
 	time.Sleep(10 * time.Second)
+	close(m.Timer)
 	close(m.Turn)
 	core.AppLog.Printf("table closed %d\n", m.Id)
 }

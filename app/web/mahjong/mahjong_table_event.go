@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 )
 
 type MahjongTableEvent struct {
@@ -15,7 +14,7 @@ type MahjongTableEvent struct {
 	West      int64
 	North     int64
 	CountDown int
-	event.EventObj
+	MahjongTimeoutObj
 }
 
 func (s *MahjongTableEvent) ClassId() int {
@@ -73,9 +72,9 @@ func (s *MahjongTableEvent) Outbound(buff core.DataBuffer) error {
 }
 
 func (s *MahjongTableEvent) Start() {
-	tm := time.NewTimer(10 * time.Second)
-	t := <-tm.C
-	tm.Stop()
+	s.T = *time.NewTimer(10 * time.Second)
+	t := <-s.T.C
+	s.T.Stop()
 	core.AppLog.Printf("Timeout %v\n", t)
 }
 func (s *MahjongTableEvent) Stop() {
