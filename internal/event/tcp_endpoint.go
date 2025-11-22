@@ -144,6 +144,7 @@ func (s *TcpEndpoint) outbound() {
 				oc, exists := s.outboundIndex[e.RecipientId()]
 				if exists {
 					core.AppLog.Printf("remove connection from %d\n", e.RecipientId())
+					oc.C.Close()
 					close(oc.Pending)
 					delete(s.outboundIndex, e.RecipientId())
 					s.Service.OnEvent(e)
