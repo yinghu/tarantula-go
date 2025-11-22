@@ -71,6 +71,11 @@ func (m *MahjongTable) Play() {
 				break
 			}
 			core.AppLog.Printf("Token seat: %d selected : %d cmd: %d Id :%d\n", t.Seat, t.Selected, t.Cmd, t.Id)
+			timer, exists := timerIndex[t.Id]
+			if exists {
+				delete(timerIndex, t.Id)
+				timer.Stop()
+			}
 			switch t.Cmd {
 			case CMD_SIT:
 				err := m.Sit(t.SystemId, t.Seat)
