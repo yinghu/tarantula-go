@@ -29,14 +29,13 @@ require (
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/mj v0.0.0-00010101000000-000000000000
-	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
-	google.golang.org/protobuf v1.36.8
 )
 
 require (
 	gameclustering.com/internal/cluster v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000 // indirect
+	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
@@ -79,4 +78,5 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20250303144028-a0af3efb3deb // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250303144028-a0af3efb3deb // indirect
 	google.golang.org/grpc v1.71.1 // indirect
+	google.golang.org/protobuf v1.36.8 // indirect
 )
