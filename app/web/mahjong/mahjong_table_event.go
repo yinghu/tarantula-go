@@ -26,6 +26,13 @@ func (s *MahjongTableEvent) ETag() string {
 	return "table"
 }
 
+func (s *MahjongTableEvent) WriteKey(buff core.DataBuffer) error {
+	if err := buff.WriteInt64(s.OId()); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *MahjongTableEvent) Write(buff core.DataBuffer) error {
 	if err := buff.WriteInt64(s.SystemId); err != nil {
 		return err

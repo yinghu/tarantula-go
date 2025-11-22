@@ -32,6 +32,7 @@ type MahjongTable struct {
 	Solo         bool
 	Turn         chan MahjongPlayToken `json:"-"`
 	event.Pusher `json:"-"`
+	
 }
 
 func (m *MahjongTable) New() {

@@ -104,7 +104,9 @@ func (s *MahjongService) onTable(systemId int64, flag int64) {
 		table.New()
 		s.TableIndex[systemId] = &table
 		go table.Play()
+		id, _ := s.Sequence().Id()
 		mt := MahjongTableEvent{TableId: table.Id, SystemId: systemId, CountDown: TURN_TICKER_SECONDS}
+		mt.OnOId(id)
 		s.Pusher().Push(&mt)
 		go mt.Timeout()
 	} else {
