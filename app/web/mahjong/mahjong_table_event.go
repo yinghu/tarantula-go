@@ -71,10 +71,16 @@ func (s *MahjongTableEvent) Outbound(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *MahjongTableEvent) Start() {
-	tm := *time.NewTimer(35 * time.Second)
+func (s *MahjongTableEvent) Start(tb *MahjongTable) {
+	tm := *time.NewTimer(time.Duration(s.CountDown+5) * time.Second)
 	t := <-tm.C
-	core.AppLog.Printf("Timeout %v %v\n", t,s.Commited)
+	if s.Commited {
+		return
+	}
+	core.AppLog.Printf("Timeout %v %v\n", t, s.Commited)
+	mr := MahjongErrorEvent{SystemId: s.SystemId, TableId: s.TableId, Code: 100, Message: "timeout"}
+	tb.Push(&mr)
+
 }
 func (s *MahjongTableEvent) Stop() {
 	s.Commited = true

@@ -5,7 +5,7 @@ import (
 )
 
 type MahjongTimeout interface {
-	Start()
+	Start(t *MahjongTable)
 	Stop()
 	OId() int64
 }
@@ -13,5 +13,4 @@ type MahjongTimeout interface {
 type MahjongTimeoutObj struct {
 	event.EventObj
 	Commited bool
-	//T        time.Timer
 }
