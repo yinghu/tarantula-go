@@ -54,26 +54,18 @@ func (m *MahjongTable) Reset() {
 }
 
 func (m *MahjongTable) Play() {
-	tick := time.NewTicker(time.Duration(TURN_TICKER_SECONDS) * time.Second)
+
 	running := true
-	nextTurn := SEAT_E
+	tk := time.NewTicker(10 * time.Second)
 	for running {
 		select {
-		case <-tick.C:
-			core.AppLog.Printf("Turn %d\n", nextTurn%4)
-			m.Players[nextTurn%4].EndTurn(m)
+		case tm := <-tk.C:
+			core.AppLog.Printf("Ticker fired %v\n", tm)
 		case t := <-m.Turn:
 			if t.Cmd == CMD_END {
 				m.Started = false
 				running = false
 				break
-			}
-			if t.Cmd == CMD_END_TURN {
-				nextTurn++
-				tick.Reset(time.Duration(TURN_TICKER_SECONDS) * time.Second)
-				go m.Players[nextTurn%4].StartTurn(m)
-				core.AppLog.Printf("Next Turn %d\n", nextTurn%4)
-				continue
 			}
 			core.AppLog.Printf("Token seat: %d selected : %d cmd: %d \n", t.Seat, t.Selected, t.Cmd)
 			switch t.Cmd {
@@ -94,7 +86,7 @@ func (m *MahjongTable) Play() {
 				m.Deal()
 				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
 				m.Push(&mt)
-				
+
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
 				if err != nil {
@@ -144,8 +136,8 @@ func (m *MahjongTable) Play() {
 			}
 		}
 	}
+	tk.Stop()
 	time.Sleep(10 * time.Second)
-	tick.Stop()
 	close(m.Turn)
 	core.AppLog.Printf("table closed %d\n", m.Id)
 }
