@@ -70,7 +70,7 @@ func (m *MahjongTable) Play() {
 				running = false
 				break
 			}
-			core.AppLog.Printf("Token seat: %d selected : %d cmd: %d \n", t.Seat, t.Selected, t.Cmd)
+			core.AppLog.Printf("Token seat: %d selected : %d cmd: %d Id :%d\n", t.Seat, t.Selected, t.Cmd, t.Id)
 			switch t.Cmd {
 			case CMD_SIT:
 				err := m.Sit(t.SystemId, t.Seat)
