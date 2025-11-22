@@ -109,7 +109,6 @@ func (s *MahjongService) onTable(systemId int64, flag int64) {
 		mt.OnOId(id)
 		s.Pusher().Push(&mt)
 		table.Timer <- &mt
-		//go mt.Timeout()
 	} else {
 		//4 players
 	}
