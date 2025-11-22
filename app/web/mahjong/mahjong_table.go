@@ -56,11 +56,12 @@ func (m *MahjongTable) Reset() {
 }
 
 func (m *MahjongTable) Play() {
-	//timerIndex := make(map[int64]MahjongTimeout)
+	timerIndex := make(map[int64]MahjongTimeout)
 	running := true
 	for running {
 		select {
 		case to := <-m.Timer:
+			timerIndex[to.OId()] = to
 			go to.Start()
 			core.AppLog.Printf("Timer %d\n", to.OId())
 		case t := <-m.Turn:
