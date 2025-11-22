@@ -1,8 +1,6 @@
 package main
 
 import (
-	"time"
-
 	"gameclustering.com/internal/event"
 )
 
@@ -14,5 +12,6 @@ type MahjongTimeout interface {
 
 type MahjongTimeoutObj struct {
 	event.EventObj
-	T time.Timer
+	Commited bool
+	//T        time.Timer
 }

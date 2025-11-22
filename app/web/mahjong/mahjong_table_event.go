@@ -72,11 +72,11 @@ func (s *MahjongTableEvent) Outbound(buff core.DataBuffer) error {
 }
 
 func (s *MahjongTableEvent) Start() {
-	s.T = *time.NewTimer(35 * time.Second)
-	t := <-s.T.C
-	core.AppLog.Printf("Timeout %v\n", t)
+	tm := *time.NewTimer(35 * time.Second)
+	t := <-tm.C
+	core.AppLog.Printf("Timeout %v %v\n", t,s.Commited)
 }
 func (s *MahjongTableEvent) Stop() {
-	st := s.T.Stop()
-	core.AppLog.Printf("Stop %v\n", st)
+	s.Commited = true
+	core.AppLog.Printf("Stop %v\n", s.Commited)
 }
