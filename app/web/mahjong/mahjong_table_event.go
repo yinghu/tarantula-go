@@ -77,6 +77,6 @@ func (s *MahjongTableEvent) Start() {
 	core.AppLog.Printf("Timeout %v\n", t)
 }
 func (s *MahjongTableEvent) Stop() {
-	s.T.Stop()
-	core.AppLog.Println("Stop")
+	st := s.T.Stop()
+	core.AppLog.Printf("Stop %v\n", st)
 }
