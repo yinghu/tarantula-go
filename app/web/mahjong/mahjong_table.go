@@ -60,10 +60,10 @@ func (m *MahjongTable) Play() {
 	running := true
 	for running {
 		select {
-		case to := <-m.Timer:
-			timerIndex[to.OId()] = to
-			go to.Start()
-			core.AppLog.Printf("Timer %d\n", to.OId())
+		case tm := <-m.Timer:
+			timerIndex[tm.OId()] = tm
+			go tm.Start()
+			core.AppLog.Printf("Timer %d\n", tm.OId())
 		case t := <-m.Turn:
 			if t.Cmd == CMD_END {
 				m.Started = false
