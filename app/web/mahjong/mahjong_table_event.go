@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 )
 
 type MahjongTableEvent struct {
@@ -79,10 +78,12 @@ func (s *MahjongTableEvent) Start(tb *MahjongTable) {
 		return
 	}
 	core.AppLog.Printf("Timeout %v %v\n", t, s.Commited)
-	mr := MahjongErrorEvent{SystemId: s.SystemId, TableId: s.TableId, Code: 100, Message: "timeout"}
-	tb.Push(&mr)
-	ko := event.KickoffEvent{SystemId: s.SystemId, Source: "timeout"}
-	tb.Push(&ko)
+	se := MahjongPlayToken{SystemId: s.SystemId, Cmd: CMD_SIT, Seat: SEAT_E, Id: s.OId()}
+	tb.Turn <- se
+	//mr := MahjongErrorEvent{SystemId: s.SystemId, TableId: s.TableId, Code: 100, Message: "timeout"}
+	//tb.Push(&mr)
+	//ko := event.KickoffEvent{SystemId: s.SystemId, Source: "timeout"}
+	//tb.Push(&ko)
 
 }
 func (s *MahjongTableEvent) Stop() {
