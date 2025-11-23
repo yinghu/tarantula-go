@@ -70,14 +70,21 @@ func (s *MahjongTableEvent) Outbound(buff core.DataBuffer) error {
 func (s *MahjongTableEvent) Start(tb *MahjongTable) {
 	tm := *time.NewTimer(time.Duration(s.Next.CountDown+5) * time.Second)
 	s.Commited = make(chan bool)
-	select {
-	case <-tm.C:
-		se := MahjongPlayToken{SystemId: s.SystemId, Cmd: CMD_SIT, Seat: SEAT_E, Id: s.OId()}
-		tb.Turn <- se
-	case <-s.Commited:
-		core.AppLog.Printf("Stop %d\n", s.OId())
+	closing := false
+	for {
+		if closing {
+			break
+		}
+		select {
+		case <-tm.C:
+			se := MahjongPlayToken{SystemId: s.SystemId, Cmd: CMD_SIT, Seat: SEAT_E, Id: s.OId()}
+			tb.Turn <- se
+		case <-s.Commited:
+			core.AppLog.Printf("Stop %d\n", s.OId())
+			close(s.Commited)
+			closing = true
+		}
 	}
-	close(s.Commited)
 }
 func (s *MahjongTableEvent) Stop() {
 	s.Commited <- true
