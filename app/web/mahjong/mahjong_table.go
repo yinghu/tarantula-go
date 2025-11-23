@@ -144,6 +144,10 @@ func (m *MahjongTable) Play() {
 			}
 		}
 	}
+	for c, t := range timerIndex {
+		t.Stop()
+		delete(timerIndex, c)
+	}
 	time.Sleep(10 * time.Second)
 	close(m.Timer)
 	close(m.Turn)
