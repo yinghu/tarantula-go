@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"slices"
-	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -148,7 +147,7 @@ func (m *MahjongTable) Play() {
 		t.Stop()
 		delete(timerIndex, c)
 	}
-	time.Sleep(10 * time.Second)
+	//time.Sleep(10 * time.Second)
 	close(m.Timer)
 	close(m.Turn)
 	core.AppLog.Printf("table closed %d\n", m.Id)
