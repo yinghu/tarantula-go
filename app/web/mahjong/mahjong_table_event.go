@@ -80,6 +80,7 @@ func (s *MahjongTableEvent) Start(tb *MahjongTable) {
 	case <-s.Commited:
 		core.AppLog.Printf("Stop %d\n", s.OId())
 	}
+	close(s.Commited)
 }
 func (s *MahjongTableEvent) Stop() {
 	s.Commited <- true
