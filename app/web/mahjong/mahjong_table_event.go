@@ -73,15 +73,14 @@ func (s *MahjongTableEvent) Outbound(buff core.DataBuffer) error {
 
 func (s *MahjongTableEvent) Start(tb *MahjongTable) {
 	tm := *time.NewTimer(time.Duration(s.CountDown+5) * time.Second)
-	t := <-tm.C
-	if s.Commited {
-		return
+	select {
+	case <-tm.C:
+		se := MahjongPlayToken{SystemId: s.SystemId, Cmd: CMD_SIT, Seat: SEAT_E, Id: s.OId()}
+		tb.Turn <- se
+	case <-s.Commited:
+		core.AppLog.Printf("Stop %d\n", s.OId())
 	}
-	core.AppLog.Printf("Timeout %v %v\n", t, s.Commited)
-	se := MahjongPlayToken{SystemId: s.SystemId, Cmd: CMD_SIT, Seat: SEAT_E, Id: s.OId()}
-	tb.Turn <- se
 }
 func (s *MahjongTableEvent) Stop() {
-	s.Commited = true
-	core.AppLog.Printf("Stop %v\n", s.Commited)
+	s.Commited <- true
 }
