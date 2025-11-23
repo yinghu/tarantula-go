@@ -89,9 +89,14 @@ func (m *MahjongTable) Play() {
 				mt := MahjongDiceEvent{Dice1: int32(dice[0]), Dice2: int32(dice[1])}
 				m.Push(&mt)
 			case CMD_DEAL:
-				m.Deal()
-				mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
-				m.Push(&mt)
+				err := m.Deal()
+				if err != nil {
+					mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
+					m.Push(&mr)
+				} else {
+					mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
+					m.Push(&mt)
+				}
 
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
@@ -173,6 +178,9 @@ func (m *MahjongTable) Dice() []int {
 	return dice
 }
 func (m *MahjongTable) Deal() error {
+	if m.Pts == 0 {
+		return fmt.Errorf("no dice")
+	}
 	dealer := (m.Pts - 1) % 4
 	r := 3
 	for {

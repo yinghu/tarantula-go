@@ -3,8 +3,6 @@ package main
 import (
 	"slices"
 	"time"
-
-	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
@@ -28,7 +26,7 @@ type MahjongPlayer struct {
 	Pusher       event.Pusher
 }
 
-func (mp *MahjongPlayer) StartTurn(t *MahjongTable) {
+func (mp *MahjongPlayer) Play(t *MahjongTable) {
 	if mp.Auto && !t.Started {
 		time.Sleep(5 * time.Second)
 		pt := MahjongPlayToken{Seat: mp.Seat, Cmd: CMD_END_TURN}
@@ -36,9 +34,7 @@ func (mp *MahjongPlayer) StartTurn(t *MahjongTable) {
 		return
 	}
 }
-func (mp *MahjongPlayer) EndTurn(t *MahjongTable) {
-	core.AppLog.Printf("End turn %d\n", mp.Seat)
-}
+
 func (mp *MahjongPlayer) Reset() {
 	mp.Clear()
 	mp.B = mp.B[:0]
