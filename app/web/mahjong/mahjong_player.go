@@ -2,7 +2,7 @@ package main
 
 import (
 	"slices"
-	"time"
+
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
@@ -26,12 +26,9 @@ type MahjongPlayer struct {
 	Pusher       event.Pusher
 }
 
-func (mp *MahjongPlayer) Play(t *MahjongTable) {
-	if mp.Auto && !t.Started {
-		time.Sleep(5 * time.Second)
-		pt := MahjongPlayToken{Seat: mp.Seat, Cmd: CMD_END_TURN}
-		t.Turn <- pt
-		return
+func (mp *MahjongPlayer) Play(tk MahjongPlayToken, mt *MahjongTable) {
+	switch tk.Cmd{
+			
 	}
 }
 

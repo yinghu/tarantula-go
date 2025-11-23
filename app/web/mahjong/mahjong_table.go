@@ -149,7 +149,7 @@ func (m *MahjongTable) Play() {
 	}
 	for _, t := range timerIndex {
 		t.Stop()
-	}
+	}	
 	clear(timerIndex)
 	close(m.Timer)
 	close(m.Turn)
