@@ -73,6 +73,7 @@ func (s *MahjongTableEvent) Outbound(buff core.DataBuffer) error {
 
 func (s *MahjongTableEvent) Start(tb *MahjongTable) {
 	tm := *time.NewTimer(time.Duration(s.CountDown+5) * time.Second)
+	s.Commited = make(chan bool)
 	select {
 	case <-tm.C:
 		se := MahjongPlayToken{SystemId: s.SystemId, Cmd: CMD_SIT, Seat: SEAT_E, Id: s.OId()}
