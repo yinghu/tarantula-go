@@ -105,7 +105,7 @@ func (s *MahjongService) onTable(systemId int64, flag int64) {
 		s.TableIndex[systemId] = &table
 		go table.Play()
 		pt := MahjongPlayToken{SystemId: systemId, Cmd: CMD_SIT, Seat: SEAT_S}
-		table.Turn <- pt
+		table.Sync <- pt
 	} else {
 		//4 players
 	}
@@ -117,6 +117,6 @@ func (s *MahjongService) offTable(systemId int64) {
 		return
 	}
 	delete(s.TableIndex, systemId)
-	table.Turn <- MahjongPlayToken{Cmd: CMD_END}
+	table.Sync <- MahjongPlayToken{Cmd: CMD_END}
 
 }

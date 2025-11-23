@@ -32,6 +32,7 @@ type MahjongTable struct {
 	Turn         chan MahjongPlayToken `json:"-"`
 	event.Pusher `json:"-"`
 	Timer        chan MahjongTimeout
+	Sync         chan MahjongPlayToken `json:"-"`
 }
 
 func (m *MahjongTable) New() {
@@ -43,6 +44,7 @@ func (m *MahjongTable) New() {
 	m.Discharged = make([]mj.Tile, 0)
 	m.Turn = make(chan MahjongPlayToken, 3)
 	m.Timer = make(chan MahjongTimeout, 3)
+	m.Sync = make(chan MahjongPlayToken, 3)
 }
 
 func (m *MahjongTable) Reset() {
@@ -59,15 +61,26 @@ func (m *MahjongTable) Play() {
 	running := true
 	for running {
 		select {
+		case k := <-m.Sync:
+			switch k.Cmd {
+			case CMD_END:
+				m.Started = false
+				running = false
+				//break
+			case CMD_SIT:
+				err := m.Sit(k.SystemId, k.Seat)
+				if err != nil {
+					mr := MahjongErrorEvent{SystemId: k.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
+					m.Push(&mr)
+				} else {
+					mt := MahjongSitEvent{SystemId: k.SystemId, TableId: m.Id, Seat: int32(k.Seat)}
+					m.Push(&mt)
+				}
+			}
 		case tm := <-m.Timer:
 			timerIndex[tm.OId()] = tm
 			go tm.Start(m)
 		case t := <-m.Turn:
-			if t.Cmd == CMD_END {
-				m.Started = false
-				running = false
-				break
-			}
 			core.AppLog.Printf("Token seat: %d selected : %d cmd: %d Id :%d\n", t.Seat, t.Selected, t.Cmd, t.Id)
 			timer, exists := timerIndex[t.Id]
 			if exists {
@@ -75,15 +88,6 @@ func (m *MahjongTable) Play() {
 				timer.Stop()
 			}
 			switch t.Cmd {
-			case CMD_SIT:
-				err := m.Sit(t.SystemId, t.Seat)
-				if err != nil {
-					mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
-					m.Push(&mr)
-				} else {
-					mt := MahjongSitEvent{SystemId: t.SystemId, TableId: m.Id, Seat: int32(t.Seat)}
-					m.Push(&mt)
-				}
 			case CMD_DICE:
 				dice := m.Dice()
 				mt := MahjongDiceEvent{Dice1: int32(dice[0]), Dice2: int32(dice[1])}
@@ -149,8 +153,9 @@ func (m *MahjongTable) Play() {
 	}
 	for _, t := range timerIndex {
 		t.Stop()
-	}	
+	}
 	clear(timerIndex)
+	close(m.Sync)
 	close(m.Timer)
 	close(m.Turn)
 	core.AppLog.Printf("table closed %d\n", m.Id)
