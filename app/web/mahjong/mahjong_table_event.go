@@ -7,13 +7,12 @@ import (
 )
 
 type MahjongTableEvent struct {
-	SystemId  int64
-	TableId   int64
-	East      int64
-	South     int64
-	West      int64
-	North     int64
-	CountDown int
+	SystemId int64
+	TableId  int64
+	East     int64
+	South    int64
+	West     int64
+	North    int64
 	MahjongTimeoutObj
 }
 
@@ -51,10 +50,7 @@ func (s *MahjongTableEvent) Write(buff core.DataBuffer) error {
 	if err := buff.WriteInt64(s.North); err != nil {
 		return err
 	}
-	if err := buff.WriteInt32(int32(s.CountDown)); err != nil {
-		return err
-	}
-	return nil
+	return s.Next.Write(buff)
 }
 
 func (s *MahjongTableEvent) Outbound(buff core.DataBuffer) error {
@@ -72,7 +68,7 @@ func (s *MahjongTableEvent) Outbound(buff core.DataBuffer) error {
 }
 
 func (s *MahjongTableEvent) Start(tb *MahjongTable) {
-	tm := *time.NewTimer(time.Duration(s.CountDown+5) * time.Second)
+	tm := *time.NewTimer(time.Duration(s.Next.CountDown+5) * time.Second)
 	s.Commited = make(chan bool)
 	select {
 	case <-tm.C:

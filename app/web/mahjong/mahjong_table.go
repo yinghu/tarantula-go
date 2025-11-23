@@ -62,7 +62,6 @@ func (m *MahjongTable) Play() {
 		case tm := <-m.Timer:
 			timerIndex[tm.OId()] = tm
 			go tm.Start(m)
-			core.AppLog.Printf("Timer %d\n", tm.OId())
 		case t := <-m.Turn:
 			if t.Cmd == CMD_END {
 				m.Started = false
@@ -143,11 +142,10 @@ func (m *MahjongTable) Play() {
 			}
 		}
 	}
-	for c, t := range timerIndex {
+	for _, t := range timerIndex {
 		t.Stop()
-		delete(timerIndex, c)
 	}
-	//time.Sleep(10 * time.Second)
+	clear(timerIndex)
 	close(m.Timer)
 	close(m.Turn)
 	core.AppLog.Printf("table closed %d\n", m.Id)

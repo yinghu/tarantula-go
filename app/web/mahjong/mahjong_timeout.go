@@ -13,4 +13,5 @@ type MahjongTimeout interface {
 type MahjongTimeoutObj struct {
 	event.EventObj
 	Commited chan bool
+	Next     MahjongPlayTurn
 }

@@ -12,10 +12,11 @@ const (
 	CMD_KONG      int = 6
 	CMD_CHOW      int = 7
 	CMD_CLAIM     int = 8
-
-	CMD_END_TURN int = 97
-	CMD_RESET    int = 98
-	CMD_END      int = 99
+	CMD_WAIT      int = 9
+	
+	CMD_END_TURN  int = 97
+	CMD_RESET     int = 98
+	CMD_END       int = 99
 
 	//internal
 
