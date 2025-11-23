@@ -1,5 +1,7 @@
 package mj
 
+import "fmt"
+
 type Evaluator struct {
 	Queue EvaluationQueue
 }
@@ -18,6 +20,7 @@ func (e *Evaluator) Evaluate(h *Hand) []Meld {
 			break
 		}
 		hx := HandIndex{}
+		fmt.Printf("Pending hand %v\n",n.PendingHand)
 		hx.From(n.PendingHand)
 		if len(n.Formed) == h.MaxClaims-len(h.Formed) {
 			eye, err := hx.Eye()
@@ -33,8 +36,8 @@ func (e *Evaluator) Evaluate(h *Hand) []Meld {
 			e.Queue.Next(nx)
 		}
 
-		pong := hx.Pong()
-		for _, m := range pong {
+		pung := hx.Pung()
+		for _, m := range pung {
 			nx := EvaluationNode{PendingHand: hx.AfterFormed(m), Formed: n.Form(m), Type: PUNG}
 			e.Queue.Next(nx)
 		}

@@ -91,7 +91,7 @@ func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
 		}
 	case mj.FLOWER:
 		if !mp.Auto {
-			core.AppLog.Printf("Knog %d %d\n", mp.SystemId, t.Seq)
+			//core.AppLog.Printf("Knog %d %d\n", mp.SystemId, t.Seq)
 			mp.PendingKongs = append(mp.PendingKongs, t.Seq)
 			//mt := MahjongKnogEvent{SystemId: mp.SystemId, Knog: mp.PendingKongs}
 			//mp.Pusher.Push(&mt)
@@ -211,7 +211,7 @@ func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
 }
 
 func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
-	core.AppLog.Printf("Check list %v\n", clist)
+	//core.AppLog.Printf("Check list %v\n", clist)
 	if !hornor {
 
 		return

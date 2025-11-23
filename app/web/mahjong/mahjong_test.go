@@ -6,6 +6,7 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/mj"
 )
 
 type SampleCallback struct {
@@ -39,7 +40,7 @@ func TestMahjongTable(t *testing.T) {
 		t.Errorf("dealer hand should be 14 %d", dz)
 	}
 	//fmt.Printf("F Hand %v\n",mt.Players[dealer].Tiles)
-	mt.Claim(dealer)
+	//mt.Claim(dealer)
 	//fmt.Printf("X Hand %v\n",mt.Players[dealer].Tiles)
 	err := mt.Draw(dealer)
 	if err == nil {
@@ -77,7 +78,7 @@ func TestMahjongAutoTable(t *testing.T) {
 	if dz != 14 {
 		t.Errorf("dealer hand should be 14 %d", dz)
 	}
-	mt.Claim(dealer)
+	//mt.Claim(dealer)
 	err := mt.Draw(dealer)
 	if err == nil {
 		t.Errorf("should be error")
@@ -88,12 +89,12 @@ func TestMahjongAutoTable(t *testing.T) {
 			if pz != 13 {
 				t.Errorf("player hand should be 13 %d", pz)
 			}
-			fmt.Printf("X Tiles %v\n", mt.Players[i].Tiles)
+			//fmt.Printf("X Tiles %v\n", mt.Players[i].Tiles)
 			err = mt.Draw(i)
 			if err != nil {
 				t.Errorf("shoud not be error %s", err.Error())
 			}
-			fmt.Printf("Y Tiles %v\n", mt.Players[i].Tiles)
+			//fmt.Printf("Y Tiles %v\n", mt.Players[i].Tiles)
 			hz := len(mt.Players[i].Tiles)
 			if hz != 14 {
 				t.Errorf("hand size should be 14 %d", hz)
@@ -134,19 +135,41 @@ func TestMahjongToken(t *testing.T) {
 	}
 }
 
-func TestMahjongTableIndex(t *testing.T) {
-	ix := make(map[int64]*MahjongTable)
-	mt := MahjongTable{}
-	mt.New()
-	ix[10] = &mt
-	mx := ix[10]
-	mx.Dice()
-	mx.Deal()
-	tx := mt.Players[SEAT_E].Hand.Tiles[0]
-	fmt.Printf("%v\n", mt.Players[SEAT_E].Hand.Tiles)
-	fmt.Printf("%v\n", mx.Players[SEAT_E].Hand.Tiles)
-	mx.Discharge(SEAT_E, tx.Seq)
-	fmt.Printf("%v\n", mt.Players[SEAT_E].Hand.Tiles)
-	fmt.Printf("%v\n", mx.Players[SEAT_E].Hand.Tiles)
+//func cmp(a, b mj.Tile) int {
+	//return a.Seq - b.Seq
+//}
+func TestClassic1(t *testing.T) {
 
+	b1 := mj.NewTile(mj.BAMBOO1)
+	b2 := mj.NewTile(mj.BAMBOO1)
+	b3 := mj.NewTile(mj.BAMBOO2)
+
+	b4 := mj.NewTile(mj.BAMBOO3)
+	b5 := mj.NewTile(mj.BAMBOO4)
+	b6 := mj.NewTile(mj.BAMBOO6)
+
+	b7 := mj.NewTile(mj.BAMBOO6)
+	b8 := mj.NewTile(mj.BAMBOO7)
+	b9 := mj.NewTile(mj.BAMBOO7)
+
+	c7 := mj.NewTile(mj.BAMBOO8)
+	c8 := mj.NewTile(mj.BAMBOO8)
+
+	c9 := mj.NewTile(mj.DOTS5)
+
+	p1 := mj.NewTile(mj.DOTS6)
+	p2 := mj.NewTile(mj.DOTS7)
+
+	tiles := []mj.Tile{b1, b2, b3, b4, b5, b6, b7, b8, b9, c7, c8, c9, p1, p2}
+	h := mj.Hand{}
+	h.New()
+	h.Tiles = append(h.Tiles, tiles...)
+	//slices.SortFunc(h.Tiles, cmp)
+	cm := mj.ClassicMahjong{}
+	cm.New()
+	claimed := cm.Mahjong(&h)
+	if !claimed {
+		t.Errorf("should be claimed %v", claimed)
+	}
+	//B1,B2,B3,B2,B3,B4,B3,B4,B5,B4,B5,B6,B1,B1
 }

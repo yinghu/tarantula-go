@@ -49,7 +49,7 @@ func (h *HandIndex) Kong() []Meld {
 	return nodes
 }
 
-func (h *HandIndex) Pong() []Meld {
+func (h *HandIndex) Pung() []Meld {
 	h.reset()
 	nodes := make([]Meld, 0)
 	for s, c := range h.Index {
