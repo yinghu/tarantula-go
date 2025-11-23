@@ -71,6 +71,7 @@ func (s *MahjongTableEvent) Start(tb *MahjongTable) {
 	tm := *time.NewTimer(time.Duration(s.Next.CountDown+5) * time.Second)
 	s.Commited = make(chan bool)
 	closing := false
+	defer close(s.Commited)
 	for {
 		if closing {
 			break
@@ -81,7 +82,6 @@ func (s *MahjongTableEvent) Start(tb *MahjongTable) {
 			tb.Turn <- se
 		case <-s.Commited:
 			core.AppLog.Printf("Stop %d\n", s.OId())
-			close(s.Commited)
 			closing = true
 		}
 	}
