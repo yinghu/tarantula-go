@@ -64,6 +64,7 @@ func (m *MahjongTable) Play() {
 	for running {
 		select {
 		case k := <-m.Sync:
+			core.AppLog.Printf("Sync: %d selected : %d cmd: %d Id :%d\n", k.Seat, k.Selected, k.Cmd, k.Id)
 			switch k.Cmd {
 			case CMD_END:
 				m.Started = false
@@ -79,7 +80,7 @@ func (m *MahjongTable) Play() {
 				}
 			case CMD_TURN_END:
 				tp++
-				go m.Players[tp].Play(m)
+				go m.Players[tp%4].Play(m)
 			}
 		case tm := <-m.Timer:
 			timerIndex[tm.OId()] = tm
@@ -131,7 +132,7 @@ func (m *MahjongTable) Play() {
 					mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
 					m.Push(&mt)
 				}
-				
+
 				go m.Players[tp%4].Play(m)
 			case CMD_DISCHARGE:
 				err := m.Discharge(t.Seat, t.Selected)
