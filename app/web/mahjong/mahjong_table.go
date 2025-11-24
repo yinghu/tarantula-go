@@ -76,7 +76,6 @@ func (m *MahjongTable) Play() {
 				} else {
 					ms := MahjongSitEvent{SystemId: k.SystemId, TableId: m.Id, Seat: int32(k.Seat)}
 					m.Push(&ms)
-					//go m.Players[k.Seat].Setup(CMD_DICE, m)
 				}
 			}
 		case tm := <-m.Timer:

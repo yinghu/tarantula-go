@@ -38,8 +38,11 @@ func (mp *MahjongPlayer) Setup(cmd int, mt *MahjongTable) {
 
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	core.AppLog.Printf("Seat %d", mp.Seat)
-	if mp.Auto{
-			
+	if !mp.Auto {
+		oid, _ := mt.Sequence.Id()
+		md := NewTurn(mp.SystemId, oid, CMD_DRAW, MahjongPlayToken{Cmd: CMD_DRAW, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid})
+		mt.Push(&md)
+		mt.Timer <- &md
 	}
 }
 
