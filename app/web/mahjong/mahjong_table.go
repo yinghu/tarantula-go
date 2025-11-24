@@ -79,7 +79,7 @@ func (m *MahjongTable) Play() {
 					m.Push(&ms)
 				}
 			case CMD_TURN_END:
-				tp++
+				tp++ //next player turn
 				go m.Players[tp%4].Play(m)
 			}
 		case tm := <-m.Timer:
@@ -115,43 +115,14 @@ func (m *MahjongTable) Play() {
 
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
-				if err != nil {
-					mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
-					m.Push(&mr)
-				} else {
-					mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
-					m.Push(&mt)
-				}
-				go m.Players[tp%4].Play(m)
+				go m.Players[tp%4].OnPlayFinished(m, t, err)
+
 			case CMD_KONG:
 				err := m.Knog(t.Seat, t.Selected)
-				if err != nil {
-					mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
-					m.Push(&mr)
-				} else {
-					mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
-					m.Push(&mt)
-				}
-
-				go m.Players[tp%4].Play(m)
+				go m.Players[tp%4].OnPlayFinished(m, t, err)
 			case CMD_DISCHARGE:
 				err := m.Discharge(t.Seat, t.Selected)
-				if err != nil {
-					mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
-					m.Push(&mr)
-				} else {
-					mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
-					m.Push(&mt)
-					dz := len(m.Discharged)
-					if dz <= 3 {
-						md := MahjongDischargeEvent{D: m.Discharged}
-						m.Push(&md)
-					} else {
-						md := MahjongDischargeEvent{D: m.Discharged[(dz - 3):]}
-						m.Push(&md)
-					}
-				}
-				go m.Players[tp%4].Play(m)
+				go m.Players[tp%4].OnPlayFinished(m, t, err)
 			case CMD_CLAIM:
 				claimed := m.Claim(t.Seat)
 				mt := MahjongClaimEvent{SystemId: t.SystemId, TableId: m.Id, Seat: int32(t.Seat), Claimed: claimed}
@@ -159,7 +130,6 @@ func (m *MahjongTable) Play() {
 					mt.Formed = append(mt.Formed, m.Players[t.Seat].Formed...)
 				}
 				m.Push(&mt)
-				go m.Players[tp%4].Play(m)
 			case CMD_RESET:
 				m.Reset()
 				mt := MahjongResetEvent{Started: false}

@@ -45,9 +45,29 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		})
 		mt.Push(&md)
 		mt.Timer <- &md
-		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
+		//mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
+		return
 	}
 	mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
+}
+func (mp *MahjongPlayer) OnPlayFinished(m *MahjongTable, t MahjongPlayToken, err error) {
+	if err != nil {
+		mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
+		m.Push(&mr)
+	} else {
+		mt := MahjongHandEvent{H: mp.Hand, K: mp.PendingKongs}
+		m.Push(&mt)
+		if t.Cmd == CMD_DISCHARGE {
+			dz := len(m.Discharged)
+			if dz <= 3 {
+				md := MahjongDischargeEvent{D: m.Discharged}
+				m.Push(&md)
+			} else {
+				md := MahjongDischargeEvent{D: m.Discharged[(dz - 3):]}
+				m.Push(&md)
+			}
+		}
+	}
 }
 
 func (mp *MahjongPlayer) Reset() {
