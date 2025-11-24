@@ -74,7 +74,9 @@ func (m *MahjongTable) Play() {
 					mr := MahjongErrorEvent{SystemId: k.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
 					m.Push(&mr)
 				} else {
-					go m.Players[k.Seat].Setup(CMD_DICE, m)
+					ms := MahjongSitEvent{SystemId: k.SystemId, TableId: m.Id, Seat: int32(k.Seat)}
+					m.Push(&ms)
+					//go m.Players[k.Seat].Setup(CMD_DICE, m)
 				}
 			}
 		case tm := <-m.Timer:
@@ -88,6 +90,8 @@ func (m *MahjongTable) Play() {
 				timer.Stop()
 			}
 			switch t.Cmd {
+			case CMD_TABLE:
+				go m.Players[t.Seat].Setup(CMD_DICE, m)
 			case CMD_DICE:
 				dice := m.Dice()
 				mt := MahjongDiceEvent{Dice1: int32(dice[0]), Dice2: int32(dice[1])}
@@ -103,7 +107,6 @@ func (m *MahjongTable) Play() {
 					m.Push(&mt)
 				}
 				tp = (m.Pts - 1) % 4
-				core.AppLog.Printf("Deal start %d %d", tp, m.Players[tp].Hand.TileSize())
 				//start dealer
 				go m.Players[tp].Play(m)
 
