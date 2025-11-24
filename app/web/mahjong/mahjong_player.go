@@ -26,11 +26,11 @@ type MahjongPlayer struct {
 	Pusher       event.Pusher
 }
 
-func (mp *MahjongPlayer) Play(mt *MahjongTable) {
+func (mp *MahjongPlayer) Play(cmd int, mt *MahjongTable) {
 	ms := MahjongSitEvent{SystemId: mp.SystemId, TableId: mt.Id, Seat: int32(mp.Seat)}
 	mt.Push(&ms)
 	oid, _ := mt.Sequence.Id()
-	md := NewTurn(mp.SystemId, oid, CMD_DICE, MahjongPlayToken{Cmd: CMD_DICE, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid})
+	md := NewTurn(mp.SystemId, oid, CMD_DICE, MahjongPlayToken{Cmd: cmd, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid})
 	mt.Push(&md)
 	mt.Timer <- &md
 }

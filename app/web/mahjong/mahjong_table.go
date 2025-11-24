@@ -73,7 +73,7 @@ func (m *MahjongTable) Play() {
 					mr := MahjongErrorEvent{SystemId: k.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
 					m.Push(&mr)
 				} else {
-					go m.Players[k.Seat].Play(m)
+					go m.Players[k.Seat].Play(CMD_DICE, m)
 				}
 			}
 		case tm := <-m.Timer:
@@ -91,6 +91,7 @@ func (m *MahjongTable) Play() {
 				dice := m.Dice()
 				mt := MahjongDiceEvent{Dice1: int32(dice[0]), Dice2: int32(dice[1])}
 				m.Push(&mt)
+				go m.Players[t.Seat].Play(CMD_DEAL, m)
 			case CMD_DEAL:
 				err := m.Deal()
 				if err != nil {
