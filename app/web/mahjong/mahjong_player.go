@@ -47,6 +47,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		mt.Timer <- &md
 		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 	}
+	mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 }
 
 func (mp *MahjongPlayer) Reset() {
