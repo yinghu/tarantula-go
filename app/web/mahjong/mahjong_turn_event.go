@@ -45,7 +45,7 @@ func (s *MahjongTurnEvent) RecipientId() int64 {
 	return s.SystemId
 }
 
-func NewTurn(systemId int64, oid int64, cmd int, t MahjongPlayToken) MahjongTurnEvent {
+func NewTurn(systemId int64, oid int64, cmd int, t OnTurn) MahjongTurnEvent {
 	mt := MahjongTurnEvent{SystemId: systemId}
 	mt.OnOId(oid)
 	mt.N = MahjongPlayTurn{Cmd: cmd, CountDown: TURN_TICKER_SECONDS}

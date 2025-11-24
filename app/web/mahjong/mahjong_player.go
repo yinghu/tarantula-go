@@ -28,10 +28,10 @@ type MahjongPlayer struct {
 }
 
 func (mp *MahjongPlayer) Setup(cmd int, mt *MahjongTable) {
-	//ms := MahjongSitEvent{SystemId: mp.SystemId, TableId: mt.Id, Seat: int32(mp.Seat)}
-	//mt.Push(&ms)
 	oid, _ := mt.Sequence.Id()
-	md := NewTurn(mp.SystemId, oid, cmd, MahjongPlayToken{Cmd: cmd, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid})
+	md := NewTurn(mp.SystemId, oid, cmd, func() {
+		mt.Turn <- MahjongPlayToken{Cmd: cmd, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
+	})
 	mt.Push(&md)
 	mt.Timer <- &md
 }
@@ -40,7 +40,9 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	core.AppLog.Printf("Seat %d", mp.Seat)
 	if !mp.Auto {
 		oid, _ := mt.Sequence.Id()
-		md := NewTurn(mp.SystemId, oid, CMD_DRAW, MahjongPlayToken{Cmd: CMD_DRAW, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid})
+		md := NewTurn(mp.SystemId, oid, CMD_DRAW, func() {
+			mt.Turn <- MahjongPlayToken{Cmd: CMD_DRAW, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
+		})
 		mt.Push(&md)
 		mt.Timer <- &md
 	}
