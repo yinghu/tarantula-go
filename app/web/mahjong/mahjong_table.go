@@ -103,7 +103,7 @@ func (m *MahjongTable) Play() {
 					m.Push(&mt)
 				}
 				tp = (m.Pts - 1) / 4
-				core.AppLog.Printf("Deal start %d", tp)
+				core.AppLog.Printf("Deal start %d %d", tp, m.Players[tp].Hand.TileSize())
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
 				if err != nil {
