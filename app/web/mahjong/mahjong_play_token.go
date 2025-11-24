@@ -14,7 +14,7 @@ const (
 	CMD_CLAIM     int = 8
 	CMD_TABLE     int = 9
 
-	CMD_END_TURN int = 97
+	CMD_TURN_END int = 97
 	CMD_RESET    int = 98
 	CMD_END      int = 99
 

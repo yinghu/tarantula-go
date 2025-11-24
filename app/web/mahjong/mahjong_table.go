@@ -77,6 +77,9 @@ func (m *MahjongTable) Play() {
 					ms := MahjongSitEvent{SystemId: k.SystemId, TableId: m.Id, Seat: int32(k.Seat)}
 					m.Push(&ms)
 				}
+			case CMD_TURN_END:
+				tp++
+				go m.Players[tp].Play(m)
 			}
 		case tm := <-m.Timer:
 			timerIndex[tm.OId()] = tm
@@ -118,7 +121,6 @@ func (m *MahjongTable) Play() {
 					mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
 					m.Push(&mt)
 				}
-				tp++
 				go m.Players[tp%4].Play(m)
 			case CMD_KONG:
 				err := m.Knog(t.Seat, t.Selected)
@@ -129,7 +131,7 @@ func (m *MahjongTable) Play() {
 					mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
 					m.Push(&mt)
 				}
-				tp++
+				
 				go m.Players[tp%4].Play(m)
 			case CMD_DISCHARGE:
 				err := m.Discharge(t.Seat, t.Selected)
@@ -148,7 +150,6 @@ func (m *MahjongTable) Play() {
 						m.Push(&md)
 					}
 				}
-				tp++
 				go m.Players[tp%4].Play(m)
 			case CMD_CLAIM:
 				claimed := m.Claim(t.Seat)
@@ -157,7 +158,6 @@ func (m *MahjongTable) Play() {
 					mt.Formed = append(mt.Formed, m.Players[t.Seat].Formed...)
 				}
 				m.Push(&mt)
-				tp++
 				go m.Players[tp%4].Play(m)
 			case CMD_RESET:
 				m.Reset()

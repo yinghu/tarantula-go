@@ -37,7 +37,6 @@ func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 		}
 		select {
 		case <-tm.C:
-			//tb.Turn <- s.T
 			s.T()
 		case <-s.Commited:
 			core.AppLog.Printf("Stop %d\n", s.OId())
