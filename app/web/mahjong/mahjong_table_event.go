@@ -1,8 +1,6 @@
 package main
 
 import (
-	"time"
-
 	"gameclustering.com/internal/core"
 )
 
@@ -50,7 +48,7 @@ func (s *MahjongTableEvent) Write(buff core.DataBuffer) error {
 	if err := buff.WriteInt64(s.North); err != nil {
 		return err
 	}
-	return s.Next.Write(buff)
+	return s.N.Write(buff)
 }
 
 func (s *MahjongTableEvent) Outbound(buff core.DataBuffer) error {
@@ -67,25 +65,3 @@ func (s *MahjongTableEvent) Outbound(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *MahjongTableEvent) Start(tb *MahjongTable) {
-	tm := *time.NewTimer(time.Duration(s.Next.CountDown+5) * time.Second)
-	s.Commited = make(chan bool)
-	closing := false
-	defer close(s.Commited)
-	for {
-		if closing {
-			break
-		}
-		select {
-		case <-tm.C:
-			se := MahjongPlayToken{SystemId: s.SystemId, Cmd: CMD_SIT, Seat: SEAT_E, Id: s.OId()}
-			tb.Turn <- se
-		case <-s.Commited:
-			core.AppLog.Printf("Stop %d\n", s.OId())
-			closing = true
-		}
-	}
-}
-func (s *MahjongTableEvent) Stop() {
-	s.Commited <- true
-}

@@ -2,14 +2,11 @@ package main
 
 import (
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 )
 
 type MahjongTurnEvent struct {
-	SystemId  int64
-	TableId   int64
-	CountDown int32
-	event.EventObj
+	SystemId int64
+	MahjongTimeoutObj
 }
 
 func (s *MahjongTurnEvent) ClassId() int {
@@ -24,13 +21,10 @@ func (s *MahjongTurnEvent) Write(buff core.DataBuffer) error {
 	if err := buff.WriteInt64(s.SystemId); err != nil {
 		return err
 	}
-	if err := buff.WriteInt64(s.TableId); err != nil {
+	if err := buff.WriteInt64(s.OId()); err != nil {
 		return err
 	}
-	if err := buff.WriteInt32(s.CountDown); err != nil {
-		return err
-	}
-	return nil
+	return s.N.Write(buff)
 }
 
 func (s *MahjongTurnEvent) Outbound(buff core.DataBuffer) error {
@@ -45,4 +39,16 @@ func (s *MahjongTurnEvent) Outbound(buff core.DataBuffer) error {
 		return err
 	}
 	return nil
+}
+
+func (s *MahjongTurnEvent) RecipientId() int64 {
+	return s.SystemId
+}
+
+func NewTurn(systemId int64, oid int64, cmd int, t MahjongPlayToken) MahjongTurnEvent {
+	mt := MahjongTurnEvent{SystemId: systemId}
+	mt.OnOId(oid)
+	mt.N = MahjongPlayTurn{Cmd: cmd, CountDown: TURN_TICKER_SECONDS}
+	mt.T = t
+	return mt
 }

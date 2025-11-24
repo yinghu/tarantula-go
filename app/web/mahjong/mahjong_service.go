@@ -100,7 +100,7 @@ func (s *MahjongService) onTable(systemId int64, flag int64) {
 	core.AppLog.Printf("table flag %d\n", flag)
 	if flag == systemId { //solo player with 3 auto players
 		tid, _ := s.Sequence().Id()
-		table := MahjongTable{Id: tid, Pusher: s.Pusher(), Setup: mj.ClassicMahjong{}, Solo: flag == systemId}
+		table := MahjongTable{Id: tid, Pusher: s.Pusher(), Sequence: s.Sequence(), Setup: mj.ClassicMahjong{}, Solo: flag == systemId}
 		table.New()
 		s.TableIndex[systemId] = &table
 		go table.Play()

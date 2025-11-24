@@ -22,17 +22,18 @@ const (
 )
 
 type MahjongTable struct {
-	Id           int64             `json:"Id,string"`
-	Setup        mj.ClassicMahjong `json:"-"`
-	Players      [4]*MahjongPlayer `json:"Players"`
-	Pts          int               `json:"Pts"`
-	Discharged   []mj.Tile         `json:"Discharged"`
-	Started      bool
-	Solo         bool
-	Turn         chan MahjongPlayToken `json:"-"`
-	event.Pusher `json:"-"`
-	Timer        chan MahjongTimeout
-	Sync         chan MahjongPlayToken `json:"-"`
+	Id            int64             `json:"Id,string"`
+	Setup         mj.ClassicMahjong `json:"-"`
+	Players       [4]*MahjongPlayer `json:"Players"`
+	Pts           int               `json:"Pts"`
+	Discharged    []mj.Tile         `json:"Discharged"`
+	Started       bool
+	Solo          bool
+	Turn          chan MahjongPlayToken `json:"-"`
+	event.Pusher  `json:"-"`
+	core.Sequence `json:"-"`
+	Timer         chan MahjongTimeout
+	Sync          chan MahjongPlayToken `json:"-"`
 }
 
 func (m *MahjongTable) New() {
@@ -66,15 +67,13 @@ func (m *MahjongTable) Play() {
 			case CMD_END:
 				m.Started = false
 				running = false
-				//break
 			case CMD_SIT:
 				err := m.Sit(k.SystemId, k.Seat)
 				if err != nil {
 					mr := MahjongErrorEvent{SystemId: k.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
 					m.Push(&mr)
 				} else {
-					mt := MahjongSitEvent{SystemId: k.SystemId, TableId: m.Id, Seat: int32(k.Seat)}
-					m.Push(&mt)
+					go m.Players[k.Seat].Play(m)
 				}
 			}
 		case tm := <-m.Timer:
