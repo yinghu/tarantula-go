@@ -102,7 +102,7 @@ func (m *MahjongTable) Play() {
 					mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
 					m.Push(&mt)
 				}
-				tp = (m.Pts - 1) / 4
+				tp = (m.Pts - 1) % 4
 				core.AppLog.Printf("Deal start %d %d", tp, m.Players[tp].Hand.TileSize())
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
