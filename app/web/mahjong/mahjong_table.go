@@ -60,6 +60,7 @@ func (m *MahjongTable) Reset() {
 func (m *MahjongTable) Play() {
 	timerIndex := make(map[int64]MahjongTimeout)
 	running := true
+	var tp int
 	for running {
 		select {
 		case k := <-m.Sync:
@@ -101,7 +102,8 @@ func (m *MahjongTable) Play() {
 					mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
 					m.Push(&mt)
 				}
-
+				tp = (m.Pts - 1) / 4
+				core.AppLog.Printf("Deal start %d", tp)
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
 				if err != nil {
