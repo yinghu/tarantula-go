@@ -13,7 +13,7 @@ const (
 	CMD_CHOW      int = 7
 	CMD_CLAIM     int = 8
 	CMD_WAIT      int = 9
-	
+	CMD_TURN      int = 10
 	CMD_END_TURN  int = 97
 	CMD_RESET     int = 98
 	CMD_END       int = 99

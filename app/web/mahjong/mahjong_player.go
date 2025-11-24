@@ -3,6 +3,7 @@ package main
 import (
 	"slices"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
@@ -26,13 +27,20 @@ type MahjongPlayer struct {
 	Pusher       event.Pusher
 }
 
-func (mp *MahjongPlayer) Play(cmd int, mt *MahjongTable) {
+func (mp *MahjongPlayer) Setup(cmd int, mt *MahjongTable) {
 	ms := MahjongSitEvent{SystemId: mp.SystemId, TableId: mt.Id, Seat: int32(mp.Seat)}
 	mt.Push(&ms)
 	oid, _ := mt.Sequence.Id()
-	md := NewTurn(mp.SystemId, oid, CMD_DICE, MahjongPlayToken{Cmd: cmd, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid})
+	md := NewTurn(mp.SystemId, oid, cmd, MahjongPlayToken{Cmd: cmd, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid})
 	mt.Push(&md)
 	mt.Timer <- &md
+}
+
+func (mp *MahjongPlayer) Play(mt *MahjongTable) {
+	core.AppLog.Printf("Seat %d", mp.Seat)
+	if mp.Auto{
+		
+	}
 }
 
 func (mp *MahjongPlayer) Reset() {
