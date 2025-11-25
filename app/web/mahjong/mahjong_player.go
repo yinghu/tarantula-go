@@ -41,7 +41,6 @@ func (mp *MahjongPlayer) PlayDice(mt *MahjongTable) {
 	}, func() {
 		me := MahjongDiceEvent{Dice1: int32(mt.dice[0]), Dice2: int32(mt.dice[1])}
 		mt.Push(&me)
-
 	})
 	mt.Push(&md)
 	mt.Timer <- &md

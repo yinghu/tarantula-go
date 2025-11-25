@@ -107,6 +107,7 @@ func (m *MahjongTable) Play() {
 			switch t.Cmd {
 			case CMD_DICE:
 				m.Dice()
+				timer.Stop()
 				go m.Players[t.Seat].PlayDeal(m)
 			case CMD_DEAL:
 				err := m.Deal()
