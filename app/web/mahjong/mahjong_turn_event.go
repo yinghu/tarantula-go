@@ -5,7 +5,6 @@ import (
 )
 
 type MahjongTurnEvent struct {
-	SystemId int64
 	MahjongTimeoutObj
 }
 
@@ -39,16 +38,4 @@ func (s *MahjongTurnEvent) Outbound(buff core.DataBuffer) error {
 		return err
 	}
 	return nil
-}
-
-func (s *MahjongTurnEvent) RecipientId() int64 {
-	return s.SystemId
-}
-
-func NewTurn(systemId int64, oid int64, cmd int, t OnTurn) MahjongTurnEvent {
-	mt := MahjongTurnEvent{SystemId: systemId}
-	mt.OnOId(oid)
-	mt.N = MahjongPlayTurn{Cmd: cmd, CountDown: TURN_TICKER_SECONDS}
-	mt.T = t
-	return mt
 }

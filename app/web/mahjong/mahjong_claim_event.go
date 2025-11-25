@@ -2,17 +2,15 @@ package main
 
 import (
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
 
 type MahjongClaimEvent struct {
-	SystemId int64
 	TableId  int64
 	Seat     int32
 	Claimed  bool
 	Formed   []mj.Meld
-	event.EventObj
+	MahjongEventObj
 }
 
 func (s *MahjongClaimEvent) ClassId() int {

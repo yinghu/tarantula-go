@@ -2,7 +2,6 @@ package main
 
 import (
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 )
 
 const (
@@ -21,8 +20,7 @@ const (
 
 type MahjongEvent struct {
 	Token    MahjongPlayToken
-	SystemId int64
-	event.EventObj
+	MahjongEventObj
 }
 
 func (s *MahjongEvent) ClassId() int {
@@ -91,8 +89,4 @@ func (s *MahjongEvent) Inbound(buff core.DataBuffer) error {
 	}
 	s.Callback.OnEvent(s)
 	return nil
-}
-
-func (s *MahjongEvent) RecipientId() int64 {
-	return s.SystemId
 }

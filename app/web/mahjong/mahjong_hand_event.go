@@ -2,14 +2,13 @@ package main
 
 import (
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
 
 type MahjongHandEvent struct {
 	H mj.Hand
 	K []int
-	event.EventObj
+	MahjongEventObj
 }
 
 func (s *MahjongHandEvent) ClassId() int {

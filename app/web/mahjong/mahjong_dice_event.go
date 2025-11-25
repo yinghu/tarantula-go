@@ -2,14 +2,14 @@ package main
 
 import (
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 )
 
 type MahjongDiceEvent struct {
 	Dice1 int32
 	Dice2 int32
-	event.EventObj
+	MahjongEventObj
 }
+
 func (s *MahjongDiceEvent) ClassId() int {
 	return M_DICE_CID
 }
@@ -27,7 +27,6 @@ func (s *MahjongDiceEvent) Write(buff core.DataBuffer) error {
 	}
 	return nil
 }
-
 
 func (s *MahjongDiceEvent) Outbound(buff core.DataBuffer) error {
 	err := s.WriteKey(buff)

@@ -122,7 +122,7 @@ func TestMahjongAutoTable(t *testing.T) {
 
 func TestMahjongToken(t *testing.T) {
 	lis := SampleCallback{}
-	me := MahjongEvent{Token: MahjongPlayToken{Cmd: CMD_DICE, SystemId: 100}, SystemId: 101}
+	me := NewMahjongEvent(101, MahjongPlayToken{Cmd: CMD_DICE, SystemId: 100})
 	me.Callback = &lis
 	buff := core.NewBuffer(100)
 	me.Outbound(buff)
@@ -135,9 +135,9 @@ func TestMahjongToken(t *testing.T) {
 	}
 }
 
-//func cmp(a, b mj.Tile) int {
-	//return a.Seq - b.Seq
-//}
+// func cmp(a, b mj.Tile) int {
+// return a.Seq - b.Seq
+// }
 func TestClassic1(t *testing.T) {
 
 	b1 := mj.NewTile(mj.BAMBOO1)

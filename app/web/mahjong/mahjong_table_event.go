@@ -5,7 +5,6 @@ import (
 )
 
 type MahjongTableEvent struct {
-	SystemId int64
 	TableId  int64
 	East     int64
 	South    int64

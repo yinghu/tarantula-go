@@ -17,10 +17,19 @@ type MahjongTimeout interface {
 	OId() int64
 }
 
+type MahjongEventObj struct {
+	event.EventObj
+	SystemId int64
+}
+
+func (s *MahjongEventObj) RecipientId() int64 {
+	return s.SystemId
+}
+
 type OnTurn func()
 
 type MahjongTimeoutObj struct {
-	event.EventObj
+	MahjongEventObj
 	Commited chan bool
 	N        MahjongPlayTurn
 	T        OnTurn

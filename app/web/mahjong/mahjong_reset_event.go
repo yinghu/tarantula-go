@@ -2,12 +2,11 @@ package main
 
 import (
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 )
 
 type MahjongResetEvent struct {
 	Started bool
-	event.EventObj
+	MahjongEventObj
 }
 
 func (s *MahjongResetEvent) ClassId() int {

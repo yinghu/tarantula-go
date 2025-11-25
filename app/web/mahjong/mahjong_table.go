@@ -72,10 +72,10 @@ func (m *MahjongTable) Play() {
 			case CMD_SIT:
 				err := m.Sit(k.SystemId, k.Seat)
 				if err != nil {
-					mr := MahjongErrorEvent{SystemId: k.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
+					mr := NewMahjongErrorEvent(k.SystemId, m.Id, 100, err.Error())
 					m.Push(&mr)
 				} else {
-					ms := MahjongSitEvent{SystemId: k.SystemId, TableId: m.Id, Seat: int32(k.Seat)}
+					ms := NewMahjongSitEvent(k.SystemId, m.Id, k.Seat)
 					m.Push(&ms)
 				}
 			case CMD_TURN_END:
@@ -102,8 +102,9 @@ func (m *MahjongTable) Play() {
 				go m.Players[t.Seat].Setup(CMD_DEAL, m)
 			case CMD_DEAL:
 				err := m.Deal()
+
 				if err != nil {
-					mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
+					mr := NewMahjongErrorEvent(t.SystemId, m.Id, 100, err.Error())
 					m.Push(&mr)
 				} else {
 					mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
@@ -112,11 +113,9 @@ func (m *MahjongTable) Play() {
 				tp = (m.Pts - 1) % 4
 				//start dealer
 				go m.Players[tp].Play(m)
-
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
 				go m.Players[tp%4].OnPlayFinished(m, t, err)
-
 			case CMD_KONG:
 				err := m.Knog(t.Seat, t.Selected)
 				go m.Players[tp%4].OnPlayFinished(m, t, err)
@@ -124,12 +123,12 @@ func (m *MahjongTable) Play() {
 				err := m.Discharge(t.Seat, t.Selected)
 				go m.Players[tp%4].OnPlayFinished(m, t, err)
 			case CMD_CLAIM:
-				claimed := m.Claim(t.Seat)
-				mt := MahjongClaimEvent{SystemId: t.SystemId, TableId: m.Id, Seat: int32(t.Seat), Claimed: claimed}
-				if claimed {
-					mt.Formed = append(mt.Formed, m.Players[t.Seat].Formed...)
-				}
-				m.Push(&mt)
+				//claimed := m.Claim(t.Seat)
+				//mt := MahjongClaimEvent{SystemId: t.SystemId, TableId: m.Id, Seat: int32(t.Seat), Claimed: claimed}
+				//if claimed {
+					//mt.Formed = append(mt.Formed, m.Players[t.Seat].Formed...)
+				//}
+				//m.Push(&mt)
 			case CMD_RESET:
 				m.Reset()
 				mt := MahjongResetEvent{Started: false}

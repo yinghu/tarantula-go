@@ -29,7 +29,7 @@ type MahjongPlayer struct {
 
 func (mp *MahjongPlayer) Setup(cmd int, mt *MahjongTable) {
 	oid, _ := mt.Sequence.Id()
-	md := NewTurn(mp.SystemId, oid, cmd, func() {
+	md := NewMahjongTurnEvent(mp.SystemId, oid, cmd, func() {
 		mt.Turn <- MahjongPlayToken{Cmd: cmd, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
 	})
 	mt.Push(&md)
@@ -40,7 +40,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	core.AppLog.Printf("Seat %d", mp.Seat)
 	if !mp.Auto {
 		oid, _ := mt.Sequence.Id()
-		md := NewTurn(mp.SystemId, oid, CMD_DRAW, func() {
+		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DRAW, func() {
 			mt.Turn <- MahjongPlayToken{Cmd: CMD_DRAW, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
 		})
 		mt.Push(&md)
@@ -54,7 +54,7 @@ func (mp *MahjongPlayer) OnPlayFinished(m *MahjongTable, t MahjongPlayToken, err
 		return
 	}
 	if err != nil {
-		mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
+		mr := NewMahjongErrorEvent(mp.SystemId, m.Id, 100, err.Error())
 		m.Push(&mr)
 	} else {
 		mt := MahjongHandEvent{H: mp.Hand, K: mp.PendingKongs}
@@ -251,7 +251,8 @@ func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
 	}
 	if len(clist) == 4 {
 		mp.PendingKongs = append(mp.PendingKongs, clist[0].Seq)
-		mt := MahjongKnogEvent{SystemId: mp.SystemId, Knog: mp.PendingKongs}
+		mt := MahjongKnogEvent{Knog: mp.PendingKongs}
+		mt.SystemId = mp.SystemId
 		mp.Pusher.Push(&mt)
 	}
 

@@ -2,15 +2,13 @@ package main
 
 import (
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 )
 
 type MahjongErrorEvent struct {
-	SystemId int64
 	TableId  int64
 	Code     int
 	Message  string
-	event.EventObj
+	MahjongEventObj
 }
 
 func (s *MahjongErrorEvent) ClassId() int {

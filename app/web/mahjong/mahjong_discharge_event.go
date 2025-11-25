@@ -2,13 +2,12 @@ package main
 
 import (
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
 
 type MahjongDischargeEvent struct {
 	D []mj.Tile
-	event.EventObj
+	MahjongEventObj
 }
 
 func (s *MahjongDischargeEvent) ClassId() int {
@@ -20,7 +19,7 @@ func (s *MahjongDischargeEvent) ETag() string {
 }
 
 func (s *MahjongDischargeEvent) Write(buff core.DataBuffer) error {
-	
+
 	sz := len(s.D)
 	if err := buff.WriteInt32(int32(sz)); err != nil {
 		return err

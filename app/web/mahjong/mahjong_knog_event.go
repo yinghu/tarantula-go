@@ -2,13 +2,12 @@ package main
 
 import (
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 )
 
 type MahjongKnogEvent struct {
-	SystemId int64
+	
 	Knog     []int
-	event.EventObj
+	MahjongEventObj
 }
 
 func (s *MahjongKnogEvent) ClassId() int {
@@ -49,6 +48,3 @@ func (s *MahjongKnogEvent) Outbound(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *MahjongKnogEvent) RecipientId() int64 {
-	return s.SystemId
-}
