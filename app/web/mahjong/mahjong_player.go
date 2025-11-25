@@ -45,12 +45,14 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		})
 		mt.Push(&md)
 		mt.Timer <- &md
-		//mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 		return
 	}
 	mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 }
 func (mp *MahjongPlayer) OnPlayFinished(m *MahjongTable, t MahjongPlayToken, err error) {
+	if mp.Auto {
+		return
+	}
 	if err != nil {
 		mr := MahjongErrorEvent{SystemId: t.SystemId, TableId: m.Id, Code: 100, Message: err.Error()}
 		m.Push(&mr)
