@@ -47,7 +47,8 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		mt.Timer <- &md
 		return
 	}
-	mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCHARGE, SystemId: mp.SystemId, Seat: mp.Seat, Id: 0}
+	t := mp.Hand.Tiles[0]
+	mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCHARGE, SystemId: mp.SystemId, Seat: mp.Seat, Selected: t.Seq, Id: 0}
 }
 func (mp *MahjongPlayer) OnPlayFinished(m *MahjongTable, t MahjongPlayToken, err error) {
 	if mp.Auto {
