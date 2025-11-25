@@ -41,7 +41,8 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	if !mp.Auto {
 		oid, _ := mt.Sequence.Id()
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DRAW, func() {
-			mt.Turn <- MahjongPlayToken{Cmd: CMD_DRAW, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
+			t := mp.Hand.Tiles[0]
+			mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCHARGE, SystemId: mp.SystemId, Seat: mp.Seat, Selected: t.Seq, Id: oid}
 		})
 		mt.Push(&md)
 		mt.Timer <- &md
