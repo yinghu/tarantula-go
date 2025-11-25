@@ -38,7 +38,7 @@ func (mp *MahjongPlayer) Setup(cmd int, mt *MahjongTable) {
 }
 
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
-	core.AppLog.Printf("Player Seat %d Auto %v\n", mp.Seat, mp.Auto)
+	//core.AppLog.Printf("Player Seat %d Auto %v\n", mp.Seat, mp.Auto)
 	if !mp.Auto {
 
 		oid, _ := mt.Sequence.Id()

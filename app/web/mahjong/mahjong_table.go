@@ -64,7 +64,7 @@ func (m *MahjongTable) Play() {
 	for running {
 		select {
 		case k := <-m.Sync:
-			core.AppLog.Printf("Sync: %d selected : %d cmd: %d Id :%d\n", k.Seat, k.Selected, k.Cmd, k.Id)
+			//core.AppLog.Printf("Sync: %d selected : %d cmd: %d Id :%d\n", k.Seat, k.Selected, k.Cmd, k.Id)
 			switch k.Cmd {
 			case CMD_END:
 				m.Started = false
