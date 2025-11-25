@@ -32,7 +32,8 @@ type MahjongTimeoutObj struct {
 	MahjongEventObj
 	Commited chan bool
 	N        MahjongPlayTurn
-	T        OnTurn
+	T        OnTurn //triger on timer
+	P        OnTurn //call on stop
 }
 
 func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
@@ -48,7 +49,9 @@ func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 		case <-tm.C:
 			s.T()
 		case <-s.Commited:
-			//core.AppLog.Printf("Stop %d\n", s.OId())
+			if s.P != nil {
+				s.P()
+			}
 			closing = true
 		}
 	}

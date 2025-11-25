@@ -64,7 +64,7 @@ func (m *MahjongTable) Play() {
 	for running {
 		select {
 		case k := <-m.Sync:
-			//core.AppLog.Printf("Sync: %d selected : %d cmd: %d Id :%d\n", k.Seat, k.Selected, k.Cmd, k.Id)
+			core.AppLog.Printf("Sync: %d selected : %d cmd: %d Id :%d\n", k.Seat, k.Selected, k.Cmd, k.Id)
 			switch k.Cmd {
 			case CMD_END:
 				m.Started = false
@@ -86,7 +86,7 @@ func (m *MahjongTable) Play() {
 			timerIndex[tm.OId()] = tm
 			go tm.Start(m)
 		case t := <-m.Turn:
-			//core.AppLog.Printf("Token seat: %d selected : %d cmd: %d Id :%d\n", t.Seat, t.Selected, t.Cmd, t.Id)
+			core.AppLog.Printf("Token seat: %d selected : %d cmd: %d Id :%d\n", t.Seat, t.Selected, t.Cmd, t.Id)
 			timer, exists := timerIndex[t.Id]
 			if exists {
 				delete(timerIndex, t.Id)
@@ -94,7 +94,11 @@ func (m *MahjongTable) Play() {
 			}
 			switch t.Cmd {
 			case CMD_TABLE:
-				go m.Players[t.Seat].Setup(CMD_DICE, m)
+				if m.Solo{
+					go m.Players[t.Seat].PlayDice(m)
+				}else{
+
+				}
 			case CMD_DICE:
 				dice := m.Dice()
 				mt := MahjongDiceEvent{Dice1: int32(dice[0]), Dice2: int32(dice[1])}

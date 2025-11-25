@@ -28,11 +28,26 @@ type MahjongPlayer struct {
 	cmd          int
 }
 
+func (mp *MahjongPlayer) PlayDice(mt *MahjongTable) {
+	oid, _ := mt.Sequence.Id()
+	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DICE, func() {
+		mt.Turn <- MahjongPlayToken{Cmd: CMD_DICE, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
+	}, func() {
+		core.AppLog.Printf("Dice %d\n", mt.Pts)
+	})
+	mt.Push(&md)
+	mt.Timer <- &md
+}
+
+func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
+
+}
+
 func (mp *MahjongPlayer) Setup(cmd int, mt *MahjongTable) {
 	oid, _ := mt.Sequence.Id()
 	md := NewMahjongTurnEvent(mp.SystemId, oid, cmd, func() {
 		mt.Turn <- MahjongPlayToken{Cmd: cmd, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
-	})
+	}, nil)
 	mt.Push(&md)
 	mt.Timer <- &md
 }
@@ -45,7 +60,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		md := NewMahjongTurnEvent(mp.SystemId, oid, mp.cmd, func() {
 			t := mp.Hand.Tiles[0]
 			mt.Turn <- MahjongPlayToken{Cmd: mp.cmd, SystemId: mp.SystemId, Seat: mp.Seat, Selected: t.Seq, Id: oid}
-		})
+		},nil)
 		mt.Push(&md)
 		mt.Timer <- &md
 		return
