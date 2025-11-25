@@ -5,7 +5,6 @@ import (
 )
 
 type MahjongSitEvent struct {
-	TableId  int64
 	Seat     int32
 	MahjongEventObj
 }

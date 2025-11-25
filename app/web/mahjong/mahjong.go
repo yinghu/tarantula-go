@@ -7,7 +7,8 @@ import (
 
 // event util
 func NewMahjongErrorEvent(systemId int64, tableId int64, code int, msg string) MahjongErrorEvent {
-	me := MahjongErrorEvent{TableId: tableId, Code: code, Message: msg}
+	me := MahjongErrorEvent{Code: code, Message: msg}
+	me.TableId = tableId
 	me.SystemId = systemId
 	return me
 }
@@ -31,9 +32,22 @@ func NewMahjongEvent(systemId int64, t MahjongPlayToken) MahjongEvent {
 	me.SystemId = systemId
 	return me
 }
-func NewMahjongSitEvent(systemId int64,tableId int64,seat int) MahjongSitEvent{
-	me := MahjongSitEvent{TableId: tableId,Seat: int32(seat)}
+func NewMahjongSitEvent(systemId int64, tableId int64, seat int) MahjongSitEvent {
+	me := MahjongSitEvent{Seat: int32(seat)}
+	me.TableId = tableId
 	me.SystemId = systemId
+	return me
+}
+func NewMahjongKnogEvent(systemId int64, knog []int) MahjongKnogEvent {
+	me := MahjongKnogEvent{Knog: knog}
+	me.SystemId = systemId
+	return me
+}
+
+func NewMahjongClaimEvent(systemId int64, tableId int64, seat int, claimed bool) MahjongClaimEvent {
+	me := MahjongClaimEvent{Seat: int32(seat), Claimed: claimed}
+	me.SystemId = systemId
+	me.TableId = tableId
 	return me
 }
 

@@ -5,7 +5,6 @@ import (
 )
 
 type MahjongErrorEvent struct {
-	TableId  int64
 	Code     int
 	Message  string
 	MahjongEventObj

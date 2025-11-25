@@ -123,12 +123,12 @@ func (m *MahjongTable) Play() {
 				err := m.Discharge(t.Seat, t.Selected)
 				go m.Players[tp%4].OnPlayFinished(m, t, err)
 			case CMD_CLAIM:
-				//claimed := m.Claim(t.Seat)
-				//mt := MahjongClaimEvent{SystemId: t.SystemId, TableId: m.Id, Seat: int32(t.Seat), Claimed: claimed}
-				//if claimed {
-					//mt.Formed = append(mt.Formed, m.Players[t.Seat].Formed...)
-				//}
-				//m.Push(&mt)
+				claimed := m.Claim(t.Seat)
+				mt := NewMahjongClaimEvent(t.SystemId, m.Id, t.Seat,claimed)
+				if claimed {
+					mt.Formed = append(mt.Formed, m.Players[t.Seat].Formed...)
+				}
+				m.Push(&mt)
 			case CMD_RESET:
 				m.Reset()
 				mt := MahjongResetEvent{Started: false}

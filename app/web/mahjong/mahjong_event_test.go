@@ -1,6 +1,11 @@
 package main
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"gameclustering.com/internal/core"
+)
 
 func TestMahjongEvent(t *testing.T) {
 	err := NewMahjongErrorEvent(100, 200, 1, "error")
@@ -19,4 +24,13 @@ func TestMahjongEvent(t *testing.T) {
 	if err.Message != "error" {
 		t.Errorf("error should error %s", err.Message)
 	}
+	err.Callback = &SampleCallback{}
+	buff := core.NewBuffer(100)
+	err.Outbound(buff)
+	buff.Flip()
+	sysId, _ := buff.ReadInt64()
+	tid, _ := buff.ReadInt64()
+	code, _ := buff.ReadInt32()
+	msg, _ := buff.ReadString()
+	fmt.Printf(">>%d %d %d %s\n", sysId, tid, code, msg)
 }

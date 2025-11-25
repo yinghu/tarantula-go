@@ -6,7 +6,6 @@ import (
 )
 
 type MahjongClaimEvent struct {
-	TableId  int64
 	Seat     int32
 	Claimed  bool
 	Formed   []mj.Meld

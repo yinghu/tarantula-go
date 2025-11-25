@@ -20,6 +20,7 @@ type MahjongTimeout interface {
 type MahjongEventObj struct {
 	event.EventObj
 	SystemId int64
+	TableId  int64
 }
 
 func (s *MahjongEventObj) RecipientId() int64 {
