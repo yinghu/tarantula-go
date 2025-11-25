@@ -25,7 +25,7 @@ type MahjongTable struct {
 	Id            int64             `json:"Id,string"`
 	Setup         mj.ClassicMahjong `json:"-"`
 	Players       [4]*MahjongPlayer `json:"Players"`
-	Pts           int               `json:"Pts"`
+	dice          []int             `json:"-"`
 	Discharged    []mj.Tile         `json:"Discharged"`
 	Started       bool
 	Solo          bool
@@ -34,6 +34,10 @@ type MahjongTable struct {
 	core.Sequence `json:"-"`
 	Timer         chan MahjongTimeout
 	Sync          chan MahjongPlayToken `json:"-"`
+}
+
+func (m *MahjongTable) Pts() int {
+	return m.dice[0] + m.dice[1]
 }
 
 func (m *MahjongTable) New() {
@@ -102,29 +106,38 @@ func (m *MahjongTable) Play() {
 			delete(timerIndex, t.Id)
 			switch t.Cmd {
 			case CMD_DICE:
-				dice := m.Dice()
-				mt := MahjongDiceEvent{Dice1: int32(dice[0]), Dice2: int32(dice[1])}
-				m.Push(&mt)
-				timer.Stop()
-				go m.Players[t.Seat].Setup(CMD_DEAL, m)
+				m.Dice()
+				go m.Players[t.Seat].PlayDeal(m)
 			case CMD_DEAL:
 				err := m.Deal()
-				go m.Players[SEAT_E].OnPlayFinished(m, t, err)
-				go m.Players[SEAT_S].OnPlayFinished(m, t, err)
-				go m.Players[SEAT_W].OnPlayFinished(m, t, err)
-				go m.Players[SEAT_N].OnPlayFinished(m, t, err)
-				tp = (m.Pts - 1) % 4
+				if err != nil {
+					go m.Players[t.Seat].OnError(m, err)
+					continue
+				}
+				timer.Stop()
 				//start dealer
-				go m.Players[tp].Play(m)
+				//go m.Players[tp].Play(m)
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
-				go m.Players[tp%4].OnPlayFinished(m, t, err)
+				if err != nil {
+					go m.Players[t.Seat].OnError(m, err)
+					continue
+				}
+				timer.Stop()
 			case CMD_KONG:
 				err := m.Knog(t.Seat, t.Selected)
-				go m.Players[tp%4].OnPlayFinished(m, t, err)
+				if err != nil {
+					go m.Players[t.Seat].OnError(m, err)
+					continue
+				}
+				timer.Stop()
 			case CMD_DISCHARGE:
 				err := m.Discharge(t.Seat, t.Selected)
-				go m.Players[tp%4].OnPlayFinished(m, t, err)
+				if err != nil {
+					go m.Players[t.Seat].OnError(m, err)
+					continue
+				}
+				timer.Stop()
 			case CMD_CLAIM:
 				claimed := m.Claim(t.Seat)
 				mt := NewMahjongClaimEvent(t.SystemId, m.Id, t.Seat, claimed)
@@ -136,7 +149,7 @@ func (m *MahjongTable) Play() {
 				m.Reset()
 				mt := MahjongResetEvent{Started: false}
 				m.Push(&mt)
-				go m.Players[t.Seat].Setup(CMD_DEAL, m)
+				go m.Players[t.Seat].PlayDeal(m)
 			}
 		}
 	}
@@ -166,16 +179,14 @@ func (m *MahjongTable) Sit(systemId int64, seatNumber int) error {
 
 }
 
-func (m *MahjongTable) Dice() []int {
-	dice := m.Setup.Dice()
-	m.Pts = dice[0] + dice[1]
-	return dice
+func (m *MahjongTable) Dice() {
+	m.dice = m.Setup.Dice()
 }
 func (m *MahjongTable) Deal() error {
-	if m.Pts == 0 {
+	if m.Pts() == 0 {
 		return fmt.Errorf("no dice")
 	}
-	dealer := (m.Pts - 1) % 4
+	dealer := (m.Pts() - 1) % 4
 	r := 3
 	for {
 		if r == 0 {

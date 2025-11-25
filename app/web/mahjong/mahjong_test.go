@@ -34,7 +34,7 @@ func TestMahjongTable(t *testing.T) {
 	mt.Sit(4, SEAT_N)
 	mt.Dice()
 	mt.Deal()
-	dealer := (mt.Pts - 1) % 4
+	dealer := (mt.Pts() - 1) % 4
 	dz := len(mt.Players[dealer].Hand.Tiles)
 	if dz != 14 {
 		t.Errorf("dealer hand should be 14 %d", dz)
@@ -73,7 +73,7 @@ func TestMahjongAutoTable(t *testing.T) {
 	//mt.Sit(4, SEAT_N)
 	mt.Dice()
 	mt.Deal()
-	dealer := (mt.Pts - 1) % 4
+	dealer := (mt.Pts() - 1) % 4
 	dz := len(mt.Players[dealer].Hand.Tiles)
 	if dz != 14 {
 		t.Errorf("dealer hand should be 14 %d", dz)

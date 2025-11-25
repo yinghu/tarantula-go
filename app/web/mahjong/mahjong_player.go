@@ -2,8 +2,6 @@ package main
 
 import (
 	"slices"
-
-	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
@@ -28,26 +26,35 @@ type MahjongPlayer struct {
 	cmd          int
 }
 
+func (mp *MahjongPlayer) OnError(mt *MahjongTable, err error) {
+	if mp.Auto {
+		return
+	}
+	mr := NewMahjongErrorEvent(mp.SystemId, mt.Id, 100, err.Error())
+	mt.Push(&mr)
+}
+
 func (mp *MahjongPlayer) PlayDice(mt *MahjongTable) {
 	oid, _ := mt.Sequence.Id()
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DICE, func() {
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_DICE, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
 	}, func() {
-		core.AppLog.Printf("Dice %d\n", mt.Pts)
+		me := MahjongDiceEvent{Dice1: int32(mt.dice[0]), Dice2: int32(mt.dice[1])}
+		mt.Push(&me)
+
 	})
 	mt.Push(&md)
 	mt.Timer <- &md
 }
 
 func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
-
-}
-
-func (mp *MahjongPlayer) Setup(cmd int, mt *MahjongTable) {
 	oid, _ := mt.Sequence.Id()
-	md := NewMahjongTurnEvent(mp.SystemId, oid, cmd, func() {
-		mt.Turn <- MahjongPlayToken{Cmd: cmd, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
-	}, nil)
+	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DEAL, func() {
+		mt.Turn <- MahjongPlayToken{Cmd: CMD_DEAL, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
+	}, func() {
+		me := NewMahjongHandEvent(mp.SystemId,mp.Hand,mp.PendingKongs)
+		mt.Push(&me)
+	})
 	mt.Push(&md)
 	mt.Timer <- &md
 }
@@ -60,7 +67,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		md := NewMahjongTurnEvent(mp.SystemId, oid, mp.cmd, func() {
 			t := mp.Hand.Tiles[0]
 			mt.Turn <- MahjongPlayToken{Cmd: mp.cmd, SystemId: mp.SystemId, Seat: mp.Seat, Selected: t.Seq, Id: oid}
-		},nil)
+		}, nil)
 		mt.Push(&md)
 		mt.Timer <- &md
 		return
@@ -68,35 +75,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	t := mp.Hand.Tiles[0]
 	mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCHARGE, SystemId: mp.SystemId, Seat: mp.Seat, Selected: t.Seq, Id: 0}
 }
-func (mp *MahjongPlayer) OnPlayFinished(m *MahjongTable, t MahjongPlayToken, err error) {
-	if mp.Auto {
-		if err != nil {
-			mp.cmd = CMD_DRAW
-		}
-		core.AppLog.Printf("Auto Hand %d >> %d \n", mp.Seat, mp.Hand.TileSize())
-		m.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
-		return
-	}
-	if err != nil {
-		mp.cmd = CMD_DRAW
-		mr := NewMahjongErrorEvent(mp.SystemId, m.Id, 100, err.Error())
-		m.Push(&mr)
-	} else {
-		mt := MahjongHandEvent{H: mp.Hand, K: mp.PendingKongs}
-		m.Push(&mt)
-		if t.Cmd == CMD_DISCHARGE {
-			dz := len(m.Discharged)
-			if dz <= 3 {
-				md := MahjongDischargeEvent{D: m.Discharged}
-				m.Push(&md)
-			} else {
-				md := MahjongDischargeEvent{D: m.Discharged[(dz - 3):]}
-				m.Push(&md)
-			}
-		}
-		m.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
-	}
-}
+
 
 func (mp *MahjongPlayer) Reset() {
 	mp.Clear()
