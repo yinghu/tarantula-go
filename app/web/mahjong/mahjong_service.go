@@ -70,7 +70,7 @@ func (s *MahjongService) OnEvent(e event.Event) {
 	case event.JOIN_CID:
 		join, _ := e.(*event.JoinEvent)
 		core.AppLog.Printf("joined from %d %d\n", join.RecipientId(), join.Flag)
-		s.Dispatcher <- MahjongPlayToken{SystemId: e.RecipientId(), Cmd: CMD_JOINED, Table: join.Flag}
+		s.Dispatcher <- MahjongPlayToken{SystemId: e.RecipientId(), Cmd: CMD_JOINED, TableId: join.Flag}
 	case event.KICKOFF_CID:
 		core.AppLog.Printf("kickoff from %d\n", e.RecipientId())
 		s.Dispatcher <- MahjongPlayToken{SystemId: e.RecipientId(), Cmd: CMD_LEFT}
@@ -89,7 +89,7 @@ func (s *MahjongService) dispatch() {
 	for t := range s.Dispatcher {
 		switch t.Cmd {
 		case CMD_JOINED:
-			go s.onTable(t.SystemId, t.Table)
+			go s.onTable(t.SystemId, t.TableId)
 		case CMD_LEFT:
 			go s.offTable(t.SystemId)
 		}

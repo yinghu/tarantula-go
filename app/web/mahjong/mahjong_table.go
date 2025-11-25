@@ -112,7 +112,7 @@ func (m *MahjongTable) Play() {
 				}
 				tp = (m.Pts - 1) % 4
 				//start dealer
-				go m.Players[tp].Play(m)
+				//go m.Players[tp].Play(m)
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
 				go m.Players[tp%4].OnPlayFinished(m, t, err)
