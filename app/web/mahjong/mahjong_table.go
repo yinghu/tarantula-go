@@ -102,14 +102,6 @@ func (m *MahjongTable) Play() {
 				go m.Players[t.Seat].Setup(CMD_DEAL, m)
 			case CMD_DEAL:
 				err := m.Deal()
-
-				//if err != nil {
-				//mr := NewMahjongErrorEvent(t.SystemId, m.Id, 100, err.Error())
-				//m.Push(&mr)
-				//} else {
-				//mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
-				//m.Push(&mt)
-				//}
 				go m.Players[SEAT_E].OnPlayFinished(m, t, err)
 				go m.Players[SEAT_S].OnPlayFinished(m, t, err)
 				go m.Players[SEAT_W].OnPlayFinished(m, t, err)
