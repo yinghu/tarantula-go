@@ -15,10 +15,10 @@ const (
 	SEAT_W int = 2
 	SEAT_N int = 3
 
-	HAND_SIZE_THRESHHOLD int = 13
-	TURN_TICKER_SECONDS  int = 30
-
-	SOLO int = 1
+	HAND_SIZE_THRESHHOLD       int = 13
+	PLAYER_TURN_TICKER_SECONDS int = 30
+	AUTO_TURN_TICKER_SECONDS   int = 3
+	SOLO                       int = 1
 )
 
 type MahjongTable struct {
@@ -117,7 +117,7 @@ func (m *MahjongTable) Play() {
 				}
 				timer.Stop()
 				//start dealer
-				//go m.Players[tp].Play(m)
+				go m.Players[tp].Play(m)
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
 				if err != nil {
@@ -188,6 +188,7 @@ func (m *MahjongTable) Deal() error {
 		return fmt.Errorf("no dice")
 	}
 	dealer := (m.Pts() - 1) % 4
+	m.Players[dealer].TN = true
 	r := 3
 	for {
 		if r == 0 {
@@ -241,11 +242,7 @@ func (m *MahjongTable) Knog(seat int, knog int) error {
 	deleted := false
 	for i := range mp.PendingKongs {
 		if knog == mp.PendingKongs[i] {
-			if i == sz-1 {
-				mp.PendingKongs = mp.PendingKongs[:sz-1]
-			} else {
-				mp.PendingKongs = slices.Delete(mp.PendingKongs, i, i+1)
-			}
+			mp.PendingKongs = slices.Delete(mp.PendingKongs, i, i+1)
 			deleted = true
 			break
 		}

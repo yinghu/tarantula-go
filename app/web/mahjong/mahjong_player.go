@@ -2,6 +2,7 @@ package main
 
 import (
 	"slices"
+
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
@@ -23,7 +24,7 @@ type MahjongPlayer struct {
 	W            []mj.Tile `json:"-"` //white
 	PendingKongs []int
 	Pusher       event.Pusher
-	cmd          int
+	TN           bool //false draw true discharge
 }
 
 func (mp *MahjongPlayer) OnError(mt *MahjongTable, err error) {
@@ -51,7 +52,7 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DEAL, func() {
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_DEAL, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
 	}, func() {
-		me := NewMahjongHandEvent(mp.SystemId,mp.Hand,mp.PendingKongs)
+		me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
 		mt.Push(&me)
 	})
 	mt.Push(&md)
@@ -59,22 +60,56 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 }
 
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
-	//core.AppLog.Printf("Player Seat %d Auto %v\n", mp.Seat, mp.Auto)
-	if !mp.Auto {
-
+	if mp.Auto {
+		if mp.TN {
+			oid, _ := mt.Sequence.Id()
+			md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DISCHARGE, func() {
+				t := mp.Hand.Tiles[0]
+				mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCHARGE, Seat: mp.Seat, Selected: t.Seq, Id: oid}
+			}, func() {
+				mp.TN = false
+				mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
+			})
+			mt.Timer <- &md
+		} else {
+			oid, _ := mt.Sequence.Id()
+			md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DRAW, func() {
+				mt.Turn <- MahjongPlayToken{Cmd: CMD_DRAW, Seat: mp.Seat, Id: oid}
+			}, func() {
+				mp.TN = true
+				mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
+			})
+			mt.Timer <- &md
+		}
+	}
+	//player
+	if mp.TN {
 		oid, _ := mt.Sequence.Id()
-		md := NewMahjongTurnEvent(mp.SystemId, oid, mp.cmd, func() {
+		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DISCHARGE, func() {
 			t := mp.Hand.Tiles[0]
-			mt.Turn <- MahjongPlayToken{Cmd: mp.cmd, SystemId: mp.SystemId, Seat: mp.Seat, Selected: t.Seq, Id: oid}
-		}, nil)
+			mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCHARGE, Seat: mp.Seat, Selected: t.Seq, Id: oid}
+		}, func() {
+			mp.TN = false
+			me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
+			mt.Push(&me)
+			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
+		})
 		mt.Push(&md)
 		mt.Timer <- &md
-		return
+	} else {
+		oid, _ := mt.Sequence.Id()
+		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DRAW, func() {
+			mt.Turn <- MahjongPlayToken{Cmd: CMD_DRAW, Seat: mp.Seat, Id: oid}
+		}, func() {
+			mp.TN = true
+			me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
+			mt.Push(&me)
+			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
+		})
+		mt.Push(&md)
+		mt.Timer <- &md
 	}
-	t := mp.Hand.Tiles[0]
-	mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCHARGE, SystemId: mp.SystemId, Seat: mp.Seat, Selected: t.Seq, Id: 0}
 }
-
 
 func (mp *MahjongPlayer) Reset() {
 	mp.Clear()
@@ -127,24 +162,11 @@ func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
 			mp.checkKong(mp.W, true)
 		}
 	case mj.FLOWER:
-		if !mp.Auto {
-			//core.AppLog.Printf("Knog %d %d\n", mp.SystemId, t.Seq)
-			mp.PendingKongs = append(mp.PendingKongs, t.Seq)
-			//mt := MahjongKnogEvent{SystemId: mp.SystemId, Knog: mp.PendingKongs}
-			//mp.Pusher.Push(&mt)
-		}
+		mp.PendingKongs = append(mp.PendingKongs, t.Seq)
 	}
 
 }
 func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
-	if !mp.Auto {
-		if t.Suit == mj.FLOWER {
-			//KNOG EVENT TO PLAYER
-			//mp.PendingKongs = append(mp.PendingKongs, t.Seq)
-			//mt := MahjongKnogEvent{SystemId: mp.SystemId, Knog: mp.PendingKongs}
-			//mp.Pusher.Push(&mt)
-		}
-	}
 	switch t.Suit {
 	case mj.BAMBOO:
 		for i := range mp.B {
@@ -277,6 +299,5 @@ func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
 	mp.G = make([]mj.Tile, 0)
 	mp.W = make([]mj.Tile, 0)
 	mp.PendingKongs = make([]int, 0)
-	mp.cmd = CMD_DISCHARGE
 	return &mp
 }
