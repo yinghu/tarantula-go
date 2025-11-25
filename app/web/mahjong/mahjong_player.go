@@ -51,7 +51,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 }
 func (mp *MahjongPlayer) OnPlayFinished(m *MahjongTable, t MahjongPlayToken, err error) {
 	if mp.Auto {
-		core.AppLog.Printf("Auto Hand %d \n", mp.Hand.TileSize())
+		core.AppLog.Printf("Auto Hand %d >> %d \n", mp.Seat, mp.Hand.TileSize())
 		m.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 		return
 	}
@@ -71,6 +71,7 @@ func (mp *MahjongPlayer) OnPlayFinished(m *MahjongTable, t MahjongPlayToken, err
 				m.Push(&md)
 			}
 		}
+		m.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 	}
 }
 
