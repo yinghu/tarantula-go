@@ -25,6 +25,7 @@ type MahjongPlayer struct {
 	W            []mj.Tile `json:"-"` //white
 	PendingKongs []int
 	Pusher       event.Pusher
+	cmd          int
 }
 
 func (mp *MahjongPlayer) Setup(cmd int, mt *MahjongTable) {
@@ -39,10 +40,11 @@ func (mp *MahjongPlayer) Setup(cmd int, mt *MahjongTable) {
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	core.AppLog.Printf("Player Seat %d Auto %v\n", mp.Seat, mp.Auto)
 	if !mp.Auto {
+
 		oid, _ := mt.Sequence.Id()
-		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DRAW, func() {
+		md := NewMahjongTurnEvent(mp.SystemId, oid, mp.cmd, func() {
 			t := mp.Hand.Tiles[0]
-			mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCHARGE, SystemId: mp.SystemId, Seat: mp.Seat, Selected: t.Seq, Id: oid}
+			mt.Turn <- MahjongPlayToken{Cmd: mp.cmd, SystemId: mp.SystemId, Seat: mp.Seat, Selected: t.Seq, Id: oid}
 		})
 		mt.Push(&md)
 		mt.Timer <- &md
@@ -53,11 +55,15 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 }
 func (mp *MahjongPlayer) OnPlayFinished(m *MahjongTable, t MahjongPlayToken, err error) {
 	if mp.Auto {
+		if err != nil {
+			mp.cmd = CMD_DRAW
+		}
 		core.AppLog.Printf("Auto Hand %d >> %d \n", mp.Seat, mp.Hand.TileSize())
 		m.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 		return
 	}
 	if err != nil {
+		mp.cmd = CMD_DRAW
 		mr := NewMahjongErrorEvent(mp.SystemId, m.Id, 100, err.Error())
 		m.Push(&mr)
 	} else {
@@ -278,5 +284,6 @@ func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
 	mp.G = make([]mj.Tile, 0)
 	mp.W = make([]mj.Tile, 0)
 	mp.PendingKongs = make([]int, 0)
+	mp.cmd = CMD_DISCHARGE
 	return &mp
 }
