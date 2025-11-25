@@ -103,16 +103,20 @@ func (m *MahjongTable) Play() {
 			case CMD_DEAL:
 				err := m.Deal()
 
-				if err != nil {
-					mr := NewMahjongErrorEvent(t.SystemId, m.Id, 100, err.Error())
-					m.Push(&mr)
-				} else {
-					mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
-					m.Push(&mt)
-				}
+				//if err != nil {
+				//mr := NewMahjongErrorEvent(t.SystemId, m.Id, 100, err.Error())
+				//m.Push(&mr)
+				//} else {
+				//mt := MahjongHandEvent{H: m.Players[t.Seat].Hand, K: m.Players[t.Seat].PendingKongs}
+				//m.Push(&mt)
+				//}
+				go m.Players[SEAT_E].OnPlayFinished(m, t, err)
+				go m.Players[SEAT_S].OnPlayFinished(m, t, err)
+				go m.Players[SEAT_W].OnPlayFinished(m, t, err)
+				go m.Players[SEAT_N].OnPlayFinished(m, t, err)
 				tp = (m.Pts - 1) % 4
 				//start dealer
-				//go m.Players[tp].Play(m)
+				go m.Players[tp].Play(m)
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
 				go m.Players[tp%4].OnPlayFinished(m, t, err)
@@ -124,7 +128,7 @@ func (m *MahjongTable) Play() {
 				go m.Players[tp%4].OnPlayFinished(m, t, err)
 			case CMD_CLAIM:
 				claimed := m.Claim(t.Seat)
-				mt := NewMahjongClaimEvent(t.SystemId, m.Id, t.Seat,claimed)
+				mt := NewMahjongClaimEvent(t.SystemId, m.Id, t.Seat, claimed)
 				if claimed {
 					mt.Formed = append(mt.Formed, m.Players[t.Seat].Formed...)
 				}
