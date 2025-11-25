@@ -86,7 +86,7 @@ func (m *MahjongTable) Play() {
 			timerIndex[tm.OId()] = tm
 			go tm.Start(m)
 		case t := <-m.Turn:
-			core.AppLog.Printf("Token seat: %d selected : %d cmd: %d Id :%d\n", t.Seat, t.Selected, t.Cmd, t.Id)
+			//core.AppLog.Printf("Token seat: %d selected : %d cmd: %d Id :%d\n", t.Seat, t.Selected, t.Cmd, t.Id)
 			timer, exists := timerIndex[t.Id]
 			if exists {
 				delete(timerIndex, t.Id)

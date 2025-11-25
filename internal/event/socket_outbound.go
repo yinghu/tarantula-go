@@ -7,8 +7,6 @@ import (
 	"gameclustering.com/internal/core"
 )
 
-
-
 type OutboundSocket struct {
 	C       net.Conn
 	B       core.DataBuffer
@@ -31,11 +29,11 @@ func (out *OutboundSocket) Subscribe() {
 		if err != nil {
 			break
 		}
-		num, err := out.C.Write(data)
+		_, err = out.C.Write(data)
 		if err != nil {
 			break
 		}
-		core.AppLog.Printf("write number %d\n", num)
+		//core.AppLog.Printf("write number %d\n", num)
 		time.Sleep(10 * time.Millisecond)
 	}
 }
