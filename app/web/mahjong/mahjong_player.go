@@ -47,10 +47,12 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		mt.Timer <- &md
 		return
 	}
-	mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
+	mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCHARGE, SystemId: mp.SystemId, Seat: mp.Seat, Id: 0}
 }
 func (mp *MahjongPlayer) OnPlayFinished(m *MahjongTable, t MahjongPlayToken, err error) {
 	if mp.Auto {
+		core.AppLog.Printf("Auto Hand %d \n", mp.Hand.TileSize())
+		m.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 		return
 	}
 	if err != nil {
