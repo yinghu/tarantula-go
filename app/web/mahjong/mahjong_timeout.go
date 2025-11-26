@@ -12,7 +12,7 @@ const (
 
 type MahjongTimeout interface {
 	Start(t *MahjongTable)
-	Stop()
+	Stop(commited bool)
 	OId() int64
 }
 
@@ -48,8 +48,8 @@ func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 		select {
 		case <-tm.C:
 			s.T()
-		case <-s.Commited:
-			if s.P != nil {
+		case c := <-s.Commited:
+			if c && s.P != nil {
 				s.P()
 			}
 			closing = true
@@ -57,6 +57,6 @@ func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 	}
 }
 
-func (mt *MahjongTimeoutObj) Stop() {
-	mt.Commited <- true
+func (mt *MahjongTimeoutObj) Stop(commited bool) {
+	mt.Commited <- commited
 }

@@ -81,6 +81,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 			})
 			mt.Timer <- &md
 		}
+		return
 	}
 	//player
 	if mp.TN {

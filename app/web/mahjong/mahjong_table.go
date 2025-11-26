@@ -108,7 +108,7 @@ func (m *MahjongTable) Play() {
 			switch t.Cmd {
 			case CMD_DICE:
 				m.Dice()
-				timer.Stop()
+				timer.Stop(true)
 				go m.Players[t.Seat].PlayDeal(m)
 			case CMD_DEAL:
 				err := m.Deal()
@@ -116,7 +116,7 @@ func (m *MahjongTable) Play() {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				timer.Stop()
+				timer.Stop(true)
 				//start dealer
 				go m.Players[tp].Play(m)
 			case CMD_DRAW:
@@ -125,21 +125,21 @@ func (m *MahjongTable) Play() {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				timer.Stop()
+				timer.Stop(true)
 			case CMD_KONG:
 				err := m.Knog(t.Seat, t.Selected)
 				if err != nil {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				timer.Stop()
+				timer.Stop(true)
 			case CMD_DISCHARGE:
 				err := m.Discharge(t.Seat, t.Selected)
 				if err != nil {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				timer.Stop()
+				timer.Stop(true)
 			case CMD_CLAIM:
 				claimed := m.Claim(t.Seat)
 				mt := NewMahjongClaimEvent(t.SystemId, m.Id, t.Seat, claimed)
@@ -156,9 +156,9 @@ func (m *MahjongTable) Play() {
 		}
 	}
 	for _, t := range timerIndex {
-		t.Stop()
+		t.Stop(false)
 	}
-	time.Sleep(5 * time.Second)
+	//time.Sleep(10 * time.Second)
 	clear(timerIndex)
 	close(m.Sync)
 	close(m.Timer)
