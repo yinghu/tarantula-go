@@ -71,7 +71,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_KONG, func() {
 			mt.Turn <- MahjongPlayToken{Cmd: CMD_KONG, Seat: mp.Seat, Selected: k, Id: oid}
 		}, func() {
-			mp.TN = false
+			//mp.TN = false
 			if !mp.Auto {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
 				mt.Push(&me)
