@@ -26,6 +26,7 @@ type MahjongPlayer struct {
 	PendingKongs []int
 	Pusher       event.Pusher
 	TN           bool //false draw true discharge
+	CT           int  //
 }
 
 func (mp *MahjongPlayer) OnError(mt *MahjongTable, err error) {
@@ -61,7 +62,8 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 }
 
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
-	core.AppLog.Printf("player turn %d %v", mp.Seat, mp.Auto)
+	core.AppLog.Printf("player turn %d %v\n", mp.Seat, mp.Auto)
+	core.AppLog.Printf("player kong %v\n", mp.PendingKongs)
 	if mp.Auto {
 		if mp.TN {
 			oid, _ := mt.Sequence.Id()
@@ -302,5 +304,7 @@ func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
 	mp.G = make([]mj.Tile, 0)
 	mp.W = make([]mj.Tile, 0)
 	mp.PendingKongs = make([]int, 0)
+	mp.CT = 0
+	mp.TN = false
 	return &mp
 }
