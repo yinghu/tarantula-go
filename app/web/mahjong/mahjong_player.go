@@ -278,8 +278,12 @@ func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
 func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
 	//core.AppLog.Printf("Check list %v\n", clist)
 	if !hornor {
-		core.AppLog.Printf("category : %v\n", clist)
-
+		ix := mj.HandIndex{}
+		ix.From(clist)
+		ks := ix.Kong()
+		for i := range ks {
+			core.AppLog.Printf("meld %v\n", ks[i].Name())
+		}
 		return
 	}
 	if len(clist) == 4 {
