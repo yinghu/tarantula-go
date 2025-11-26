@@ -151,7 +151,7 @@ func TestHandStart(t *testing.T) {
 	if err != nil {
 		t.Errorf("should be error")
 	}
-	err = h.Knog(&s)
+	err = h.Kong(&s)
 	if err != nil {
 		t.Errorf("should be error")
 	}

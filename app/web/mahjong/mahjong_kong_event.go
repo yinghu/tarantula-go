@@ -4,21 +4,21 @@ import (
 	"gameclustering.com/internal/core"
 )
 
-type MahjongKnogEvent struct {
+type MahjongKongEvent struct {
 	
 	Knog     []int
 	MahjongEventObj
 }
 
-func (s *MahjongKnogEvent) ClassId() int {
+func (s *MahjongKongEvent) ClassId() int {
 	return M_KNOG_CID
 }
 
-func (s *MahjongKnogEvent) ETag() string {
-	return "knog"
+func (s *MahjongKongEvent) ETag() string {
+	return "kong"
 }
 
-func (s *MahjongKnogEvent) Write(buff core.DataBuffer) error {
+func (s *MahjongKongEvent) Write(buff core.DataBuffer) error {
 	if err := buff.WriteInt64(s.SystemId); err != nil {
 		return err
 	}
@@ -34,7 +34,7 @@ func (s *MahjongKnogEvent) Write(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *MahjongKnogEvent) Outbound(buff core.DataBuffer) error {
+func (s *MahjongKongEvent) Outbound(buff core.DataBuffer) error {
 	err := s.WriteKey(buff)
 	if err != nil {
 		s.Callback.OnError(s, err)

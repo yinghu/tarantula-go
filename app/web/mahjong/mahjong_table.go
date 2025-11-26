@@ -129,7 +129,7 @@ func (m *MahjongTable) Play() {
 				}
 				timer.Stop(true)
 			case CMD_KONG:
-				err := m.Knog(t.Seat, t.Selected)
+				err := m.Kong(t.Seat, t.Selected)
 				if err != nil {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
@@ -236,7 +236,7 @@ func (m *MahjongTable) Deal() error {
 func (m *MahjongTable) Draw(seat int) error {
 	return m.deal(seat)
 }
-func (m *MahjongTable) Knog(seat int, knog int) error {
+func (m *MahjongTable) Kong(seat int, kong int) error {
 	mp := m.Players[seat]
 	sz := len(mp.PendingKongs)
 	if sz == 0 {
@@ -244,21 +244,22 @@ func (m *MahjongTable) Knog(seat int, knog int) error {
 	}
 	deleted := false
 	for i := range mp.PendingKongs {
-		if knog == mp.PendingKongs[i] {
+		if kong == mp.PendingKongs[i] {
 			mp.PendingKongs = slices.Delete(mp.PendingKongs, i, i+1)
 			deleted = true
 			break
 		}
 	}
 	if !deleted {
-		return fmt.Errorf("no pending kong %d", knog)
+		return fmt.Errorf("no pending kong %d", kong)
 	}
-	if knog > mj.FS_LIMIT {
-		m.Discharge(seat, knog)
+	if kong > mj.FS_LIMIT {
+		m.Discharge(seat, kong)
 	} else {
-		//4 kind knog / or pung to knog
+		//4 kind kong / or pung to kong
+		
 	}
-	return mp.Knog(&m.Setup.Deck)
+	return mp.Kong(&m.Setup.Deck)
 }
 
 func (m *MahjongTable) Discharge(seat int, t int) error {
@@ -300,7 +301,7 @@ func (m *MahjongTable) deal(p int) error {
 	}
 	fz = sz
 	for {
-		err = mp.Knog(&m.Setup.Deck)
+		err = mp.Kong(&m.Setup.Deck)
 		if err != nil {
 			return err
 		}

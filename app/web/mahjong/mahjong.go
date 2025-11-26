@@ -43,8 +43,8 @@ func NewMahjongSitEvent(systemId int64, tableId int64, seat int) MahjongSitEvent
 	me.SystemId = systemId
 	return me
 }
-func NewMahjongKnogEvent(systemId int64, knog []int) MahjongKnogEvent {
-	me := MahjongKnogEvent{Knog: knog}
+func NewMahjongKongEvent(systemId int64, knog []int) MahjongKongEvent {
+	me := MahjongKongEvent{Knog: knog}
 	me.SystemId = systemId
 	return me
 }

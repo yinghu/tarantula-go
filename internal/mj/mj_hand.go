@@ -10,7 +10,7 @@ import (
 type HandListener interface {
 	OnDraw(t Tile)
 	OnDrop(t Tile)
-	OnKnog(t Tile)
+	OnKong(t Tile)
 	OnFormed(m Meld)
 }
 
@@ -138,13 +138,13 @@ func (h *Hand) append(t Tile, knog bool) error {
 		return nil
 	}
 	if knog {
-		h.Listener.OnKnog(t)
+		h.Listener.OnKong(t)
 	} else {
 		h.Listener.OnDraw(t)
 	}
 	return nil
 }
-func (h *Hand) Knog(deck *Deck) error {
+func (h *Hand) Kong(deck *Deck) error {
 	t, err := deck.Kong()
 	if err != nil {
 		return err

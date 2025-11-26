@@ -271,7 +271,7 @@ func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
 
 	}
 }
-func (mp *MahjongPlayer) OnKnog(t mj.Tile) {
+func (mp *MahjongPlayer) OnKong(t mj.Tile) {
 	mp.OnDraw(t)
 }
 func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
