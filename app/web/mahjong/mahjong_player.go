@@ -65,6 +65,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	core.AppLog.Printf("player turn %d %v\n", mp.Seat, mp.Auto)
 	core.AppLog.Printf("player kong %v\n", mp.PendingKongs)
 	if mp.Auto {
+
 		if mp.TN {
 			oid, _ := mt.Sequence.Id()
 			md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DISCHARGE, func() {
@@ -277,6 +278,7 @@ func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
 func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
 	//core.AppLog.Printf("Check list %v\n", clist)
 	if !hornor {
+		core.AppLog.Printf("category : %v\n", clist)
 
 		return
 	}
