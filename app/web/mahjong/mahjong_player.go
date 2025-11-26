@@ -78,6 +78,9 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 			}
 			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 		})
+		if !mp.Auto {
+			mt.Push(&md)
+		}
 		mt.Timer <- &md
 	} else {
 		oid, _ := mt.Sequence.Id()
@@ -91,6 +94,9 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 			}
 			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 		})
+		if !mp.Auto {
+			mt.Push(&md)
+		}
 		mt.Timer <- &md
 	}
 }
