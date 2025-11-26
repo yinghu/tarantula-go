@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"slices"
-	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
