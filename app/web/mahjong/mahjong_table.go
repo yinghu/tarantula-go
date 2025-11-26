@@ -144,11 +144,13 @@ func (m *MahjongTable) Play() {
 				timer.Stop(true)
 			case CMD_CLAIM:
 				claimed := m.Claim(t.Seat)
-				mt := NewMahjongClaimEvent(t.SystemId, m.Id, t.Seat, claimed)
-				if claimed {
-					mt.Formed = append(mt.Formed, m.Players[t.Seat].Formed...)
+				if !claimed {
+					go m.Players[t.Seat].OnError(m, fmt.Errorf("fake claimed"))
+					continue
 				}
-				m.Push(&mt)
+				timer.Stop(true)
+				m.Reset()
+				go m.Players[t.Seat].PlayDeal(m)
 			case CMD_RESET:
 				m.Reset()
 				mt := MahjongResetEvent{Started: false}
@@ -257,7 +259,7 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 		m.Discharge(seat, kong)
 	} else {
 		//4 kind kong / or pung to kong
-		
+
 	}
 	return mp.Kong(&m.Setup.Deck)
 }

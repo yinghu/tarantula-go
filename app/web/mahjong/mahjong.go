@@ -49,8 +49,8 @@ func NewMahjongKongEvent(systemId int64, knog []int) MahjongKongEvent {
 	return me
 }
 
-func NewMahjongClaimEvent(systemId int64, tableId int64, seat int, claimed bool) MahjongClaimEvent {
-	me := MahjongClaimEvent{Seat: int32(seat), Claimed: claimed}
+func NewMahjongClaimEvent(systemId int64, tableId int64, seat int, claimed bool, formed []mj.Meld) MahjongClaimEvent {
+	me := MahjongClaimEvent{Seat: int32(seat), Claimed: claimed, Formed: formed}
 	me.SystemId = systemId
 	me.TableId = tableId
 	return me
