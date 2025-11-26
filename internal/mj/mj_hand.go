@@ -70,6 +70,37 @@ func (h *Hand) Discharge(discharged int) (Tile, error) {
 	return Tile{}, fmt.Errorf("discharged not existed %d", discharged)
 }
 
+func (h *Hand) RevealedKnog(knog int) error {
+	for i := range h.Formed {
+		if h.Formed[i].Pung() && h.Formed[i].Tiles[0].Seq == knog {
+			t := h.Formed[i].Tiles[0]
+			mt := []Tile{t, t, t, t}
+			h.Formed = slices.Delete(h.Formed, i, i+1)
+			h.Formed = append(h.Formed, Meld{Tiles: mt})
+			return nil
+		}
+	}
+	return fmt.Errorf("no revealed kong %d", knog)
+}
+
+func (h *Hand) ConsealedKnog(knog int) error {
+	m := Meld{}
+	for i := range h.Tiles {
+		t := h.Tiles[i]
+		if t.Seq == knog {
+			m.Tiles = append(m.Tiles, t)
+		}
+	}
+	if !m.Kong() {
+		return fmt.Errorf("not knog %d", knog)
+	}
+	h.Tiles = slices.DeleteFunc(h.Tiles, func(d Tile) bool {
+		return d.Seq == knog
+	})
+	h.Formed = append(h.Formed, m)
+	return nil
+}
+
 func (h *Hand) Chow() error {
 	return nil
 }
