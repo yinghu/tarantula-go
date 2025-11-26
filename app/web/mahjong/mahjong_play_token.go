@@ -14,9 +14,10 @@ const (
 	CMD_CLAIM     int = 8
 	CMD_TABLE     int = 9
 
-	CMD_TURN_END int = 97
-	CMD_RESET    int = 98
-	CMD_END      int = 99
+	CMD_TURN_CONTINUE int = 96
+	CMD_TURN_END      int = 97
+	CMD_RESET         int = 98
+	CMD_END           int = 99
 
 	//internal
 
@@ -26,7 +27,7 @@ const (
 
 type MahjongPlayToken struct {
 	Id       int64
-	TableId    int64
+	TableId  int64
 	SystemId int64
 	Cmd      int
 	Seat     int

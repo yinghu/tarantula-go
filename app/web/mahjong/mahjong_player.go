@@ -64,7 +64,25 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	core.AppLog.Printf("player turn %d %v\n", mp.Seat, mp.Auto)
 	core.AppLog.Printf("player kong %v\n", mp.PendingKongs)
-
+	if len(mp.PendingKongs) > 0 { //knog first
+		oid, _ := mt.Sequence.Id()
+		k := mp.PendingKongs[0]
+		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_KONG, func() {
+			mt.Turn <- MahjongPlayToken{Cmd: CMD_KONG, Seat: mp.Seat, Selected: k, Id: oid}
+		}, func() {
+			mp.TN = false
+			if !mp.Auto {
+				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
+				mt.Push(&me)
+			}
+			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_CONTINUE}
+		})
+		if !mp.Auto {
+			mt.Push(&md)
+		}
+		mt.Timer <- &md
+		return
+	}
 	if mp.TN {
 		oid, _ := mt.Sequence.Id()
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DISCHARGE, func() {

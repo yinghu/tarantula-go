@@ -83,6 +83,8 @@ func (m *MahjongTable) Play() {
 					ms := NewMahjongSitEvent(k.SystemId, m.Id, k.Seat)
 					m.Push(&ms)
 				}
+			case CMD_TURN_CONTINUE:
+				go m.Players[tp%4].Play(m)
 			case CMD_TURN_END:
 				tp++ //next player turn
 				go m.Players[tp%4].Play(m)
