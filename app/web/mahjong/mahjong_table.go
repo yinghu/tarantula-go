@@ -160,7 +160,6 @@ func (m *MahjongTable) Play() {
 	for _, t := range timerIndex {
 		t.Stop(false)
 	}
-	//time.Sleep(10 * time.Second)
 	clear(timerIndex)
 	close(m.Sync)
 	close(m.Timer)

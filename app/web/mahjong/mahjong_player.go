@@ -30,11 +30,12 @@ type MahjongPlayer struct {
 }
 
 func (mp *MahjongPlayer) OnError(mt *MahjongTable, err error) {
-	if mp.Auto {
-		return
+	if !mp.Auto {
+		mr := NewMahjongErrorEvent(mp.SystemId, mt.Id, 100, err.Error())
+		mt.Push(&mr)
 	}
-	mr := NewMahjongErrorEvent(mp.SystemId, mt.Id, 100, err.Error())
-	mt.Push(&mr)
+	mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
+	core.AppLog.Printf("play error %s on %d\n", err.Error(), mp.Seat)
 }
 
 func (mp *MahjongPlayer) PlayDice(mt *MahjongTable) {
