@@ -3,6 +3,7 @@ package main
 import (
 	"slices"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
@@ -60,6 +61,7 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 }
 
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
+	core.AppLog.Printf("player turn %d %v", mp.Seat, mp.Auto)
 	if mp.Auto {
 		if mp.TN {
 			oid, _ := mt.Sequence.Id()

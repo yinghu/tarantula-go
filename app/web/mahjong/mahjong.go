@@ -56,6 +56,11 @@ func NewMahjongClaimEvent(systemId int64, tableId int64, seat int, claimed bool)
 	return me
 }
 
+func NewMahjongDischargeEvent(ts []mj.Tile) MahjongDischargeEvent {
+	me := MahjongDischargeEvent{D: ts}
+	return me
+}
+
 func main() {
 	bootstrap.AppBootstrap(&MahjongService{})
 }

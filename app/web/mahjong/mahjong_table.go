@@ -16,8 +16,9 @@ const (
 	SEAT_N int = 3
 
 	HAND_SIZE_THRESHHOLD       int = 13
-	PLAYER_TURN_TICKER_SECONDS int = 30
+	PLAYER_TURN_TICKER_SECONDS int = 10
 	AUTO_TURN_TICKER_SECONDS   int = 3
+	COUNT_DOWN_BUFFER          int = 1
 	SOLO                       int = 1
 )
 
@@ -68,7 +69,7 @@ func (m *MahjongTable) Play() {
 	for running {
 		select {
 		case k := <-m.Sync:
-			core.AppLog.Printf("Sync: %d selected : %d cmd: %d Id :%d\n", k.Seat, k.Selected, k.Cmd, k.Id)
+			//core.AppLog.Printf("Sync: %d selected : %d cmd: %d Id :%d\n", k.Seat, k.Selected, k.Cmd, k.Id)
 			switch k.Cmd {
 			case CMD_END:
 				m.Started = false

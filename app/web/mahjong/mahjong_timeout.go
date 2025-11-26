@@ -6,10 +6,6 @@ import (
 	"gameclustering.com/internal/event"
 )
 
-const (
-	COUNT_DOWN_BUFFER int = 5
-)
-
 type MahjongTimeout interface {
 	Start(t *MahjongTable)
 	Stop(commited bool)
