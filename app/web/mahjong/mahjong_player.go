@@ -64,31 +64,7 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	core.AppLog.Printf("player turn %d %v\n", mp.Seat, mp.Auto)
 	core.AppLog.Printf("player kong %v\n", mp.PendingKongs)
-	if mp.Auto {
 
-		if mp.TN {
-			oid, _ := mt.Sequence.Id()
-			md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DISCHARGE, func() {
-				t := mp.Hand.Tiles[0]
-				mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCHARGE, Seat: mp.Seat, Selected: t.Seq, Id: oid}
-			}, func() {
-				mp.TN = false
-				mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
-			})
-			mt.Timer <- &md
-		} else {
-			oid, _ := mt.Sequence.Id()
-			md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DRAW, func() {
-				mt.Turn <- MahjongPlayToken{Cmd: CMD_DRAW, Seat: mp.Seat, Id: oid}
-			}, func() {
-				mp.TN = true
-				mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
-			})
-			mt.Timer <- &md
-		}
-		return
-	}
-	//player
 	if mp.TN {
 		oid, _ := mt.Sequence.Id()
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DISCHARGE, func() {
@@ -96,11 +72,12 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 			mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCHARGE, Seat: mp.Seat, Selected: t.Seq, Id: oid}
 		}, func() {
 			mp.TN = false
-			me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
-			mt.Push(&me)
+			if !mp.Auto {
+				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
+				mt.Push(&me)
+			}
 			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 		})
-		mt.Push(&md)
 		mt.Timer <- &md
 	} else {
 		oid, _ := mt.Sequence.Id()
@@ -108,11 +85,12 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 			mt.Turn <- MahjongPlayToken{Cmd: CMD_DRAW, Seat: mp.Seat, Id: oid}
 		}, func() {
 			mp.TN = true
-			me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
-			mt.Push(&me)
+			if !mp.Auto {
+				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
+				mt.Push(&me)
+			}
 			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 		})
-		mt.Push(&md)
 		mt.Timer <- &md
 	}
 }
@@ -276,21 +254,17 @@ func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
 }
 
 func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
-	core.AppLog.Printf("Check list %v\n", clist)
 	if !hornor {
 		ix := mj.HandIndex{}
 		ix.From(clist)
 		ks := ix.Kong()
 		for i := range ks {
-			core.AppLog.Printf("meld %v\n", ks[i].Name())
+			mp.PendingKongs = append(mp.PendingKongs, ks[i].Tiles[0].Seq)
 		}
 		return
 	}
 	if len(clist) == 4 {
 		mp.PendingKongs = append(mp.PendingKongs, clist[0].Seq)
-		mt := MahjongKnogEvent{Knog: mp.PendingKongs}
-		mt.SystemId = mp.SystemId
-		mp.Pusher.Push(&mt)
 	}
 
 }
