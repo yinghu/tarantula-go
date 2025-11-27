@@ -13,6 +13,7 @@ const (
 	CMD_CHOW      int = 7
 	CMD_CLAIM     int = 8
 	CMD_TABLE     int = 9
+	CMD_SKIP      int = 10
 
 	CMD_TURN_CONTINUE int = 96
 	CMD_TURN_END      int = 97

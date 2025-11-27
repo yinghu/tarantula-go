@@ -88,7 +88,13 @@ func (m *MahjongTable) Play() {
 			case CMD_TURN_CONTINUE:
 				go m.Players[tp%4].Play(m)
 			case CMD_TURN_END:
-				
+				sz := len(m.skips)
+				if sz > 0 {
+					se := m.skips[sz-1]
+					m.skips = m.skips[:sz-1]
+					go m.Players[se.Seat].PlayDischarge(m, se)
+					break
+				}
 				tp++ //next player turn
 				go m.Players[tp%4].Play(m)
 			}
@@ -144,6 +150,8 @@ func (m *MahjongTable) Play() {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
+				timer.Stop(true)
+			case CMD_SKIP:
 				timer.Stop(true)
 			case CMD_CLAIM:
 				claimed := m.Claim(t.Seat)
@@ -281,17 +289,17 @@ func (m *MahjongTable) Discharge(seat int, t int) error {
 	p := seat + 1
 	cp := m.Players[p%4].CheckDischarge(seat, drop, true) //pung/kong/chow
 	if len(cp) > 0 {
-		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4,seat,drop,cp))
+		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, cp))
 	}
 	p++
 	pp1 := m.Players[p%4].CheckDischarge(seat, drop, false) //pung/kong
 	if len(pp1) > 0 {
-		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4,seat,drop,pp1))
+		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, pp1))
 	}
 	p++
 	pp2 := m.Players[p%4].CheckDischarge(seat, drop, false) //pung/kong
 	if len(pp2) > 0 {
-		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4,seat,drop,pp2))
+		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, pp2))
 	}
 	return nil
 }

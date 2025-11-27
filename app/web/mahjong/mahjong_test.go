@@ -182,4 +182,9 @@ func checkList(c []mj.Tile){
 	m := mj.NewTile(mj.DOTS9)
 	c = append(c, m)
 	fmt.Printf("sz %d\n",len(c))
+	x := c[:14]
+	fmt.Printf("sz %d\n",len(x))
+	y := []mj.Tile{m}
+	z := y[:0]
+	fmt.Printf("sz %d\n",len(z))
 }

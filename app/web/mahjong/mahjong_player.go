@@ -63,7 +63,18 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 }
 
 func (mp *MahjongPlayer) PlayDischarge(mt *MahjongTable, mc MahjongDischargeEvent) {
-
+	core.AppLog.Printf("player discharge %d %v\n", mp.Seat, mp.Auto)
+	oid, _ := mt.Sequence.Id()
+	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_SKIP, func() {
+		mt.Turn <- MahjongPlayToken{Cmd: CMD_SKIP, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
+	}, func() {
+		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
+	})
+	if !mp.Auto {
+		mt.Push(&mc)
+		mt.Push(&md)
+	}
+	mt.Timer <- &md
 }
 
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
@@ -184,7 +195,6 @@ func (mp *MahjongPlayer) checkMatch(seg []mj.Tile, d mj.Tile, c bool) []mj.Meld 
 	}
 	m = append(m, ix.Pung()...)
 	m = append(m, ix.Kong()...)
-	core.AppLog.Printf("Match %v\n", m)
 	return m
 }
 
