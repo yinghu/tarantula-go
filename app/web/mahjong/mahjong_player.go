@@ -64,7 +64,7 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 
 func (mp *MahjongPlayer) PlayDischarge(mt *MahjongTable, mc MahjongDischargeEvent) {
 	core.AppLog.Printf("player discharge %d %v\n", mp.Seat, mp.Auto)
-	core.AppLog.Printf("drop %v\n", mc)
+	core.AppLog.Printf("drop %v\n", mc.Opts)
 	oid, _ := mt.Sequence.Id()
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_SKIP, func() {
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_SKIP, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
@@ -117,7 +117,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		}
 		oid, _ := mt.Sequence.Id()
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DISCHARGE, func() {
-			t := mp.Hand.Tiles[0]
+			t := mp.Hand.Tiles[oid%10]
 			mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCHARGE, Seat: mp.Seat, Selected: t.Seq, Id: oid}
 		}, func() {
 			mp.TN = false
