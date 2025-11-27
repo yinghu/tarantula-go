@@ -64,6 +64,7 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 
 func (mp *MahjongPlayer) PlayDischarge(mt *MahjongTable, mc MahjongDischargeEvent) {
 	core.AppLog.Printf("player discharge %d %v\n", mp.Seat, mp.Auto)
+	core.AppLog.Printf("drop %v\n", mc)
 	oid, _ := mt.Sequence.Id()
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_SKIP, func() {
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_SKIP, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
