@@ -3,17 +3,18 @@ package main
 import "gameclustering.com/internal/core"
 
 const (
-	CMD_SIT       int = 0
-	CMD_DICE      int = 1
-	CMD_DEAL      int = 2
-	CMD_DRAW      int = 3
-	CMD_DISCHARGE int = 4
-	CMD_PUNG      int = 5
-	CMD_KONG      int = 6
-	CMD_CHOW      int = 7
-	CMD_CLAIM     int = 8
-	CMD_TABLE     int = 9
-	CMD_SKIP      int = 10
+	CMD_SIT           int = 0
+	CMD_DICE          int = 1
+	CMD_DEAL          int = 2
+	CMD_DRAW          int = 3
+	CMD_DISCHARGE     int = 4
+	CMD_PUNG          int = 5
+	CMD_KONG          int = 6
+	CMD_CHOW          int = 7
+	CMD_CLAIM         int = 8
+	CMD_TABLE         int = 9
+	CMD_SKIP          int = 10 //skip discharge event
+	CMD_REVEALED_KONG int = 11 //revealed kong
 
 	CMD_TURN_CONTINUE int = 96
 	CMD_TURN_END      int = 97

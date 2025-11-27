@@ -151,6 +151,15 @@ func (m *MahjongTable) Play() {
 					continue
 				}
 				timer.Stop(true)
+			case CMD_CHOW:
+				tp = t.Seat
+				timer.Stop(true)
+			case CMD_PUNG:
+				tp = t.Seat
+				timer.Stop(true)
+			case CMD_REVEALED_KONG:
+				tp = t.Seat
+				timer.Stop(true)
 			case CMD_SKIP:
 				timer.Stop(true)
 			case CMD_CLAIM:
