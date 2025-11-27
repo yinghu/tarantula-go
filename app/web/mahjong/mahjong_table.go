@@ -123,14 +123,15 @@ func (m *MahjongTable) Play() {
 				timer.Stop(true)
 				go m.Players[t.Seat].PlayDeal(m)
 			case CMD_DEAL:
-				err := m.Deal()
+				dealer, err := m.Deal()
 				if err != nil {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
 				timer.Stop(true)
 				//start dealer
-				go m.Players[tp].Play(m)
+				tp = dealer
+				go m.Players[tp%4].Play(m)
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
 				if err != nil {
@@ -210,9 +211,9 @@ func (m *MahjongTable) Sit(systemId int64, seatNumber int) error {
 func (m *MahjongTable) Dice() {
 	m.dice = m.Setup.Dice()
 }
-func (m *MahjongTable) Deal() error {
+func (m *MahjongTable) Deal() (int, error) {
 	if m.Pts() == 0 {
-		return fmt.Errorf("no dice")
+		return 0, fmt.Errorf("no dice")
 	}
 	dealer := (m.Pts() - 1) % 4
 	m.Players[dealer].TN = true
@@ -254,7 +255,7 @@ func (m *MahjongTable) Deal() error {
 		r--
 	}
 	m.Started = true
-	return nil
+	return dealer, nil
 }
 
 func (m *MahjongTable) Draw(seat int) error {
