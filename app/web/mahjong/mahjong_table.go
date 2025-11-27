@@ -276,11 +276,11 @@ func (m *MahjongTable) Discharge(seat int, t int) error {
 	}
 	m.Discharged = append(m.Discharged, drop)
 	p := seat + 1
-	m.Players[p%4].CheckDischarge(seat, drop)
+	m.Players[p%4].CheckDischarge(seat, drop,true) //pung or chow
 	p++
-	m.Players[p%4].CheckDischarge(seat, drop)
+	m.Players[p%4].CheckDischarge(seat, drop,false) //pung
 	p++
-	m.Players[p%4].CheckDischarge(seat, drop)
+	m.Players[p%4].CheckDischarge(seat, drop,false) //pung
 	return nil
 }
 

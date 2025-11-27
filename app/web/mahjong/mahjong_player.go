@@ -134,9 +134,38 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	}
 }
 
-func (mp *MahjongPlayer) CheckDischarge(seat int, drop mj.Tile) int {
-	core.AppLog.Printf("Check drop [%d] from [%d] tile %v\n", mp.Seat, seat, drop)
-	return 0
+func (mp *MahjongPlayer) CheckDischarge(seat int, drop mj.Tile, chow bool) int {
+	switch drop.Suit {
+	case mj.BAMBOO:
+		return mp.checkMatch(mp.B, drop, chow)
+	case mj.CHARACTER:
+		return mp.checkMatch(mp.C, drop, chow)
+	case mj.DOTS:
+		return mp.checkMatch(mp.D, drop, chow)
+	case mj.HORNOR:
+		switch drop.Name() {
+		case mj.EAST:
+			return mp.checkMatch(mp.HE, drop, false)
+		case mj.SOUTH:
+			return mp.checkMatch(mp.HS, drop, false)
+		case mj.WEST:
+			return mp.checkMatch(mp.HW, drop, false)
+		case mj.NORTH:
+			return mp.checkMatch(mp.HN, drop, false)
+		case mj.RED:
+			return mp.checkMatch(mp.R, drop, false)
+		case mj.GREEN:
+			return mp.checkMatch(mp.G, drop, false)
+		case mj.WHITE:
+			return mp.checkMatch(mp.W, drop, false)
+		}
+	}
+	return -1
+}
+
+func (mp *MahjongPlayer) checkMatch(seg []mj.Tile, d mj.Tile, c bool) int {
+	core.AppLog.Printf("Check list [%v] from [%v] chow %v\n", seg, d, c)
+	return -1
 }
 
 func (mp *MahjongPlayer) Reset() {
