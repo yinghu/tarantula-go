@@ -134,6 +134,11 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	}
 }
 
+func (mp *MahjongPlayer) CheckDischarge(seat int, drop mj.Tile) int {
+	core.AppLog.Printf("Check drop [%d] from [%d] tile %v\n", mp.Seat, seat, drop)
+	return 0
+}
+
 func (mp *MahjongPlayer) Reset() {
 	mp.Clear()
 	mp.B = mp.B[:0]
