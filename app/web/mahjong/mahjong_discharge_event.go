@@ -6,7 +6,8 @@ import (
 )
 
 type MahjongDischargeEvent struct {
-	D []mj.Tile
+	Seat int
+	Drop mj.Tile
 	MahjongEventObj
 }
 
@@ -20,16 +21,10 @@ func (s *MahjongDischargeEvent) ETag() string {
 
 func (s *MahjongDischargeEvent) Write(buff core.DataBuffer) error {
 
-	sz := len(s.D)
-	if err := buff.WriteInt32(int32(sz)); err != nil {
+	if err := buff.WriteInt32(int32(s.Seat)); err != nil {
 		return err
 	}
-	for i := range s.D {
-		if err := s.D[i].Write(buff); err != nil {
-			return err
-		}
-	}
-	return nil
+	return s.Drop.Write(buff)
 }
 
 func (s *MahjongDischargeEvent) Outbound(buff core.DataBuffer) error {

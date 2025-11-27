@@ -134,7 +134,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	}
 }
 
-func (mp *MahjongPlayer) CheckDischarge(seat int, drop mj.Tile, chow bool) int {
+func (mp *MahjongPlayer) CheckDischarge(seat int, drop mj.Tile, chow bool) []mj.Meld {
 	switch drop.Suit {
 	case mj.BAMBOO:
 		return mp.checkMatch(mp.B, drop, chow)
@@ -160,12 +160,21 @@ func (mp *MahjongPlayer) CheckDischarge(seat int, drop mj.Tile, chow bool) int {
 			return mp.checkMatch(mp.W, drop, false)
 		}
 	}
-	return -1
+	return nil
 }
 
-func (mp *MahjongPlayer) checkMatch(seg []mj.Tile, d mj.Tile, c bool) int {
+func (mp *MahjongPlayer) checkMatch(seg []mj.Tile, d mj.Tile, c bool) []mj.Meld {
+	if len(seg) < 2 {
+		return nil
+	}
+	if c{
+		ix := mj.HandIndex{}
+		ix.From(seg)
+		//ix.Chow()
+		
+	}
 	core.AppLog.Printf("Check list [%v] from [%v] chow %v\n", seg, d, c)
-	return -1
+	return nil
 }
 
 func (mp *MahjongPlayer) Reset() {
