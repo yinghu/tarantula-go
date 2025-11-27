@@ -79,7 +79,7 @@ func (mp *MahjongPlayer) PlayDischarge(mt *MahjongTable, mc MahjongDischargeEven
 }
 
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
-	core.AppLog.Printf("player turn %d %v\n", mp.Seat, mp.Auto)
+	core.AppLog.Printf("player turn %d %v %v\n", mp.Seat, mp.Auto, mp.TN)
 	core.AppLog.Printf("player kong %v\n", mp.PendingKongs)
 	if len(mp.PendingKongs) > 0 { //knog first
 		oid, _ := mt.Sequence.Id()
