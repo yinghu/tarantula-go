@@ -6,8 +6,10 @@ import (
 )
 
 type MahjongDischargeEvent struct {
-	Seat int
-	Drop mj.Tile
+	Seat     int
+	DropSeat int
+	Drop     mj.Tile
+	Opts     []mj.Meld
 	MahjongEventObj
 }
 
@@ -20,11 +22,21 @@ func (s *MahjongDischargeEvent) ETag() string {
 }
 
 func (s *MahjongDischargeEvent) Write(buff core.DataBuffer) error {
-
 	if err := buff.WriteInt32(int32(s.Seat)); err != nil {
 		return err
 	}
-	return s.Drop.Write(buff)
+	if err := buff.WriteInt32(int32(s.DropSeat)); err != nil {
+		return err
+	}
+	if err := s.Drop.Write(buff); err!=nil{
+		return err
+	}
+	for _, m := range s.Opts {
+		if err := m.Write(buff); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *MahjongDischargeEvent) Outbound(buff core.DataBuffer) error {

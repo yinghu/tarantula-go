@@ -35,6 +35,7 @@ type MahjongTable struct {
 	core.Sequence `json:"-"`
 	Timer         chan MahjongTimeout
 	Sync          chan MahjongPlayToken `json:"-"`
+	skips         []MahjongDischargeEvent
 }
 
 func (m *MahjongTable) Pts() int {
@@ -51,6 +52,7 @@ func (m *MahjongTable) New() {
 	m.Turn = make(chan MahjongPlayToken, 3)
 	m.Timer = make(chan MahjongTimeout, 3)
 	m.Sync = make(chan MahjongPlayToken, 3)
+	m.skips = make([]MahjongDischargeEvent, 0)
 }
 
 func (m *MahjongTable) Reset() {
@@ -86,6 +88,7 @@ func (m *MahjongTable) Play() {
 			case CMD_TURN_CONTINUE:
 				go m.Players[tp%4].Play(m)
 			case CMD_TURN_END:
+				
 				tp++ //next player turn
 				go m.Players[tp%4].Play(m)
 			}
@@ -276,11 +279,20 @@ func (m *MahjongTable) Discharge(seat int, t int) error {
 	}
 	m.Discharged = append(m.Discharged, drop)
 	p := seat + 1
-	m.Players[p%4].CheckDischarge(seat, drop,true) //pung or chow
+	cp := m.Players[p%4].CheckDischarge(seat, drop, true) //pung/kong/chow
+	if len(cp) > 0 {
+		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4,seat,drop,cp))
+	}
 	p++
-	m.Players[p%4].CheckDischarge(seat, drop,false) //pung
+	pp1 := m.Players[p%4].CheckDischarge(seat, drop, false) //pung/kong
+	if len(pp1) > 0 {
+		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4,seat,drop,pp1))
+	}
 	p++
-	m.Players[p%4].CheckDischarge(seat, drop,false) //pung
+	pp2 := m.Players[p%4].CheckDischarge(seat, drop, false) //pung/kong
+	if len(pp2) > 0 {
+		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4,seat,drop,pp2))
+	}
 	return nil
 }
 

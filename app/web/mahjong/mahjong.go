@@ -56,8 +56,8 @@ func NewMahjongClaimEvent(systemId int64, tableId int64, seat int, claimed bool,
 	return me
 }
 
-func NewMahjongDischargeEvent(seat int, drop mj.Tile) MahjongDischargeEvent {
-	me := MahjongDischargeEvent{Seat: seat, Drop: drop}
+func NewMahjongDischargeEvent(seat int, dropSeat int, drop mj.Tile, opts []mj.Meld) MahjongDischargeEvent {
+	me := MahjongDischargeEvent{Seat: seat, DropSeat: dropSeat, Drop: drop, Opts: opts}
 	return me
 }
 

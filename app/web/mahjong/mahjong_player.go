@@ -62,6 +62,10 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 	mt.Timer <- &md
 }
 
+func (mp *MahjongPlayer) PlayDischarge(mt *MahjongTable, mc MahjongDischargeEvent) {
+
+}
+
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	core.AppLog.Printf("player turn %d %v\n", mp.Seat, mp.Auto)
 	core.AppLog.Printf("player kong %v\n", mp.PendingKongs)
@@ -160,21 +164,28 @@ func (mp *MahjongPlayer) CheckDischarge(seat int, drop mj.Tile, chow bool) []mj.
 			return mp.checkMatch(mp.W, drop, false)
 		}
 	}
-	return nil
+	return []mj.Meld{}
 }
 
 func (mp *MahjongPlayer) checkMatch(seg []mj.Tile, d mj.Tile, c bool) []mj.Meld {
 	if len(seg) < 2 {
 		return nil
 	}
-	if c{
-		ix := mj.HandIndex{}
-		ix.From(seg)
-		//ix.Chow()
-		
+	ix := mj.HandIndex{}
+	seg = append(seg, d)
+	ix.From(seg)
+	m := make([]mj.Meld, 0)
+	if c {
+
+		m = append(m, ix.Chow()...)
+		m = append(m, ix.Pung()...)
+		m = append(m, ix.Kong()...)
+		return m
 	}
-	core.AppLog.Printf("Check list [%v] from [%v] chow %v\n", seg, d, c)
-	return nil
+	m = append(m, ix.Pung()...)
+	m = append(m, ix.Kong()...)
+	core.AppLog.Printf("Match %v\n", m)
+	return m
 }
 
 func (mp *MahjongPlayer) Reset() {

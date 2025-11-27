@@ -161,6 +161,10 @@ func TestClassic1(t *testing.T) {
 	p2 := mj.NewTile(mj.DOTS7)
 
 	tiles := []mj.Tile{b1, b2, b3, b4, b5, b6, b7, b8, b9, c7, c8, c9, p1, p2}
+	checkList(tiles)
+	if len(tiles) != 14{
+		t.Errorf("hand size should be 14 %d",len(tiles))
+	}
 	h := mj.Hand{}
 	h.New()
 	h.Tiles = append(h.Tiles, tiles...)
@@ -172,4 +176,10 @@ func TestClassic1(t *testing.T) {
 		t.Errorf("should be claimed %v", claimed)
 	}
 	//B1,B2,B3,B2,B3,B4,B3,B4,B5,B4,B5,B6,B1,B1
+}
+
+func checkList(c []mj.Tile){
+	m := mj.NewTile(mj.DOTS9)
+	c = append(c, m)
+	fmt.Printf("sz %d\n",len(c))
 }
