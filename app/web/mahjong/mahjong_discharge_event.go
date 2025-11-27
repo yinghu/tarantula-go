@@ -28,7 +28,11 @@ func (s *MahjongDischargeEvent) Write(buff core.DataBuffer) error {
 	if err := buff.WriteInt32(int32(s.DropSeat)); err != nil {
 		return err
 	}
-	if err := s.Drop.Write(buff); err!=nil{
+	if err := s.Drop.Write(buff); err != nil {
+		return err
+	}
+	sz := len(s.Opts)
+	if err := buff.WriteInt32(int32(sz)); err != nil {
 		return err
 	}
 	for _, m := range s.Opts {
