@@ -36,10 +36,10 @@ func (h *Hand) Clear() {
 	h.Flowers = h.Flowers[:0]
 }
 
-func (h *Hand) Discharge(discharged Tile) (error) {
+func (h *Hand) Discharge(discharged Tile) error {
 	for i := range h.Tiles {
 		if h.Tiles[i].Seq == discharged.Seq {
-			
+
 			h.Tiles = slices.Delete(h.Tiles, i, i+1)
 			if discharged.Suit == FLOWER {
 				h.Flowers = append(h.Flowers, discharged)
@@ -48,7 +48,7 @@ func (h *Hand) Discharge(discharged Tile) (error) {
 				return nil
 			}
 			h.Listener.OnDischarge(discharged)
-			return  nil
+			return nil
 		}
 	}
 	return fmt.Errorf("discharged not existed %v", discharged)
@@ -122,7 +122,44 @@ func (h *Hand) Pung(drop Tile) error {
 }
 
 func (h *Hand) Kong(kong Tile) error {
-	
+	mk := Meld{}
+	for i := range h.Formed {
+		m := h.Formed[i]
+		if m.Pung() && m.Tiles[0].Seq == kong.Seq {
+			mk.Tiles = m.Tiles
+			mk.Concealed = false
+			h.Formed = slices.Delete(h.Formed, i, i+1)
+			break
+		}
+	}
+	if mk.Pung() { //pung + a draw
+		mk.Tiles = append(mk.Tiles, kong)
+		h.Formed = append(h.Formed, mk)
+		h.Tiles = slices.DeleteFunc(h.Tiles, func(t Tile) bool {
+			return t.Seq == kong.Seq
+		})
+		return nil
+	}
+	ct := 0
+	for i := range h.Tiles {
+		t := h.Tiles[i]
+		if t.Seq == kong.Seq {
+			ct++
+		}
+	}
+	if ct < 3 {
+		return fmt.Errorf("no know %v", kong)
+	}
+	if ct == 3 {
+		mk.Concealed = false
+	} else {
+		mk.Concealed = true
+	}
+	mk.Tiles = []Tile{kong, kong, kong, kong}
+	h.Formed = append(h.Formed, mk)
+	h.Tiles = slices.DeleteFunc(h.Tiles, func(t Tile) bool {
+		return t.Seq == kong.Seq
+	})
 	return nil
 }
 
