@@ -18,7 +18,6 @@ func (e *Evaluator) Evaluate(h *Hand) []Meld {
 			break
 		}
 		hx := HandIndex{}
-		//fmt.Printf("Pending hand %v\n",n.PendingHand)
 		hx.From(n.PendingHand)
 		if len(n.Formed) == h.MaxClaims-len(h.Formed) {
 			eye, err := hx.Eye()
@@ -29,19 +28,22 @@ func (e *Evaluator) Evaluate(h *Hand) []Meld {
 		}
 
 		kong := hx.Kong()
-		for _, m := range kong {
+		for i := range kong {
+			m := kong[i]
 			nx := EvaluationNode{PendingHand: hx.AfterFormed(m), Formed: n.Form(m), Type: KNOG}
 			e.Queue.Next(nx)
 		}
 
 		pung := hx.Pung()
-		for _, m := range pung {
+		for i := range pung {
+			m := pung[i]
 			nx := EvaluationNode{PendingHand: hx.AfterFormed(m), Formed: n.Form(m), Type: PUNG}
 			e.Queue.Next(nx)
 		}
 
 		chow := hx.Chow()
-		for _, m := range chow {
+		for i := range chow {
+			m := chow[i]
 			nx := EvaluationNode{PendingHand: hx.AfterFormed(m), Formed: n.Form(m), Type: CHOW}
 			e.Queue.Next(nx)
 		}

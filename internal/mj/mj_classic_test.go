@@ -1,7 +1,6 @@
 package mj
 
 import (
-	"slices"
 	"testing"
 )
 
@@ -66,7 +65,7 @@ func TestClassic1(t *testing.T) {
 	h := Hand{}
 	h.New()
 	h.Tiles = append(h.Tiles, tiles...)
-	slices.SortFunc(h.Tiles, cmp)
+	//slices.SortFunc(h.Tiles, cmp)
 	cm := ClassicMahjong{}
 	cm.New()
 	claimed := cm.Mahjong(&h)

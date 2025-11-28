@@ -15,17 +15,20 @@ func (e *EvaluationNode) New(t uint8) {
 func (e *EvaluationNode) FormedIdentically(n EvaluationNode) bool {
 	occ1 := n.OccurrenceOfMeld()
 	occ2 := e.OccurrenceOfMeld()
+	identified := true
 	for k, v := range occ2 {
 		cv, exists := occ1[k]
 		if !exists {
-			return false
+			identified = false
+			break
 		}
 		if cv != v {
-			return false
+			identified = false
+			break
 		}
 		delete(occ1, k)
 	}
-	return len(occ1) == 0
+	return identified && len(occ1) == 0
 }
 
 func (e *EvaluationNode) OccurrenceOfMeld() map[string]int {

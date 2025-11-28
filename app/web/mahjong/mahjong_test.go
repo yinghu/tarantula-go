@@ -161,7 +161,7 @@ func TestClassic1(t *testing.T) {
 	p2 := mj.NewTile(mj.DOTS7)
 
 	tiles := []mj.Tile{b1, b2, b3, b4, b5, b6, b7, b8, b9, c7, c8, c9, p1, p2}
-	checkList(tiles)
+	//checkList(tiles)
 	if len(tiles) != 14 {
 		t.Errorf("hand size should be 14 %d", len(tiles))
 	}
@@ -178,39 +178,37 @@ func TestClassic1(t *testing.T) {
 	//B1,B2,B3,B2,B3,B4,B3,B4,B5,B4,B5,B6,B1,B1
 }
 
-func checkList(c []mj.Tile) {
-	m := mj.NewTile(mj.DOTS9)
-	c = append(c, m)
-	fmt.Printf("sz %d\n", len(c))
-	x := c[:14]
-	fmt.Printf("sz %d\n", len(x))
-	y := []mj.Tile{m}
-	z := y[:0]
-	fmt.Printf("sz %d\n", len(z))
+func TestClassic(t *testing.T) {
 
-	pts := 12
-	dealer := (pts-1) % 4
-	tp := dealer
-	fmt.Printf("pts %d dealer %d\n", pts, dealer)
-	tp++
-	player := tp % 4
-	fmt.Printf("tp %d player %d\n", tp, player)
-	tp++
-	player = tp % 4
-	fmt.Printf("tp %d player %d\n", tp, player)
-	tp++
-	player = tp % 4
-	fmt.Printf("tp %d player %d\n", tp, player)
-	tp++
-	player = tp % 4
-	fmt.Printf("tp %d player %d\n", tp, player)
-	tp++
-	player = tp % 4
-	fmt.Printf("tp %d player %d\n", tp, player)
-	tp++
-	player = tp % 4
-	fmt.Printf("tp %d player %d\n", tp, player)
-	tp++
-	player = tp % 4
-	fmt.Printf("tp %d player %d\n", tp, player)
+	b1 := mj.NewTile(mj.BAMBOO5)
+	b2 := mj.NewTile(mj.BAMBOO6)
+	b3 := mj.NewTile(mj.BAMBOO7)
+
+	b4 := mj.NewTile(mj.BAMBOO7)
+	b5 := mj.NewTile(mj.BAMBOO8)
+	b6 := mj.NewTile(mj.BAMBOO9)
+
+	b7 := mj.NewTile(mj.CHARACTER3)
+	b8 := mj.NewTile(mj.CHARACTER4)
+	b9 := mj.NewTile(mj.CHARACTER5)
+
+	c7 := mj.NewTile(mj.CHARACTER6)
+	c8 := mj.NewTile(mj.CHARACTER6)
+
+	c9 := mj.NewTile(mj.RED)
+
+	p1 := mj.NewTile(mj.RED)
+	p2 := mj.NewTile(mj.RED)
+
+	tiles := []mj.Tile{b1, b2, b3, b4, b5, b6, b7, b8, b9, c7, c8, c9, p1, p2}
+	h := mj.Hand{}
+	h.New()
+	h.Tiles = append(h.Tiles, tiles...)
+	cm := mj.ClassicMahjong{}
+	cm.New()
+	claimed := cm.Mahjong(&h)
+	if !claimed {
+		t.Errorf("should be claimed %v", claimed)
+	}
+	//B1,B2,B3,B2,B3,B4,B3,B4,B5,B4,B5,B6,B1,B1
 }

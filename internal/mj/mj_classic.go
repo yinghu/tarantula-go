@@ -1,7 +1,5 @@
 package mj
 
-import "fmt"
-
 const (
 	CLASSIC_MAX_FORMS int = 4
 )
@@ -23,7 +21,6 @@ func (c *ClassicMahjong) Mahjong(h *Hand) bool {
 	var eyeCount int
 	var formed int
 	for _, v := range h.Formed {
-		fmt.Printf("formed %v\n",v.Tiles)
 		if v.Eye() {
 			eyeCount++
 		}

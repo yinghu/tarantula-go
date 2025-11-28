@@ -2,7 +2,7 @@ package mj
 
 import (
 	"fmt"
-	//"slices"
+	"slices"
 )
 
 func cmp(a, b Tile) int {
@@ -18,21 +18,25 @@ type TileIndex struct {
 type HandIndex struct {
 	Hand  []Tile
 	Index map[int]TileIndex
+	tx    []int
 }
 
 func (h *HandIndex) From(tiles []Tile) {
 	h.Hand = tiles
-	//slices.SortFunc(h.Hand, cmp)
 	h.Index = make(map[int]TileIndex)
-	for _, v := range tiles {
+	h.tx = make([]int, 0)
+	for i := range tiles {
+		v := tiles[i]
 		s, exists := h.Index[v.Seq]
 		if exists {
 			s.Count++
 			h.Index[v.Seq] = s
 		} else {
 			h.Index[v.Seq] = TileIndex{Count: 1, Used: 0, Suit: v}
+			h.tx = append(h.tx, v.Seq)
 		}
 	}
+	slices.Sort(h.tx)
 }
 
 func (h *HandIndex) Kong() []Meld {
