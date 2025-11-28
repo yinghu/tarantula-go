@@ -1,6 +1,7 @@
 package mj
 
 import (
+	"fmt"
 	"strconv"
 
 	"gameclustering.com/internal/core"
@@ -76,6 +77,22 @@ type Tile struct {
 	Suit string `json:"Suit"`
 	Rank int8   `json:"Rank"`
 	Seq  int    `json:"Seq"`
+}
+
+func FromQ(seq int) Tile {
+	if seq > 29 && seq < 44 {
+		return NewTile(fmt.Sprintf("H%d", seq))
+	}
+	if seq > 44 {
+		return NewTile(fmt.Sprintf("F%d", seq))
+	}
+	if seq > 9 && seq < 20 {
+		return NewTile(fmt.Sprintf("B%d", seq))
+	}
+	if seq > 20 && seq < 30 {
+		return NewTile(fmt.Sprintf("D%d", seq))
+	}
+	return NewTile(fmt.Sprintf("C%d", seq))
 }
 
 func (t *Tile) From(src string) {

@@ -101,11 +101,70 @@ func (h *Hand) ConsealedKnog(knog int) error {
 	return nil
 }
 
-func (h *Hand) Chow() error {
+func (h *Hand) Chow(drop Tile, c1 Tile, c2 Tile) error {
+	c := []int{-1, -1}
+	m := make([]Tile, 0)
+	for i := range h.Tiles {
+		if h.Tiles[i].Seq == c1.Seq && c[0] == -1 {
+			c[0] = i
+			m = append(m, h.Tiles[i])
+			continue
+		}
+		if h.Tiles[i].Seq == c2.Seq && c[1] == -1 {
+			c[1] = i
+			m = append(m, h.Tiles[i])
+			continue
+		}
+	}
+	if c[0] == -1 || c[1] == -1 {
+		return fmt.Errorf("no chow %s %s %s", drop.Name(), c1.Name(), c2.Name())
+	}
+	m = append(m, drop)
+	slices.SortFunc(m, cmp)
+	chow := Meld{Tiles: m}
+	if !chow.Chow() {
+		return fmt.Errorf("not chow %v", drop)
+	}
+	c[0]=-1
+	c[1]=-1
+	h.Tiles = slices.DeleteFunc(h.Tiles, func(t Tile) bool {
+		if t.Seq == c1.Seq && c[0]==-1 {
+			c[0]=t.Seq
+			return true
+		}
+		if t.Seq == c2.Seq && c[1]==-1 {
+			c[1]=t.Seq
+			return true
+		}
+		return false
+	})
+	h.Formed = append(h.Formed, chow)
 	return nil
 }
 
-func (h *Hand) Pung() error {
+func (h *Hand) Pung(drop Tile) error {
+	c := 0
+	for i := range h.Tiles {
+		if h.Tiles[i].Seq == drop.Seq {
+			if c == 2 {
+				break
+			}
+			c++
+		}
+	}
+	if c != 2 {
+		return fmt.Errorf("no pung %d", c)
+	}
+	m := Meld{Tiles: []Tile{drop, drop, drop}}
+	c = 0
+	h.Tiles = slices.DeleteFunc(h.Tiles, func(t Tile) bool {
+		if t.Seq == drop.Seq && c < 2 {
+			c++
+			return true
+		}
+		return false
+	})
+	h.Formed = append(h.Formed, m)
 	return nil
 }
 
