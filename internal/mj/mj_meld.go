@@ -12,7 +12,8 @@ const (
 )
 
 type Meld struct {
-	Tiles []Tile `json:"Tiles"`
+	Tiles     []Tile `json:"Tiles"`
+	Concealed bool
 }
 
 func (m *Meld) Type() int32 {

@@ -9,7 +9,7 @@ import (
 
 type HandListener interface {
 	OnDraw(t Tile)
-	OnDrop(t Tile)
+	OnDischarge(t Tile)
 	OnKong(t Tile)
 	OnFormed(m Meld)
 }
@@ -36,69 +36,22 @@ func (h *Hand) Clear() {
 	h.Flowers = h.Flowers[:0]
 }
 
-func (h *Hand) Drop(drop Tile) error {
+func (h *Hand) Discharge(discharged Tile) (error) {
 	for i := range h.Tiles {
-		if h.Tiles[i] == drop {
+		if h.Tiles[i].Seq == discharged.Seq {
+			
 			h.Tiles = slices.Delete(h.Tiles, i, i+1)
-			if drop.Suit == FLOWER {
-				h.Flowers = append(h.Flowers, drop)
+			if discharged.Suit == FLOWER {
+				h.Flowers = append(h.Flowers, discharged)
 			}
 			if h.Listener == nil {
 				return nil
 			}
-			h.Listener.OnDrop(drop)
-			return nil
+			h.Listener.OnDischarge(discharged)
+			return  nil
 		}
 	}
-	return fmt.Errorf("drop not existed %v", drop)
-}
-func (h *Hand) Discharge(discharged int) (Tile, error) {
-	for i := range h.Tiles {
-		if h.Tiles[i].Seq == discharged {
-			drop := h.Tiles[i]
-			h.Tiles = slices.Delete(h.Tiles, i, i+1)
-			if drop.Suit == FLOWER {
-				h.Flowers = append(h.Flowers, drop)
-			}
-			if h.Listener == nil {
-				return drop, nil
-			}
-			h.Listener.OnDrop(drop)
-			return drop, nil
-		}
-	}
-	return Tile{}, fmt.Errorf("discharged not existed %d", discharged)
-}
-
-func (h *Hand) RevealedKnog(knog int) error {
-	for i := range h.Formed {
-		if h.Formed[i].Pung() && h.Formed[i].Tiles[0].Seq == knog {
-			t := h.Formed[i].Tiles[0]
-			mt := []Tile{t, t, t, t}
-			h.Formed = slices.Delete(h.Formed, i, i+1)
-			h.Formed = append(h.Formed, Meld{Tiles: mt})
-			return nil
-		}
-	}
-	return fmt.Errorf("no revealed kong %d", knog)
-}
-
-func (h *Hand) ConsealedKnog(knog int) error {
-	m := Meld{}
-	for i := range h.Tiles {
-		t := h.Tiles[i]
-		if t.Seq == knog {
-			m.Tiles = append(m.Tiles, t)
-		}
-	}
-	if !m.Kong() {
-		return fmt.Errorf("not knog %d", knog)
-	}
-	h.Tiles = slices.DeleteFunc(h.Tiles, func(d Tile) bool {
-		return d.Seq == knog
-	})
-	h.Formed = append(h.Formed, m)
-	return nil
+	return fmt.Errorf("discharged not existed %v", discharged)
 }
 
 func (h *Hand) Chow(drop Tile, c1 Tile, c2 Tile) error {
@@ -125,15 +78,15 @@ func (h *Hand) Chow(drop Tile, c1 Tile, c2 Tile) error {
 	if !chow.Chow() {
 		return fmt.Errorf("not chow %v", drop)
 	}
-	c[0]=-1
-	c[1]=-1
+	c[0] = -1
+	c[1] = -1
 	h.Tiles = slices.DeleteFunc(h.Tiles, func(t Tile) bool {
-		if t.Seq == c1.Seq && c[0]==-1 {
-			c[0]=t.Seq
+		if t.Seq == c1.Seq && c[0] == -1 {
+			c[0] = t.Seq
 			return true
 		}
-		if t.Seq == c2.Seq && c[1]==-1 {
-			c[1]=t.Seq
+		if t.Seq == c2.Seq && c[1] == -1 {
+			c[1] = t.Seq
 			return true
 		}
 		return false
@@ -165,6 +118,11 @@ func (h *Hand) Pung(drop Tile) error {
 		return false
 	})
 	h.Formed = append(h.Formed, m)
+	return nil
+}
+
+func (h *Hand) Kong(kong Tile) error {
+	
 	return nil
 }
 
@@ -203,7 +161,7 @@ func (h *Hand) append(t Tile, knog bool) error {
 	}
 	return nil
 }
-func (h *Hand) Kong(deck *Deck) error {
+func (h *Hand) DrawB(deck *Deck) error {
 	t, err := deck.Kong()
 	if err != nil {
 		return err

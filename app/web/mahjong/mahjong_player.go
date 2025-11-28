@@ -254,7 +254,7 @@ func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
 	}
 
 }
-func (mp *MahjongPlayer) OnDrop(t mj.Tile) {
+func (mp *MahjongPlayer) OnDischarge(t mj.Tile) {
 	switch t.Suit {
 	case mj.BAMBOO:
 		for i := range mp.B {

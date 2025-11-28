@@ -140,25 +140,25 @@ func TestMahjongToken(t *testing.T) {
 // }
 func TestClassic1(t *testing.T) {
 
-	b1 := mj.NewTile(mj.BAMBOO1)
-	b2 := mj.NewTile(mj.BAMBOO1)
-	b3 := mj.NewTile(mj.BAMBOO2)
+	b1 := mj.FromS(mj.BAMBOO1)
+	b2 := mj.FromS(mj.BAMBOO1)
+	b3 := mj.FromS(mj.BAMBOO2)
 
-	b4 := mj.NewTile(mj.BAMBOO3)
-	b5 := mj.NewTile(mj.BAMBOO4)
-	b6 := mj.NewTile(mj.BAMBOO6)
+	b4 := mj.FromS(mj.BAMBOO3)
+	b5 := mj.FromS(mj.BAMBOO4)
+	b6 := mj.FromS(mj.BAMBOO6)
 
-	b7 := mj.NewTile(mj.BAMBOO6)
-	b8 := mj.NewTile(mj.BAMBOO7)
-	b9 := mj.NewTile(mj.BAMBOO7)
+	b7 := mj.FromS(mj.BAMBOO6)
+	b8 := mj.FromS(mj.BAMBOO7)
+	b9 := mj.FromS(mj.BAMBOO7)
 
-	c7 := mj.NewTile(mj.BAMBOO8)
-	c8 := mj.NewTile(mj.BAMBOO8)
+	c7 := mj.FromS(mj.BAMBOO8)
+	c8 := mj.FromS(mj.BAMBOO8)
 
-	c9 := mj.NewTile(mj.DOTS5)
+	c9 := mj.FromS(mj.DOTS5)
 
-	p1 := mj.NewTile(mj.DOTS6)
-	p2 := mj.NewTile(mj.DOTS7)
+	p1 := mj.FromS(mj.DOTS6)
+	p2 := mj.FromS(mj.DOTS7)
 
 	tiles := []mj.Tile{b1, b2, b3, b4, b5, b6, b7, b8, b9, c7, c8, c9, p1, p2}
 	//checkList(tiles)
@@ -180,25 +180,25 @@ func TestClassic1(t *testing.T) {
 
 func TestClassic(t *testing.T) {
 
-	b1 := mj.NewTile(mj.BAMBOO5)
-	b2 := mj.NewTile(mj.BAMBOO6)
-	b3 := mj.NewTile(mj.BAMBOO7)
+	b1 := mj.FromS(mj.BAMBOO5)
+	b2 := mj.FromS(mj.BAMBOO6)
+	b3 := mj.FromS(mj.BAMBOO7)
 
-	b4 := mj.NewTile(mj.BAMBOO7)
-	b5 := mj.NewTile(mj.BAMBOO8)
-	b6 := mj.NewTile(mj.BAMBOO9)
+	b4 := mj.FromS(mj.BAMBOO7)
+	b5 := mj.FromS(mj.BAMBOO8)
+	b6 := mj.FromS(mj.BAMBOO9)
 
-	b7 := mj.NewTile(mj.CHARACTER3)
-	b8 := mj.NewTile(mj.CHARACTER4)
-	b9 := mj.NewTile(mj.CHARACTER5)
+	b7 := mj.FromS(mj.CHARACTER3)
+	b8 := mj.FromS(mj.CHARACTER4)
+	b9 := mj.FromS(mj.CHARACTER5)
 
-	c7 := mj.NewTile(mj.CHARACTER6)
-	c8 := mj.NewTile(mj.CHARACTER6)
+	c7 := mj.FromS(mj.CHARACTER6)
+	c8 := mj.FromS(mj.CHARACTER6)
 
-	c9 := mj.NewTile(mj.RED)
+	c9 := mj.FromS(mj.RED)
 
-	p1 := mj.NewTile(mj.RED)
-	p2 := mj.NewTile(mj.RED)
+	p1 := mj.FromS(mj.RED)
+	p2 := mj.FromS(mj.RED)
 
 	tiles := []mj.Tile{b1, b2, b3, b4, b5, b6, b7, b8, b9, c7, c8, c9, p1, p2}
 	h := mj.Hand{}

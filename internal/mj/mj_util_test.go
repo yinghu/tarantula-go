@@ -151,7 +151,7 @@ func TestHandStart(t *testing.T) {
 	if err != nil {
 		t.Errorf("should be error")
 	}
-	err = h.Kong(&s)
+	err = h.DrawB(&s)
 	if err != nil {
 		t.Errorf("should be error")
 	}
@@ -162,5 +162,28 @@ func TestHandStart(t *testing.T) {
 	if dt[0] > 6 || dt[1] > 6 {
 		t.Errorf("should not be more than 6 %d, %d", dt[0], dt[1])
 	}
+
+	d1 := FromQ(21)
+	fmt.Printf("dots 1 tile %v\n",d1)
+
+	c1 := FromQ(1)
+	fmt.Printf("character 1 tile %v\n",c1)
+	
+	b1 := FromQ(11)
+	fmt.Printf("bamboo 1 tile %v\n",b1)
+
+	d9 := FromQ(29)
+	fmt.Printf("dots 9 tile %v\n",d9)
+
+	c9 := FromQ(9)
+	fmt.Printf("character 9 tile %v\n",c9)
+	
+	b9 := FromQ(19)
+	fmt.Printf("bamboo 9 tile %v\n",b9)
+
+	b5 := FromS(BAMBOO5)
+	x5 := FromQ(b5.Seq)
+	fmt.Printf("bamboo 5 tile %v %v\n",b5,x5)
+
 
 }

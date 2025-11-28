@@ -67,7 +67,7 @@ const (
 	F_WINTER        string = "F59"
 )
 
-func NewTile(src string) Tile {
+func FromS(src string) Tile {
 	t := Tile{}
 	t.From(src)
 	return t
@@ -81,18 +81,18 @@ type Tile struct {
 
 func FromQ(seq int) Tile {
 	if seq > 29 && seq < 44 {
-		return NewTile(fmt.Sprintf("H%d", seq))
+		return FromS(fmt.Sprintf("H%d", seq))
 	}
 	if seq > 44 {
-		return NewTile(fmt.Sprintf("F%d", seq))
+		return FromS(fmt.Sprintf("F%d", seq))
 	}
 	if seq > 9 && seq < 20 {
-		return NewTile(fmt.Sprintf("B%d", seq))
+		return FromS(fmt.Sprintf("B%d", seq-10))
 	}
 	if seq > 20 && seq < 30 {
-		return NewTile(fmt.Sprintf("D%d", seq))
+		return FromS(fmt.Sprintf("D%d", seq-20))
 	}
-	return NewTile(fmt.Sprintf("C%d", seq))
+	return FromS(fmt.Sprintf("C%d", seq))
 }
 
 func (t *Tile) From(src string) {
