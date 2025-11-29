@@ -14,8 +14,7 @@ const (
 	CMD_CLAIM         int = 8
 	CMD_TABLE         int = 9
 	CMD_SKIP          int = 10 //skip discharge event
-	CMD_REVEALED_KONG int = 11 //revealed kong
-
+	
 	CMD_TURN_CONTINUE int = 96
 	CMD_TURN_END      int = 97
 	CMD_RESET         int = 98
@@ -34,6 +33,8 @@ type MahjongPlayToken struct {
 	Cmd      int
 	Seat     int
 	Selected int
+	Chow1    int
+	Chow2    int
 }
 
 func (mp *MahjongPlayToken) Write(buff core.DataBuffer) error {

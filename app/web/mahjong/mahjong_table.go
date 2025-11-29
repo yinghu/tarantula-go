@@ -154,12 +154,19 @@ func (m *MahjongTable) Play() {
 				}
 				timer.Stop(true)
 			case CMD_CHOW:
+				err := m.Chow(t.Seat, t.Selected, t.Chow1, t.Chow2)
+				if err != nil {
+					go m.Players[t.Seat].OnError(m, err)
+					continue
+				}
 				tp = t.Seat
 				timer.Stop(true)
 			case CMD_PUNG:
-				tp = t.Seat
-				timer.Stop(true)
-			case CMD_REVEALED_KONG:
+				err := m.Pung(t.Seat, t.Selected)
+				if err != nil {
+					go m.Players[t.Seat].OnError(m, err)
+					continue
+				}
 				tp = t.Seat
 				timer.Stop(true)
 			case CMD_SKIP:
@@ -280,10 +287,14 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 	}
 	if kong > mj.FS_LIMIT {
 		m.Discharge(seat, kong)
-	} else {
-		//4 kind kong / or pung to kong
-
+		return mp.TailDraw(&m.Setup.Deck)
 	}
+	k := mj.FromQ(kong)
+	err := mp.Kong(k)
+	if err !=nil{
+		return err
+	}
+	//4 kind kong / or pung to kong
 	return mp.TailDraw(&m.Setup.Deck)
 }
 
@@ -317,8 +328,18 @@ func (m *MahjongTable) Discharge(seat int, t int) error {
 	return nil
 }
 
-func (m *MahjongTable) Chow(seat int, t mj.Tile) error {
-	return nil
+func (m *MahjongTable) Chow(seat int, drop int, chow1 int, chow2 int) error {
+	d := mj.FromQ(drop)
+	c1 := mj.FromQ(chow1)
+	c2 := mj.FromQ(chow2)
+	mp := m.Players[seat]
+	return mp.Chow(d, c1, c2)
+}
+
+func (m *MahjongTable) Pung(seat int, drop int) error {
+	d := mj.FromQ(drop)
+	mp := m.Players[seat]
+	return mp.Pung(d)
 }
 
 func (m *MahjongTable) Claim(seat int) bool {
