@@ -284,7 +284,7 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 		//4 kind kong / or pung to kong
 
 	}
-	return mp.DrawB(&m.Setup.Deck)
+	return mp.TailDraw(&m.Setup.Deck)
 }
 
 func (m *MahjongTable) Discharge(seat int, t int) error {
@@ -332,7 +332,7 @@ func (m *MahjongTable) deal(p int) error {
 		return fmt.Errorf("no more draw %d", sz)
 	}
 	fz := len(mp.Flowers)
-	err := mp.Draw(&m.Setup.Deck)
+	err := mp.HeadDraw(&m.Setup.Deck)
 	if err != nil {
 		return err
 	}
@@ -342,7 +342,7 @@ func (m *MahjongTable) deal(p int) error {
 	}
 	fz = sz
 	for {
-		err = mp.DrawB(&m.Setup.Deck)
+		err = mp.TailDraw(&m.Setup.Deck)
 		if err != nil {
 			return err
 		}

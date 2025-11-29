@@ -70,23 +70,29 @@ func (h *HandIndex) Pung() []Meld {
 func (h *HandIndex) Chow() []Meld {
 	h.reset()
 	nodes := make([]Meld, 0)
-	for s, c := range h.Index {
+	for i := range h.tx {
+		s := h.tx[i]
+		c, exists := h.Index[s]
+		if !exists {
+			continue
+		}
 		nc, exsits := h.Index[s+1]
-		if !exsits || nc.Count-nc.Used == 0 {
+		if !exsits {
 			continue
 		}
 		nb, exsits := h.Index[s+2]
-		if !exsits || nc.Count-nc.Used == 0 {
+		if !exsits {
 			continue
 		}
-		c.Used++
-		h.Index[s] = c
-		nc.Used++
-		h.Index[s+1] = nc
-		nb.Used++
-		h.Index[s+2] = nb
+		//c.Used++
+		//h.Index[s] = c
+		//nc.Used++
+		//h.Index[s+1] = nc
+		//nb.Used++
+		//h.Index[s+2] = nb
 		tiles := []Tile{c.Suit, nc.Suit, nb.Suit}
 		nodes = append(nodes, Meld{Tiles: tiles})
+
 	}
 	return nodes
 }

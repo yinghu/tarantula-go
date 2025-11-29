@@ -163,7 +163,7 @@ func (h *Hand) Kong(kong Tile) error {
 	return nil
 }
 
-func (h *Hand) Draw(deck *Deck) error {
+func (h *Hand) HeadDraw(deck *Deck) error {
 	t, err := deck.Draw()
 	if err != nil {
 		return err
@@ -198,7 +198,7 @@ func (h *Hand) append(t Tile, knog bool) error {
 	}
 	return nil
 }
-func (h *Hand) DrawB(deck *Deck) error {
+func (h *Hand) TailDraw(deck *Deck) error {
 	t, err := deck.Kong()
 	if err != nil {
 		return err

@@ -31,5 +31,5 @@ func TestHandIndex(t *testing.T) {
 		fmt.Printf("%s\n",mk[i].Name())
 	}
 
-	//f := ix.AfterFormed()
+	
 }

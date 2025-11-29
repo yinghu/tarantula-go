@@ -147,11 +147,11 @@ func TestHandStart(t *testing.T) {
 	s.Shuffle()
 	h := Hand{}
 	h.New()
-	err := h.Draw(&s)
+	err := h.HeadDraw(&s)
 	if err != nil {
 		t.Errorf("should be error")
 	}
-	err = h.DrawB(&s)
+	err = h.TailDraw(&s)
 	if err != nil {
 		t.Errorf("should be error")
 	}
@@ -164,26 +164,25 @@ func TestHandStart(t *testing.T) {
 	}
 
 	d1 := FromQ(21)
-	fmt.Printf("dots 1 tile %v\n",d1)
+	fmt.Printf("dots 1 tile %v\n", d1)
 
 	c1 := FromQ(1)
-	fmt.Printf("character 1 tile %v\n",c1)
-	
+	fmt.Printf("character 1 tile %v\n", c1)
+
 	b1 := FromQ(11)
-	fmt.Printf("bamboo 1 tile %v\n",b1)
+	fmt.Printf("bamboo 1 tile %v\n", b1)
 
 	d9 := FromQ(29)
-	fmt.Printf("dots 9 tile %v\n",d9)
+	fmt.Printf("dots 9 tile %v\n", d9)
 
 	c9 := FromQ(9)
-	fmt.Printf("character 9 tile %v\n",c9)
-	
+	fmt.Printf("character 9 tile %v\n", c9)
+
 	b9 := FromQ(19)
-	fmt.Printf("bamboo 9 tile %v\n",b9)
+	fmt.Printf("bamboo 9 tile %v\n", b9)
 
 	b5 := FromS(BAMBOO5)
 	x5 := FromQ(b5.Seq)
-	fmt.Printf("bamboo 5 tile %v %v\n",b5,x5)
-
+	fmt.Printf("bamboo 5 tile %v %v\n", b5, x5)
 
 }

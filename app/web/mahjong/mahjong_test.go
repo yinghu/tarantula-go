@@ -142,6 +142,7 @@ func TestClassic1(t *testing.T) {
 
 	b1 := mj.FromS(mj.BAMBOO1)
 	b2 := mj.FromS(mj.BAMBOO1)
+
 	b3 := mj.FromS(mj.BAMBOO2)
 
 	b4 := mj.FromS(mj.BAMBOO3)
@@ -178,7 +179,7 @@ func TestClassic1(t *testing.T) {
 	//B1,B2,B3,B2,B3,B4,B3,B4,B5,B4,B5,B6,B1,B1
 }
 
-func TestClassic(t *testing.T) {
+func TestClassic2(t *testing.T) {
 
 	b1 := mj.FromS(mj.BAMBOO5)
 	b2 := mj.FromS(mj.BAMBOO6)
