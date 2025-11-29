@@ -107,7 +107,7 @@ func (m *MahjongTable) Play() {
 				if m.Solo {
 					go m.Players[t.Seat].PlayDice(m)
 				} else {
-
+					//load table data to players
 				}
 				continue
 			}
@@ -291,7 +291,7 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 	}
 	k := mj.FromQ(kong)
 	err := mp.Kong(k)
-	if err !=nil{
+	if err != nil {
 		return err
 	}
 	//4 kind kong / or pung to kong
@@ -374,4 +374,18 @@ func (m *MahjongTable) deal(p int) error {
 		fz = sz
 	}
 	return nil
+}
+
+func (m *MahjongTable) Update(e event.Event) {
+	if e.RecipientId() > 0 {
+		m.Push(e)
+		return
+	}
+	//table broadcasting
+	for i := range m.Players {
+		if m.Players[i].SystemId > 0 {
+			e.OnRecipientId(m.Players[i].SystemId)
+			m.Push(e)
+		}
+	}
 }

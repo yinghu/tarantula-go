@@ -33,6 +33,7 @@ type Event interface {
 	Topic() string
 	OId() int64
 	OnOId(id int64)
+	OnRecipientId(id int64)
 	RecipientId() int64
 }
 
@@ -97,4 +98,8 @@ func (s *EventObj) OId() int64 {
 
 func (s *EventObj) RecipientId() int64 {
 	return 0
+}
+
+func (s *EventObj) OnRecipientId(recipientId int64) {
+
 }

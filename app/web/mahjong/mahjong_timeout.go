@@ -22,6 +22,10 @@ func (s *MahjongEventObj) RecipientId() int64 {
 	return s.SystemId
 }
 
+func (s *MahjongEventObj) OnRecipientId(recipientId int64) {
+	s.SystemId = recipientId
+}
+
 type OnTurn func()
 
 type MahjongTimeoutObj struct {

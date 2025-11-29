@@ -44,9 +44,9 @@ func (mp *MahjongPlayer) PlayDice(mt *MahjongTable) {
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_DICE, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
 	}, func() {
 		me := MahjongDiceEvent{Dice1: int32(mt.dice[0]), Dice2: int32(mt.dice[1])}
-		mt.Push(&me)
+		mt.Update(&me)
 	})
-	mt.Push(&md)
+	mt.Update(&md)
 	mt.Timer <- &md
 }
 
@@ -56,9 +56,9 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_DEAL, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
 	}, func() {
 		me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
-		mt.Push(&me)
+		mt.Update(&me)
 	})
-	mt.Push(&md)
+	mt.Update(&md)
 	mt.Timer <- &md
 }
 
@@ -77,6 +77,7 @@ func (mp *MahjongPlayer) PlayDischarge(mt *MahjongTable, mc MahjongDischargeEven
 	}
 	mt.Timer <- &md
 }
+
 
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	core.AppLog.Printf("player turn %d %v %v\n", mp.Seat, mp.Auto, mp.TN)
