@@ -121,6 +121,7 @@ func (m *MahjongTable) Play() {
 			case CMD_DICE:
 				m.Dice()
 				timer.Stop(true,false)
+				go m.Players[t.Seat].PlayDeal(m)
 			case CMD_DEAL:
 				dealer, err := m.Deal()
 				if err != nil {

@@ -45,7 +45,7 @@ func (mp *MahjongPlayer) PlayDice(mt *MahjongTable) {
 	}, func(commited bool) {
 		me := MahjongDiceEvent{Dice1: int32(mt.dice[0]), Dice2: int32(mt.dice[1])}
 		mt.Update(&me)
-		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_CONTINUE}
+		//mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_CONTINUE}
 	})
 	mt.Update(&md)
 	mt.Timer <- &md
@@ -55,7 +55,7 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 	oid, _ := mt.Sequence.Id()
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DEAL, func() {
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_DEAL, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
-	}, func(commted bool) {
+	}, func(commited bool) {
 		me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
 		mt.Update(&me)
 		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_CONTINUE}
@@ -95,7 +95,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		k := mp.PendingKongs[0]
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_KONG, func() {
 			mt.Turn <- MahjongPlayToken{Cmd: CMD_KONG, Seat: mp.Seat, Selected: k, Id: oid}
-		}, func(commted bool) {
+		}, func(commited bool) {
 			if !mp.Auto {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
 				mt.Push(&me)
@@ -114,7 +114,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 			oid, _ := mt.Sequence.Id()
 			md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_CLAIM, func() {
 				mt.Turn <- MahjongPlayToken{Cmd: CMD_CLAIM, Seat: mp.Seat, Id: oid}
-			}, func(commted bool) {
+			}, func(commited bool) {
 				//reset to next round
 				mc := NewMahjongClaimEvent(mp.SystemId, mt.Id, mp.Seat, claimed, mp.Hand.Formed)
 				mt.Push(&mc)
@@ -128,7 +128,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DISCHARGE, func() {
 			t := mp.Hand.Tiles[oid%10]
 			mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCHARGE, Seat: mp.Seat, Selected: t.Seq, Id: oid}
-		}, func(commted bool) {
+		}, func(commited bool) {
 			mp.TN = false
 			if !mp.Auto {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
@@ -144,7 +144,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		oid, _ := mt.Sequence.Id()
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DRAW, func() {
 			mt.Turn <- MahjongPlayToken{Cmd: CMD_DRAW, Seat: mp.Seat, Id: oid}
-		}, func(commted bool) {
+		}, func(commited bool) {
 			mp.TN = true
 			if !mp.Auto {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
