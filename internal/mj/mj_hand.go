@@ -8,7 +8,7 @@ import (
 )
 
 type HandListener interface {
-	OnDraw(t Tile)
+	OnDraw(t Tile, kong bool)
 	OnDischarge(t Tile)
 	OnKong(t Tile)
 	OnChow(drop Tile, chow Meld)
@@ -95,6 +95,7 @@ func (h *Hand) Chow(drop Tile, c1 Tile, c2 Tile) error {
 	h.Formed = append(h.Formed, chow)
 	if h.Listener != nil {
 		h.Listener.OnChow(drop, chow)
+		h.Listener.OnFormed(chow)
 	}
 	return nil
 }
@@ -124,6 +125,7 @@ func (h *Hand) Pung(drop Tile) error {
 	h.Formed = append(h.Formed, m)
 	if h.Listener != nil {
 		h.Listener.OnPung(m)
+		h.Listener.OnFormed(m)
 	}
 	return nil
 }
@@ -143,7 +145,8 @@ func (h *Hand) Kong(kong Tile) error {
 		mk.Tiles = append(mk.Tiles, kong)
 		h.Formed = append(h.Formed, mk)
 		if h.Listener != nil {
-			h.Listener.OnKong(kong)
+			h.Listener.OnKong(kong) //delete
+			h.Listener.OnFormed(mk)
 		}
 		h.Tiles = slices.DeleteFunc(h.Tiles, func(t Tile) bool {
 			return t.Seq == kong.Seq
@@ -169,6 +172,7 @@ func (h *Hand) Kong(kong Tile) error {
 	h.Formed = append(h.Formed, mk)
 	if h.Listener != nil {
 		h.Listener.OnKong(kong)
+		h.Listener.OnFormed(mk)
 	}
 	h.Tiles = slices.DeleteFunc(h.Tiles, func(t Tile) bool {
 		return t.Seq == kong.Seq
@@ -184,7 +188,7 @@ func (h *Hand) HeadDraw(deck *Deck) error {
 	return h.append(t, false)
 }
 
-func (h *Hand) append(t Tile, knog bool) error {
+func (h *Hand) append(t Tile, kong bool) error {
 	if h.FlowerExcluded {
 		switch t.Suit {
 		case FLOWER:
@@ -201,13 +205,8 @@ func (h *Hand) append(t Tile, knog bool) error {
 			slices.SortFunc(h.Tiles, cmp)
 		}
 	}
-	if h.Listener == nil {
-		return nil
-	}
-	if knog {
-		h.Listener.OnKong(t)
-	} else {
-		h.Listener.OnDraw(t)
+	if h.Listener != nil {
+		h.Listener.OnDraw(t, kong)
 	}
 	return nil
 }

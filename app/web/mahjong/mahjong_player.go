@@ -125,7 +125,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		}
 		oid, _ := mt.Sequence.Id()
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DISCHARGE, func() {
-			t := mp.Hand.Tiles[oid%10]
+			t := mp.Hand.Tiles[oid%int64(len(mp.Tiles)-1)]
 			mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCHARGE, Seat: mp.Seat, Selected: t.Seq, Id: oid}
 		}, func(commited bool) {
 			mp.TN = false
@@ -221,7 +221,7 @@ func (mp *MahjongPlayer) Reset() {
 	mp.PendingKongs = mp.PendingKongs[:0]
 }
 
-func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
+func (mp *MahjongPlayer) OnDraw(t mj.Tile, kong bool) {
 	switch t.Suit {
 	case mj.BAMBOO:
 		mp.B = append(mp.B, t)
@@ -261,108 +261,161 @@ func (mp *MahjongPlayer) OnDraw(t mj.Tile) {
 	}
 
 }
+
 func (mp *MahjongPlayer) OnDischarge(t mj.Tile) {
+	mp.OnDelete(t, false)
+}
+func (mp *MahjongPlayer) OnDelete(t mj.Tile, kong bool) {
 	switch t.Suit {
 	case mj.BAMBOO:
-		for i := range mp.B {
-			if mp.B[i] == t {
-				mp.B = slices.Delete(mp.B, i, i+1)
-				break
+		if !kong {
+			for i := range mp.B {
+				if mp.B[i] == t {
+					mp.B = slices.Delete(mp.B, i, i+1)
+					break
+				}
 			}
+		} else {
+			mp.B = slices.DeleteFunc(mp.B, func(d mj.Tile) bool {
+				return d.Seq == t.Seq
+			})
 		}
 
 	case mj.CHARACTER:
-
-		for i := range mp.C {
-			if mp.C[i] == t {
-				mp.C = slices.Delete(mp.C, i, i+1)
-				break
+		if !kong {
+			for i := range mp.C {
+				if mp.C[i] == t {
+					mp.C = slices.Delete(mp.C, i, i+1)
+					break
+				}
 			}
+		} else {
+			mp.C = slices.DeleteFunc(mp.C, func(d mj.Tile) bool {
+				return d.Seq == t.Seq
+			})
 		}
 
 	case mj.DOTS:
-
-		for i := range mp.D {
-			if mp.D[i] == t {
-				mp.D = slices.Delete(mp.D, i, i+1)
-				break
+		if !kong {
+			for i := range mp.D {
+				if mp.D[i] == t {
+					mp.D = slices.Delete(mp.D, i, i+1)
+					break
+				}
 			}
+		} else {
+			mp.D = slices.DeleteFunc(mp.D, func(d mj.Tile) bool {
+				return d.Seq == t.Seq
+			})
 		}
 
 	case mj.HORNOR:
 		switch t.Name() {
 		case mj.EAST:
-
-			for i := range mp.HE {
-				if mp.HE[i] == t {
-					mp.HE = slices.Delete(mp.HE, i, i+1)
-					break
+			if !kong {
+				for i := range mp.HE {
+					if mp.HE[i] == t {
+						mp.HE = slices.Delete(mp.HE, i, i+1)
+						break
+					}
 				}
+			} else {
+				mp.HE = slices.DeleteFunc(mp.HE, func(d mj.Tile) bool {
+					return d.Seq == t.Seq
+				})
 			}
 
 		case mj.SOUTH:
-
-			for i := range mp.HS {
-				if mp.HS[i] == t {
-					mp.HS = slices.Delete(mp.HS, i, i+1)
-					break
+			if !kong {
+				for i := range mp.HS {
+					if mp.HS[i] == t {
+						mp.HS = slices.Delete(mp.HS, i, i+1)
+						break
+					}
 				}
+			} else {
+				mp.HS = slices.DeleteFunc(mp.HS, func(d mj.Tile) bool {
+					return d.Seq == t.Seq
+				})
 			}
-
 		case mj.WEST:
-
-			for i := range mp.HW {
-				if mp.HW[i] == t {
-					mp.HW = slices.Delete(mp.HW, i, i+1)
-					break
+			if !kong {
+				for i := range mp.HW {
+					if mp.HW[i] == t {
+						mp.HW = slices.Delete(mp.HW, i, i+1)
+						break
+					}
 				}
+			} else {
+				mp.HW = slices.DeleteFunc(mp.HW, func(d mj.Tile) bool {
+					return d.Seq == t.Seq
+				})
 			}
 
 		case mj.NORTH:
-
-			for i := range mp.HN {
-				if mp.HN[i] == t {
-					mp.HN = slices.Delete(mp.HN, i, i+1)
-					break
+			if !kong {
+				for i := range mp.HN {
+					if mp.HN[i] == t {
+						mp.HN = slices.Delete(mp.HN, i, i+1)
+						break
+					}
 				}
+			} else {
+				mp.HN = slices.DeleteFunc(mp.HN, func(d mj.Tile) bool {
+					return d.Seq == t.Seq
+				})
 			}
 
 		case mj.RED:
-
-			for i := range mp.R {
-				if mp.R[i] == t {
-					mp.R = slices.Delete(mp.R, i, i+1)
-					break
+			if !kong {
+				for i := range mp.R {
+					if mp.R[i] == t {
+						mp.R = slices.Delete(mp.R, i, i+1)
+						break
+					}
 				}
+			} else {
+				mp.R = slices.DeleteFunc(mp.R, func(d mj.Tile) bool {
+					return d.Seq == t.Seq
+				})
 			}
 
 		case mj.GREEN:
-
-			for i := range mp.G {
-				if mp.G[i] == t {
-					mp.G = slices.Delete(mp.G, i, i+1)
-					break
+			if !kong {
+				for i := range mp.G {
+					if mp.G[i] == t {
+						mp.G = slices.Delete(mp.G, i, i+1)
+						break
+					}
 				}
+			} else {
+				mp.G = slices.DeleteFunc(mp.G, func(d mj.Tile) bool {
+					return d.Seq == t.Seq
+				})
 			}
 
 		case mj.WHITE:
-
-			for i := range mp.W {
-				if mp.W[i] == t {
-					mp.W = slices.Delete(mp.W, i, i+1)
-					break
+			if !kong {
+				for i := range mp.W {
+					if mp.W[i] == t {
+						mp.W = slices.Delete(mp.W, i, i+1)
+						break
+					}
 				}
+			} else {
+				mp.W = slices.DeleteFunc(mp.W, func(d mj.Tile) bool {
+					return d.Seq == t.Seq
+				})
 			}
 		}
 
 	}
 }
 func (mp *MahjongPlayer) OnKong(t mj.Tile) {
-	mp.OnDraw(t)
+	mp.OnDelete(t, true)
 }
 func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
-	mp.OnDischarge(m.Tiles[0])
-	mp.OnDischarge(m.Tiles[1])
+	core.AppLog.Printf("Meld : %s\n", m.Name())
 }
 
 func (mp *MahjongPlayer) OnChow(drop mj.Tile, chow mj.Meld) {
@@ -373,7 +426,8 @@ func (mp *MahjongPlayer) OnChow(drop mj.Tile, chow mj.Meld) {
 	}
 }
 func (mp *MahjongPlayer) OnPung(pung mj.Meld) {
-
+	mp.OnDischarge(pung.Tiles[0])
+	mp.OnDischarge(pung.Tiles[0])
 }
 
 func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {

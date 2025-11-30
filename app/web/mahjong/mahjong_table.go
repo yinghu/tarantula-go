@@ -120,7 +120,7 @@ func (m *MahjongTable) Play() {
 			switch t.Cmd {
 			case CMD_DICE:
 				m.Dice()
-				timer.Stop(true,false)
+				timer.Stop(true, false)
 				go m.Players[t.Seat].PlayDeal(m)
 			case CMD_DEAL:
 				dealer, err := m.Deal()
@@ -129,7 +129,7 @@ func (m *MahjongTable) Play() {
 					continue
 				}
 				tp = dealer
-				timer.Stop(true,false)
+				timer.Stop(true, false)
 				//start dealer
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
@@ -137,21 +137,21 @@ func (m *MahjongTable) Play() {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				timer.Stop(true,false)
+				timer.Stop(true, false)
 			case CMD_KONG:
 				err := m.Kong(t.Seat, t.Selected)
 				if err != nil {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				timer.Stop(true,false)
+				timer.Stop(true, false)
 			case CMD_DISCHARGE:
 				err := m.Discharge(t.Seat, t.Selected)
 				if err != nil {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				timer.Stop(true,false)
+				timer.Stop(true, false)
 			case CMD_CHOW:
 				err := m.Chow(t.Seat, t.Selected, t.Chow1, t.Chow2)
 				if err != nil {
@@ -159,7 +159,7 @@ func (m *MahjongTable) Play() {
 					continue
 				}
 				tp = t.Seat
-				timer.Stop(true,false)
+				timer.Stop(true, false)
 			case CMD_PUNG:
 				err := m.Pung(t.Seat, t.Selected)
 				if err != nil {
@@ -167,16 +167,16 @@ func (m *MahjongTable) Play() {
 					continue
 				}
 				tp = t.Seat
-				timer.Stop(false,false)
+				timer.Stop(true, false)
 			case CMD_SKIP:
-				timer.Stop(false,false)
+				timer.Stop(false, false)
 			case CMD_CLAIM:
 				claimed := m.Claim(t.Seat)
 				if !claimed {
 					go m.Players[t.Seat].OnError(m, fmt.Errorf("fake claimed"))
 					continue
 				}
-				timer.Stop(true,false)
+				timer.Stop(true, false)
 				m.Reset()
 				go m.Players[t.Seat].PlayDeal(m)
 			case CMD_RESET:
