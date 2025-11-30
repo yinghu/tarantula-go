@@ -11,6 +11,8 @@ type HandListener interface {
 	OnDraw(t Tile)
 	OnDischarge(t Tile)
 	OnKong(t Tile)
+	OnChow(chow Meld)
+	OnPung(pung Meld)
 	OnFormed(m Meld)
 }
 
@@ -44,10 +46,9 @@ func (h *Hand) Discharge(discharged Tile) error {
 			if discharged.Suit == FLOWER {
 				h.Flowers = append(h.Flowers, discharged)
 			}
-			if h.Listener == nil {
-				return nil
+			if h.Listener != nil {
+				h.Listener.OnDischarge(discharged)
 			}
-			h.Listener.OnDischarge(discharged)
 			return nil
 		}
 	}
@@ -92,6 +93,9 @@ func (h *Hand) Chow(drop Tile, c1 Tile, c2 Tile) error {
 		return false
 	})
 	h.Formed = append(h.Formed, chow)
+	if h.Listener != nil {
+		h.Listener.OnChow(chow)
+	}
 	return nil
 }
 
@@ -118,6 +122,9 @@ func (h *Hand) Pung(drop Tile) error {
 		return false
 	})
 	h.Formed = append(h.Formed, m)
+	if h.Listener != nil {
+		h.Listener.OnChow(m)
+	}
 	return nil
 }
 
@@ -135,6 +142,9 @@ func (h *Hand) Kong(kong Tile) error {
 	if mk.Pung() { //pung + a draw
 		mk.Tiles = append(mk.Tiles, kong)
 		h.Formed = append(h.Formed, mk)
+		if h.Listener != nil {
+			h.Listener.OnChow(mk)
+		}
 		h.Tiles = slices.DeleteFunc(h.Tiles, func(t Tile) bool {
 			return t.Seq == kong.Seq
 		})
@@ -157,6 +167,9 @@ func (h *Hand) Kong(kong Tile) error {
 	}
 	mk.Tiles = []Tile{kong, kong, kong, kong}
 	h.Formed = append(h.Formed, mk)
+	if h.Listener != nil {
+		h.Listener.OnChow(mk)
+	}
 	h.Tiles = slices.DeleteFunc(h.Tiles, func(t Tile) bool {
 		return t.Seq == kong.Seq
 	})

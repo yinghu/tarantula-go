@@ -8,7 +8,7 @@ import (
 
 type MahjongTimeout interface {
 	Start(t *MahjongTable)
-	Stop(commited bool)
+	Stop(commited bool, closing bool)
 	OId() int64
 }
 
@@ -27,20 +27,25 @@ func (s *MahjongEventObj) OnRecipientId(recipientId int64) {
 }
 
 type OnTurn func()
+type OnStop func(commited bool)
 
 type MahjongTimeoutObj struct {
 	MahjongEventObj
-	Commited chan bool
+	S chan StopSignal
 	N        MahjongPlayTurn
 	T        OnTurn //triger on timer
-	P        OnTurn //call on stop
+	P        OnStop //call on stop
+}
+type StopSignal struct {
+	Commited bool
+	Closing  bool
 }
 
 func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 	tm := *time.NewTimer(time.Duration(s.N.CountDown+COUNT_DOWN_BUFFER) * time.Second)
-	s.Commited = make(chan bool)
+	s.S = make(chan StopSignal)
 	closing := false
-	defer close(s.Commited)
+	defer close(s.S)
 	for {
 		if closing {
 			break
@@ -48,15 +53,15 @@ func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 		select {
 		case <-tm.C:
 			s.T()
-		case c := <-s.Commited:
-			if c && s.P != nil {
-				s.P()
+		case c := <-s.S:
+			if !c.Closing && s.P != nil {
+				s.P(c.Commited)
 			}
-			closing = true
+			closing = c.Closing
 		}
 	}
 }
 
-func (mt *MahjongTimeoutObj) Stop(commited bool) {
-	mt.Commited <- commited
+func (mt *MahjongTimeoutObj) Stop(commited bool, closing bool) {
+	mt.S <- StopSignal{Commited: commited, Closing: closing}
 }
