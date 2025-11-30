@@ -11,7 +11,7 @@ type HandListener interface {
 	OnDraw(t Tile)
 	OnDischarge(t Tile)
 	OnKong(t Tile)
-	OnChow(chow Meld)
+	OnChow(drop Tile, chow Meld)
 	OnPung(pung Meld)
 	OnFormed(m Meld)
 }
@@ -94,7 +94,7 @@ func (h *Hand) Chow(drop Tile, c1 Tile, c2 Tile) error {
 	})
 	h.Formed = append(h.Formed, chow)
 	if h.Listener != nil {
-		h.Listener.OnChow(chow)
+		h.Listener.OnChow(drop, chow)
 	}
 	return nil
 }
@@ -123,7 +123,7 @@ func (h *Hand) Pung(drop Tile) error {
 	})
 	h.Formed = append(h.Formed, m)
 	if h.Listener != nil {
-		h.Listener.OnChow(m)
+		h.Listener.OnPung(m)
 	}
 	return nil
 }
@@ -143,7 +143,7 @@ func (h *Hand) Kong(kong Tile) error {
 		mk.Tiles = append(mk.Tiles, kong)
 		h.Formed = append(h.Formed, mk)
 		if h.Listener != nil {
-			h.Listener.OnChow(mk)
+			h.Listener.OnKong(kong)
 		}
 		h.Tiles = slices.DeleteFunc(h.Tiles, func(t Tile) bool {
 			return t.Seq == kong.Seq
@@ -168,7 +168,7 @@ func (h *Hand) Kong(kong Tile) error {
 	mk.Tiles = []Tile{kong, kong, kong, kong}
 	h.Formed = append(h.Formed, mk)
 	if h.Listener != nil {
-		h.Listener.OnChow(mk)
+		h.Listener.OnKong(kong)
 	}
 	h.Tiles = slices.DeleteFunc(h.Tiles, func(t Tile) bool {
 		return t.Seq == kong.Seq

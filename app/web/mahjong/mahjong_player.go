@@ -45,7 +45,6 @@ func (mp *MahjongPlayer) PlayDice(mt *MahjongTable) {
 	}, func(commited bool) {
 		me := MahjongDiceEvent{Dice1: int32(mt.dice[0]), Dice2: int32(mt.dice[1])}
 		mt.Update(&me)
-		//mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_CONTINUE}
 	})
 	mt.Update(&md)
 	mt.Timer <- &md
@@ -365,8 +364,12 @@ func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
 
 }
 
-func (mp *MahjongPlayer) OnChow(chow mj.Meld) {
-	mp.TN = false
+func (mp *MahjongPlayer) OnChow(drop mj.Tile, chow mj.Meld) {
+	for i := range chow.Tiles {
+		if chow.Tiles[i].Seq != drop.Seq {
+			mp.OnDischarge(chow.Tiles[i])
+		}
+	}
 }
 func (mp *MahjongPlayer) OnPung(pung mj.Meld) {
 
