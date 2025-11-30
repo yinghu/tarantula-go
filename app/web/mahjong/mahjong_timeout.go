@@ -57,7 +57,7 @@ func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 			if !c.Closing && s.P != nil {
 				s.P(c.Commited)
 			}
-			closing = c.Closing
+			closing = true
 		}
 	}
 }
