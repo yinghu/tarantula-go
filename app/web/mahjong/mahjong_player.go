@@ -361,7 +361,8 @@ func (mp *MahjongPlayer) OnKong(t mj.Tile) {
 	mp.OnDraw(t)
 }
 func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
-
+	mp.OnDischarge(m.Tiles[0])
+	mp.OnDischarge(m.Tiles[1])
 }
 
 func (mp *MahjongPlayer) OnChow(drop mj.Tile, chow mj.Meld) {
