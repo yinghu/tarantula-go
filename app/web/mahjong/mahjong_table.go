@@ -17,7 +17,7 @@ const (
 	SEAT_N int = 3
 
 	HAND_SIZE_THRESHHOLD       int = 13
-	PLAYER_TURN_TICKER_SECONDS int = 10
+	PLAYER_TURN_TICKER_SECONDS int = 30
 	AUTO_TURN_TICKER_SECONDS   int = 3
 	COUNT_DOWN_BUFFER          int = 1
 	SOLO                       int = 1
@@ -53,7 +53,7 @@ func (m *MahjongTable) New() {
 	m.Turn = make(chan MahjongPlayToken, 3)
 	m.Timer = make(chan MahjongTimeout, 3)
 	m.Sync = make(chan MahjongPlayToken, 3)
-	m.skips = make([]MahjongDischargeEvent, 0)
+	m.skips = make([]MahjongDischargeEvent, 3)
 }
 
 func (m *MahjongTable) Reset() {

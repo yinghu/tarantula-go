@@ -30,6 +30,9 @@ func TestHandIndex(t *testing.T) {
 	for i := range mk{
 		fmt.Printf("%s\n",mk[i].Name())
 	}
-
+    mc := ix.CheckChow(FromS("B3"))
+	for i := range mc{
+		fmt.Printf("CH%s\n",mc[i].Name())
+	}
 	
 }

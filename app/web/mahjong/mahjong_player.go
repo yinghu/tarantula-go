@@ -74,7 +74,7 @@ func (mp *MahjongPlayer) PlayDischarge(mt *MahjongTable, mc MahjongDischargeEven
 		if commited {
 			me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
 			mt.Update(&me)
-			mp.TN = false
+			mp.TN = true
 			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_CONTINUE}
 		} else {
 			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
