@@ -193,18 +193,17 @@ func (mp *MahjongPlayer) checkMatch(seg []mj.Tile, d mj.Tile, c bool) []mj.Meld 
 		return nil
 	}
 	ix := mj.HandIndex{}
-	seg = append(seg, d)
 	ix.From(seg)
 	m := make([]mj.Meld, 0)
 	if c {
 
-		m = append(m, ix.Chow()...)
-		m = append(m, ix.Pung()...)
-		m = append(m, ix.Kong()...)
+		m = append(m, ix.CheckChow(d)...)
+		m = append(m, ix.CheckPung(d)...)
+		m = append(m, ix.CheckKong(d)...)
 		return m
 	}
-	m = append(m, ix.Pung()...)
-	m = append(m, ix.Kong()...)
+	m = append(m, ix.CheckPung(d)...)
+	m = append(m, ix.CheckKong(d)...)
 	return m
 }
 
