@@ -85,6 +85,8 @@ func (m *MahjongTable) Play() {
 				} else {
 					go m.Players[seat].OnSeat(m)
 				}
+			case CMD_TURN_PLAYER:
+				go m.Players[k.Seat].Play(m)
 			case CMD_TURN_CONTINUE:
 				go m.Players[tp%4].Play(m)
 			case CMD_TURN_END:
@@ -92,7 +94,7 @@ func (m *MahjongTable) Play() {
 				if sz > 0 {
 					se := m.skips[sz-1]
 					m.skips = m.skips[:sz-1]
-					core.AppLog.Printf("discharge %d %v\n",sz,se.Opts)
+					core.AppLog.Printf("discharge %d %v\n", sz, se.Opts)
 					go m.Players[se.Seat].PlayDischarge(m, se)
 					break
 				}
