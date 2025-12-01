@@ -318,9 +318,9 @@ func (m *MahjongTable) Discharge(seat int, t int) error {
 	}
 	m.Discharged = append(m.Discharged, drop)
 	p := seat + 1
-	cp := m.Players[p%4].CheckDischarge(seat, drop, true) //pung/kong/chow
-	if len(cp) > 0 {
-		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, cp))
+	pp := m.Players[p%4].CheckDischarge(seat, drop, true) //pung/kong/chow
+	if len(pp) > 0 {
+		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, pp))
 	}
 	p++
 	pp1 := m.Players[p%4].CheckDischarge(seat, drop, false) //pung/kong

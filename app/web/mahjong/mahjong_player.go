@@ -92,8 +92,8 @@ func (mp *MahjongPlayer) PlayDischarge(mt *MahjongTable, mc MahjongDischargeEven
 }
 
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
-	core.AppLog.Printf("player turn %d %v %v\n", mp.Seat, mp.Auto, mp.TN)
-	core.AppLog.Printf("player kong %v\n", mp.PendingKongs)
+	core.AppLog.Printf("player seat: %d auto: %v TN: %v\n", mp.Seat, mp.Auto, mp.TN)
+	core.AppLog.Printf("player kong list: %v\n", mp.PendingKongs)
 	if len(mp.PendingKongs) > 0 { //knog first
 		oid, _ := mt.Sequence.Id()
 		k := mp.PendingKongs[0]
@@ -114,14 +114,17 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	}
 	if mp.TN {
 		claimed := mt.Setup.Mahjong(&mp.Hand)
+		core.AppLog.Printf("player claim seat : %d auto: %v mj: %v\n", mp.Seat, mp.Auto, claimed)
 		if claimed {
 			oid, _ := mt.Sequence.Id()
 			md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_CLAIM, func() {
 				mt.Turn <- MahjongPlayToken{Cmd: CMD_CLAIM, Seat: mp.Seat, Id: oid}
 			}, func(commited bool) {
 				//reset to next round
-				mc := NewMahjongClaimEvent(mp.SystemId, mt.Id, mp.Seat, claimed, mp.Hand.Formed)
-				mt.Push(&mc)
+				if !mp.Auto {
+					mc := NewMahjongClaimEvent(mp.SystemId, mt.Id, mp.Seat, claimed, mp.Hand.Formed)
+					mt.Push(&mc)
+				}
 			})
 			if !mp.Auto {
 				mt.Push(&md)
