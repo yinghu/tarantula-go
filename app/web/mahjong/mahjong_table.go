@@ -92,6 +92,7 @@ func (m *MahjongTable) Play() {
 				if sz > 0 {
 					se := m.skips[sz-1]
 					m.skips = m.skips[:sz-1]
+					core.AppLog.Printf("discharge %d %v\n",sz,se.Opts)
 					go m.Players[se.Seat].PlayDischarge(m, se)
 					break
 				}
@@ -320,7 +321,7 @@ func (m *MahjongTable) Discharge(seat int, t int) error {
 	p := seat + 1
 	pp := m.Players[p%4].CheckDischarge(seat, drop, true) //pung/kong/chow
 	if len(pp) > 0 {
-		core.AppLog.Printf("PP : %v\n", pp)
+		core.AppLog.Printf("pp : %v\n", pp)
 		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, pp))
 	}
 	p++
@@ -328,6 +329,7 @@ func (m *MahjongTable) Discharge(seat int, t int) error {
 	if len(pp1) > 0 {
 		core.AppLog.Printf("1PP : %v\n", pp1)
 		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, pp1))
+		return nil
 	}
 	p++
 	pp2 := m.Players[p%4].CheckDischarge(seat, drop, false) //pung/kong
