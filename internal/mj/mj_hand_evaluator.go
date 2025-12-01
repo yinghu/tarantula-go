@@ -24,6 +24,9 @@ func (e *Evaluator) Evaluate(h *Hand) []Meld {
 			if err == nil {
 				nx := EvaluationNode{PendingHand: hx.AfterFormed(eye), Formed: n.Form(eye), Type: EYE}
 				e.Queue.Next(nx)
+				if h.Listener != nil {
+					h.Listener.OnFormed(eye)
+				}
 			}
 		}
 
@@ -32,6 +35,9 @@ func (e *Evaluator) Evaluate(h *Hand) []Meld {
 			m := kong[i]
 			nx := EvaluationNode{PendingHand: hx.AfterFormed(m), Formed: n.Form(m), Type: KNOG}
 			e.Queue.Next(nx)
+			if h.Listener != nil {
+				h.Listener.OnFormed(m)
+			}
 		}
 
 		pung := hx.Pung()
@@ -39,6 +45,9 @@ func (e *Evaluator) Evaluate(h *Hand) []Meld {
 			m := pung[i]
 			nx := EvaluationNode{PendingHand: hx.AfterFormed(m), Formed: n.Form(m), Type: PUNG}
 			e.Queue.Next(nx)
+			if h.Listener != nil {
+				h.Listener.OnFormed(m)
+			}
 		}
 
 		chow := hx.Chow()
@@ -46,6 +55,9 @@ func (e *Evaluator) Evaluate(h *Hand) []Meld {
 			m := chow[i]
 			nx := EvaluationNode{PendingHand: hx.AfterFormed(m), Formed: n.Form(m), Type: CHOW}
 			e.Queue.Next(nx)
+			if h.Listener != nil {
+				h.Listener.OnFormed(m)
+			}
 		}
 
 	}

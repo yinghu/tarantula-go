@@ -84,12 +84,6 @@ func (h *HandIndex) Chow() []Meld {
 		if !exsits {
 			continue
 		}
-		//c.Used++
-		//h.Index[s] = c
-		//nc.Used++
-		//h.Index[s+1] = nc
-		//nb.Used++
-		//h.Index[s+2] = nb
 		tiles := []Tile{c.Suit, nc.Suit, nb.Suit}
 		nodes = append(nodes, Meld{Tiles: tiles})
 

@@ -28,3 +28,11 @@ func (c *ClassicMahjong) Mahjong(h *Hand) bool {
 	}
 	return eyeCount == 1 && formed == h.MaxClaims+1
 }
+
+func (c *ClassicMahjong) CheckMahjong(h *Hand, match Tile) bool {
+	cm := Hand{}
+	cm.New()
+	cm.Tiles = append(cm.Tiles, h.Tiles...)
+	cm.Tiles = append(cm.Tiles, match)
+	return c.Mahjong(&cm)
+}

@@ -28,10 +28,10 @@ func TestMahjongTable(t *testing.T) {
 	core.CreateTestLog()
 	mt := MahjongTable{Pusher: &SampleCallback{}}
 	mt.New()
-	mt.Sit(1, SEAT_E)
-	mt.Sit(2, SEAT_S)
-	mt.Sit(3, SEAT_W)
-	mt.Sit(4, SEAT_N)
+	mt.Sit(1)
+	mt.Sit(2)
+	mt.Sit(3)
+	mt.Sit(4)
 	mt.Dice()
 	mt.Deal()
 	dealer := (mt.Pts() - 1) % 4
@@ -212,4 +212,10 @@ func TestClassic2(t *testing.T) {
 		t.Errorf("should be claimed %v", claimed)
 	}
 	//B1,B2,B3,B2,B3,B4,B3,B4,B5,B4,B5,B6,B1,B1
+	//tile13 := []mj.Tile{b1, b2, b3, b4, b5, b6, b7, b8, b9, c7, c8, c9, p1}
+	h.Discharge(p2)
+	matched := cm.CheckMahjong(&h,p2)
+	if !matched {
+		t.Errorf("should be matched %v", matched)
+	}
 }

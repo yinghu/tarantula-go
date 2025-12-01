@@ -78,13 +78,12 @@ func (m *MahjongTable) Play() {
 				m.Started = false
 				running = false
 			case CMD_SIT:
-				err := m.Sit(k.SystemId, k.Seat)
+				seat, err := m.Sit(k.SystemId)
 				if err != nil {
 					mr := NewMahjongErrorEvent(k.SystemId, m.Id, 100, err.Error())
 					m.Push(&mr)
 				} else {
-					ms := NewMahjongSitEvent(k.SystemId, m.Id, k.Seat)
-					m.Push(&ms)
+					go m.Players[seat].OnSeat(m)
 				}
 			case CMD_TURN_CONTINUE:
 				go m.Players[tp%4].Play(m)
@@ -198,19 +197,28 @@ func (m *MahjongTable) Play() {
 	core.AppLog.Printf("table closed %d\n", m.Id)
 }
 
-func (m *MahjongTable) Sit(systemId int64, seatNumber int) error {
-	if seatNumber < SEAT_E || seatNumber > SEAT_N {
-		return fmt.Errorf("invalid seat number %d", seatNumber)
+func (m *MahjongTable) Sit(systemId int64) (int, error) {
+	if m.Players[SEAT_E].SystemId == 0 {
+		m.Players[SEAT_E].SystemId = systemId
+		m.Players[SEAT_E].Auto = false
+		return SEAT_E, nil
 	}
-	if m.Players[SEAT_E].SystemId == systemId || m.Players[SEAT_S].SystemId == systemId || m.Players[SEAT_W].SystemId == systemId || m.Players[SEAT_N].SystemId == systemId {
-		return fmt.Errorf("already has a seat %d", seatNumber)
+	if m.Players[SEAT_S].SystemId == 0 {
+		m.Players[SEAT_S].SystemId = systemId
+		m.Players[SEAT_S].Auto = false
+		return SEAT_S, nil
 	}
-	if m.Players[seatNumber].SystemId != 0 {
-		return fmt.Errorf("seat already occupied %d", seatNumber)
+	if m.Players[SEAT_W].SystemId == 0 {
+		m.Players[SEAT_W].SystemId = systemId
+		m.Players[SEAT_W].Auto = false
+		return SEAT_W, nil
 	}
-	m.Players[seatNumber].SystemId = systemId
-	m.Players[seatNumber].Auto = false
-	return nil
+	if m.Players[SEAT_N].SystemId == 0 {
+		m.Players[SEAT_N].SystemId = systemId
+		m.Players[SEAT_N].Auto = false
+		return SEAT_N, nil
+	}
+	return 0, fmt.Errorf("no seat available on table: %d", m.Id)
 
 }
 

@@ -38,6 +38,11 @@ func (mp *MahjongPlayer) OnError(mt *MahjongTable, err error) {
 	core.AppLog.Printf("play error %s on %d\n", err.Error(), mp.Seat)
 }
 
+func (mp *MahjongPlayer) OnSeat(mt *MahjongTable) {
+	ms := NewMahjongSitEvent(mp.SystemId, mt.Id, mp.Seat)
+	mt.Update(&ms)
+}
+
 func (mp *MahjongPlayer) PlayDice(mt *MahjongTable) {
 	oid, _ := mt.Sequence.Id()
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DICE, func() {
