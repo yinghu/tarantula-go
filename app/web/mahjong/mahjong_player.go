@@ -66,7 +66,7 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 	})
 	mt.Update(&md)
 	mt.Timer <- &md
-	
+
 }
 
 func (mp *MahjongPlayer) PlayDischarge(mt *MahjongTable, mc MahjongDischargeEvent) {
@@ -80,7 +80,7 @@ func (mp *MahjongPlayer) PlayDischarge(mt *MahjongTable, mc MahjongDischargeEven
 			me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
 			mt.Update(&me)
 			mp.TN = true
-			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_CONTINUE}
+			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 		} else {
 			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_CONTINUE}
 		}
