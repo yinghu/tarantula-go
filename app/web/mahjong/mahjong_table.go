@@ -320,16 +320,19 @@ func (m *MahjongTable) Discharge(seat int, t int) error {
 	p := seat + 1
 	pp := m.Players[p%4].CheckDischarge(seat, drop, true) //pung/kong/chow
 	if len(pp) > 0 {
+		core.AppLog.Printf("PP : %v\n", pp)
 		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, pp))
 	}
 	p++
 	pp1 := m.Players[p%4].CheckDischarge(seat, drop, false) //pung/kong
 	if len(pp1) > 0 {
+		core.AppLog.Printf("1PP : %v\n", pp1)
 		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, pp1))
 	}
 	p++
 	pp2 := m.Players[p%4].CheckDischarge(seat, drop, false) //pung/kong
 	if len(pp2) > 0 {
+		core.AppLog.Printf("2PP : %v\n", pp2)
 		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, pp2))
 	}
 	return nil
