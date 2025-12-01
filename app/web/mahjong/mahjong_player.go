@@ -198,7 +198,7 @@ func (mp *MahjongPlayer) CheckDischarge(seat int, drop mj.Tile, chow bool) []mj.
 
 func (mp *MahjongPlayer) checkMatch(seg []mj.Tile, d mj.Tile, c bool) []mj.Meld {
 	if len(seg) < 2 {
-		return nil
+		return []mj.Meld{}
 	}
 	ix := mj.HandIndex{}
 	ix.From(seg)
