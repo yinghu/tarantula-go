@@ -66,6 +66,7 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 	})
 	mt.Update(&md)
 	mt.Timer <- &md
+	
 }
 
 func (mp *MahjongPlayer) PlayDischarge(mt *MahjongTable, mc MahjongDischargeEvent) {
