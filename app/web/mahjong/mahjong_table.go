@@ -53,7 +53,7 @@ func (m *MahjongTable) New() {
 	m.Turn = make(chan MahjongPlayToken, 3)
 	m.Timer = make(chan MahjongTimeout, 3)
 	m.Sync = make(chan MahjongPlayToken, 3)
-	m.skips = make([]MahjongDischargeEvent, 3)
+	m.skips = make([]MahjongDischargeEvent, 0)
 }
 
 func (m *MahjongTable) Reset() {
