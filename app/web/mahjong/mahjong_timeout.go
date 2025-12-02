@@ -45,14 +45,19 @@ type StopSignal struct {
 func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 	tm := *time.NewTimer(time.Duration(s.N.CountDown+COUNT_DOWN_BUFFER) * time.Second)
 	s.S = make(chan StopSignal)
-	defer close(s.S)
-	select {
-	case <-tm.C:
-		s.T()
-	case <-s.S:
+	defer func() {
+		tm.Stop()
+		close(s.S)
+		core.AppLog.Printf("timeout!!")
+	}()
+	for {
+		select {
+		case <-tm.C:
+			s.T()
+		case <-s.S:
+			return
+		}
 	}
-	tm.Stop()
-	core.AppLog.Printf("timeout!!")
 }
 
 func (mt *MahjongTimeoutObj) Stop(commited bool, closing bool) {
