@@ -78,8 +78,10 @@ func (m *MahjongTable) Play() {
 			case CMD_SIT:
 				seat, err := m.Sit(k.SystemId)
 				if err != nil {
-					mr := NewMahjongErrorEvent(k.SystemId, m.Id, 100, err.Error())
-					m.Push(&mr)
+					go func() {
+						mr := NewMahjongErrorEvent(k.SystemId, m.Id, 100, err.Error())
+						m.Push(&mr)
+					}()
 				} else {
 					go m.Players[seat].OnSeat(m)
 				}
@@ -97,10 +99,12 @@ func (m *MahjongTable) Play() {
 				}
 				tp++ //next player turn
 				go m.Players[tp%4].Play(m)
+			
 			}
 		case tm := <-m.Timer:
 			timerIndex[tm.OId()] = tm
 			go tm.Start(m)
+
 		case t := <-m.Turn:
 			if t.Cmd == CMD_TABLE {
 				if m.Solo {
@@ -113,6 +117,7 @@ func (m *MahjongTable) Play() {
 			timer, exists := timerIndex[t.Id]
 			if !exists {
 				core.AppLog.Printf("Token not existed: %d selected : %d cmd: %d Id :%d\n", t.Seat, t.Selected, t.Cmd, t.Id)
+				go m.Players[t.Seat].OnError(m, fmt.Errorf("token not existed %d", t.Id))
 				continue
 			}
 			delete(timerIndex, t.Id)
@@ -319,20 +324,17 @@ func (m *MahjongTable) Discharge(seat int, t int) error {
 	p := seat + 1
 	pp := m.Players[p%4].CheckDischarge(seat, drop, true) //pung/kong/chow
 	if len(pp) > 0 {
-		core.AppLog.Printf("pp : %v\n", pp)
 		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, pp))
 	}
 	p++
 	pp1 := m.Players[p%4].CheckDischarge(seat, drop, false) //pung/kong
 	if len(pp1) > 0 {
-		core.AppLog.Printf("1PP : %v\n", pp1)
 		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, pp1))
 		return nil
 	}
 	p++
 	pp2 := m.Players[p%4].CheckDischarge(seat, drop, false) //pung/kong
 	if len(pp2) > 0 {
-		core.AppLog.Printf("2PP : %v\n", pp2)
 		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, pp2))
 	}
 	return nil
