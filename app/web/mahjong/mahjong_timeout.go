@@ -3,6 +3,7 @@ package main
 import (
 	"time"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
 
@@ -51,6 +52,7 @@ func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 	case <-s.S:
 		tm.Stop()
 	}
+	core.AppLog.Printf("timeout!!")
 }
 
 func (mt *MahjongTimeoutObj) Stop(commited bool, closing bool) {
