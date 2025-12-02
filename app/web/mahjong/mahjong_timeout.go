@@ -50,8 +50,8 @@ func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 	case <-tm.C:
 		s.T()
 	case <-s.S:
-		tm.Stop()
 	}
+	tm.Stop()
 	core.AppLog.Printf("timeout!!")
 }
 
