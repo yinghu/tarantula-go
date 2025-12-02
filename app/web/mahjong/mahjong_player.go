@@ -34,7 +34,6 @@ func (mp *MahjongPlayer) OnError(mt *MahjongTable, err error) {
 		mr := NewMahjongErrorEvent(mp.SystemId, mt.Id, 100, err.Error())
 		mt.Update(&mr)
 	}
-	//mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 	core.AppLog.Printf("play error %s on %d\n", err.Error(), mp.Seat)
 }
 
