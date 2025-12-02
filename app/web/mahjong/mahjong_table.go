@@ -29,7 +29,7 @@ type MahjongTable struct {
 	Players       [4]*MahjongPlayer `json:"Players"`
 	dice          []int             `json:"-"`
 	Discharged    []mj.Tile         `json:"Discharged"`
-	Started       bool
+	//Started       bool
 	Solo          bool
 	Turn          chan MahjongPlayToken `json:"-"`
 	event.Pusher  `json:"-"`
@@ -75,7 +75,7 @@ func (m *MahjongTable) Play() {
 			//core.AppLog.Printf("Sync: %d selected : %d cmd: %d Id :%d\n", k.Seat, k.Selected, k.Cmd, k.Id)
 			switch k.Cmd {
 			case CMD_END:
-				m.Started = false
+				//m.Started = false
 				running = false
 			case CMD_SIT:
 				seat, err := m.Sit(k.SystemId)
@@ -271,7 +271,7 @@ func (m *MahjongTable) Deal() (int, error) {
 		}
 		r--
 	}
-	m.Started = true
+	//m.Started = true
 	return dealer, nil
 }
 

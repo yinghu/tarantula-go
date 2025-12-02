@@ -34,7 +34,7 @@ func (mp *MahjongPlayer) OnError(mt *MahjongTable, err error) {
 		mr := NewMahjongErrorEvent(mp.SystemId, mt.Id, 100, err.Error())
 		mt.Update(&mr)
 	}
-	mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
+	//mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 	core.AppLog.Printf("play error %s on %d\n", err.Error(), mp.Seat)
 }
 
@@ -151,7 +151,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	} else {
 		oid, _ := mt.Sequence.Id()
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DRAW, func() {
-			mt.Turn <- MahjongPlayToken{Cmd: CMD_DRAW, Seat: mp.Seat, Id: oid}
+			mt.Turn <- MahjongPlayToken{Cmd: CMD_DRAW, Seat: mp.Seat, Id: oid}///
 		}, func(commited bool) {
 			mp.TN = true
 			if !mp.Auto {
