@@ -3,7 +3,6 @@ package main
 import (
 	"time"
 
-	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
 
@@ -32,7 +31,6 @@ type OnStop func(commited bool)
 
 type MahjongTimeoutObj struct {
 	MahjongEventObj
-	//S chan StopSignal
 	N MahjongPlayTurn
 	T OnTurn //triger on timer
 	P OnStop //call on stop
@@ -45,18 +43,14 @@ type StopSignal struct {
 
 func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 	s.K = time.NewTimer(time.Duration(s.N.CountDown+COUNT_DOWN_BUFFER) * time.Second)
-	//s.S = make(chan StopSignal)
-	//defer func() {
-	//close(s.S)
-	//core.AppLog.Printf("timeout!!")
-	//}()
 	<-s.K.C
 	s.T()
-	core.AppLog.Printf("timer called")
 }
 
 func (mt *MahjongTimeoutObj) Stop(commited bool, closing bool) {
-	//mt.S <- StopSignal{Commited: commited, Closing: closing}
 	mt.K.Stop()
+	if closing {
+		return
+	}
 	mt.P(commited)
 }
