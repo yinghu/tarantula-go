@@ -61,7 +61,7 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 	}, func(commited bool) {
 		me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
 		mt.Update(&me)
-		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_CONTINURE} //start game from dealer
+		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_START} //start game from dealer
 	})
 	mt.Update(&md)
 	mt.Timer <- &md

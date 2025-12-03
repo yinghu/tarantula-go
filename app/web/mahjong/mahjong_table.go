@@ -87,7 +87,7 @@ func (m *MahjongTable) Play() {
 				}
 			case CMD_TURN_PLAYER:
 				go m.Players[k.Seat].Play(m)
-			case CMD_TURN_CONTINURE:
+			case CMD_TURN_START:
 				go m.Players[tp%4].Play(m)	
 			case CMD_TURN_NEXT:
 				sz := len(m.skips)
