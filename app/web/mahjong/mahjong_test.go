@@ -102,7 +102,7 @@ func TestMahjongAutoTable(t *testing.T) {
 		}
 	}
 	tx := mt.Players[dealer].Hand.Tiles[0]
-	err = mt.Discharge(dealer, tx.Seq)
+	err = mt.Discard(dealer, tx.Seq)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}

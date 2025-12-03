@@ -87,14 +87,14 @@ func (m *MahjongTable) Play() {
 				}
 			case CMD_TURN_PLAYER:
 				go m.Players[k.Seat].Play(m)
-			case CMD_TURN_CONTINUE:
-				go m.Players[tp%4].Play(m)
-			case CMD_TURN_END:
+			case CMD_TURN_CONTINURE:
+				go m.Players[tp%4].Play(m)	
+			case CMD_TURN_NEXT:
 				sz := len(m.skips)
 				if sz > 0 {
 					se := m.skips[sz-1]
 					m.skips = m.skips[:sz-1]
-					go m.Players[se.Seat].PlayDischarge(m, se)
+					go m.Players[se.Seat].PlayDiscard(m, se)
 					break
 				}
 				tp++ //next player turn
@@ -132,9 +132,8 @@ func (m *MahjongTable) Play() {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				tp = dealer
+				tp = dealer //start dealer 
 				go timer.Stop(true, false)
-				//start dealer
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
 				if err != nil {
@@ -149,8 +148,8 @@ func (m *MahjongTable) Play() {
 					continue
 				}
 				go timer.Stop(true, false)
-			case CMD_DISCHARGE:
-				err := m.Discharge(t.Seat, t.Selected)
+			case CMD_DISCARD:
+				err := m.Discard(t.Seat, t.Selected)
 				if err != nil {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
@@ -299,7 +298,7 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 		return fmt.Errorf("no pending kong %d", kong)
 	}
 	if kong > mj.FS_LIMIT {
-		m.Discharge(seat, kong)
+		m.Discard(seat, kong)
 		return mp.TailDraw(&m.Setup.Deck)
 	}
 	k := mj.FromQ(kong)
@@ -311,7 +310,7 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 	return mp.TailDraw(&m.Setup.Deck)
 }
 
-func (m *MahjongTable) Discharge(seat int, t int) error {
+func (m *MahjongTable) Discard(seat int, t int) error {
 	mp := m.Players[seat]
 	sz := len(mp.Tiles)
 	if sz == 1 {

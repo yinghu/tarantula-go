@@ -61,15 +61,14 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 	}, func(commited bool) {
 		me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
 		mt.Update(&me)
-		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_CONTINUE} //start game from dealer
+		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_CONTINURE} //start game from dealer
 	})
 	mt.Update(&md)
 	mt.Timer <- &md
-
 }
 
-func (mp *MahjongPlayer) PlayDischarge(mt *MahjongTable, mc MahjongDischargeEvent) {
-	core.AppLog.Printf("player discharge seat :%d auto:%v tn:%v\n", mp.Seat, mp.Auto, mp.TN)
+func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDischargeEvent) {
+	core.AppLog.Printf("player discard seat :%d auto:%v tn:%v\n", mp.Seat, mp.Auto, mp.TN)
 	core.AppLog.Printf("drop %v\n", mc.Opts)
 	oid, _ := mt.Sequence.Id()
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_SKIP, func() {
@@ -79,9 +78,9 @@ func (mp *MahjongPlayer) PlayDischarge(mt *MahjongTable, mc MahjongDischargeEven
 			me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
 			mt.Update(&me)
 			mp.TN = true
-			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_PLAYER, Seat: mp.Seat}
+			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_PLAYER, Seat: mp.Seat} //full hand turn
 		} else {
-			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
+			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT}
 		}
 	})
 	if !mp.Auto {
@@ -112,7 +111,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		mt.Timer <- &md
 		return
 	}
-	if mp.TN {
+	if mp.TN { //full hand
 		claimed := mt.Setup.Mahjong(&mp.Hand)
 		core.AppLog.Printf("player claim seat : %d auto: %v mj: %v\n", mp.Seat, mp.Auto, claimed)
 		if claimed {
@@ -132,38 +131,38 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 			return
 		}
 		oid, _ := mt.Sequence.Id()
-		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DISCHARGE, func() {
+		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DISCARD, func() {
 			t := mp.Hand.Tiles[oid%int64(len(mp.Tiles)-1)]
-			mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCHARGE, Seat: mp.Seat, Selected: t.Seq, Id: oid}
+			mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCARD, Seat: mp.Seat, Selected: t.Seq, Id: oid}
 		}, func(commited bool) {
 			mp.TN = false
 			if !mp.Auto {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
 				mt.Push(&me)
 			}
-			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
+			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT} //next player
 		})
 		if !mp.Auto {
 			mt.Push(&md)
 		}
 		mt.Timer <- &md
-	} else {
-		oid, _ := mt.Sequence.Id()
-		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DRAW, func() {
-			mt.Turn <- MahjongPlayToken{Cmd: CMD_DRAW, Seat: mp.Seat, Id: oid} ///
-		}, func(commited bool) {
-			mp.TN = true
-			if !mp.Auto {
-				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
-				mt.Push(&me)
-			}
-			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_CONTINUE}
-		})
-		if !mp.Auto {
-			mt.Push(&md)
-		}
-		mt.Timer <- &md
+		return
 	}
+	oid, _ := mt.Sequence.Id()
+	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DRAW, func() {
+		mt.Turn <- MahjongPlayToken{Cmd: CMD_DRAW, Seat: mp.Seat, Id: oid} ///
+	}, func(commited bool) {
+		mp.TN = true
+		if !mp.Auto {
+			me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingKongs)
+			mt.Push(&me)
+		}
+		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_PLAYER, Seat: mp.Seat}
+	})
+	if !mp.Auto {
+		mt.Push(&md)
+	}
+	mt.Timer <- &md
 }
 
 func (mp *MahjongPlayer) CheckDischarge(seat int, drop mj.Tile, chow bool) []mj.Meld {
