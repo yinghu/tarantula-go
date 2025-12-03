@@ -204,10 +204,14 @@ func (mp *MahjongPlayer) checkMatch(seg []mj.Tile, d mj.Tile, c bool) []mj.Meld 
 	if c {
 		m = append(m, ix.CheckChow(d)...)
 	}
-	m = append(m, ix.CheckPung(d)...)
-	m = append(m, ix.CheckKong(d)...)
-	if len(m) == 1 {
+	cp := ix.CheckPung(d)
+	if cp.Type() == int32(mj.PUNG) {
+		m = append(m, cp)
+	}
+	ck := ix.CheckKong(d)
+	if ck.Type() == int32(mj.KNOG) {
 		mp.PendingKongs = append(mp.PendingKongs, d.Seq)
+		m = append(m, ix.CheckKong(d))
 	}
 	return m
 }

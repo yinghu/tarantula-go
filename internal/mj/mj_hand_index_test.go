@@ -38,11 +38,15 @@ func TestHandIndex(t *testing.T) {
 		fmt.Printf("CH %s %d\n", mc[i].Name(), mc[i].Type())
 	}
 	mn := ix.CheckPung(FromS("B6"))
-	for i := range mn {
-		fmt.Printf("PN %s %d\n", mn[i].Name(), mn[i].Type())
-	}
+
+	fmt.Printf("PN %s %d\n", mn.Name(), mn.Type())
+
 	mm := ix.CheckKong(FromS("B6"))
-	for i := range mm {
-		fmt.Printf("PK %s %d\n", mm[i].Name(), mm[i].Type())
-	}
+
+	fmt.Printf("PK %s %d\n", mm.Name(), mm.Type())
+
+	m0 := ix.CheckPung(FromS("C1"))
+	fmt.Printf("PK %s %d\n", m0.Name(), m0.Type())
+
+
 }

@@ -154,24 +154,20 @@ func (h *HandIndex) CheckChow(c Tile) []Meld {
 	return mk
 }
 
-func (h *HandIndex) CheckPung(c Tile) []Meld {
-	mk := make([]Meld, 0)
+func (h *HandIndex) CheckPung(c Tile) Meld {
 	p, exists := h.Index[c.Seq]
 	if !exists || p.Count < 2 {
-		return mk
+		return Meld{}
 	}
 	tl := []Tile{c, c, c}
-	mk = append(mk, Meld{Tiles: tl})
-	return mk
+	return Meld{Tiles: tl}
 }
 
-func (h *HandIndex) CheckKong(c Tile) []Meld {
-	mk := make([]Meld, 0)
+func (h *HandIndex) CheckKong(c Tile) Meld {
 	p, exists := h.Index[c.Seq]
 	if !exists || p.Count < 3 {
-		return mk
+		return Meld{}
 	}
 	tl := []Tile{c, c, c, c}
-	mk = append(mk, Meld{Tiles: tl})
-	return mk
+	return Meld{Tiles: tl}
 }
