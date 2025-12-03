@@ -9,7 +9,7 @@ import (
 
 type HandListener interface {
 	OnDraw(t Tile, kong bool)
-	OnDischarge(t Tile)
+	OnDiscard(t Tile)
 	OnKong(t Tile)
 	OnChow(drop Tile, chow Meld)
 	OnPung(pung Meld)
@@ -38,21 +38,21 @@ func (h *Hand) Clear() {
 	h.Flowers = h.Flowers[:0]
 }
 
-func (h *Hand) Discharge(discharged Tile) error {
+func (h *Hand) Discard(discarded Tile) error {
 	for i := range h.Tiles {
-		if h.Tiles[i].Seq == discharged.Seq {
+		if h.Tiles[i].Seq == discarded.Seq {
 
 			h.Tiles = slices.Delete(h.Tiles, i, i+1)
-			if discharged.Suit == FLOWER {
-				h.Flowers = append(h.Flowers, discharged)
+			if discarded.Suit == FLOWER {
+				h.Flowers = append(h.Flowers, discarded)
 			}
 			if h.Listener != nil {
-				h.Listener.OnDischarge(discharged)
+				h.Listener.OnDiscard(discarded)
 			}
 			return nil
 		}
 	}
-	return fmt.Errorf("discharged not existed %v", discharged)
+	return fmt.Errorf("discarded not existed %v", discarded)
 }
 
 func (h *Hand) Chow(drop Tile, c1 Tile, c2 Tile) error {
@@ -161,7 +161,7 @@ func (h *Hand) Kong(kong Tile) error {
 		}
 	}
 	if ct < 3 {
-		return fmt.Errorf("no know %v", kong)
+		return fmt.Errorf("no kong %v", kong)
 	}
 	if ct == 3 {
 		mk.Concealed = false

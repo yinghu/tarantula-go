@@ -317,7 +317,7 @@ func (m *MahjongTable) Discard(seat int, t int) error {
 		return fmt.Errorf("no more discharge %d", sz)
 	}
 	drop := mj.FromQ(t)
-	err := mp.Hand.Discharge(drop)
+	err := mp.Hand.Discard(drop)
 	if err != nil {
 		return err
 	}

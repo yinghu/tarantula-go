@@ -268,7 +268,7 @@ func (mp *MahjongPlayer) OnDraw(t mj.Tile, kong bool) {
 
 }
 
-func (mp *MahjongPlayer) OnDischarge(t mj.Tile) {
+func (mp *MahjongPlayer) OnDiscard(t mj.Tile) {
 	mp.OnDelete(t, false)
 }
 func (mp *MahjongPlayer) OnDelete(t mj.Tile, kong bool) {
@@ -427,13 +427,13 @@ func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
 func (mp *MahjongPlayer) OnChow(drop mj.Tile, chow mj.Meld) {
 	for i := range chow.Tiles {
 		if chow.Tiles[i].Seq != drop.Seq {
-			mp.OnDischarge(chow.Tiles[i])
+			mp.OnDiscard(chow.Tiles[i])
 		}
 	}
 }
 func (mp *MahjongPlayer) OnPung(pung mj.Meld) {
-	mp.OnDischarge(pung.Tiles[0])
-	mp.OnDischarge(pung.Tiles[0])
+	mp.OnDiscard(pung.Tiles[0])
+	mp.OnDiscard(pung.Tiles[0])
 }
 
 func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
