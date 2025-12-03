@@ -207,6 +207,9 @@ func (mp *MahjongPlayer) checkMatch(seg []mj.Tile, d mj.Tile, c bool) []mj.Meld 
 	}
 	m = append(m, ix.CheckPung(d)...)
 	m = append(m, ix.CheckKong(d)...)
+	if len(m) == 1 {
+		mp.PendingKongs = append(mp.PendingKongs, d.Seq)
+	}
 	return m
 }
 
