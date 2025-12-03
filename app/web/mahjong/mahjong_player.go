@@ -81,7 +81,7 @@ func (mp *MahjongPlayer) PlayDischarge(mt *MahjongTable, mc MahjongDischargeEven
 			mp.TN = true
 			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_PLAYER, Seat: mp.Seat}
 		} else {
-			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_CONTINUE}
+			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_END}
 		}
 	})
 	if !mp.Auto {
@@ -203,11 +203,7 @@ func (mp *MahjongPlayer) checkMatch(seg []mj.Tile, d mj.Tile, c bool) []mj.Meld 
 	ix.From(seg)
 	m := make([]mj.Meld, 0)
 	if c {
-
 		m = append(m, ix.CheckChow(d)...)
-		m = append(m, ix.CheckPung(d)...)
-		m = append(m, ix.CheckKong(d)...)
-		return m
 	}
 	m = append(m, ix.CheckPung(d)...)
 	m = append(m, ix.CheckKong(d)...)

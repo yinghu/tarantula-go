@@ -99,7 +99,7 @@ func (m *MahjongTable) Play() {
 				}
 				tp++ //next player turn
 				go m.Players[tp%4].Play(m)
-			
+
 			}
 		case tm := <-m.Timer:
 			timerIndex[tm.OId()] = tm
@@ -162,6 +162,7 @@ func (m *MahjongTable) Play() {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
+				m.skips = m.skips[:0]
 				tp = t.Seat
 				go timer.Stop(true, false)
 			case CMD_PUNG:
@@ -170,6 +171,7 @@ func (m *MahjongTable) Play() {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
+				m.skips = m.skips[:0]
 				tp = t.Seat
 				go timer.Stop(true, false)
 			case CMD_SKIP:

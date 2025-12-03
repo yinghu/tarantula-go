@@ -7,32 +7,42 @@ import (
 
 func TestHandIndex(t *testing.T) {
 	ix := HandIndex{}
-	h := make([]Tile,0)
-	h = append(h,FromS("B1"))
-	h = append(h,FromS("B2"))
-	h = append(h,FromS("B3"))
-	h = append(h,FromS("B2"))
-	h = append(h,FromS("B3"))
-	h = append(h,FromS("B4"))
-	h = append(h,FromS("B3"))
-	h = append(h,FromS("B3"))
+	h := make([]Tile, 0)
+	h = append(h, FromS("B1"))
+	h = append(h, FromS("B2"))
+	h = append(h, FromS("B3"))
+	h = append(h, FromS("B2"))
+	h = append(h, FromS("B3"))
+	h = append(h, FromS("B4"))
+	h = append(h, FromS("B3"))
+	h = append(h, FromS("B3"))
+	h = append(h, FromS("B6"))
+	h = append(h, FromS("B6"))
+	h = append(h, FromS("B6"))
 	ix.From(h)
 	ms := ix.Chow()
-	for i := range ms{
-		fmt.Printf("%s\n",ms[i].Name())
+	for i := range ms {
+		fmt.Printf("%s\n", ms[i].Name())
 	}
 	mp := ix.Pung()
-	for i := range mp{
-		fmt.Printf("%s\n",mp[i].Name())
+	for i := range mp {
+		fmt.Printf("%s\n", mp[i].Name())
 	}
-	
+
 	mk := ix.Kong()
-	for i := range mk{
-		fmt.Printf("%s\n",mk[i].Name())
+	for i := range mk {
+		fmt.Printf("%s\n", mk[i].Name())
 	}
-    mc := ix.CheckChow(FromS("B3"))
-	for i := range mc{
-		fmt.Printf("CH%s\n",mc[i].Name())
+	mc := ix.CheckChow(FromS("B3"))
+	for i := range mc {
+		fmt.Printf("CH %s %d\n", mc[i].Name(), mc[i].Type())
 	}
-	
+	mn := ix.CheckPung(FromS("B6"))
+	for i := range mn {
+		fmt.Printf("PN %s %d\n", mn[i].Name(), mn[i].Type())
+	}
+	mm := ix.CheckKong(FromS("B6"))
+	for i := range mm {
+		fmt.Printf("PK %s %d\n", mm[i].Name(), mm[i].Type())
+	}
 }
