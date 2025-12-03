@@ -28,14 +28,14 @@ type MahjongTable struct {
 	Setup         mj.ClassicMahjong `json:"-"`
 	Players       [4]*MahjongPlayer `json:"Players"`
 	dice          []int             `json:"-"`
-	Discharged    []mj.Tile         `json:"Discharged"`
+	Discarded     []mj.Tile         `json:"Discharged"`
 	Solo          bool
 	Turn          chan MahjongPlayToken `json:"-"`
 	event.Pusher  `json:"-"`
 	core.Sequence `json:"-"`
 	Timer         chan MahjongTimeout
 	Sync          chan MahjongPlayToken `json:"-"`
-	skips         []MahjongDischargeEvent
+	skips         []MahjongDiscardEvent
 }
 
 func (m *MahjongTable) Pts() int {
@@ -48,11 +48,11 @@ func (m *MahjongTable) New() {
 	m.Players[SEAT_S] = NewPlayer(SEAT_S, true, m)
 	m.Players[SEAT_W] = NewPlayer(SEAT_W, true, m)
 	m.Players[SEAT_N] = NewPlayer(SEAT_N, true, m)
-	m.Discharged = make([]mj.Tile, 0)
+	m.Discarded = make([]mj.Tile, 0)
 	m.Turn = make(chan MahjongPlayToken, 3)
 	m.Timer = make(chan MahjongTimeout, 3)
 	m.Sync = make(chan MahjongPlayToken, 3)
-	m.skips = make([]MahjongDischargeEvent, 0)
+	m.skips = make([]MahjongDiscardEvent, 0)
 }
 
 func (m *MahjongTable) Reset() {
@@ -61,7 +61,7 @@ func (m *MahjongTable) Reset() {
 	m.Players[SEAT_S].Reset()
 	m.Players[SEAT_W].Reset()
 	m.Players[SEAT_N].Reset()
-	m.Discharged = m.Discharged[:0]
+	m.Discarded = m.Discarded[:0]
 }
 
 func (m *MahjongTable) Play() {
@@ -88,7 +88,7 @@ func (m *MahjongTable) Play() {
 			case CMD_TURN_PLAYER:
 				go m.Players[k.Seat].Play(m)
 			case CMD_TURN_START:
-				go m.Players[tp%4].Play(m)	
+				go m.Players[tp%4].Play(m)
 			case CMD_TURN_NEXT:
 				sz := len(m.skips)
 				if sz > 0 {
@@ -132,7 +132,7 @@ func (m *MahjongTable) Play() {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				tp = dealer //start dealer 
+				tp = dealer //start dealer
 				go timer.Stop(true, false)
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
@@ -314,29 +314,29 @@ func (m *MahjongTable) Discard(seat int, t int) error {
 	mp := m.Players[seat]
 	sz := len(mp.Tiles)
 	if sz == 1 {
-		return fmt.Errorf("no more discharge %d", sz)
+		return fmt.Errorf("no more discard %d", sz)
 	}
 	drop := mj.FromQ(t)
 	err := mp.Hand.Discard(drop)
 	if err != nil {
 		return err
 	}
-	m.Discharged = append(m.Discharged, drop)
+	m.Discarded = append(m.Discarded, drop)
 	p := seat + 1
-	pp := m.Players[p%4].CheckDischarge(seat, drop, true) //pung/kong/chow
+	pp := m.Players[p%4].CheckDiscard(seat, drop, true) //pung/kong/chow
 	if len(pp) > 0 {
-		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, pp))
+		m.skips = append(m.skips, NewMahjongDiscardEvent(p%4, seat, drop, pp))
 	}
 	p++
-	pp1 := m.Players[p%4].CheckDischarge(seat, drop, false) //pung/kong
+	pp1 := m.Players[p%4].CheckDiscard(seat, drop, false) //pung/kong
 	if len(pp1) > 0 {
-		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, pp1))
+		m.skips = append(m.skips, NewMahjongDiscardEvent(p%4, seat, drop, pp1))
 		return nil
 	}
 	p++
-	pp2 := m.Players[p%4].CheckDischarge(seat, drop, false) //pung/kong
+	pp2 := m.Players[p%4].CheckDiscard(seat, drop, false) //pung/kong
 	if len(pp2) > 0 {
-		m.skips = append(m.skips, NewMahjongDischargeEvent(p%4, seat, drop, pp2))
+		m.skips = append(m.skips, NewMahjongDiscardEvent(p%4, seat, drop, pp2))
 	}
 	return nil
 }

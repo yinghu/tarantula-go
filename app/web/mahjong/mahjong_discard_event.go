@@ -5,7 +5,7 @@ import (
 	"gameclustering.com/internal/mj"
 )
 
-type MahjongDischargeEvent struct {
+type MahjongDiscardEvent struct {
 	Seat     int
 	DropSeat int
 	Drop     mj.Tile
@@ -13,15 +13,15 @@ type MahjongDischargeEvent struct {
 	MahjongEventObj
 }
 
-func (s *MahjongDischargeEvent) ClassId() int {
+func (s *MahjongDiscardEvent) ClassId() int {
 	return M_DISCHARGE_CID
 }
 
-func (s *MahjongDischargeEvent) ETag() string {
+func (s *MahjongDiscardEvent) ETag() string {
 	return "discharge"
 }
 
-func (s *MahjongDischargeEvent) Write(buff core.DataBuffer) error {
+func (s *MahjongDiscardEvent) Write(buff core.DataBuffer) error {
 	if err := buff.WriteInt32(int32(s.Seat)); err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (s *MahjongDischargeEvent) Write(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *MahjongDischargeEvent) Outbound(buff core.DataBuffer) error {
+func (s *MahjongDiscardEvent) Outbound(buff core.DataBuffer) error {
 	err := s.WriteKey(buff)
 	if err != nil {
 		s.Callback.OnError(s, err)

@@ -13,13 +13,13 @@ const (
 	CMD_CHOW    int = 7
 	CMD_CLAIM   int = 8
 	CMD_TABLE   int = 9
-	CMD_SKIP    int = 10 //skip discharge event
+	CMD_SKIP    int = 10 //skip discard event
 
-	CMD_TURN_START int = 95
-	CMD_TURN_PLAYER    int = 96
-	CMD_TURN_NEXT       int = 97
-	CMD_RESET          int = 98
-	CMD_END            int = 99
+	CMD_TURN_START  int = 95
+	CMD_TURN_PLAYER int = 96
+	CMD_TURN_NEXT   int = 97
+	CMD_RESET       int = 98
+	CMD_END         int = 99
 
 	//internal
 

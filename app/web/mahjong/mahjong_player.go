@@ -67,7 +67,7 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 	mt.Timer <- &md
 }
 
-func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDischargeEvent) {
+func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDiscardEvent) {
 	core.AppLog.Printf("player discard seat :%d auto:%v tn:%v\n", mp.Seat, mp.Auto, mp.TN)
 	core.AppLog.Printf("drop %v\n", mc.Opts)
 	oid, _ := mt.Sequence.Id()
@@ -165,7 +165,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	mt.Timer <- &md
 }
 
-func (mp *MahjongPlayer) CheckDischarge(seat int, drop mj.Tile, chow bool) []mj.Meld {
+func (mp *MahjongPlayer) CheckDiscard(seat int, drop mj.Tile, chow bool) []mj.Meld {
 	switch drop.Suit {
 	case mj.BAMBOO:
 		return mp.checkMatch(mp.B, drop, chow)
