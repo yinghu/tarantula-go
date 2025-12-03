@@ -182,8 +182,8 @@ func (m *MahjongTable) Play() {
 					continue
 				}
 				go timer.Stop(true, false)
-				m.Reset()
-				go m.Players[t.Seat].PlayDeal(m)
+				//m.Reset()
+				//go m.Players[t.Seat].PlayDeal(m)
 			case CMD_RESET:
 				m.Reset()
 				mt := MahjongResetEvent{Started: false}
