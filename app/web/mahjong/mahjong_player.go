@@ -476,6 +476,38 @@ func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
 }
 
 func (mp *MahjongPlayer) autoPick() mj.Tile {
-	
+	if len(mp.HE) == 1 {
+		return mp.HE[0]
+	}
+	if len(mp.HS) == 1 {
+		return mp.HS[0]
+	}
+	if len(mp.HW) == 1 {
+		return mp.HW[0]
+	}
+	if len(mp.HN) == 1 {
+		return mp.HN[0]
+	}
+	if len(mp.R) == 1 {
+		return mp.R[0]
+	}
+	if len(mp.G) == 1 {
+		return mp.G[0]
+	}
+	if len(mp.W) == 1 {
+		return mp.W[0]
+	}
+	sz := len(mp.C)
+	if sz == 1 || (sz == 2 && mp.C[0].Seq != mp.C[1].Seq) {
+		return mp.C[0]
+	}
+	sz = len(mp.B)
+	if sz == 1 || (sz == 2 && mp.B[0].Seq != mp.B[1].Seq) {
+		return mp.C[0]
+	}
+	sz = len(mp.D)
+	if sz == 1 || (sz == 2 && mp.D[0].Seq != mp.D[1].Seq) {
+		return mp.C[0]
+	}
 	return mp.Hand.Tiles[0]
 }
