@@ -132,7 +132,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		}
 		oid, _ := mt.Sequence.Id()
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DISCARD, func() {
-			t := mp.Hand.Tiles[oid%int64(len(mp.Tiles)-1)]
+			t := mp.autoPick()
 			mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCARD, Seat: mp.Seat, Selected: t.Seq, Id: oid}
 		}, func(commited bool) {
 			mp.TN = false
@@ -453,7 +453,6 @@ func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
 	if len(clist) == 4 {
 		mp.PendingKongs = append(mp.PendingKongs, clist[0].Seq)
 	}
-
 }
 
 func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
@@ -474,4 +473,9 @@ func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
 	mp.CT = 0
 	mp.TN = false
 	return &mp
+}
+
+func (mp *MahjongPlayer) autoPick() mj.Tile {
+	
+	return mp.Hand.Tiles[0]
 }
