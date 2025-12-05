@@ -135,6 +135,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 			if !mp.Auto {
 				mt.Push(&md)
 			}
+			mt.Timer <- &md
 			return
 		}
 		oid, _ := mt.Sequence.Id()
