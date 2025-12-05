@@ -58,7 +58,7 @@ func CheckDiscard(mp *MahjongPlayer) int {
 			}
 		}
 		if c.T == TC_B {
-			dis := discard(mp.D)
+			dis := discard(mp.B)
 			if dis > 0 {
 				return dis
 			}
