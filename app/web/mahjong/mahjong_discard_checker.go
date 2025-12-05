@@ -4,6 +4,7 @@ import (
 	"slices"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/mj"
 )
 
 type HandSegmenet struct {
@@ -51,15 +52,29 @@ func CheckDiscard(mp *MahjongPlayer) int {
 		}
 		core.AppLog.Printf("Discard from suit %d count %d\n", c.T, c.C)
 		if c.T == TC_C {
-
+			dis := discard(mp.C)
+			if dis > 0 {
+				return dis
+			}
 		}
 		if c.T == TC_B {
-
+			dis := discard(mp.D)
+			if dis > 0 {
+				return dis
+			}
 		}
 		if c.T == TC_D {
-
+			dis := discard(mp.D)
+			if dis > 0 {
+				return dis
+			}
 		}
 	}
 	core.AppLog.Printf("oops something wrong")
 	return mp.Hand.Tiles[0].Seq
+}
+
+func discard(seg []mj.Tile) int {
+
+	return seg[0].Seq
 }
