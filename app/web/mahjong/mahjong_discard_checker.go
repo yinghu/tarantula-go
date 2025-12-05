@@ -15,25 +15,51 @@ func hmp(a, b HandSegmenet) int {
 	return a.C - b.C
 }
 
-func CheckDiscard(p *MahjongPlayer) int {
+func CheckDiscard(mp *MahjongPlayer) int {
+	if mp.TC[TC_H] > 0 { //hornor first
+		if len(mp.HE) == 1 {
+			return mp.HE[0].Seq
+		}
+		if len(mp.HS) == 1 {
+			return mp.HS[0].Seq
+		}
+		if len(mp.HW) == 1 {
+			return mp.HW[0].Seq
+		}
+		if len(mp.HN) == 1 {
+			return mp.HN[0].Seq
+		}
+		if len(mp.R) == 1 {
+			return mp.R[0].Seq
+		}
+		if len(mp.G) == 1 {
+			return mp.G[0].Seq
+		}
+		if len(mp.W) == 1 {
+			return mp.W[0].Seq
+		}
+	}
 	tcs := make([]HandSegmenet, 0)
-	tcs = append(tcs,HandSegmenet{T:TC_H,C: p.TC[TC_H]})
-	tcs = append(tcs,HandSegmenet{T:TC_C,C: p.TC[TC_C]})
-	tcs = append(tcs,HandSegmenet{T:TC_B,C: p.TC[TC_B]})
-	tcs = append(tcs,HandSegmenet{T:TC_D,C: p.TC[TC_D]})
-	slices.SortFunc(tcs,hmp)
-	if p.TC[TC_H] > 0 {
+	tcs = append(tcs, HandSegmenet{T: TC_C, C: mp.TC[TC_C]})
+	tcs = append(tcs, HandSegmenet{T: TC_B, C: mp.TC[TC_B]})
+	tcs = append(tcs, HandSegmenet{T: TC_D, C: mp.TC[TC_D]})
+	slices.SortFunc(tcs, hmp)
+	for i := range tcs {
+		c := tcs[i]
+		if c.C == 0 {
+			continue
+		}
+		core.AppLog.Printf("Discard from suit %d count %d\n", c.T, c.C)
+		if c.T == TC_C {
 
-	}
-	if p.TC[TC_C] > 0 {
+		}
+		if c.T == TC_B {
 
-	}
-	if p.TC[TC_B] > 0 {
+		}
+		if c.T == TC_D {
 
+		}
 	}
-	if p.TC[TC_D] > 0 {
-
-	}
-	core.AppLog.Printf("Distribution %v\n",tcs)
-	return 0
+	core.AppLog.Printf("oops something wrong")
+	return mp.Hand.Tiles[0].Seq
 }
