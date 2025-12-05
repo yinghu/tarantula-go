@@ -527,7 +527,7 @@ func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
 }
 
 func (mp *MahjongPlayer) autoPick() mj.Tile {
-	core.AppLog.Printf("Distribution %v\n", mp.TC)
+	CheckDiscard(mp)
 	if len(mp.HE) == 1 {
 		return mp.HE[0]
 	}
@@ -549,17 +549,20 @@ func (mp *MahjongPlayer) autoPick() mj.Tile {
 	if len(mp.W) == 1 {
 		return mp.W[0]
 	}
-	sz := len(mp.C)
-	if sz == 1 || (sz == 2 && mp.C[0].Seq != mp.C[1].Seq) {
+	if len(mp.C) == 1 {
 		return mp.C[0]
 	}
-	sz = len(mp.B)
-	if sz == 1 || (sz == 2 && mp.B[0].Seq != mp.B[1].Seq) {
-		return mp.C[0]
+	//ix := mj.HandIndex{}
+	//ix.From(mp.C)
+	//disc := ix.CheckDiscard()
+	//if disc > 0 {
+
+	//}
+	if len(mp.B) == 1 {
+		return mp.B[0]
 	}
-	sz = len(mp.D)
-	if sz == 1 || (sz == 2 && mp.D[0].Seq != mp.D[1].Seq) {
-		return mp.C[0]
+	if len(mp.D) == 1 {
+		return mp.D[0]
 	}
 	return mp.Hand.Tiles[0]
 }

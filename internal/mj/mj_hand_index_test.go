@@ -47,6 +47,6 @@ func TestHandIndex(t *testing.T) {
 
 	m0 := ix.CheckPung(FromS("C1"))
 	fmt.Printf("PK %s %d\n", m0.Name(), m0.Type())
-
-
 }
+
+

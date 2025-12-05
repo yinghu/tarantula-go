@@ -171,8 +171,3 @@ func (h *HandIndex) CheckKong(c Tile) Meld {
 	tl := []Tile{c, c, c, c}
 	return Meld{Tiles: tl}
 }
-
-func (h *HandIndex) CheckDiscard() int {
-	
-	return -1
-}
