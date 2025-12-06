@@ -79,6 +79,13 @@ func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDiscardEvent) {
 	core.AppLog.Printf("drop %v\n", mc.Opts)
 	oid, _ := mt.Sequence.Id()
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_SKIP, func() {
+		for i := range mc.Opts {
+			m := mc.Opts[i]
+			if m.Type() == int32(mj.PUNG) {
+				mt.Turn <- MahjongPlayToken{Cmd: CMD_PUNG, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid, Selected: m.Tiles[0].Seq}
+				return
+			}
+		}
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_SKIP, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
 	}, func(commited bool) {
 		if commited {
