@@ -12,6 +12,10 @@ type HandSegmenet struct {
 	C int
 }
 
+func (s *HandSegmenet) OnIndex(t mj.TileIndex) {
+	core.AppLog.Println("Tile usage v%\n", t)
+}
+
 func hmp(a, b HandSegmenet) int {
 	return a.C - b.C
 }
@@ -52,19 +56,19 @@ func CheckDiscard(mp *MahjongPlayer) int {
 		}
 		core.AppLog.Printf("Discard from suit %d count %d\n", c.T, c.C)
 		if c.T == TC_C {
-			dis := discard(mp.C)
+			dis := discard(&c, mp.C)
 			if dis > 0 {
 				return dis
 			}
 		}
 		if c.T == TC_B {
-			dis := discard(mp.B)
+			dis := discard(&c, mp.B)
 			if dis > 0 {
 				return dis
 			}
 		}
 		if c.T == TC_D {
-			dis := discard(mp.D)
+			dis := discard(&c, mp.D)
 			if dis > 0 {
 				return dis
 			}
@@ -74,7 +78,12 @@ func CheckDiscard(mp *MahjongPlayer) int {
 	return mp.Hand.Tiles[0].Seq
 }
 
-func discard(seg []mj.Tile) int {
-	
+func discard(s *HandSegmenet, seg []mj.Tile) int {
+	ix := mj.HandIndex{Listener: s}
+	ix.From(seg)
+	ix.Kong()
+	ix.Pung()
+	ix.Chow()
+	ix.Eye()
 	return seg[0].Seq
 }

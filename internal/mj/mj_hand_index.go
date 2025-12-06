@@ -15,10 +15,15 @@ type TileIndex struct {
 	Used  int
 }
 
+type TileIndexListener interface {
+	OnIndex(t TileIndex)
+}
+
 type HandIndex struct {
-	Hand  []Tile
-	Index map[int]TileIndex
-	tx    []int
+	Hand     []Tile
+	Index    map[int]TileIndex
+	tx       []int
+	Listener TileIndexListener
 }
 
 func (h *HandIndex) From(tiles []Tile) {
@@ -49,6 +54,9 @@ func (h *HandIndex) Kong() []Meld {
 			c.Used = 4
 			h.Index[s] = c
 		}
+		if h.Listener != nil {
+			h.Listener.OnIndex(c)
+		}
 	}
 	return nodes
 }
@@ -62,6 +70,9 @@ func (h *HandIndex) Pung() []Meld {
 			nodes = append(nodes, Meld{Tiles: tiles})
 			c.Used += 3
 			h.Index[s] = c
+		}
+		if h.Listener != nil {
+			h.Listener.OnIndex(c)
 		}
 	}
 	return nodes
@@ -78,15 +89,32 @@ func (h *HandIndex) Chow() []Meld {
 		}
 		nc, exsits := h.Index[s+1]
 		if !exsits {
+			if h.Listener != nil {
+				h.Listener.OnIndex(c)
+			}
 			continue
 		}
 		nb, exsits := h.Index[s+2]
 		if !exsits {
+			if h.Listener != nil {
+				h.Listener.OnIndex(c)
+				h.Listener.OnIndex(nc)
+			}
 			continue
+		}
+		c.Used++
+		nc.Used++
+		nb.Used++
+		h.Index[s] = c
+		h.Index[s+1] = nc
+		h.Index[s+2] = nb
+		if h.Listener != nil {
+			h.Listener.OnIndex(c)
+			h.Listener.OnIndex(nc)
+			h.Listener.OnIndex(nb)
 		}
 		tiles := []Tile{c.Suit, nc.Suit, nb.Suit}
 		nodes = append(nodes, Meld{Tiles: tiles})
-
 	}
 	return nodes
 }
@@ -101,6 +129,9 @@ func (h *HandIndex) Eye() (Meld, error) {
 			h.Index[s] = c
 			m.Tiles = tiles
 			return m, nil
+		}
+		if h.Listener != nil {
+			h.Listener.OnIndex(c)
 		}
 	}
 	return m, fmt.Errorf("no eye")
