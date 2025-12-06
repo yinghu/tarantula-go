@@ -75,6 +75,6 @@ func CheckDiscard(mp *MahjongPlayer) int {
 }
 
 func discard(seg []mj.Tile) int {
-
+	
 	return seg[0].Seq
 }
