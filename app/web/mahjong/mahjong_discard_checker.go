@@ -13,7 +13,7 @@ type HandSegmenet struct {
 }
 
 func (s *HandSegmenet) OnIndex(t mj.TileIndex) {
-	core.AppLog.Println("Tile usage v%\n", t)
+	core.AppLog.Printf("Tile usage %v\n", t)
 }
 
 func hmp(a, b HandSegmenet) int {
