@@ -13,7 +13,7 @@ type HandSegmenet struct {
 }
 
 func (s *HandSegmenet) OnIndex(t mj.TileIndex) {
-	core.AppLog.Printf("Tile usage %v\n", t)
+	core.AppLog.Printf("Tile usage %s : %d\n", t.Suit.Name(), t.Used)
 }
 
 func hmp(a, b HandSegmenet) int {
@@ -79,6 +79,7 @@ func CheckDiscard(mp *MahjongPlayer) int {
 }
 
 func discard(s *HandSegmenet, seg []mj.Tile) int {
+	core.AppLog.Printf("Segement %v\n", seg)
 	ix := mj.HandIndex{Listener: s}
 	ix.From(seg)
 	ix.Kong()
