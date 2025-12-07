@@ -6,10 +6,14 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/mj"
 )
+type TileIndexListener interface {
+	OnIndex(t mj.TileIndex)
+}
 
 type HandSegmenet struct {
 	T int
 	C int
+	mj.HandIndex
 }
 
 func (s *HandSegmenet) OnIndex(t mj.TileIndex) {
@@ -78,9 +82,8 @@ func CheckDiscard(mp *MahjongPlayer) int {
 	return mp.Hand.Tiles[0].Seq
 }
 
-func discard(s *HandSegmenet, seg []mj.Tile) int {
+func discard(ix *HandSegmenet, seg []mj.Tile) int {
 	core.AppLog.Printf("Segement %v\n", seg)
-	ix := mj.HandIndex{}
 	ix.From(seg)
 	ix.Kong()
 	ix.Pung()

@@ -15,9 +15,6 @@ type TileIndex struct {
 	Used  int
 }
 
-type TileIndexListener interface {
-	OnIndex(t TileIndex)
-}
 
 type HandIndex struct {
 	Hand     []Tile
