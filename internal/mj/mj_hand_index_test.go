@@ -22,7 +22,7 @@ func (s *SampleListener) OnIndex(t TileIndex) {
 
 func TestHandIndex(t *testing.T) {
 	sample := SampleListener{Usage: make(map[int]int)}
-	ix := HandIndex{Listener: &sample}
+	ix := HandIndex{}
 	h := make([]Tile, 0)
 	h = append(h, FromS("B1"))
 	h = append(h, FromS("B2"))
@@ -33,7 +33,7 @@ func TestHandIndex(t *testing.T) {
 	//h = append(h, FromS("B3"))
 	//h = append(h, FromS("B3"))
 	//h = append(h, FromS("B6"))
-	//h = append(h, FromS("B6"))
+	h = append(h, FromS("B6"))
 	h = append(h, FromS("B5"))
 	ix.From(h)
 	ix.Chow()

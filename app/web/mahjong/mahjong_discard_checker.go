@@ -80,7 +80,7 @@ func CheckDiscard(mp *MahjongPlayer) int {
 
 func discard(s *HandSegmenet, seg []mj.Tile) int {
 	core.AppLog.Printf("Segement %v\n", seg)
-	ix := mj.HandIndex{Listener: s}
+	ix := mj.HandIndex{}
 	ix.From(seg)
 	ix.Kong()
 	ix.Pung()
