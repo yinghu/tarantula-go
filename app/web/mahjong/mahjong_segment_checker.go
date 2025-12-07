@@ -101,19 +101,19 @@ func (h *HandSegmenet) CheckDiscard(mp *MahjongPlayer) int {
 		}
 		core.AppLog.Printf("Discard from suit %d count %d\n", c.T, c.C)
 		if c.T == TC_C {
-			dis := discard(&c, mp.C)
+			dis := h.discard(mp.C)
 			if dis > 0 {
 				return dis
 			}
 		}
 		if c.T == TC_B {
-			dis := discard(&c, mp.B)
+			dis := h.discard(mp.B)
 			if dis > 0 {
 				return dis
 			}
 		}
 		if c.T == TC_D {
-			dis := discard(&c, mp.D)
+			dis := h.discard(mp.D)
 			if dis > 0 {
 				return dis
 			}
@@ -123,12 +123,12 @@ func (h *HandSegmenet) CheckDiscard(mp *MahjongPlayer) int {
 	return mp.Hand.Tiles[0].Seq
 }
 
-func discard(ix *HandSegmenet, seg []mj.Tile) int {
+func (h *HandSegmenet) discard(seg []mj.Tile) int {
 	core.AppLog.Printf("Segement %v\n", seg)
-	ix.From(seg)
-	ix.Kong()
-	ix.Pung()
-	ix.Chow()
-	ix.Eye()
+	h.From(seg)
+	h.Kong()
+	h.Pung()
+	h.Chow()
+	h.Eye()
 	return seg[0].Seq
 }
