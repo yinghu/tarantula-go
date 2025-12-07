@@ -6,37 +6,46 @@ import (
 )
 
 type SampleListener struct {
+	Usage map[int]int
 }
 
 func (s *SampleListener) OnIndex(t TileIndex) {
-	fmt.Printf("tile usage %s : %d\n", t.Suit.Name(), t.Used)
+	u, e := s.Usage[t.Suit.Seq]
+	if e {
+		u = u + t.Used
+		s.Usage[t.Suit.Seq] = u
+	} else {
+		s.Usage[t.Suit.Seq] = t.Used
+	}
+	//fmt.Printf("tile usage %s : %d\n", t.Suit.Name(), t.Used)
 }
 
 func TestHandIndex(t *testing.T) {
-	ix := HandIndex{Listener: &SampleListener{}}
+	sample := SampleListener{Usage: make(map[int]int)}
+	ix := HandIndex{Listener: &sample}
 	h := make([]Tile, 0)
 	h = append(h, FromS("B1"))
 	h = append(h, FromS("B2"))
 	h = append(h, FromS("B3"))
 	h = append(h, FromS("B2"))
-	h = append(h, FromS("B3"))
-	h = append(h, FromS("B4"))
-	h = append(h, FromS("B3"))
-	h = append(h, FromS("B3"))
-	h = append(h, FromS("B6"))
-	h = append(h, FromS("B6"))
-	h = append(h, FromS("B6"))
+	h = append(h, FromS("B5"))
+	//h = append(h, FromS("B4"))
+	//h = append(h, FromS("B3"))
+	//h = append(h, FromS("B3"))
+	//h = append(h, FromS("B6"))
+	//h = append(h, FromS("B6"))
+	h = append(h, FromS("B5"))
 	ix.From(h)
-	ms := ix.Chow()
-	for i := range ms {
-		fmt.Printf("%s\n", ms[i].Name())
+	ix.Chow()
+	ix.Pung()
+	ix.Kong()
+	ix.Eyes()
+	for x := range sample.Usage {
+		t := sample.Usage[x]
+		fmt.Printf("Usage : %s %d\n", FromQ(x).Name(), t)
 	}
-	mp := ix.Pung()
-	for i := range mp {
-		fmt.Printf("%s\n", mp[i].Name())
-	}
-
-	mk := ix.Kong()
+	//ix.Eye()
+	/**
 	for i := range mk {
 		fmt.Printf("%s\n", mk[i].Name())
 	}
@@ -54,4 +63,5 @@ func TestHandIndex(t *testing.T) {
 
 	m0 := ix.CheckPung(FromS("C1"))
 	fmt.Printf("PK %s %d\n", m0.Name(), m0.Type())
+	**/
 }

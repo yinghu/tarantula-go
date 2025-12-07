@@ -130,12 +130,11 @@ func (h *HandIndex) Eye() (Meld, error) {
 			m.Tiles = tiles
 			return m, nil
 		}
-		if h.Listener != nil {
-			h.Listener.OnIndex(c)
-		}
 	}
 	return m, fmt.Errorf("no eye")
 }
+
+
 
 func (h *HandIndex) AfterFormed(m Meld) []Tile {
 	h.reset()
@@ -160,6 +159,24 @@ func (h *HandIndex) reset() {
 		c.Used = 0
 		h.Index[s] = c
 	}
+}
+
+func (h *HandIndex) Eyes() []Meld {
+	h.reset()
+	mk := make([]Meld, 0)
+	for s, c := range h.Index {
+		if c.Count-c.Used >= 2 {
+			tiles := []Tile{c.Suit, c.Suit}
+			c.Used += 2
+			h.Index[s] = c
+			mk = append(mk, Meld{Tiles: tiles})
+
+		}
+		if h.Listener != nil {
+			h.Listener.OnIndex(c)
+		}
+	}
+	return mk
 }
 
 func (h *HandIndex) CheckChow(c Tile) []Meld {
