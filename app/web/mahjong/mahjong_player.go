@@ -536,6 +536,6 @@ func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
 }
 
 func (mp *MahjongPlayer) autoPick() mj.Tile {
-	ts := CheckDiscard(mp)
+	ts := mp.Checker.CheckDiscard(mp)
 	return mj.FromQ(ts)
 }

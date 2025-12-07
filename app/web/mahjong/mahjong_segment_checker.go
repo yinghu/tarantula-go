@@ -65,7 +65,7 @@ func hmp(a, b HandSegmenet) int {
 	return a.C - b.C
 }
 
-func CheckDiscard(mp *MahjongPlayer) int {
+func (h *HandSegmenet) CheckDiscard(mp *MahjongPlayer) int {
 	if mp.TC[TC_H] > 0 { //hornor first
 		if len(mp.HE) == 1 {
 			return mp.HE[0].Seq
