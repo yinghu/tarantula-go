@@ -128,7 +128,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		return
 	}
 	if mp.TN { //full hand
-		claimed := mt.Setup.Mahjong(&mp.Hand)
+		claimed := mt.CMJ.Mahjong(&mp.Hand)
 		core.AppLog.Printf("player claim seat : %d auto: %v mj: %v\n", mp.Seat, mp.Auto, claimed)
 		if claimed {
 			oid, _ := mt.Sequence.Id()

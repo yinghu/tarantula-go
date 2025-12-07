@@ -25,7 +25,7 @@ const (
 
 type MahjongTable struct {
 	Id            int64             `json:"Id,string"`
-	Setup         mj.ClassicMahjong `json:"-"`
+	CMJ         mj.ClassicMahjong `json:"-"`
 	Players       [4]*MahjongPlayer `json:"Players"`
 	dice          []int             `json:"-"`
 	Discarded     []mj.Tile         `json:"Discharged"`
@@ -43,7 +43,7 @@ func (m *MahjongTable) Pts() int {
 }
 
 func (m *MahjongTable) New() {
-	m.Setup.New()
+	m.CMJ.New()
 	m.Players[SEAT_E] = NewPlayer(SEAT_E, true, m)
 	m.Players[SEAT_S] = NewPlayer(SEAT_S, true, m)
 	m.Players[SEAT_W] = NewPlayer(SEAT_W, true, m)
@@ -56,7 +56,7 @@ func (m *MahjongTable) New() {
 }
 
 func (m *MahjongTable) Reset() {
-	m.Setup.New()
+	m.CMJ.New()
 	m.Players[SEAT_E].Reset()
 	m.Players[SEAT_S].Reset()
 	m.Players[SEAT_W].Reset()
@@ -229,7 +229,7 @@ func (m *MahjongTable) Sit(systemId int64) (int, error) {
 }
 
 func (m *MahjongTable) Dice() {
-	m.dice = m.Setup.Dice()
+	m.dice = m.CMJ.Dice()
 }
 func (m *MahjongTable) Deal() (int, error) {
 	if m.Pts() == 0 {
@@ -299,7 +299,7 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 	}
 	if kong > mj.FS_LIMIT {
 		m.Discard(seat, kong)
-		return mp.TailDraw(&m.Setup.Deck)
+		return mp.TailDraw(&m.CMJ.Deck)
 	}
 	k := mj.FromQ(kong)
 	err := mp.Kong(k)
@@ -307,7 +307,7 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 		return err
 	}
 	//4 kind kong / or pung to kong
-	return mp.TailDraw(&m.Setup.Deck)
+	return mp.TailDraw(&m.CMJ.Deck)
 }
 
 func (m *MahjongTable) Discard(seat int, t int) error {
@@ -356,7 +356,7 @@ func (m *MahjongTable) Pung(seat int, drop int) error {
 }
 
 func (m *MahjongTable) Claim(seat int) bool {
-	return m.Setup.Mahjong(&m.Players[seat].Hand)
+	return m.CMJ.Mahjong(&m.Players[seat].Hand)
 }
 
 func (m *MahjongTable) deal(p int) error {
@@ -366,7 +366,7 @@ func (m *MahjongTable) deal(p int) error {
 		return fmt.Errorf("no more draw %d", sz)
 	}
 	fz := len(mp.Flowers)
-	err := mp.HeadDraw(&m.Setup.Deck)
+	err := mp.HeadDraw(&m.CMJ.Deck)
 	if err != nil {
 		return err
 	}
@@ -376,7 +376,7 @@ func (m *MahjongTable) deal(p int) error {
 	}
 	fz = sz
 	for {
-		err = mp.TailDraw(&m.Setup.Deck)
+		err = mp.TailDraw(&m.CMJ.Deck)
 		if err != nil {
 			return err
 		}

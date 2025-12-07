@@ -99,7 +99,7 @@ func (s *MahjongService) dispatch() {
 func (s *MahjongService) onTable(systemId int64, flag int64) {
 	core.AppLog.Printf("table flag %d\n", flag)
 	tid, _ := s.Sequence().Id()
-	table := MahjongTable{Id: tid, Pusher: s.Pusher(), Sequence: s.Sequence(), Setup: mj.ClassicMahjong{}, Solo: flag == systemId}
+	table := MahjongTable{Id: tid, Pusher: s.Pusher(), Sequence: s.Sequence(), CMJ: mj.ClassicMahjong{}, Solo: flag == systemId}
 	table.New()
 	s.TableIndex[flag] = &table
 	go table.Play()

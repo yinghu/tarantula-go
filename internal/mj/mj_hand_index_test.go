@@ -5,8 +5,15 @@ import (
 	"testing"
 )
 
+type SampleListener struct {
+}
+
+func (s *SampleListener) OnIndex(t TileIndex) {
+	fmt.Printf("tile usage %s : %d\n", t.Suit.Name(), t.Used)
+}
+
 func TestHandIndex(t *testing.T) {
-	ix := HandIndex{}
+	ix := HandIndex{Listener: &SampleListener{}}
 	h := make([]Tile, 0)
 	h = append(h, FromS("B1"))
 	h = append(h, FromS("B2"))
@@ -48,5 +55,3 @@ func TestHandIndex(t *testing.T) {
 	m0 := ix.CheckPung(FromS("C1"))
 	fmt.Printf("PK %s %d\n", m0.Name(), m0.Type())
 }
-
-
