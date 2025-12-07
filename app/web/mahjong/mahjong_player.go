@@ -34,7 +34,7 @@ type MahjongPlayer struct {
 	Pusher       event.Pusher
 	TN           bool   //false draw true discharge
 	TC           [4]int //
-
+	Checker      HandSegmenet
 }
 
 func (mp *MahjongPlayer) OnError(mt *MahjongTable, err error) {
@@ -216,20 +216,19 @@ func (mp *MahjongPlayer) checkMatch(seg []mj.Tile, d mj.Tile, c bool) []mj.Meld 
 	if len(seg) < 2 {
 		return []mj.Meld{}
 	}
-	ix := HandSegmenet{}
-	ix.From(seg)
+	mp.Checker.From(seg)
 	m := make([]mj.Meld, 0)
 	if c {
-		m = append(m, ix.CheckChow(d)...)
+		m = append(m, mp.Checker.CheckChow(d)...)
 	}
-	cp := ix.CheckPung(d)
+	cp := mp.Checker.CheckPung(d)
 	if cp.Type() == int32(mj.PUNG) {
 		m = append(m, cp)
 	}
-	ck := ix.CheckKong(d)
+	ck := mp.Checker.CheckKong(d)
 	if ck.Type() == int32(mj.KNOG) {
 		mp.PendingKongs = append(mp.PendingKongs, d.Seq)
-		m = append(m, ix.CheckKong(d))
+		m = append(m, mp.Checker.CheckKong(d))
 	}
 	return m
 }
@@ -504,9 +503,8 @@ func (mp *MahjongPlayer) OnPung(pung mj.Meld) {
 
 func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
 	if !hornor {
-		ix := mj.HandIndex{}
-		ix.From(clist)
-		ks := ix.Kong()
+		mp.Checker.From(clist)
+		ks := mp.Checker.Kong()
 		for i := range ks {
 			mp.PendingKongs = append(mp.PendingKongs, ks[i].Tiles[0].Seq)
 		}
@@ -533,6 +531,7 @@ func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
 	mp.W = make([]mj.Tile, 0)
 	mp.PendingKongs = make([]int, 0)
 	mp.TN = false
+	mp.Checker = HandSegmenet{}
 	return &mp
 }
 
