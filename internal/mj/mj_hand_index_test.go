@@ -39,7 +39,6 @@ func TestHandIndex(t *testing.T) {
 	ix.Chow()
 	ix.Pung()
 	ix.Kong()
-	ix.Eyes()
 	for x := range sample.Usage {
 		t := sample.Usage[x]
 		fmt.Printf("Usage : %s %d\n", FromQ(x).Name(), t)

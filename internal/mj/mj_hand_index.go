@@ -132,7 +132,7 @@ func (h *HandIndex) reset() {
 		h.Index[s] = c
 	}
 }
-
+/**
 func (h *HandIndex) Eyes() []Meld {
 	h.reset()
 	mk := make([]Meld, 0)
@@ -187,4 +187,4 @@ func (h *HandIndex) CheckKong(c Tile) Meld {
 	}
 	tl := []Tile{c, c, c, c}
 	return Meld{Tiles: tl}
-}
+}**/

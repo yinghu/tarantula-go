@@ -34,6 +34,7 @@ type MahjongPlayer struct {
 	Pusher       event.Pusher
 	TN           bool   //false draw true discharge
 	TC           [4]int //
+
 }
 
 func (mp *MahjongPlayer) OnError(mt *MahjongTable, err error) {
@@ -215,7 +216,7 @@ func (mp *MahjongPlayer) checkMatch(seg []mj.Tile, d mj.Tile, c bool) []mj.Meld 
 	if len(seg) < 2 {
 		return []mj.Meld{}
 	}
-	ix := mj.HandIndex{}
+	ix := HandSegmenet{}
 	ix.From(seg)
 	m := make([]mj.Meld, 0)
 	if c {

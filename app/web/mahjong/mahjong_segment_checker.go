@@ -20,6 +20,47 @@ func (s *HandSegmenet) OnIndex(t mj.TileIndex) {
 	core.AppLog.Printf("Tile usage %s : %d\n", t.Suit.Name(), t.Used)
 }
 
+func (h *HandSegmenet) CheckChow(c mj.Tile) []mj.Meld {
+	mk := make([]mj.Meld, 0)
+	r1, r1e := h.Index[c.Seq+1]
+	r2, r2e := h.Index[c.Seq+2]
+	if r1e && r2e {
+		r := []mj.Tile{c, r1.Suit, r2.Suit}
+		mk = append(mk, mj.Meld{Tiles: r})
+	}
+	l1, l1e := h.Index[c.Seq-1]
+	l2, l2e := h.Index[c.Seq-2]
+	if l1e && l2e {
+		r := []mj.Tile{l2.Suit, l1.Suit, c}
+		mk = append(mk, mj.Meld{Tiles: r})
+	}
+	m1, m1e := h.Index[c.Seq+1]
+	m2, m2e := h.Index[c.Seq-1]
+	if m1e && m2e {
+		r := []mj.Tile{m2.Suit, c, m1.Suit}
+		mk = append(mk, mj.Meld{Tiles: r})
+	}
+	return mk
+}
+
+func (h *HandSegmenet) CheckPung(c mj.Tile) mj.Meld {
+	p, exists := h.Index[c.Seq]
+	if !exists || p.Count < 2 {
+		return mj.Meld{}
+	}
+	tl := []mj.Tile{c, c, c}
+	return mj.Meld{Tiles: tl}
+}
+
+func (h *HandSegmenet) CheckKong(c mj.Tile) mj.Meld {
+	p, exists := h.Index[c.Seq]
+	if !exists || p.Count < 3 {
+		return mj.Meld{}
+	}
+	tl := []mj.Tile{c, c, c, c}
+	return mj.Meld{Tiles: tl}
+}
+
 func hmp(a, b HandSegmenet) int {
 	return a.C - b.C
 }
