@@ -184,6 +184,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 }
 
 func (mp *MahjongPlayer) CheckDiscard(seat int, drop mj.Tile, chow bool) []mj.Meld {
+	
 	switch drop.Suit {
 	case mj.BAMBOO:
 		return mp.checkMatch(mp.B, drop, chow)

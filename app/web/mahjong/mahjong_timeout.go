@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sync"
 	"time"
 
 	"gameclustering.com/internal/event"
@@ -31,10 +32,12 @@ type OnStop func(commited bool)
 
 type MahjongTimeoutObj struct {
 	MahjongEventObj
-	N MahjongPlayTurn
-	T OnTurn //triger on timer
-	P OnStop //call on stop
-	K *time.Timer
+	N       MahjongPlayTurn
+	T       OnTurn //triger on timer
+	P       OnStop //call on stop
+	K       *time.Timer
+	Lock    sync.Mutex
+	Stopped bool
 }
 type StopSignal struct {
 	Commited bool
@@ -42,15 +45,25 @@ type StopSignal struct {
 }
 
 func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
+	s.Lock = sync.Mutex{}
+	s.Stopped = false
 	s.K = time.NewTimer(time.Duration(s.N.CountDown+COUNT_DOWN_BUFFER) * time.Second)
 	<-s.K.C
+	s.Lock.Lock()
+	defer s.Lock.Unlock()
+	if s.Stopped {
+		return
+	}
 	s.T()
 }
 
-func (mt *MahjongTimeoutObj) Stop(commited bool, closing bool) {
-	mt.K.Stop()
+func (s *MahjongTimeoutObj) Stop(commited bool, closing bool) {
+	s.K.Stop()
 	if closing {
+		s.Lock.Lock()
+		defer s.Lock.Unlock()
+		s.Stopped = true
 		return
 	}
-	mt.P(commited)
+	s.P(commited)
 }

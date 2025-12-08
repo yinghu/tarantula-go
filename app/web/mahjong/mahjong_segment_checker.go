@@ -6,6 +6,11 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/mj"
 )
+
+func hmp(a, b HandSegmenet) int {
+	return a.C - b.C
+}
+
 type TileIndexListener interface {
 	OnIndex(t mj.TileIndex)
 }
@@ -61,9 +66,6 @@ func (h *HandSegmenet) CheckKong(c mj.Tile) mj.Meld {
 	return mj.Meld{Tiles: tl}
 }
 
-func hmp(a, b HandSegmenet) int {
-	return a.C - b.C
-}
 
 func (h *HandSegmenet) CheckDiscard(mp *MahjongPlayer) int {
 	if mp.TC[TC_H] > 0 { //hornor first
