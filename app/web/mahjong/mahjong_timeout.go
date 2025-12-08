@@ -4,6 +4,7 @@ import (
 	"sync"
 	"time"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
 
@@ -52,6 +53,7 @@ func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 	s.Lock.Lock()
 	defer s.Lock.Unlock()
 	if s.Stopped {
+		core.AppLog.Printf("Timer stopped %v\n", s.Stopped)
 		return
 	}
 	s.T()
