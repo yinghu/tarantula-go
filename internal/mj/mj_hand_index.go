@@ -41,7 +41,7 @@ func (h *HandIndex) From(tiles []Tile) {
 }
 
 func (h *HandIndex) Kong() []Meld {
-	h.reset()
+	h.Reset()
 	nodes := make([]Meld, 0)
 	for s, c := range h.Index {
 		if c.Count-c.Used == 4 {
@@ -55,7 +55,7 @@ func (h *HandIndex) Kong() []Meld {
 }
 
 func (h *HandIndex) Pung() []Meld {
-	h.reset()
+	h.Reset()
 	nodes := make([]Meld, 0)
 	for s, c := range h.Index {
 		if c.Count-c.Used >= 3 {
@@ -69,7 +69,7 @@ func (h *HandIndex) Pung() []Meld {
 }
 
 func (h *HandIndex) Chow() []Meld {
-	h.reset()
+	h.Reset()
 	nodes := make([]Meld, 0)
 	for i := range h.tx {
 		s := h.tx[i]
@@ -92,7 +92,7 @@ func (h *HandIndex) Chow() []Meld {
 }
 
 func (h *HandIndex) Eye() (Meld, error) {
-	h.reset()
+	h.Reset()
 	m := Meld{}
 	for s, c := range h.Index {
 		if c.Count-c.Used >= 2 {
@@ -109,7 +109,7 @@ func (h *HandIndex) Eye() (Meld, error) {
 
 
 func (h *HandIndex) AfterFormed(m Meld) []Tile {
-	h.reset()
+	h.Reset()
 	remaining := make([]Tile, 0)
 	for _, t := range m.Tiles {
 		c := h.Index[t.Seq]
@@ -126,7 +126,7 @@ func (h *HandIndex) AfterFormed(m Meld) []Tile {
 	return remaining
 }
 
-func (h *HandIndex) reset() {
+func (h *HandIndex) Reset() {
 	for s, c := range h.Index {
 		c.Used = 0
 		h.Index[s] = c
