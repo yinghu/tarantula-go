@@ -184,7 +184,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 }
 
 func (mp *MahjongPlayer) CheckDiscard(seat int, drop mj.Tile, chow bool) []mj.Meld {
-	
+
 	switch drop.Suit {
 	case mj.BAMBOO:
 		return mp.checkMatch(mp.B, drop, chow)
@@ -532,7 +532,8 @@ func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
 	mp.W = make([]mj.Tile, 0)
 	mp.PendingKongs = make([]int, 0)
 	mp.TN = false
-	mp.Checker = HandSegmenet{}
+	mp.Checker = HandSegmenet{Used: make(map[int]int)}
+	mp.Checker.Listener = &mp.Checker
 	return &mp
 }
 

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 
 	"gameclustering.com/internal/core"
@@ -13,11 +12,11 @@ type SampleCallback struct {
 }
 
 func (s *SampleCallback) OnError(e event.Event, err error) {
-	fmt.Printf("On event error %v %s\n", e, err.Error())
+	//fmt.Printf("On event error %v %s\n", e, err.Error())
 }
 
 func (s *SampleCallback) OnEvent(e event.Event) {
-	fmt.Printf("On event %v\n", e)
+	//fmt.Printf("On event %v\n", e)
 }
 
 func (s *SampleCallback) Push(e event.Event) {
@@ -214,7 +213,7 @@ func TestClassic2(t *testing.T) {
 	//B1,B2,B3,B2,B3,B4,B3,B4,B5,B4,B5,B6,B1,B1
 	//tile13 := []mj.Tile{b1, b2, b3, b4, b5, b6, b7, b8, b9, c7, c8, c9, p1}
 	h.Discard(p2)
-	matched := cm.CheckMahjong(&h,p2)
+	matched := cm.CheckMahjong(&h, p2)
 	if !matched {
 		t.Errorf("should be matched %v", matched)
 	}

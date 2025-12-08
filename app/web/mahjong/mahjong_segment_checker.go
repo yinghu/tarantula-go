@@ -11,18 +11,16 @@ func hmp(a, b HandSegmenet) int {
 	return a.C - b.C
 }
 
-type TileIndexListener interface {
-	OnIndex(t mj.TileIndex)
-}
-
 type HandSegmenet struct {
 	T int
 	C int
 	mj.HandIndex
+	Used map[int]int
 }
 
 func (s *HandSegmenet) OnIndex(t mj.TileIndex) {
-	core.AppLog.Printf("Tile usage %s : %d\n", t.Suit.Name(), t.Used)
+	//core.AppLog.Printf("Tile usage %s : CT : %d USED : %d\n", t.Suit.Name(), t.Count, t.Used)
+	s.Used[t.Suit.Seq] = t.Used
 }
 
 func (h *HandSegmenet) CheckChow(c mj.Tile) []mj.Meld {
@@ -65,7 +63,6 @@ func (h *HandSegmenet) CheckKong(c mj.Tile) mj.Meld {
 	tl := []mj.Tile{c, c, c, c}
 	return mj.Meld{Tiles: tl}
 }
-
 
 func (h *HandSegmenet) CheckDiscard(mp *MahjongPlayer) int {
 	if mp.TC[TC_H] > 0 { //hornor first
@@ -131,6 +128,10 @@ func (h *HandSegmenet) discard(seg []mj.Tile) int {
 	h.Kong()
 	h.Pung()
 	h.Chow()
-	h.Eye()
+	for s := range h.Index {
+		if h.Used[s] == 0 {
+			return s
+		}
+	}
 	return seg[0].Seq
 }
