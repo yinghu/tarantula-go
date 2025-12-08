@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"slices"
-	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -25,7 +24,7 @@ const (
 
 type MahjongTable struct {
 	Id            int64             `json:"Id,string"`
-	CMJ         mj.ClassicMahjong `json:"-"`
+	CMJ           mj.ClassicMahjong `json:"-"`
 	Players       [4]*MahjongPlayer `json:"Players"`
 	dice          []int             `json:"-"`
 	Discarded     []mj.Tile         `json:"Discharged"`
@@ -195,7 +194,6 @@ func (m *MahjongTable) Play() {
 	for _, t := range timerIndex {
 		t.Stop(false, true)
 	}
-	time.Sleep(10 * time.Second)
 	clear(timerIndex)
 	close(m.Sync)
 	close(m.Timer)
