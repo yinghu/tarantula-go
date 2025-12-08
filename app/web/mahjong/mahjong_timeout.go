@@ -60,7 +60,7 @@ func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 }
 
 func (s *MahjongTimeoutObj) Stop(commited bool, closing bool) {
-	s.K.Stop()
+	core.AppLog.Printf("Timer stop %v\n", s.K.Stop())
 	s.Lock.Lock()
 	defer s.Lock.Unlock()
 	s.Stopped = true
