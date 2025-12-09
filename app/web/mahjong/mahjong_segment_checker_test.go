@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"gameclustering.com/internal/core"
@@ -16,11 +17,14 @@ func TestMahjongSegment(t *testing.T) {
 	tiles = append(tiles, mj.FromS(mj.BAMBOO4))
 	tiles = append(tiles, mj.FromS(mj.BAMBOO5))
 	tiles = append(tiles, mj.FromS(mj.BAMBOO3))
-	seg := HandSegmenet{Used: make(map[int]int)}
+	seg := HandSegmenet{Used: make(map[int]TCU)}
 	seg.Listener = &seg
 	seg.From(tiles)
 	seg.Chow()
 	seg.Pung()
 	seg.Kong()
-
+	for s := range seg.Used {
+		v := seg.Used[s]
+		fmt.Printf("Used %d %d %d\n", s, v.CT,v.UT)
+	}
 }

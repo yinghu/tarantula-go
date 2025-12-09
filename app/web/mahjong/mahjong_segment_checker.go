@@ -11,16 +11,21 @@ func hmp(a, b HandSegmenet) int {
 	return a.C - b.C
 }
 
+type TCU struct {
+	CT int
+	UT int
+}
+
 type HandSegmenet struct {
 	T int
 	C int
 	mj.HandIndex
-	Used map[int]int
+	Used map[int]TCU
 }
 
 func (s *HandSegmenet) OnIndex(t mj.TileIndex) {
 	//core.AppLog.Printf("Tile usage %s : CT : %d USED : %d\n", t.Suit.Name(), t.Count, t.Used)
-	s.Used[t.Suit.Seq] = t.Used
+	s.Used[t.Suit.Seq] = TCU{CT: t.Count, UT: t.Used}
 }
 
 func (h *HandSegmenet) CheckChow(c mj.Tile) []mj.Meld {
@@ -129,7 +134,9 @@ func (h *HandSegmenet) discard(seg []mj.Tile) int {
 	h.Pung()
 	h.Chow()
 	for s := range h.Index {
-		if h.Used[s] == 0 {
+		utc := h.Used[s]
+		core.AppLog.Printf("Tile Usage %d >> %d >> %d\n", s, utc.CT, utc.UT)
+		if utc.CT-utc.UT > 0 {
 			return s
 		}
 	}
