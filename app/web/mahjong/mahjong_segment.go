@@ -59,6 +59,14 @@ func (h *HandSegmenet) AfterChow() {
 		h.Index[s+2] = nb
 	}
 }
+func (h *HandSegmenet) AfterPair() {
+	for s, c := range h.Index {
+		if c.Count-c.Used >= 2 {
+			c.Used += 2
+			h.Index[s] = c
+		}
+	}
+}
 
 func (h *HandSegmenet) CheckChow(c mj.Tile) []mj.Meld {
 	mk := make([]mj.Meld, 0)
