@@ -17,14 +17,30 @@ func TestMahjongSegment(t *testing.T) {
 	tiles = append(tiles, mj.FromS(mj.BAMBOO4))
 	tiles = append(tiles, mj.FromS(mj.BAMBOO5))
 	tiles = append(tiles, mj.FromS(mj.BAMBOO3))
-	seg := HandSegmenet{Used: make(map[int]TCU)}
-	seg.Listener = &seg
+	tiles = append(tiles, mj.FromS(mj.BAMBOO3))
+	
+	tiles = append(tiles, mj.FromS(mj.BAMBOO6))
+	tiles = append(tiles, mj.FromS(mj.BAMBOO6))
+	tiles = append(tiles, mj.FromS(mj.BAMBOO6))
+	seg := HandSegmenet{}
+	seq := seg.discard(tiles)
+	fmt.Printf("Discard %v\n",mj.FromQ(seq))
 	seg.From(tiles)
-	seg.Chow()
-	seg.Pung()
-	seg.Kong()
-	for s := range seg.Used {
-		v := seg.Used[s]
-		fmt.Printf("Used %d %d %d\n", s, v.CT,v.UT)
+	seg.AfterKong()
+	seg.AfterPung()
+	seg.AfterChow()
+	for s := range seg.Index {
+		v := seg.Index[s]
+		fmt.Printf("Used %d %d %d\n", s, v.Count,v.Used)
 	}
+	seg.Reset()
+	seg.AfterChow()
+	seg.AfterKong()
+	seg.AfterPung()
+	for s := range seg.Index {
+		v := seg.Index[s]
+		fmt.Printf("Used %d %d %d\n", s, v.Count,v.Used)
+	}
+
+
 }

@@ -532,8 +532,7 @@ func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
 	mp.W = make([]mj.Tile, 0)
 	mp.PendingKongs = make([]int, 0)
 	mp.TN = false
-	mp.Checker = HandSegmenet{Used: make(map[int]TCU)}
-	mp.Checker.Listener = &mp.Checker
+	mp.Checker = HandSegmenet{}
 	return &mp
 }
 

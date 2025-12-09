@@ -11,21 +11,53 @@ func hmp(a, b HandSegmenet) int {
 	return a.C - b.C
 }
 
-type TCU struct {
-	CT int
-	UT int
-}
-
 type HandSegmenet struct {
 	T int
 	C int
 	mj.HandIndex
-	Used map[int]TCU
 }
 
-func (s *HandSegmenet) OnIndex(t mj.TileIndex) {
-	//core.AppLog.Printf("Tile usage %s : CT : %d USED : %d\n", t.Suit.Name(), t.Count, t.Used)
-	s.Used[t.Suit.Seq] = TCU{CT: t.Count, UT: t.Used}
+func (h *HandSegmenet) AfterKong() {
+	//h.Reset()
+	for s, c := range h.Index {
+		if c.Count-c.Used == 4 {
+			c.Used = 4
+			h.Index[s] = c
+		}
+	}
+}
+func (h *HandSegmenet) AfterPung() {
+	//h.Reset()
+	for s, c := range h.Index {
+		if c.Count-c.Used == 3 {
+			c.Used += 3
+			h.Index[s] = c
+		}
+	}
+}
+func (h *HandSegmenet) AfterChow() {
+	//h.Reset()
+	for i := range h.Tx {
+		s := h.Tx[i]
+		c, exists := h.Index[s]
+		if !exists || c.Count-c.Used == 0 {
+			continue
+		}
+		nc, exsits := h.Index[s+1]
+		if !exsits || nc.Count-nc.Used == 0 {
+			continue
+		}
+		nb, exsits := h.Index[s+2]
+		if !exsits || nb.Count-nb.Used == 0 {
+			continue
+		}
+		c.Used++
+		nc.Used++
+		nb.Used++
+		h.Index[s] = c
+		h.Index[s+1] = nc
+		h.Index[s+2] = nb
+	}
 }
 
 func (h *HandSegmenet) CheckChow(c mj.Tile) []mj.Meld {
@@ -130,15 +162,14 @@ func (h *HandSegmenet) CheckDiscard(mp *MahjongPlayer) int {
 func (h *HandSegmenet) discard(seg []mj.Tile) int {
 	core.AppLog.Printf("Segement %v\n", seg)
 	h.From(seg)
-	h.Kong()
-	h.Pung()
-	h.Chow()
-	for s := range h.Index {
-		utc := h.Used[s]
-		core.AppLog.Printf("Tile Usage %d >> %d >> %d\n", s, utc.CT, utc.UT)
-		if utc.CT-utc.UT > 0 {
-			return s
+	h.AfterChow()
+	h.AfterPung()
+	h.AfterKong()
+	for i := range h.Index {
+		c := h.Index[i]
+		if c.Count-c.Used == 1 {
+			return i
 		}
 	}
-	return seg[0].Seq
+	return -1
 }
