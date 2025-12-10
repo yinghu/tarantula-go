@@ -17,26 +17,33 @@ type HandSegmenet struct {
 	mj.HandIndex
 }
 
-func (h *HandSegmenet) AfterKong() {
+func (h *HandSegmenet) AfterKong() int {
 	//h.Reset()
+	ct := 0
 	for s, c := range h.Index {
 		if c.Count-c.Used == 4 {
 			c.Used = 4
 			h.Index[s] = c
+			ct++
 		}
 	}
+	return ct
 }
-func (h *HandSegmenet) AfterPung() {
+func (h *HandSegmenet) AfterPung() int {
 	//h.Reset()
+	ct := 0
 	for s, c := range h.Index {
 		if c.Count-c.Used == 3 {
 			c.Used += 3
 			h.Index[s] = c
+			ct++
 		}
 	}
+	return ct
 }
-func (h *HandSegmenet) AfterChow() {
+func (h *HandSegmenet) AfterChow() int{
 	//h.Reset()
+	ct := 0
 	for i := range h.Tx {
 		s := h.Tx[i]
 		c, exists := h.Index[s]
@@ -57,15 +64,20 @@ func (h *HandSegmenet) AfterChow() {
 		h.Index[s] = c
 		h.Index[s+1] = nc
 		h.Index[s+2] = nb
+		ct++
 	}
+	return ct
 }
-func (h *HandSegmenet) AfterPair() {
+func (h *HandSegmenet) AfterPair() int {
+	ct := 0
 	for s, c := range h.Index {
 		if c.Count-c.Used >= 2 {
 			c.Used += 2
 			h.Index[s] = c
+			ct++
 		}
 	}
+	return ct
 }
 
 func (h *HandSegmenet) CheckChow(c mj.Tile) []mj.Meld {
