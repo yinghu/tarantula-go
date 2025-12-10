@@ -35,6 +35,7 @@ type MahjongPlayer struct {
 	TN           bool   //false draw true discharge
 	TC           [4]int //
 	Checker      HandSegmenet
+	LD           int //last draw
 }
 
 func (mp *MahjongPlayer) OnError(mt *MahjongTable, err error) {
@@ -290,6 +291,9 @@ func (mp *MahjongPlayer) OnDraw(t mj.Tile, kong bool) {
 		}
 	case mj.FLOWER:
 		mp.PendingKongs = append(mp.PendingKongs, t.Seq)
+	}
+	if t.Suit != mj.FLOWER {
+		mp.LD = t.Seq
 	}
 
 }

@@ -41,7 +41,7 @@ func (h *HandSegmenet) AfterPung() int {
 	}
 	return ct
 }
-func (h *HandSegmenet) AfterChow() int{
+func (h *HandSegmenet) AfterChow() int {
 	//h.Reset()
 	ct := 0
 	for i := range h.Tx {
@@ -175,8 +175,8 @@ func (h *HandSegmenet) CheckDiscard(mp *MahjongPlayer) int {
 			}
 		}
 	}
-	core.AppLog.Printf("oops something wrong")
-	return mp.Hand.Tiles[0].Seq
+	core.AppLog.Printf("no tile matched to delete last draw %d\n", mp.LD)
+	return mp.LD
 }
 
 func (h *HandSegmenet) discard(seg []mj.Tile) int {
