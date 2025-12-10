@@ -40,9 +40,9 @@ func TestMahjongSegment(t *testing.T) {
 	if pc != 2 {
 		t.Errorf("chow number should 2 %d", pc)
 	}
-	for i := range seg.Index{
+	for i := range seg.Index {
 		c := seg.Index[i]
-		fmt.Printf("Usage : %d >> %d >> %d\n",i,c.Count,c.Used)
+		fmt.Printf("Usage : %d >> %d >> %d\n", i, c.Count, c.Used)
 	}
 
 }

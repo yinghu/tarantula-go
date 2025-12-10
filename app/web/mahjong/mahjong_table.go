@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"slices"
+	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -74,6 +75,9 @@ func (m *MahjongTable) Play() {
 			switch k.Cmd {
 			case CMD_END:
 				running = false
+				for _, t := range timerIndex {
+					t.Stop(false, true)
+				}
 			case CMD_SIT:
 				seat, err := m.Sit(k.SystemId)
 				if err != nil {
@@ -191,9 +195,7 @@ func (m *MahjongTable) Play() {
 			}
 		}
 	}
-	for _, t := range timerIndex {
-		t.Stop(false, true)
-	}
+	time.Sleep(5 * time.Second)
 	clear(timerIndex)
 	close(m.Sync)
 	close(m.Timer)
