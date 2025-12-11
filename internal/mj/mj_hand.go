@@ -188,6 +188,10 @@ func (h *Hand) HeadDraw(deck *Deck) error {
 	return h.append(t, false)
 }
 
+func (h *Hand) AppendForTest(t Tile, kong bool) error {
+	return h.append(t, kong)
+}
+
 func (h *Hand) append(t Tile, kong bool) error {
 	if h.FlowerExcluded {
 		switch t.Suit {
