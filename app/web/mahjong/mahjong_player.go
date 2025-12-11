@@ -84,7 +84,7 @@ func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDiscardEvent) {
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_SKIP, func() {
 		for i := range mc.Opts {
 			m := mc.Opts[i]
-			if m.Type() == int32(mj.PUNG) {
+			if m.Type() == mj.PUNG {
 				mt.Turn <- MahjongPlayToken{Cmd: CMD_PUNG, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid, Selected: m.Tiles[0].Seq}
 				return
 			}
@@ -225,11 +225,11 @@ func (mp *MahjongPlayer) checkMatch(seg []mj.Tile, d mj.Tile, c bool) []mj.Meld 
 		m = append(m, mp.Checker.CheckChow(d)...)
 	}
 	cp := mp.Checker.CheckPung(d)
-	if cp.Type() == int32(mj.PUNG) {
+	if cp.Type() == mj.PUNG {
 		m = append(m, cp)
 	}
 	ck := mp.Checker.CheckKong(d)
-	if ck.Type() == int32(mj.KNOG) {
+	if ck.Type() == mj.KNOG {
 		mp.PendingKongs = append(mp.PendingKongs, d.Seq)
 		m = append(m, mp.Checker.CheckKong(d))
 	}
@@ -508,6 +508,13 @@ func (mp *MahjongPlayer) OnPung(pung mj.Meld) {
 }
 
 func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
+	//for i := range clist{
+		//t := clist[i]
+		//for j:= range mp.Formed{
+			//m := mp.Formed[j]
+			//if m.Type()==int32(mj.KNOG) &&
+		//}
+	//}
 	if !hornor {
 		mp.Checker.From(clist)
 		ks := mp.Checker.Kong()

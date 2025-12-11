@@ -27,6 +27,8 @@ func TestPlayerSetup(t *testing.T) {
 	}
 	mp.AppendForTest(mj.FromS(mj.BAMBOO1), false)
 	mp.AppendForTest(mj.FromS(mj.CHARACTER1), false)
+	mp.AppendForTest(mj.FromS(mj.CHARACTER1), false)
+	mp.AppendForTest(mj.FromS(mj.CHARACTER1), false)
 	mp.AppendForTest(mj.FromS(mj.DOTS1), false)
 	mp.AppendForTest(mj.FromS(mj.DOTS1), false)
 	mp.AppendForTest(mj.FromS(mj.DOTS1), false)
@@ -50,4 +52,9 @@ func TestPlayerSetup(t *testing.T) {
 	if err != nil {
 		t.Errorf("should be a kong %s", err.Error())
 	}
+	mds := mp.CheckDiscard(1, mj.FromS(mj.CHARACTER1), false)
+	for i := range mds {
+		fmt.Printf("Kong %s\n", mds[i].Name())
+	}
+	fmt.Printf("pending kong %v\n", mp.PendingKongs)
 }

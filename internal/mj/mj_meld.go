@@ -4,11 +4,11 @@ import "gameclustering.com/internal/core"
 
 //2 to 4 tiles, or 14 if 13 orphans
 const (
-	NONE uint8 = 0
-	EYE  uint8 = 1
-	CHOW uint8 = 2
-	PUNG uint8 = 3
-	KNOG uint8 = 4
+	NONE int = 0
+	EYE  int = 1
+	CHOW int = 2
+	PUNG int = 3
+	KNOG int = 4
 )
 
 type Meld struct {
@@ -16,20 +16,24 @@ type Meld struct {
 	Concealed bool
 }
 
-func (m *Meld) Type() int32 {
+func (m *Meld) Type() int {
 	if m.Eye() {
-		return 1
+		return EYE
 	}
 	if m.Chow() {
-		return 2
+		return CHOW
 	}
 	if m.Pung() {
-		return 3
+		return PUNG
 	}
 	if m.Kong() {
-		return 4
+		return KNOG
 	}
-	return 0
+	return NONE
+}
+
+func (m *Meld) Suit() string {
+	return m.Tiles[0].Suit
 }
 
 func (m *Meld) Eye() bool {
@@ -74,7 +78,7 @@ func (m *Meld) Name() string {
 }
 
 func (m *Meld) Write(buff core.DataBuffer) error {
-	if err := buff.WriteInt32(m.Type()); err != nil {
+	if err := buff.WriteInt32(int32(m.Type())); err != nil {
 		return err
 	}
 	sz := len(m.Tiles)

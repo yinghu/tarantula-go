@@ -3,10 +3,10 @@ package mj
 type EvaluationNode struct {
 	PendingHand []Tile
 	Formed      []Meld
-	Type        uint8
+	Type        int
 }
 
-func (e *EvaluationNode) New(t uint8) {
+func (e *EvaluationNode) New(t int) {
 	e.PendingHand = make([]Tile, 0)
 	e.Formed = make([]Meld, 0)
 	e.Type = t
