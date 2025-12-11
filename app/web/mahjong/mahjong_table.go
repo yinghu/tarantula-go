@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"slices"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -281,27 +280,16 @@ func (m *MahjongTable) Draw(seat int) error {
 }
 func (m *MahjongTable) Kong(seat int, kong int) error {
 	mp := m.Players[seat]
-	sz := len(mp.PendingKongs)
-	if sz == 0 {
-		return fmt.Errorf("no pending kong %d", sz)
-	}
-	deleted := false
-	for i := range mp.PendingKongs {
-		if kong == mp.PendingKongs[i] {
-			mp.PendingKongs = slices.Delete(mp.PendingKongs, i, i+1)
-			deleted = true
-			break
-		}
-	}
-	if !deleted {
-		return fmt.Errorf("no pending kong %d", kong)
+	err := mp.validateKong(kong)
+	if err != nil {
+		return err
 	}
 	if kong > mj.FS_LIMIT {
 		m.Discard(seat, kong)
 		return mp.TailDraw(&m.CMJ.Deck)
 	}
 	k := mj.FromQ(kong)
-	err := mp.Kong(k)
+	err = mp.Kong(k)
 	if err != nil {
 		return err
 	}

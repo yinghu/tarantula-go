@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"slices"
 
 	"gameclustering.com/internal/core"
@@ -518,6 +519,21 @@ func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
 	if len(clist) == 4 {
 		mp.PendingKongs = append(mp.PendingKongs, clist[0].Seq)
 	}
+}
+
+func (mp *MahjongPlayer) validateKong(kong int) error {
+	deleted := false
+	for i := range mp.PendingKongs {
+		if kong == mp.PendingKongs[i] {
+			mp.PendingKongs = slices.Delete(mp.PendingKongs, i, i+1)
+			deleted = true
+			break
+		}
+	}
+	if !deleted {
+		return fmt.Errorf("no pending kong %d", kong)
+	}
+	return nil
 }
 
 func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
