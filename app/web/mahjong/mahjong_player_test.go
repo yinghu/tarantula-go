@@ -26,6 +26,7 @@ func TestPlayerSetup(t *testing.T) {
 		t.Errorf("flower should be included %v", mp.FlowerExcluded)
 	}
 	mp.AppendForTest(mj.FromS(mj.BAMBOO1), false)
+	mp.AppendForTest(mj.FromS(mj.BAMBOO1), false)
 	mp.AppendForTest(mj.FromS(mj.CHARACTER1), false)
 	mp.AppendForTest(mj.FromS(mj.CHARACTER1), false)
 	mp.AppendForTest(mj.FromS(mj.CHARACTER1), false)
@@ -57,4 +58,14 @@ func TestPlayerSetup(t *testing.T) {
 		fmt.Printf("Kong %s\n", mds[i].Name())
 	}
 	fmt.Printf("pending kong %v\n", mp.PendingKongs)
+	err = mp.Pung(mj.FromS(mj.BAMBOO1))
+	if err != nil {
+		t.Errorf("should be a ping %s", err.Error())
+	}
+	err = mp.AppendForTest(mj.FromS(mj.BAMBOO1),false)
+	if err != nil {
+		t.Errorf("should be no error %s", err.Error())
+	}
+	fmt.Printf("pending kong %v\n", mp.PendingKongs)
+	
 }

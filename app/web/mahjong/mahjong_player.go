@@ -508,13 +508,16 @@ func (mp *MahjongPlayer) OnPung(pung mj.Meld) {
 }
 
 func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
-	//for i := range clist{
-		//t := clist[i]
-		//for j:= range mp.Formed{
-			//m := mp.Formed[j]
-			//if m.Type()==int32(mj.KNOG) &&
-		//}
-	//}
+	for i := range clist {
+		t := clist[i]
+		for j := range mp.Formed {
+			m := mp.Formed[j]
+			if m.Type() == mj.PUNG && m.Suit() == t.Suit {
+				//exposed kong
+				mp.PendingKongs = append(mp.PendingKongs, t.Seq)
+			}
+		}
+	}
 	if !hornor {
 		mp.Checker.From(clist)
 		ks := mp.Checker.Kong()
