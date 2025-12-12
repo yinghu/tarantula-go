@@ -114,7 +114,6 @@ func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDiscardEvent) {
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	core.AppLog.Printf("player seat: %d auto: %v TN: %v\n", mp.Seat, mp.Auto, mp.TN)
 	core.AppLog.Printf("player kong list: %v\n", mp.PendingKongs)
-	/**
 	if len(mp.PendingKongs) > 0 { //knog first
 		oid, _ := mt.Sequence.Id()
 		k := mp.PendingKongs[0]
@@ -132,7 +131,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		}
 		mt.Timer <- &md
 		return
-	}**/
+	}
 	if mp.TN { //full hand
 		claimed := mt.CMJ.Mahjong(&mp.Hand)
 		core.AppLog.Printf("player claim seat : %d auto: %v mj: %v\n", mp.Seat, mp.Auto, claimed)
