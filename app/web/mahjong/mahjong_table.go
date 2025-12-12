@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -193,7 +194,7 @@ func (m *MahjongTable) Play() {
 			}
 		}
 	}
-	//time.Sleep(5 * time.Second)
+	time.Sleep(5 * time.Second)
 	clear(timerIndex)
 	close(m.Sync)
 	close(m.Timer)
