@@ -579,6 +579,7 @@ func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
 	mp.G = make([]mj.Tile, 0)
 	mp.W = make([]mj.Tile, 0)
 	mp.PendingKongs = make([]int, 0)
+	mp.PendingFlowers = make([]int, 0)
 	mp.TN = false
 	mp.Checker = HandSegmenet{}
 	return &mp
