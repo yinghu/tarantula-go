@@ -148,6 +148,7 @@ func (m *MahjongTable) Play() {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
+				tp = t.Seat
 				go timer.Stop(true, false)
 			case CMD_DISCARD:
 				err := m.Discard(t.Seat, t.Selected)
@@ -281,6 +282,7 @@ func (m *MahjongTable) Draw(seat int) error {
 func (m *MahjongTable) Kong(seat int, kong int) error {
 	mp := m.Players[seat]
 	err := mp.validateKong(kong)
+
 	if err != nil {
 		return err
 	}
