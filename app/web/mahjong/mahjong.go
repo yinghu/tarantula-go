@@ -27,8 +27,8 @@ func NewMahjongTurnEvent(systemId int64, oid int64, cmd int, t OnTurn, p OnStop)
 	return mt
 }
 
-func NewMahjongHandEvent(systemId int64, h mj.Hand, k []int) MahjongHandEvent {
-	mh := MahjongHandEvent{H: h, K: k}
+func NewMahjongHandEvent(systemId int64, h mj.Hand, f, k []int) MahjongHandEvent {
+	mh := MahjongHandEvent{H: h, F: f, K: k}
 	mh.SystemId = systemId
 	return mh
 }

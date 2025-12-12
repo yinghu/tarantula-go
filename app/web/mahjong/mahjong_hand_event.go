@@ -7,6 +7,7 @@ import (
 
 type MahjongHandEvent struct {
 	H mj.Hand
+	F []int
 	K []int
 	MahjongEventObj
 }
@@ -24,7 +25,16 @@ func (s *MahjongHandEvent) Write(buff core.DataBuffer) error {
 	if err != nil {
 		return err
 	}
-	sz := len(s.K)
+	sz := len(s.F)
+	if err := buff.WriteInt32(int32(sz)); err != nil {
+		return err
+	}
+	for i := range s.F {
+		if err := buff.WriteInt32(int32(s.F[i])); err != nil {
+			return err
+		}
+	}
+	sz = len(s.K)
 	if err := buff.WriteInt32(int32(sz)); err != nil {
 		return err
 	}
@@ -33,6 +43,7 @@ func (s *MahjongHandEvent) Write(buff core.DataBuffer) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
