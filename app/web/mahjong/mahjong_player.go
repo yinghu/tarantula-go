@@ -117,7 +117,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	core.AppLog.Printf("player kong list: %v\n", mp.PendingKongs)
 	if len(mp.PendingFlowers) > 0 { //knog first
 		oid, _ := mt.Sequence.Id()
-		k := mp.PendingKongs[0]
+		k := mp.PendingFlowers[0]
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_KONG, func() {
 			mt.Turn <- MahjongPlayToken{Cmd: CMD_KONG, Seat: mp.Seat, Selected: k, Id: oid}
 		}, func(commited bool) {
