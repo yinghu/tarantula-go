@@ -32,8 +32,8 @@ func (m *Meld) Type() int {
 	return NONE
 }
 
-func (m *Meld) Suit() string {
-	return m.Tiles[0].Suit
+func (m *Meld) Seq() int {
+	return m.Tiles[0].Seq
 }
 
 func (m *Meld) Eye() bool {

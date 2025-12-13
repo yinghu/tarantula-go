@@ -68,5 +68,13 @@ func TestPlayerSetup(t *testing.T) {
 	}
 	fmt.Printf("pending kongs %v\n", mp.PendingKongs)
 	fmt.Printf("pending flowers %v\n", mp.PendingFlowers)
-	
+	seg := make([]mj.Tile, 0)
+	seg = append(seg, mj.FromS(mj.BAMBOO7))
+	seg = append(seg, mj.FromS(mj.BAMBOO9))
+	seg = append(seg, mj.FromS(mj.BAMBOO9))
+	seg = append(seg, mj.FromS(mj.BAMBOO7))
+	seg = append(seg, mj.FromS(mj.BAMBOO8))
+	mp.checkKong(seg,false)
+	fmt.Printf("pending kongs %v\n", mp.PendingKongs)
+
 }

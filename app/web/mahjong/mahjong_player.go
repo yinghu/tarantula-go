@@ -511,13 +511,11 @@ func (mp *MahjongPlayer) OnPung(pung mj.Meld) {
 }
 
 func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
-	core.AppLog.Printf("SEG %v\n", clist)
-	core.AppLog.Printf("KONGS %v\n", mp.PendingKongs)
 	for i := range clist {
 		t := clist[i]
 		for j := range mp.Formed {
 			m := mp.Formed[j]
-			if m.Type() == mj.PUNG && m.Suit() == t.Suit {
+			if m.Type() == mj.PUNG && m.Seq() == t.Seq {
 				//exposed kong
 				mp.PendingKongs = append(mp.PendingKongs, t.Seq)
 			}
@@ -529,13 +527,11 @@ func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
 		for i := range ks {
 			mp.PendingKongs = append(mp.PendingKongs, ks[i].Tiles[0].Seq)
 		}
-		core.AppLog.Printf("N KONGS %v\n", mp.PendingKongs)
 		return
 	}
 	if len(clist) == 4 {
 		mp.PendingKongs = append(mp.PendingKongs, clist[0].Seq)
 	}
-	core.AppLog.Printf("H KONGS %v\n", mp.PendingKongs)
 }
 
 func (mp *MahjongPlayer) validateKong(kong int) error {
