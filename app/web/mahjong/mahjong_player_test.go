@@ -66,6 +66,7 @@ func TestPlayerSetup(t *testing.T) {
 	if err != nil {
 		t.Errorf("should be no error %s", err.Error())
 	}
-	fmt.Printf("pending kong %v\n", mp.PendingKongs)
+	fmt.Printf("pending kongs %v\n", mp.PendingKongs)
+	fmt.Printf("pending flowers %v\n", mp.PendingFlowers)
 	
 }

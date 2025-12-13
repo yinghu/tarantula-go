@@ -9,7 +9,7 @@ import (
 
 type MahjongTimeout interface {
 	Start(t *MahjongTable)
-	Stop(commited bool, closing bool)
+	Stop(commited MahjongPlayToken, closing bool)
 	OId() int64
 }
 
@@ -28,7 +28,7 @@ func (s *MahjongEventObj) OnRecipientId(recipientId int64) {
 }
 
 type OnTurn func()
-type OnStop func(commited bool)
+type OnStop func(commited MahjongPlayToken)
 
 type MahjongTimeoutObj struct {
 	MahjongEventObj
@@ -57,7 +57,7 @@ func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 	s.T()
 }
 
-func (s *MahjongTimeoutObj) Stop(commited bool, closing bool) {
+func (s *MahjongTimeoutObj) Stop(commited MahjongPlayToken, closing bool) {
 	s.Lock.Lock()
 	s.K.Stop()
 	defer s.Lock.Unlock()

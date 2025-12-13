@@ -57,7 +57,7 @@ func (mp *MahjongPlayer) PlayDice(mt *MahjongTable) {
 	oid, _ := mt.Sequence.Id()
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DICE, func() {
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_DICE, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
-	}, func(commited bool) {
+	}, func(commited MahjongPlayToken) {
 		me := MahjongDiceEvent{Dice1: int32(mt.dice[0]), Dice2: int32(mt.dice[1])}
 		mt.Update(&me)
 	})
@@ -70,7 +70,7 @@ func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
 	oid, _ := mt.Sequence.Id()
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DEAL, func() {
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_DEAL, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
-	}, func(commited bool) {
+	}, func(commited MahjongPlayToken) {
 		me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 		mt.Update(&me)
 		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_START} //start game from dealer
@@ -92,8 +92,8 @@ func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDiscardEvent) {
 			}
 		}
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_SKIP, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
-	}, func(commited bool) {
-		if commited {
+	}, func(commited MahjongPlayToken) {
+		if commited.Cmd!= CMD_SKIP {
 			if !mp.Auto {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 				mt.Update(&me)
@@ -120,7 +120,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		k := mp.PendingFlowers[0]
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_KONG, func() {
 			mt.Turn <- MahjongPlayToken{Cmd: CMD_KONG, Seat: mp.Seat, Selected: k, Id: oid}
-		}, func(commited bool) {
+		}, func(commited MahjongPlayToken) {
 			if !mp.Auto {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 				mt.Push(&me)
@@ -140,7 +140,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 			oid, _ := mt.Sequence.Id()
 			md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_CLAIM, func() {
 				mt.Turn <- MahjongPlayToken{Cmd: CMD_CLAIM, Seat: mp.Seat, Id: oid}
-			}, func(commited bool) {
+			}, func(commited MahjongPlayToken) {
 				//reset to next round
 				if !mp.Auto {
 					mc := NewMahjongClaimEvent(mp.SystemId, mt.Id, mp.Seat, claimed, mp.Hand.Formed)
@@ -157,7 +157,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DISCARD, func() {
 			t := mp.autoPick()
 			mt.Turn <- MahjongPlayToken{Cmd: CMD_DISCARD, Seat: mp.Seat, Selected: t.Seq, Id: oid}
-		}, func(commited bool) {
+		}, func(commited MahjongPlayToken) {
 			mp.TN = false
 			if !mp.Auto {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
@@ -174,7 +174,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	oid, _ := mt.Sequence.Id()
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DRAW, func() {
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_DRAW, Seat: mp.Seat, Id: oid} ///
-	}, func(commited bool) {
+	}, func(commited MahjongPlayToken) {
 		mp.TN = true
 		if !mp.Auto {
 			me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
@@ -295,7 +295,6 @@ func (mp *MahjongPlayer) OnDraw(t mj.Tile, kong bool) {
 		}
 	case mj.FLOWER:
 		mp.PendingFlowers = append(mp.PendingFlowers, t.Seq)
-		//mp.PendingKongs = append(mp.PendingKongs, t.Seq)
 	}
 	if t.Suit != mj.FLOWER {
 		mp.LD = t.Seq

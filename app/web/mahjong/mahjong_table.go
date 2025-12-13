@@ -74,7 +74,7 @@ func (m *MahjongTable) Play() {
 			case CMD_END:
 				running = false
 				for _, t := range timerIndex {
-					t.Stop(false, true)
+					t.Stop(k, true)
 				}
 			case CMD_SIT:
 				seat, err := m.Sit(k.SystemId)
@@ -125,7 +125,7 @@ func (m *MahjongTable) Play() {
 			switch t.Cmd {
 			case CMD_DICE:
 				m.Dice()
-				go timer.Stop(true, false)
+				go timer.Stop(t, false)
 				go m.Players[t.Seat].PlayDeal(m)
 			case CMD_DEAL:
 				dealer, err := m.Deal()
@@ -134,28 +134,28 @@ func (m *MahjongTable) Play() {
 					continue
 				}
 				tp = dealer //start dealer
-				go timer.Stop(true, false)
+				go timer.Stop(t, false)
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
 				if err != nil {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				go timer.Stop(true, false)
+				go timer.Stop(t, false)
 			case CMD_KONG:
 				err := m.Kong(t.Seat, t.Selected)
 				if err != nil {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				go timer.Stop(true, false)
+				go timer.Stop(t, false)
 			case CMD_DISCARD:
 				err := m.Discard(t.Seat, t.Selected)
 				if err != nil {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				go timer.Stop(true, false)
+				go timer.Stop(t, false)
 			case CMD_CHOW:
 				err := m.Chow(t.Seat, t.Selected, t.Chow1, t.Chow2)
 				if err != nil {
@@ -164,7 +164,7 @@ func (m *MahjongTable) Play() {
 				}
 				m.skips = m.skips[:0]
 				tp = t.Seat
-				go timer.Stop(true, false)
+				go timer.Stop(t, false)
 			case CMD_PUNG:
 				err := m.Pung(t.Seat, t.Selected)
 				if err != nil {
@@ -173,16 +173,16 @@ func (m *MahjongTable) Play() {
 				}
 				m.skips = m.skips[:0]
 				tp = t.Seat
-				go timer.Stop(true, false)
+				go timer.Stop(t, false)
 			case CMD_SKIP:
-				go timer.Stop(false, false)
+				go timer.Stop(t, false)
 			case CMD_CLAIM:
 				claimed := m.Claim(t.Seat)
 				if !claimed {
 					go m.Players[t.Seat].OnError(m, fmt.Errorf("fake claimed"))
 					continue
 				}
-				go timer.Stop(true, false)
+				go timer.Stop(t, false)
 				//m.Reset()
 				//go m.Players[t.Seat].PlayDeal(m)
 			case CMD_RESET:
