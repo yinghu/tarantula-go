@@ -93,7 +93,7 @@ func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDiscardEvent) {
 		}
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_SKIP, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
 	}, func(commited MahjongPlayToken) {
-		if commited.Cmd!= CMD_SKIP {
+		if commited.Cmd != CMD_SKIP {
 			if !mp.Auto {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 				mt.Update(&me)
@@ -511,6 +511,8 @@ func (mp *MahjongPlayer) OnPung(pung mj.Meld) {
 }
 
 func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
+	core.AppLog.Printf("SEG %v\n", clist)
+	core.AppLog.Printf("KONGS %v\n", mp.PendingKongs)
 	for i := range clist {
 		t := clist[i]
 		for j := range mp.Formed {
@@ -527,11 +529,13 @@ func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
 		for i := range ks {
 			mp.PendingKongs = append(mp.PendingKongs, ks[i].Tiles[0].Seq)
 		}
+		core.AppLog.Printf("N KONGS %v\n", mp.PendingKongs)
 		return
 	}
 	if len(clist) == 4 {
 		mp.PendingKongs = append(mp.PendingKongs, clist[0].Seq)
 	}
+	core.AppLog.Printf("H KONGS %v\n", mp.PendingKongs)
 }
 
 func (mp *MahjongPlayer) validateKong(kong int) error {
