@@ -69,7 +69,6 @@ func (m *MahjongTable) Play() {
 	for running {
 		select {
 		case k := <-m.Sync:
-			//core.AppLog.Printf("Sync: %d selected : %d cmd: %d Id :%d\n", k.Seat, k.Selected, k.Cmd, k.Id)
 			switch k.Cmd {
 			case CMD_END:
 				running = false
@@ -148,6 +147,7 @@ func (m *MahjongTable) Play() {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
+				tp = t.Seat
 				go timer.Stop(t, false)
 			case CMD_DISCARD:
 				err := m.Discard(t.Seat, t.Selected)

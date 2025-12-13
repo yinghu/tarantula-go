@@ -163,7 +163,11 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 				mt.Push(&me)
 			}
-			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT} //next player
+			if commited.Cmd == CMD_KONG {
+				mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_PLAYER, Seat: mp.Seat}
+			} else {
+				mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT} //next player
+			}
 		})
 		if !mp.Auto {
 			mt.Push(&md)
@@ -532,6 +536,7 @@ func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
 	if len(clist) == 4 {
 		mp.PendingKongs = append(mp.PendingKongs, clist[0].Seq)
 	}
+
 }
 
 func (mp *MahjongPlayer) validateKong(kong int) error {
