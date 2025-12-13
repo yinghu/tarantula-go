@@ -499,7 +499,7 @@ func (mp *MahjongPlayer) OnKong(t mj.Tile) {
 	mp.OnDelete(t, true)
 }
 func (mp *MahjongPlayer) OnFormed(m mj.Meld) {
-	core.AppLog.Printf("Meld : %s\n", m.Name())
+	//core.AppLog.Printf("Meld : %s\n", m.Name())
 }
 
 func (mp *MahjongPlayer) OnChow(drop mj.Tile, chow mj.Meld) {
