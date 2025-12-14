@@ -68,7 +68,7 @@ func (m *MahjongTable) Play() {
 	var tp int
 	for running {
 		select {
-		case k := <-m.Sync:
+		case k := <-m.Sync: //player control
 			switch k.Cmd {
 			case CMD_END:
 				running = false
@@ -101,11 +101,11 @@ func (m *MahjongTable) Play() {
 				go m.Players[tp%4].Play(m)
 
 			}
-		case tm := <-m.Timer:
+		case tm := <-m.Timer: //timer control
 			timerIndex[tm.OId()] = tm
 			go tm.Start(m)
 
-		case t := <-m.Turn:
+		case t := <-m.Turn: //play control
 			if t.Cmd == CMD_TABLE {
 				if m.Solo {
 					go m.Players[t.Seat].PlayDice(m)
