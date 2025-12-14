@@ -187,8 +187,115 @@ func TestPlayerPung(t *testing.T) {
 	if !formed {
 		t.Errorf("should be a pung meld %s", "H31.H31.H31")
 	}
+	err = mp.Pung(mj.FromS(mj.CHARACTER1))
+	if err != nil {
+		t.Errorf("should be a pung %s", err.Error())
+	}
+	formed = false
+	for i := range mp.Formed {
+		meld := mp.Formed[i]
+		if meld.Name() == "C1.C1.C1" {
+			formed = true
+			break
+		}
+	}
+	if !formed {
+		t.Errorf("should be a pung meld %s", "C1.C1.C1")
+	}
+	err = mp.Pung(mj.FromS(mj.CHARACTER3))
+	if err != nil {
+		t.Errorf("should be a pung %s", err.Error())
+	}
+	formed = false
+	for i := range mp.Formed {
+		meld := mp.Formed[i]
+		if meld.Name() == "C3.C3.C3" {
+			formed = true
+			break
+		}
+	}
+	if !formed {
+		t.Errorf("should be a pung meld %s", "C3.C3.C3")
+	}
+	hz := mp.TileSize()
+	if hz != 0 {
+		t.Errorf("hand size should be 0%d", hz)
+	}
+	fz := len(mp.Formed)
+	if fz != 3 {
+		t.Errorf("formed size should be 3%d", fz)
+	}
 }
 
 func TestPlayerKong(t *testing.T) {
-
+	core.CreateTestLog()
+	mp := NewPlayer(0, true, &SampleCallback{})
+	mp.AppendForTest(mj.FromS(mj.EAST), false)
+	mp.AppendForTest(mj.FromS(mj.EAST), false)
+	mp.AppendForTest(mj.FromS(mj.EAST), false)
+	mp.AppendForTest(mj.FromS(mj.EAST), false)
+	mp.AppendForTest(mj.FromS(mj.CHARACTER3), false)
+	mp.AppendForTest(mj.FromS(mj.CHARACTER3), false)
+	mp.AppendForTest(mj.FromS(mj.CHARACTER3), false)
+	mp.AppendForTest(mj.FromS(mj.CHARACTER2), false)
+	err := mp.Kong(mj.FromS(mj.EAST)) //concealed kong 
+	if err != nil {
+		t.Errorf("should be a kong %s", err.Error())
+	}
+	formed := false
+	for i := range mp.Formed {
+		meld := mp.Formed[i]
+		if meld.Name() == "H31.H31.H31.H31" && meld.Concealed {
+			formed = true
+			break
+		}
+	}
+	if !formed {
+		t.Errorf("should be a pung meld %s", "H31.H31.H31,H31")
+	}
+	err = mp.Kong(mj.FromS(mj.CHARACTER3)) //pung kong as exposed kong
+	if err != nil {
+		t.Errorf("should be a kong %s", err.Error())
+	}
+	formed = false
+	for i := range mp.Formed {
+		meld := mp.Formed[i]
+		if meld.Name() == "C3.C3.C3.C3" && (!meld.Concealed) {
+			formed = true
+			break
+		}
+	}
+	if !formed {
+		t.Errorf("should be a pung meld %s", "C3.C3.C3,C3")
+	}
+	p2 := mj.Meld{}
+	p2.Tiles = []mj.Tile{mj.FromS(mj.CHARACTER1), mj.FromS(mj.CHARACTER1), mj.FromS(mj.CHARACTER1)}
+	mp.Formed = append(mp.Formed, p2)
+	err = mp.Kong(mj.FromS(mj.CHARACTER1)) //draw to kong from meld pung
+	if err != nil {
+		t.Errorf("should be a kong %s", err.Error())
+	}
+	formed = false
+	for i := range mp.Formed {
+		meld := mp.Formed[i]
+		if meld.Name() == "C1.C1.C1.C1" && (!meld.Concealed) {
+			formed = true
+			break
+		}
+	}
+	if !formed {
+		t.Errorf("should be a pung meld %s", "C1.C1.C1,C1")
+	}
+	hz := mp.TileSize()
+	if hz != 1 {
+		t.Errorf("hand size should be 1%d", hz)
+	}
+	fz := len(mp.Formed)
+	if fz != 3 {
+		t.Errorf("formed size should be 3%d", fz)
+	}
+	err = mp.Kong(mj.FromS(mj.CHARACTER2)) //no kong
+	if err == nil {
+		t.Errorf("should be no kong")
+	}
 }
