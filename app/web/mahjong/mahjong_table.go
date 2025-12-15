@@ -34,7 +34,6 @@ type MahjongTable struct {
 	Timer         chan MahjongTimeout
 	Sync          chan MahjongPlayToken `json:"-"`
 	skips         []MahjongDiscardEvent
-	
 }
 
 func (m *MahjongTable) Pts() int {
@@ -281,14 +280,25 @@ func (m *MahjongTable) Draw(seat int) error {
 }
 func (m *MahjongTable) Kong(seat int, kong int) error {
 	mp := m.Players[seat]
-	kt,err := mp.validateKong(kong)
-	core.AppLog.Printf("KONG TYE %v\n",kt)
+	kt, err := mp.validateKong(kong)
 	if err != nil {
 		return err
 	}
-	if kong > mj.FS_LIMIT {
+	if kt.Tye > K_FLOWER {
 		m.Discard(seat, kong)
 		return mp.TailDraw(&m.CMJ.Deck)
+	}
+	if kt.Tye == K_FORMED {
+		core.AppLog.Printf("Rub Kong Checkpoint%v\n", kt)
+		p := seat+1
+		claimed1 := m.CMJ.CheckMahjong(&m.Players[p%4].Hand,mj.FromQ(kong))
+		p++
+		claimed2 := m.CMJ.CheckMahjong(&m.Players[p%4].Hand,mj.FromQ(kong))
+		p++
+		claimed3 := m.CMJ.CheckMahjong(&m.Players[p%4].Hand,mj.FromQ(kong))
+		if claimed1 || claimed2 || claimed3 {
+			core.AppLog.Printf("Claimed %v %v %v\n",claimed1,claimed2,claimed3)
+		}
 	}
 	k := mj.FromQ(kong)
 	err = mp.Kong(k)
