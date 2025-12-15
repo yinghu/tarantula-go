@@ -14,7 +14,17 @@ const (
 	TC_B int = 1
 	TC_D int = 2
 	TC_H int = 3
+
+	K_FLOWER    = 0
+	K_CONCEALED = 1
+	K_PUNG      = 2
+	K_FORMED    = 3
 )
+
+type KongType struct {
+	Seq int
+	Tye int
+}
 
 type MahjongPlayer struct {
 	SystemId       int64 `json:"SystemId,string"`
@@ -31,8 +41,8 @@ type MahjongPlayer struct {
 	R              []mj.Tile `json:"-"` //red
 	G              []mj.Tile `json:"-"` //green
 	W              []mj.Tile `json:"-"` //white
-	PendingKongs   []int
-	PendingFlowers []int
+	PendingKongs   []KongType
+	PendingFlowers []KongType
 	Pusher         event.Pusher
 	TN             bool   //false draw true discharge
 	TC             [4]int //
@@ -118,7 +128,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	core.AppLog.Printf("player kong list: %v\n", mp.PendingKongs)
 	if len(mp.PendingFlowers) > 0 { //knog first
 		oid, _ := mt.Sequence.Id()
-		k := mp.PendingFlowers[0]
+		k := mp.PendingFlowers[0].Seq
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_KONG, func() {
 			mt.Turn <- MahjongPlayToken{Cmd: CMD_KONG, Seat: mp.Seat, Selected: k, Id: oid}
 		}, func(commited MahjongPlayToken) {
@@ -177,7 +187,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 		mt.Timer <- &md
 		return
 	}
-	//draw 
+	//draw
 	oid, _ := mt.Sequence.Id()
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DRAW, func() {
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_DRAW, Seat: mp.Seat, Id: oid}
@@ -240,7 +250,7 @@ func (mp *MahjongPlayer) checkMatch(seg []mj.Tile, d mj.Tile, c bool) []mj.Meld 
 	}
 	ck := mp.Checker.CheckKong(d)
 	if ck.Type() == mj.KNOG {
-		mp.PendingKongs = append(mp.PendingKongs, d.Seq)
+		mp.PendingKongs = append(mp.PendingKongs, KongType{Seq: d.Seq, Tye: K_CONCEALED})
 		m = append(m, mp.Checker.CheckKong(d))
 	}
 	return m
@@ -301,7 +311,7 @@ func (mp *MahjongPlayer) OnDraw(t mj.Tile, kong bool) {
 			mp.checkKong(mp.W, true)
 		}
 	case mj.FLOWER:
-		mp.PendingFlowers = append(mp.PendingFlowers, t.Seq)
+		mp.PendingFlowers = append(mp.PendingFlowers, KongType{Seq: t.Seq, Tye: K_FLOWER})
 	}
 	if t.Suit != mj.FLOWER {
 		mp.LD = t.Seq
@@ -524,7 +534,7 @@ func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
 			m := mp.Formed[j]
 			if m.Type() == mj.PUNG && m.Seq() == t.Seq {
 				//exposed kong
-				mp.PendingKongs = append(mp.PendingKongs, t.Seq)
+				mp.PendingKongs = append(mp.PendingKongs, KongType{Seq: t.Seq, Tye: K_FORMED})
 			}
 		}
 	}
@@ -532,12 +542,12 @@ func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
 		mp.Checker.From(clist)
 		ks := mp.Checker.Kong()
 		for i := range ks {
-			mp.PendingKongs = append(mp.PendingKongs, ks[i].Tiles[0].Seq)
+			mp.PendingKongs = append(mp.PendingKongs, KongType{Seq: ks[i].Tiles[0].Seq, Tye: K_CONCEALED})
 		}
 		return
 	}
 	if len(clist) == 4 {
-		mp.PendingKongs = append(mp.PendingKongs, clist[0].Seq)
+		mp.PendingKongs = append(mp.PendingKongs, KongType{Seq: clist[0].Seq, Tye: K_CONCEALED})
 	}
 
 }
@@ -546,7 +556,7 @@ func (mp *MahjongPlayer) validateKong(kong int) error {
 	if kong > mj.FS_LIMIT {
 		deleted := false
 		for i := range mp.PendingFlowers {
-			if kong == mp.PendingFlowers[i] {
+			if kong == mp.PendingFlowers[i].Seq {
 				mp.PendingFlowers = slices.Delete(mp.PendingFlowers, i, i+1)
 				deleted = true
 				break
@@ -557,9 +567,10 @@ func (mp *MahjongPlayer) validateKong(kong int) error {
 		}
 		return nil
 	}
+
 	deleted := false
 	for i := range mp.PendingKongs {
-		if kong == mp.PendingKongs[i] {
+		if kong == mp.PendingKongs[i].Seq {
 			mp.PendingKongs = slices.Delete(mp.PendingKongs, i, i+1)
 			deleted = true
 			break
@@ -585,8 +596,8 @@ func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
 	mp.R = make([]mj.Tile, 0)
 	mp.G = make([]mj.Tile, 0)
 	mp.W = make([]mj.Tile, 0)
-	mp.PendingKongs = make([]int, 0)
-	mp.PendingFlowers = make([]int, 0)
+	mp.PendingKongs = make([]KongType, 0)
+	mp.PendingFlowers = make([]KongType, 0)
 	mp.TN = false
 	mp.Checker = HandSegmenet{}
 	return &mp
