@@ -284,20 +284,20 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 	if err != nil {
 		return err
 	}
-	if kt.Tye > K_FLOWER {
+	if kt.Tye == K_FLOWER {
 		m.Discard(seat, kong)
 		return mp.TailDraw(&m.CMJ.Deck)
 	}
 	if kt.Tye == K_FORMED {
 		core.AppLog.Printf("Rub Kong Checkpoint%v\n", kt)
-		p := seat+1
-		claimed1 := m.CMJ.CheckMahjong(&m.Players[p%4].Hand,mj.FromQ(kong))
+		p := seat + 1
+		claimed1 := m.CMJ.CheckMahjong(&m.Players[p%4].Hand, mj.FromQ(kong))
 		p++
-		claimed2 := m.CMJ.CheckMahjong(&m.Players[p%4].Hand,mj.FromQ(kong))
+		claimed2 := m.CMJ.CheckMahjong(&m.Players[p%4].Hand, mj.FromQ(kong))
 		p++
-		claimed3 := m.CMJ.CheckMahjong(&m.Players[p%4].Hand,mj.FromQ(kong))
+		claimed3 := m.CMJ.CheckMahjong(&m.Players[p%4].Hand, mj.FromQ(kong))
 		if claimed1 || claimed2 || claimed3 {
-			core.AppLog.Printf("Claimed %v %v %v\n",claimed1,claimed2,claimed3)
+			core.AppLog.Printf("Claimed %v %v %v\n", claimed1, claimed2, claimed3)
 		}
 	}
 	k := mj.FromQ(kong)
