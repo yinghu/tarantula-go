@@ -34,6 +34,7 @@ type MahjongTable struct {
 	Timer         chan MahjongTimeout
 	Sync          chan MahjongPlayToken `json:"-"`
 	skips         []MahjongDiscardEvent
+	
 }
 
 func (m *MahjongTable) Pts() int {
