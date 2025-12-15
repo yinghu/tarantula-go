@@ -44,7 +44,7 @@ func TestPlayerSetup(t *testing.T) {
 	fmt.Printf("distribution %v\n", mp.TC)
 	fmt.Printf("pending kong %v\n", mp.PendingKongs)
 	fmt.Printf("last draw %d\n", mp.LD)
-	err := mp.validateKong(mj.FromS(mj.DOTS1).Seq)
+	_, err := mp.validateKong(mj.FromS(mj.DOTS1).Seq)
 	fmt.Printf("pending kong %v\n", mp.PendingKongs)
 	if err != nil {
 		t.Errorf("should be a kong %s", err.Error())
@@ -238,7 +238,7 @@ func TestPlayerKong(t *testing.T) {
 	mp.AppendForTest(mj.FromS(mj.CHARACTER3), false)
 	mp.AppendForTest(mj.FromS(mj.CHARACTER3), false)
 	mp.AppendForTest(mj.FromS(mj.CHARACTER2), false)
-	err := mp.Kong(mj.FromS(mj.EAST)) //concealed kong 
+	err := mp.Kong(mj.FromS(mj.EAST)) //concealed kong
 	if err != nil {
 		t.Errorf("should be a kong %s", err.Error())
 	}

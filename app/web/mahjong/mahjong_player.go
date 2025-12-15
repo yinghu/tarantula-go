@@ -15,10 +15,10 @@ const (
 	TC_D int = 2
 	TC_H int = 3
 
-	K_FLOWER    = 0
-	K_CONCEALED = 1
-	K_PUNG      = 2
-	K_FORMED    = 3
+	K_FLOWER    = 1
+	K_CONCEALED = 2
+	K_PUNG      = 3
+	K_FORMED    = 4
 )
 
 type KongType struct {
@@ -552,7 +552,7 @@ func (mp *MahjongPlayer) checkKong(clist []mj.Tile, hornor bool) {
 
 }
 
-func (mp *MahjongPlayer) validateKong(kong int) error {
+func (mp *MahjongPlayer) validateKong(kong int) (KongType, error) {
 	if kong > mj.FS_LIMIT {
 		deleted := false
 		for i := range mp.PendingFlowers {
@@ -563,23 +563,24 @@ func (mp *MahjongPlayer) validateKong(kong int) error {
 			}
 		}
 		if !deleted {
-			return fmt.Errorf("no pending kong %d", kong)
+			return KongType{}, fmt.Errorf("no pending kong %d", kong)
 		}
-		return nil
+		return KongType{Seq: kong, Tye: K_FLOWER}, nil
 	}
 
-	deleted := false
+	deleted := KongType{}
 	for i := range mp.PendingKongs {
-		if kong == mp.PendingKongs[i].Seq {
+		kp := mp.PendingKongs[i]
+		if kong == kp.Seq {
 			mp.PendingKongs = slices.Delete(mp.PendingKongs, i, i+1)
-			deleted = true
+			deleted = kp
 			break
 		}
 	}
-	if !deleted {
-		return fmt.Errorf("no pending kong %d", kong)
+	if deleted.Tye == 0 {
+		return deleted, fmt.Errorf("no pending kong %d", kong)
 	}
-	return nil
+	return deleted, nil
 }
 
 func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {

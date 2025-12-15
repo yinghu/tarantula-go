@@ -281,8 +281,8 @@ func (m *MahjongTable) Draw(seat int) error {
 }
 func (m *MahjongTable) Kong(seat int, kong int) error {
 	mp := m.Players[seat]
-	err := mp.validateKong(kong)
-
+	kt,err := mp.validateKong(kong)
+	core.AppLog.Printf("KONG TYE %v\n",kt)
 	if err != nil {
 		return err
 	}
