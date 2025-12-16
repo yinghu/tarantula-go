@@ -140,11 +140,13 @@ func (s *TcpEndpoint) outbound() {
 			if e.ClassId() == KICKOFF_CID {
 				oc, exists := s.outboundIndex[e.RecipientId()]
 				if exists {
+					kickoff, _ := e.(*KickoffEvent)
 					core.AppLog.Printf("remove connection from %d\n", e.RecipientId())
 					oc.C.Close()
 					close(oc.Pending)
 					delete(s.outboundIndex, e.RecipientId())
-					s.Service.OnEvent(e)
+					kickoff.Flag = oc.Flag
+					s.Service.OnEvent(kickoff)
 					metrics.SOCKET_CONCURRENCY_METRICS.Dec()
 				}
 				continue
@@ -152,7 +154,7 @@ func (s *TcpEndpoint) outbound() {
 			if e.ClassId() == JOIN_CID {
 				metrics.SOCKET_CONCURRENCY_METRICS.Inc()
 				join, _ := e.(*JoinEvent)
-				cout := OutboundSocket{C: join.Client, Pending: make(chan Event, 10), B: core.NewBuffer(TCP_READ_BUFFER_SIZE)}
+				cout := OutboundSocket{C: join.Client, Pending: make(chan Event, 10), B: core.NewBuffer(TCP_READ_BUFFER_SIZE), Flag: join.Flag}
 				go cout.Subscribe()
 				s.outboundIndex[join.SystemId] = &cout
 				go s.inbound(join.Client, join.SystemId)

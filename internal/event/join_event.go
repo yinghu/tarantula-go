@@ -7,11 +7,10 @@ import (
 )
 
 type JoinEvent struct {
-	Ticket string `json:"Ticket"`
-	Client net.Conn
+	Ticket   string `json:"Ticket"`
+	Client   net.Conn
 	SystemId int64
 	Flag     int64
-
 	EventObj
 }
 

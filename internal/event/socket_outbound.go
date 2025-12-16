@@ -10,6 +10,7 @@ import (
 type OutboundSocket struct {
 	C       net.Conn
 	B       core.DataBuffer
+	Flag    int64
 	Pending chan Event
 }
 

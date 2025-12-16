@@ -73,7 +73,8 @@ func (s *MahjongService) OnEvent(e event.Event) {
 		s.Dispatcher <- MahjongPlayToken{SystemId: e.RecipientId(), Cmd: CMD_JOINED, TableId: join.Flag}
 	case event.KICKOFF_CID:
 		core.AppLog.Printf("kickoff from %d\n", e.RecipientId())
-		s.Dispatcher <- MahjongPlayToken{SystemId: e.RecipientId(), Cmd: CMD_LEFT}
+		kickoff, _ := e.(*event.KickoffEvent)
+		s.Dispatcher <- MahjongPlayToken{SystemId: e.RecipientId(), Cmd: CMD_LEFT, TableId: kickoff.Flag}
 		id, _ := s.Sequence().Id()
 		e.OnOId(id)
 		e.OnTopic("mahjong")
@@ -91,7 +92,7 @@ func (s *MahjongService) dispatch() {
 		case CMD_JOINED:
 			s.onTable(t.SystemId, t.TableId)
 		case CMD_LEFT:
-			s.offTable(t.SystemId)
+			s.offTable(t.SystemId, t.TableId)
 		}
 	}
 }
@@ -118,8 +119,8 @@ func (s *MahjongService) onTable(systemId int64, flag int64) {
 	pt := MahjongPlayToken{SystemId: systemId, Cmd: CMD_SIT}
 	table.Sync <- pt
 }
-func (s *MahjongService) offTable(systemId int64) {
-
+func (s *MahjongService) offTable(systemId int64, tableId int64) {
+	core.AppLog.Printf("table id : %d\n", tableId)
 	table, exists := s.TableIndex[systemId]
 	if !exists {
 		return

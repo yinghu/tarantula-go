@@ -5,6 +5,7 @@ import "gameclustering.com/internal/core"
 type KickoffEvent struct {
 	Source   string `json:"source"`
 	SystemId int64  `json:"systemId,string"`
+	Flag     int64
 	EventObj
 }
 
