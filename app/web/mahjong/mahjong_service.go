@@ -72,8 +72,8 @@ func (s *MahjongService) OnEvent(e event.Event) {
 		core.AppLog.Printf("joined from %d %d\n", join.RecipientId(), join.Flag)
 		s.Dispatcher <- MahjongPlayToken{SystemId: e.RecipientId(), Cmd: CMD_JOINED, TableId: join.Flag}
 	case event.KICKOFF_CID:
-		core.AppLog.Printf("kickoff from %d\n", e.RecipientId())
 		kickoff, _ := e.(*event.KickoffEvent)
+		core.AppLog.Printf("kickoff from %d : %d\n", e.RecipientId(), kickoff.Flag)
 		s.Dispatcher <- MahjongPlayToken{SystemId: e.RecipientId(), Cmd: CMD_LEFT, TableId: kickoff.Flag}
 		id, _ := s.Sequence().Id()
 		e.OnOId(id)
