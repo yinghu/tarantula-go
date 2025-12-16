@@ -276,7 +276,16 @@ func (m *MahjongTable) Deal() (int, error) {
 }
 
 func (m *MahjongTable) Draw(seat int) error {
-	return m.deal(seat)
+	mp := m.Players[seat]
+	if mp.TN {
+		return fmt.Errorf("cannot draw tile from tn : %v", mp.TN)
+	}
+	err := m.deal(seat)
+	if err != nil {
+		return err
+	}
+	mp.TN = true
+	return nil
 }
 func (m *MahjongTable) Kong(seat int, kong int) error {
 	mp := m.Players[seat]
@@ -296,9 +305,10 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 		claimed2 := m.CMJ.CheckMahjong(&m.Players[p%4].Hand, mj.FromQ(kong))
 		p++
 		claimed3 := m.CMJ.CheckMahjong(&m.Players[p%4].Hand, mj.FromQ(kong))
-		if claimed1 || claimed2 || claimed3 {
-			core.AppLog.Printf("Claimed %v %v %v\n", claimed1, claimed2, claimed3)
-		}
+		core.AppLog.Printf("Claimed %v %v %v\n", claimed1, claimed2, claimed3)
+		//if claimed1 || claimed2 || claimed3 {
+		//core.AppLog.Printf("Claimed %v %v %v\n", claimed1, claimed2, claimed3)
+		//}
 	}
 	k := mj.FromQ(kong)
 	err = mp.Kong(k)
@@ -311,9 +321,8 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 
 func (m *MahjongTable) Discard(seat int, t int) error {
 	mp := m.Players[seat]
-	sz := len(mp.Tiles)
-	if sz == 1 {
-		return fmt.Errorf("no more discard %d", sz)
+	if !mp.TN {
+		return fmt.Errorf("cannot discard tile from tn : %v", mp.TN)
 	}
 	drop := mj.FromQ(t)
 	err := mp.Hand.Discard(drop)
@@ -321,6 +330,7 @@ func (m *MahjongTable) Discard(seat int, t int) error {
 		return err
 	}
 	m.Discarded = append(m.Discarded, drop)
+	mp.TN = false
 	p := seat + 1
 	pp := m.Players[p%4].CheckDiscard(seat, drop, true) //pung/kong/chow
 	if len(pp) > 0 {
@@ -345,7 +355,12 @@ func (m *MahjongTable) Chow(seat int, drop int, chow1 int, chow2 int) error {
 	c1 := mj.FromQ(chow1)
 	c2 := mj.FromQ(chow2)
 	mp := m.Players[seat]
-	return mp.Chow(d, c1, c2)
+	err := mp.Chow(d, c1, c2)
+	if err != nil {
+		return err
+	}
+	mp.TN = true
+	return nil
 }
 
 func (m *MahjongTable) Pung(seat int, drop int) error {

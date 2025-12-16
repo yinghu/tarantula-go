@@ -3,6 +3,7 @@ package main
 import (
 	"testing"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/mj"
 )
 
@@ -145,4 +146,87 @@ func TestTableSetup(t *testing.T) {
 		}
 	}
 
+}
+
+func TestTablePlayDrawDiscard(t *testing.T) {
+	core.CreateTestLog()
+	mt := MahjongTable{}
+	mt.New()
+	mt.Sit(100)
+	mt.Dice()
+	mt.Deal()
+	dealer := (mt.Pts() - 1) % 4
+	if mt.Players[dealer].TileSize() != 14 {
+		t.Errorf("dealer hand should be 14 %d", mt.Players[dealer].TileSize())
+	}
+	if !mt.Players[dealer].TN {
+		t.Errorf("dealer tn should be true %v", mt.Players[dealer].TN)
+	}
+	for i := range 4 {
+		if i != dealer {
+			del := mt.Players[i].autoPick()
+			err := mt.Discard(i, del.Seq)
+			if err == nil {
+				t.Errorf("should not allowed to discard from tn %v", mt.Players[i].TN)
+			}
+			if mt.Players[i].TileSize() != 13 {
+				t.Errorf("player hand size should be still 13 %d", mt.Players[i].TileSize())
+			}
+			err = mt.Draw(i)
+			if err != nil {
+				t.Errorf("player should be able to draw %s", err.Error())
+			}
+			if mt.Players[i].TileSize() != 14 {
+				t.Errorf("player hand size should be still 14 %d", mt.Players[i].TileSize())
+			}
+			err = mt.Discard(i, del.Seq)
+			if err != nil {
+				t.Errorf("should be allowed to discard from tn %v", mt.Players[i].TN)
+			}
+			if mt.Players[i].TileSize() != 13 {
+				t.Errorf("player hand size should be still 13 %d", mt.Players[i].TileSize())
+			}
+		}
+	}
+	del := mt.Players[dealer].autoPick()
+	err := mt.Discard(dealer, del.Seq)
+	if err != nil {
+		t.Errorf("dealer should be allowed to discard from %v", mt.Players[dealer].TN)
+	}
+	if mt.Players[dealer].TileSize() != 13 {
+		t.Errorf("dealer hand size should be still 13 %d", mt.Players[dealer].TileSize())
+	}
+	err = mt.Draw(dealer)
+	if err != nil {
+		t.Errorf("dealer should be allowed to draw from %v", mt.Players[dealer].TN)
+	}
+	if mt.Players[dealer].TileSize() != 14 {
+		t.Errorf("dealer hand size should be still 14 %d", mt.Players[dealer].TileSize())
+	}
+}
+
+func TestTablePlayChow(t *testing.T) {
+	core.CreateTestLog()
+	mt := MahjongTable{}
+	mt.New()
+	mt.Sit(100)
+	mt.Dice()
+	dealer := (mt.Pts() - 1) % 4
+
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO1), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO2), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO5), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO5), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO6), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.CHARACTER1), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.CHARACTER3), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.CHARACTER5), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.RED), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.RED), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.GREEN), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.F_AUTUMN), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.WHITE), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.WHITE), false)
+	mt.Players[dealer].TN = true
+	
 }

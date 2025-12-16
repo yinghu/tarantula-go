@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 
 	"gameclustering.com/internal/core"
@@ -32,7 +31,8 @@ func TestPlayerSetup(t *testing.T) {
 		t.Errorf("hand should be shorting %v", mp.Sorting)
 	}
 	mp.AppendForTest(mj.FromS(mj.BAMBOO1), false)
-	mp.AppendForTest(mj.FromS(mj.BAMBOO1), false)
+	mp.AppendForTest(mj.FromS(mj.BAMBOO2), false)
+	mp.AppendForTest(mj.FromS(mj.BAMBOO3), false)
 	mp.AppendForTest(mj.FromS(mj.CHARACTER1), false)
 	mp.AppendForTest(mj.FromS(mj.CHARACTER1), false)
 	mp.AppendForTest(mj.FromS(mj.CHARACTER1), false)
@@ -41,54 +41,65 @@ func TestPlayerSetup(t *testing.T) {
 	mp.AppendForTest(mj.FromS(mj.DOTS1), false)
 	mp.AppendForTest(mj.FromS(mj.DOTS1), false)
 	mp.AppendForTest(mj.FromS(mj.RED), false)
+	mp.AppendForTest(mj.FromS(mj.RED), false)
 	mp.AppendForTest(mj.FromS(mj.F_AUTUMN), false)
-	if mp.TileSize() != 11 {
-		t.Errorf("hand size should be 11 %d", mp.TileSize())
+	if mp.TileSize() != 13 {
+		t.Errorf("hand size should be 13 %d", mp.TileSize())
 	}
-	fmt.Printf("hand %v\n", mp.Hand.Tiles)
-	//fmt.Printf("bamboo %v\n", mp.B)
-	//fmt.Printf("character %v\n", mp.C)
-	//fmt.Printf("dots %v\n", mp.D)
-	//fmt.Printf("red %v\n", mp.R)
-	//fmt.Printf("distribution %v\n", mp.TC)
-	//fmt.Printf("pending kong %v\n", mp.PendingKongs)
-	//fmt.Printf("last draw %d\n", mp.LD)
-	kt, err := mp.validateKong(mj.FromS(mj.DOTS1).Seq)
-	//fmt.Printf("pending kong %v\n", mp.PendingKongs)
-	if err != nil {
-		t.Errorf("should be a kong %s", err.Error())
+	if len(mp.B) != 3 {
+		t.Errorf("bamboo seg size should be 3 %d", len(mp.B))
 	}
-	if kt.Tye != K_CONCEALED {
-		t.Errorf("should be a concealed kong %d", kt.Tye)
+	if len(mp.C) != 3 {
+		t.Errorf("characters seg size should be 3 %d", len(mp.C))
 	}
-	err = mp.Kong(mj.FromS(mj.DOTS1))
-	if err != nil {
-		t.Errorf("should be a kong %s", err.Error())
+	if len(mp.D) != 4 {
+		t.Errorf("DOTS seg size should be 4 %d", len(mp.D))
 	}
-	//fmt.Printf("hand %v\n", mp.Hand.Tiles)
-	mds := mp.CheckDiscard(1, mj.FromS(mj.CHARACTER1), false)
-	for i := range mds {
-		fmt.Printf("Kong %s\n", mds[i].Name())
+	if len(mp.R) != 2 {
+		t.Errorf("red seg size should be 2 %d", len(mp.R))
 	}
-	fmt.Printf("pending kong %v\n", mp.PendingKongs)
-	err = mp.Pung(mj.FromS(mj.BAMBOO1))
-	if err != nil {
-		t.Errorf("should be a ping %s", err.Error())
+	if len(mp.PendingFlowers) != 1 {
+		t.Errorf("pending flowers should be 1 %d", len(mp.PendingFlowers))
 	}
-	err = mp.AppendForTest(mj.FromS(mj.BAMBOO1), false)
-	if err != nil {
-		t.Errorf("should be no error %s", err.Error())
+	if len(mp.HE) != 0 {
+		t.Errorf("east seg size should be 0 %d", len(mp.HE))
 	}
-	fmt.Printf("pending kongs %v\n", mp.PendingKongs)
-	fmt.Printf("pending flowers %v\n", mp.PendingFlowers)
-	seg := make([]mj.Tile, 0)
-	seg = append(seg, mj.FromS(mj.BAMBOO7))
-	seg = append(seg, mj.FromS(mj.BAMBOO9))
-	seg = append(seg, mj.FromS(mj.BAMBOO9))
-	seg = append(seg, mj.FromS(mj.BAMBOO7))
-	seg = append(seg, mj.FromS(mj.BAMBOO8))
-	mp.checkKong(seg, false)
-	fmt.Printf("pending kongs %v\n", mp.PendingKongs)
+	if len(mp.HS) != 0 {
+		t.Errorf("south seg size should be 0 %d", len(mp.HS))
+	}
+	if len(mp.HW) != 0 {
+		t.Errorf("west seg size should be 0 %d", len(mp.HW))
+	}
+	if len(mp.HN) != 0 {
+		t.Errorf("north seg size should be 0 %d", len(mp.HN))
+	}
+	if len(mp.G) != 0 {
+		t.Errorf("green seg size should be 0 %d", len(mp.G))
+	}
+	if len(mp.W) != 0 {
+		t.Errorf("white seg size should be 0 %d", len(mp.W))
+	}
+	if mp.TC[TC_B] != 3 {
+		t.Errorf("bamboo seg size should be 3 %d", mp.TC[TC_B])
+	}
+	if mp.TC[TC_C] != 3 {
+		t.Errorf("characters seg size should be 3 %d", mp.TC[TC_C])
+	}
+	if mp.TC[TC_D] != 4 {
+		t.Errorf("dots seg size should be 4 %d", mp.TC[TC_D])
+	}
+	if mp.TC[TC_H] != 2 {
+		t.Errorf("hornor seg size should be 4 %d", mp.TC[TC_H])
+	}
+	if mp.LD != mj.FromS(mj.RED).Seq {
+		t.Errorf("last draw should be %d , %d", mj.FromS(mj.RED).Seq, mp.LD)
+	}
+	if mp.TN {
+		t.Errorf("hand state should no setting as false %v", mp.TN)
+	}
+	if mp.SystemId != 0 {
+		t.Errorf("seat should no player as 0 %v", mp.SystemId)
+	}
 }
 func TestPlayerChow(t *testing.T) {
 	core.CreateTestLog()
@@ -250,7 +261,16 @@ func TestPlayerKong(t *testing.T) {
 	mp.AppendForTest(mj.FromS(mj.CHARACTER3), false)
 	mp.AppendForTest(mj.FromS(mj.CHARACTER3), false)
 	mp.AppendForTest(mj.FromS(mj.CHARACTER2), false)
-	err := mp.Kong(mj.FromS(mj.EAST)) //concealed kong
+	//mp.AppendForTest(mj.FromS(mj.CHARACTER7), false)
+	//mp.AppendForTest(mj.FromS(mj.CHARACTER7), false)
+	kt, err := mp.validateKong(mj.FromS(mj.EAST).Seq)
+	if err != nil {
+		t.Errorf("should be a kong %s", err.Error())
+	}
+	if kt.Tye != K_CONCEALED {
+		t.Errorf("should be a concealed kong %d", kt.Tye)
+	}
+	err = mp.Kong(mj.FromS(mj.EAST)) //concealed kong
 	if err != nil {
 		t.Errorf("should be a kong %s", err.Error())
 	}
@@ -263,7 +283,7 @@ func TestPlayerKong(t *testing.T) {
 		}
 	}
 	if !formed {
-		t.Errorf("should be a pung meld %s", "H31.H31.H31,H31")
+		t.Errorf("should be a kong meld %s", "H31.H31.H31,H31")
 	}
 	err = mp.Kong(mj.FromS(mj.CHARACTER3)) //pung kong as exposed kong
 	if err != nil {
