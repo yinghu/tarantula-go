@@ -102,13 +102,14 @@ func (s *MahjongService) onTable(systemId int64, flag int64) {
 	if systemId != flag {
 		t, exists := s.TableIndex[flag]
 		if !exists {
-			tid, _ := s.Sequence().Id()
-			t = &MahjongTable{Id: tid, Pusher: s.Pusher(), Sequence: s.Sequence(), CMJ: mj.ClassicMahjong{}, Solo: flag == systemId}
+			//tid, _ := s.Sequence().Id()
+			t = &MahjongTable{Id: flag, Pusher: s.Pusher(), Sequence: s.Sequence(), CMJ: mj.ClassicMahjong{}, Solo: flag == systemId}
 			s.TableIndex[flag] = t
 			go t.Play()
 		}
 		pt := MahjongPlayToken{SystemId: systemId, Cmd: CMD_SIT}
 		t.Sync <- pt
+		core.AppLog.Printf("joining table flag %d\n", flag)
 		return
 	}
 	tid, _ := s.Sequence().Id()
