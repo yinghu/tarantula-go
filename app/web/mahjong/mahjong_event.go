@@ -19,7 +19,7 @@ const (
 )
 
 type MahjongEvent struct {
-	Token    MahjongPlayToken
+	Token MahjongPlayToken
 	MahjongEventObj
 }
 
@@ -52,11 +52,20 @@ func (s *MahjongEvent) Read(buff core.DataBuffer) error {
 		return err
 	}
 	s.SystemId = sysId
+	tableId, err := buff.ReadInt64()
+	if err != nil {
+		return err
+	}
+	s.TableId = tableId
+
 	return s.Token.Read(buff)
 }
 
 func (s *MahjongEvent) Write(buff core.DataBuffer) error {
 	if err := buff.WriteInt64(s.SystemId); err != nil {
+		return err
+	}
+	if err := buff.WriteInt64(s.TableId); err != nil {
 		return err
 	}
 	return s.Token.Write(buff)
