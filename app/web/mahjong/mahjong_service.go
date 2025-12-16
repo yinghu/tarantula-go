@@ -89,15 +89,27 @@ func (s *MahjongService) dispatch() {
 	for t := range s.Dispatcher {
 		switch t.Cmd {
 		case CMD_JOINED:
-			go s.onTable(t.SystemId, t.TableId)
+			s.onTable(t.SystemId, t.TableId)
 		case CMD_LEFT:
-			go s.offTable(t.SystemId)
+			s.offTable(t.SystemId)
 		}
 	}
 }
 
 func (s *MahjongService) onTable(systemId int64, flag int64) {
 	core.AppLog.Printf("table flag %d\n", flag)
+	if systemId != flag {
+		t, exists := s.TableIndex[flag]
+		if !exists {
+			tid, _ := s.Sequence().Id()
+			t = &MahjongTable{Id: tid, Pusher: s.Pusher(), Sequence: s.Sequence(), CMJ: mj.ClassicMahjong{}, Solo: flag == systemId}
+			s.TableIndex[flag] = t
+			go t.Play()
+		}
+		pt := MahjongPlayToken{SystemId: systemId, Cmd: CMD_SIT}
+		t.Sync <- pt
+		return
+	}
 	tid, _ := s.Sequence().Id()
 	table := MahjongTable{Id: tid, Pusher: s.Pusher(), Sequence: s.Sequence(), CMJ: mj.ClassicMahjong{}, Solo: flag == systemId}
 	table.New()

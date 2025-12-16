@@ -111,6 +111,7 @@ func (m *MahjongTable) Play() {
 					go m.Players[t.Seat].PlayDice(m)
 				} else {
 					//load table data to players
+					go m.Players[t.Seat].PlayDice(m)
 				}
 				continue
 			}
