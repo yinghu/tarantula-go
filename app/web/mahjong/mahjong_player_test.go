@@ -18,12 +18,18 @@ func (p *SamplePusher) Push(e event.Event) {
 
 func TestPlayerSetup(t *testing.T) {
 	core.CreateTestLog()
-	mp := NewPlayer(0, true, &SampleCallback{})
+	mp := NewPlayer(1, true, &SampleCallback{})
 	if !mp.Auto {
 		t.Errorf("default should be auto %v", mp.Auto)
 	}
 	if mp.FlowerExcluded {
 		t.Errorf("flower should be included %v", mp.FlowerExcluded)
+	}
+	if mp.Seat != 1 {
+		t.Errorf("seat should be 1 %d", mp.Seat)
+	}
+	if !mp.Sorting {
+		t.Errorf("hand should be shorting %v", mp.Sorting)
 	}
 	mp.AppendForTest(mj.FromS(mj.BAMBOO1), false)
 	mp.AppendForTest(mj.FromS(mj.BAMBOO1), false)
@@ -36,24 +42,30 @@ func TestPlayerSetup(t *testing.T) {
 	mp.AppendForTest(mj.FromS(mj.DOTS1), false)
 	mp.AppendForTest(mj.FromS(mj.RED), false)
 	mp.AppendForTest(mj.FromS(mj.F_AUTUMN), false)
+	if mp.TileSize() != 11 {
+		t.Errorf("hand size should be 11 %d", mp.TileSize())
+	}
 	fmt.Printf("hand %v\n", mp.Hand.Tiles)
-	fmt.Printf("bamboo %v\n", mp.B)
-	fmt.Printf("character %v\n", mp.C)
-	fmt.Printf("dots %v\n", mp.D)
-	fmt.Printf("red %v\n", mp.R)
-	fmt.Printf("distribution %v\n", mp.TC)
-	fmt.Printf("pending kong %v\n", mp.PendingKongs)
-	fmt.Printf("last draw %d\n", mp.LD)
-	_, err := mp.validateKong(mj.FromS(mj.DOTS1).Seq)
-	fmt.Printf("pending kong %v\n", mp.PendingKongs)
+	//fmt.Printf("bamboo %v\n", mp.B)
+	//fmt.Printf("character %v\n", mp.C)
+	//fmt.Printf("dots %v\n", mp.D)
+	//fmt.Printf("red %v\n", mp.R)
+	//fmt.Printf("distribution %v\n", mp.TC)
+	//fmt.Printf("pending kong %v\n", mp.PendingKongs)
+	//fmt.Printf("last draw %d\n", mp.LD)
+	kt, err := mp.validateKong(mj.FromS(mj.DOTS1).Seq)
+	//fmt.Printf("pending kong %v\n", mp.PendingKongs)
 	if err != nil {
 		t.Errorf("should be a kong %s", err.Error())
+	}
+	if kt.Tye != K_CONCEALED {
+		t.Errorf("should be a concealed kong %d", kt.Tye)
 	}
 	err = mp.Kong(mj.FromS(mj.DOTS1))
 	if err != nil {
 		t.Errorf("should be a kong %s", err.Error())
 	}
-	fmt.Printf("hand %v\n", mp.Hand.Tiles)
+	//fmt.Printf("hand %v\n", mp.Hand.Tiles)
 	mds := mp.CheckDiscard(1, mj.FromS(mj.CHARACTER1), false)
 	for i := range mds {
 		fmt.Printf("Kong %s\n", mds[i].Name())
