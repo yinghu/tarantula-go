@@ -104,6 +104,7 @@ func (s *MahjongService) onTable(systemId int64, flag int64) {
 		if !exists {
 			//tid, _ := s.Sequence().Id()
 			t = &MahjongTable{Id: flag, Pusher: s.Pusher(), Sequence: s.Sequence(), CMJ: mj.ClassicMahjong{}, Solo: flag == systemId}
+			t.New()
 			s.TableIndex[flag] = t
 			go t.Play()
 		}
