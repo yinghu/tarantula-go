@@ -36,7 +36,7 @@ type MahjongTimeoutObj struct {
 	T       OnTurn //triger on timer
 	P       OnStop //call on stop
 	K       *time.Timer
-	Lock    sync.Mutex
+	Lock    *sync.Mutex
 	Stopped bool
 }
 type StopSignal struct {
@@ -45,7 +45,7 @@ type StopSignal struct {
 }
 
 func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
-	s.Lock = sync.Mutex{}
+	s.Lock = &sync.Mutex{}
 	s.Stopped = false
 	s.K = time.NewTimer(time.Duration(s.N.CountDown+COUNT_DOWN_BUFFER) * time.Second)
 	<-s.K.C
