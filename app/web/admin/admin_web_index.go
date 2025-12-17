@@ -40,6 +40,7 @@ func (s *AdminWebIndex) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 	} else {
 		w.Header().Set("Content-Type", "text/html")
 	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(http.StatusOK)
 	defer dest.Close()
 	io.Copy(w, dest)
