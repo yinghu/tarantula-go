@@ -75,6 +75,8 @@ func (m *MahjongTable) Play() {
 				for _, t := range timerIndex {
 					t.Stop(k, true)
 				}
+			case CMD_LEAVE:
+				m.Leave(k.SystemId)
 			case CMD_SIT:
 				seat, err := m.Sit(k.SystemId)
 				if err != nil {
@@ -224,7 +226,29 @@ func (m *MahjongTable) Sit(systemId int64) (int, error) {
 		return SEAT_N, nil
 	}
 	return 0, fmt.Errorf("no seat available on table: %d", m.Id)
+}
 
+func (m *MahjongTable) Leave(systemId int64) {
+	if m.Players[SEAT_E].SystemId == systemId {
+		m.Players[SEAT_E].SystemId = 0
+		m.Players[SEAT_E].Auto = true
+		return
+	}
+	if m.Players[SEAT_S].SystemId == systemId {
+		m.Players[SEAT_S].SystemId = 0
+		m.Players[SEAT_S].Auto = true
+		return
+	}
+	if m.Players[SEAT_W].SystemId == systemId {
+		m.Players[SEAT_W].SystemId = 0
+		m.Players[SEAT_W].Auto = true
+		return
+	}
+	if m.Players[SEAT_N].SystemId == systemId {
+		m.Players[SEAT_N].SystemId = 0
+		m.Players[SEAT_N].Auto = true
+		return
+	}
 }
 
 func (m *MahjongTable) Dice() {

@@ -121,12 +121,12 @@ func (s *MahjongService) onTable(systemId int64, flag int64) {
 	table.Sync <- pt
 }
 func (s *MahjongService) offTable(systemId int64, tableId int64) {
-	core.AppLog.Printf("table id : %d\n", tableId)
-	table, exists := s.TableIndex[systemId]
+	core.AppLog.Printf("systemId %d >> table id : %d\n", systemId, tableId)
+	table, exists := s.TableIndex[tableId]
 	if !exists {
 		return
 	}
-	delete(s.TableIndex, systemId)
-	table.Sync <- MahjongPlayToken{Cmd: CMD_END}
+	//delete(s.TableIndex, tableId)
+	table.Sync <- MahjongPlayToken{Cmd: CMD_LEAVE, SystemId: systemId}
 
 }

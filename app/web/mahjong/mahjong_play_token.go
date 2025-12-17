@@ -14,6 +14,7 @@ const (
 	CMD_CLAIM   int = 8
 	CMD_TABLE   int = 9
 	CMD_SKIP    int = 10 //skip discard event
+	CMD_LEAVE   int = 11
 
 	CMD_TURN_START  int = 95
 	CMD_TURN_PLAYER int = 96
