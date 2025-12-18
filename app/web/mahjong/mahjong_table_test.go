@@ -212,7 +212,6 @@ func TestTablePlayChow(t *testing.T) {
 	mt.Sit(100)
 	mt.Dice()
 	dealer := (mt.Pts() - 1) % 4
-
 	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO1), false)
 	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO2), false)
 	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO5), false)
@@ -232,7 +231,7 @@ func TestTablePlayChow(t *testing.T) {
 	if err == nil {
 		t.Errorf("draw not allow from %v", mt.Players[dealer].TN)
 	}
-	err = mt.Chow(dealer, mj.FromS(mj.CHARACTER2).Seq, mj.FromS(mj.CHARACTER3).Seq, mj.FromS(mj.CHARACTER5).Seq)
+	err = mt.Chow(dealer, mj.FromS(mj.CHARACTER4).Seq, mj.FromS(mj.CHARACTER3).Seq, mj.FromS(mj.CHARACTER5).Seq)
 	if err == nil {
 		t.Errorf("chow not allow from %v", mt.Players[dealer].TN)
 	}
@@ -251,5 +250,193 @@ func TestTablePlayChow(t *testing.T) {
 	if err != nil {
 		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
 	}
-	
+	err = mt.Chow(dealer, mj.FromS(mj.CHARACTER4).Seq, mj.FromS(mj.CHARACTER3).Seq, mj.FromS(mj.CHARACTER5).Seq)
+	if err != nil {
+		t.Errorf("chow allow from %v : %s", mt.Players[dealer].TN, err.Error())
+	}
+	if !mt.Players[dealer].TN {
+		t.Errorf("tn should be true %v", mt.Players[dealer].TN)
+	}
+	err = mt.Discard(dealer, mj.FromS(mj.WHITE).Seq)
+	if err != nil {
+		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Chow(dealer, mj.FromS(mj.BAMBOO4).Seq, mj.FromS(mj.BAMBOO5).Seq, mj.FromS(mj.BAMBOO6).Seq)
+	if err != nil {
+		t.Errorf("chow allow from %v : %s", mt.Players[dealer].TN, err.Error())
+	}
+	err = mt.Discard(dealer, mj.FromS(mj.WHITE).Seq)
+	if err != nil {
+		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
+	}
+
+	for i := range mt.Players[dealer].Formed {
+		if mt.Players[dealer].Formed[i].Name() != "C3.C4.C5" && mt.Players[dealer].Formed[i].Name() != "B4.B5.B6" {
+			t.Errorf("meld should be C3.C4.C5 or B4.B5.B6 %s", mt.Players[dealer].Formed[i].Name())
+		}
+	}
+	err = mt.Draw(dealer)
+	if err != nil {
+		t.Errorf("draw allowed from %v", mt.Players[dealer].TN)
+	}
+}
+
+func TestTablePlayPung(t *testing.T) {
+	core.CreateTestLog()
+	mt := MahjongTable{}
+	mt.New()
+	mt.Sit(100)
+	mt.Dice()
+	dealer := (mt.Pts() - 1) % 4
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO1), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO2), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO5), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO5), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO6), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.CHARACTER1), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.CHARACTER3), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.CHARACTER5), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.RED), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.RED), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.GREEN), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.F_AUTUMN), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.WHITE), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.WHITE), false)
+	mt.Players[dealer].TN = true
+	err := mt.Draw(dealer)
+	if err == nil {
+		t.Errorf("draw not allow from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Chow(dealer, mj.FromS(mj.CHARACTER4).Seq, mj.FromS(mj.CHARACTER3).Seq, mj.FromS(mj.CHARACTER5).Seq)
+	if err == nil {
+		t.Errorf("chow not allow from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Pung(dealer, mj.FromS(mj.BAMBOO5).Seq)
+	if err == nil {
+		t.Errorf("pung not allow from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Kong(dealer, mj.FromS(mj.F_AUTUMN).Seq)
+	if err != nil {
+		t.Errorf("kong allowed from %v", mt.Players[dealer].TN)
+	}
+	if !mt.Players[dealer].TN {
+		t.Errorf("ttn should still true %v", mt.Players[dealer].TN)
+	}
+	err = mt.Discard(dealer, mj.FromS(mj.GREEN).Seq)
+	if err != nil {
+		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Pung(dealer, mj.FromS(mj.BAMBOO5).Seq)
+	if err != nil {
+		t.Errorf("pung allow from %v : %s", mt.Players[dealer].TN, err.Error())
+	}
+	if !mt.Players[dealer].TN {
+		t.Errorf("tn should be true %v", mt.Players[dealer].TN)
+	}
+	err = mt.Discard(dealer, mj.FromS(mj.BAMBOO1).Seq)
+	if err != nil {
+		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
+	}
+	for i := range mt.Players[dealer].Formed {
+		if mt.Players[dealer].Formed[i].Name() != "B5.B5.B5" {
+			t.Errorf("meld should be B5.B5.B5 %s", mt.Players[dealer].Formed[i].Name())
+		}
+	}
+	err = mt.Draw(dealer)
+	if err != nil {
+		t.Errorf("draw allowed from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Discard(dealer, mj.FromS(mj.BAMBOO2).Seq)
+	if err != nil {
+		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Pung(dealer, mj.FromS(mj.RED).Seq)
+	if err != nil {
+		t.Errorf("pung allow from %v : %s", mt.Players[dealer].TN, err.Error())
+	}
+	for i := range mt.Players[dealer].Formed {
+		if mt.Players[dealer].Formed[i].Name() != "B5.B5.B5" && mt.Players[dealer].Formed[i].Name() != "H39.H39.H39" {
+			t.Errorf("meld should be B5.B5.B5 OR H39.H39.H39 %s", mt.Players[dealer].Formed[i].Name())
+		}
+	}
+}
+
+func TestTablePlayKong(t *testing.T) {
+	core.CreateTestLog()
+	mt := MahjongTable{}
+	mt.New()
+	mt.Sit(100)
+	mt.Dice()
+	dealer := (mt.Pts() - 1) % 4
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO1), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO2), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO5), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO5), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO6), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.CHARACTER1), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.CHARACTER3), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.CHARACTER5), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.RED), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.RED), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.GREEN), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.F_AUTUMN), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.WHITE), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.WHITE), false)
+	mt.Players[dealer].TN = true
+	err := mt.Draw(dealer)
+	if err == nil {
+		t.Errorf("draw not allow from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Chow(dealer, mj.FromS(mj.CHARACTER4).Seq, mj.FromS(mj.CHARACTER3).Seq, mj.FromS(mj.CHARACTER5).Seq)
+	if err == nil {
+		t.Errorf("chow not allow from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Pung(dealer, mj.FromS(mj.BAMBOO5).Seq)
+	if err == nil {
+		t.Errorf("pung not allow from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Kong(dealer, mj.FromS(mj.F_AUTUMN).Seq)
+	if err != nil {
+		t.Errorf("kong allowed from %v", mt.Players[dealer].TN)
+	}
+	if !mt.Players[dealer].TN {
+		t.Errorf("ttn should still true %v", mt.Players[dealer].TN)
+	}
+	err = mt.Discard(dealer, mj.FromS(mj.GREEN).Seq)
+	if err != nil {
+		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Pung(dealer, mj.FromS(mj.BAMBOO5).Seq)
+	if err != nil {
+		t.Errorf("pung allow from %v : %s", mt.Players[dealer].TN, err.Error())
+	}
+	if !mt.Players[dealer].TN {
+		t.Errorf("tn should be true %v", mt.Players[dealer].TN)
+	}
+	err = mt.Discard(dealer, mj.FromS(mj.BAMBOO1).Seq)
+	if err != nil {
+		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
+	}
+	for i := range mt.Players[dealer].Formed {
+		if mt.Players[dealer].Formed[i].Name() != "B5.B5.B5" {
+			t.Errorf("meld should be B5.B5.B5 %s", mt.Players[dealer].Formed[i].Name())
+		}
+	}
+	err = mt.Draw(dealer)
+	if err != nil {
+		t.Errorf("draw allowed from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Discard(dealer, mj.FromS(mj.BAMBOO2).Seq)
+	if err != nil {
+		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Pung(dealer, mj.FromS(mj.RED).Seq)
+	if err != nil {
+		t.Errorf("pung allow from %v : %s", mt.Players[dealer].TN, err.Error())
+	}
+	for i := range mt.Players[dealer].Formed {
+		if mt.Players[dealer].Formed[i].Name() != "B5.B5.B5" && mt.Players[dealer].Formed[i].Name() != "H39.H39.H39" {
+			t.Errorf("meld should be B5.B5.B5 OR H39.H39.H39 %s", mt.Players[dealer].Formed[i].Name())
+		}
+	}
 }

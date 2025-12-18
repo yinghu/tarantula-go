@@ -322,7 +322,15 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 		mp.Discard(mj.FromQ(kong))
 		return mp.TailDraw(&m.CMJ.Deck)
 	}
-	if kt.Tye == K_FORMED {
+	if kt.Tye == K_CONCEALED {
+		k := mj.FromQ(kong)
+		err = mp.Kong(k)
+		if err != nil {
+			return err
+		}
+		return mp.TailDraw(&m.CMJ.Deck)
+	}
+	if kt.Tye == K_FORMED && mp.TN {
 		core.AppLog.Printf("Rub Kong Checkpoint%v\n", kt)
 		p := seat + 1
 		claimed1 := m.CMJ.CheckMahjong(&m.Players[p%4].Hand, mj.FromQ(kong))
@@ -331,10 +339,18 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 		p++
 		claimed3 := m.CMJ.CheckMahjong(&m.Players[p%4].Hand, mj.FromQ(kong))
 		core.AppLog.Printf("Claimed %v %v %v\n", claimed1, claimed2, claimed3)
-		//if claimed1 || claimed2 || claimed3 {
-		//core.AppLog.Printf("Claimed %v %v %v\n", claimed1, claimed2, claimed3)
-		//}
+		if !claimed1 && !claimed2 && !claimed3 {
+			k := mj.FromQ(kong)
+			err = mp.Kong(k)
+			if err != nil {
+				return err
+			}
+			//exposed kong
+			return mp.TailDraw(&m.CMJ.Deck)
+		}
+		return fmt.Errorf("Rub kong !!!! %v %v %v", claimed1, claimed2, claimed3)
 	}
+	
 	k := mj.FromQ(kong)
 	err = mp.Kong(k)
 	if err != nil {
@@ -406,7 +422,11 @@ func (m *MahjongTable) Pung(seat int, drop int) error {
 }
 
 func (m *MahjongTable) Claim(seat int) bool {
-	return m.CMJ.Mahjong(&m.Players[seat].Hand)
+	mp := m.Players[seat]
+	if !mp.TN {
+		return false
+	}
+	return m.CMJ.Mahjong(&mp.Hand)
 }
 
 func (m *MahjongTable) deal(p int) error {
