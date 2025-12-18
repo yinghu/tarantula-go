@@ -319,7 +319,7 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 		return err
 	}
 	if kt.Tye == K_FLOWER {
-		m.Discard(seat, kong)
+		mp.Discard(mj.FromQ(kong))
 		return mp.TailDraw(&m.CMJ.Deck)
 	}
 	if kt.Tye == K_FORMED {
@@ -376,10 +376,13 @@ func (m *MahjongTable) Discard(seat int, t int) error {
 }
 
 func (m *MahjongTable) Chow(seat int, drop int, chow1 int, chow2 int) error {
+	mp := m.Players[seat]
+	if mp.TN {
+		return fmt.Errorf("cannot chow tile from tn : %v", mp.TN)
+	}
 	d := mj.FromQ(drop)
 	c1 := mj.FromQ(chow1)
 	c2 := mj.FromQ(chow2)
-	mp := m.Players[seat]
 	err := mp.Chow(d, c1, c2)
 	if err != nil {
 		return err
@@ -389,9 +392,17 @@ func (m *MahjongTable) Chow(seat int, drop int, chow1 int, chow2 int) error {
 }
 
 func (m *MahjongTable) Pung(seat int, drop int) error {
-	d := mj.FromQ(drop)
 	mp := m.Players[seat]
-	return mp.Pung(d)
+	if mp.TN {
+		return fmt.Errorf("cannot pung tile from tn : %v", mp.TN)
+	}
+	d := mj.FromQ(drop)
+	err := mp.Pung(d)
+	if err != nil {
+		return err
+	}
+	mp.TN = true
+	return nil
 }
 
 func (m *MahjongTable) Claim(seat int) bool {

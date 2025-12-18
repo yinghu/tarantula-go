@@ -228,5 +228,28 @@ func TestTablePlayChow(t *testing.T) {
 	mt.Players[dealer].AppendForTest(mj.FromS(mj.WHITE), false)
 	mt.Players[dealer].AppendForTest(mj.FromS(mj.WHITE), false)
 	mt.Players[dealer].TN = true
+	err := mt.Draw(dealer)
+	if err == nil {
+		t.Errorf("draw not allow from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Chow(dealer, mj.FromS(mj.CHARACTER2).Seq, mj.FromS(mj.CHARACTER3).Seq, mj.FromS(mj.CHARACTER5).Seq)
+	if err == nil {
+		t.Errorf("chow not allow from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Pung(dealer, mj.FromS(mj.BAMBOO5).Seq)
+	if err == nil {
+		t.Errorf("pung not allow from %v", mt.Players[dealer].TN)
+	}
+	err = mt.Kong(dealer, mj.FromS(mj.F_AUTUMN).Seq)
+	if err != nil {
+		t.Errorf("kong allowed from %v", mt.Players[dealer].TN)
+	}
+	if !mt.Players[dealer].TN {
+		t.Errorf("ttn should still true %v", mt.Players[dealer].TN)
+	}
 	
+	err = mt.Discard(dealer, mj.FromS(mj.GREEN).Seq)
+	if err != nil {
+		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
+	}
 }
