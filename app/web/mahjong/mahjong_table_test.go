@@ -247,9 +247,9 @@ func TestTablePlayChow(t *testing.T) {
 	if !mt.Players[dealer].TN {
 		t.Errorf("ttn should still true %v", mt.Players[dealer].TN)
 	}
-	
 	err = mt.Discard(dealer, mj.FromS(mj.GREEN).Seq)
 	if err != nil {
 		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
 	}
+	
 }
