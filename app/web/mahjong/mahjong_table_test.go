@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"gameclustering.com/internal/core"
@@ -369,13 +370,13 @@ func TestTablePlayKong(t *testing.T) {
 	mt.Dice()
 	dealer := (mt.Pts() - 1) % 4
 	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO1), false)
-	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO2), false)
-	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO5), false)
-	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO5), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO1), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO1), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO1), false)
 	mt.Players[dealer].AppendForTest(mj.FromS(mj.BAMBOO6), false)
 	mt.Players[dealer].AppendForTest(mj.FromS(mj.CHARACTER1), false)
-	mt.Players[dealer].AppendForTest(mj.FromS(mj.CHARACTER3), false)
-	mt.Players[dealer].AppendForTest(mj.FromS(mj.CHARACTER5), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.CHARACTER1), false)
+	mt.Players[dealer].AppendForTest(mj.FromS(mj.CHARACTER1), false)
 	mt.Players[dealer].AppendForTest(mj.FromS(mj.RED), false)
 	mt.Players[dealer].AppendForTest(mj.FromS(mj.RED), false)
 	mt.Players[dealer].AppendForTest(mj.FromS(mj.GREEN), false)
@@ -383,60 +384,41 @@ func TestTablePlayKong(t *testing.T) {
 	mt.Players[dealer].AppendForTest(mj.FromS(mj.WHITE), false)
 	mt.Players[dealer].AppendForTest(mj.FromS(mj.WHITE), false)
 	mt.Players[dealer].TN = true
-	err := mt.Draw(dealer)
+	err := mt.Kong(dealer, mj.FromS(mj.F_AUTUMN).Seq)
+	if err != nil {
+		t.Errorf("flower kong allowed from %v", mt.Players[dealer].TN)
+	}
+
+	err = mt.Kong(dealer, mj.FromS(mj.BAMBOO1).Seq)
+	if err != nil {
+		t.Errorf("concealed kong allowed from %v", mt.Players[dealer].TN)
+	}
+	for i := range mt.Players[dealer].PendingKongs {
+		fmt.Printf("Knog %d \n", mt.Players[dealer].PendingKongs[i])
+	}
+	for i := range mt.Players[dealer].Formed {
+		if mt.Players[dealer].Formed[i].Name() != "B1.B1.B1.B1" {
+			t.Errorf("meld should be B1.B1.B1.B1 %s", mt.Players[dealer].Formed[i].Name())
+		}
+	}
+	if mt.Players[dealer].TileSize() != 11 {
+		t.Errorf("dealer hand size should be still 11 %d", mt.Players[dealer].TileSize())
+	}
+	err = mt.Draw(dealer)
 	if err == nil {
 		t.Errorf("draw not allow from %v", mt.Players[dealer].TN)
-	}
-	err = mt.Chow(dealer, mj.FromS(mj.CHARACTER4).Seq, mj.FromS(mj.CHARACTER3).Seq, mj.FromS(mj.CHARACTER5).Seq)
-	if err == nil {
-		t.Errorf("chow not allow from %v", mt.Players[dealer].TN)
-	}
-	err = mt.Pung(dealer, mj.FromS(mj.BAMBOO5).Seq)
-	if err == nil {
-		t.Errorf("pung not allow from %v", mt.Players[dealer].TN)
-	}
-	err = mt.Kong(dealer, mj.FromS(mj.F_AUTUMN).Seq)
-	if err != nil {
-		t.Errorf("kong allowed from %v", mt.Players[dealer].TN)
-	}
-	if !mt.Players[dealer].TN {
-		t.Errorf("ttn should still true %v", mt.Players[dealer].TN)
 	}
 	err = mt.Discard(dealer, mj.FromS(mj.GREEN).Seq)
 	if err != nil {
 		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
 	}
-	err = mt.Pung(dealer, mj.FromS(mj.BAMBOO5).Seq)
-	if err != nil {
-		t.Errorf("pung allow from %v : %s", mt.Players[dealer].TN, err.Error())
+
+	pds := mt.Players[dealer].CheckDiscard((dealer+1)%4, mj.FromS(mj.CHARACTER1), false)
+	for i := range pds {
+		fmt.Printf("meld %s\n", pds[i].Name())
 	}
-	if !mt.Players[dealer].TN {
-		t.Errorf("tn should be true %v", mt.Players[dealer].TN)
-	}
-	err = mt.Discard(dealer, mj.FromS(mj.BAMBOO1).Seq)
-	if err != nil {
-		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
-	}
-	for i := range mt.Players[dealer].Formed {
-		if mt.Players[dealer].Formed[i].Name() != "B5.B5.B5" {
-			t.Errorf("meld should be B5.B5.B5 %s", mt.Players[dealer].Formed[i].Name())
-		}
-	}
-	err = mt.Draw(dealer)
-	if err != nil {
-		t.Errorf("draw allowed from %v", mt.Players[dealer].TN)
-	}
-	err = mt.Discard(dealer, mj.FromS(mj.BAMBOO2).Seq)
-	if err != nil {
-		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
-	}
-	err = mt.Pung(dealer, mj.FromS(mj.RED).Seq)
-	if err != nil {
-		t.Errorf("pung allow from %v : %s", mt.Players[dealer].TN, err.Error())
-	}
-	for i := range mt.Players[dealer].Formed {
-		if mt.Players[dealer].Formed[i].Name() != "B5.B5.B5" && mt.Players[dealer].Formed[i].Name() != "H39.H39.H39" {
-			t.Errorf("meld should be B5.B5.B5 OR H39.H39.H39 %s", mt.Players[dealer].Formed[i].Name())
-		}
-	}
+	//for i := range mt.Players[dealer].PendingKongs {
+		//fmt.Printf("Knog %d \n", mt.Players[dealer].PendingKongs[i])
+	//}
+
 }

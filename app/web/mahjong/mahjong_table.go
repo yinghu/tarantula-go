@@ -330,6 +330,15 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 		}
 		return mp.TailDraw(&m.CMJ.Deck)
 	}
+	if kt.Tye == K_PUNG && !mp.TN {
+		k := mj.FromQ(kong)
+		err = mp.Kong(k)
+		if err != nil {
+			return err
+		}
+		mp.TN = true
+		return mp.TailDraw(&m.CMJ.Deck)
+	}
 	if kt.Tye == K_FORMED && mp.TN {
 		core.AppLog.Printf("Rub Kong Checkpoint%v\n", kt)
 		p := seat + 1
@@ -350,14 +359,7 @@ func (m *MahjongTable) Kong(seat int, kong int) error {
 		}
 		return fmt.Errorf("Rub kong !!!! %v %v %v", claimed1, claimed2, claimed3)
 	}
-	
-	k := mj.FromQ(kong)
-	err = mp.Kong(k)
-	if err != nil {
-		return err
-	}
-	//4 kind kong / or pung to kong
-	return mp.TailDraw(&m.CMJ.Deck)
+	return fmt.Errorf("no knog from %d", kong)
 }
 
 func (m *MahjongTable) Discard(seat int, t int) error {
