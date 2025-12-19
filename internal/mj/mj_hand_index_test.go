@@ -21,27 +21,23 @@ func (s *SampleListener) OnIndex(t TileIndex) {
 }
 
 func TestHandIndex(t *testing.T) {
-	sample := SampleListener{Usage: make(map[int]int)}
+	//sample := SampleListener{Usage: make(map[int]int)}
 	ix := HandIndex{}
 	h := make([]Tile, 0)
 	h = append(h, FromS("B1"))
-	h = append(h, FromS("B2"))
-	h = append(h, FromS("B3"))
-	h = append(h, FromS("B2"))
+	h = append(h, FromS("B1"))
+	h = append(h, FromS("B1"))
+	h = append(h, FromS("B1"))
 	h = append(h, FromS("B5"))
-	//h = append(h, FromS("B4"))
-	//h = append(h, FromS("B3"))
-	//h = append(h, FromS("B3"))
-	//h = append(h, FromS("B6"))
 	h = append(h, FromS("B6"))
 	h = append(h, FromS("B5"))
 	ix.From(h)
-	ix.Chow()
-	ix.Pung()
-	ix.Kong()
-	for x := range sample.Usage {
-		t := sample.Usage[x]
-		fmt.Printf("Usage : %s %d\n", FromQ(x).Name(), t)
+	//ix.Chow()
+	//ix.Pung()
+	ks := ix.Kong()
+	for x := range ks {
+		t := ks[x]
+		fmt.Printf("KS %s\n", t.Name())
 	}
 	//ix.Eye()
 	/**

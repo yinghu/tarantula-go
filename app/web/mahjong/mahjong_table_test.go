@@ -389,7 +389,7 @@ func TestTablePlayKong(t *testing.T) {
 		t.Errorf("flower kong allowed from %v", mt.Players[dealer].TN)
 	}
 	for i := range mt.Players[dealer].PendingKongs {
-		fmt.Printf("aKnog %d \n", mt.Players[dealer].PendingKongs[i])
+		fmt.Printf("aKnog %d %d\n", mt.Players[dealer].PendingKongs[i],i)
 	}
 	err = mt.Kong(dealer, mj.FromS(mj.BAMBOO1).Seq)
 	if err != nil {
@@ -419,8 +419,12 @@ func TestTablePlayKong(t *testing.T) {
 	for i := range pds {
 		fmt.Printf("meld %s\n", pds[i].Name())
 	}
-	//for i := range mt.Players[dealer].PendingKongs {
-	//fmt.Printf("Knog %d \n", mt.Players[dealer].PendingKongs[i])
-	//}
+	err = mt.Kong(dealer, mj.FromS(mj.CHARACTER1).Seq)
+	if err != nil {
+		t.Errorf("pung kong allowed from %v", mt.Players[dealer].TN)
+	}
+	for i := range mt.Players[dealer].PendingKongs {
+		fmt.Printf("Knog %d \n", mt.Players[dealer].PendingKongs[i])
+	}
 
 }
