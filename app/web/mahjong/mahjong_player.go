@@ -104,7 +104,9 @@ func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDiscardEvent) {
 		}
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_SKIP, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
 	}, func(commited MahjongPlayToken) {
-
+		if commited.Cmd != CMD_SKIP {
+			core.AppLog.Printf("discard play commited seat %d\n", commited.Seat)
+		}
 		if !mp.Auto {
 			me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 			mt.Update(&me)
@@ -134,7 +136,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 				mt.Push(&me)
 			}
-			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT} 	
+			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT}
 		})
 		if !mp.Auto {
 			mt.Push(&md)
