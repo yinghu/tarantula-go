@@ -87,8 +87,6 @@ func (m *MahjongTable) Play() {
 				} else {
 					go m.Players[seat].OnSeat(m)
 				}
-			//case CMD_TURN_PLAYER:
-				//go m.Players[k.Seat].Play(m)
 			case CMD_TURN_START:
 				go m.Players[tp%4].Play(m)
 			case CMD_TURN_NEXT:
@@ -143,6 +141,7 @@ func (m *MahjongTable) Play() {
 					go m.Players[t.Seat].OnError(m, err)
 					continue
 				}
+				tp--
 				go timer.Stop(t, false)
 			case CMD_KONG:
 				err := m.Kong(t.Seat, t.Selected)
@@ -151,7 +150,7 @@ func (m *MahjongTable) Play() {
 					continue
 				}
 				m.skips = m.skips[:0]
-				tp--//= t.Seat
+				tp-- //= t.Seat
 				go timer.Stop(t, false)
 			case CMD_DISCARD:
 				err := m.Discard(t.Seat, t.Selected)
@@ -167,7 +166,7 @@ func (m *MahjongTable) Play() {
 					continue
 				}
 				m.skips = m.skips[:0]
-				tp--//= t.Seat
+				tp-- //= t.Seat
 				go timer.Stop(t, false)
 			case CMD_PUNG:
 				err := m.Pung(t.Seat, t.Selected)
@@ -176,7 +175,7 @@ func (m *MahjongTable) Play() {
 					continue
 				}
 				m.skips = m.skips[:0]
-				tp--//= t.Seat
+				tp-- //= t.Seat
 				go timer.Stop(t, false)
 			case CMD_SKIP:
 				go timer.Stop(t, false)

@@ -174,12 +174,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 				mt.Push(&me)
 			}
-			//if commited.Cmd == CMD_KONG {
-			//mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_PLAYER, Seat: mp.Seat}
-			//} else {
-			//mp.TN = false
 			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT} //next player
-			//}
 		})
 		if !mp.Auto {
 			mt.Push(&md)
@@ -192,7 +187,6 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DRAW, func() {
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_DRAW, Seat: mp.Seat, Id: oid}
 	}, func(commited MahjongPlayToken) {
-		//mp.TN = true
 		if !mp.Auto {
 			me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 			mt.Push(&me)
