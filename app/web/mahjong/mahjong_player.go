@@ -134,7 +134,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 				mt.Push(&me)
 			}
-
+			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT} 	
 		})
 		if !mp.Auto {
 			mt.Push(&md)
