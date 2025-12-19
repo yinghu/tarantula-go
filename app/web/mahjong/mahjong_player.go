@@ -55,6 +55,7 @@ func (mp *MahjongPlayer) OnError(mt *MahjongTable, err error) {
 		mr := NewMahjongErrorEvent(mp.SystemId, mt.Id, 100, err.Error())
 		mt.Update(&mr)
 	}
+	mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT}
 	core.AppLog.Printf("play error %s on %d\n", err.Error(), mp.Seat)
 }
 
@@ -103,16 +104,13 @@ func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDiscardEvent) {
 		}
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_SKIP, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
 	}, func(commited MahjongPlayToken) {
-		if commited.Cmd != CMD_SKIP {
-			if !mp.Auto {
-				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
-				mt.Update(&me)
-			}
-			//mp.TN = true
-			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT, Seat: mp.Seat} //full hand turn
-		} else {
-			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT}
+
+		if !mp.Auto {
+			me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
+			mt.Update(&me)
 		}
+		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT}
+
 	})
 	if !mp.Auto {
 		mt.Push(&mc)
@@ -126,7 +124,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	core.AppLog.Printf("player seat: %d auto: %v TN: %v\n", mp.Seat, mp.Auto, mp.TN)
 	core.AppLog.Printf("player flower list: %v\n", mp.PendingFlowers)
 	core.AppLog.Printf("player kong list: %v\n", mp.PendingKongs)
-	if len(mp.PendingFlowers) > 0 { //knog first
+	if len(mp.PendingFlowers) > 0 { //flower knog first
 		oid, _ := mt.Sequence.Id()
 		k := mp.PendingFlowers[0].Seq
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_KONG, func() {
@@ -136,7 +134,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 				mt.Push(&me)
 			}
-			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT, Seat: mp.Seat}
+
 		})
 		if !mp.Auto {
 			mt.Push(&md)
