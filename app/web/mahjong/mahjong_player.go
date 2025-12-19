@@ -574,6 +574,7 @@ func (mp *MahjongPlayer) validateKong(kong int) (KongType, error) {
 		if kong == kp.Seq {
 			mp.PendingKongs = slices.Delete(mp.PendingKongs, i, i+1)
 			deleted = kp
+			fmt.Printf("pending kong deleted from %d\n", kong)
 			break
 		}
 	}

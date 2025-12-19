@@ -368,7 +368,7 @@ func (m *MahjongTable) Discard(seat int, t int) error {
 		return fmt.Errorf("cannot discard tile from tn : %v", mp.TN)
 	}
 	drop := mj.FromQ(t)
-	err := mp.Hand.Discard(drop)
+	err := mp.Discard(drop)
 	if err != nil {
 		return err
 	}
