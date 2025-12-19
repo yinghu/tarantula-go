@@ -94,6 +94,7 @@ func (m *MahjongTable) Play() {
 				if sz > 0 {
 					se := m.skips[sz-1]
 					m.skips = m.skips[:sz-1]
+					tp = se.Seat
 					go m.Players[se.Seat].PlayDiscard(m, se)
 					break
 				}
