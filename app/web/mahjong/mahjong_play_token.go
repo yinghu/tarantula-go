@@ -17,7 +17,7 @@ const (
 	CMD_LEAVE   int = 11
 
 	CMD_TURN_START  int = 95
-	CMD_TURN_PLAYER int = 96
+	//CMD_TURN_PLAYER int = 96
 	CMD_TURN_NEXT   int = 97
 	CMD_RESET       int = 98
 	CMD_END         int = 99
