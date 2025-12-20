@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -32,9 +31,12 @@ type MahjongTable struct {
 	Turn          chan MahjongPlayToken `json:"-"`
 	event.Pusher  `json:"-"`
 	core.Sequence `json:"-"`
-	Timer         chan MahjongTimeout
 	Sync          chan MahjongPlayToken `json:"-"`
 	skips         []MahjongDiscardEvent
+
+	timerIndex      map[int64]MahjongTimeout
+	tp              int
+	tpBeforeDiscard int
 }
 
 func (m *MahjongTable) Pts() int {
@@ -49,9 +51,9 @@ func (m *MahjongTable) New() {
 	m.Players[SEAT_N] = NewPlayer(SEAT_N, true, m)
 	m.Discarded = make([]mj.Tile, 0)
 	m.Turn = make(chan MahjongPlayToken, 3)
-	m.Timer = make(chan MahjongTimeout, 3)
 	m.Sync = make(chan MahjongPlayToken, 3)
 	m.skips = make([]MahjongDiscardEvent, 0)
+	m.timerIndex = map[int64]MahjongTimeout{}
 }
 
 func (m *MahjongTable) Reset() {
@@ -64,17 +66,16 @@ func (m *MahjongTable) Reset() {
 }
 
 func (m *MahjongTable) Play() {
-	timerIndex := make(map[int64]MahjongTimeout)
+
 	running := true
-	var tp int
-	var tpBeforeDiscard int
+
 	for running {
 		select {
 		case k := <-m.Sync: //player control
 			switch k.Cmd {
 			case CMD_END:
 				running = false
-				for _, t := range timerIndex {
+				for _, t := range m.timerIndex {
 					t.Stop(k, true)
 				}
 			case CMD_LEAVE:
@@ -82,139 +83,140 @@ func (m *MahjongTable) Play() {
 			case CMD_SIT:
 				seat, err := m.Sit(k.SystemId)
 				if err != nil {
-					go func() {
-						mr := NewMahjongErrorEvent(k.SystemId, m.Id, 100, err.Error())
-						m.Push(&mr)
-					}()
+					mr := NewMahjongErrorEvent(k.SystemId, m.Id, 100, err.Error())
+					m.Push(&mr)
 				} else {
-					go m.Players[seat].OnSeat(m)
+					m.Players[seat].OnSeat(m)
 				}
-			case CMD_TURN_START:
-				go m.Players[tp%4].Play(m)
-			case CMD_TURN_NEXT:
-				sz := len(m.skips)
-				if sz > 0 {
-					se := m.skips[sz-1]
-					m.skips = m.skips[:sz-1]
-					tpBeforeDiscard = tp
-					tp = se.Seat
-					go m.Players[se.Seat].PlayDiscard(m, se)
-					break
-				}
-				tp++ //next player turn
-				go m.Players[tp%4].Play(m)
-
 			}
-		case tm := <-m.Timer: //timer control
-			timerIndex[tm.OId()] = tm
-			tm.Start(m)
-
 		case t := <-m.Turn: //play control
 			if t.Cmd == CMD_TABLE {
 				if m.Solo {
 					tm := m.Players[t.Seat].PlayDice(m)
-					timerIndex[tm.OId()] = tm
+					m.timerIndex[tm.OId()] = tm
 					tm.Start(m)
 				} else {
 					//load table data to players
-					go m.Players[t.Seat].PlayDice(m)
+					//go m.Players[t.Seat].PlayDice(m)
 				}
-				time.AfterFunc(4*time.Second, func() {
-					core.AppLog.Printf("call after 5 seocnds with no block")
-				})
-				//tm.Stop()
 				continue
 			}
-			timer, exists := timerIndex[t.Id]
+			timer, exists := m.timerIndex[t.Id]
 			if !exists {
 				core.AppLog.Printf("Token not existed: %d selected : %d cmd: %d Id :%d\n", t.Seat, t.Selected, t.Cmd, t.Id)
-				go m.Players[t.Seat].OnError(m, fmt.Errorf("token not existed %d", t.Id))
+				m.Players[t.Seat].OnError(m, fmt.Errorf("token not existed %d", t.Id))
 				continue
 			}
-			delete(timerIndex, t.Id)
+			delete(m.timerIndex, t.Id)
 			switch t.Cmd {
 			case CMD_DICE:
 				m.Dice()
 				timer.Stop(t, false)
-				go m.Players[t.Seat].PlayDeal(m)
+				tm := m.Players[t.Seat].PlayDeal(m)
+				m.timerIndex[tm.OId()] = tm
+				tm.Start(m)
 			case CMD_DEAL:
 				dealer, err := m.Deal()
 				if err != nil {
-					go m.Players[t.Seat].OnError(m, err)
+					m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				tp = dealer //start dealer
-				go timer.Stop(t, false)
+				m.tp = dealer //start dealer
+				timer.Stop(t, false)
+				m.Players[m.tp%4].Play(m)
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
 				if err != nil {
-					go m.Players[t.Seat].OnError(m, err)
+					m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				tp--
-				go timer.Stop(t, false)
+				m.tp--
+				timer.Stop(t, false)
+				m.Next()
 			case CMD_KONG:
 				err := m.Kong(t.Seat, t.Selected)
 				if err != nil {
-					go m.Players[t.Seat].OnError(m, err)
+					m.Players[t.Seat].OnError(m, err)
 					continue
 				}
 				m.skips = m.skips[:0]
-				tp--
-				go timer.Stop(t, false)
+				m.tp--
+				timer.Stop(t, false)
+				m.Next()
 			case CMD_DISCARD:
 				err := m.Discard(t.Seat, t.Selected)
 				if err != nil {
-					go m.Players[t.Seat].OnError(m, err)
+					m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				go timer.Stop(t, false)
+				timer.Stop(t, false)
+				m.Next()
 			case CMD_CHOW:
 				err := m.Chow(t.Seat, t.Selected, t.Chow1, t.Chow2)
 				if err != nil {
-					go m.Players[t.Seat].OnError(m, err)
+					m.Players[t.Seat].OnError(m, err)
 					continue
 				}
 				m.skips = m.skips[:0]
-				tp--
-				go timer.Stop(t, false)
+				m.tp--
+				timer.Stop(t, false)
+				m.Next()
 			case CMD_PUNG:
 				err := m.Pung(t.Seat, t.Selected)
 				if err != nil {
-					go m.Players[t.Seat].OnError(m, err)
+					m.Players[t.Seat].OnError(m, err)
 					continue
 				}
 				m.skips = m.skips[:0]
-				tp--
-				go timer.Stop(t, false)
+				m.tp--
+				timer.Stop(t, false)
+				m.Next()
 			case CMD_SKIP:
-				tp = tpBeforeDiscard
-				tp--
-
-				go timer.Stop(t, false)
+				m.tp = m.tpBeforeDiscard
+				m.tp--
+				timer.Stop(t, false)
+				m.Next()
 			case CMD_CLAIM:
 				claimed := m.Claim(t.Seat)
 				if !claimed {
-					go m.Players[t.Seat].OnError(m, fmt.Errorf("fake claimed"))
+					m.Players[t.Seat].OnError(m, fmt.Errorf("fake claimed"))
 					continue
 				}
-				go timer.Stop(t, false)
+				timer.Stop(t, false)
 				//m.Reset()
 				//go m.Players[t.Seat].PlayDeal(m)
 			case CMD_RESET:
 				m.Reset()
 				mt := MahjongResetEvent{Started: false}
 				m.Push(&mt)
-				go m.Players[t.Seat].PlayDeal(m)
+				m.Players[t.Seat].PlayDeal(m)
 			}
 		}
 	}
 	//time.Sleep(5 * time.Second)
-	clear(timerIndex)
+	clear(m.timerIndex)
 	close(m.Sync)
-	close(m.Timer)
+
 	close(m.Turn)
 	core.AppLog.Printf("table closed %d\n", m.Id)
+}
+
+func (m *MahjongTable) Next() {
+	sz := len(m.skips)
+	if sz > 0 {
+		se := m.skips[sz-1]
+		m.skips = m.skips[:sz-1]
+		m.tpBeforeDiscard = m.tp
+		m.tp = se.Seat
+		tm := m.Players[se.Seat].PlayDiscard(m, se)
+		m.timerIndex[tm.OId()] = tm
+		tm.Start(m)
+		return
+	}
+	m.tp++ //next player turn
+	tm := m.Players[m.tp%4].Play(m)
+	m.timerIndex[tm.OId()] = tm
+	tm.Start(m)
 }
 
 func (m *MahjongTable) Sit(systemId int64) (int, error) {

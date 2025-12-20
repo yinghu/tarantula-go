@@ -55,7 +55,7 @@ func (mp *MahjongPlayer) OnError(mt *MahjongTable, err error) {
 		mr := NewMahjongErrorEvent(mp.SystemId, mt.Id, 100, err.Error())
 		mt.Update(&mr)
 	}
-	mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT}
+	
 	core.AppLog.Printf("play error %s on %d\n", err.Error(), mp.Seat)
 }
 
@@ -76,20 +76,19 @@ func (mp *MahjongPlayer) PlayDice(mt *MahjongTable) MahjongTimeout {
 	return &md
 }
 
-func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
+func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) MahjongTimeout {
 	oid, _ := mt.Sequence.Id()
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DEAL, func() {
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_DEAL, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
 	}, func(commited MahjongPlayToken) {
 		me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 		mt.Update(&me)
-		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_START} //start game from dealer
 	})
 	mt.Update(&md)
-	mt.Timer <- &md
+	return &md
 }
 
-func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDiscardEvent) {
+func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDiscardEvent) MahjongTimeout {
 	core.AppLog.Printf("player discard seat :%d auto:%v tn:%v\n", mp.Seat, mp.Auto, mp.TN)
 	core.AppLog.Printf("drop %v\n", mc.Opts)
 	oid, _ := mt.Sequence.Id()
@@ -110,20 +109,15 @@ func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDiscardEvent) {
 			me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 			mt.Update(&me)
 		}
-		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT}
 	})
 	if !mp.Auto {
 		mt.Push(&mc)
 		mt.Push(&md)
 	}
-	mt.Timer <- &md
-
+	return &md
 }
 
-func (mo *MahjongPlayer) PlayerDraw(mt *MahjongTable) {
-
-}
-func (mp *MahjongPlayer) Play(mt *MahjongTable) {
+func (mp *MahjongPlayer) Play(mt *MahjongTable) MahjongTimeout {
 	core.AppLog.Printf("player seat: %d auto: %v TN: %v\n", mp.Seat, mp.Auto, mp.TN)
 	core.AppLog.Printf("player flower list: %v\n", mp.PendingFlowers)
 	core.AppLog.Printf("player kong list: %v\n", mp.PendingKongs)
@@ -137,13 +131,11 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 				mt.Push(&me)
 			}
-			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT}
 		})
 		if !mp.Auto {
 			mt.Push(&md)
 		}
-		mt.Timer <- &md
-		return
+		return &md
 	}
 
 	if mp.TN { //full hand
@@ -163,8 +155,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 			if !mp.Auto {
 				mt.Push(&md)
 			}
-			mt.Timer <- &md
-			return
+			return &md
 		}
 		oid, _ := mt.Sequence.Id()
 		md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DISCARD, func() {
@@ -175,13 +166,11 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 				me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 				mt.Push(&me)
 			}
-			mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT} //next player
 		})
 		if !mp.Auto {
 			mt.Push(&md)
 		}
-		mt.Timer <- &md
-		return
+		return &md
 	}
 	//draw
 	oid, _ := mt.Sequence.Id()
@@ -192,12 +181,11 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 			me := NewMahjongHandEvent(mp.SystemId, mp.Hand, mp.PendingFlowers, mp.PendingKongs)
 			mt.Push(&me)
 		}
-		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT, Seat: mp.Seat}
 	})
 	if !mp.Auto {
 		mt.Push(&md)
 	}
-	mt.Timer <- &md
+	return &md
 }
 
 func (mp *MahjongPlayer) CheckDiscard(seat int, drop mj.Tile, chow bool) []mj.Meld {
