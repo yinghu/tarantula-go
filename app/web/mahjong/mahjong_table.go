@@ -177,7 +177,7 @@ func (m *MahjongTable) Play() {
 				m.Next()
 			case CMD_SKIP:
 				m.tp = m.tpBeforeDiscard
-				m.tp--
+				//m.tp
 				core.AppLog.Printf("skip tp %d %d\n", m.tp, (m.tp+1)%4)
 				timer.Stop(t, false)
 				m.Next()
