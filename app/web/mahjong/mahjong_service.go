@@ -93,8 +93,23 @@ func (s *MahjongService) dispatch() {
 			s.onTable(t.SystemId, t.TableId)
 		case CMD_LEFT:
 			s.offTable(t.SystemId, t.TableId)
+		case CMD_END:
+			s.endTable(t.TableId)
 		}
 	}
+}
+
+func (s *MahjongService) endTable(tableId int64) {
+	m, exists := s.TableIndex[tableId]
+	if !exists {
+		core.AppLog.Printf("tabel not existed %d\n", tableId)
+		return
+	}
+	clear(m.timerIndex)
+	close(m.Sync)
+	close(m.Turn)
+	delete(s.TableIndex, tableId)
+	core.AppLog.Printf("table closed %d\n", m.Id)
 }
 
 func (s *MahjongService) onTable(systemId int64, flag int64) {
@@ -102,7 +117,7 @@ func (s *MahjongService) onTable(systemId int64, flag int64) {
 	if systemId != flag {
 		t, exists := s.TableIndex[flag]
 		if !exists {
-			t = &MahjongTable{Id: flag, Pusher: s.Pusher(), Sequence: s.Sequence(), CMJ: mj.ClassicMahjong{}, Solo: flag == systemId}
+			t = &MahjongTable{Id: flag, Pusher: s.Pusher(), Sequence: s.Sequence(), CMJ: mj.ClassicMahjong{}, Solo: flag == systemId, dispatch: s.Dispatcher}
 			t.New()
 			s.TableIndex[flag] = t
 			go t.Play()
@@ -113,7 +128,7 @@ func (s *MahjongService) onTable(systemId int64, flag int64) {
 		return
 	}
 	tid, _ := s.Sequence().Id()
-	table := MahjongTable{Id: tid, Pusher: s.Pusher(), Sequence: s.Sequence(), CMJ: mj.ClassicMahjong{}, Solo: flag == systemId}
+	table := MahjongTable{Id: tid, Pusher: s.Pusher(), Sequence: s.Sequence(), CMJ: mj.ClassicMahjong{}, Solo: flag == systemId, dispatch: s.Dispatcher}
 	table.New()
 	s.TableIndex[flag] = &table
 	go table.Play()

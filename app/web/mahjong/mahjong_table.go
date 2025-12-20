@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -37,6 +38,8 @@ type MahjongTable struct {
 	timerIndex      map[int64]MahjongTimeout
 	tp              int
 	tpBeforeDiscard int
+
+	dispatch chan MahjongPlayToken
 }
 
 func (m *MahjongTable) Pts() int {
@@ -73,13 +76,13 @@ func (m *MahjongTable) Play() {
 		select {
 		case k := <-m.Sync: //player control
 			switch k.Cmd {
-			case CMD_END:
-				running = false
-				for _, t := range m.timerIndex {
-					t.Stop(k, true)
-				}
 			case CMD_LEAVE:
-				m.Leave(k.SystemId)
+				if m.Leave(k.SystemId) {
+					running = false
+					for _, t := range m.timerIndex {
+						t.Stop(k, true)
+					}
+				}
 			case CMD_SIT:
 				seat, err := m.Sit(k.SystemId)
 				if err != nil {
@@ -198,12 +201,9 @@ func (m *MahjongTable) Play() {
 			}
 		}
 	}
-	//time.Sleep(5 * time.Second)
-	clear(m.timerIndex)
-	close(m.Sync)
-
-	close(m.Turn)
-	core.AppLog.Printf("table closed %d\n", m.Id)
+	time.AfterFunc(5*time.Second, func() {
+		m.dispatch <- MahjongPlayToken{TableId: m.Id, Cmd: CMD_END}
+	})
 }
 
 func (m *MahjongTable) Next() {
@@ -248,27 +248,32 @@ func (m *MahjongTable) Sit(systemId int64) (int, error) {
 	return 0, fmt.Errorf("no seat available on table: %d", m.Id)
 }
 
-func (m *MahjongTable) Leave(systemId int64) {
+func (m *MahjongTable) Leave(systemId int64) bool {
 	if m.Players[SEAT_E].SystemId == systemId {
 		m.Players[SEAT_E].SystemId = 0
 		m.Players[SEAT_E].Auto = true
-		return
+		return m.empty()
 	}
 	if m.Players[SEAT_S].SystemId == systemId {
 		m.Players[SEAT_S].SystemId = 0
 		m.Players[SEAT_S].Auto = true
-		return
+		return m.empty()
 	}
 	if m.Players[SEAT_W].SystemId == systemId {
 		m.Players[SEAT_W].SystemId = 0
 		m.Players[SEAT_W].Auto = true
-		return
+		return true
 	}
 	if m.Players[SEAT_N].SystemId == systemId {
 		m.Players[SEAT_N].SystemId = 0
 		m.Players[SEAT_N].Auto = true
-		return
+		return m.empty()
 	}
+	return m.empty()
+}
+
+func (m *MahjongTable) empty() bool {
+	return m.Players[SEAT_E].SystemId+m.Players[SEAT_E].SystemId+m.Players[SEAT_W].SystemId+m.Players[SEAT_N].SystemId == 0
 }
 
 func (m *MahjongTable) Dice() {
