@@ -48,6 +48,7 @@ func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 	s.Lock = &sync.Mutex{}
 	s.Stopped = false
 	s.K = time.NewTimer(time.Duration(s.N.CountDown+COUNT_DOWN_BUFFER) * time.Second)
+
 	<-s.K.C
 	s.Lock.Lock()
 	defer s.Lock.Unlock()

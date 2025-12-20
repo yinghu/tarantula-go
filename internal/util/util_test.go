@@ -3,6 +3,7 @@ package util
 import (
 	"encoding/base64"
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 )
@@ -50,4 +51,15 @@ func TestTick(t *testing.T) {
 		}
 		c = 3
 	}
+}
+func worker(wt *sync.WaitGroup) {
+	defer wt.Done()
+	time.Sleep(1 * time.Second)
+}
+func TestWaitGroup(t *testing.T) {
+	var wt sync.WaitGroup
+	wt.Add(2)
+	go worker(&wt)
+	go worker(&wt)
+	wt.Wait()
 }

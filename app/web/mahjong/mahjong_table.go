@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -116,6 +117,10 @@ func (m *MahjongTable) Play() {
 					//load table data to players
 					go m.Players[t.Seat].PlayDice(m)
 				}
+				time.AfterFunc(4*time.Second, func() {
+					core.AppLog.Printf("call after 5 seocnds with no block")
+				})
+				//tm.Stop()
 				continue
 			}
 			timer, exists := timerIndex[t.Id]
@@ -183,6 +188,7 @@ func (m *MahjongTable) Play() {
 			case CMD_SKIP:
 				tp = tpBeforeDiscard
 				tp--
+
 				go timer.Stop(t, false)
 			case CMD_CLAIM:
 				claimed := m.Claim(t.Seat)

@@ -121,6 +121,9 @@ func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDiscardEvent) {
 
 }
 
+func (mo *MahjongPlayer) PlayerDraw(mt *MahjongTable){
+	
+}
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	core.AppLog.Printf("player seat: %d auto: %v TN: %v\n", mp.Seat, mp.Auto, mp.TN)
 	core.AppLog.Printf("player flower list: %v\n", mp.PendingFlowers)
