@@ -112,7 +112,6 @@ func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDiscardEvent) {
 			mt.Update(&me)
 		}
 		mt.Sync <- MahjongPlayToken{Cmd: CMD_TURN_NEXT}
-
 	})
 	if !mp.Auto {
 		mt.Push(&mc)

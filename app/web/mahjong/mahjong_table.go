@@ -66,6 +66,7 @@ func (m *MahjongTable) Play() {
 	timerIndex := make(map[int64]MahjongTimeout)
 	running := true
 	var tp int
+	var tpBeforeDiscard int
 	for running {
 		select {
 		case k := <-m.Sync: //player control
@@ -94,6 +95,7 @@ func (m *MahjongTable) Play() {
 				if sz > 0 {
 					se := m.skips[sz-1]
 					m.skips = m.skips[:sz-1]
+					tpBeforeDiscard = tp
 					tp = se.Seat
 					go m.Players[se.Seat].PlayDiscard(m, se)
 					break
@@ -179,6 +181,8 @@ func (m *MahjongTable) Play() {
 				tp--
 				go timer.Stop(t, false)
 			case CMD_SKIP:
+				tp = tpBeforeDiscard
+				tp--
 				go timer.Stop(t, false)
 			case CMD_CLAIM:
 				claimed := m.Claim(t.Seat)
