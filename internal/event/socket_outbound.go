@@ -30,11 +30,11 @@ func (out *OutboundSocket) Subscribe() {
 		if err != nil {
 			break
 		}
-		_, err = out.C.Write(data)
+		num, err := out.C.Write(data)
 		if err != nil {
 			break
 		}
-		//core.AppLog.Printf("write number %d\n", num)
+		core.AppLog.Printf("write number %d\n", num)
 		time.Sleep(10 * time.Millisecond)
 	}
 }
