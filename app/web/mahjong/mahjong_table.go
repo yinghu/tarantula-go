@@ -35,11 +35,11 @@ type MahjongTable struct {
 	Sync          chan MahjongPlayToken `json:"-"`
 	skips         []MahjongDiscardEvent
 
-	timerIndex      map[int64]MahjongTimeout
-	tp              int
-	tpBeforeDiscard int
+	timerIndex      map[int64]MahjongTimeout `json:"-"`
+	tp              int                      `json:"-"`
+	tpBeforeDiscard int                      `json:"-"`
 
-	dispatch chan MahjongPlayToken
+	dispatch chan MahjongPlayToken `json:"-"`
 }
 
 func (m *MahjongTable) Pts() int {

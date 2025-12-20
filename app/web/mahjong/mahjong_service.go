@@ -126,6 +126,7 @@ func (s *MahjongService) onTable(systemId int64, flag int64) {
 		t.Sync <- pt
 		core.AppLog.Printf("joining table flag %d\n", flag)
 		return
+		
 	}
 	table := MahjongTable{Id: flag, Pusher: s.Pusher(), Sequence: s.Sequence(), CMJ: mj.ClassicMahjong{}, Solo: flag == systemId, dispatch: s.Dispatcher}
 	table.New()
