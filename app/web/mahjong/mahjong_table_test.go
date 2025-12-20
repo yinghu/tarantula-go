@@ -415,7 +415,7 @@ func TestTablePlayKong(t *testing.T) {
 		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
 	}
 
-	pds := mt.Players[dealer].CheckDiscard((dealer+1)%4, mj.FromS(mj.CHARACTER1), false)
+	pds := mt.Players[dealer].CheckDiscard( mj.FromS(mj.CHARACTER1), false)
 	for i := range pds {
 		fmt.Printf("meld %s\n", pds[i].Name())
 	}

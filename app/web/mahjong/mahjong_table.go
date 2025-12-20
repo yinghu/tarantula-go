@@ -211,7 +211,7 @@ func (m *MahjongTable) Next() {
 	if sz > 0 {
 		se := m.skips[sz-1]
 		m.skips = m.skips[:sz-1]
-		m.tpBeforeDiscard = m.tp
+		m.tpBeforeDiscard = se.DropSeat + 100
 		m.tp = se.Seat + 100
 		tm := m.Players[se.Seat].PlayDiscard(m, se)
 		m.timerIndex[tm.OId()] = tm
@@ -395,18 +395,18 @@ func (m *MahjongTable) Discard(seat int, t int) error {
 	m.Discarded = append(m.Discarded, drop)
 	mp.TN = false
 	p := seat + 1
-	pp := m.Players[p%4].CheckDiscard(seat, drop, true) //pung/kong/chow
+	pp := m.Players[p%4].CheckDiscard(drop, true) //pung/kong/chow
 	if len(pp) > 0 {
 		m.skips = append(m.skips, NewMahjongDiscardEvent(p%4, seat, drop, pp))
 	}
 	p++
-	pp1 := m.Players[p%4].CheckDiscard(seat, drop, false) //pung/kong
+	pp1 := m.Players[p%4].CheckDiscard(drop, false) //pung/kong
 	if len(pp1) > 0 {
 		m.skips = append(m.skips, NewMahjongDiscardEvent(p%4, seat, drop, pp1))
 		return nil
 	}
 	p++
-	pp2 := m.Players[p%4].CheckDiscard(seat, drop, false) //pung/kong
+	pp2 := m.Players[p%4].CheckDiscard(drop, false) //pung/kong
 	if len(pp2) > 0 {
 		m.skips = append(m.skips, NewMahjongDiscardEvent(p%4, seat, drop, pp2))
 	}

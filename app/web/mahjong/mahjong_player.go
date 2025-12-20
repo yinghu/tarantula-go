@@ -188,7 +188,7 @@ func (mp *MahjongPlayer) Play(mt *MahjongTable) MahjongTimeout {
 	return &md
 }
 
-func (mp *MahjongPlayer) CheckDiscard(seat int, drop mj.Tile, chow bool) []mj.Meld {
+func (mp *MahjongPlayer) CheckDiscard(drop mj.Tile, chow bool) []mj.Meld {
 
 	switch drop.Suit {
 	case mj.BAMBOO:
