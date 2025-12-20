@@ -64,7 +64,7 @@ func (mp *MahjongPlayer) OnSeat(mt *MahjongTable) {
 	mt.Update(&ms)
 }
 
-func (mp *MahjongPlayer) PlayDice(mt *MahjongTable) {
+func (mp *MahjongPlayer) PlayDice(mt *MahjongTable) MahjongTimeout {
 	oid, _ := mt.Sequence.Id()
 	md := NewMahjongTurnEvent(mp.SystemId, oid, CMD_DICE, func() {
 		mt.Turn <- MahjongPlayToken{Cmd: CMD_DICE, SystemId: mp.SystemId, Seat: mp.Seat, Id: oid}
@@ -73,8 +73,7 @@ func (mp *MahjongPlayer) PlayDice(mt *MahjongTable) {
 		mt.Update(&me)
 	})
 	mt.Update(&md)
-	mt.Timer <- &md
-
+	return &md
 }
 
 func (mp *MahjongPlayer) PlayDeal(mt *MahjongTable) {
@@ -121,8 +120,8 @@ func (mp *MahjongPlayer) PlayDiscard(mt *MahjongTable, mc MahjongDiscardEvent) {
 
 }
 
-func (mo *MahjongPlayer) PlayerDraw(mt *MahjongTable){
-	
+func (mo *MahjongPlayer) PlayerDraw(mt *MahjongTable) {
+
 }
 func (mp *MahjongPlayer) Play(mt *MahjongTable) {
 	core.AppLog.Printf("player seat: %d auto: %v TN: %v\n", mp.Seat, mp.Auto, mp.TN)

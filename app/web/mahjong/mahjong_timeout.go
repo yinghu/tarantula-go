@@ -47,15 +47,14 @@ type StopSignal struct {
 func (s *MahjongTimeoutObj) Start(tb *MahjongTable) {
 	s.Lock = &sync.Mutex{}
 	s.Stopped = false
-	s.K = time.NewTimer(time.Duration(s.N.CountDown+COUNT_DOWN_BUFFER) * time.Second)
-
-	<-s.K.C
-	s.Lock.Lock()
-	defer s.Lock.Unlock()
-	if s.Stopped {
-		return
-	}
-	s.T()
+	s.K = time.AfterFunc(time.Duration(s.N.CountDown+COUNT_DOWN_BUFFER)*time.Second, func() {
+		s.Lock.Lock()
+		defer s.Lock.Unlock()
+		if s.Stopped {
+			return
+		}
+		s.T()
+	})
 }
 
 func (s *MahjongTimeoutObj) Stop(commited MahjongPlayToken, closing bool) {

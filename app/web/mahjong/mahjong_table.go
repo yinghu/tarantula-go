@@ -107,12 +107,14 @@ func (m *MahjongTable) Play() {
 			}
 		case tm := <-m.Timer: //timer control
 			timerIndex[tm.OId()] = tm
-			go tm.Start(m)
+			tm.Start(m)
 
 		case t := <-m.Turn: //play control
 			if t.Cmd == CMD_TABLE {
 				if m.Solo {
-					go m.Players[t.Seat].PlayDice(m)
+					tm := m.Players[t.Seat].PlayDice(m)
+					timerIndex[tm.OId()] = tm
+					tm.Start(m)
 				} else {
 					//load table data to players
 					go m.Players[t.Seat].PlayDice(m)
@@ -133,7 +135,7 @@ func (m *MahjongTable) Play() {
 			switch t.Cmd {
 			case CMD_DICE:
 				m.Dice()
-				go timer.Stop(t, false)
+				timer.Stop(t, false)
 				go m.Players[t.Seat].PlayDeal(m)
 			case CMD_DEAL:
 				dealer, err := m.Deal()
