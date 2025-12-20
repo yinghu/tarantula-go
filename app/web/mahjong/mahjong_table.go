@@ -97,7 +97,9 @@ func (m *MahjongTable) Play() {
 					tm.Start(m)
 				} else {
 					//load table data to players
-					//go m.Players[t.Seat].PlayDice(m)
+					tm := m.Players[t.Seat].PlayDice(m)
+					m.timerIndex[tm.OId()] = tm
+					tm.Start(m)
 				}
 				continue
 			}
@@ -123,7 +125,9 @@ func (m *MahjongTable) Play() {
 				}
 				m.tp = dealer //start dealer
 				timer.Stop(t, false)
-				m.Players[m.tp%4].Play(m)
+				tm := m.Players[m.tp%4].Play(m)
+				m.timerIndex[tm.OId()] = tm
+				tm.Start(m)
 			case CMD_DRAW:
 				err := m.Draw(t.Seat)
 				if err != nil {
