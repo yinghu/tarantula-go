@@ -123,7 +123,7 @@ func (m *MahjongTable) Play() {
 					m.Players[t.Seat].OnError(m, err)
 					continue
 				}
-				m.tp = dealer //start dealer
+				m.tp = dealer + 100 //start dealer
 				timer.Stop(t, false)
 				tm := m.Players[m.tp%4].Play(m)
 				m.timerIndex[tm.OId()] = tm
@@ -212,7 +212,7 @@ func (m *MahjongTable) Next() {
 		se := m.skips[sz-1]
 		m.skips = m.skips[:sz-1]
 		m.tpBeforeDiscard = m.tp
-		m.tp = se.Seat
+		m.tp = se.Seat + 100
 		tm := m.Players[se.Seat].PlayDiscard(m, se)
 		m.timerIndex[tm.OId()] = tm
 		tm.Start(m)
