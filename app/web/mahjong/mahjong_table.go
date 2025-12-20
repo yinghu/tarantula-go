@@ -71,7 +71,6 @@ func (m *MahjongTable) Reset() {
 func (m *MahjongTable) Play() {
 
 	running := true
-
 	for running {
 		select {
 		case k := <-m.Sync: //player control

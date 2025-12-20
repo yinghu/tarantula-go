@@ -127,8 +127,7 @@ func (s *MahjongService) onTable(systemId int64, flag int64) {
 		core.AppLog.Printf("joining table flag %d\n", flag)
 		return
 	}
-	tid, _ := s.Sequence().Id()
-	table := MahjongTable{Id: tid, Pusher: s.Pusher(), Sequence: s.Sequence(), CMJ: mj.ClassicMahjong{}, Solo: flag == systemId, dispatch: s.Dispatcher}
+	table := MahjongTable{Id: flag, Pusher: s.Pusher(), Sequence: s.Sequence(), CMJ: mj.ClassicMahjong{}, Solo: flag == systemId, dispatch: s.Dispatcher}
 	table.New()
 	s.TableIndex[flag] = &table
 	go table.Play()
