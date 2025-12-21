@@ -28,13 +28,13 @@ func (s *MahjongEventObj) OnRecipientId(recipientId int64) {
 	s.SystemId = recipientId
 }
 
-type OnTurn func()
+type OnTimer func()
 type OnStop func(commited MahjongPlayToken)
 
 type MahjongTimeoutObj struct {
 	MahjongEventObj
 	N       MahjongPlayTurn
-	T       OnTurn //triger on timer
+	T       OnTimer //triger on timer
 	P       OnStop //call on stop
 	K       *time.Timer
 	Lock    *sync.Mutex

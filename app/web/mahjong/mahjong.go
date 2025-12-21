@@ -13,7 +13,7 @@ func NewMahjongErrorEvent(systemId int64, tableId int64, code int, msg string) M
 	return me
 }
 
-func NewMahjongTurnEvent(systemId int64, oid int64, cmd int, t OnTurn, p OnStop) MahjongTurnEvent {
+func NewMahjongTurnEvent(systemId int64, oid int64, cmd int, t OnTimer, p OnStop) MahjongTurnEvent {
 	mt := MahjongTurnEvent{}
 	mt.SystemId = systemId
 	mt.OnOId(oid)
