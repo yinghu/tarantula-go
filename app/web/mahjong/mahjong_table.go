@@ -190,8 +190,10 @@ func (m *MahjongTable) Play() {
 					continue
 				}
 				timer.Stop(t, false)
-				//m.Reset()
-				//go m.Players[t.Seat].PlayDeal(m)
+				m.Reset()
+				tm := m.Players[t.Seat].PlayDice(m)
+				m.timerIndex[tm.OId()] = tm
+				tm.Start(m)
 			case CMD_RESET:
 				m.Reset()
 				mt := MahjongResetEvent{Started: false}
