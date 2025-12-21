@@ -4,6 +4,7 @@ import (
 	"sync"
 	"time"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
 
@@ -63,6 +64,7 @@ func (s *MahjongTimeoutObj) Stop(commited MahjongPlayToken, closing bool) {
 	defer s.Lock.Unlock()
 	s.Stopped = true
 	if closing {
+		core.AppLog.Printf("timeout closed forcefully %d", s.OId())
 		return
 	}
 	s.P(commited)
