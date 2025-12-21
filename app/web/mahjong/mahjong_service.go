@@ -95,8 +95,19 @@ func (s *MahjongService) dispatch() {
 			s.offTable(t.SystemId, t.TableId)
 		case CMD_END:
 			s.endTable(t.TableId)
+		default:
+			s.onTurn(t)
 		}
 	}
+}
+
+func (s *MahjongService) onTurn(turn MahjongPlayToken) {
+	m, exists := s.TableIndex[turn.TableId]
+	if !exists {
+		core.AppLog.Printf("tabel not existed %d\n", turn.TableId)
+		return
+	}
+	m.Turn <- turn
 }
 
 func (s *MahjongService) endTable(tableId int64) {
@@ -126,7 +137,7 @@ func (s *MahjongService) onTable(systemId int64, flag int64) {
 		t.Sync <- pt
 		core.AppLog.Printf("joining table flag %d\n", flag)
 		return
-		
+
 	}
 	table := MahjongTable{Id: flag, Pusher: s.Pusher(), Sequence: s.Sequence(), CMJ: mj.ClassicMahjong{}, Solo: flag == systemId, dispatch: s.Dispatcher}
 	table.New()

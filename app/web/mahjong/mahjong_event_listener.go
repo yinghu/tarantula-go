@@ -18,10 +18,6 @@ func (s *MahjongEventListener) OnEvent(e event.Event) {
 	if !y {
 		return
 	}
-	table, exists := s.TableIndex[ex.TableId]
-	if !exists {
-		core.AppLog.Printf("table not existed %d %d\n", ex.SystemId, ex.TableId)
-		return
-	}
-	table.Turn <- ex.Token
+	ex.Token.TableId = ex.TableId
+	s.Dispatcher <- ex.Token
 }
