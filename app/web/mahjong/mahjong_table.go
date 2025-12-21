@@ -99,12 +99,16 @@ func (m *MahjongTable) Play() {
 					tm.Start(m)
 				} else {
 					//load table data to players
+					if !m.full() {
+						continue
+					}
 					tm := m.Players[t.Seat].PlayDice(m)
 					m.timerIndex[tm.OId()] = tm
 					tm.Start(m)
 				}
 				continue
 			}
+
 			timer, exists := m.timerIndex[t.Id]
 			if !exists {
 				core.AppLog.Printf("Token not existed: %d selected : %d cmd: %d Id :%d\n", t.Seat, t.Selected, t.Cmd, t.Id)
@@ -275,6 +279,9 @@ func (m *MahjongTable) Leave(systemId int64) bool {
 
 func (m *MahjongTable) empty() bool {
 	return m.Players[SEAT_E].SystemId+m.Players[SEAT_E].SystemId+m.Players[SEAT_W].SystemId+m.Players[SEAT_N].SystemId == 0
+}
+func (m *MahjongTable) full() bool {
+	return m.Players[SEAT_E].SystemId > 0 && m.Players[SEAT_E].SystemId+m.Players[SEAT_W].SystemId > 0 && m.Players[SEAT_N].SystemId > 0
 }
 
 func (m *MahjongTable) Dice() {

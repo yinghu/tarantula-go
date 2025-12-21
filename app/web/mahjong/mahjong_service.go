@@ -27,7 +27,7 @@ func (s *MahjongService) Start(f conf.Env, c core.Cluster, p event.Pusher) error
 	s.TableIndex = make(map[int64]*MahjongTable)
 	s.Dispatcher = make(chan MahjongPlayToken, 10)
 	go s.dispatch()
-	http.Handle("/mahjong/table", bootstrap.Logging(&MahjongTableSelector{MahjongService: s}))
+	http.Handle("/mahjong/table/{lobby}/{systemId}", bootstrap.Logging(&MahjongTableSelector{MahjongService: s}))
 	return nil
 }
 
@@ -95,10 +95,17 @@ func (s *MahjongService) dispatch() {
 			s.offTable(t.SystemId, t.TableId)
 		case CMD_END:
 			s.endTable(t.TableId)
+		case CMD_TABLE_PICK:
+			s.onLobby(t)
 		default:
 			s.onTurn(t)
 		}
 	}
+}
+
+func (s *MahjongService) onLobby(turn MahjongPlayToken) {
+	ti := TableInfo{TableId: turn.SystemId}
+	turn.TableSelector <- ti
 }
 
 func (s *MahjongService) onTurn(turn MahjongPlayToken) {

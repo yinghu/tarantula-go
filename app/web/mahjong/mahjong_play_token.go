@@ -19,24 +19,26 @@ const (
 	//CMD_TURN_START  int = 95
 	//CMD_TURN_PLAYER int = 96
 	//CMD_TURN_NEXT   int = 97
-	CMD_RESET       int = 98
-	CMD_END         int = 99
+	CMD_RESET int = 98
+	CMD_END   int = 99
 
 	//internal
-
-	CMD_JOINED int = 100
-	CMD_LEFT   int = 101
+	CMD_JOINED     int = 100
+	CMD_LEFT       int = 101
+	CMD_TABLE_PICK int = 102
 )
 
 type MahjongPlayToken struct {
-	Id       int64
-	TableId  int64
-	SystemId int64
-	Cmd      int
-	Seat     int
-	Selected int
-	Chow1    int
-	Chow2    int
+	Id            int64
+	TableId       int64
+	SystemId      int64
+	Cmd           int
+	Seat          int
+	Selected      int
+	Chow1         int
+	Chow2         int
+	Lobby         string
+	TableSelector chan TableInfo
 }
 
 func (mp *MahjongPlayToken) Write(buff core.DataBuffer) error {
