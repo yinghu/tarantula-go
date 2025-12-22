@@ -35,7 +35,7 @@ func (s *MahjongTableSelector) Request(rs core.OnSession, w http.ResponseWriter,
 	}
 	tc := make(chan TableInfo, 1)
 	defer close(tc)
-	pt := MahjongPlayToken{SystemId: sysId, Lobby: lobby, TableSelector: tc}
+	pt := MahjongPlayToken{SystemId: sysId, Lobby: lobby, TableSelector: tc, Cmd: CMD_TABLE_PICK}
 	s.Dispatcher <- pt
 	ti := <-tc
 	w.Write(util.ToJson(ti))
