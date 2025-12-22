@@ -20,6 +20,9 @@ const (
 	AUTO_TURN_TICKER_SECONDS   int = 3
 	COUNT_DOWN_BUFFER          int = 1
 	SOLO                       int = 1
+	P2_TABLE                   int = 2
+	P3_TABLE                   int = 3
+	P4_TABLE                   int = 4
 )
 
 type MahjongTable struct {

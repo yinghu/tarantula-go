@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/conf"
@@ -28,7 +27,7 @@ func (s *MahjongService) Start(f conf.Env, c core.Cluster, p event.Pusher) error
 	s.TableIndex = make(map[int64]*MahjongTable)
 	s.Dispatcher = make(chan MahjongPlayToken, 10)
 	go s.dispatch()
-	http.Handle("/mahjong/table/{lobby}/{systemId}", bootstrap.Logging(&MahjongTableSelector{MahjongService: s}))
+	http.Handle("/mahjong/table/{lobbyId}/{systemId}", bootstrap.Logging(&MahjongTableSelector{MahjongService: s}))
 	return nil
 }
 
@@ -105,9 +104,10 @@ func (s *MahjongService) dispatch() {
 }
 
 func (s *MahjongService) onLobby(turn MahjongPlayToken) {
-	ti := TableInfo{TableId: turn.SystemId}
-	time.Sleep(5 * time.Second)
-	turn.TableSelector <- ti
+	if turn.LobbyId == SOLO {
+		ti := TableInfo{TableId: turn.SystemId}
+		turn.TableSelector <- ti
+	}
 }
 
 func (s *MahjongService) onTurn(turn MahjongPlayToken) {

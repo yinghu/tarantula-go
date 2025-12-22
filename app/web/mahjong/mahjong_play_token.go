@@ -37,7 +37,7 @@ type MahjongPlayToken struct {
 	Selected      int
 	Chow1         int
 	Chow2         int
-	Lobby         string
+	LobbyId       int
 	TableSelector chan TableInfo
 }
 

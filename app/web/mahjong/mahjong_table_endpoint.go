@@ -25,7 +25,12 @@ func (s *MahjongTableSelector) AccessControl() int32 {
 
 func (s *MahjongTableSelector) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	lobby := r.PathValue("lobby")
+	lobbyId, err := strconv.ParseInt(r.PathValue("lobbyId"), 10, 32)
+	if err != nil {
+		ti := TableInfo{Message: err.Error(), Code: 400100, TableId: 0}
+		w.Write(util.ToJson(ti))
+		return
+	}
 	sysId, err := strconv.ParseInt(r.PathValue("systemId"), 10, 64)
 	w.WriteHeader(http.StatusOK)
 	if err != nil {
@@ -35,7 +40,7 @@ func (s *MahjongTableSelector) Request(rs core.OnSession, w http.ResponseWriter,
 	}
 	tc := make(chan TableInfo, 1)
 	defer close(tc)
-	pt := MahjongPlayToken{SystemId: sysId, Lobby: lobby, TableSelector: tc, Cmd: CMD_TABLE_PICK}
+	pt := MahjongPlayToken{SystemId: sysId, LobbyId: int(lobbyId), TableSelector: tc, Cmd: CMD_TABLE_PICK}
 	s.Dispatcher <- pt
 	ti := <-tc
 	w.Write(util.ToJson(ti))
