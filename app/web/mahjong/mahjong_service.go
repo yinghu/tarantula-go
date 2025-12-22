@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/conf"
@@ -105,6 +106,7 @@ func (s *MahjongService) dispatch() {
 
 func (s *MahjongService) onLobby(turn MahjongPlayToken) {
 	ti := TableInfo{TableId: turn.SystemId}
+	time.Sleep(5 * time.Second)
 	turn.TableSelector <- ti
 }
 
