@@ -142,6 +142,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			return
 		}
 		stub = session.Stub
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		s.Request(session, w, r)
 	}
 }
