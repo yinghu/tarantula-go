@@ -119,6 +119,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 
 		}()
 		if s.AccessControl() == PUBLIC_ACCESS_CONTROL {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
 			s.Request(core.OnSession{}, w, r)
 			return
 		}
