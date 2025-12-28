@@ -118,8 +118,9 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			metrics.HTTP_REQUEST_METRICS.WithLabelValues(r.URL.Path).Observe(dur.Seconds())
 
 		}()
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		if s.AccessControl() == PUBLIC_ACCESS_CONTROL {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
+			//w.Header().Set("Access-Control-Allow-Origin", "*")
 			s.Request(core.OnSession{}, w, r)
 			return
 		}
@@ -143,7 +144,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			return
 		}
 		stub = session.Stub
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		//w.Header().Set("Access-Control-Allow-Origin", "*")
 		s.Request(session, w, r)
 	}
 }
