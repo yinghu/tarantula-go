@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/memberlist"
 )
 
 func TestMemberList(t *testing.T) {
 	cfg := memberlist.DefaultLANConfig()
-	cfg.Name = "a01"
+	cfg.Name = "a02"
 	fmt.Printf("config %s %d %v\n", cfg.Name, cfg.BindPort, cfg.SecretKey)
 	list, err := memberlist.Create(cfg)
 	if err != nil {
@@ -20,13 +21,17 @@ func TestMemberList(t *testing.T) {
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func(m *memberlist.Memberlist) {
-		for _, member := range m.Members() {
-			
-			fmt.Printf("Member: %s %s %s\n", member.Name, member.Addr,m.LocalNode().Name)
+		tk := time.NewTicker(5 * time.Second)
+		for {
+			t := <-tk.C
+			for _, member := range m.Members() {
+
+				fmt.Printf("Member: %s %s %s %v\n", member.Name, member.Addr, m.LocalNode().Name, t)
+			}
 		}
-		wg.Wait()
+		//wg.Wait()
 	}(list)
-	//n, err := list.Join([]string{"localhost"})
+	//n, err := list.Join([]string{"192.168.1.11:7946"})
 	//if err != nil {
 		//panic("Failed to join cluster: " + err.Error())
 	//}
