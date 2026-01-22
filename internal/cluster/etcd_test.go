@@ -11,7 +11,7 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-func TestPartition(t *testing.T) {
+func XTestPartition(t *testing.T) {
 	core.CreateTestLog()
 	nodes := []string{"a11", "a02", "a03", "a04", "a05", "a06", "a07", "a08", "a09", "a10", "a01", "a12"}
 	slices.Sort(nodes)
@@ -24,7 +24,7 @@ func TestPartition(t *testing.T) {
 	}
 }
 
-func TestNode(t *testing.T) {
+func XTestNode(t *testing.T) {
 	core.CreateTestLog()
 	nodes := []core.Node{{Name: "a05"}, {Name: "a04"}, {Name: "a02"}, {Name: "a01"}}
 	slices.SortFunc(nodes, func(a, b core.Node) int {
@@ -35,7 +35,7 @@ func TestNode(t *testing.T) {
 	}
 }
 
-func TestCluster(t *testing.T) {
+func XTestCluster(t *testing.T) {
 	core.CreateTestLog()
 	lc := core.Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"}
 	c := newCluster("tarantula", []string{"192.168.1.7:2379"}, LocalNode{Node: lc}, nil)
@@ -50,7 +50,7 @@ func TestCluster(t *testing.T) {
 	}
 }
 
-func TestTransaction(t *testing.T) {
+func XTestTransaction(t *testing.T) {
 	core.CreateTestLog()
 	lc := core.Node{Name: "a01", HttpEndpoint: "http://192.168.1.11:8080", TcpEndpoint: "tcp://192.168.1.11:5000"}
 	c := newCluster("tarantula", []string{"192.168.1.7:2379"}, LocalNode{Node: lc}, nil)

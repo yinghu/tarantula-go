@@ -1,0 +1,36 @@
+package cluster
+
+import (
+	"fmt"
+	"sync"
+	"testing"
+
+	"github.com/hashicorp/memberlist"
+)
+
+func TestMemberList(t *testing.T) {
+	cfg := memberlist.DefaultLANConfig()
+	cfg.Name = "a01"
+	fmt.Printf("config %s %d %v\n", cfg.Name, cfg.BindPort, cfg.SecretKey)
+	list, err := memberlist.Create(cfg)
+	if err != nil {
+		fmt.Printf("Erorr %s\n", err.Error())
+		return
+	}
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func(m *memberlist.Memberlist) {
+		for _, member := range m.Members() {
+			
+			fmt.Printf("Member: %s %s %s\n", member.Name, member.Addr,m.LocalNode().Name)
+		}
+		wg.Wait()
+	}(list)
+	//n, err := list.Join([]string{"localhost"})
+	//if err != nil {
+		//panic("Failed to join cluster: " + err.Error())
+	//}
+	//fmt.Printf("joined : %d\n", n)
+	// Ask for members of the cluster
+	wg.Wait()
+}
