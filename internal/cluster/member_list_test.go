@@ -25,7 +25,7 @@ func TestMemberList(t *testing.T) {
 	go func(m *memberlist.Memberlist) {
 		for {
 			e := <-ch
-			fmt.Printf("Node event %v\n", e)
+			fmt.Printf("Node event %v %d\n", e, m.NumMembers())
 		}
 	}(list)
 	//fmt.Printf("joining to ")
