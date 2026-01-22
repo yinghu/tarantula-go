@@ -10,11 +10,10 @@ import (
 
 func TestMemberList(t *testing.T) {
 	cfg := memberlist.DefaultLANConfig()
-	ch := make(chan memberlist.NodeEvent)
+	ch := make(chan memberlist.NodeEvent,10)
 	cl := memberlist.ChannelEventDelegate{Ch: ch}
-	cfg.Name = "a02"
+	cfg.Name = "a03"
 	cfg.Events = &cl
-
 	fmt.Printf("config %s %d %v\n", cfg.Name, cfg.BindPort, cfg.SecretKey)
 	list, err := memberlist.Create(cfg)
 	if err != nil {
@@ -30,7 +29,7 @@ func TestMemberList(t *testing.T) {
 		}
 	}(list)
 	//fmt.Printf("joining to ")
-	//n, err := list.Join([]string{"192.168.1.11:7946"})
+	//n, err := list.Join([]string{"localhost:7946"})
 	//if err != nil {
 		//panic("Failed to join cluster: " + err.Error())
 	//}
