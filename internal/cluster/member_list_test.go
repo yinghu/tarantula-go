@@ -5,14 +5,16 @@ import (
 	"sync"
 	"testing"
 
+	"gameclustering.com/internal/core"
 	"github.com/hashicorp/memberlist"
 )
 
 func TestMemberList(t *testing.T) {
+	core.CreateTestLog()
 	cfg := memberlist.DefaultLANConfig()
 	ch := make(chan memberlist.NodeEvent, 10) //HAVE TO BUFFER
 	cl := memberlist.ChannelEventDelegate{Ch: ch}
-
+	cfg.Logger = core.AppLog
 	cfg.Events = &cl
 	fmt.Printf("config %s %d %v %s\n", cfg.Name, cfg.BindPort, cfg.SecretKey, cfg.Label)
 	list, err := memberlist.Create(cfg)
