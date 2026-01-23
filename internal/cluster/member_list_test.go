@@ -55,7 +55,7 @@ func TestMemberList(t *testing.T) {
 	cfg.Events = &cl
 	cfg.Delegate = &MockDelegate{}
 	cfg.Ping = &MockDelegate{}
-	cfg.ProbeInterval = 5 * time.Second
+	cfg.ProbeInterval = 1 * time.Second
 	fmt.Printf("config %s %d %v %s\n", cfg.Name, cfg.BindPort, cfg.SecretKey, cfg.Label)
 	list, err := memberlist.Create(cfg)
 	if err != nil {
