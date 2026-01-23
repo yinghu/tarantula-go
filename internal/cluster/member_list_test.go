@@ -22,7 +22,7 @@ func (M *MockDelegate) NotifyMsg(msg []byte) {
 }
 
 func (M *MockDelegate) GetBroadcasts(overhead, limit int) [][]byte {
-	fmt.Printf("broadcast %d %d\n", overhead, limit)
+	//fmt.Printf("broadcast %d %d\n", overhead, limit)
 	return nil
 }
 
@@ -36,6 +36,7 @@ func (M *MockDelegate) MergeRemoteState(buf []byte, join bool) {
 func TestMemberList(t *testing.T) {
 	core.CreateTestLog()
 	cfg := memberlist.DefaultLANConfig()
+	
 	ch := make(chan memberlist.NodeEvent, 10) //HAVE TO BUFFER
 	cl := memberlist.ChannelEventDelegate{Ch: ch}
 	cfg.Logger = core.AppLog
