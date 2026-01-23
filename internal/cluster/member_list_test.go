@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 	"testing"
+	"time"
 
 	"gameclustering.com/internal/core"
 	"github.com/hashicorp/memberlist"
@@ -32,11 +33,19 @@ func (M *MockDelegate) LocalState(join bool) []byte {
 		return []byte("mice")
 	}
 	return []byte("dog")
-
 }
 func (M *MockDelegate) MergeRemoteState(buf []byte, join bool) {
 	fmt.Printf("MergeRemoteState %s %v\n", string(buf), join)
 }
+
+func (M *MockDelegate) AckPayload() []byte {
+	return []byte("cat")
+}
+
+func (M *MockDelegate) NotifyPingComplete(other *memberlist.Node, rtt time.Duration, payload []byte) {
+	fmt.Printf("ping :%v %s\n", other, string(payload))
+}
+
 func TestMemberList(t *testing.T) {
 	core.CreateTestLog()
 	cfg := memberlist.DefaultLANConfig()
@@ -52,13 +61,12 @@ func TestMemberList(t *testing.T) {
 		fmt.Printf("Erorr %s\n", err.Error())
 		return
 	}
-	//list.LocalNode().Meta = []byte("tarantula")
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func(m *memberlist.Memberlist) {
 		for {
 			e := <-ch
-			fmt.Printf("Node event %v %d %s\n", e, m.NumMembers(), string(m.LocalNode().Meta))
+			fmt.Printf("Node event %v %d\n", e, m.NumMembers())
 		}
 	}(list)
 	n, err := list.Join([]string{"192.168.1.11:7946", "192.168.1.6:7946"})
@@ -68,7 +76,9 @@ func TestMemberList(t *testing.T) {
 	fmt.Printf("joined : %d\n", n)
 	list.SendReliable(list.LocalNode(), []byte("hello"))
 	list.SendBestEffort(list.LocalNode(), []byte("udp"))
-	//list.Leave(5)
+	//list.Leave(5 * time.Second)
+	//time.Sleep(5 * time.Second)
+	//list.Join([]string{"192.168.1.11:7946", "192.168.1.6:7946"})
 	// Ask for members of the cluster
 	wg.Wait()
 }
