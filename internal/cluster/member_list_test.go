@@ -14,7 +14,7 @@ type MockDelegate struct {
 
 func (M *MockDelegate) NodeMeta(limit int) []byte {
 	fmt.Printf("node meta %d\n", limit)
-	return nil
+	return []byte("tarantula")
 }
 
 func (M *MockDelegate) NotifyMsg(msg []byte) {
@@ -27,16 +27,16 @@ func (M *MockDelegate) GetBroadcasts(overhead, limit int) [][]byte {
 }
 
 func (M *MockDelegate) LocalState(join bool) []byte {
-	fmt.Printf("node meta %v\n", join)
-	return nil
+	fmt.Printf("LocalState %v\n", join)
+	return []byte("mice")
+
 }
 func (M *MockDelegate) MergeRemoteState(buf []byte, join bool) {
-	fmt.Printf("node meta %s %v\n", string(buf), join)
+	fmt.Printf("MergeRemoteState %s %v\n", string(buf), join)
 }
 func TestMemberList(t *testing.T) {
 	core.CreateTestLog()
 	cfg := memberlist.DefaultLANConfig()
-	
 	ch := make(chan memberlist.NodeEvent, 10) //HAVE TO BUFFER
 	cl := memberlist.ChannelEventDelegate{Ch: ch}
 	cfg.Logger = core.AppLog
@@ -49,12 +49,13 @@ func TestMemberList(t *testing.T) {
 		fmt.Printf("Erorr %s\n", err.Error())
 		return
 	}
+	//list.LocalNode().Meta = []byte("tarantula")
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func(m *memberlist.Memberlist) {
 		for {
 			e := <-ch
-			fmt.Printf("Node event %v %d\n", e, m.NumMembers())
+			fmt.Printf("Node event %v %d %s\n", e, m.NumMembers(), string(m.LocalNode().Meta))
 		}
 	}(list)
 	n, err := list.Join([]string{"192.168.1.11:7946", "192.168.1.6:7946"})
@@ -63,7 +64,7 @@ func TestMemberList(t *testing.T) {
 	}
 	fmt.Printf("joined : %d\n", n)
 	list.SendReliable(list.LocalNode(), []byte("hello"))
-	list.SendBestEffort(list.LocalNode(),[]byte("udp"))
+	list.SendBestEffort(list.LocalNode(), []byte("udp"))
 	//list.Leave(5)
 	// Ask for members of the cluster
 	wg.Wait()
