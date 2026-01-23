@@ -27,8 +27,11 @@ func (M *MockDelegate) GetBroadcasts(overhead, limit int) [][]byte {
 }
 
 func (M *MockDelegate) LocalState(join bool) []byte {
-	fmt.Printf("LocalState %v\n", join)
-	return []byte("mice")
+	if join{
+		fmt.Printf("LocalState %v\n", join)
+		return []byte("mice")
+	}
+	return nil
 
 }
 func (M *MockDelegate) MergeRemoteState(buf []byte, join bool) {
