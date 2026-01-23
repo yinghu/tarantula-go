@@ -54,7 +54,7 @@ func TestMemberList(t *testing.T) {
 	cfg.Logger = core.AppLog
 	cfg.Events = &cl
 	cfg.Delegate = &MockDelegate{}
-
+	cfg.Ping = &MockDelegate{}
 	fmt.Printf("config %s %d %v %s\n", cfg.Name, cfg.BindPort, cfg.SecretKey, cfg.Label)
 	list, err := memberlist.Create(cfg)
 	if err != nil {
