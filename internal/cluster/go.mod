@@ -13,6 +13,7 @@ require (
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
 	github.com/hashicorp/memberlist v0.5.4
+	github.com/spaolacci/murmur3 v1.1.0
 	go.etcd.io/etcd/client/v3 v3.6.5
 )
 

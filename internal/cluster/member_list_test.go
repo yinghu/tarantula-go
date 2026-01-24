@@ -8,6 +8,7 @@ import (
 
 	"gameclustering.com/internal/core"
 	"github.com/hashicorp/memberlist"
+	"github.com/spaolacci/murmur3"
 )
 
 type MockDelegate struct {
@@ -65,6 +66,10 @@ func TestMemberList(t *testing.T) {
 	}
 	wg := sync.WaitGroup{}
 	wg.Add(1)
+	hash := murmur3.New32()
+	hash.Write([]byte("node1"))
+	hv := hash.Sum32()
+	fmt.Printf("hash :%d\n",hv)
 	go func(m *memberlist.Memberlist) {
 		for {
 			e := <-ch
