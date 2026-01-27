@@ -15,5 +15,10 @@ func main() {
 		core.AppLog.Printf("no cluster can join %s\n", err.Error())
 		return
 	}
+	go func() {
+		for e := range m.Ch {
+			core.AppLog.Printf("member event %v\n", e)
+		}
+	}()
 	select {}
 }
