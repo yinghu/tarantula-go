@@ -17,6 +17,10 @@ func (m *MemberListListener) Listen() {
 	for e := range m.Ch {
 		core.AppLog.Printf("Cluster event : %v %d\n", e, m.NumMembers())
 	}
+	for n := range m.Members() {
+		core.AppLog.Printf("Node %v\n", m.Members()[n])
+	}
+
 }
 
 // delegate
