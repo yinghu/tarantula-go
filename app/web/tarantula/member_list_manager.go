@@ -18,7 +18,7 @@ func (m *MemberlistManager) Start() error {
 	cfg.Logger = core.AppLog
 	cfg.Events = &cl
 	cfg.Delegate = m
-	//cfg.Ping = m
+	cfg.Ping = m
 	//cfg.Merge = m
 	//cfg.Alive = m
 	list, err := memberlist.Create(cfg)
