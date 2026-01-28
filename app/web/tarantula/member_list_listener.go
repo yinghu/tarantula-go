@@ -36,7 +36,8 @@ func (m *MemberListListener) ShutdownHook() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	<-sigs
 	core.AppLog.Println("Signal to exit")
-	m.Leave(3*time.Second)
+	m.Leave(3 * time.Second)
+	m.Shutdown()
 	signal.Stop(sigs)
 	close(sigs)
 }
