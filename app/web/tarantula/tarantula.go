@@ -15,5 +15,6 @@ func main() {
 		return
 	}
 	go presence.Start(&m)
+	go m.ShutdownHook()
 	select {}
 }

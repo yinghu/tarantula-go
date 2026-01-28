@@ -1,6 +1,9 @@
 package main
 
 import (
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -19,13 +22,23 @@ func (m *MemberListListener) Listen() {
 	}
 }
 
-func (m *MemberListListener) List() []core.Node{
-	nodes := make([]core.Node,0)
+func (m *MemberListListener) List() []core.Node {
+	nodes := make([]core.Node, 0)
 	for _, n := range m.Members() {
 		node := core.Node{Name: n.Name}
-		nodes = append(nodes,node)
+		nodes = append(nodes, node)
 	}
 	return nodes
+}
+
+func (m *MemberListListener) ShutdownHook() {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	<-sigs
+	core.AppLog.Println("Signal to exit")
+	m.Leave(3*time.Second)
+	signal.Stop(sigs)
+	close(sigs)
 }
 
 // delegate
@@ -71,4 +84,9 @@ func (m *MemberListListener) NotifyMerge(peers []*memberlist.Node) error {
 func (m *MemberListListener) NotifyAlive(peer *memberlist.Node) error {
 	core.AppLog.Printf("alive :%v\n", peer)
 	return nil
+}
+
+// conflict delegate
+func (m *MemberListListener) NotifyConflict(existing, other *memberlist.Node) {
+	core.AppLog.Printf("conflict node :%v %v\n", existing, other)
 }
