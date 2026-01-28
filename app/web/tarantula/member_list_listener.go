@@ -9,12 +9,13 @@ import (
 
 type MemberListListener struct {
 	Ch chan memberlist.NodeEvent
+	memberlist.Memberlist
 }
 
 // event dispatch from event delegate
 func (m *MemberListListener) Listen() {
 	for e := range m.Ch {
-		core.AppLog.Printf("Cluster event : %v\n", e)
+		core.AppLog.Printf("Cluster event : %v %d\n", e, m.NumMembers())
 	}
 }
 

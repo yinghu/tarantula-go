@@ -26,6 +26,7 @@ func (m *MemberlistManager) Start() error {
 		core.AppLog.Printf("erorr on member create %s\n", err.Error())
 		return err
 	}
+	m.Memberlist = *list
 	go m.Listen()
 	joined, err := list.Join(m.Seed)
 	if err != nil {

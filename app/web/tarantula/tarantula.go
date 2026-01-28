@@ -7,7 +7,6 @@ import (
 
 func main() {
 	core.CreateTestLog()
-	presence.Start()
 	m := MemberlistManager{}
 	m.Seed = []string{"192.168.1.11", "192.168.1.6"}
 	err := m.Start()
@@ -15,6 +14,6 @@ func main() {
 		core.AppLog.Printf("no cluster can join %s\n", err.Error())
 		return
 	}
-	//go 
+	go presence.Start()
 	select {}
 }
