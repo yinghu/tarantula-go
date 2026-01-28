@@ -8,6 +8,7 @@ import (
 
 	"gameclustering.com/internal/core"
 	"github.com/hashicorp/memberlist"
+	"github.com/spaolacci/murmur3"
 )
 
 type MemberListListener struct {
@@ -17,8 +18,11 @@ type MemberListListener struct {
 
 // event dispatch from event delegate
 func (m *MemberListListener) Listen() {
+	hash := murmur3.New64()
 	for e := range m.Ch {
-		core.AppLog.Printf("Cluster event : %v %d\n", e, m.NumMembers())
+		hash.Write([]byte(e.Node.Name))
+		hd := hash.Sum64()
+		core.AppLog.Printf("Cluster event : %v %d\n", e, hd)
 	}
 }
 
