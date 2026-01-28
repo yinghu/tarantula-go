@@ -40,6 +40,7 @@ func (m *MemberListListener) ShutdownHook() {
 	m.Shutdown()
 	signal.Stop(sigs)
 	close(sigs)
+	os.Exit(0)
 }
 
 // delegate
