@@ -14,6 +14,6 @@ func main() {
 		core.AppLog.Printf("no cluster can join %s\n", err.Error())
 		return
 	}
-	go presence.Start()
+	go presence.Start(&m)
 	select {}
 }
