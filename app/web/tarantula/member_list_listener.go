@@ -19,10 +19,13 @@ func (m *MemberListListener) Listen() {
 	}
 }
 
-func (m *MemberListListener) List() {
+func (m *MemberListListener) List() []core.Node{
+	nodes := make([]core.Node,0)
 	for _, n := range m.Members() {
-		core.AppLog.Printf("Node %v\n", n)
+		node := core.Node{Name: n.Name}
+		nodes = append(nodes,node)
 	}
+	return nodes
 }
 
 // delegate

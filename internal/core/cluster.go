@@ -49,5 +49,5 @@ type ClusterListener interface {
 }
 
 type ClusterViewer interface {
-	List()
+	List() []Node
 }
