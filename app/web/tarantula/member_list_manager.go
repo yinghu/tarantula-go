@@ -20,7 +20,7 @@ func (m *MemberlistManager) Start() error {
 	cfg.Delegate = m
 	cfg.Ping = m
 	cfg.Merge = m
-	//cfg.Alive = m
+	cfg.Alive = m
 	list, err := memberlist.Create(cfg)
 	if err != nil {
 		core.AppLog.Printf("erorr on member create %s\n", err.Error())
