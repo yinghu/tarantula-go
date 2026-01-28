@@ -7,8 +7,7 @@ import (
 
 type MemberlistManager struct {
 	Seed []string
-	MemberListener
-	Ch chan memberlist.NodeEvent
+	MemberListListener
 }
 
 func (m *MemberlistManager) Start() error {
@@ -25,6 +24,7 @@ func (m *MemberlistManager) Start() error {
 		core.AppLog.Printf("erorr on member create %s\n", err.Error())
 		return err
 	}
+	go m.Listen()
 	joined, err := list.Join(m.Seed)
 	if err != nil {
 		core.AppLog.Printf("erorr on member join %s\n", err.Error())
