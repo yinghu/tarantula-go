@@ -17,16 +17,16 @@ func (m *MemberlistManager) Start() error {
 	m.Ch = ch
 	cfg.Logger = core.AppLog
 	cfg.Events = &cl
-	cfg.Delegate = m
-	cfg.Ping = m
-	cfg.Merge = m
-	cfg.Alive = m
+	//cfg.Delegate = m
+	//cfg.Ping = m
+	//cfg.Merge = m
+	//cfg.Alive = m
 	list, err := memberlist.Create(cfg)
 	if err != nil {
 		core.AppLog.Printf("erorr on member create %s\n", err.Error())
 		return err
 	}
-	m.Memberlist = *list
+	m.Memberlist = list
 	go m.Listen()
 	joined, err := list.Join(m.Seed)
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 
 type MemberListListener struct {
 	Ch chan memberlist.NodeEvent
-	memberlist.Memberlist
+	*memberlist.Memberlist
 }
 
 // event dispatch from event delegate
