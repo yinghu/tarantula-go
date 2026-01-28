@@ -47,3 +47,7 @@ type ClusterListener interface {
 	MemberJoined(joined Node)
 	MemberLeft(left Node)
 }
+
+type ClusterViewer interface {
+	List()
+}
