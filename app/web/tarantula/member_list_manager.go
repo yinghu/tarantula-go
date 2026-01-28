@@ -12,13 +12,15 @@ type MemberlistManager struct {
 
 func (m *MemberlistManager) Start() error {
 	cfg := memberlist.DefaultLANConfig()
-	ch := make(chan memberlist.NodeEvent, 10) //HAVE TO BUFFER
+	ch := make(chan memberlist.NodeEvent, 16) //HAVE TO BUFFER
 	cl := memberlist.ChannelEventDelegate{Ch: ch}
 	m.Ch = ch
 	cfg.Logger = core.AppLog
 	cfg.Events = &cl
 	cfg.Delegate = m
 	cfg.Ping = m
+	cfg.Merge = m
+	cfg.Alive = m
 	list, err := memberlist.Create(cfg)
 	if err != nil {
 		core.AppLog.Printf("erorr on member create %s\n", err.Error())
