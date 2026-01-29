@@ -11,9 +11,15 @@ import (
 	"github.com/spaolacci/murmur3"
 )
 
+const (
+	RING_SLOTS int = 271
+)
+
 type MemberListListener struct {
 	Ch chan memberlist.NodeEvent
 	*memberlist.Memberlist
+	ringSlots int
+	
 }
 
 // event dispatch from event delegate
@@ -22,7 +28,7 @@ func (m *MemberListListener) Listen() {
 	for e := range m.Ch {
 		hash.Write([]byte(e.Node.Name))
 		hd := hash.Sum64()
-		core.AppLog.Printf("Cluster event : %v %d\n", e, hd)
+		core.AppLog.Printf("Cluster event : %v %d\n", e, hd%1024)
 	}
 }
 

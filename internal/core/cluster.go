@@ -6,6 +6,7 @@ const (
 
 type Node struct {
 	Name         string `json:"name"`
+	RingToken    uint32 `json:"ringToken"`
 	HttpEndpoint string `json:"http"`
 	TcpEndpoint  string `json:"tcp"`
 }
