@@ -10,18 +10,18 @@ import (
 	"github.com/hashicorp/memberlist"
 )
 
-type Hash64 func([]byte) int64
-
 type MemberListListener struct {
-	Ch chan memberlist.NodeEvent
+	MEvent chan memberlist.NodeEvent
+	MMerge chan []core.Node
+	MAlive chan core.Node
 	*memberlist.Memberlist
 	*MemberHashRing
 }
 
 // event dispatch from event delegate
 func (m *MemberListListener) Listen() {
-
-	for e := range m.Ch {
+	select {
+	case e := <-m.MEvent:
 		switch e.Event {
 		case memberlist.NodeJoin:
 			m.Add(core.Node{Name: e.Node.Name})
@@ -30,8 +30,11 @@ func (m *MemberListListener) Listen() {
 		case memberlist.NodeUpdate:
 			m.Update(core.Node{Name: e.Node.Name})
 		}
-
 		core.AppLog.Printf("Cluster event : %v\n", e)
+	case mg := <-m.MMerge:
+		core.AppLog.Printf("Merge event %v\n", mg)
+	case ma := <-m.MAlive:
+		core.AppLog.Printf("Alive event %v\n", ma)
 	}
 }
 
@@ -50,6 +53,7 @@ func (m *MemberListListener) ShutdownHook() {
 	<-sigs
 	core.AppLog.Println("Signal to exit")
 	m.Leave(3 * time.Second)
+	time.Sleep(5 * time.Second)
 	m.Shutdown()
 	signal.Stop(sigs)
 	close(sigs)
@@ -92,12 +96,18 @@ func (m *MemberListListener) NotifyPingComplete(other *memberlist.Node, rtt time
 // merge delegate
 func (m *MemberListListener) NotifyMerge(peers []*memberlist.Node) error {
 	core.AppLog.Printf("merge :%v\n", peers)
+	nodes := make([]core.Node, 0, len(peers))
+	for _, n := range peers {
+		nodes = append(nodes, core.Node{Name: n.Name})
+	}
+	m.MMerge <- nodes
 	return nil
 }
 
 // alive delegate
 func (m *MemberListListener) NotifyAlive(peer *memberlist.Node) error {
 	//core.AppLog.Printf("alive :%v\n", peer)
+	m.MAlive <- core.Node{Name: peer.Name}
 	return nil
 }
 

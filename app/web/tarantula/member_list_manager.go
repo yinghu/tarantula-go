@@ -5,6 +5,10 @@ import (
 	"github.com/hashicorp/memberlist"
 )
 
+const (
+	NODE_EVENT_BUFFER_SIZE int = 16
+)
+
 type MemberlistManager struct {
 	Seed []string
 	MemberListListener
@@ -13,9 +17,11 @@ type MemberlistManager struct {
 func (m *MemberlistManager) Start() error {
 	m.MemberHashRing = &MemberHashRing{nodes: make([]core.Node, 0)}
 	cfg := memberlist.DefaultLANConfig()
-	ch := make(chan memberlist.NodeEvent, 16) //HAVE TO BUFFER
+	ch := make(chan memberlist.NodeEvent, NODE_EVENT_BUFFER_SIZE) //HAVE TO BUFFER
 	cl := memberlist.ChannelEventDelegate{Ch: ch}
-	m.Ch = ch
+	m.MEvent = ch
+	m.MMerge = make(chan []core.Node, NODE_EVENT_BUFFER_SIZE)
+	m.MAlive = make(chan core.Node, NODE_EVENT_BUFFER_SIZE)
 	cfg.Logger = core.AppLog
 	cfg.Events = &cl
 	cfg.Delegate = m
