@@ -77,7 +77,7 @@ func (m *MemberListListener) LocalState(join bool) []byte {
 	return []byte("dog")
 }
 func (m *MemberListListener) MergeRemoteState(buf []byte, join bool) {
-	core.AppLog.Printf("MergeRemoteState %s %v\n", string(buf), join)
+	//core.AppLog.Printf("MergeRemoteState %s %v\n", string(buf), join)
 }
 
 // ping delegate
@@ -97,7 +97,7 @@ func (m *MemberListListener) NotifyMerge(peers []*memberlist.Node) error {
 
 // alive delegate
 func (m *MemberListListener) NotifyAlive(peer *memberlist.Node) error {
-	core.AppLog.Printf("alive :%v\n", peer)
+	//core.AppLog.Printf("alive :%v\n", peer)
 	return nil
 }
 
