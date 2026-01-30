@@ -22,6 +22,9 @@ func (m *MemberlistManager) Start() error {
 	m.MEvent = ch
 	m.MMerge = make(chan []core.Node, NODE_EVENT_BUFFER_SIZE)
 	m.MAlive = make(chan core.Node, NODE_EVENT_BUFFER_SIZE)
+	m.MPing = make(chan core.Node, NODE_EVENT_BUFFER_SIZE)
+	m.MConflict = make(chan core.Node, NODE_EVENT_BUFFER_SIZE)
+	m.MRequest = make(chan core.RingRequest, NODE_EVENT_BUFFER_SIZE)
 	cfg.Logger = core.AppLog
 	cfg.Events = &cl
 	cfg.Delegate = m

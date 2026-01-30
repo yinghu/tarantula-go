@@ -11,9 +11,12 @@ import (
 )
 
 type MemberListListener struct {
-	MEvent chan memberlist.NodeEvent
-	MMerge chan []core.Node
-	MAlive chan core.Node
+	MEvent    chan memberlist.NodeEvent
+	MMerge    chan []core.Node
+	MAlive    chan core.Node
+	MPing     chan core.Node
+	MConflict chan core.Node
+	MRequest  chan core.RingRequest
 	*memberlist.Memberlist
 	*MemberHashRing
 }
@@ -36,15 +39,25 @@ func (m *MemberListListener) Listen() {
 			core.AppLog.Printf("Merge event %v\n", mg)
 		case ma := <-m.MAlive:
 			core.AppLog.Printf("Alive event %v\n", ma)
+		case mp := <-m.MPing:
+			core.AppLog.Printf("Ping event %v\n", mp)
+		case mc := <-m.MConflict:
+			core.AppLog.Printf("Conflict event %v\n", mc)
+		case mr := <-m.MRequest:
+			node := m.FindNode(mr.Token)
+			mr.Async <- node
 		}
 	}
 }
 
+func (m *MemberListListener) RequestRing(r core.RingRequest) {
+	m.MRequest <- r
+}
+
 func (m *MemberListListener) List() []core.Node {
 	nodes := make([]core.Node, 0)
-	for _, n := range m.Members() {
-		node := core.Node{Name: n.Name}
-		nodes = append(nodes, node)
+	for _, n := range m.nodes {
+		nodes = append(nodes, n)
 	}
 	return nodes
 }
@@ -92,12 +105,11 @@ func (m *MemberListListener) AckPayload() []byte {
 }
 
 func (m *MemberListListener) NotifyPingComplete(other *memberlist.Node, rtt time.Duration, payload []byte) {
-	//core.AppLog.Printf("ping :%v %s\n", other, string(payload))
+	m.MPing <- core.Node{Name: other.Name}
 }
 
 // merge delegate
 func (m *MemberListListener) NotifyMerge(peers []*memberlist.Node) error {
-	core.AppLog.Printf("merge :%v\n", peers)
 	nodes := make([]core.Node, 0, len(peers))
 	for _, n := range peers {
 		nodes = append(nodes, core.Node{Name: n.Name})
@@ -108,12 +120,11 @@ func (m *MemberListListener) NotifyMerge(peers []*memberlist.Node) error {
 
 // alive delegate
 func (m *MemberListListener) NotifyAlive(peer *memberlist.Node) error {
-	//core.AppLog.Printf("alive :%v\n", peer)
 	m.MAlive <- core.Node{Name: peer.Name}
 	return nil
 }
 
 // conflict delegate
 func (m *MemberListListener) NotifyConflict(existing, other *memberlist.Node) {
-	core.AppLog.Printf("conflict node :%v %v\n", existing, other)
+	m.MConflict <- core.Node{Name: other.Name}
 }

@@ -1,6 +1,11 @@
 package main
 
-import "gameclustering.com/internal/core"
+import (
+	"slices"
+
+	"gameclustering.com/internal/core"
+	"github.com/spaolacci/murmur3"
+)
 
 func cmp(n1, n2 core.Node) int {
 	if n1.RingToken > n2.RingToken {
@@ -18,6 +23,17 @@ type MemberHashRing struct {
 
 func (m *MemberHashRing) Add(node core.Node) {
 	core.AppLog.Printf("ADD NODE %v\n", node)
+	sz := len(m.nodes)
+	node.RingToken = m.RingToken([]byte(node.Name))
+	if sz == 0 {
+		m.nodes = append(m.nodes, node)
+		return
+	}
+	pending := make([]core.Node, 0, sz+1)
+	copy(pending, m.nodes)
+	pending = append(pending, node)
+	m.nodes = pending
+	slices.SortFunc(m.nodes, cmp)
 }
 
 func (m *MemberHashRing) Remove(node core.Node) {
@@ -27,7 +43,9 @@ func (m *MemberHashRing) Remove(node core.Node) {
 func (m *MemberHashRing) Update(node core.Node) {
 	core.AppLog.Printf("UPDATE NODE %v\n", node)
 }
-
+func (m *MemberHashRing) RingToken(key []byte) uint32 {
+	return murmur3.Sum32(key)
+}
 func (m *MemberHashRing) FindNode(t uint32) core.Node {
 	n := core.Node{RingToken: t}
 	l := 0
