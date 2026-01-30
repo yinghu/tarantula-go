@@ -39,6 +39,7 @@ func (m *MemberListListener) Listen() {
 			core.AppLog.Printf("Merge event %v\n", mg)
 		case ma := <-m.MAlive:
 			core.AppLog.Printf("Alive event %v\n", ma)
+			m.UpdateNode(5 * time.Second)
 		case mp := <-m.MPing:
 			core.AppLog.Printf("Ping event %v\n", mp)
 		case mc := <-m.MConflict:
