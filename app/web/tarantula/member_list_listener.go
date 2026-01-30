@@ -64,6 +64,7 @@ func (m *MemberListListener) KeyRing(r core.RingRequest) {
 
 func (m *MemberListListener) HashRing(r core.RingRequest) {
 	m.MRequest <- r
+	m.UpdateNode(500 * time.Millisecond)
 }
 
 func (m *MemberListListener) ShutdownHook() {
