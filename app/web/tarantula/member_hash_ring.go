@@ -30,6 +30,10 @@ func (m *MemberHashRing) Add(node core.Node) {
 
 func (m *MemberHashRing) Remove(node core.Node) {
 	core.AppLog.Printf("REMOVE NODE %v\n", node)
+	m.nodes = slices.DeleteFunc(m.nodes, func(n core.Node) bool {
+		return n.Name == node.Name
+	})
+	slices.SortFunc(m.nodes, cmp)
 }
 
 func (m *MemberHashRing) Update(node core.Node) {
