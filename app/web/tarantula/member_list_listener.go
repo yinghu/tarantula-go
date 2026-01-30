@@ -8,27 +8,29 @@ import (
 
 	"gameclustering.com/internal/core"
 	"github.com/hashicorp/memberlist"
-	"github.com/spaolacci/murmur3"
 )
 
-const (
-	RING_SLOTS int = 271
-)
+type Hash64 func([]byte) int64
 
 type MemberListListener struct {
 	Ch chan memberlist.NodeEvent
 	*memberlist.Memberlist
-	ringSlots int
-	
+	*MemberHashRing
 }
 
 // event dispatch from event delegate
 func (m *MemberListListener) Listen() {
-	hash := murmur3.New64()
+
 	for e := range m.Ch {
-		hash.Write([]byte(e.Node.Name))
-		hd := hash.Sum64()
-		core.AppLog.Printf("Cluster event : %v %d\n", e, hd%1024)
+		switch e.Event {
+		case memberlist.NodeJoin:
+			m.Add(core.Node{Name: e.Node.Name})
+		case memberlist.NodeLeave:
+		case memberlist.NodeUpdate:
+
+		}
+
+		core.AppLog.Printf("Cluster event : %v\n", e)
 	}
 }
 

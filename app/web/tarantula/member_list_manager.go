@@ -11,11 +11,11 @@ type MemberlistManager struct {
 }
 
 func (m *MemberlistManager) Start() error {
+	m.MemberHashRing = &MemberHashRing{nodes: make([]core.Node, 0)}
 	cfg := memberlist.DefaultLANConfig()
 	ch := make(chan memberlist.NodeEvent, 16) //HAVE TO BUFFER
 	cl := memberlist.ChannelEventDelegate{Ch: ch}
 	m.Ch = ch
-	m.ringSlots = RING_SLOTS
 	cfg.Logger = core.AppLog
 	cfg.Events = &cl
 	cfg.Delegate = m
