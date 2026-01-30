@@ -20,6 +20,14 @@ func (m *MemberHashRing) Add(node core.Node) {
 	core.AppLog.Printf("ADD NODE %v\n", node)
 }
 
+func (m *MemberHashRing) Remove(node core.Node) {
+	core.AppLog.Printf("REMOVE NODE %v\n", node)
+}
+
+func (m *MemberHashRing) Update(node core.Node) {
+	core.AppLog.Printf("UPDATE NODE %v\n", node)
+}
+
 func (m *MemberHashRing) FindNode(t uint32) core.Node {
 	n := core.Node{RingToken: t}
 	l := 0

@@ -26,8 +26,9 @@ func (m *MemberListListener) Listen() {
 		case memberlist.NodeJoin:
 			m.Add(core.Node{Name: e.Node.Name})
 		case memberlist.NodeLeave:
+			m.Remove(core.Node{Name: e.Node.Name})
 		case memberlist.NodeUpdate:
-
+			m.Update(core.Node{Name: e.Node.Name})
 		}
 
 		core.AppLog.Printf("Cluster event : %v\n", e)
@@ -85,7 +86,7 @@ func (m *MemberListListener) AckPayload() []byte {
 }
 
 func (m *MemberListListener) NotifyPingComplete(other *memberlist.Node, rtt time.Duration, payload []byte) {
-	core.AppLog.Printf("ping :%v %s\n", other, string(payload))
+	//core.AppLog.Printf("ping :%v %s\n", other, string(payload))
 }
 
 // merge delegate
