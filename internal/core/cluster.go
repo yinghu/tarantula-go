@@ -49,6 +49,13 @@ type ClusterListener interface {
 	MemberLeft(left Node)
 }
 
+type RingRequest struct {
+	Token uint32
+	Async chan []Node
+}
+
 type ClusterViewer interface {
-	List() []Node
+	HashRing(r RingRequest)
+	KeyRing(r RingRequest)
+	RingToken(key []byte) uint32
 }

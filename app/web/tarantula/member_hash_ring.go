@@ -47,13 +47,12 @@ func (m *MemberHashRing) RingToken(key []byte) uint32 {
 	return murmur3.Sum32(key)
 }
 func (m *MemberHashRing) FindNode(t uint32) core.Node {
-	n := core.Node{RingToken: t}
 	l := 0
 	r := len(m.nodes) - 1
 	ix := -1
 	for l <= r {
 		md := l + (r-l)/2
-		if n.RingToken < m.nodes[md].RingToken {
+		if t < m.nodes[md].RingToken {
 			ix = md
 			r = md - 1
 		} else {
@@ -63,6 +62,5 @@ func (m *MemberHashRing) FindNode(t uint32) core.Node {
 	if ix == -1 {
 		ix = 0
 	}
-	n.Name = m.nodes[ix].Name
-	return n
+	return m.nodes[ix]
 }

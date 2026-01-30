@@ -44,22 +44,26 @@ func (m *MemberListListener) Listen() {
 		case mc := <-m.MConflict:
 			core.AppLog.Printf("Conflict event %v\n", mc)
 		case mr := <-m.MRequest:
-			node := m.FindNode(mr.Token)
-			mr.Async <- node
+			if mr.Token > 0 {
+				node := m.FindNode(mr.Token)
+				mr.Async <- []core.Node{node}
+			} else {
+				nodes := make([]core.Node, 0)
+				for _, n := range m.nodes {
+					nodes = append(nodes, n)
+				}
+				mr.Async <- nodes
+			}
 		}
 	}
 }
 
-func (m *MemberListListener) RequestRing(r core.RingRequest) {
+func (m *MemberListListener) KeyRing(r core.RingRequest) {
 	m.MRequest <- r
 }
 
-func (m *MemberListListener) List() []core.Node {
-	nodes := make([]core.Node, 0)
-	for _, n := range m.nodes {
-		nodes = append(nodes, n)
-	}
-	return nodes
+func (m *MemberListListener) HashRing(r core.RingRequest) {
+	m.MRequest <- r
 }
 
 func (m *MemberListListener) ShutdownHook() {
