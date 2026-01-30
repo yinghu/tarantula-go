@@ -20,21 +20,23 @@ type MemberListListener struct {
 
 // event dispatch from event delegate
 func (m *MemberListListener) Listen() {
-	select {
-	case e := <-m.MEvent:
-		switch e.Event {
-		case memberlist.NodeJoin:
-			m.Add(core.Node{Name: e.Node.Name})
-		case memberlist.NodeLeave:
-			m.Remove(core.Node{Name: e.Node.Name})
-		case memberlist.NodeUpdate:
-			m.Update(core.Node{Name: e.Node.Name})
+	for {
+		select {
+		case e := <-m.MEvent:
+			switch e.Event {
+			case memberlist.NodeJoin:
+				m.Add(core.Node{Name: e.Node.Name})
+			case memberlist.NodeLeave:
+				m.Remove(core.Node{Name: e.Node.Name})
+			case memberlist.NodeUpdate:
+				m.Update(core.Node{Name: e.Node.Name})
+			}
+			core.AppLog.Printf("Cluster event : %v\n", e)
+		case mg := <-m.MMerge:
+			core.AppLog.Printf("Merge event %v\n", mg)
+		case ma := <-m.MAlive:
+			core.AppLog.Printf("Alive event %v\n", ma)
 		}
-		core.AppLog.Printf("Cluster event : %v\n", e)
-	case mg := <-m.MMerge:
-		core.AppLog.Printf("Merge event %v\n", mg)
-	case ma := <-m.MAlive:
-		core.AppLog.Printf("Alive event %v\n", ma)
 	}
 }
 
