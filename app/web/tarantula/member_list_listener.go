@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -19,6 +20,7 @@ type MemberListListener struct {
 	MRequest  chan core.RingRequest
 	*memberlist.Memberlist
 	*MemberHashRing
+	ct int
 }
 
 // event dispatch from event delegate
@@ -83,7 +85,8 @@ func (m *MemberListListener) ShutdownHook() {
 // delegate
 func (m *MemberListListener) NodeMeta(limit int) []byte {
 	core.AppLog.Printf("pull meta data for node update")
-	return []byte("tarantula")
+	m.ct++
+	return []byte(fmt.Sprintf("tarantula%d", m.ct))
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
