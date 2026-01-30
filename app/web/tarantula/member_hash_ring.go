@@ -23,16 +23,8 @@ type MemberHashRing struct {
 
 func (m *MemberHashRing) Add(node core.Node) {
 	core.AppLog.Printf("ADD NODE %v\n", node)
-	sz := len(m.nodes)
 	node.RingToken = m.RingToken([]byte(node.Name))
-	if sz == 0 {
-		m.nodes = append(m.nodes, node)
-		return
-	}
-	pending := make([]core.Node, 0, sz+1)
-	copy(pending, m.nodes)
-	pending = append(pending, node)
-	m.nodes = pending
+	m.nodes = append(m.nodes, node)
 	slices.SortFunc(m.nodes, cmp)
 }
 
