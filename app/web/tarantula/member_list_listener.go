@@ -30,7 +30,7 @@ func (m *MemberListListener) Listen() {
 		case e := <-m.MEvent:
 			switch e.Event {
 			case memberlist.NodeJoin:
-				m.Add(core.Node{Name: e.Node.Name})
+				m.Add(core.Node{Name: e.Node.Name, Meta: e.Node.Meta, IP: e.Node.Address(), State: int(e.Node.State)})
 			case memberlist.NodeLeave:
 				m.Remove(core.Node{Name: e.Node.Name})
 			case memberlist.NodeUpdate:
