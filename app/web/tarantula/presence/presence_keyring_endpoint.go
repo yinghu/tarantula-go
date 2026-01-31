@@ -7,14 +7,16 @@ import (
 	"gameclustering.com/internal/core"
 )
 
-type PresenceEndpoint struct {
+type PresenceKeyRingEndpoint struct {
 	core.ClusterViewer
 }
 
-func (p *PresenceEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (p *PresenceKeyRingEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+	k := r.PathValue("key")
 	rq := make(chan []core.Node, 1)
-	p.HashRing(core.RingRequest{Async: rq})
+	defer close(rq)
+	p.KeyRing(core.RingRequest{Token: p.RingToken([]byte(k)), Async: rq})
 	n := <-rq
 	data, err := json.Marshal(n)
 	if err != nil {

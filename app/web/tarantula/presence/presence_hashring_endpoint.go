@@ -1,0 +1,26 @@
+package presence
+
+import (
+	"encoding/json"
+	"net/http"
+
+	"gameclustering.com/internal/core"
+)
+
+type PresenceHashRingEndpoint struct {
+	core.ClusterViewer
+}
+
+func (p *PresenceHashRingEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	rq := make(chan []core.Node, 1)
+	defer close(rq)
+	p.HashRing(core.RingRequest{Async: rq})
+	n := <-rq
+	data, err := json.Marshal(n)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return
+	}
+	w.Write(data)
+}
