@@ -67,7 +67,7 @@
             "Name":"Cloud","ScopeSequence":5,"Icon":"cloud",
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
-                {"Name":"Edit","Callback":"edit_category"}           
+                {"Name":"Edit","Callback":"edit_category"},{"Name":"TokenRing","Callback":"list_token_ring"}           
             ]        
         },
         {
