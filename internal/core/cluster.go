@@ -7,9 +7,9 @@ const (
 type Node struct {
 	Name         string `json:"name"`
 	RingToken    uint32 `json:"ringToken"`
-	Meta         []byte `json:"-"`
-	IP           string `json:"-"`
-	State        int    `json:"-"`
+	Meta         string `json:"meta"`
+	IP           string `json:"address"`
+	State        int    `json:"state"`
 	HttpEndpoint string `json:"http"`
 	TcpEndpoint  string `json:"tcp"`
 }
@@ -58,7 +58,7 @@ type RingRequest struct {
 }
 
 type ValueRequest struct {
-	Key []byte
+	Key   []byte
 	Async chan Chunk
 }
 

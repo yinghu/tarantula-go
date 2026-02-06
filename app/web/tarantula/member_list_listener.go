@@ -24,7 +24,7 @@ type MemberListListener struct {
 }
 
 func (m *MemberListListener) toNode(e *memberlist.Node) core.Node {
-	return core.Node{Name: e.Name, Meta: e.Meta, IP: e.Address(), State: int(e.State)}
+	return core.Node{Name: e.Name, Meta: string(e.Meta), IP: e.Address(), State: int(e.State)}
 }
 
 // event dispatch from event delegate
