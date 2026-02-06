@@ -120,14 +120,14 @@ func (m *MemberListListener) AckPayload() []byte {
 }
 
 func (m *MemberListListener) NotifyPingComplete(other *memberlist.Node, rtt time.Duration, payload []byte) {
-	m.MPing <- core.Node{Name: other.Name, Meta: other.Meta}
+	m.MPing <- m.toNode(other)
 }
 
 // merge delegate
 func (m *MemberListListener) NotifyMerge(peers []*memberlist.Node) error {
 	nodes := make([]core.Node, 0, len(peers))
 	for _, n := range peers {
-		nodes = append(nodes, core.Node{Name: n.Name})
+		nodes = append(nodes, m.toNode(n))
 	}
 	m.MMerge <- nodes
 	return nil
@@ -135,11 +135,11 @@ func (m *MemberListListener) NotifyMerge(peers []*memberlist.Node) error {
 
 // alive delegate
 func (m *MemberListListener) NotifyAlive(peer *memberlist.Node) error {
-	m.MAlive <- core.Node{Name: peer.Name}
+	m.MAlive <- m.toNode(peer)
 	return nil
 }
 
 // conflict delegate
 func (m *MemberListListener) NotifyConflict(existing, other *memberlist.Node) {
-	m.MConflict <- []core.Node{{Name: existing.Name}, {Name: other.Name}}
+	m.MConflict <- []core.Node{m.toNode(existing),m.toNode(other)}
 }
