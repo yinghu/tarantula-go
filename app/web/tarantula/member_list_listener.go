@@ -86,7 +86,7 @@ func (m *MemberListListener) ShutdownHook() {
 func (m *MemberListListener) NodeMeta(limit int) []byte {
 	core.AppLog.Printf("pull meta data for node update")
 	m.ct++
-	return []byte(fmt.Sprintf("tarantula%d", m.ct))
+	return fmt.Appendf([]byte{}, "tarantula%d", m.ct)
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
