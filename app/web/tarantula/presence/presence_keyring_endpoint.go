@@ -13,6 +13,9 @@ type PresenceKeyRingEndpoint struct {
 
 func (p *PresenceKeyRingEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
 	k := r.PathValue("key")
 	rq := make(chan []core.Node, 1)
 	defer close(rq)

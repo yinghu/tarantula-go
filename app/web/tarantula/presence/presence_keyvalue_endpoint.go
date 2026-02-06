@@ -12,8 +12,11 @@ type PresenceKeyValueEndpoint struct {
 
 func (p *PresenceKeyValueEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
 	k := r.PathValue("key")
-	rq := make(chan core.Chunk,3)
+	rq := make(chan core.Chunk, 3)
 	defer close(rq)
 	p.FindValue(core.ValueRequest{Key: []byte(k), Async: rq})
 	for c := range rq {

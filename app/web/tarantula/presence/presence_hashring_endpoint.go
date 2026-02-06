@@ -13,6 +13,9 @@ type PresenceHashRingEndpoint struct {
 
 func (p *PresenceHashRingEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
 	p.HashRing(core.RingRequest{Async: rq})
