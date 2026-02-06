@@ -67,6 +67,12 @@ func (m *MemberListListener) HashRing(r core.RingRequest) {
 	m.MRequest <- r
 	m.UpdateNode(500 * time.Millisecond)
 }
+func (m *MemberListListener) FindValue(r core.ValueRequest) {
+	//m.MRequest <- r
+	//m.UpdateNode(500 * time.Millisecond)
+	r.Async <- core.Chunk{Remaining: true, Data: []byte("chunk1")}
+	r.Async <- core.Chunk{Remaining: false, Data: []byte("chunk2")}
+}
 
 func (m *MemberListListener) ShutdownHook() {
 	sigs := make(chan os.Signal, 1)
@@ -112,7 +118,7 @@ func (m *MemberListListener) AckPayload() []byte {
 }
 
 func (m *MemberListListener) NotifyPingComplete(other *memberlist.Node, rtt time.Duration, payload []byte) {
-	m.MPing <- core.Node{Name: other.Name,Meta: other.Meta}
+	m.MPing <- core.Node{Name: other.Name, Meta: other.Meta}
 }
 
 // merge delegate
@@ -133,5 +139,5 @@ func (m *MemberListListener) NotifyAlive(peer *memberlist.Node) error {
 
 // conflict delegate
 func (m *MemberListListener) NotifyConflict(existing, other *memberlist.Node) {
-	m.MConflict <- []core.Node{{Name: existing.Name},{Name: other.Name}}
+	m.MConflict <- []core.Node{{Name: existing.Name}, {Name: other.Name}}
 }

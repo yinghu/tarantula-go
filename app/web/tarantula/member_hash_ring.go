@@ -81,3 +81,5 @@ func (m *MemberHashRing) RingNode(t uint32) core.Node {
 	}
 	return m.nodes[ix]
 }
+
+

@@ -57,8 +57,14 @@ type RingRequest struct {
 	Async chan []Node
 }
 
+type ValueRequest struct {
+	Key []byte
+	Async chan Chunk
+}
+
 type ClusterViewer interface {
 	HashRing(r RingRequest)
 	KeyRing(r RingRequest)
 	RingToken(key []byte) uint32
+	FindValue(r ValueRequest)
 }
