@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"slices"
 
 	"gameclustering.com/internal/core"
@@ -22,17 +23,24 @@ type MemberHashRing struct {
 	weight int
 }
 
+func (m *MemberHashRing) vNode(node core.Node, weight int) core.Node {
+	return core.Node{Name: fmt.Sprintf("%s#%d", node.Name, weight), IP: node.IP, Meta: node.Meta, State: node.State}
+}
+
 func (m *MemberHashRing) OnAdd(node core.Node) {
 	core.AppLog.Printf("ADD NODE %v\n", node)
-	node.RingToken = m.RingToken([]byte(node.Name))
-	m.nodes = append(m.nodes, node)
+	for w := range m.weight {
+		v := m.vNode(node, w)
+		node.RingToken = m.RingToken([]byte(v.Name))
+		m.nodes = append(m.nodes, v)
+	}
 	slices.SortFunc(m.nodes, cmp)
 }
 
 func (m *MemberHashRing) OnRemove(node core.Node) {
 	core.AppLog.Printf("REMOVE NODE %v\n", node)
 	m.nodes = slices.DeleteFunc(m.nodes, func(n core.Node) bool {
-		return n.Name == node.Name
+		return n.IP == node.IP
 	})
 	slices.SortFunc(m.nodes, cmp)
 }
