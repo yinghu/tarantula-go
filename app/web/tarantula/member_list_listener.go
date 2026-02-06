@@ -68,8 +68,6 @@ func (m *MemberListListener) HashRing(r core.RingRequest) {
 	m.UpdateNode(500 * time.Millisecond)
 }
 func (m *MemberListListener) FindValue(r core.ValueRequest) {
-	//m.MRequest <- r
-	//m.UpdateNode(500 * time.Millisecond)
 	r.Async <- core.Chunk{Remaining: true, Data: []byte("chunk1")}
 	r.Async <- core.Chunk{Remaining: false, Data: []byte("chunk2")}
 }

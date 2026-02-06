@@ -49,16 +49,15 @@ func (m *MemberHashRing) OnLive(node core.Node) {
 }
 
 func (m *MemberHashRing) OnPing(node core.Node) {
-	core.AppLog.Printf("PING NODE %v\n", node)
-	
+	core.AppLog.Printf("PING NODE %s %s\n", node.Name, string(node.Meta))
+
 }
 
 func (m *MemberHashRing) OnConflict(nodes []core.Node) {
 	core.AppLog.Printf("CONFLICT NODE %v\n", nodes)
 }
 
-
-//hash ring operations 
+// hash ring operations
 func (m *MemberHashRing) RingToken(key []byte) uint32 {
 	return murmur3.Sum32(key)
 }
@@ -81,5 +80,3 @@ func (m *MemberHashRing) RingNode(t uint32) core.Node {
 	}
 	return m.nodes[ix]
 }
-
-
