@@ -58,9 +58,10 @@ func TestHashRing(t *testing.T) {
 		return false
 	})
 	fmt.Printf("node pos %d %s\n", pos, keyNode.Name)
-	pn := mr.FindNode(rt)
+	pn := mr.RingNode(rt)
 	fmt.Printf("node found %d %s\n", pn.RingToken, pn.Name)
 	if keyNode.Name != pn.Name{
 		t.Errorf("should be same node %s <> %s",keyNode.Name,pn.Name)
 	}
+	fmt.Println(string(fmt.Appendf([]byte{}, "tarantula%d", 1)))
 }

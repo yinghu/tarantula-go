@@ -16,7 +16,7 @@ type MemberListListener struct {
 	MMerge    chan []core.Node
 	MAlive    chan core.Node
 	MPing     chan core.Node
-	MConflict chan core.Node
+	MConflict chan []core.Node
 	MRequest  chan core.RingRequest
 	*memberlist.Memberlist
 	*MemberHashRing
@@ -30,24 +30,23 @@ func (m *MemberListListener) Listen() {
 		case e := <-m.MEvent:
 			switch e.Event {
 			case memberlist.NodeJoin:
-				m.Add(core.Node{Name: e.Node.Name, Meta: e.Node.Meta, IP: e.Node.Address(), State: int(e.Node.State)})
+				m.OnAdd(core.Node{Name: e.Node.Name, Meta: e.Node.Meta, IP: e.Node.Address(), State: int(e.Node.State)})
 			case memberlist.NodeLeave:
-				m.Remove(core.Node{Name: e.Node.Name})
+				m.OnRemove(core.Node{Name: e.Node.Name})
 			case memberlist.NodeUpdate:
-				m.Update(core.Node{Name: e.Node.Name})
+				m.OnUpdate(core.Node{Name: e.Node.Name})
 			}
-			core.AppLog.Printf("Cluster event : %v\n", e)
 		case mg := <-m.MMerge:
-			core.AppLog.Printf("Merge event %v\n", mg)
+			m.OnMerge(mg)
 		case ma := <-m.MAlive:
-			core.AppLog.Printf("Alive event %v\n", ma)
+			m.OnLive(ma)
 		case mp := <-m.MPing:
-			core.AppLog.Printf("Ping event %v\n", mp)
+			m.OnPing(mp)
 		case mc := <-m.MConflict:
-			core.AppLog.Printf("Conflict event %v\n", mc)
+			m.OnConflict(mc)
 		case mr := <-m.MRequest:
 			if mr.Token > 0 {
-				node := m.FindNode(mr.Token)
+				node := m.RingNode(mr.Token)
 				mr.Async <- []core.Node{node}
 			} else {
 				nodes := make([]core.Node, 0)
@@ -113,7 +112,7 @@ func (m *MemberListListener) AckPayload() []byte {
 }
 
 func (m *MemberListListener) NotifyPingComplete(other *memberlist.Node, rtt time.Duration, payload []byte) {
-	m.MPing <- core.Node{Name: other.Name}
+	m.MPing <- core.Node{Name: other.Name,Meta: other.Meta}
 }
 
 // merge delegate
@@ -134,5 +133,5 @@ func (m *MemberListListener) NotifyAlive(peer *memberlist.Node) error {
 
 // conflict delegate
 func (m *MemberListListener) NotifyConflict(existing, other *memberlist.Node) {
-	m.MConflict <- core.Node{Name: other.Name}
+	m.MConflict <- []core.Node{{Name: existing.Name},{Name: other.Name}}
 }
