@@ -18,7 +18,8 @@ func cmp(n1, n2 core.Node) int {
 }
 
 type MemberHashRing struct {
-	nodes []core.Node
+	nodes  []core.Node
+	weight int
 }
 
 func (m *MemberHashRing) OnAdd(node core.Node) {

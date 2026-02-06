@@ -23,6 +23,10 @@ type MemberListListener struct {
 	ct int
 }
 
+func (m *MemberListListener) toNode(e *memberlist.Node) core.Node {
+	return core.Node{Name: e.Name, Meta: e.Meta, IP: e.Address(), State: int(e.State)}
+}
+
 // event dispatch from event delegate
 func (m *MemberListListener) Listen() {
 	for {
@@ -30,11 +34,11 @@ func (m *MemberListListener) Listen() {
 		case e := <-m.MEvent:
 			switch e.Event {
 			case memberlist.NodeJoin:
-				m.OnAdd(core.Node{Name: e.Node.Name, Meta: e.Node.Meta, IP: e.Node.Address(), State: int(e.Node.State)})
+				m.OnAdd(m.toNode(e.Node))
 			case memberlist.NodeLeave:
-				m.OnRemove(core.Node{Name: e.Node.Name})
+				m.OnRemove(m.toNode(e.Node))
 			case memberlist.NodeUpdate:
-				m.OnUpdate(core.Node{Name: e.Node.Name})
+				m.OnUpdate(m.toNode(e.Node))
 			}
 		case mg := <-m.MMerge:
 			m.OnMerge(mg)
