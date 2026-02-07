@@ -116,7 +116,37 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 	get.Async <- core.Chunk{Remaining: false, Data: []byte(retry.Err.Error())}
 }
 func (m *MemberListListener) Set(set core.SetRequest) {
-
+	rq := make(chan []core.Node, 1)
+	m.MRequest <- core.RingRequest{Token: m.RingToken(set.Key), Async: rq}
+	nodes := <-rq
+	retry := RetryTrack{}
+	for _, ringNode := range nodes {
+		core.AppLog.Printf("target node %s\n", ringNode.IP)
+		tcp, err := grpc.NewClient(ringNode.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if err != nil {
+			retry.Err = err
+			retry.Reties++
+			continue
+		}
+		defer tcp.Close()
+		dsp := data.NewDataServiceClient(tcp)
+		kv := data.Data{Key: set.Key, Value: set.Value}
+		var dt *data.Response
+		dt, err = dsp.Set(context.Background(), &kv)
+		if err != nil {
+			retry.Err = err
+			retry.Reties++
+			continue
+		}
+		set.Async <- core.Chunk{Remaining: false, Data: []byte(dt.Message)}
+		retry.Suc = true
+		break
+	}
+	if retry.Suc {
+		return
+	}
+	core.AppLog.Printf("retry %s, %d\n", retry.Err.Error(), retry.Reties)
+	set.Async <- core.Chunk{Remaining: false, Data: []byte(retry.Err.Error())}
 }
 
 func (m *MemberListListener) ShutdownHook() {
