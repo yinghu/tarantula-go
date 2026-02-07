@@ -76,6 +76,7 @@ func (m *MemberListListener) FindValue(r core.ValueRequest) {
 	r.Async <- core.Chunk{Remaining: false, Data: []byte("chunk2")}
 }
 
+
 func (m *MemberListListener) ShutdownHook() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
