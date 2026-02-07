@@ -6,11 +6,11 @@ import (
 	"gameclustering.com/internal/core"
 )
 
-type PresenceKeyValueEndpoint struct {
+type PresenceSetValueEndpoint struct {
 	core.ClusterService
 }
 
-func (p *PresenceKeyValueEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (p *PresenceSetValueEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "*")
