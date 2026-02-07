@@ -8,7 +8,7 @@ import (
 )
 
 type PresenceKeyRingEndpoint struct {
-	core.ClusterViewer
+	core.ClusterService
 }
 
 func (p *PresenceKeyRingEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {

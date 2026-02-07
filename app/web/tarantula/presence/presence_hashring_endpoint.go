@@ -8,7 +8,7 @@ import (
 )
 
 type PresenceHashRingEndpoint struct {
-	core.ClusterViewer
+	core.ClusterService
 }
 
 func (p *PresenceHashRingEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {

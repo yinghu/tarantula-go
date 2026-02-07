@@ -7,7 +7,7 @@ import (
 )
 
 type PresenceKeyValueEndpoint struct {
-	core.ClusterViewer
+	core.ClusterService
 }
 
 func (p *PresenceKeyValueEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -18,7 +18,7 @@ func (p *PresenceKeyValueEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Requ
 	k := r.PathValue("key")
 	rq := make(chan core.Chunk, 3)
 	defer close(rq)
-	p.FindValue(core.ValueRequest{Key: []byte(k), Async: rq})
+	p.Get(core.GetRequest{Key: []byte(k), Async: rq})
 	for c := range rq {
 		if len(c.Data) > 0 {
 			w.Write(c.Data)

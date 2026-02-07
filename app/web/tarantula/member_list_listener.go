@@ -77,28 +77,29 @@ func (m *MemberListListener) HashRing(r core.RingRequest) {
 	m.MRequest <- r
 	m.UpdateNode(500 * time.Millisecond)
 }
-func (m *MemberListListener) FindValue(r core.ValueRequest) {
-	ringNode := m.RingNode(m.RingToken(r.Key))
+func (m *MemberListListener) Get(get core.GetRequest) {
+	rq := make(chan []core.Node, 1)
+	m.MRequest <- core.RingRequest{Token: m.RingToken(get.Key), Async: rq}
+	nodes := <-rq
+	ringNode := nodes[0]
 	core.AppLog.Printf("target node %s\n", ringNode.IP)
 	tcp, err := grpc.NewClient(ringNode.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		r.Async <- core.Chunk{Remaining: false, Data: []byte(err.Error())}
+		get.Async <- core.Chunk{Remaining: false, Data: []byte(err.Error())}
 		return
 	}
 	defer tcp.Close()
 	dsp := data.NewDataServiceClient(tcp)
-	_, err = dsp.Get(context.Background(), &data.Request{})
+	var dt *data.Data
+	dt, err = dsp.Get(context.Background(), &data.Request{Key: get.Key})
 	if err != nil {
-		r.Async <- core.Chunk{Remaining: false, Data: []byte(err.Error())}
+		get.Async <- core.Chunk{Remaining: false, Data: []byte(err.Error())}
 		return
 	}
-	_, err = dsp.Set(context.Background(), &data.Data{})
-	if err != nil {
-		r.Async <- core.Chunk{Remaining: false, Data: []byte(err.Error())}
-		return
-	}
-	r.Async <- core.Chunk{Remaining: true, Data: []byte("chunk1")}
-	r.Async <- core.Chunk{Remaining: false, Data: []byte("chunk2")}
+	get.Async <- core.Chunk{Remaining: false, Data: dt.Value}
+}
+func (m *MemberListListener) Set(set core.SetRequest) {
+
 }
 
 func (m *MemberListListener) ShutdownHook() {

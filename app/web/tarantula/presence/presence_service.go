@@ -6,7 +6,7 @@ import (
 	"gameclustering.com/internal/core"
 )
 
-func Start(viewer core.ClusterViewer) {
+func Start(viewer core.ClusterService) {
 	http.Handle("/tarantula/presence/hashring", &PresenceHashRingEndpoint{viewer})
 	http.Handle("/tarantula/presence/keyring/{key}", &PresenceKeyRingEndpoint{viewer})
 	http.Handle("/tarantula/presence/keyvalue/{key}", &PresenceKeyValueEndpoint{viewer})
