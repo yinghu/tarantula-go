@@ -1,14 +1,19 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/tarantula/data"
 	"github.com/hashicorp/memberlist"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type MemberListListener struct {
@@ -24,7 +29,8 @@ type MemberListListener struct {
 }
 
 func (m *MemberListListener) toNode(e *memberlist.Node) core.Node {
-	return core.Node{Name: e.Name, Meta: string(e.Meta), IP: e.Address(), State: int(e.State)}
+	parts := strings.Split(e.Address(), ":")
+	return core.Node{Name: e.Name, Meta: string(e.Meta), IP: fmt.Sprintf("%s:%d", parts[0], 7001), State: int(e.State)}
 }
 
 // event dispatch from event delegate
@@ -72,10 +78,28 @@ func (m *MemberListListener) HashRing(r core.RingRequest) {
 	m.UpdateNode(500 * time.Millisecond)
 }
 func (m *MemberListListener) FindValue(r core.ValueRequest) {
+	ringNode := m.RingNode(m.RingToken(r.Key))
+	core.AppLog.Printf("target node %s\n", ringNode.IP)
+	tcp, err := grpc.NewClient(ringNode.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		r.Async <- core.Chunk{Remaining: false, Data: []byte(err.Error())}
+		return
+	}
+	defer tcp.Close()
+	dsp := data.NewDataServiceClient(tcp)
+	_, err = dsp.Get(context.Background(), &data.Request{})
+	if err != nil {
+		r.Async <- core.Chunk{Remaining: false, Data: []byte(err.Error())}
+		return
+	}
+	_, err = dsp.Set(context.Background(), &data.Data{})
+	if err != nil {
+		r.Async <- core.Chunk{Remaining: false, Data: []byte(err.Error())}
+		return
+	}
 	r.Async <- core.Chunk{Remaining: true, Data: []byte("chunk1")}
 	r.Async <- core.Chunk{Remaining: false, Data: []byte("chunk2")}
 }
-
 
 func (m *MemberListListener) ShutdownHook() {
 	sigs := make(chan os.Signal, 1)
@@ -142,5 +166,5 @@ func (m *MemberListListener) NotifyAlive(peer *memberlist.Node) error {
 
 // conflict delegate
 func (m *MemberListListener) NotifyConflict(existing, other *memberlist.Node) {
-	m.MConflict <- []core.Node{m.toNode(existing),m.toNode(other)}
+	m.MConflict <- []core.Node{m.toNode(existing), m.toNode(other)}
 }

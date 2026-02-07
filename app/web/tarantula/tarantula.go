@@ -2,6 +2,7 @@ package main
 
 import (
 	"gameclustering.com/internal/core"
+	"gameclustering.com/tarantula/data"
 	"gameclustering.com/tarantula/presence"
 )
 
@@ -15,6 +16,8 @@ func main() {
 		return
 	}
 	go presence.Start(&m)
+	dsp := data.DataServiceProvider{}
+	go dsp.Start()
 	go m.ShutdownHook()
 	select {}
 }
