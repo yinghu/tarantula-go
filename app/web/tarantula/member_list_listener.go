@@ -16,6 +16,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+type RetryTrack struct {
+	Err    error
+	Reties int32
+	Suc    bool
+}
+
 type MemberListListener struct {
 	MEvent    chan memberlist.NodeEvent
 	MMerge    chan []core.Node
@@ -81,22 +87,33 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 	rq := make(chan []core.Node, 1)
 	m.MRequest <- core.RingRequest{Token: m.RingToken(get.Key), Async: rq}
 	nodes := <-rq
-	ringNode := nodes[0]
-	core.AppLog.Printf("target node %s\n", ringNode.IP)
-	tcp, err := grpc.NewClient(ringNode.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		get.Async <- core.Chunk{Remaining: false, Data: []byte(err.Error())}
+	retry := RetryTrack{}
+	for _, ringNode := range nodes {
+		core.AppLog.Printf("target node %s\n", ringNode.IP)
+		tcp, err := grpc.NewClient(ringNode.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if err != nil {
+			retry.Err = err
+			retry.Reties++
+			continue
+		}
+		defer tcp.Close()
+		dsp := data.NewDataServiceClient(tcp)
+		var dt *data.Data
+		dt, err = dsp.Get(context.Background(), &data.Request{Key: get.Key})
+		if err != nil {
+			retry.Err = err
+			retry.Reties++
+			continue
+		}
+		get.Async <- core.Chunk{Remaining: false, Data: dt.Value}
+		retry.Suc = true
+		break
+	}
+	if retry.Suc {
 		return
 	}
-	defer tcp.Close()
-	dsp := data.NewDataServiceClient(tcp)
-	var dt *data.Data
-	dt, err = dsp.Get(context.Background(), &data.Request{Key: get.Key})
-	if err != nil {
-		get.Async <- core.Chunk{Remaining: false, Data: []byte(err.Error())}
-		return
-	}
-	get.Async <- core.Chunk{Remaining: false, Data: dt.Value}
+	core.AppLog.Printf("retry %s, %d\n", retry.Err.Error(), retry.Reties)
+	get.Async <- core.Chunk{Remaining: false, Data: []byte(retry.Err.Error())}
 }
 func (m *MemberListListener) Set(set core.SetRequest) {
 
