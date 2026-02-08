@@ -100,18 +100,23 @@ func (m *MemberHashRing) RingNode(t uint32, relica int) []core.Node {
 	syncNum := min(m.nodeNum, relica) - 1
 	syncNodes := make([]core.Node, 0, syncNum)
 	sz := len(m.nodes)
-	nd := m.nodes[ix]
+	syncNodes = append(syncNodes,m.nodes[ix])
 	ix++
-	syncNodes = append(syncNodes, nd)
 	for syncNum > 0 {
 		if ix == sz {
 			ix = 0
 		}
 		p := m.nodes[ix]
-		if p.IP != nd.IP {
+		dup := false
+		for _,nd := range syncNodes{
+			if p.IP == nd.IP{
+				dup = true
+				break
+			}
+		}
+		if !dup{
 			syncNum--
-			syncNodes = append(syncNodes, p)
-			core.AppLog.Printf("%s :: %s\n", p.IP, nd.IP)
+			syncNodes = append(syncNodes, p)		
 		}
 		ix++
 	}
