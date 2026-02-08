@@ -101,6 +101,7 @@ func (m *MemberHashRing) RingNode(t uint32, relica int) []core.Node {
 	syncNodes := make([]core.Node, 0, syncNum)
 	sz := len(m.nodes)
 	nd := m.nodes[ix]
+	ix++
 	syncNodes = append(syncNodes, nd)
 	for syncNum > 0 {
 		if ix == sz {
