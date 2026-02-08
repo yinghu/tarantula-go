@@ -89,7 +89,7 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 	nodes := <-rq
 	retry := RetryTrack{}
 	for _, ringNode := range nodes {
-		core.AppLog.Printf("target node %s\n", ringNode.IP)
+		core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
 		tcp, err := grpc.NewClient(ringNode.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			retry.Err = err
@@ -99,7 +99,7 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 		defer tcp.Close()
 		dsp := data.NewDataServiceClient(tcp)
 		var dt *data.Data
-		dt, err = dsp.Get(context.Background(), &data.Request{Key: get.Key})
+		dt, err = dsp.Get(context.Background(), &data.Request{Database: get.Database, Key: get.Key})
 		if err != nil {
 			retry.Err = err
 			retry.Reties++
@@ -121,7 +121,7 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 	nodes := <-rq
 	retry := RetryTrack{}
 	for _, ringNode := range nodes {
-		core.AppLog.Printf("target node %s\n", ringNode.IP)
+		core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
 		tcp, err := grpc.NewClient(ringNode.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			retry.Err = err
@@ -130,7 +130,7 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 		}
 		defer tcp.Close()
 		dsp := data.NewDataServiceClient(tcp)
-		kv := data.Data{Key: set.Key, Value: set.Value}
+		kv := data.Data{Database: set.Database, Key: set.Key, Value: set.Value}
 		var dt *data.Response
 		dt, err = dsp.Set(context.Background(), &kv)
 		if err != nil {

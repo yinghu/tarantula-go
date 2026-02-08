@@ -58,20 +58,21 @@ type RingRequest struct {
 }
 
 type GetRequest struct {
-	Key []byte 
-	Async chan Chunk
+	Database string
+	Key      []byte
+	Async    chan Chunk
 }
 type SetRequest struct {
-	Key []byte 
-	Value []byte 
-	Async chan Chunk
+	Database string
+	Key      []byte
+	Value    []byte
+	Async    chan Chunk
 }
-
 
 type ClusterService interface {
 	HashRing(r RingRequest)
 	KeyRing(r RingRequest)
 	RingToken(key []byte) uint32
 	Get(get GetRequest)
-	Set(get SetRequest) 
+	Set(get SetRequest)
 }

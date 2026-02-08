@@ -15,10 +15,11 @@ func (p *PresenceGetValueEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Requ
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "*")
+	d := r.PathValue("database")
 	k := r.PathValue("key")
 	rq := make(chan core.Chunk, 3)
 	defer close(rq)
-	p.Get(core.GetRequest{Key: []byte(k), Async: rq})
+	p.Get(core.GetRequest{Database: d, Key: []byte(k), Async: rq})
 	for c := range rq {
 		if len(c.Data) > 0 {
 			w.Write(c.Data)

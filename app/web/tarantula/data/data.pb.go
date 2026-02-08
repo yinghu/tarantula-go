@@ -24,8 +24,9 @@ const (
 type Data struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Header        *Header                `protobuf:"bytes,1,opt,name=header,proto3" json:"header,omitempty"`
-	Key           []byte                 `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
-	Value         []byte                 `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
+	Database      string                 `protobuf:"bytes,2,opt,name=database,proto3" json:"database,omitempty"`
+	Key           []byte                 `protobuf:"bytes,3,opt,name=key,proto3" json:"key,omitempty"`
+	Value         []byte                 `protobuf:"bytes,4,opt,name=value,proto3" json:"value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -67,6 +68,13 @@ func (x *Data) GetHeader() *Header {
 	return nil
 }
 
+func (x *Data) GetDatabase() string {
+	if x != nil {
+		return x.Database
+	}
+	return ""
+}
+
 func (x *Data) GetKey() []byte {
 	if x != nil {
 		return x.Key
@@ -86,11 +94,12 @@ var File_data_proto protoreflect.FileDescriptor
 const file_data_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"data.proto\x12\x04data\x1a\fheader.proto\"T\n" +
+	"data.proto\x12\x04data\x1a\fheader.proto\"p\n" +
 	"\x04Data\x12$\n" +
-	"\x06header\x18\x01 \x01(\v2\f.data.HeaderR\x06header\x12\x10\n" +
-	"\x03key\x18\x02 \x01(\fR\x03key\x12\x14\n" +
-	"\x05value\x18\x03 \x01(\fR\x05valueBI\n" +
+	"\x06header\x18\x01 \x01(\v2\f.data.HeaderR\x06header\x12\x1a\n" +
+	"\bdatabase\x18\x02 \x01(\tR\bdatabase\x12\x10\n" +
+	"\x03key\x18\x03 \x01(\fR\x03key\x12\x14\n" +
+	"\x05value\x18\x04 \x01(\fR\x05valueBI\n" +
 	"\x17com.icodesoftware.protoB\vDataFactoryZ!gameclustering.com/tarantula/datab\x06proto3"
 
 var (

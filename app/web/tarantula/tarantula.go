@@ -1,7 +1,11 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/persistence"
 	"gameclustering.com/tarantula/data"
 	"gameclustering.com/tarantula/presence"
 )
@@ -16,7 +20,18 @@ func main() {
 		return
 	}
 	go presence.Start(&m)
-	dsp := data.DataServiceProvider{}
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return
+	}
+	path := fmt.Sprintf("%s/%s", homeDir, "tarantula")
+	core.AppLog.Printf("check path %s\n",path)
+	err = os.MkdirAll(path, 0755)
+	if err != nil {
+		return
+	}
+	lmdb := persistence.LMDBLocal{Path: path, MapSizeMb: 10, Readers: 100}
+	dsp := data.DataServiceProvider{Db: &lmdb}
 	go dsp.Start()
 	go m.ShutdownHook()
 	select {}

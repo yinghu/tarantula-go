@@ -23,7 +23,8 @@ const (
 
 type Request struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Key           []byte                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Database      string                 `protobuf:"bytes,1,opt,name=database,proto3" json:"database,omitempty"`
+	Key           []byte                 `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -58,6 +59,13 @@ func (*Request) Descriptor() ([]byte, []int) {
 	return file_request_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *Request) GetDatabase() string {
+	if x != nil {
+		return x.Database
+	}
+	return ""
+}
+
 func (x *Request) GetKey() []byte {
 	if x != nil {
 		return x.Key
@@ -69,9 +77,10 @@ var File_request_proto protoreflect.FileDescriptor
 
 const file_request_proto_rawDesc = "" +
 	"\n" +
-	"\rrequest.proto\x12\x04data\"\x1b\n" +
-	"\aRequest\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\fR\x03keyBL\n" +
+	"\rrequest.proto\x12\x04data\"7\n" +
+	"\aRequest\x12\x1a\n" +
+	"\bdatabase\x18\x01 \x01(\tR\bdatabase\x12\x10\n" +
+	"\x03key\x18\x02 \x01(\fR\x03keyBL\n" +
 	"\x17com.icodesoftware.protoB\x0eRequestFactoryZ!gameclustering.com/tarantula/datab\x06proto3"
 
 var (

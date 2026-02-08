@@ -52,18 +52,6 @@ func (db *LMDBLocal) Put(dbName string, key, value []byte) error {
 	})
 }
 
-func (db *LMDBLocal) PutEdge(dbName string, label string, key, value []byte) error {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-	return db.env.Update(func(txn *lmdb.Txn) error {
-		dbi, err := txn.CreateDBI(fmt.Sprintf("%s#%s", dbName, label))
-		if err != nil {
-			return err
-		}
-		return txn.Put(dbi, key, value, lmdb.DupSort)
-	})
-}
-
 func (db *LMDBLocal) Get(dbName string, key []byte) ([]byte, error) {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()

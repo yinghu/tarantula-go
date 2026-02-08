@@ -56,11 +56,11 @@ func (m *MemberHashRing) OnMerge(nodes []core.Node) {
 }
 
 func (m *MemberHashRing) OnLive(node core.Node) {
-	core.AppLog.Printf("LIVE NODE %v\n", node)
+	//core.AppLog.Printf("LIVE NODE %v\n", node)
 }
 
 func (m *MemberHashRing) OnPing(node core.Node) {
-	core.AppLog.Printf("PING NODE %s %s\n", node.Name, string(node.Meta))
+	//core.AppLog.Printf("PING NODE %s %s\n", node.Name, string(node.Meta))
 
 }
 
