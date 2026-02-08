@@ -7,7 +7,8 @@ import (
 
 const (
 	NODE_EVENT_BUFFER_SIZE int = 16
-	NODE_WEIGHT int = 7 //virtual nodes per ip node
+	NODE_WEIGHT            int = 7 //virtual nodes per ip node
+	REPLICA_MAX            int = 3
 )
 
 type MemberlistManager struct {
@@ -16,7 +17,7 @@ type MemberlistManager struct {
 }
 
 func (m *MemberlistManager) Start() error {
-	m.MemberHashRing = &MemberHashRing{nodes: make([]core.Node, 0),weight: NODE_WEIGHT}
+	m.MemberHashRing = &MemberHashRing{nodes: make([]core.Node, 0), weight: NODE_WEIGHT}
 	cfg := memberlist.DefaultLANConfig()
 	ch := make(chan memberlist.NodeEvent, NODE_EVENT_BUFFER_SIZE) //HAVE TO BUFFER
 	cl := memberlist.ChannelEventDelegate{Ch: ch}

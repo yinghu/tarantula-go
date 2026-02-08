@@ -62,8 +62,8 @@ func (m *MemberListListener) Listen() {
 			m.OnConflict(mc)
 		case mr := <-m.MRequest:
 			if mr.Token > 0 {
-				node := m.RingNode(mr.Token)
-				mr.Async <- []core.Node{node}
+				nodes := m.RingNode(mr.Token, mr.Replicas)
+				mr.Async <- nodes
 			} else {
 				nodes := make([]core.Node, 0)
 				for _, n := range m.nodes {
@@ -76,6 +76,7 @@ func (m *MemberListListener) Listen() {
 }
 
 func (m *MemberListListener) KeyRing(r core.RingRequest) {
+	r.Replicas = REPLICA_MAX
 	m.MRequest <- r
 }
 
@@ -117,7 +118,7 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 }
 func (m *MemberListListener) Set(set core.SetRequest) {
 	rq := make(chan []core.Node, 1)
-	m.MRequest <- core.RingRequest{Token: m.RingToken(set.Key), Async: rq}
+	m.MRequest <- core.RingRequest{Token: m.RingToken(set.Key), Replicas: REPLICA_MAX, Async: rq}
 	nodes := <-rq
 	retry := RetryTrack{}
 	for _, ringNode := range nodes {

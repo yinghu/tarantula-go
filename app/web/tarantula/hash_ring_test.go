@@ -48,7 +48,7 @@ func TestHashRing(t *testing.T) {
 	}
 	var rt uint32 = 90
 	keyNode := core.Node{RingToken: rt}
-	fmt.Printf("Key  ring %v\n", keyNode.RingToken)
+	fmt.Printf("Key ring %v\n", keyNode.RingToken)
 	pos := slices.IndexFunc(mr.nodes, func(t core.Node) bool {
 		if keyNode.RingToken < t.RingToken {
 			keyNode.Name = t.Name
@@ -57,11 +57,55 @@ func TestHashRing(t *testing.T) {
 		return false
 	})
 	fmt.Printf("node pos %d %s\n", pos, keyNode.Name)
-	pn := mr.RingNode(rt)
+	pn := mr.RingNode(rt, 0)[0]
 	fmt.Printf("node found %d %s\n", pn.RingToken, pn.Name)
 	if keyNode.Name != pn.Name {
 		t.Errorf("should be same node %s <> %s", keyNode.Name, pn.Name)
 	}
 	fmt.Println(string(fmt.Appendf([]byte{}, "tarantula%d", 1)))
+	n := min(20, 2)
+	fmt.Printf("start min number %d\n", n)
+	for n > 0 {
+		fmt.Printf("min number %d\n", n)
+		n--
+	}
+	fmt.Printf("end min number %d\n", n)
+}
+
+func TestHashRingScale(t *testing.T) {
+	core.CreateTestLog()
+	ring := MemberHashRing{weight: NODE_WEIGHT}
+	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
+	if len(ring.nodes) != 7 {
+		t.Errorf("ring node should 7 %d", len(ring.nodes))
+	}
+	ring.OnRemove(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
+	if len(ring.nodes) != 0 {
+		t.Errorf("ring node should 0 %d", len(ring.nodes))
+	}
+	//hash := murmur3.New32()
+	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
+	nodes := ring.RingNode(murmur3.Sum32([]byte("adb")),REPLICA_MAX)
+	if len(nodes) != 1 {
+		t.Errorf("key ring node should 1 %d", len(nodes))
+	}
+	ring.OnAdd(core.Node{Name: "node-b", IP: "192.168.1.11:6060"})
+	nodes = ring.RingNode(murmur3.Sum32([]byte("adb")),REPLICA_MAX)
+	if len(nodes) != 2 {
+		t.Errorf("key ring node should 2 %d", len(nodes))
+	}
+
+	ring.OnAdd(core.Node{Name: "node-c", IP: "192.168.1.12:6060"})
+	nodes = ring.RingNode(murmur3.Sum32([]byte("adb")),REPLICA_MAX)
+	if len(nodes) != 3 {
+		t.Errorf("key ring node should 3 %d", len(nodes))
+	}
+	ring.OnAdd(core.Node{Name: "node-d", IP: "192.168.1.13:6060"})
+	ring.OnAdd(core.Node{Name: "node-e", IP: "192.168.1.14:6060"})
 	
+	nodes = ring.RingNode(murmur3.Sum32([]byte("bopaa")),REPLICA_MAX)
+	if len(nodes) != 3 {
+		t.Errorf("key ring node should 3 %d", len(nodes))
+	}
+	fmt.Printf("NODES : %v\n",nodes)
 }

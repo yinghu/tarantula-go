@@ -19,8 +19,9 @@ func cmp(n1, n2 core.Node) int {
 }
 
 type MemberHashRing struct {
-	nodes  []core.Node
-	weight int
+	nodes   []core.Node
+	weight  int
+	nodeNum int
 }
 
 func (m *MemberHashRing) vNode(node core.Node, weight int) core.Node {
@@ -30,21 +31,25 @@ func (m *MemberHashRing) vNode(node core.Node, weight int) core.Node {
 }
 
 func (m *MemberHashRing) OnAdd(node core.Node) {
-	core.AppLog.Printf("ADD NODE %v\n", node)
+	core.AppLog.Printf("ADD NODE %v %d\n", node, m.nodeNum)
 	for w := range m.weight {
 		v := m.vNode(node, w)
 		node.RingToken = m.RingToken([]byte(v.Name))
 		m.nodes = append(m.nodes, v)
 	}
 	slices.SortFunc(m.nodes, cmp)
+	m.nodeNum++
+	core.AppLog.Printf("ADDED NODE %v %d\n", node, m.nodeNum)
 }
 
 func (m *MemberHashRing) OnRemove(node core.Node) {
-	core.AppLog.Printf("REMOVE NODE %v\n", node)
+	core.AppLog.Printf("REMOVE NODE %v %d\n", node, m.nodeNum)
 	m.nodes = slices.DeleteFunc(m.nodes, func(n core.Node) bool {
 		return n.IP == node.IP
 	})
 	slices.SortFunc(m.nodes, cmp)
+	m.nodeNum--
+	core.AppLog.Printf("REMOVED NODE %v %d\n", node, m.nodeNum)
 }
 
 func (m *MemberHashRing) OnUpdate(node core.Node) {
@@ -73,7 +78,7 @@ func (m *MemberHashRing) RingToken(key []byte) uint32 {
 	return murmur3.Sum32(key)
 }
 
-func (m *MemberHashRing) RingNode(t uint32) core.Node {
+func (m *MemberHashRing) RingNode(t uint32, relica int) []core.Node {
 	l := 0
 	r := len(m.nodes) - 1
 	ix := -1
@@ -89,5 +94,24 @@ func (m *MemberHashRing) RingNode(t uint32) core.Node {
 	if ix == -1 {
 		ix = 0
 	}
-	return m.nodes[ix]
+	if relica == 0 || m.nodeNum == 1 {
+		return []core.Node{m.nodes[ix]}
+	}
+	syncNum := min(m.nodeNum, relica) - 1
+	syncNodes := make([]core.Node, 0, syncNum)
+	sz := len(m.nodes)
+	nd := m.nodes[ix]
+	syncNodes = append(syncNodes, nd)
+	for syncNum > 0 {
+		if ix == sz {
+			ix = 0
+		}
+		p := m.nodes[ix]
+		if p.IP != nd.IP {
+			syncNum--
+			syncNodes = append(syncNodes, p)
+		}
+		ix++
+	}
+	return syncNodes
 }
