@@ -86,15 +86,18 @@ func (m *MemberListListener) HashRing(r core.RingRequest) {
 }
 func (m *MemberListListener) Get(get core.GetRequest) {
 	rq := make(chan []core.Node, 1)
-	m.MRequest <- core.RingRequest{Token: m.RingToken(get.Key), Async: rq}
-	nodes := <-rq
-	retry := RetryTrack{}
-	for _, ringNode := range nodes {
+	defer close(rq)
+	retry := RetryTrack{Reties: 3}
+
+	for retry.Reties > 0 {
+		m.MRequest <- core.RingRequest{Token: m.RingToken(get.Key), Async: rq}
+		nodes := <-rq
+		ringNode := nodes[0]
 		core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
 		tcp, err := grpc.NewClient(ringNode.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			retry.Err = err
-			retry.Reties++
+			retry.Reties--
 			continue
 		}
 		defer tcp.Close()
@@ -103,7 +106,7 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 		dt, err = dsp.Get(context.Background(), &data.Request{Database: get.Database, Key: get.Key})
 		if err != nil {
 			retry.Err = err
-			retry.Reties++
+			retry.Reties--
 			continue
 		}
 		get.Async <- core.Chunk{Remaining: false, Data: dt.Value}
