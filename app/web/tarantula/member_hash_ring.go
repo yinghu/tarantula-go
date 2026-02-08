@@ -111,6 +111,7 @@ func (m *MemberHashRing) RingNode(t uint32, relica int) []core.Node {
 		if p.IP != nd.IP {
 			syncNum--
 			syncNodes = append(syncNodes, p)
+			core.AppLog.Printf("%s :: %s\n", p.IP, nd.IP)
 		}
 		ix++
 	}
