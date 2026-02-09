@@ -30,7 +30,7 @@ func (c *DataServiceProvider) Set(ctx context.Context, in *Data) (*Response, err
 		return &Response{Successful: false, Code: 100, Message: err.Error()}, err
 	}
 	core.AppLog.Println("calling from set")
-	return &Response{Successful: true}, nil
+	return &Response{Successful: true, Message: "saved"}, nil
 }
 
 func (c *DataServiceProvider) Start() {
