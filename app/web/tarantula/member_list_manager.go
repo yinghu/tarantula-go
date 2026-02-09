@@ -9,6 +9,7 @@ const (
 	NODE_EVENT_BUFFER_SIZE int = 16
 	NODE_WEIGHT            int = 7 //virtual nodes per ip node
 	REPLICA_MAX            int = 3
+	RETRY_MAX              int = 3
 )
 
 type MemberlistManager struct {

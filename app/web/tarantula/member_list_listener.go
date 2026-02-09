@@ -18,7 +18,7 @@ import (
 
 type RetryTrack struct {
 	Err    error
-	Reties int32
+	Reties int
 	Suc    bool
 }
 
@@ -84,10 +84,11 @@ func (m *MemberListListener) HashRing(r core.RingRequest) {
 	m.MRequest <- r
 	m.UpdateNode(500 * time.Millisecond)
 }
+
 func (m *MemberListListener) Get(get core.GetRequest) {
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
-	retry := RetryTrack{Reties: 3}
+	retry := RetryTrack{Reties: RETRY_MAX}
 
 	for retry.Reties > 0 {
 		m.MRequest <- core.RingRequest{Token: m.RingToken(get.Key), Async: rq}
@@ -119,31 +120,39 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 	core.AppLog.Printf("retry %s, %d\n", retry.Err.Error(), retry.Reties)
 	get.Async <- core.Chunk{Remaining: false, Data: []byte(retry.Err.Error())}
 }
+
+func (m *MemberListListener) set(ringNode core.Node, set core.SetRequest) (*data.Response, error) {
+	core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
+	tcp, err := grpc.NewClient(ringNode.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return &data.Response{}, err
+	}
+	defer tcp.Close()
+	dsp := data.NewDataServiceClient(tcp)
+	kv := data.Data{Database: set.Database, Key: set.Key, Value: set.Value}
+	return dsp.Set(context.Background(), &kv)
+}
+
 func (m *MemberListListener) Set(set core.SetRequest) {
 	rq := make(chan []core.Node, 1)
-	m.MRequest <- core.RingRequest{Token: m.RingToken(set.Key), Replicas: REPLICA_MAX, Async: rq}
-	nodes := <-rq
-	retry := RetryTrack{}
-	for _, ringNode := range nodes {
-		core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
-		tcp, err := grpc.NewClient(ringNode.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	defer close(rq)
+	retry := RetryTrack{Reties: RETRY_MAX}
+	for retry.Reties > 0 {
+		m.MRequest <- core.RingRequest{Token: m.RingToken(set.Key), Replicas: REPLICA_MAX, Async: rq}
+		nodes := <-rq
+		ringNode := nodes[0]
+		resp, err := m.set(ringNode, set)
 		if err != nil {
 			retry.Err = err
-			retry.Reties++
+			retry.Reties--
 			continue
 		}
-		defer tcp.Close()
-		dsp := data.NewDataServiceClient(tcp)
-		kv := data.Data{Database: set.Database, Key: set.Key, Value: set.Value}
-		var dt *data.Response
-		dt, err = dsp.Set(context.Background(), &kv)
-		if err != nil {
-			retry.Err = err
-			retry.Reties++
-			continue
-		}
-		set.Async <- core.Chunk{Remaining: false, Data: []byte(dt.Message)}
+		set.Async <- core.Chunk{Remaining: false, Data: []byte(resp.Message)}
 		retry.Suc = true
+		slaves := nodes[1:]
+		for _, slave := range slaves {
+			m.set(slave, set)
+		}
 		break
 	}
 	if retry.Suc {
