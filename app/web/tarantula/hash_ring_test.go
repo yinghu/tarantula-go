@@ -108,4 +108,7 @@ func TestHashRingScale(t *testing.T) {
 		t.Errorf("key ring node should 3 %d", len(nodes))
 	}
 	fmt.Printf("NODES : %v\n",nodes)
+	
 }
+
+

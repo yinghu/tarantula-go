@@ -94,7 +94,7 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 		m.MRequest <- core.RingRequest{Token: m.RingToken(get.Key), Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
+		//core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
 		tcp, err := grpc.NewClient(ringNode.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			retry.Err = err
@@ -122,7 +122,7 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 }
 
 func (m *MemberListListener) set(ringNode core.Node, set core.SetRequest) (*data.Response, error) {
-	core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
+	//core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
 	tcp, err := grpc.NewClient(ringNode.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return &data.Response{}, err
@@ -177,7 +177,7 @@ func (m *MemberListListener) ShutdownHook() {
 
 // delegate
 func (m *MemberListListener) NodeMeta(limit int) []byte {
-	core.AppLog.Printf("pull meta data for node update")
+	//core.AppLog.Printf("pull meta data for node update")
 	m.ct++
 	return fmt.Appendf([]byte{}, "tarantula%d", m.ct)
 }
