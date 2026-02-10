@@ -31,7 +31,7 @@ func main() {
 		return
 	}
 	lmdb := persistence.LMDBLocal{Path: path, MapSizeMb: 10, Readers: 100}
-	dsp := data.DataServiceProvider{Db: &lmdb}
+	dsp := data.DataServiceProvider{Db: &lmdb,Cs: &m}
 	go dsp.Start()
 	go m.ShutdownHook()
 	select {}

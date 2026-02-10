@@ -12,6 +12,7 @@ import (
 type DataServiceProvider struct {
 	UnimplementedDataServiceServer
 	Db *persistence.LMDBLocal
+	Cs core.ClusterService
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *Request) (*Data, error) {
@@ -20,7 +21,8 @@ func (c *DataServiceProvider) Get(ctx context.Context, in *Request) (*Data, erro
 		return nil, err
 	}
 	data := Data{Value: ret}
-	core.AppLog.Println("calling from get")
+	id, _ := c.Cs.Id()
+	core.AppLog.Printf("calling from get %d\n", id)
 	return &data, nil
 }
 
@@ -29,7 +31,8 @@ func (c *DataServiceProvider) Set(ctx context.Context, in *Data) (*Response, err
 	if err != nil {
 		return &Response{Successful: false, Code: 100, Message: err.Error()}, err
 	}
-	core.AppLog.Println("calling from set")
+	id, _ := c.Cs.Id()
+	core.AppLog.Printf("calling from set %d\n", id)
 	return &Response{Successful: true, Message: "saved"}, nil
 }
 
