@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -10,10 +9,7 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/tarantula/data"
 	"github.com/hashicorp/memberlist"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type RetryTrack struct {
@@ -96,7 +92,7 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 		nodes := <-rq
 		ringNode := nodes[0]
 		//core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
-		dt,err := m.MemberDataListener.Get(&ringNode,&get)
+		dt, err := m.MemberDataListener.Get(&ringNode, &get)
 		if err != nil {
 			retry.Err = err
 			retry.Reties--
@@ -113,18 +109,6 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 	get.Async <- core.Chunk{Remaining: false, Data: []byte(retry.Err.Error())}
 }
 
-func (m *MemberListListener) set(ringNode core.Node, set core.SetRequest) (*data.Response, error) {
-	//core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
-	tcp, err := grpc.NewClient(ringNode.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return &data.Response{}, err
-	}
-	defer tcp.Close()
-	dsp := data.NewDataServiceClient(tcp)
-	kv := data.Data{Database: set.Database, Key: set.Key, Value: set.Value}
-	return dsp.Set(context.Background(), &kv)
-}
-
 func (m *MemberListListener) Set(set core.SetRequest) {
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
@@ -133,7 +117,7 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 		m.MRequest <- core.RingRequest{Token: m.RingToken(set.Key), Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		resp, err := m.set(ringNode, set)
+		resp, err := m.MemberDataListener.Set(&ringNode, &set)
 		if err != nil {
 			retry.Err = err
 			retry.Reties--
@@ -143,7 +127,7 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 		retry.Suc = true
 		slaves := nodes[1:]
 		for _, slave := range slaves {
-			m.set(slave, set)
+			m.MemberDataListener.Set(&slave, &set)
 		}
 		break
 	}

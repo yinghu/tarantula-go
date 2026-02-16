@@ -35,3 +35,15 @@ func (m *MemberDataListener) Get(target *core.Node, request *core.GetRequest) ([
 	}
 	return dt.Value, nil
 }
+
+func (m *MemberDataListener) Set(target *core.Node, request *core.SetRequest) (*data.Response, error) {
+	//core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
+	tcp, err := grpc.NewClient(target.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return &data.Response{}, err
+	}
+	defer tcp.Close()
+	dsp := data.NewDataServiceClient(tcp)
+	kv := data.Data{Database: request.Database, Key: request.Key, Value: request.Value}
+	return dsp.Set(context.Background(), &kv)
+}
