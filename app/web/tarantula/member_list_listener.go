@@ -31,6 +31,7 @@ type MemberListListener struct {
 	MRequest  chan core.RingRequest
 	*memberlist.Memberlist
 	*MemberHashRing
+	*MemberDataListener
 	ct int
 }
 
@@ -95,22 +96,13 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 		nodes := <-rq
 		ringNode := nodes[0]
 		//core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
-		tcp, err := grpc.NewClient(ringNode.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		dt,err := m.MemberDataListener.Get(&ringNode,&get)
 		if err != nil {
 			retry.Err = err
 			retry.Reties--
 			continue
 		}
-		defer tcp.Close()
-		dsp := data.NewDataServiceClient(tcp)
-		var dt *data.Data
-		dt, err = dsp.Get(context.Background(), &data.Request{Database: get.Database, Key: get.Key})
-		if err != nil {
-			retry.Err = err
-			retry.Reties--
-			continue
-		}
-		get.Async <- core.Chunk{Remaining: false, Data: dt.Value}
+		get.Async <- core.Chunk{Remaining: false, Data: dt}
 		retry.Suc = true
 		break
 	}

@@ -51,8 +51,8 @@ func (m *MemberlistManager) Start() error {
 	core.AppLog.Printf("node id %d %d\n", nodeId, int64(nodeId)%1024)
 	m.snowflake = util.NewSnowflake(int64(nodeId)%1024, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	go m.Listen()
-	mdl := MemberDataListener{RNode: rwNode}
-	go mdl.Listen()
+	m.MemberDataListener = &MemberDataListener{RNode: rwNode}
+	go m.RingUpdated()
 	joined, err := list.Join(m.Seed)
 	if err != nil {
 		core.AppLog.Printf("erorr on member join %s\n", err.Error())
