@@ -22,6 +22,7 @@ type MemberHashRing struct {
 	nodes   []core.Node
 	weight  int
 	nodeNum int
+	WNode   chan<- core.Node
 }
 
 func (m *MemberHashRing) vNode(node core.Node, weight int) core.Node {
@@ -36,6 +37,7 @@ func (m *MemberHashRing) OnAdd(node core.Node) {
 		v := m.vNode(node, w)
 		node.RingToken = m.RingToken([]byte(v.Name))
 		m.nodes = append(m.nodes, v)
+		m.WNode <- v
 	}
 	slices.SortFunc(m.nodes, cmp)
 	m.nodeNum++
@@ -45,10 +47,16 @@ func (m *MemberHashRing) OnAdd(node core.Node) {
 func (m *MemberHashRing) OnRemove(node core.Node) {
 	core.AppLog.Printf("REMOVE NODE %v %d\n", node, m.nodeNum)
 	m.nodes = slices.DeleteFunc(m.nodes, func(n core.Node) bool {
-		return n.IP == node.IP
+		if n.IP == node.IP {
+			n.State = 3
+			m.WNode <- n
+			return true
+		}
+		return false
 	})
 	slices.SortFunc(m.nodes, cmp)
 	m.nodeNum--
+
 	core.AppLog.Printf("REMOVED NODE %v %d\n", node, m.nodeNum)
 }
 
@@ -66,7 +74,6 @@ func (m *MemberHashRing) OnLive(node core.Node) {
 
 func (m *MemberHashRing) OnPing(node core.Node) {
 	//core.AppLog.Printf("PING NODE %s %s\n", node.Name, string(node.Meta))
-
 }
 
 func (m *MemberHashRing) OnConflict(nodes []core.Node) {
@@ -122,4 +129,3 @@ func (m *MemberHashRing) RingNode(t uint32, relica int) []core.Node {
 	}
 	return syncNodes
 }
-

@@ -22,6 +22,7 @@ type MemberlistManager struct {
 
 func (m *MemberlistManager) Start() error {
 	m.MemberHashRing = &MemberHashRing{nodes: make([]core.Node, 0), weight: NODE_WEIGHT}
+
 	cfg := memberlist.DefaultLANConfig()
 	ch := make(chan memberlist.NodeEvent, NODE_EVENT_BUFFER_SIZE) //HAVE TO BUFFER
 	cl := memberlist.ChannelEventDelegate{Ch: ch}
@@ -31,6 +32,8 @@ func (m *MemberlistManager) Start() error {
 	m.MPing = make(chan core.Node, NODE_EVENT_BUFFER_SIZE)
 	m.MConflict = make(chan []core.Node, NODE_EVENT_BUFFER_SIZE)
 	m.MRequest = make(chan core.RingRequest, NODE_EVENT_BUFFER_SIZE)
+	rwNode := make(chan core.Node, NODE_EVENT_BUFFER_SIZE)
+	m.WNode = rwNode
 	cfg.Logger = core.AppLog
 	cfg.Events = &cl
 	cfg.Delegate = m
@@ -48,6 +51,8 @@ func (m *MemberlistManager) Start() error {
 	core.AppLog.Printf("node id %d %d\n", nodeId, int64(nodeId)%1024)
 	m.snowflake = util.NewSnowflake(int64(nodeId)%1024, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	go m.Listen()
+	mdl := MemberDataListener{RNode: rwNode}
+	go mdl.Listen()
 	joined, err := list.Join(m.Seed)
 	if err != nil {
 		core.AppLog.Printf("erorr on member join %s\n", err.Error())
