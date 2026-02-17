@@ -50,7 +50,7 @@ func AppBootstrap(tcx TarantulaContext) {
 			core.AppLog.Printf("Register app cluster admin endpoint %s\n", tcx.Context())
 		}
 		http.Handle("/", http.HandlerFunc(badRequest))
-		core.AppLog.Fatal(http.ListenAndServe(f.HttpBinding, nil))
+		core.AppLog.Fatal().Err(http.ListenAndServe(f.HttpBinding, nil))
 
 	}()
 	go func() {

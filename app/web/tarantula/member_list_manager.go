@@ -34,7 +34,7 @@ func (m *MemberlistManager) Start() error {
 	m.MRequest = make(chan core.RingRequest, NODE_EVENT_BUFFER_SIZE)
 	rwNode := make(chan []core.Node, NODE_EVENT_BUFFER_SIZE)
 	m.WNode = rwNode
-	cfg.Logger = core.AppLog
+	//cfg.Logger = core.AppLog
 	cfg.Events = &cl
 	cfg.Delegate = m
 	cfg.Ping = m

@@ -1,22 +1,21 @@
 package core
 
 import (
-	"flag"
 	"fmt"
-	"log"
 	"os"
+
+	"github.com/rs/zerolog"
 )
 
 var (
-	AppLog *log.Logger
+	AppLog zerolog.Logger
 )
 
 func CreateAppLog(dir string, truncated bool) {
 	fmt.Printf("Creating app log %s\n", dir)
-	flag.Parse()
 	err := os.MkdirAll(dir+"/log", 0755)
 	if err != nil {
-		AppLog = log.New(os.Stdout, "", log.LstdFlags)
+		AppLog = zerolog.New(os.Stdout)
 		return
 	}
 	opt := os.O_WRONLY | os.O_CREATE | os.O_APPEND
@@ -25,15 +24,14 @@ func CreateAppLog(dir string, truncated bool) {
 	}
 	file, err := os.OpenFile(dir+"/log/tarantula.log", opt, 0644)
 	if err != nil {
-		AppLog = log.New(os.Stdout, "", log.LstdFlags)
+		AppLog = zerolog.New(os.Stdout)
 		return
 	}
-	AppLog = log.New(file, "", log.LstdFlags|log.Lshortfile)
+	AppLog = zerolog.New(file)
 	AppLog.Println("Initialized app log")
 }
 
 func CreateTestLog() {
-	flag.Parse()
-	AppLog = log.New(os.Stdout, "", log.LstdFlags)
+	AppLog = zerolog.New(os.Stdout)
 	AppLog.Println("Initialized app log")
 }

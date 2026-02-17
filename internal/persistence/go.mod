@@ -22,7 +22,14 @@ require (
 	github.com/jackc/pgx/v5 v5.7.4
 )
 
-require github.com/bmatsuo/lmdb-go v1.8.0 // indirect
+require (
+	github.com/bmatsuo/lmdb-go v1.8.0 // indirect
+	github.com/mattn/go-colorable v0.1.14 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/rs/zerolog v1.33.0 // indirect
+	wellquite.org/actors v0.0.0-20250213162225-78a831443155 // indirect
+	wellquite.org/golmdb v0.0.0-20250215130419-fec76d4e8d6c // indirect
+)
 
 require (
 	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
