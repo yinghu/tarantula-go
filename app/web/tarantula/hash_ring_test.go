@@ -74,7 +74,9 @@ func TestHashRing(t *testing.T) {
 
 func TestHashRingScale(t *testing.T) {
 	core.CreateTestLog()
-	ring := MemberHashRing{weight: NODE_WEIGHT}
+	rwNode := make(chan []core.Node, NODE_EVENT_BUFFER_SIZE)
+	ring := MemberHashRing{weight: NODE_WEIGHT,WNode: rwNode}
+	
 	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
 	if len(ring.nodes) != 7 {
 		t.Errorf("ring node should 7 %d", len(ring.nodes))
