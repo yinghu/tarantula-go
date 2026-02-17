@@ -20,14 +20,12 @@ require (
 	github.com/dgraph-io/badger/v4 v4.7.0
 	github.com/dgraph-io/ristretto/v2 v2.2.0
 	github.com/jackc/pgx/v5 v5.7.4
-	wellquite.org/golmdb v0.0.0-20250215130419-fec76d4e8d6c
 )
 
 require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/rs/zerolog v1.34.0 // indirect
-	wellquite.org/actors v0.0.0-20250213162225-78a831443155 // indirect
 )
 
 require (
