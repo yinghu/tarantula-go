@@ -105,7 +105,7 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 	if retry.Suc {
 		return
 	}
-	core.AppLog.Printf("retry %s, %d\n", retry.Err.Error(), retry.Reties)
+	core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
 	get.Async <- core.Chunk{Remaining: false, Data: []byte(retry.Err.Error())}
 }
 
@@ -134,7 +134,7 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 	if retry.Suc {
 		return
 	}
-	core.AppLog.Printf("retry %s, %d\n", retry.Err.Error(), retry.Reties)
+	core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
 	set.Async <- core.Chunk{Remaining: false, Data: []byte(retry.Err.Error())}
 }
 
@@ -159,7 +159,7 @@ func (m *MemberListListener) NodeMeta(limit int) []byte {
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
-	core.AppLog.Printf("notify msf %s\n", string(msg))
+	core.AppLog.Printf("notify msf %s", string(msg))
 }
 
 func (m *MemberListListener) GetBroadcasts(overhead, limit int) [][]byte {

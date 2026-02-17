@@ -31,7 +31,7 @@ func TestMurmur3(t *testing.T) {
 		i++
 	}
 	if len(dup) != total {
-		t.Errorf("Total should be rings %d insead of %d\n", total, len(dup))
+		t.Errorf("Total should be rings %d insead of %d", total, len(dup))
 	}
 }
 
@@ -44,11 +44,11 @@ func TestHashRing(t *testing.T) {
 	mr := MemberHashRing{nodes: nodes}
 	slices.SortFunc(nodes, cmp)
 	for _, n := range mr.nodes {
-		fmt.Printf("Node ring %d\n", n.RingToken)
+		fmt.Printf("Node ring %d", n.RingToken)
 	}
 	var rt uint32 = 90
 	keyNode := core.Node{RingToken: rt}
-	fmt.Printf("Key ring %v\n", keyNode.RingToken)
+	fmt.Printf("Key ring %v", keyNode.RingToken)
 	pos := slices.IndexFunc(mr.nodes, func(t core.Node) bool {
 		if keyNode.RingToken < t.RingToken {
 			keyNode.Name = t.Name
@@ -56,20 +56,20 @@ func TestHashRing(t *testing.T) {
 		}
 		return false
 	})
-	fmt.Printf("node pos %d %s\n", pos, keyNode.Name)
+	fmt.Printf("node pos %d %s", pos, keyNode.Name)
 	pn := mr.RingNode(rt, 0)[0]
-	fmt.Printf("node found %d %s\n", pn.RingToken, pn.Name)
+	fmt.Printf("node found %d %s", pn.RingToken, pn.Name)
 	if keyNode.Name != pn.Name {
 		t.Errorf("should be same node %s <> %s", keyNode.Name, pn.Name)
 	}
 	fmt.Println(string(fmt.Appendf([]byte{}, "tarantula%d", 1)))
 	n := min(20, 2)
-	fmt.Printf("start min number %d\n", n)
+	fmt.Printf("start min number %d", n)
 	for n > 0 {
-		fmt.Printf("min number %d\n", n)
+		fmt.Printf("min number %d", n)
 		n--
 	}
-	fmt.Printf("end min number %d\n", n)
+	fmt.Printf("end min number %d", n)
 }
 
 func TestHashRingScale(t *testing.T) {
@@ -107,7 +107,7 @@ func TestHashRingScale(t *testing.T) {
 	if len(nodes) != 3 {
 		t.Errorf("key ring node should 3 %d", len(nodes))
 	}
-	fmt.Printf("NODES : %v\n",nodes)
+	fmt.Printf("NODES : %v",nodes)
 	
 }
 

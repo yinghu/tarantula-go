@@ -28,10 +28,10 @@ func CreateAppLog(dir string, truncated bool) {
 		return
 	}
 	AppLog = zerolog.New(file)
-	AppLog.Println("Initialized app log")
+	AppLog.Info().Msg("Initialized app log")
 }
 
 func CreateTestLog() {
 	AppLog = zerolog.New(os.Stdout)
-	AppLog.Println("Initialized app log")
+	AppLog.Info().Msg("Initialized app log")
 }

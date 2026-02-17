@@ -4,9 +4,8 @@ go 1.24.2
 
 require (
 	github.com/0xc0d/encoding v0.1.0
+	github.com/rs/zerolog v1.34.0
 	go.etcd.io/etcd/client/v3 v3.6.5
-	google.golang.org/grpc v1.71.1
-	google.golang.org/protobuf v1.36.5
 )
 
 require (
@@ -17,7 +16,6 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/rs/zerolog v1.34.0 // indirect
 	go.etcd.io/etcd/api/v3 v3.6.5 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.6.5 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
@@ -27,4 +25,6 @@ require (
 	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250303144028-a0af3efb3deb // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250303144028-a0af3efb3deb // indirect
+	google.golang.org/grpc v1.71.1 // indirect
+	google.golang.org/protobuf v1.36.5 // indirect
 )

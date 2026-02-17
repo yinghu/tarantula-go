@@ -22,7 +22,7 @@ func (c *DataServiceProvider) Get(ctx context.Context, in *Request) (*Data, erro
 	}
 	data := Data{Value: ret}
 	id, _ := c.Cs.Id()
-	core.AppLog.Printf("calling from get %d\n", id)
+	core.AppLog.Printf("calling from get %d", id)
 	return &data, nil
 }
 
@@ -32,7 +32,7 @@ func (c *DataServiceProvider) Set(ctx context.Context, in *Data) (*Response, err
 		return &Response{Successful: false, Code: 100, Message: err.Error()}, err
 	}
 	id, _ := c.Cs.Id()
-	core.AppLog.Printf("calling from set %d\n", id)
+	core.AppLog.Printf("calling from set %d", id)
 	return &Response{Successful: true, Message: "saved"}, nil
 }
 
@@ -44,7 +44,7 @@ func (c *DataServiceProvider) Start() {
 	}
 	rpc := grpc.NewServer()
 	RegisterDataServiceServer(rpc, c)
-	core.AppLog.Printf("data service provider started on : %s\n", tcp.Addr().String())
+	core.AppLog.Printf("data service provider started on : %s", tcp.Addr().String())
 	err = rpc.Serve(tcp)
 	if err != nil {
 		panic(err)

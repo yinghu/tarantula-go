@@ -34,31 +34,31 @@ func (m *MemberlistManager) Start() error {
 	m.MRequest = make(chan core.RingRequest, NODE_EVENT_BUFFER_SIZE)
 	rwNode := make(chan []core.Node, NODE_EVENT_BUFFER_SIZE)
 	m.WNode = rwNode
-	//cfg.Logger = core.AppLog
 	cfg.Events = &cl
 	cfg.Delegate = m
 	cfg.Ping = m
 	cfg.Merge = m
 	cfg.Alive = m
 	cfg.Conflict = m
+	cfg.LogOutput = core.AppLog
 	list, err := memberlist.Create(cfg)
 	if err != nil {
-		core.AppLog.Printf("erorr on member create %s\n", err.Error())
+		core.AppLog.Printf("erorr on member create %s", err.Error())
 		return err
 	}
 	m.Memberlist = list
 	nodeId := murmur3.Sum64(m.LocalNode().Addr)
-	core.AppLog.Printf("node id %d %d\n", nodeId, int64(nodeId)%1024)
+	core.AppLog.Printf("node id %d %d", nodeId, int64(nodeId)%1024)
 	m.snowflake = util.NewSnowflake(int64(nodeId)%1024, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	go m.Listen()
 	m.MemberDataListener = &MemberDataListener{RNode: rwNode}
 	go m.RingUpdated()
 	joined, err := list.Join(m.Seed)
 	if err != nil {
-		core.AppLog.Printf("erorr on member join %s\n", err.Error())
+		core.AppLog.Printf("erorr on member join %s", err.Error())
 		return err
 	}
-	core.AppLog.Printf("joined %d\n", joined)
+	core.AppLog.Printf("joined %d", joined)
 	return nil
 }
 

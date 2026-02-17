@@ -26,7 +26,7 @@ func (db *LMDBLocal) Open() {
 	defer runtime.UnlockOSThread()
 	env, err := lmdb.NewEnv()
 	if err != nil {
-		fmt.Printf("lmd error %s\n", err.Error())
+		fmt.Printf("lmd error %s", err.Error())
 		panic(err)
 	}
 	db.env = env
@@ -35,7 +35,7 @@ func (db *LMDBLocal) Open() {
 	env.SetMaxDBs(MAX_DB_NUMBER)
 	err = db.env.Open(db.Path, 0, 0644)
 	if err != nil {
-		fmt.Printf("lmd error %s\n", err.Error())
+		fmt.Printf("lmd error %s", err.Error())
 		panic(err)
 	}
 }
