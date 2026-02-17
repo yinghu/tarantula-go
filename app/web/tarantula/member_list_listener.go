@@ -45,7 +45,9 @@ func (m *MemberListListener) Listen() {
 			case memberlist.NodeJoin:
 				m.OnAdd(m.toNode(e.Node))
 			case memberlist.NodeLeave:
-				m.OnRemove(m.toNode(e.Node))
+				if (m.LocalNode().Name) != e.Node.Name{
+					m.OnRemove(m.toNode(e.Node))
+				}
 			case memberlist.NodeUpdate:
 				m.OnUpdate(m.toNode(e.Node))
 			}
