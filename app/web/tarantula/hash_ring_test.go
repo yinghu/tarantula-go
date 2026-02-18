@@ -75,8 +75,8 @@ func TestHashRing(t *testing.T) {
 func TestHashRingScale(t *testing.T) {
 	core.CreateTestLog()
 	rwNode := make(chan []core.Node, NODE_EVENT_BUFFER_SIZE)
-	ring := MemberHashRing{weight: NODE_WEIGHT,WNode: rwNode}
-	
+	ring := MemberHashRing{weight: NODE_WEIGHT, WNode: rwNode}
+
 	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
 	if len(ring.nodes) != 7 {
 		t.Errorf("ring node should 7 %d", len(ring.nodes))
@@ -87,30 +87,51 @@ func TestHashRingScale(t *testing.T) {
 	}
 	//hash := murmur3.New32()
 	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
-	nodes := ring.RingNode(murmur3.Sum32([]byte("adb")),REPLICA_MAX)
+	nodes := ring.RingNode(murmur3.Sum32([]byte("adb")), REPLICA_MAX)
 	if len(nodes) != 1 {
 		t.Errorf("key ring node should 1 %d", len(nodes))
 	}
 	ring.OnAdd(core.Node{Name: "node-b", IP: "192.168.1.11:6060"})
-	nodes = ring.RingNode(murmur3.Sum32([]byte("adb")),REPLICA_MAX)
+	nodes = ring.RingNode(murmur3.Sum32([]byte("adb")), REPLICA_MAX)
 	if len(nodes) != 2 {
 		t.Errorf("key ring node should 2 %d", len(nodes))
 	}
 
 	ring.OnAdd(core.Node{Name: "node-c", IP: "192.168.1.12:6060"})
-	nodes = ring.RingNode(murmur3.Sum32([]byte("adb")),REPLICA_MAX)
+	nodes = ring.RingNode(murmur3.Sum32([]byte("adb")), REPLICA_MAX)
 	if len(nodes) != 3 {
 		t.Errorf("key ring node should 3 %d", len(nodes))
 	}
 	ring.OnAdd(core.Node{Name: "node-d", IP: "192.168.1.13:6060"})
 	ring.OnAdd(core.Node{Name: "node-e", IP: "192.168.1.14:6060"})
-	
-	nodes = ring.RingNode(murmur3.Sum32([]byte("bopaa")),REPLICA_MAX)
+
+	nodes = ring.RingNode(murmur3.Sum32([]byte("bopaa")), REPLICA_MAX)
 	if len(nodes) != 3 {
 		t.Errorf("key ring node should 3 %d", len(nodes))
 	}
-	fmt.Printf("NODES : %v",nodes)
-	
+	fmt.Printf("NODES : %v", nodes)
+
 }
 
+func TestHashRingPrefix(t *testing.T) {
+	core.CreateTestLog()
+	rwNode := make(chan []core.Node, NODE_EVENT_BUFFER_SIZE)
+	ring := MemberHashRing{weight: NODE_WEIGHT, WNode: rwNode}
+	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
+	key := []byte("key1")
+	hash := ring.RingToken(key)
+	nodes := ring.RingNode(hash, REPLICA_MAX)
+	core.AppLog.Debug().Msgf("xnode hash %d", nodes[0].RingToken)
+	buff := core.NewBuffer(100)
+	buff.WriteUInt32(nodes[0].RingToken)
+	buff.Write(key)
+	buff.Flip()
+	data, _ := buff.Read(0)
+	resp := core.NewBuffer(100)
+	resp.Write(data)
+	resp.Flip()
+	h, _ := resp.ReadUInt32()
+	k, _ := resp.Read(0)
+	core.AppLog.Debug().Uint32("h",h).Str("k",string(k)).Send()
 
+}

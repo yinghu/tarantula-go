@@ -45,7 +45,7 @@ func (m *MemberListListener) Listen() {
 			case memberlist.NodeJoin:
 				m.OnAdd(m.toNode(e.Node))
 			case memberlist.NodeLeave:
-				if (m.LocalNode().Name) != e.Node.Name{
+				if (m.LocalNode().Name) != e.Node.Name {
 					m.OnRemove(m.toNode(e.Node))
 				}
 			case memberlist.NodeUpdate:
@@ -144,7 +144,7 @@ func (m *MemberListListener) ShutdownHook() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	<-sigs
-	core.AppLog.Println("Signal to exit")
+	core.AppLog.Warn().Msg("Signal to exit")
 	m.Leave(3 * time.Second)
 	time.Sleep(5 * time.Second)
 	m.Shutdown()

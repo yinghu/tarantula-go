@@ -84,6 +84,16 @@ func (s *BufferProxy) WriteInt32(data int32) error {
 
 }
 
+func (s *BufferProxy) WriteUInt32(data uint32) error {
+	buf := new(bytes.Buffer)
+	err := binary.Write(buf, binary.BigEndian, data)
+	if err != nil {
+		return err
+	}
+	return s.data.PutBytes(buf.Bytes(), 0, buf.Len())
+
+}
+
 func (s *BufferProxy) WriteInt16(data int16) error {
 	buf := new(bytes.Buffer)
 	err := binary.Write(buf, binary.BigEndian, data)
@@ -120,6 +130,20 @@ func (s *BufferProxy) ReadInt32() (int32, error) {
 		return 0, err
 	}
 	var v int32
+	err = binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
+	if err != nil {
+		return 0, err
+	}
+	return v, nil
+}
+
+func (s *BufferProxy) ReadUInt32() (uint32, error) {
+	buf := make([]byte, 4)
+	err := s.data.GetBytes(buf, 0, 4)
+	if err != nil {
+		return 0, err
+	}
+	var v uint32
 	err = binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
 	if err != nil {
 		return 0, err

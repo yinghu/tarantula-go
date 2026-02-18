@@ -17,6 +17,8 @@ type DataBuffer interface {
 
 	WriteInt32(data int32) error
 
+	WriteUInt32(data uint32) error
+
 	WriteInt16(data int16) error
 
 	WriteInt8(data int8) error
@@ -26,6 +28,7 @@ type DataBuffer interface {
 	Write(data []byte) error
 
 	ReadInt32() (int32, error)
+	ReadUInt32() (uint32, error)
 
 	ReadInt64() (int64, error)
 
