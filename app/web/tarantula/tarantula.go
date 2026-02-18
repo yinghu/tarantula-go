@@ -30,8 +30,8 @@ func main() {
 	if err != nil {
 		return
 	}
-	lmdb := persistence.LMDBLocal{Path: path, MapSizeMb: 10, Readers: 100}
-	dsp := data.DataServiceProvider{Db: &lmdb,Cs: &m}
+	badger := persistence.BadgerLocal{Path: path,InMemory: true,LogDisabled: true}
+	dsp := data.DataServiceProvider{Db: &badger,Cs: &m}
 	go dsp.Start()
 	go m.ShutdownHook()
 	select {}
