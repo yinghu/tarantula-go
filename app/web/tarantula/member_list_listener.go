@@ -115,6 +115,7 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
 	retry := RetryTrack{Reties: RETRY_MAX}
+
 	for retry.Reties > 0 {
 		m.MRequest <- core.RingRequest{Token: m.RingToken(set.Key), Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
@@ -161,11 +162,12 @@ func (m *MemberListListener) NodeMeta(limit int) []byte {
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
+	//broadcasting message 
 	core.AppLog.Printf("notify msf %s", string(msg))
 }
 
 func (m *MemberListListener) GetBroadcasts(overhead, limit int) [][]byte {
-	core.AppLog.Debug().Msgf("broadcasting overhead %d %d",overhead,limit)
+	//core.AppLog.Debug().Msgf("broadcasting overhead %d %d",overhead,limit)
 	var data [][]byte
 	data = append(data, []byte("data1"))
 	data = append(data, []byte("data2"))
@@ -180,7 +182,7 @@ func (m *MemberListListener) LocalState(join bool) []byte {
 	return []byte("dog")
 }
 func (m *MemberListListener) MergeRemoteState(buf []byte, join bool) {
-	//core.AppLog.Printf("MergeRemoteState %s %v\n", string(buf), join)
+	core.AppLog.Printf("MergeRemoteState %s %v", string(buf), join)
 }
 
 // ping delegate
