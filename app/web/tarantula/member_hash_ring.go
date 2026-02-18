@@ -32,7 +32,7 @@ func (m *MemberHashRing) vNode(node core.Node, weight int) core.Node {
 }
 
 func (m *MemberHashRing) OnAdd(node core.Node) {
-	core.AppLog.Printf("ADD NODE %v %d", node, m.nodeNum)
+	//core.AppLog.Printf("ADD NODE %v %d", node, m.nodeNum)
 	added := make([]core.Node, 0, m.weight)
 	for w := range m.weight {
 		v := m.vNode(node, w)
@@ -43,11 +43,11 @@ func (m *MemberHashRing) OnAdd(node core.Node) {
 	slices.SortFunc(m.nodes, cmp)
 	m.nodeNum++
 	m.WNode <- added
-	core.AppLog.Printf("ADDED NODE %v %d", node, m.nodeNum)
+	//core.AppLog.Printf("ADDED NODE %v %d", node, m.nodeNum)
 }
 
 func (m *MemberHashRing) OnRemove(node core.Node) {
-	core.AppLog.Printf("REMOVE NODE %v %d", node, m.nodeNum)
+	//core.AppLog.Printf("REMOVE NODE %v %d", node, m.nodeNum)
 	removed := make([]core.Node, m.weight)
 	m.nodes = slices.DeleteFunc(m.nodes, func(n core.Node) bool {
 		if n.IP == node.IP {
@@ -60,7 +60,7 @@ func (m *MemberHashRing) OnRemove(node core.Node) {
 	slices.SortFunc(m.nodes, cmp)
 	m.nodeNum--
 	m.WNode <- removed
-	core.AppLog.Printf("REMOVED NODE %v %d", node, m.nodeNum)
+	//core.AppLog.Printf("REMOVED NODE %v %d", node, m.nodeNum)
 }
 
 func (m *MemberHashRing) OnUpdate(node core.Node) {

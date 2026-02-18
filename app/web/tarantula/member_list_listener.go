@@ -165,6 +165,7 @@ func (m *MemberListListener) NotifyMsg(msg []byte) {
 }
 
 func (m *MemberListListener) GetBroadcasts(overhead, limit int) [][]byte {
+	core.AppLog.Debug().Msgf("broadcasting overhead %d %d",overhead,limit)
 	return nil
 }
 
