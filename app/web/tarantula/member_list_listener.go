@@ -166,7 +166,11 @@ func (m *MemberListListener) NotifyMsg(msg []byte) {
 
 func (m *MemberListListener) GetBroadcasts(overhead, limit int) [][]byte {
 	core.AppLog.Debug().Msgf("broadcasting overhead %d %d",overhead,limit)
-	return nil
+	var data [][]byte
+	data = append(data, []byte("data1"))
+	data = append(data, []byte("data2"))
+	data = append(data, []byte("data3"))
+	return data
 }
 
 func (m *MemberListListener) LocalState(join bool) []byte {
