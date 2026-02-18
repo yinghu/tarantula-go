@@ -307,7 +307,7 @@ func (s *BadgerLocal) Open() error {
 	go func() {
 		for range s.gcTick.C {
 		gc:
-			core.AppLog.Printf("running gc at %v\n", time.Now())
+			core.AppLog.Printf("running gc at %v", time.Now())
 			err := s.Db.RunValueLogGC(0.7)
 			if err == nil {
 				goto gc

@@ -30,7 +30,7 @@ func main() {
 	if err != nil {
 		return
 	}
-	badger := persistence.BadgerLocal{Path: path,InMemory: true,LogDisabled: true}
+	badger := persistence.BadgerLocal{Path: path,InMemory: false,LogDisabled: true,GcEnabled: true}
 	dsp := data.DataServiceProvider{Db: &badger,Cs: &m}
 	go dsp.Start()
 	go m.ShutdownHook()
