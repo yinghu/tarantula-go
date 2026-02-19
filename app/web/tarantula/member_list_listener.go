@@ -163,7 +163,7 @@ func (m *MemberListListener) NodeMeta(limit int) []byte {
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
 	//broadcasting message 
-	core.AppLog.Printf("notify msf %s", string(msg))
+	//core.AppLog.Printf("notify msf %s", string(msg))
 }
 
 func (m *MemberListListener) GetBroadcasts(overhead, limit int) [][]byte {
@@ -182,7 +182,7 @@ func (m *MemberListListener) LocalState(join bool) []byte {
 	return []byte("dog")
 }
 func (m *MemberListListener) MergeRemoteState(buf []byte, join bool) {
-	core.AppLog.Printf("MergeRemoteState %s %v", string(buf), join)
+	//core.AppLog.Printf("MergeRemoteState %s %v", string(buf), join)
 }
 
 // ping delegate

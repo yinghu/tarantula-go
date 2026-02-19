@@ -64,7 +64,7 @@ func (m *MemberHashRing) OnRemove(node core.Node) {
 }
 
 func (m *MemberHashRing) OnUpdate(node core.Node) {
-	core.AppLog.Printf("UPDATE NODE %v", node)
+	core.AppLog.Printf("UPDATE NODE %s", string(node.Meta))
 }
 
 func (m *MemberHashRing) OnMerge(nodes []core.Node) {
