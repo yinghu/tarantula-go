@@ -1,5 +1,7 @@
 package main
 
-type KeyIndex struct{
-	
+import "gameclustering.com/internal/core"
+
+type KeyIndex struct {
+	core.PersistentableObj
 }

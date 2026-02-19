@@ -6,7 +6,6 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
-	"gameclustering.com/tarantula/data"
 	"gameclustering.com/tarantula/presence"
 )
 
@@ -31,7 +30,7 @@ func main() {
 		return
 	}
 	badger := persistence.BadgerLocal{Path: path,InMemory: false,LogDisabled: true,GcEnabled: true}
-	dsp := data.DataServiceProvider{Db: &badger,Cs: &m}
+	dsp := DataServiceProvider{Db: &badger,Cs: &m}
 	go dsp.Start()
 	go m.ShutdownHook()
 	select {}

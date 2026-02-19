@@ -156,7 +156,8 @@ func (m *MemberListListener) ShutdownHook() {
 
 // delegate
 func (m *MemberListListener) NodeMeta(limit int) []byte {
-	core.AppLog.Printf("pull meta data for node update %d",limit)
+	//limit 512 
+	//core.AppLog.Printf("pull meta data for node update %d",limit)
 	m.ct++
 	return fmt.Appendf([]byte{}, "tarantula%d", m.ct)
 }
@@ -167,6 +168,7 @@ func (m *MemberListListener) NotifyMsg(msg []byte) {
 }
 
 func (m *MemberListListener) GetBroadcasts(overhead, limit int) [][]byte {
+	//overhead 3 limit 1350
 	//core.AppLog.Debug().Msgf("broadcasting overhead %d %d",overhead,limit)
 	var data [][]byte
 	data = append(data, []byte("data1"))

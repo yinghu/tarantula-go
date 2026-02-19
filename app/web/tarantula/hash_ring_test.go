@@ -87,25 +87,25 @@ func TestHashRingScale(t *testing.T) {
 	}
 	//hash := murmur3.New32()
 	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
-	nodes := ring.RingNode(murmur3.Sum32([]byte("adb")), REPLICA_MAX)
+	nodes := ring.RingNode(murmur3.Sum32([]byte("adb")), 3)
 	if len(nodes) != 1 {
 		t.Errorf("key ring node should 1 %d", len(nodes))
 	}
 	ring.OnAdd(core.Node{Name: "node-b", IP: "192.168.1.11:6060"})
-	nodes = ring.RingNode(murmur3.Sum32([]byte("adb")), REPLICA_MAX)
+	nodes = ring.RingNode(murmur3.Sum32([]byte("adb")), 3)
 	if len(nodes) != 2 {
 		t.Errorf("key ring node should 2 %d", len(nodes))
 	}
 
 	ring.OnAdd(core.Node{Name: "node-c", IP: "192.168.1.12:6060"})
-	nodes = ring.RingNode(murmur3.Sum32([]byte("adb")), REPLICA_MAX)
+	nodes = ring.RingNode(murmur3.Sum32([]byte("adb")), 3)
 	if len(nodes) != 3 {
 		t.Errorf("key ring node should 3 %d", len(nodes))
 	}
 	ring.OnAdd(core.Node{Name: "node-d", IP: "192.168.1.13:6060"})
 	ring.OnAdd(core.Node{Name: "node-e", IP: "192.168.1.14:6060"})
 
-	nodes = ring.RingNode(murmur3.Sum32([]byte("bopaa")), REPLICA_MAX)
+	nodes = ring.RingNode(murmur3.Sum32([]byte("bopaa")), 3)
 	if len(nodes) != 3 {
 		t.Errorf("key ring node should 3 %d", len(nodes))
 	}
@@ -219,7 +219,7 @@ func TestHashRingPrefix(t *testing.T) {
 	}
 	core.AppLog.Debug().Msgf("shared node number %d", shared)
 	shared = 0
-	ring.OnAdd(core.Node{Name: "node-s", IP: "192.168.1.147:6060"})
+	ring.OnAdd(core.Node{Name: "node-v", IP: "192.168.1.147:6060"})
 	ring.OnAdd(core.Node{Name: "node-t", IP: "192.168.1.148:6060"})
 	ring.OnAdd(core.Node{Name: "node-u", IP: "192.168.1.149:6060"})
 	nodes = ring.RingNode(hash, REPLICA_MAX)
