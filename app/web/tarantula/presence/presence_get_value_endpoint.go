@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/util"
 )
 
 type PresenceGetValueEndpoint struct {
@@ -21,7 +22,7 @@ func (p *PresenceGetValueEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Requ
 	p.Get(core.GetRequest{Key: []byte(k), Async: rq})
 	for c := range rq {
 		if len(c.Data) > 0 {
-			w.Write(c.Data)
+			w.Write(util.ToJson(c))
 		}
 		if !c.Remaining {
 			break
