@@ -59,15 +59,15 @@ type RingRequest struct {
 }
 
 type GetRequest struct {
-	Database string
-	Key      []byte
-	Async    chan Chunk
+	Prefix []byte
+	Key    []byte
+	Async  chan Chunk
 }
 type SetRequest struct {
-	Database string
-	Key      []byte
-	Value    []byte
-	Async    chan Chunk
+	Prefix []byte
+	Key    []byte
+	Value  []byte
+	Async  chan Chunk
 }
 
 type ClusterService interface {

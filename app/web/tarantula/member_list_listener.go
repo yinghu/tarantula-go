@@ -27,7 +27,7 @@ type MemberListListener struct {
 	MRequest  chan core.RingRequest
 	*memberlist.Memberlist
 	*MemberHashRing
-	*MemberDataListener
+	*DataServiceProvider
 	ct int
 }
 
@@ -94,7 +94,7 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 		nodes := <-rq
 		ringNode := nodes[0]
 		//core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
-		dt, err := m.MemberDataListener.Get(&ringNode, &get)
+		dt, err := m.DataServiceProvider.ClientGet(&ringNode, &get)
 		if err != nil {
 			retry.Err = err
 			retry.Reties--
@@ -120,7 +120,7 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 		m.MRequest <- core.RingRequest{Token: m.RingToken(set.Key), Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		resp, err := m.MemberDataListener.Set(&ringNode, &set)
+		resp, err := m.DataServiceProvider.ClientSet(&ringNode, &set)
 		if err != nil {
 			retry.Err = err
 			retry.Reties--
@@ -130,7 +130,7 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 		retry.Suc = true
 		slaves := nodes[1:]
 		for _, slave := range slaves {
-			m.MemberDataListener.Set(&slave, &set)
+			m.DataServiceProvider.ClientSet(&slave, &set)
 		}
 		break
 	}
