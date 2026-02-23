@@ -1,11 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"os"
-
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/persistence"
 	"gameclustering.com/tarantula/presence"
 )
 
@@ -19,20 +15,8 @@ func main() {
 		return
 	}
 	go presence.Start(&m)
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return
-	}
-	path := fmt.Sprintf("%s/%s", homeDir, "tarantula")
-	core.AppLog.Printf("check path %s",path)
-	err = os.MkdirAll(path, 0755)
-	if err != nil {
-		return
-	}
-	badger := persistence.BadgerLocal{Path: path,InMemory: false,LogDisabled: true,GcEnabled: true}
-	m.DataServiceProvider.Db = &badger
-	m.Cs = &m
-	go m.DataServiceProvider.Start()
+	//m.Cs = &m
+	//go m.DataServiceProvider.Start()
 	go m.ShutdownHook()
 	select {}
 }

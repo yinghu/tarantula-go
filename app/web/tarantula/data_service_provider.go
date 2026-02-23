@@ -2,7 +2,9 @@ package main
 
 import (
 	context "context"
+	"fmt"
 	"net"
+	"os"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
@@ -14,8 +16,8 @@ import (
 
 type DataServiceProvider struct {
 	protocol.UnimplementedDataServiceServer
-	Db *persistence.BadgerLocal
-	Cs core.ClusterService
+	Db    *persistence.BadgerLocal
+	Cs    core.ClusterService
 	RNode <-chan []core.Node
 }
 
@@ -45,6 +47,17 @@ func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Data) (*prot
 }
 
 func (c *DataServiceProvider) Start() {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+	path := fmt.Sprintf("%s/%s", homeDir, "tarantula")
+	core.AppLog.Printf("check path %s", path)
+	err = os.MkdirAll(path, 0755)
+	if err != nil {
+		panic(err)
+	}
+	c.Db = &persistence.BadgerLocal{Path: path,InMemory: false,LogDisabled: true,GcEnabled: true} 
 	c.Db.Open()
 	tcp, err := net.Listen("tcp", ":7001")
 	if err != nil {

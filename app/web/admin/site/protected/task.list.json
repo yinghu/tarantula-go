@@ -55,6 +55,7 @@
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
                 {"Name":"Edit","Callback":"edit_category"}           
+                
             ]        
         },
         {
