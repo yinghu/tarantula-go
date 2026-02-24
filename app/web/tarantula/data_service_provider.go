@@ -52,7 +52,7 @@ func (c *DataServiceProvider) Start() {
 		panic(err)
 	}
 	path := fmt.Sprintf("%s/%s", homeDir, "tarantula")
-	core.AppLog.Printf("check path %s", path)
+	core.AppLog.Printf("creating path %s if not existed", path)
 	err = os.MkdirAll(path, 0755)
 	if err != nil {
 		panic(err)

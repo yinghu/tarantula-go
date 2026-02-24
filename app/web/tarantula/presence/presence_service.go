@@ -13,6 +13,7 @@ func Start(viewer core.ClusterService) {
 	http.Handle("/tarantula/presence/set/{key}/{value}", &PresenceSetValueEndpoint{viewer})
 	err := http.ListenAndServe(":8090", nil)
 	if err != nil {
-		core.AppLog.Printf("failed to start service %s\n", "presence")
+		core.AppLog.Printf("failed to start service %s", "presence")
+		panic(err)
 	}
 }
