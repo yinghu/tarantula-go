@@ -23,7 +23,7 @@ type BadgerLocal struct {
 	Db          *badger.DB
 	LogDisabled bool
 	GcEnabled   bool
-	gcTick      time.Ticker
+	gcTick      *time.Ticker
 }
 
 func (s *BadgerLocal) Save(t core.Persistentable) error {
@@ -303,7 +303,7 @@ func (s *BadgerLocal) Open() error {
 	if !s.GcEnabled {
 		return nil
 	}
-	s.gcTick = *time.NewTicker(10 * time.Minute)
+	s.gcTick = time.NewTicker(10 * time.Minute)
 	go func() {
 		for range s.gcTick.C {
 		gc:
@@ -337,6 +337,6 @@ func (s *BadgerLocal) Tx() core.Transaction {
 	k.NewProxy(BDG_KEY_SIZE)
 	v := core.BufferProxy{}
 	v.NewProxy(BDG_VALUE_SIZE)
-	tx := BadgerLocalTransaction{ctx: s.Db.NewTransaction(true),key: &k,value: &v}
+	tx := BadgerLocalTransaction{ctx: s.Db.NewTransaction(true), key: &k, value: &v}
 	return &tx
 }

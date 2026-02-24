@@ -16,8 +16,9 @@ import (
 
 type DataServiceProvider struct {
 	protocol.UnimplementedDataServiceServer
-	Local *persistence.BadgerLocal
-	RNode <-chan []core.Node
+	Local  *persistence.BadgerLocal
+	RNode  <-chan []core.Node
+	server *grpc.Server
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Data, error) {
@@ -56,15 +57,16 @@ func (c *DataServiceProvider) Start() {
 	if err != nil {
 		panic(err)
 	}
-	c.Local = &persistence.BadgerLocal{Path: path, InMemory: false, LogDisabled: true, GcEnabled: true}
+	c.Local = &persistence.BadgerLocal{Path: path, InMemory: false, LogDisabled: false, GcEnabled: true}
 	c.Local.Open()
 	tcp, err := net.Listen("tcp", ":7001")
 	if err != nil {
 		panic(err)
 	}
 	rpc := grpc.NewServer()
+	c.server = rpc
 	protocol.RegisterDataServiceServer(rpc, c)
-	core.AppLog.Printf("data service provider started on : %s", tcp.Addr().String())
+	core.AppLog.Printf("local data service provider started on : %s", tcp.Addr().String())
 	err = rpc.Serve(tcp)
 	if err != nil {
 		panic(err)
@@ -111,7 +113,9 @@ func (m *DataServiceProvider) RingUpdated() {
 			break
 		}
 	}
-	core.AppLog.Info().Msg("local ring update stopped")
+	m.server.Stop()
+	m.Local.Close()
+	core.AppLog.Info().Msg("local data service provider stopped")
 }
 
 // internal operations
