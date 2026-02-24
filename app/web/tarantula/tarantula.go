@@ -15,8 +15,6 @@ func main() {
 		return
 	}
 	go presence.Start(&m)
-	//m.Cs = &m
-	//go m.DataServiceProvider.Start()
 	go m.ShutdownHook()
 	select {}
 }

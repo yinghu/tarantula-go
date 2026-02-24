@@ -16,14 +16,14 @@ import (
 
 type DataServiceProvider struct {
 	protocol.UnimplementedDataServiceServer
-	Db    *persistence.BadgerLocal
+	Local *persistence.BadgerLocal
 	Cs    core.ClusterService
 	RNode <-chan []core.Node
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Data, error) {
 	data := protocol.Data{}
-	err := c.Db.Db.View(func(txn *badger.Txn) error {
+	err := c.Local.Db.View(func(txn *badger.Txn) error {
 		item, err := txn.Get(in.Key)
 		if err != nil {
 			return err
@@ -37,7 +37,7 @@ func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*p
 }
 
 func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Data) (*protocol.Response, error) {
-	err := c.Db.Db.Update(func(txn *badger.Txn) error {
+	err := c.Local.Db.Update(func(txn *badger.Txn) error {
 		return txn.Set(in.Key, in.Value)
 	})
 	if err != nil {
@@ -57,8 +57,8 @@ func (c *DataServiceProvider) Start() {
 	if err != nil {
 		panic(err)
 	}
-	c.Db = &persistence.BadgerLocal{Path: path,InMemory: false,LogDisabled: true,GcEnabled: true} 
-	c.Db.Open()
+	c.Local = &persistence.BadgerLocal{Path: path, InMemory: false, LogDisabled: true, GcEnabled: true}
+	c.Local.Open()
 	tcp, err := net.Listen("tcp", ":7001")
 	if err != nil {
 		panic(err)
@@ -105,3 +105,61 @@ func (m *DataServiceProvider) RingUpdated() {
 		}
 	}
 }
+
+// internal operations
+func (m *DataServiceProvider) SaveKeyIndex(keyIndex *KeyIndex) error {
+	kBuff := core.NewBuffer(100)
+	if err := keyIndex.WriteKey(kBuff); err != nil {
+		return err
+	}
+	kBuff.Flip()
+	key, err := kBuff.Read(0)
+	if err != nil {
+		return err
+	}
+	kBuff.Clear()
+	if err := keyIndex.Write(kBuff); err != nil {
+		return err
+	}
+	kBuff.Flip()
+	value, err := kBuff.Read(0)
+	if err != nil {
+		return err
+	}
+	if err := m.Local.Db.Update(func(txn *badger.Txn) error {
+		return txn.Set(key, value)
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *DataServiceProvider) LoadKeyIndex(keyIndex *KeyIndex) error {
+	kBuff := core.NewBuffer(100)
+	if err := keyIndex.WriteKey(kBuff); err != nil {
+		return err
+	}
+	kBuff.Flip()
+	key, err := kBuff.Read(0)
+	if err != nil {
+		return err
+	}
+	kBuff.Clear()
+	if err := m.Local.Db.View(func(txn *badger.Txn) error {
+		item, err := txn.Get(key)
+		if err != nil {
+			return err
+		}
+		return item.Value(func(val []byte) error {
+			if err := kBuff.Write(val); err != nil {
+				return err
+			}
+			return nil
+		})
+	}); err != nil {
+		return err
+	}
+	kBuff.Flip()
+	return keyIndex.Read(kBuff)
+}
+

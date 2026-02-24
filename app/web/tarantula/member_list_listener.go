@@ -146,6 +146,7 @@ func (m *MemberListListener) ShutdownHook() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	<-sigs
 	core.AppLog.Warn().Msg("Signal to exit")
+	m.Local.Close()
 	m.Leave(3 * time.Second)
 	time.Sleep(5 * time.Second)
 	m.Shutdown()
@@ -156,14 +157,14 @@ func (m *MemberListListener) ShutdownHook() {
 
 // delegate
 func (m *MemberListListener) NodeMeta(limit int) []byte {
-	//limit 512 
+	//limit 512
 	//core.AppLog.Printf("pull meta data for node update %d",limit)
 	m.ct++
 	return fmt.Appendf([]byte{}, "tarantula%d", m.ct)
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
-	//broadcasting message 
+	//broadcasting message
 	//core.AppLog.Printf("notify msf %s", string(msg))
 }
 
