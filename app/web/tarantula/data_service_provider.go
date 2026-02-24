@@ -19,6 +19,7 @@ type DataServiceProvider struct {
 	Local  *persistence.BadgerLocal
 	RNode  <-chan []core.Node
 	server *grpc.Server
+	Cs     core.ClusterService
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Data, error) {
@@ -100,7 +101,11 @@ func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.SetRequ
 	defer tcp.Close()
 	dsp := protocol.NewDataServiceClient(tcp)
 	kv := protocol.Data{Key: request.Key, Value: request.Value}
-	return dsp.Set(context.Background(), &kv)
+	resp, err := dsp.Set(context.Background(), &kv)
+	if err != nil {
+		m.Cs.Publish([]byte("keyindex"))
+	}
+	return resp, err
 }
 func (m *DataServiceProvider) RingUpdated() {
 	stopping := false

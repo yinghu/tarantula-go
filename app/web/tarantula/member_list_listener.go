@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -25,6 +26,15 @@ type MemberListListener struct {
 	*memberlist.Memberlist
 	*MemberHashRing
 	*DataServiceProvider
+	//cluster broadcasting data
+	broadcastingData [][]byte
+	lock             sync.Mutex
+}
+
+func (m *MemberListListener) Publish(broadcasting []byte) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	m.broadcastingData = append(m.broadcastingData, broadcasting)
 }
 
 func (m *MemberListListener) toNode(e *memberlist.Node) core.Node {
@@ -156,11 +166,19 @@ func (m *MemberListListener) NotifyMsg(msg []byte) {
 func (m *MemberListListener) GetBroadcasts(overhead, limit int) [][]byte {
 	//overhead 3 limit 1350
 	//core.AppLog.Debug().Msgf("broadcasting overhead %d %d",overhead,limit)
-	var data [][]byte
-	data = append(data, []byte("data1"))
-	data = append(data, []byte("data2"))
-	data = append(data, []byte("data3"))
-	return data
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	pz := len(m.broadcastingData)
+	if pz == 0 {
+		return nil
+	}
+	pz = min(limit, pz)
+	out := make([][]byte, 0, pz)
+	for i := range pz {
+		out = append(out, m.broadcastingData[i])
+	}
+	m.broadcastingData = m.broadcastingData[pz:]
+	return out
 }
 
 func (m *MemberListListener) LocalState(join bool) []byte {
