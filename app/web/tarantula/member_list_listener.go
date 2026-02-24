@@ -172,6 +172,7 @@ func (m *MemberListListener) GetBroadcasts(overhead, limit int) [][]byte {
 	if pz == 0 {
 		return nil
 	}
+	core.AppLog.Debug().Msgf("broadcasting overhead %d %d %d", overhead, limit, pz)
 	pz = min(limit, pz)
 	out := make([][]byte, 0, pz)
 	for i := range pz {
