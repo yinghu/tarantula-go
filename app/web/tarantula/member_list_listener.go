@@ -2,10 +2,7 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"os/signal"
 	"strings"
-	"syscall"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -38,7 +35,8 @@ func (m *MemberListListener) toNode(e *memberlist.Node) core.Node {
 
 // event dispatch from event delegate
 func (m *MemberListListener) Listen() {
-	for {
+	running := true
+	for running {
 		select {
 		case e := <-m.MEvent:
 			switch e.Event {
@@ -60,18 +58,22 @@ func (m *MemberListListener) Listen() {
 		case mc := <-m.MConflict:
 			m.OnConflict(mc)
 		case mr := <-m.MRequest:
-			if mr.Token > 0 {
+			if mr.Token > 1 {
 				nodes := m.RingNode(mr.Token, mr.Replicas)
 				mr.Async <- nodes
-			} else {
+			} else if mr.Token == 0 {
 				nodes := make([]core.Node, 0)
 				for _, n := range m.nodes {
 					nodes = append(nodes, n)
 				}
 				mr.Async <- nodes
+			} else if mr.Token == 1 {
+				running = false
+				break
 			}
 		}
 	}
+	core.AppLog.Info().Msg("local member listener stopped")
 }
 
 func (m *MemberListListener) KeyRing(r core.RingRequest) {
@@ -139,20 +141,6 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 	}
 	core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
 	set.Async <- core.Chunk{Remaining: false, Data: []byte(retry.Err.Error())}
-}
-
-func (m *MemberListListener) ShutdownHook() {
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	<-sigs
-	core.AppLog.Warn().Msg("Signal to exit")
-	m.Local.Close()
-	m.Leave(3 * time.Second)
-	time.Sleep(5 * time.Second)
-	m.Shutdown()
-	signal.Stop(sigs)
-	close(sigs)
-	os.Exit(0)
 }
 
 // delegate

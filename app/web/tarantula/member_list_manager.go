@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 	"github.com/hashicorp/memberlist"
@@ -51,7 +53,7 @@ func (m *MemberlistManager) Start() error {
 	m.snowflake = util.NewSnowflake(int64(nodeId)%1024, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	go m.Listen()
 	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode}
-	m.Cs = m
+	//m.Cs = m
 	go m.DataServiceProvider.Start()
 	go m.RingUpdated()
 	joined, err := list.Join(m.Seed)
@@ -68,4 +70,25 @@ func (m *MemberlistManager) Id() (int64, error) {
 }
 func (m *MemberlistManager) Parse(snowflakeId int64) (int64, int64, int64) {
 	return m.snowflake.Parse(snowflakeId)
+}
+
+func (m *MemberlistManager) ShutdownHook() {
+	core.AppLog.Info().Msg("Running shut down hook ...")
+	m.Leave(3 * time.Second)
+	time.Sleep(3 * time.Second)
+	m.Shutdown()
+	core.AppLog.Info().Msg("Closing resouces ...")
+	m.MRequest <- core.RingRequest{Token: 1}
+	stopNode := []core.Node{{State: -1000}}
+	m.WNode <- stopNode
+	time.Sleep(3 * time.Second)
+	//clear()
+	close(m.MEvent)
+	close(m.MAlive)
+	close(m.MPing)
+	close(m.MMerge)
+	close(m.MConflict)
+	close(m.MRequest)
+	close(m.WNode)
+	//m..Close()
 }

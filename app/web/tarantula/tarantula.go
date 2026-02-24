@@ -1,6 +1,10 @@
 package main
 
 import (
+	"os"
+	"os/signal"
+	"syscall"
+
 	"gameclustering.com/internal/core"
 	"gameclustering.com/tarantula/presence"
 )
@@ -15,6 +19,13 @@ func main() {
 		return
 	}
 	go presence.Start(&m)
-	go m.ShutdownHook()
-	select {}
+	//shutdown hook
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	<-sigs
+	core.AppLog.Warn().Msg("Signal to exit")
+	m.ShutdownHook()
+	signal.Stop(sigs)
+	close(sigs)
+	os.Exit(0)
 }

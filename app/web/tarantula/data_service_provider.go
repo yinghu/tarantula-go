@@ -17,7 +17,6 @@ import (
 type DataServiceProvider struct {
 	protocol.UnimplementedDataServiceServer
 	Local *persistence.BadgerLocal
-	Cs    core.ClusterService
 	RNode <-chan []core.Node
 }
 
@@ -99,11 +98,20 @@ func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.SetRequ
 	return dsp.Set(context.Background(), &kv)
 }
 func (m *DataServiceProvider) RingUpdated() {
+	stopping := false
 	for nlist := range m.RNode {
 		for _, n := range nlist {
+			if n.State == -1000 {
+				stopping = true
+				break
+			}
 			core.AppLog.Printf("node updated IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
 		}
+		if stopping {
+			break
+		}
 	}
+	core.AppLog.Info().Msg("local ring update stopped")
 }
 
 // internal operations
@@ -162,4 +170,3 @@ func (m *DataServiceProvider) LoadKeyIndex(keyIndex *KeyIndex) error {
 	kBuff.Flip()
 	return keyIndex.Read(kBuff)
 }
-
