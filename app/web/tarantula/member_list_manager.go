@@ -61,7 +61,7 @@ func (m *MemberlistManager) Start() error {
 		core.AppLog.Printf("erorr on member join %s", err.Error())
 		return err
 	}
-	core.AppLog.Printf("local has joined %d", joined)
+	core.AppLog.Printf("total nodes have joined %d", joined)
 	return nil
 }
 

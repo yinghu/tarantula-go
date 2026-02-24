@@ -25,7 +25,6 @@ type MemberListListener struct {
 	*memberlist.Memberlist
 	*MemberHashRing
 	*DataServiceProvider
-	ct int
 }
 
 func (m *MemberListListener) toNode(e *memberlist.Node) core.Node {
@@ -146,14 +145,12 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 // delegate
 func (m *MemberListListener) NodeMeta(limit int) []byte {
 	//limit 512
-	//core.AppLog.Printf("pull meta data for node update %d",limit)
-	m.ct++
-	return fmt.Appendf([]byte{}, "tarantula%d", m.ct)
+	return fmt.Appendf([]byte{}, "tarantula")
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
 	//broadcasting message
-	//core.AppLog.Printf("notify msf %s", string(msg))
+	core.AppLog.Printf("notify msf %s", string(msg))
 }
 
 func (m *MemberListListener) GetBroadcasts(overhead, limit int) [][]byte {
