@@ -15,6 +15,7 @@ import (
 const (
 	BDG_KEY_SIZE   int = 200
 	BDG_VALUE_SIZE int = 4096
+	BDG_GC_TICK    int = 10
 )
 
 type BadgerLocal struct {
@@ -23,6 +24,7 @@ type BadgerLocal struct {
 	Db          *badger.DB
 	LogDisabled bool
 	GcEnabled   bool
+	GcInterval  int
 	gcTick      *time.Ticker
 }
 
@@ -303,7 +305,10 @@ func (s *BadgerLocal) Open() error {
 	if !s.GcEnabled {
 		return nil
 	}
-	s.gcTick = time.NewTicker(10 * time.Minute)
+	if s.GcInterval == 0 {
+		s.GcInterval = BDG_GC_TICK
+	}
+	s.gcTick = time.NewTicker(time.Duration(s.GcInterval) * time.Minute)
 	go func() {
 		for range s.gcTick.C {
 		gc:

@@ -23,7 +23,7 @@ func main() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	<-sigs
-	core.AppLog.Warn().Msg("Signal to exit")
+	core.AppLog.Warn().Msg("shutdown signal to be triggered")
 	m.ShutdownHook()
 	signal.Stop(sigs)
 	close(sigs)

@@ -58,7 +58,10 @@ func (c *DataServiceProvider) Start() {
 		panic(err)
 	}
 	c.Local = &persistence.BadgerLocal{Path: path, InMemory: false, LogDisabled: false, GcEnabled: true}
-	c.Local.Open()
+	err = c.Local.Open()
+	if err != nil {
+		panic(err)
+	}
 	tcp, err := net.Listen("tcp", ":7001")
 	if err != nil {
 		panic(err)
@@ -115,7 +118,7 @@ func (m *DataServiceProvider) RingUpdated() {
 	}
 	m.server.Stop()
 	m.Local.Close()
-	core.AppLog.Info().Msg("local data service provider stopped")
+	core.AppLog.Info().Msg("local data service provider has stopped")
 }
 
 // internal operations

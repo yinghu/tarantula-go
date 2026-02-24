@@ -73,7 +73,7 @@ func (m *MemberListListener) Listen() {
 			}
 		}
 	}
-	core.AppLog.Info().Msg("local member listener stopped")
+	core.AppLog.Info().Msg("local member listener has stopped")
 }
 
 func (m *MemberListListener) KeyRing(r core.RingRequest) {
