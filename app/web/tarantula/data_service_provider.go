@@ -102,7 +102,7 @@ func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.SetRequ
 	dsp := protocol.NewDataServiceClient(tcp)
 	kv := protocol.Data{Key: request.Key, Value: request.Value}
 	resp, err := dsp.Set(context.Background(), &kv)
-	if err != nil {
+	if err == nil {
 		m.Cs.Publish([]byte("keyindex"))
 	}
 	return resp, err
