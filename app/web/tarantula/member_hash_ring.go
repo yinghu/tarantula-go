@@ -58,6 +58,7 @@ func (m *MemberHashRing) OnRemove(node core.Node) {
 	})
 	slices.SortFunc(m.nodes, cmp)
 	m.nodeNum--
+	core.AppLog.Debug().Msgf("RMOVED ITESM %d", len(removed))
 	m.WNode <- removed
 }
 
