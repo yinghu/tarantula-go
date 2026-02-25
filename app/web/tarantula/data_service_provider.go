@@ -93,7 +93,6 @@ func (m *DataServiceProvider) ClientGet(target *core.Node, request *core.GetRequ
 }
 
 func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.SetRequest) (*protocol.Response, error) {
-	//core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
 	tcp, err := grpc.NewClient(target.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return &protocol.Response{}, err

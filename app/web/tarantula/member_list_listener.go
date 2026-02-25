@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/util"
 	"github.com/hashicorp/memberlist"
 )
 
@@ -82,7 +83,6 @@ func (m *MemberListListener) KeyRing(r core.RingRequest) {
 
 func (m *MemberListListener) HashRing(r core.RingRequest) {
 	m.MRequest <- r
-	m.UpdateNode(500 * time.Millisecond)
 }
 
 func (m *MemberListListener) Get(get core.GetRequest) {
@@ -94,7 +94,6 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 		m.MRequest <- core.RingRequest{Token: m.RingToken(get.Key), Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		//core.AppLog.Printf("target node %s %s %d\n", ringNode.IP, ringNode.Name, ringNode.RingToken)
 		dt, err := m.DataServiceProvider.ClientGet(&ringNode, &get)
 		if err != nil {
 			retry.Err = err
@@ -121,13 +120,13 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 		m.MRequest <- core.RingRequest{Token: m.RingToken(set.Key), Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		resp, err := m.DataServiceProvider.ClientSet(&ringNode, &set)
+		_, err := m.DataServiceProvider.ClientSet(&ringNode, &set)
 		if err != nil {
 			retry.Err = err
 			retry.Reties--
 			continue
 		}
-		set.Async <- core.Chunk{Remaining: false, Data: []byte(resp.Message)}
+		set.Async <- core.Chunk{Remaining: false, Data: util.ToJson(ringNode)}
 		retry.Suc = true
 		slaves := nodes[1:]
 		for _, slave := range slaves {
@@ -155,8 +154,6 @@ func (m *MemberListListener) NotifyMsg(msg []byte) {
 
 func (m *MemberListListener) GetBroadcasts(overhead, limit int) [][]byte {
 	//overhead 3 limit 1350
-	//core.AppLog.Debug().Msgf("broadcasting overhead %d %d",overhead,limit)
-
 	return nil
 }
 
@@ -167,7 +164,6 @@ func (m *MemberListListener) LocalState(join bool) []byte {
 	return []byte("dog")
 }
 func (m *MemberListListener) MergeRemoteState(buf []byte, join bool) {
-	//core.AppLog.Printf("MergeRemoteState %s %v", string(buf), join)
 }
 
 // ping delegate
