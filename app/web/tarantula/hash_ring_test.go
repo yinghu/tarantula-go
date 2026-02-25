@@ -265,7 +265,19 @@ func TestHashRingPrefix(t *testing.T) {
 	k, _ := resp.Read(0)
 	core.AppLog.Debug().Uint32("h", h).Str("k", string(k)).Send()
 
-	//core.AppLog.Debug().Msgf("Replicas %d",3+12%10)
-	//core.AppLog.Debug().Msgf("Replicas %d",3+16%10)
-	//core.AppLog.Debug().Msgf("Replicas %d",3+22%10)
+}
+
+func TestHashRingBalance(t *testing.T) {
+	core.CreateTestLog()
+	rwNode := make(chan []core.Node, NODE_EVENT_BUFFER_SIZE*100)
+	ring := MemberHashRing{weight: NODE_WEIGHT, WNode: rwNode}
+	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
+	ring.OnAdd(core.Node{Name: "node-b", IP: "192.168.1.11:6060"})
+	
+	//ring.OnAdd(core.Node{Name: "node-c", IP: "192.168.1.12:6060"})
+	//ring.OnAdd(core.Node{Name: "node-d", IP: "192.168.1.13:6060"})
+	//ring.OnAdd(core.Node{Name: "node-e", IP: "192.168.1.14:6060"})
+	//ring.OnAdd(core.Node{Name: "node-f", IP: "192.168.1.15:6060"})
+
+
 }

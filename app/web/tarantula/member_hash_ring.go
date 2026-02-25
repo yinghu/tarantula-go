@@ -84,22 +84,10 @@ func (m *MemberHashRing) RingToken(key []byte) uint32 {
 	return murmur3.Sum32(key)
 }
 
+
+
 func (m *MemberHashRing) RingNode(t uint32, relica int) []core.Node {
-	l := 0
-	r := len(m.nodes) - 1
-	ix := -1
-	for l <= r {
-		md := l + (r-l)/2
-		if t < m.nodes[md].RingToken {
-			ix = md
-			r = md - 1
-		} else {
-			l = md + 1
-		}
-	}
-	if ix == -1 {
-		ix = 0
-	}
+	ix := m.indexOf(t)
 	if relica == 0 || m.nodeNum == 1 {
 		return []core.Node{m.nodes[ix]}
 	}
@@ -127,4 +115,23 @@ func (m *MemberHashRing) RingNode(t uint32, relica int) []core.Node {
 		ix++
 	}
 	return syncNodes
+}
+
+func (m *MemberHashRing) indexOf(t uint32) int{
+	l := 0
+	r := len(m.nodes) - 1
+	ix := -1
+	for l <= r {
+		md := l + (r-l)/2
+		if t < m.nodes[md].RingToken {
+			ix = md
+			r = md - 1
+		} else {
+			l = md + 1
+		}
+	}
+	if ix == -1 {
+		ix = 0
+	}
+	return ix;
 }
