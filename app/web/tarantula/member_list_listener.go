@@ -10,6 +10,14 @@ import (
 	"github.com/hashicorp/memberlist"
 )
 
+const (
+	REPLICA_RING_OPT int = 0
+
+	ALL_RING_OPT int = 3
+
+	CLOSE_RING_OPT = 99
+)
+
 type RetryTrack struct {
 	Err    error
 	Reties int
@@ -58,18 +66,19 @@ func (m *MemberListListener) Listen() {
 		case mc := <-m.MConflict:
 			m.OnConflict(mc)
 		case mr := <-m.MRequest:
-			if mr.Token > 1 {
+			switch mr.Opt {
+			case REPLICA_RING_OPT:
 				nodes := m.RingNode(mr.Token, mr.Replicas)
 				mr.Async <- nodes
-			} else if mr.Token == 0 {
+			case ALL_RING_OPT:
 				nodes := make([]core.Node, 0)
 				for _, n := range m.nodes {
 					nodes = append(nodes, n)
 				}
 				mr.Async <- nodes
-			} else if mr.Token == 1 {
+			case CLOSE_RING_OPT:
 				running = false
-				break
+
 			}
 		}
 	}
@@ -78,10 +87,12 @@ func (m *MemberListListener) Listen() {
 
 func (m *MemberListListener) KeyRing(r core.RingRequest) {
 	r.Replicas = REPLICA_MAX
+	r.Opt = REPLICA_RING_OPT
 	m.MRequest <- r
 }
 
 func (m *MemberListListener) HashRing(r core.RingRequest) {
+	r.Opt = ALL_RING_OPT
 	m.MRequest <- r
 }
 
@@ -144,7 +155,7 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 // delegate
 func (m *MemberListListener) NodeMeta(limit int) []byte {
 	//limit 512
-	return nil//fmt.Appendf([]byte{}, "tarantula")
+	return nil //fmt.Appendf([]byte{}, "tarantula")
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {

@@ -78,7 +78,7 @@ func (m *MemberlistManager) ShutdownHook() {
 	time.Sleep(3 * time.Second)
 	m.Shutdown()
 	core.AppLog.Info().Msg("closing resouces ...")
-	m.MRequest <- core.RingRequest{Token: 1}
+	m.MRequest <- core.RingRequest{Opt: CLOSE_RING_OPT}
 	stopNode := []core.Node{{State: -1000}}
 	m.WNode <- stopNode
 	time.Sleep(3 * time.Second)
