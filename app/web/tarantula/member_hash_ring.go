@@ -84,6 +84,26 @@ func (m *MemberHashRing) RingToken(key []byte) uint32 {
 	return murmur3.Sum32(key)
 }
 
+func (m *MemberHashRing) rangeNodeAdded(t uint32) []core.Node{
+	target := core.Node{RingToken: t}
+	n,exist := slices.BinarySearchFunc(m.nodes,target,func(n1,n2 core.Node) int {
+		return cmp(n1,n2)
+	})
+	if exist{
+		if n>0{
+			return []core.Node{m.nodes[n-1]}
+		}else{
+			p := len(m.nodes)-1
+			return []core.Node{m.nodes[p]}
+		}
+	}
+	return []core.Node{target}
+}
+func (m *MemberHashRing) rangeNodeRemoved(t uint32) []core.Node{
+	ix := m.indexOf(t)
+	return []core.Node{m.nodes[ix]}
+}
+
 func (m *MemberHashRing) keyRing(t uint32, relica int) []core.Node {
 	ix := m.indexOf(t)
 	if relica == 0 || m.nodeNum == 1 {

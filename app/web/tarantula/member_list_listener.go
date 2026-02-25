@@ -84,9 +84,9 @@ func (m *MemberListListener) Listen() {
 				}
 				mr.Async <- nodes
 			case ADD_NODE_OPT:
-
+				mr.Async <- m.rangeNodeAdded(mr.Token)
 			case REMOVE_NODE_OPT:
-
+				mr.Async <- m.rangeNodeRemoved(mr.Token)
 			case CLOSE_RING_OPT:
 				running = false
 
