@@ -101,11 +101,7 @@ func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.SetRequ
 	defer tcp.Close()
 	dsp := protocol.NewDataServiceClient(tcp)
 	kv := protocol.Data{Key: request.Key, Value: request.Value}
-	resp, err := dsp.Set(context.Background(), &kv)
-	if err == nil {
-		m.Cs.Publish([]byte("keyindex"))
-	}
-	return resp, err
+	return dsp.Set(context.Background(), &kv)
 }
 func (m *DataServiceProvider) RingUpdated() {
 	stopping := false

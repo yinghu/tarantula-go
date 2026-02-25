@@ -77,5 +77,5 @@ type ClusterService interface {
 	RingToken(key []byte) uint32
 	Get(get GetRequest)
 	Set(get SetRequest)
-	Publish([]byte)
+	//Publish([]byte)
 }
