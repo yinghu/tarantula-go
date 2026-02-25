@@ -53,7 +53,7 @@ func (m *MemberlistManager) Start() error {
 	m.snowflake = util.NewSnowflake(int64(nodeId)%1024, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	go m.Listen()
 	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode}
-	m.Cs = m
+	m.Cs = m.MemberListListener
 	go m.DataServiceProvider.Start()
 	go m.RingUpdated()
 	joined, err := list.Join(m.Seed)
@@ -79,7 +79,7 @@ func (m *MemberlistManager) ShutdownHook() {
 	m.Shutdown()
 	core.AppLog.Info().Msg("closing resouces ...")
 	m.MRequest <- core.RingRequest{Opt: CLOSE_RING_OPT}
-	stopNode := []core.Node{{State: -1000}}
+	stopNode := []core.Node{{State: NODE_STATE_SHUTDOWN}}
 	m.WNode <- stopNode
 	time.Sleep(3 * time.Second)
 	close(m.MEvent)

@@ -57,7 +57,7 @@ func TestHashRing(t *testing.T) {
 		return false
 	})
 	fmt.Printf("node pos %d %s", pos, keyNode.Name)
-	pn := mr.RingNode(rt, 0)[0]
+	pn := mr.keyRing(rt, 0)[0]
 	fmt.Printf("node found %d %s", pn.RingToken, pn.Name)
 	if keyNode.Name != pn.Name {
 		t.Errorf("should be same node %s <> %s", keyNode.Name, pn.Name)
@@ -87,25 +87,25 @@ func TestHashRingScale(t *testing.T) {
 	}
 	//hash := murmur3.New32()
 	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
-	nodes := ring.RingNode(murmur3.Sum32([]byte("adb")), 3)
+	nodes := ring.keyRing(murmur3.Sum32([]byte("adb")), 3)
 	if len(nodes) != 1 {
 		t.Errorf("key ring node should 1 %d", len(nodes))
 	}
 	ring.OnAdd(core.Node{Name: "node-b", IP: "192.168.1.11:6060"})
-	nodes = ring.RingNode(murmur3.Sum32([]byte("adb")), 3)
+	nodes = ring.keyRing(murmur3.Sum32([]byte("adb")), 3)
 	if len(nodes) != 2 {
 		t.Errorf("key ring node should 2 %d", len(nodes))
 	}
 
 	ring.OnAdd(core.Node{Name: "node-c", IP: "192.168.1.12:6060"})
-	nodes = ring.RingNode(murmur3.Sum32([]byte("adb")), 3)
+	nodes = ring.keyRing(murmur3.Sum32([]byte("adb")), 3)
 	if len(nodes) != 3 {
 		t.Errorf("key ring node should 3 %d", len(nodes))
 	}
 	ring.OnAdd(core.Node{Name: "node-d", IP: "192.168.1.13:6060"})
 	ring.OnAdd(core.Node{Name: "node-e", IP: "192.168.1.14:6060"})
 
-	nodes = ring.RingNode(murmur3.Sum32([]byte("bopaa")), 3)
+	nodes = ring.keyRing(murmur3.Sum32([]byte("bopaa")), 3)
 	if len(nodes) != 3 {
 		t.Errorf("key ring node should 3 %d", len(nodes))
 	}
@@ -126,13 +126,13 @@ func TestHashRingPrefix(t *testing.T) {
 	mindex := make(map[string]uint32)
 	key := []byte("key1")
 	hash := ring.RingToken(key)
-	nodes := ring.RingNode(hash, REPLICA_MAX)
+	nodes := ring.keyRing(hash, REPLICA_MAX)
 	for _, n := range nodes {
 		core.AppLog.Debug().Msgf("hash %d ip %s name %s", n.RingToken, n.IP, n.Name)
 		mindex[n.Name] = n.RingToken
 	}
 	ring.OnRemove(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
-	nodes = ring.RingNode(hash, REPLICA_MAX)
+	nodes = ring.keyRing(hash, REPLICA_MAX)
 	shared := 0
 	for _, n := range nodes {
 		core.AppLog.Debug().Msgf("hash %d ip %s name %s", n.RingToken, n.IP, n.Name)
@@ -144,7 +144,7 @@ func TestHashRingPrefix(t *testing.T) {
 	core.AppLog.Debug().Msgf("shared node number %d", shared)
 	shared = 0
 	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
-	nodes = ring.RingNode(hash, REPLICA_MAX)
+	nodes = ring.keyRing(hash, REPLICA_MAX)
 	for _, n := range nodes {
 		core.AppLog.Debug().Msgf("hash %d ip %s name %s", n.RingToken, n.IP, n.Name)
 		_, ex := mindex[n.Name]
@@ -157,7 +157,7 @@ func TestHashRingPrefix(t *testing.T) {
 	ring.OnAdd(core.Node{Name: "node-g", IP: "192.168.1.7:6060"})
 	ring.OnAdd(core.Node{Name: "node-h", IP: "192.168.1.8:6060"})
 	ring.OnAdd(core.Node{Name: "node-i", IP: "192.168.1.9:6060"})
-	nodes = ring.RingNode(hash, REPLICA_MAX)
+	nodes = ring.keyRing(hash, REPLICA_MAX)
 	for _, n := range nodes {
 		core.AppLog.Debug().Msgf("hash %d ip %s name %s", n.RingToken, n.IP, n.Name)
 		_, ex := mindex[n.Name]
@@ -170,7 +170,7 @@ func TestHashRingPrefix(t *testing.T) {
 	ring.OnAdd(core.Node{Name: "node-j", IP: "192.168.1.17:6060"})
 	ring.OnAdd(core.Node{Name: "node-k", IP: "192.168.1.18:6060"})
 	ring.OnAdd(core.Node{Name: "node-l", IP: "192.168.1.19:6060"})
-	nodes = ring.RingNode(hash, REPLICA_MAX)
+	nodes = ring.keyRing(hash, REPLICA_MAX)
 	for _, n := range nodes {
 		core.AppLog.Debug().Msgf("hash %d ip %s name %s", n.RingToken, n.IP, n.Name)
 		_, ex := mindex[n.Name]
@@ -183,7 +183,7 @@ func TestHashRingPrefix(t *testing.T) {
 	ring.OnAdd(core.Node{Name: "node-m", IP: "192.168.1.27:6060"})
 	ring.OnAdd(core.Node{Name: "node-n", IP: "192.168.1.28:6060"})
 	ring.OnAdd(core.Node{Name: "node-o", IP: "192.168.1.29:6060"})
-	nodes = ring.RingNode(hash, REPLICA_MAX)
+	nodes = ring.keyRing(hash, REPLICA_MAX)
 	for _, n := range nodes {
 		core.AppLog.Debug().Msgf("hash %d ip %s name %s", n.RingToken, n.IP, n.Name)
 		_, ex := mindex[n.Name]
@@ -196,7 +196,7 @@ func TestHashRingPrefix(t *testing.T) {
 	ring.OnAdd(core.Node{Name: "node-q", IP: "192.168.1.37:6060"})
 	ring.OnAdd(core.Node{Name: "node-r", IP: "192.168.1.38:6060"})
 	ring.OnAdd(core.Node{Name: "node-s", IP: "192.168.1.39:6060"})
-	nodes = ring.RingNode(hash, REPLICA_MAX)
+	nodes = ring.keyRing(hash, REPLICA_MAX)
 	for _, n := range nodes {
 		core.AppLog.Debug().Msgf("hash %d ip %s name %s", n.RingToken, n.IP, n.Name)
 		_, ex := mindex[n.Name]
@@ -209,7 +209,7 @@ func TestHashRingPrefix(t *testing.T) {
 	ring.OnAdd(core.Node{Name: "node-x", IP: "192.168.1.47:6060"})
 	ring.OnAdd(core.Node{Name: "node-y", IP: "192.168.1.48:6060"})
 	ring.OnAdd(core.Node{Name: "node-z", IP: "192.168.1.49:6060"})
-	nodes = ring.RingNode(hash, REPLICA_MAX)
+	nodes = ring.keyRing(hash, REPLICA_MAX)
 	for _, n := range nodes {
 		core.AppLog.Debug().Msgf("hash %d ip %s name %s", n.RingToken, n.IP, n.Name)
 		_, ex := mindex[n.Name]
@@ -222,7 +222,7 @@ func TestHashRingPrefix(t *testing.T) {
 	ring.OnAdd(core.Node{Name: "node-v", IP: "192.168.1.147:6060"})
 	ring.OnAdd(core.Node{Name: "node-t", IP: "192.168.1.148:6060"})
 	ring.OnAdd(core.Node{Name: "node-u", IP: "192.168.1.149:6060"})
-	nodes = ring.RingNode(hash, REPLICA_MAX)
+	nodes = ring.keyRing(hash, REPLICA_MAX)
 	for _, n := range nodes {
 		core.AppLog.Debug().Msgf("hash %d ip %s name %s", n.RingToken, n.IP, n.Name)
 		_, ex := mindex[n.Name]
@@ -236,7 +236,7 @@ func TestHashRingPrefix(t *testing.T) {
 	ring.OnAdd(core.Node{Name: "node-aa", IP: "192.168.1.247:6060"})
 	ring.OnAdd(core.Node{Name: "node-bb", IP: "192.168.1.248:6060"})
 	ring.OnAdd(core.Node{Name: "node-cc", IP: "192.168.1.249:6060"})
-	nodes = ring.RingNode(hash, REPLICA_MAX)
+	nodes = ring.keyRing(hash, REPLICA_MAX)
 	for _, n := range nodes {
 		core.AppLog.Debug().Msgf("hash %d ip %s name %s", n.RingToken, n.IP, n.Name)
 		_, ex := mindex[n.Name]

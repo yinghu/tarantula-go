@@ -19,7 +19,7 @@ type DataServiceProvider struct {
 	Local  *persistence.BadgerLocal
 	RNode  <-chan []core.Node
 	server *grpc.Server
-	Cs     core.ClusterService
+	Cs     MemberListListener
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Data, error) {
@@ -106,13 +106,15 @@ func (m *DataServiceProvider) RingUpdated() {
 	stopping := false
 	for nlist := range m.RNode {
 		for _, n := range nlist {
-			if n.State == -1000 {
+			switch n.State {
+			case NODE_STATE_SHUTDOWN:
 				stopping = true
-				break
-			}
-			core.AppLog.Debug().Msgf("node updated IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
-			if n.State == 0{
-				
+			case NODE_STATE_LIVE:
+				core.AppLog.Debug().Msgf("node updated IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
+				//m.Cs.previousNode(core.RingRequest{Token: n.RingToken, Opt: ADD_NODE_OPT})
+			case NODE_STATE_DEAD:
+				core.AppLog.Debug().Msgf("node updated IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
+				//m.Cs.previousNode(core.RingRequest{Token: n.RingToken, Opt: REMOVE_NODE_OPT})
 			}
 		}
 		if stopping {

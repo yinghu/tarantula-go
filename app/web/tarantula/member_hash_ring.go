@@ -48,7 +48,7 @@ func (m *MemberHashRing) OnRemove(node core.Node) {
 	removed := make([]core.Node, m.weight)
 	m.nodes = slices.DeleteFunc(m.nodes, func(n core.Node) bool {
 		if n.IP == node.IP {
-			n.State = 3
+			n.State = NODE_STATE_DEAD
 			removed = append(removed, n)
 			return true
 		}
@@ -64,19 +64,19 @@ func (m *MemberHashRing) OnUpdate(node core.Node) {
 }
 
 func (m *MemberHashRing) OnMerge(nodes []core.Node) {
-	
+
 }
 
 func (m *MemberHashRing) OnLive(node core.Node) {
-	
+
 }
 
 func (m *MemberHashRing) OnPing(node core.Node) {
-	
+
 }
 
 func (m *MemberHashRing) OnConflict(nodes []core.Node) {
-	
+
 }
 
 // hash ring operations
@@ -84,9 +84,7 @@ func (m *MemberHashRing) RingToken(key []byte) uint32 {
 	return murmur3.Sum32(key)
 }
 
-
-
-func (m *MemberHashRing) RingNode(t uint32, relica int) []core.Node {
+func (m *MemberHashRing) keyRing(t uint32, relica int) []core.Node {
 	ix := m.indexOf(t)
 	if relica == 0 || m.nodeNum == 1 {
 		return []core.Node{m.nodes[ix]}
@@ -117,7 +115,7 @@ func (m *MemberHashRing) RingNode(t uint32, relica int) []core.Node {
 	return syncNodes
 }
 
-func (m *MemberHashRing) indexOf(t uint32) int{
+func (m *MemberHashRing) indexOf(t uint32) int {
 	l := 0
 	r := len(m.nodes) - 1
 	ix := -1
@@ -133,5 +131,5 @@ func (m *MemberHashRing) indexOf(t uint32) int{
 	if ix == -1 {
 		ix = 0
 	}
-	return ix;
+	return ix
 }

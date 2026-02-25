@@ -15,7 +15,14 @@ const (
 
 	ALL_RING_OPT int = 3
 
+	ADD_NODE_OPT    = 5
+	REMOVE_NODE_OPT = 6
+
 	CLOSE_RING_OPT = 99
+
+	NODE_STATE_LIVE     = 0
+	NODE_STATE_DEAD     = 3
+	NODE_STATE_SHUTDOWN = -1000
 )
 
 type RetryTrack struct {
@@ -68,7 +75,7 @@ func (m *MemberListListener) Listen() {
 		case mr := <-m.MRequest:
 			switch mr.Opt {
 			case REPLICA_RING_OPT:
-				nodes := m.RingNode(mr.Token, mr.Replicas)
+				nodes := m.keyRing(mr.Token, mr.Replicas)
 				mr.Async <- nodes
 			case ALL_RING_OPT:
 				nodes := make([]core.Node, 0)
@@ -76,6 +83,10 @@ func (m *MemberListListener) Listen() {
 					nodes = append(nodes, n)
 				}
 				mr.Async <- nodes
+			case ADD_NODE_OPT:
+
+			case REMOVE_NODE_OPT:
+
 			case CLOSE_RING_OPT:
 				running = false
 
@@ -83,6 +94,10 @@ func (m *MemberListListener) Listen() {
 		}
 	}
 	core.AppLog.Info().Msg("local member listener has stopped")
+}
+
+func (m *MemberListListener) previousNode(r core.RingRequest) {
+	m.MRequest <- r
 }
 
 func (m *MemberListListener) KeyRing(r core.RingRequest) {
