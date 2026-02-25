@@ -32,6 +32,7 @@ func (m *MemberHashRing) vNode(node core.Node, weight int) core.Node {
 }
 
 func (m *MemberHashRing) OnAdd(node core.Node) {
+	core.AppLog.Debug().Msg("ON ADD")
 	added := make([]core.Node, 0, m.weight)
 	for w := range m.weight {
 		v := m.vNode(node, w)
@@ -45,6 +46,7 @@ func (m *MemberHashRing) OnAdd(node core.Node) {
 }
 
 func (m *MemberHashRing) OnRemove(node core.Node) {
+	core.AppLog.Debug().Msg("ON REMOVE")
 	removed := make([]core.Node, m.weight)
 	m.nodes = slices.DeleteFunc(m.nodes, func(n core.Node) bool {
 		if n.IP == node.IP {
@@ -84,22 +86,22 @@ func (m *MemberHashRing) RingToken(key []byte) uint32 {
 	return murmur3.Sum32(key)
 }
 
-func (m *MemberHashRing) rangeNodeAdded(t uint32) []core.Node{
+func (m *MemberHashRing) rangeNodeAdded(t uint32) []core.Node {
 	target := core.Node{RingToken: t}
-	n,exist := slices.BinarySearchFunc(m.nodes,target,func(n1,n2 core.Node) int {
-		return cmp(n1,n2)
+	n, exist := slices.BinarySearchFunc(m.nodes, target, func(n1, n2 core.Node) int {
+		return cmp(n1, n2)
 	})
-	if exist{
-		if n>0{
+	if exist {
+		if n > 0 {
 			return []core.Node{m.nodes[n-1]}
-		}else{
-			p := len(m.nodes)-1
+		} else {
+			p := len(m.nodes) - 1
 			return []core.Node{m.nodes[p]}
 		}
 	}
 	return []core.Node{target}
 }
-func (m *MemberHashRing) rangeNodeRemoved(t uint32) []core.Node{
+func (m *MemberHashRing) rangeNodeRemoved(t uint32) []core.Node {
 	ix := m.indexOf(t)
 	return []core.Node{m.nodes[ix]}
 }
