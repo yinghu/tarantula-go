@@ -53,6 +53,7 @@ type ClusterListener interface {
 }
 
 type RingRequest struct {
+	Opt      int
 	Token    uint32
 	Replicas int
 	Async    chan []Node

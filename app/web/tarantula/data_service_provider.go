@@ -110,7 +110,10 @@ func (m *DataServiceProvider) RingUpdated() {
 				stopping = true
 				break
 			}
-			core.AppLog.Printf("node updated IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
+			core.AppLog.Debug().Msgf("node updated IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
+			if n.State == 0{
+				
+			}
 		}
 		if stopping {
 			break
