@@ -247,7 +247,7 @@ func TestHashRingPrefix(t *testing.T) {
 	core.AppLog.Debug().Msgf("shared node number %d", shared)
 	shared = 0
 
-	core.AppLog.Debug().Msgf("total nodes : %d %d", len(ring.nodes)/NODE_WEIGHT,len(ring.nodes))
+	core.AppLog.Debug().Msgf("total nodes : %d %d", len(ring.nodes)/NODE_WEIGHT, len(ring.nodes))
 	core.AppLog.Debug().Msgf("xnode hash %d", nodes[0].RingToken)
 	buff := core.NewBuffer(100)
 	buff.WriteUInt32(nodes[0].RingToken)
@@ -267,17 +267,55 @@ func TestHashRingPrefix(t *testing.T) {
 
 }
 
+func h32(n string) uint32{
+	return murmur3.Sum32([]byte(n))
+}
 func TestHashRingBalance(t *testing.T) {
 	core.CreateTestLog()
 	rwNode := make(chan []core.Node, NODE_EVENT_BUFFER_SIZE*100)
+	defer close(rwNode)
 	ring := MemberHashRing{weight: NODE_WEIGHT, WNode: rwNode}
 	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
+	for _, n := range ring.nodes {
+		core.AppLog.Debug().Msgf("XXX Node %v", n)
+	}
+	for i:= range 7{
+		n0 := core.Node{RingToken: h32(fmt.Sprintf("node-a#%d",i))}
+		a0 := ring.rangeNodeAdded(n0.RingToken)[0]
+		core.AppLog.Debug().Msgf("pevious node %d %d",a0.RingToken,n0.RingToken)
+	}
+	
 	ring.OnAdd(core.Node{Name: "node-b", IP: "192.168.1.11:6060"})
 	
+	for _, n := range ring.nodes {
+		core.AppLog.Debug().Msgf("YYY Node %v", n)
+	}
+
+	for i:= range 7{
+		n0 := core.Node{RingToken: h32(fmt.Sprintf("node-a#%d",i))}
+		a0 := ring.rangeNodeAdded(n0.RingToken)[0]
+		core.AppLog.Debug().Msgf("pevious node %d %d",a0.RingToken,n0.RingToken)
+		
+		n1 := core.Node{RingToken: h32(fmt.Sprintf("node-b#%d",i))}
+		a1 := ring.rangeNodeAdded(n1.RingToken)[0]
+		core.AppLog.Debug().Msgf("pevious node %d %d",a1.RingToken,n1.RingToken)
+	}
+
+	ring.OnRemove(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
+	for _, n := range ring.nodes {
+		core.AppLog.Debug().Msgf("ZZZ Node %v", n)
+	}
+	for i:= range 7{
+		n0 := core.Node{RingToken: h32(fmt.Sprintf("node-a#%d",i))}
+		a0 := ring.rangeNodeRemoved(n0.RingToken)[0]
+		core.AppLog.Debug().Msgf("pevious node %d %d",a0.RingToken,n0.RingToken)
+	}
+	//for _,n := range ring.nodes{
+	//core.AppLog.Debug().Msgf("YYY Node %v",n)
+	//}
 	//ring.OnAdd(core.Node{Name: "node-c", IP: "192.168.1.12:6060"})
 	//ring.OnAdd(core.Node{Name: "node-d", IP: "192.168.1.13:6060"})
 	//ring.OnAdd(core.Node{Name: "node-e", IP: "192.168.1.14:6060"})
 	//ring.OnAdd(core.Node{Name: "node-f", IP: "192.168.1.15:6060"})
-
 
 }
