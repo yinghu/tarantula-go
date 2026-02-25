@@ -7,11 +7,11 @@ const (
 type Node struct {
 	Name         string `json:"name"`
 	RingToken    uint32 `json:"ringToken"`
-	Meta         string `json:"meta"`
+	Meta         string `json:"-"`
 	IP           string `json:"address"`
-	State        int    `json:"state"`
-	HttpEndpoint string `json:"http"`
-	TcpEndpoint  string `json:"tcp"`
+	State        int    `json:"-"`
+	HttpEndpoint string `json:"http,omitempty"`
+	TcpEndpoint  string `json:"tcp,omitempty"`
 }
 type KVLoad func(k, v string) bool
 
