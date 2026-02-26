@@ -88,14 +88,19 @@ func (m *MemberHashRing) rangeNodeAdded(t uint32) []core.Node {
 		return cmp(n1, n2)
 	})
 	if exist {
-		if n > 0 {
-			return []core.Node{m.nodes[n-1]}
-		} else {
-			p := len(m.nodes) - 1
-			return []core.Node{m.nodes[p]}
+		end := len(m.nodes)-1
+		switch n {
+		case 0:
+			return []core.Node{m.nodes[end], m.nodes[1]}
+		case end:
+			return []core.Node{m.nodes[0],m.nodes[end-1]}
+		default:
+			return []core.Node{m.nodes[n-1],m.nodes[n+1]}
 		}
 	}
-	return []core.Node{target}
+	core.AppLog.Warn().Msgf("should be never happening %d %v",n,exist)
+	//should not be happening
+	return []core.Node{}
 }
 func (m *MemberHashRing) rangeNodeRemoved(t uint32) []core.Node {
 	ix := m.indexOf(t)

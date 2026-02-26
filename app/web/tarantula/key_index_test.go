@@ -29,20 +29,20 @@ func TestKeyIndex(t *testing.T) {
 	if ak.Prefix != k.Prefix {
 		t.Errorf("should be same %d %d", ak.Prefix, k.Prefix)
 	}
-	core.AppLog.Debug().Msgf("prefix %d %d", ak.Prefix, k.Prefix)
+	//core.AppLog.Debug().Msgf("prefix %d %d", ak.Prefix, k.Prefix)
 	if ak.Master.RingToken != k.Master.RingToken {
 		t.Errorf("should be same %d %d", ak.Master.RingToken, k.Master.RingToken)
 	}
-	core.AppLog.Debug().Msgf("master %d %d", ak.Master.RingToken, k.Master.RingToken)
+	//core.AppLog.Debug().Msgf("master %d %d", ak.Master.RingToken, k.Master.RingToken)
 	if string(ak.Key) != string(k.Key) {
 		t.Errorf("should be same %s %s", string(ak.Key), string(k.Key))
 	}
-	core.AppLog.Debug().Msgf("key %s %s", string(ak.Key), string(k.Key))
+	//core.AppLog.Debug().Msgf("key %s %s", string(ak.Key), string(k.Key))
 	for i, n := range k.Slaves {
 		if n.RingToken != ak.Slaves[i].RingToken {
 			t.Errorf("should be same %d %d", n.RingToken, ak.Slaves[i].RingToken)
 		}
-		core.AppLog.Debug().Msgf("slave %d %d %d", i, n.RingToken, ak.Slaves[i].RingToken)
+		//core.AppLog.Debug().Msgf("slave %d %d %d", i, n.RingToken, ak.Slaves[i].RingToken)
 	}
 }
 
@@ -98,20 +98,20 @@ func TestKeyIndex2(t *testing.T) {
 	if ak.Prefix != k.Prefix {
 		t.Errorf("should be same %d %d", ak.Prefix, k.Prefix)
 	}
-	core.AppLog.Debug().Msgf("prefix %d %d", ak.Prefix, k.Prefix)
+	//core.AppLog.Debug().Msgf("prefix %d %d", ak.Prefix, k.Prefix)
 	if ak.Master.RingToken != k.Master.RingToken {
 		t.Errorf("should be same %d %d", ak.Master.RingToken, k.Master.RingToken)
 	}
-	core.AppLog.Debug().Msgf("master %d %d", ak.Master.RingToken, k.Master.RingToken)
+	//core.AppLog.Debug().Msgf("master %d %d", ak.Master.RingToken, k.Master.RingToken)
 	if string(ak.Key) != string(k.Key) {
 		t.Errorf("should be same %s %s", string(ak.Key), string(k.Key))
 	}
-	core.AppLog.Debug().Msgf("key %s %s", string(ak.Key), string(k.Key))
+	//core.AppLog.Debug().Msgf("key %s %s", string(ak.Key), string(k.Key))
 	for i, n := range k.Slaves {
 		if n.RingToken != ak.Slaves[i].RingToken {
 			t.Errorf("should be same %d %d", n.RingToken, ak.Slaves[i].RingToken)
 		}
-		core.AppLog.Debug().Msgf("slave %d %d %d", i, n.RingToken, ak.Slaves[i].RingToken)
+		//core.AppLog.Debug().Msgf("slave %d %d %d", i, n.RingToken, ak.Slaves[i].RingToken)
 	}
 }
 
@@ -141,19 +141,19 @@ func TestKeyIndex3(t *testing.T) {
 	if ak.Prefix != k.Prefix {
 		t.Errorf("should be same %d %d", ak.Prefix, k.Prefix)
 	}
-	core.AppLog.Debug().Msgf("prefix %d %d", ak.Prefix, k.Prefix)
+	//core.AppLog.Debug().Msgf("prefix %d %d", ak.Prefix, k.Prefix)
 	if ak.Master.RingToken != k.Master.RingToken {
 		t.Errorf("should be same %d %d", ak.Master.RingToken, k.Master.RingToken)
 	}
-	core.AppLog.Debug().Msgf("master %d %d", ak.Master.RingToken, k.Master.RingToken)
+	//core.AppLog.Debug().Msgf("master %d %d", ak.Master.RingToken, k.Master.RingToken)
 	if string(ak.Key) != string(k.Key) {
 		t.Errorf("should be same %s %s", string(ak.Key), string(k.Key))
 	}
-	core.AppLog.Debug().Msgf("key %s %s", string(ak.Key), string(k.Key))
+	//core.AppLog.Debug().Msgf("key %s %s", string(ak.Key), string(k.Key))
 	for i, n := range k.Slaves {
 		if n.RingToken != ak.Slaves[i].RingToken {
 			t.Errorf("should be same %d %d", n.RingToken, ak.Slaves[i].RingToken)
 		}
-		core.AppLog.Debug().Msgf("slave %d %d %d", i, n.RingToken, ak.Slaves[i].RingToken)
+		//core.AppLog.Debug().Msgf("slave %d %d %d", i, n.RingToken, ak.Slaves[i].RingToken)
 	}
 }

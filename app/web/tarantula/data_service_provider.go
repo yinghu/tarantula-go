@@ -111,21 +111,20 @@ func (m *DataServiceProvider) RingUpdated() {
 				stopping = true
 			case NODE_STATE_LIVE:
 				if !m.Mll.localNode(n) {
-
 					core.AppLog.Debug().Msgf("node live IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
 					rq := make(chan []core.Node, 1)
-					m.Mll.previousNode(core.RingRequest{Token: n.RingToken, Opt: ADD_NODE_OPT, Async: rq})
+					m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: ADD_NODE_OPT, Async: rq})
 					preNode := <-rq
 					core.AppLog.Debug().Msgf("previous node on live %s %d", preNode[0].Name, preNode[0].RingToken)
 					close(rq)
 				}
 			case NODE_STATE_DEAD:
-				core.AppLog.Debug().Msgf("node dead IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
-				rq := make(chan []core.Node, 1)
-				m.Mll.previousNode(core.RingRequest{Token: n.RingToken, Opt: REMOVE_NODE_OPT, Async: rq})
-				preNode := <-rq
-				core.AppLog.Debug().Msgf("previous node on dead %s %d", preNode[0].Name, preNode[0].RingToken)
-				close(rq)
+				//core.AppLog.Debug().Msgf("node dead IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
+				//rq := make(chan []core.Node, 1)
+				//m.Mll.previousNode(core.RingRequest{Token: n.RingToken, Opt: REMOVE_NODE_OPT, Async: rq})
+				//preNode := <-rq
+				//core.AppLog.Debug().Msgf("previous node on dead %s %d", preNode[0].Name, preNode[0].RingToken)
+				//close(rq)
 			}
 		}
 		if stopping {

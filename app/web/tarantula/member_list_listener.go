@@ -96,7 +96,7 @@ func (m *MemberListListener) Listen() {
 	core.AppLog.Info().Msg("local member listener has stopped")
 }
 
-func (m *MemberListListener) previousNode(r core.RingRequest) {
+func (m *MemberListListener) rangeRing(r core.RingRequest) {
 	m.MRequest <- r
 	//m.UpdateNode(5 * time.Second) //trigger node mata update
 }
