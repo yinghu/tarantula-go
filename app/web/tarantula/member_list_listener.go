@@ -91,6 +91,7 @@ func (m *MemberListListener) Listen() {
 				mr.Async <- m.rangeNodeRemoved(mr.Token)
 			case UPDATE_NODE_OPT:
 				m.balancing = mr.Replicas == 0
+				m.UpdateNode(5 * time.Second)
 			case CLOSE_RING_OPT:
 				running = false
 
@@ -178,6 +179,7 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 // delegate
 func (m *MemberListListener) NodeMeta(limit int) []byte {
 	//limit 512
+	core.AppLog.Debug().Msgf("pulling node meta %v", m.balancing)
 	if m.balancing {
 		return []byte("pending")
 	}

@@ -48,7 +48,7 @@ func (m *MemberlistManager) Start() error {
 		return err
 	}
 	m.Memberlist = list
-	m.LocalNode().Meta = []byte("pending")
+	//m.LocalNode().Meta = []byte("pending")
 	nodeId := murmur3.Sum64(m.LocalNode().Addr)
 	core.AppLog.Printf("node id %d %d", nodeId, int64(nodeId)%1024)
 	m.snowflake = util.NewSnowflake(int64(nodeId)%1024, util.EpochMillisecondsFromMidnight(2020, 1, 1))
