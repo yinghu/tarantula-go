@@ -17,11 +17,12 @@ const (
 
 	ADD_NODE_OPT    = 5
 	REMOVE_NODE_OPT = 6
+	UPDATE_NODE_OPT = 7
+	CLOSE_RING_OPT  = 99
 
-	CLOSE_RING_OPT = 99
+	NODE_STATE_LIVE = 0
+	NODE_STATE_DEAD = 3
 
-	NODE_STATE_LIVE     = 0
-	NODE_STATE_DEAD     = 3
 	NODE_STATE_SHUTDOWN = -1000
 )
 
@@ -41,6 +42,7 @@ type MemberListListener struct {
 	*memberlist.Memberlist
 	*MemberHashRing
 	*DataServiceProvider
+	balancing bool
 }
 
 func (m *MemberListListener) toNode(e *memberlist.Node) core.Node {
@@ -87,6 +89,8 @@ func (m *MemberListListener) Listen() {
 				mr.Async <- m.rangeNodeAdded(mr.Token)
 			case REMOVE_NODE_OPT:
 				mr.Async <- m.rangeNodeRemoved(mr.Token)
+			case UPDATE_NODE_OPT:
+				m.balancing = mr.Replicas == 0
 			case CLOSE_RING_OPT:
 				running = false
 
@@ -174,7 +178,10 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 // delegate
 func (m *MemberListListener) NodeMeta(limit int) []byte {
 	//limit 512
-	return []byte("meta")
+	if m.balancing {
+		return []byte("pending")
+	}
+	return []byte("ready")
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {

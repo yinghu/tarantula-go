@@ -106,6 +106,7 @@ func (m *DataServiceProvider) RingUpdated() {
 	stopping := false
 	for nlist := range m.RNode {
 		//update node to pending
+		m.Mll.MRequest <- core.RingRequest{Opt: UPDATE_NODE_OPT, Replicas: 0}
 		for _, n := range nlist {
 			switch n.State {
 			case NODE_STATE_SHUTDOWN:
@@ -131,6 +132,7 @@ func (m *DataServiceProvider) RingUpdated() {
 				//close(rq)
 			}
 		}
+		m.Mll.MRequest <- core.RingRequest{Opt: UPDATE_NODE_OPT, Replicas: 1}
 		//update node to ready
 		if stopping {
 			break
