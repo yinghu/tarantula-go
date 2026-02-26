@@ -54,7 +54,6 @@ func (m *MemberListListener) Listen() {
 	for running {
 		select {
 		case e := <-m.MEvent:
-			core.AppLog.Debug().Msgf("C EVET %v", e)
 			switch e.Event {
 			case memberlist.NodeJoin:
 				m.OnAdd(m.toNode(e.Node))

@@ -32,7 +32,6 @@ func (m *MemberHashRing) vNode(node core.Node, weight int) core.Node {
 }
 
 func (m *MemberHashRing) OnAdd(node core.Node) {
-	core.AppLog.Debug().Msg("ON ADD")
 	added := make([]core.Node, 0, m.weight)
 	for w := range m.weight {
 		v := m.vNode(node, w)
@@ -46,8 +45,7 @@ func (m *MemberHashRing) OnAdd(node core.Node) {
 }
 
 func (m *MemberHashRing) OnRemove(node core.Node) {
-	core.AppLog.Debug().Msg("ON REMOVE")
-	removed := make([]core.Node, m.weight)
+	removed := make([]core.Node, 0,m.weight)
 	m.nodes = slices.DeleteFunc(m.nodes, func(n core.Node) bool {
 		if n.IP == node.IP {
 			n.State = NODE_STATE_DEAD
@@ -58,7 +56,6 @@ func (m *MemberHashRing) OnRemove(node core.Node) {
 	})
 	slices.SortFunc(m.nodes, cmp)
 	m.nodeNum--
-	core.AppLog.Debug().Msgf("RMOVED ITESM %d", len(removed))
 	m.WNode <- removed
 }
 
