@@ -61,7 +61,6 @@ func (m *MemberHashRing) OnRemove(node core.Node) {
 }
 
 func (m *MemberHashRing) OnUpdate(node core.Node) {
-	core.AppLog.Debug().Msgf("node updated %v", node)
 	for i, n := range m.nodes {
 		if strings.HasPrefix(n.Name, node.Name) {
 			n.Meta = node.Meta
