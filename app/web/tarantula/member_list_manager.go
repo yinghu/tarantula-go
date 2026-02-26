@@ -24,6 +24,7 @@ type MemberlistManager struct {
 
 func (m *MemberlistManager) Start() error {
 	m.MemberHashRing = &MemberHashRing{nodes: make([]core.Node, 0), weight: NODE_WEIGHT}
+	m.balancing = true
 	cfg := memberlist.DefaultLANConfig()
 	ch := make(chan memberlist.NodeEvent, NODE_EVENT_BUFFER_SIZE) //HAVE TO BUFFER
 	cl := memberlist.ChannelEventDelegate{Ch: ch}
@@ -48,7 +49,6 @@ func (m *MemberlistManager) Start() error {
 		return err
 	}
 	m.Memberlist = list
-	m.balancing = true
 	nodeId := murmur3.Sum64(m.LocalNode().Addr)
 	core.AppLog.Printf("node id %d %d", nodeId, int64(nodeId)%1024)
 	m.snowflake = util.NewSnowflake(int64(nodeId)%1024, util.EpochMillisecondsFromMidnight(2020, 1, 1))
