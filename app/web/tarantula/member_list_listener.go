@@ -170,7 +170,7 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 // delegate
 func (m *MemberListListener) NodeMeta(limit int) []byte {
 	//limit 512
-	return nil //fmt.Appendf([]byte{}, "tarantula")
+	return fmt.Appendf([]byte{}, "tarantula")
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
