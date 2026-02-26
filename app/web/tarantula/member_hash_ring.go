@@ -27,7 +27,7 @@ type MemberHashRing struct {
 }
 
 func (m *MemberHashRing) vNode(node core.Node, weight int) core.Node {
-	v := core.Node{Name: fmt.Sprintf("%s#%d", node.Name, weight), IP: node.IP, Meta: node.Meta, State: node.State}
+	v := core.Node{Name: fmt.Sprintf("%s#%d", node.Name, weight), IP: node.IP, RpcEndpoint: node.RpcEndpoint, Meta: node.Meta, State: node.State}
 	v.RingToken = m.RingToken([]byte(v.Name))
 	return v
 }
