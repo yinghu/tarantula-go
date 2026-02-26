@@ -14,6 +14,10 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+const (
+	RPC_PORT int = 7001
+)
+
 type DataServiceProvider struct {
 	protocol.UnimplementedDataServiceServer
 	Local  *persistence.BadgerLocal
@@ -63,7 +67,7 @@ func (c *DataServiceProvider) Start() {
 	if err != nil {
 		panic(err)
 	}
-	tcp, err := net.Listen("tcp", ":7001")
+	tcp, err := net.Listen("tcp",fmt.Sprintf(":%d",RPC_PORT))
 	if err != nil {
 		panic(err)
 	}
@@ -78,7 +82,7 @@ func (c *DataServiceProvider) Start() {
 }
 
 func (m *DataServiceProvider) ClientGet(target *core.Node, request *core.GetRequest) ([]byte, error) {
-	tcp, err := grpc.NewClient(target.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +97,7 @@ func (m *DataServiceProvider) ClientGet(target *core.Node, request *core.GetRequ
 }
 
 func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.SetRequest) (*protocol.Response, error) {
-	tcp, err := grpc.NewClient(target.IP, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return &protocol.Response{}, err
 	}

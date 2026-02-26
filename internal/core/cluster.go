@@ -10,6 +10,7 @@ type Node struct {
 	Meta         string `json:"meta"`
 	IP           string `json:"address"`
 	State        int    `json:"-"`
+	RpcEndpoint  string `json:"rpc,omitempty"`
 	HttpEndpoint string `json:"http,omitempty"`
 	TcpEndpoint  string `json:"tcp,omitempty"`
 }
@@ -54,6 +55,7 @@ type ClusterListener interface {
 
 type RingRequest struct {
 	Opt      int
+	Address  string
 	Token    uint32
 	Replicas int
 	Async    chan []Node

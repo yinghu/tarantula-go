@@ -15,10 +15,11 @@ const (
 
 	ALL_RING_OPT int = 3
 
-	ADD_NODE_OPT    = 5
-	REMOVE_NODE_OPT = 6
-	UPDATE_NODE_OPT = 7
-	CLOSE_RING_OPT  = 99
+	ADD_NODE_OPT     = 5
+	REMOVE_NODE_OPT  = 6
+	UPDATE_NODE_OPT  = 7
+	BALANCE_NODE_OPT = 8
+	CLOSE_RING_OPT   = 99
 
 	NODE_STATE_LIVE = 0
 	NODE_STATE_DEAD = 3
@@ -47,7 +48,7 @@ type MemberListListener struct {
 
 func (m *MemberListListener) toNode(e *memberlist.Node) core.Node {
 	parts := strings.Split(e.Address(), ":")
-	return core.Node{Name: e.Name, Meta: string(e.Meta), IP: fmt.Sprintf("%s:%d", parts[0], 7001), State: int(e.State)}
+	return core.Node{Name: e.Name, Meta: string(e.Meta), IP: e.Address(), RpcEndpoint: fmt.Sprintf("%s:%d", parts[0], RPC_PORT), State: int(e.State)}
 }
 
 // event dispatch from event delegate
@@ -92,6 +93,8 @@ func (m *MemberListListener) Listen() {
 			case UPDATE_NODE_OPT:
 				m.balancing = mr.Replicas == 0
 				m.UpdateNode(5 * time.Second)
+			case BALANCE_NODE_OPT:
+				//m.SendToAddress()
 			case CLOSE_RING_OPT:
 				running = false
 
