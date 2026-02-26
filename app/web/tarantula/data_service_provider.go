@@ -67,7 +67,7 @@ func (c *DataServiceProvider) Start() {
 	if err != nil {
 		panic(err)
 	}
-	tcp, err := net.Listen("tcp",fmt.Sprintf(":%d",RPC_PORT))
+	tcp, err := net.Listen("tcp", fmt.Sprintf(":%d", RPC_PORT))
 	if err != nil {
 		panic(err)
 	}
@@ -142,6 +142,7 @@ func (m *DataServiceProvider) RingUpdated() {
 					if !m.Mll.localNode(ringRange[0]) {
 						//pull remote data from >= pre.hash to < added.hash to remote added node
 						core.AppLog.Debug().Msgf("take over data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
+						m.Mll.MRequest <- core.RingRequest{Opt: BALANCE_NODE_OPT, Address: n.IP}
 					}
 				}
 			}

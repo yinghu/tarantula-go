@@ -94,7 +94,14 @@ func (m *MemberListListener) Listen() {
 				m.balancing = mr.Replicas == 0
 				m.UpdateNode(5 * time.Second)
 			case BALANCE_NODE_OPT:
-				//m.SendToAddress()
+				for _, mbr := range m.Members() {
+					if mbr.Address() == mr.Address {
+						core.AppLog.Debug().Msg("sending message")
+						m.SendToAddress(mbr.FullAddress(), []byte("balance"))
+						break
+					}
+				}
+				//m.SendToAddress(ip,[]byte("balance"))
 			case CLOSE_RING_OPT:
 				running = false
 
