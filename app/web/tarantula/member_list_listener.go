@@ -98,6 +98,10 @@ func (m *MemberListListener) Listen() {
 
 func (m *MemberListListener) previousNode(r core.RingRequest) {
 	m.MRequest <- r
+	//m.UpdateNode(5 * time.Second) //trigger node mata update
+}
+func (m *MemberListListener) localNode(node core.Node) bool {
+	return strings.HasPrefix(node.Name, m.LocalNode().Name)
 }
 
 func (m *MemberListListener) KeyRing(r core.RingRequest) {
@@ -170,7 +174,6 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 // delegate
 func (m *MemberListListener) NodeMeta(limit int) []byte {
 	//limit 512
-	core.AppLog.Debug().Msg("pulling node meta")
 	return []byte("meta")
 }
 
@@ -188,9 +191,11 @@ func (m *MemberListListener) LocalState(join bool) []byte {
 	if join {
 		return []byte("mice")
 	}
+	//join == false called on push/pull
 	return []byte("dog")
 }
 func (m *MemberListListener) MergeRemoteState(buf []byte, join bool) {
+
 }
 
 // ping delegate

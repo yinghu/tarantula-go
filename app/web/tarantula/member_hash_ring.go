@@ -45,7 +45,7 @@ func (m *MemberHashRing) OnAdd(node core.Node) {
 }
 
 func (m *MemberHashRing) OnRemove(node core.Node) {
-	removed := make([]core.Node, 0,m.weight)
+	removed := make([]core.Node, 0, m.weight)
 	m.nodes = slices.DeleteFunc(m.nodes, func(n core.Node) bool {
 		if n.IP == node.IP {
 			n.State = NODE_STATE_DEAD
@@ -60,11 +60,9 @@ func (m *MemberHashRing) OnRemove(node core.Node) {
 }
 
 func (m *MemberHashRing) OnUpdate(node core.Node) {
-
 }
 
 func (m *MemberHashRing) OnMerge(nodes []core.Node) {
-
 }
 
 func (m *MemberHashRing) OnLive(node core.Node) {

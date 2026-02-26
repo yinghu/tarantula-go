@@ -19,7 +19,7 @@ type DataServiceProvider struct {
 	Local  *persistence.BadgerLocal
 	RNode  <-chan []core.Node
 	server *grpc.Server
-	Cs     MemberListListener
+	Mll    MemberListListener
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Data, error) {
@@ -110,16 +110,19 @@ func (m *DataServiceProvider) RingUpdated() {
 			case NODE_STATE_SHUTDOWN:
 				stopping = true
 			case NODE_STATE_LIVE:
-				core.AppLog.Debug().Msgf("node live IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
-				rq := make(chan []core.Node, 1)
-				m.Cs.previousNode(core.RingRequest{Token: n.RingToken, Opt: ADD_NODE_OPT, Async: rq})
-				preNode := <-rq
-				core.AppLog.Debug().Msgf("previous node on live %s %d", preNode[0].Name, preNode[0].RingToken)
-				close(rq)
+				if !m.Mll.localNode(n) {
+
+					core.AppLog.Debug().Msgf("node live IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
+					rq := make(chan []core.Node, 1)
+					m.Mll.previousNode(core.RingRequest{Token: n.RingToken, Opt: ADD_NODE_OPT, Async: rq})
+					preNode := <-rq
+					core.AppLog.Debug().Msgf("previous node on live %s %d", preNode[0].Name, preNode[0].RingToken)
+					close(rq)
+				}
 			case NODE_STATE_DEAD:
 				core.AppLog.Debug().Msgf("node dead IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
 				rq := make(chan []core.Node, 1)
-				m.Cs.previousNode(core.RingRequest{Token: n.RingToken, Opt: REMOVE_NODE_OPT, Async: rq})
+				m.Mll.previousNode(core.RingRequest{Token: n.RingToken, Opt: REMOVE_NODE_OPT, Async: rq})
 				preNode := <-rq
 				core.AppLog.Debug().Msgf("previous node on dead %s %d", preNode[0].Name, preNode[0].RingToken)
 				close(rq)
