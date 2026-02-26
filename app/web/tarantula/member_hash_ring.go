@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"slices"
+	"strings"
 
 	"gameclustering.com/internal/core"
 	"github.com/spaolacci/murmur3"
@@ -60,6 +61,13 @@ func (m *MemberHashRing) OnRemove(node core.Node) {
 }
 
 func (m *MemberHashRing) OnUpdate(node core.Node) {
+	core.AppLog.Debug().Msgf("node updated %v", node)
+	for i, n := range m.nodes {
+		if strings.HasPrefix(n.Name, node.Name) {
+			n.Meta = node.Meta
+			m.nodes[i] = n
+		}
+	}
 }
 
 func (m *MemberHashRing) OnMerge(nodes []core.Node) {
@@ -88,17 +96,17 @@ func (m *MemberHashRing) rangeNodeAdded(t uint32) []core.Node {
 		return cmp(n1, n2)
 	})
 	if exist {
-		end := len(m.nodes)-1
+		end := len(m.nodes) - 1
 		switch n {
 		case 0:
 			return []core.Node{m.nodes[end], m.nodes[1]}
 		case end:
-			return []core.Node{m.nodes[0],m.nodes[end-1]}
+			return []core.Node{m.nodes[0], m.nodes[end-1]}
 		default:
-			return []core.Node{m.nodes[n-1],m.nodes[n+1]}
+			return []core.Node{m.nodes[n-1], m.nodes[n+1]}
 		}
 	}
-	core.AppLog.Warn().Msgf("should be never happening %d %v",n,exist)
+	core.AppLog.Warn().Msgf("should be never happening %d %v", n, exist)
 	//should not be happening
 	return []core.Node{}
 }
