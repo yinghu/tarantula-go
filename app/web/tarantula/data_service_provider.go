@@ -107,6 +107,7 @@ func (m *DataServiceProvider) RingUpdated() {
 	for nlist := range m.RNode {
 		//update node to pending
 		m.Mll.MRequest <- core.RingRequest{Opt: UPDATE_NODE_OPT, Replicas: 0}
+		core.AppLog.Debug().Msg("Ring updating")
 		for _, n := range nlist {
 			switch n.State {
 			case NODE_STATE_SHUTDOWN:
@@ -118,12 +119,12 @@ func (m *DataServiceProvider) RingUpdated() {
 				m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: ADD_NODE_OPT, Async: rq})
 				ringRange := <-rq
 				close(rq)
-				core.AppLog.Debug().Msgf("Previous %v",ringRange[0])
-				core.AppLog.Debug().Msgf("Added %v",n)
-				core.AppLog.Debug().Msgf("Next %v",ringRange[1])
+				core.AppLog.Debug().Msgf("Previous %v", ringRange[0])
+				core.AppLog.Debug().Msgf("Added %v", n)
+				core.AppLog.Debug().Msgf("Next %v", ringRange[1])
 				//if !m.Mll.localNode(ringRange[0]) {
-					//pull remote data from >= pre.hash to < added.hash to remote added node
-					//core.AppLog.Debug().Msgf("pull data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
+				//pull remote data from >= pre.hash to < added.hash to remote added node
+				//core.AppLog.Debug().Msgf("pull data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
 				//}
 				//}
 			case NODE_STATE_DEAD:
@@ -137,6 +138,7 @@ func (m *DataServiceProvider) RingUpdated() {
 		}
 		m.Mll.MRequest <- core.RingRequest{Opt: UPDATE_NODE_OPT, Replicas: 1}
 		//update node to ready
+		core.AppLog.Debug().Msg("Ring updated")
 		if stopping {
 			break
 		}
