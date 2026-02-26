@@ -232,6 +232,14 @@ func TestHashRingPrefix(t *testing.T) {
 func h32(n string) uint32 {
 	return murmur3.Sum32([]byte(n))
 }
+
+func check(t core.Node,rangeRing []core.Node) bool{
+	a0 := rangeRing[0]
+	a1 := rangeRing[1]
+	core.AppLog.Debug().Msgf("pevious : %d <<%d>> next : %d", a0.RingToken, t.RingToken, a1.RingToken)
+	order := a0.RingToken > t.RingToken && t.RingToken > a0.RingToken
+	return order
+}
 func TestHashRingBalance(t *testing.T) {
 	core.CreateTestLog()
 	rwNode := make(chan []core.Node, NODE_EVENT_BUFFER_SIZE*100)
@@ -239,45 +247,38 @@ func TestHashRingBalance(t *testing.T) {
 	ring := MemberHashRing{weight: NODE_WEIGHT, WNode: rwNode}
 	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
 	for _, n := range ring.nodes {
-		core.AppLog.Debug().Msgf("XXX Node %v", n)
+		core.AppLog.Debug().Msgf("one node ring %v", n)
 	}
 	for i := range 7 {
 		n0 := core.Node{RingToken: h32(fmt.Sprintf("node-a#%d", i))}
-		a0 := ring.rangeNodeAdded(n0.RingToken)[0]
-		core.AppLog.Debug().Msgf("pevious node %d %d", a0.RingToken, n0.RingToken)
+		check(n0,ring.rangeNodeAdded(n0.RingToken))
 	}
 
 	ring.OnAdd(core.Node{Name: "node-b", IP: "192.168.1.11:6060"})
 
 	for _, n := range ring.nodes {
-		core.AppLog.Debug().Msgf("YYY Node %v", n)
+		core.AppLog.Debug().Msgf("two node ring %v", n)
 	}
 
 	for i := range 7 {
 		n0 := core.Node{RingToken: h32(fmt.Sprintf("node-a#%d", i))}
-		a0 := ring.rangeNodeAdded(n0.RingToken)[0]
-		core.AppLog.Debug().Msgf("pevious node %d %d", a0.RingToken, n0.RingToken)
-
+		check(n0,ring.rangeNodeAdded(n0.RingToken))	
 		n1 := core.Node{RingToken: h32(fmt.Sprintf("node-b#%d", i))}
-		a1 := ring.rangeNodeAdded(n1.RingToken)[0]
-		core.AppLog.Debug().Msgf("pevious node %d %d", a1.RingToken, n1.RingToken)
+		check(n1,ring.rangeNodeAdded(n1.RingToken))
 	}
 
-	ring.OnRemove(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
+	ring.OnAdd(core.Node{Name: "node-c", IP: "192.168.1.12:6060"})
 	for _, n := range ring.nodes {
-		core.AppLog.Debug().Msgf("ZZZ Node %v", n)
+		core.AppLog.Debug().Msgf("three node ring %v", n)
 	}
 	for i := range 7 {
 		n0 := core.Node{RingToken: h32(fmt.Sprintf("node-a#%d", i))}
-		a0 := ring.rangeNodeRemoved(n0.RingToken)[0]
-		core.AppLog.Debug().Msgf("pevious node %d %d", a0.RingToken, n0.RingToken)
+		check(n0,ring.rangeNodeAdded(n0.RingToken))	
+		n1 := core.Node{RingToken: h32(fmt.Sprintf("node-b#%d", i))}
+		check(n1,ring.rangeNodeAdded(n1.RingToken))
+		n2 := core.Node{RingToken: h32(fmt.Sprintf("node-c#%d", i))}
+		check(n2,ring.rangeNodeAdded(n2.RingToken))
 	}
-	//for _,n := range ring.nodes{
-	//core.AppLog.Debug().Msgf("YYY Node %v",n)
-	//}
-	//ring.OnAdd(core.Node{Name: "node-c", IP: "192.168.1.12:6060"})
-	//ring.OnAdd(core.Node{Name: "node-d", IP: "192.168.1.13:6060"})
-	//ring.OnAdd(core.Node{Name: "node-e", IP: "192.168.1.14:6060"})
-	//ring.OnAdd(core.Node{Name: "node-f", IP: "192.168.1.15:6060"})
+	
 
 }
