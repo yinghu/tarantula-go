@@ -43,6 +43,7 @@ type MemberListListener struct {
 	*MemberHashRing
 	*DataServiceProvider
 	balancing bool
+	version   uint32
 }
 
 func (m *MemberListListener) toNode(e *memberlist.Node) core.Node {
@@ -179,11 +180,12 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 // delegate
 func (m *MemberListListener) NodeMeta(limit int) []byte {
 	//limit 512
-	core.AppLog.Debug().Msgf("pulling node meta %v", m.balancing)
+	core.AppLog.Debug().Msgf("pulling node meta %v %d", m.balancing, m.version)
+	m.version++
 	if m.balancing {
-		return []byte("pending")
+		return fmt.Appendf([]byte{}, "pending#%d", m.version)
 	}
-	return []byte("ready")
+	return fmt.Appendf([]byte{}, "ready#%d", m.version)
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
