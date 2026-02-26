@@ -170,8 +170,8 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 // delegate
 func (m *MemberListListener) NodeMeta(limit int) []byte {
 	//limit 512
-	meta := m.LocalNode().Name
-	return []byte(meta)
+	
+	return []byte("meta")
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
