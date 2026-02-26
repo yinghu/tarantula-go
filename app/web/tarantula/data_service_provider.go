@@ -105,6 +105,7 @@ func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.SetRequ
 func (m *DataServiceProvider) RingUpdated() {
 	stopping := false
 	for nlist := range m.RNode {
+		//update node to pending
 		for _, n := range nlist {
 			switch n.State {
 			case NODE_STATE_SHUTDOWN:
@@ -114,9 +115,12 @@ func (m *DataServiceProvider) RingUpdated() {
 					core.AppLog.Debug().Msgf("node live IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
 					rq := make(chan []core.Node, 1)
 					m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: ADD_NODE_OPT, Async: rq})
-					preNode := <-rq
-					core.AppLog.Debug().Msgf("previous node on live %s %d", preNode[0].Name, preNode[0].RingToken)
+					ringRange := <-rq
 					close(rq)
+					if !m.Mll.localNode(ringRange[0]) {
+						//pull remote data from >= pre.hash to < added.hash to remote added node
+						core.AppLog.Debug().Msgf("pull data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
+					}
 				}
 			case NODE_STATE_DEAD:
 				//core.AppLog.Debug().Msgf("node dead IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
@@ -127,6 +131,7 @@ func (m *DataServiceProvider) RingUpdated() {
 				//close(rq)
 			}
 		}
+		//update node to ready
 		if stopping {
 			break
 		}
