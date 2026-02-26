@@ -129,7 +129,7 @@ func (m *DataServiceProvider) RingUpdated() {
 			case NODE_STATE_DEAD:
 				if !m.Mll.localNode(n) { //skip node initial add call
 					rq := make(chan []core.Node, 1)
-					m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: ADD_NODE_OPT, Async: rq})
+					m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: REMOVE_NODE_OPT, Async: rq})
 					ringRange := <-rq
 					close(rq)
 					core.AppLog.Debug().Msgf("Previous %v", ringRange[0])

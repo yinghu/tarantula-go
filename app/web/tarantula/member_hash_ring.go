@@ -110,8 +110,20 @@ func (m *MemberHashRing) rangeNodeAdded(t uint32) []core.Node {
 	return []core.Node{}
 }
 func (m *MemberHashRing) rangeNodeRemoved(t uint32) []core.Node {
-	ix := m.indexOf(t)
-	return []core.Node{m.nodes[ix]}
+	n := m.indexOf(t)
+	end := len(m.nodes) - 1
+	switch n {
+	case 0:
+		return []core.Node{m.nodes[end], m.nodes[1]}
+	case end:
+		return []core.Node{m.nodes[0], m.nodes[end-1]}
+	default:
+		return []core.Node{m.nodes[n-1], m.nodes[n+1]}
+	}
+	core.AppLog.Warn().Msgf("should be never happening %d", n)
+	//should not be happening
+	return []core.Node{}
+
 }
 
 func (m *MemberHashRing) keyRing(t uint32, relica int) []core.Node {
