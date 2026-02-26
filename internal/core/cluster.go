@@ -10,7 +10,7 @@ type Node struct {
 	Meta         string `json:"meta"`
 	IP           string `json:"address"`
 	State        int    `json:"-"`
-	RpcEndpoint  string `json:"rpc,omitempty"`
+	RpcEndpoint  string `json:"rpc"`
 	HttpEndpoint string `json:"http,omitempty"`
 	TcpEndpoint  string `json:"tcp,omitempty"`
 }
