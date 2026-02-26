@@ -133,7 +133,7 @@ func (m *DataServiceProvider) RingUpdated() {
 					ringRange := <-rq
 					close(rq)
 					core.AppLog.Debug().Msgf("Previous %v", ringRange[0])
-					core.AppLog.Debug().Msgf("Added %v", n)
+					core.AppLog.Debug().Msgf("Removed %v", n)
 					core.AppLog.Debug().Msgf("Next %v", ringRange[1])
 					//if !m.Mll.localNode(ringRange[0]) {
 					//pull remote data from >= pre.hash to < added.hash to remote added node
