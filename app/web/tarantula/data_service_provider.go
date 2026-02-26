@@ -113,20 +113,19 @@ func (m *DataServiceProvider) RingUpdated() {
 			case NODE_STATE_SHUTDOWN:
 				stopping = true
 			case NODE_STATE_LIVE:
-				//if !m.Mll.localNode(n) {
-				//core.AppLog.Debug().Msgf("node live IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
-				rq := make(chan []core.Node, 1)
-				m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: ADD_NODE_OPT, Async: rq})
-				ringRange := <-rq
-				close(rq)
-				core.AppLog.Debug().Msgf("Previous %v", ringRange[0])
-				core.AppLog.Debug().Msgf("Added %v", n)
-				core.AppLog.Debug().Msgf("Next %v", ringRange[1])
-				//if !m.Mll.localNode(ringRange[0]) {
-				//pull remote data from >= pre.hash to < added.hash to remote added node
-				//core.AppLog.Debug().Msgf("pull data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
-				//}
-				//}
+				if !m.Mll.localNode(n) { //skip node initial add call
+					rq := make(chan []core.Node, 1)
+					m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: ADD_NODE_OPT, Async: rq})
+					ringRange := <-rq
+					close(rq)
+					core.AppLog.Debug().Msgf("Previous %v", ringRange[0])
+					core.AppLog.Debug().Msgf("Added %v", n)
+					core.AppLog.Debug().Msgf("Next %v", ringRange[1])
+					//if !m.Mll.localNode(ringRange[0]) {
+					//pull remote data from >= pre.hash to < added.hash to remote added node
+					//core.AppLog.Debug().Msgf("pull data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
+					//}
+				}
 			case NODE_STATE_DEAD:
 				//core.AppLog.Debug().Msgf("node dead IP : %s NAME : %s RING TOKEN : %d STATE : %d", n.IP, n.Name, n.RingToken, n.State)
 				//rq := make(chan []core.Node, 1)
