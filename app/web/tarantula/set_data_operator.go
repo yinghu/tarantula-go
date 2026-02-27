@@ -26,6 +26,7 @@ type SetData struct {
 func (m *DataServiceProvider) runSetData() {
 start:
 	core.AppLog.Debug().Msg("starting set operation")
+	m.DWait.Wait()
 	for sd := range m.DSet {
 		if sd.Opt == SET_OPT_RECOVER {
 			break
@@ -49,6 +50,7 @@ start:
 	for _, h := range sync.Hashs {
 		core.AppLog.Warn().Msgf("recovering data from hash %d", h)
 	}
+	m.DWait.Done()
 	goto start
 
 }

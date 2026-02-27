@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"sync"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
@@ -30,6 +31,7 @@ type DataServiceProvider struct {
 	//write worker chan
 	DSet  chan SetData
 	DPull chan core.RingSync
+	DWait sync.WaitGroup
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Data, error) {
@@ -166,6 +168,7 @@ func (m *DataServiceProvider) RingUpdated() {
 				core.AppLog.Warn().Msgf("cannot parse remote data from %s", string(sync))
 			} else {
 				m.DSet <- SetData{Opt: SET_OPT_RECOVER}
+				m.DWait.Add(1)
 				m.DPull <- ds
 			}
 		}
