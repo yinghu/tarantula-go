@@ -43,6 +43,7 @@ start:
 		} else {
 			sd.Msg <- SetRes{Suc: true}
 		}
+		core.AppLog.Debug().Msg("set data 2")
 	}
 	core.AppLog.Debug().Msg("running recover operation")
 	sync := <-m.DPull
