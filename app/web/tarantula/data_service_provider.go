@@ -132,7 +132,7 @@ func (m *DataServiceProvider) RingUpdated() {
 						if m.Mll.localNode(ringRange[1]) {
 							//push local data from >= pre.hash to < added.hash to remote added node
 							core.AppLog.Debug().Msgf("push data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
-							m.Mll.MRequest <- core.RingRequest{Opt: BALANCE_NODE_OPT, Headers: []string{n.IP, n.RpcEndpoint}, Token: ringRange[0].RingToken}
+							m.Mll.MRequest <- core.RingRequest{Opt: BALANCE_NODE_OPT, Headers: []string{n.IP, ringRange[1].RpcEndpoint}, Token: ringRange[0].RingToken}
 						}
 					}
 				case NODE_STATE_DEAD:
