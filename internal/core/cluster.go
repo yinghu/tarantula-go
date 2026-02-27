@@ -53,9 +53,15 @@ type ClusterListener interface {
 	MemberLeft(left Node)
 }
 
+type RingSync struct {
+	Remote string   `json:"remote"`
+	Hashs  []uint32 `json:"hashs"`
+}
+
 type RingRequest struct {
 	Opt      int
-	Headers  []string
+	Address  string
+	Source   RingSync
 	Token    uint32
 	Replicas int
 	Async    chan []Node
