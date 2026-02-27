@@ -127,16 +127,11 @@ func (m *DataServiceProvider) RingUpdated() {
 						m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: ADD_NODE_OPT, Async: rq})
 						ringRange := <-rq
 						close(rq)
-						core.AppLog.Debug().Msgf("Previous %v", ringRange[0])
-						core.AppLog.Debug().Msgf("Added %v", n)
-						core.AppLog.Debug().Msgf("Next %v", ringRange[1])
 						if m.Mll.localNode(ringRange[1]) {
-							//push local data from >= pre.hash to < added.hash to remote added node
 							ringReqest.Opt = BALANCE_NODE_OPT
 							ringReqest.Source.Remote = ringRange[1].RpcEndpoint
 							ringReqest.Source.Hashs = append(ringReqest.Source.Hashs, ringRange[0].RingToken)
 							core.AppLog.Debug().Msgf("push data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
-							///m.Mll.MRequest <- core.RingRequest{Opt: BALANCE_NODE_OPT, Headers: []string{n.IP, ringRange[1].RpcEndpoint}, Token: ringRange[0].RingToken}
 						}
 					}
 				case NODE_STATE_DEAD:
@@ -145,9 +140,6 @@ func (m *DataServiceProvider) RingUpdated() {
 						m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: REMOVE_NODE_OPT, Async: rq})
 						ringRange := <-rq
 						close(rq)
-						core.AppLog.Debug().Msgf("Previous %v", ringRange[0])
-						core.AppLog.Debug().Msgf("Removed %v", n)
-						core.AppLog.Debug().Msgf("Next %v", ringRange[1])
 						if !m.Mll.localNode(ringRange[0]) {
 							//pull remote data from >= pre.hash to < added.hash to remote added node
 							core.AppLog.Debug().Msgf("take over data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
