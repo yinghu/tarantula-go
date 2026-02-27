@@ -166,12 +166,13 @@ func (m *DataServiceProvider) RingUpdated() {
 			if err != nil {
 				core.AppLog.Warn().Msgf("cannot parse remote data from %s", string(sync))
 			} else {
-				m.DSet <- SetData{Closing: true}
+				m.DSet <- SetData{Opt: SET_OPT_RECOVER}
 				m.DPull <- ds
 			}
 		}
 	}
 	//shutdown server
+	m.DSet <- SetData{Opt: SET_OPT_CLOSE}
 	close(m.DSet)
 	close(m.DPull)
 	m.server.Stop()
