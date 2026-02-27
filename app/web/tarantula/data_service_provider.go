@@ -74,6 +74,7 @@ func (c *DataServiceProvider) Start() {
 		panic(err)
 	}
 	c.DSet = make(chan SetData, NODE_EVENT_BUFFER_SIZE)
+	c.DPull = make(chan core.RingSync, 1)
 	go c.runSetData()
 	tcp, err := net.Listen("tcp", fmt.Sprintf(":%d", RPC_PORT))
 	if err != nil {
@@ -171,6 +172,8 @@ func (m *DataServiceProvider) RingUpdated() {
 		}
 	}
 	//shutdown server
+	close(m.DSet)
+	close(m.DPull)
 	m.server.Stop()
 	m.Local.Close()
 	core.AppLog.Info().Msg("local data service provider has stopped")
