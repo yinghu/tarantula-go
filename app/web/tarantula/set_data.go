@@ -14,6 +14,7 @@ type SetData struct {
 
 func (m *DataServiceProvider) runSetData() {
 	start:
+	core.AppLog.Debug().Msg("starting set operation")
 	for sd := range m.DSet {
 		if sd.Closing {
 			break
