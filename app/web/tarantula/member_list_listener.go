@@ -98,7 +98,7 @@ func (m *MemberListListener) Listen() {
 				for _, mbr := range m.Members() {
 					if mbr.Address() == mr.Headers[0] {
 						core.AppLog.Debug().Msgf("sending message %s", mr.Headers[1])
-						m.SendToAddress(mbr.FullAddress(), []byte("balance"))
+						m.SendToAddress(mbr.FullAddress(), fmt.Appendf([]byte{}, "%s#%d", mr.Headers[1], mr.Token))
 						break
 					}
 				}
