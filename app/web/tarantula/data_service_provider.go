@@ -71,6 +71,7 @@ func (c *DataServiceProvider) Start() {
 	if err != nil {
 		panic(err)
 	}
+	c.DSet = make(chan SetData, NODE_EVENT_BUFFER_SIZE)
 	go c.runSetData()
 	tcp, err := net.Listen("tcp", fmt.Sprintf(":%d", RPC_PORT))
 	if err != nil {

@@ -85,6 +85,7 @@ func (m *MemberlistManager) ShutdownHook() {
 	stopNode := []core.Node{{State: NODE_STATE_SHUTDOWN}}
 	m.WNode <- stopNode
 	time.Sleep(3 * time.Second)
+	close(m.DSet)
 	close(m.MEvent)
 	close(m.MAlive)
 	close(m.MPing)
