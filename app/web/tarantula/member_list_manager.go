@@ -38,7 +38,6 @@ func (m *MemberlistManager) Start() error {
 	rwSync := make(chan []byte, NODE_EVENT_BUFFER_SIZE)
 	m.WNode = rwNode
 	m.MSync = rwSync
-	m.RSync = rwSync
 	cfg.Events = &cl
 	cfg.Delegate = m
 	cfg.Ping = m
