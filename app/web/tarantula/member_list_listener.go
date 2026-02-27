@@ -97,15 +97,13 @@ func (m *MemberListListener) Listen() {
 			case BALANCE_NODE_OPT:
 				for _, mbr := range m.Members() {
 					if mbr.Address() == mr.Headers[0] {
-						core.AppLog.Debug().Msgf("sending message %s", mr.Headers[1])
+						core.AppLog.Debug().Msgf("sending sync message to %s", mr.Headers[1])
 						m.SendToAddress(mbr.FullAddress(), fmt.Appendf([]byte{}, "%s#%d", mr.Headers[1], mr.Token))
 						break
 					}
 				}
-				//m.SendToAddress(ip,[]byte("balance"))
 			case CLOSE_RING_OPT:
 				running = false
-
 			}
 		}
 	}
@@ -114,7 +112,6 @@ func (m *MemberListListener) Listen() {
 
 func (m *MemberListListener) rangeRing(r core.RingRequest) {
 	m.MRequest <- r
-	//m.UpdateNode(5 * time.Second) //trigger node mata update
 }
 func (m *MemberListListener) localNode(node core.Node) bool {
 	return strings.HasPrefix(node.Name, m.LocalNode().Name)
@@ -190,7 +187,6 @@ func (m *MemberListListener) Set(set core.SetRequest) {
 // delegate
 func (m *MemberListListener) NodeMeta(limit int) []byte {
 	//limit 512
-	core.AppLog.Debug().Msgf("pulling node meta %v", m.balancing)
 	if m.balancing {
 		return fmt.Append([]byte{}, "pending")
 	}
@@ -198,8 +194,7 @@ func (m *MemberListListener) NodeMeta(limit int) []byte {
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
-	//broadcasting message
-	core.AppLog.Printf("notify msf %s", string(msg))
+	//app message
 	m.MSync <- msg
 }
 
@@ -209,11 +204,7 @@ func (m *MemberListListener) GetBroadcasts(overhead, limit int) [][]byte {
 }
 
 func (m *MemberListListener) LocalState(join bool) []byte {
-	if join {
-		return []byte("mice")
-	}
-	//join == false called on push/pull
-	return []byte("dog")
+	return nil
 }
 func (m *MemberListListener) MergeRemoteState(buf []byte, join bool) {
 
@@ -221,7 +212,7 @@ func (m *MemberListListener) MergeRemoteState(buf []byte, join bool) {
 
 // ping delegate
 func (m *MemberListListener) AckPayload() []byte {
-	return []byte("cat")
+	return nil
 }
 
 func (m *MemberListListener) NotifyPingComplete(other *memberlist.Node, rtt time.Duration, payload []byte) {
