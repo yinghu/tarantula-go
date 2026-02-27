@@ -50,7 +50,7 @@ func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*p
 func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Data) (*protocol.Response, error) {
 	msg := make(chan SetRes, 3)
 	defer close(msg)
-	setData := SetData{Key: in.Key, Value: in.Value}
+	setData := SetData{Key: in.Key, Value: in.Value, Msg: msg}
 	c.DSet <- setData
 	resp := <-msg
 	core.AppLog.Debug().Msgf("set data %v", resp)
