@@ -2,6 +2,7 @@ package main
 
 import (
 	context "context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"os"
@@ -27,7 +28,8 @@ type DataServiceProvider struct {
 	Mll    MemberListListener
 
 	//write worker chan
-	DSet chan SetData
+	DSet  chan SetData
+	DPull chan core.RingSync
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Data, error) {
@@ -158,8 +160,14 @@ func (m *DataServiceProvider) RingUpdated() {
 			//update node to ready
 			core.AppLog.Debug().Msg("Ring updated")
 		case sync := <-m.RSync:
-			core.AppLog.Debug().Msgf("Sync %s", string(sync))
-			m.DSet <- SetData{Closing: true}
+			var ds core.RingSync
+			err := json.Unmarshal(sync, &ds)
+			if err != nil {
+				core.AppLog.Warn().Msgf("cannot parse remote data from %s", string(sync))
+			} else {
+				m.DSet <- SetData{Closing: true}
+				m.DPull <- ds
+			}
 		}
 	}
 	//shutdown server

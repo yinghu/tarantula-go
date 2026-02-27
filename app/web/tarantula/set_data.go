@@ -12,6 +12,7 @@ type SetData struct {
 	Msg     chan string
 }
 
+
 func (m *DataServiceProvider) runSetData() {
 	start:
 	core.AppLog.Debug().Msg("starting set operation")
@@ -29,7 +30,12 @@ func (m *DataServiceProvider) runSetData() {
 			sd.Msg <- "saved"
 		}
 	}
-	core.AppLog.Debug().Msg("closing set operation")
+	core.AppLog.Debug().Msg("running recover operation")
+	sync := <-m.DPull
+	core.AppLog.Warn().Msgf("pulling data from %s",sync.Remote)
+	for _, h := range sync.Hashs{
+		core.AppLog.Warn().Msgf("recovering data from hash %d",h)
+	}
 	goto start
 	
 }
