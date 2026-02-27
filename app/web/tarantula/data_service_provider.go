@@ -128,7 +128,7 @@ func (m *DataServiceProvider) RingUpdated() {
 						ringRange := <-rq
 						close(rq)
 						if m.Mll.localNode(ringRange[1]) {
-							ringReqest.Opt = BALANCE_NODE_OPT
+							ringReqest.Opt = SYNC_NODE_OPT
 							ringReqest.Source.Remote = ringRange[1].RpcEndpoint
 							ringReqest.Source.Hashs = append(ringReqest.Source.Hashs, ringRange[0].RingToken)
 							core.AppLog.Debug().Msgf("push data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
@@ -147,7 +147,7 @@ func (m *DataServiceProvider) RingUpdated() {
 					}
 				}
 			}
-			if ringReqest.Opt == BALANCE_NODE_OPT {
+			if ringReqest.Opt == SYNC_NODE_OPT {
 				m.Mll.MRequest <- ringReqest
 			}
 			m.Mll.MRequest <- core.RingRequest{Opt: UPDATE_NODE_OPT, Replicas: 1}

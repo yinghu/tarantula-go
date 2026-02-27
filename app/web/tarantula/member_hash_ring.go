@@ -70,6 +70,7 @@ func (m *MemberHashRing) OnUpdate(node core.Node) {
 }
 
 func (m *MemberHashRing) OnMerge(nodes []core.Node) {
+	core.AppLog.Debug().Msgf("merging request nodes %d", len(nodes))
 }
 
 func (m *MemberHashRing) OnLive(node core.Node) {

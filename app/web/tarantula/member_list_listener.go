@@ -15,11 +15,11 @@ const (
 
 	ALL_RING_OPT int = 3
 
-	ADD_NODE_OPT     = 5
-	REMOVE_NODE_OPT  = 6
-	UPDATE_NODE_OPT  = 7
-	BALANCE_NODE_OPT = 8
-	CLOSE_RING_OPT   = 99
+	ADD_NODE_OPT    = 5
+	REMOVE_NODE_OPT = 6
+	UPDATE_NODE_OPT = 7
+	SYNC_NODE_OPT   = 8
+	CLOSE_RING_OPT  = 99
 
 	NODE_STATE_LIVE = 0
 	NODE_STATE_DEAD = 3
@@ -94,7 +94,7 @@ func (m *MemberListListener) Listen() {
 			case UPDATE_NODE_OPT:
 				m.balancing = mr.Replicas == 0
 				m.UpdateNode(5 * time.Second)
-			case BALANCE_NODE_OPT:
+			case SYNC_NODE_OPT:
 				for _, mbr := range m.Members() {
 					if mbr.Address() == mr.Address {
 						core.AppLog.Debug().Msgf("sending sync message to %s", mr.Address)
