@@ -96,9 +96,9 @@ func (m *MemberListListener) Listen() {
 				m.UpdateNode(5 * time.Second)
 			case BALANCE_NODE_OPT:
 				for _, mbr := range m.Members() {
-					if mbr.Address() == mr.Headers[0] {
-						core.AppLog.Debug().Msgf("sending sync message to %s", mr.Headers[1])
-						m.SendToAddress(mbr.FullAddress(), fmt.Appendf([]byte{}, "%s#%d", mr.Headers[1], mr.Token))
+					if mbr.Address() == mr.Address {
+						core.AppLog.Debug().Msgf("sending sync message to %s", mr.Address)
+						m.SendToAddress(mbr.FullAddress(), util.ToJson(mr.Source))
 						break
 					}
 				}

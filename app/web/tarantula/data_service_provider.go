@@ -116,6 +116,7 @@ func (m *DataServiceProvider) RingUpdated() {
 			//update node to pending
 			m.Mll.MRequest <- core.RingRequest{Opt: UPDATE_NODE_OPT, Replicas: 0}
 			core.AppLog.Debug().Msg("Ring updating")
+			ringReqest := core.RingRequest{Address: nlist[0].IP}
 			for _, n := range nlist {
 				switch n.State {
 				case NODE_STATE_SHUTDOWN:
@@ -131,8 +132,11 @@ func (m *DataServiceProvider) RingUpdated() {
 						core.AppLog.Debug().Msgf("Next %v", ringRange[1])
 						if m.Mll.localNode(ringRange[1]) {
 							//push local data from >= pre.hash to < added.hash to remote added node
+							ringReqest.Opt = BALANCE_NODE_OPT
+							ringReqest.Source.Remote = ringRange[1].RpcEndpoint
+							ringReqest.Source.Hashs = append(ringReqest.Source.Hashs, ringRange[0].RingToken)
 							core.AppLog.Debug().Msgf("push data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
-							m.Mll.MRequest <- core.RingRequest{Opt: BALANCE_NODE_OPT, Headers: []string{n.IP, ringRange[1].RpcEndpoint}, Token: ringRange[0].RingToken}
+							///m.Mll.MRequest <- core.RingRequest{Opt: BALANCE_NODE_OPT, Headers: []string{n.IP, ringRange[1].RpcEndpoint}, Token: ringRange[0].RingToken}
 						}
 					}
 				case NODE_STATE_DEAD:
@@ -150,6 +154,9 @@ func (m *DataServiceProvider) RingUpdated() {
 						}
 					}
 				}
+			}
+			if ringReqest.Opt == BALANCE_NODE_OPT {
+				m.Mll.MRequest <- ringReqest
 			}
 			m.Mll.MRequest <- core.RingRequest{Opt: UPDATE_NODE_OPT, Replicas: 1}
 			//update node to ready
