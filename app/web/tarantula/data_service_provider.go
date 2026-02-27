@@ -48,13 +48,12 @@ func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*p
 }
 
 func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Data) (*protocol.Response, error) {
-	err := c.Local.Db.Update(func(txn *badger.Txn) error {
-		return txn.Set(in.Key, in.Value)
-	})
-	if err != nil {
-		return &protocol.Response{Successful: false, Message: err.Error()}, err
-	}
-	return &protocol.Response{Successful: true, Message: "saved"}, nil
+	msg := make(chan SetRes, 1)
+	defer close(msg)
+	setData := SetData{Key: in.Key, Value: in.Value}
+	c.DSet <- setData
+	resp := <-msg
+	return &protocol.Response{Successful: resp.Suc}, resp.Err
 }
 
 func (c *DataServiceProvider) Start() {

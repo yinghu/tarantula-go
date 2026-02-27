@@ -10,11 +10,17 @@ const (
 	SET_OPT_CLOSE   int = 2
 )
 
+type SetRes struct {
+	Suc  bool
+	Code int
+	Err  error
+}
+
 type SetData struct {
 	Key   []byte
 	Value []byte
 	Opt   int
-	Msg   chan string
+	Msg   chan SetRes
 }
 
 func (m *DataServiceProvider) runSetData() {
@@ -31,10 +37,10 @@ start:
 			return txn.Set(sd.Key, sd.Value)
 		})
 		if err != nil {
-			sd.Msg <- err.Error()
+			sd.Msg <- SetRes{Err: err}
 
 		} else {
-			sd.Msg <- "saved"
+			sd.Msg <- SetRes{Suc: true}
 		}
 	}
 	core.AppLog.Debug().Msg("running recover operation")
