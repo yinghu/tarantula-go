@@ -76,7 +76,10 @@ func (c *DataServiceProvider) Start() {
 	}
 	c.DSet = make(chan SetData, NODE_EVENT_BUFFER_SIZE)
 	c.DPull = make(chan core.RingSync, 1)
-	go c.runSetData()
+	for n := range SET_OPERATOR_NUM {
+		go c.runSetData(n)
+	}
+
 	tcp, err := net.Listen("tcp", fmt.Sprintf(":%d", RPC_PORT))
 	if err != nil {
 		panic(err)
@@ -168,8 +171,16 @@ func (m *DataServiceProvider) RingUpdated() {
 				core.AppLog.Warn().Msgf("cannot parse remote data from %s", string(sync))
 			} else {
 				m.DSet <- SetData{Opt: SET_OPT_RECOVER}
-				m.DWait.Add(1)
-				m.DPull <- ds
+				m.DWait.Add(SET_OPERATOR_NUM)
+				pz := SET_OPERATOR_NUM
+				for _, p := range ds.Hashs {
+					ps := core.RingSync{Remote: ds.Remote, Hashs: []uint32{p}}
+					m.DPull <- ps
+					pz--
+				}
+				for range pz {
+					m.DPull <- core.RingSync{Remote: ds.Remote}
+				}
 			}
 		}
 	}
