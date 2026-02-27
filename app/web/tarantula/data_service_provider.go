@@ -53,6 +53,7 @@ func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Data) (*prot
 	setData := SetData{Key: in.Key, Value: in.Value}
 	c.DSet <- setData
 	resp := <-msg
+	core.AppLog.Debug().Msgf("set data %v", resp)
 	return &protocol.Response{Successful: resp.Suc}, resp.Err
 }
 
