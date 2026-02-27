@@ -25,6 +25,9 @@ type DataServiceProvider struct {
 	RSync  <-chan []byte
 	server *grpc.Server
 	Mll    MemberListListener
+
+	//write worker chan
+	DSet chan SetData
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Data, error) {
@@ -68,6 +71,7 @@ func (c *DataServiceProvider) Start() {
 	if err != nil {
 		panic(err)
 	}
+	go c.runSetData()
 	tcp, err := net.Listen("tcp", fmt.Sprintf(":%d", RPC_PORT))
 	if err != nil {
 		panic(err)
@@ -109,7 +113,6 @@ func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.SetRequ
 }
 func (m *DataServiceProvider) RingUpdated() {
 	running := true
-	///
 	for running {
 		select {
 		case nlist := <-m.RNode:
@@ -155,9 +158,10 @@ func (m *DataServiceProvider) RingUpdated() {
 			core.AppLog.Debug().Msg("Ring updated")
 		case sync := <-m.RSync:
 			core.AppLog.Debug().Msgf("Sync %s", string(sync))
+			m.DSet <- SetData{Closing: true}
 		}
 	}
-	///
+	//shutdown server
 	m.server.Stop()
 	m.Local.Close()
 	core.AppLog.Info().Msg("local data service provider has stopped")
