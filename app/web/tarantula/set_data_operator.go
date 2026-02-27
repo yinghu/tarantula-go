@@ -33,7 +33,6 @@ start:
 			core.AppLog.Debug().Msg("closing set data operation")
 			return
 		}
-		core.AppLog.Debug().Msg("set data")
 		err := m.Local.Db.Update(func(txn *badger.Txn) error {
 			return txn.Set(sd.Key, sd.Value)
 		})
@@ -43,7 +42,6 @@ start:
 		} else {
 			sd.Msg <- SetRes{Suc: true}
 		}
-		core.AppLog.Debug().Msg("set data 2")
 	}
 	core.AppLog.Debug().Msg("running recover operation")
 	sync := <-m.DPull
