@@ -9,7 +9,7 @@ const (
 	SET_OPT_RECOVER int = 1
 	SET_OPT_CLOSE   int = 2
 
-	SET_OPERATOR_NUM int = 3
+	SET_OPERATOR_NUM int = 8
 )
 
 type SetRes struct {
@@ -27,7 +27,7 @@ type SetData struct {
 
 func (m *DataServiceProvider) runSetData(num int) {
 start:
-	core.AppLog.Debug().Msgf("starting set operation on %d",num)
+	core.AppLog.Debug().Msgf("starting set operation on %d", num)
 	m.DWait.Wait()
 	for sd := range m.DSet {
 		if sd.Opt == SET_OPT_RECOVER {
