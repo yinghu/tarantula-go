@@ -22,6 +22,7 @@ type DataServiceProvider struct {
 	protocol.UnimplementedDataServiceServer
 	Local  *persistence.BadgerLocal
 	RNode  <-chan []core.Node
+	RSync  <-chan []byte
 	server *grpc.Server
 	Mll    MemberListListener
 }
@@ -107,53 +108,57 @@ func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.SetRequ
 	return dsp.Set(context.Background(), &kv)
 }
 func (m *DataServiceProvider) RingUpdated() {
-	stopping := false
-	for nlist := range m.RNode {
-		//update node to pending
-		m.Mll.MRequest <- core.RingRequest{Opt: UPDATE_NODE_OPT, Replicas: 0}
-		core.AppLog.Debug().Msg("Ring updating")
-		for _, n := range nlist {
-			switch n.State {
-			case NODE_STATE_SHUTDOWN:
-				stopping = true
-			case NODE_STATE_LIVE:
-				if !m.Mll.localNode(n) { //skip node initial add call
-					rq := make(chan []core.Node, 1)
-					m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: ADD_NODE_OPT, Async: rq})
-					ringRange := <-rq
-					close(rq)
-					core.AppLog.Debug().Msgf("Previous %v", ringRange[0])
-					core.AppLog.Debug().Msgf("Added %v", n)
-					core.AppLog.Debug().Msgf("Next %v", ringRange[1])
-					if m.Mll.localNode(ringRange[1]) {
-						//push local data from >= pre.hash to < added.hash to remote added node
-						core.AppLog.Debug().Msgf("push data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
-						m.Mll.MRequest <- core.RingRequest{Opt: BALANCE_NODE_OPT, Headers: []string{n.IP,n.RpcEndpoint},Token: ringRange[0].RingToken}
+	running := true
+	///
+	for running {
+		select {
+		case nlist := <-m.RNode:
+			//update node to pending
+			m.Mll.MRequest <- core.RingRequest{Opt: UPDATE_NODE_OPT, Replicas: 0}
+			core.AppLog.Debug().Msg("Ring updating")
+			for _, n := range nlist {
+				switch n.State {
+				case NODE_STATE_SHUTDOWN:
+					running = false
+				case NODE_STATE_LIVE:
+					if !m.Mll.localNode(n) { //skip node initial add call
+						rq := make(chan []core.Node, 1)
+						m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: ADD_NODE_OPT, Async: rq})
+						ringRange := <-rq
+						close(rq)
+						core.AppLog.Debug().Msgf("Previous %v", ringRange[0])
+						core.AppLog.Debug().Msgf("Added %v", n)
+						core.AppLog.Debug().Msgf("Next %v", ringRange[1])
+						if m.Mll.localNode(ringRange[1]) {
+							//push local data from >= pre.hash to < added.hash to remote added node
+							core.AppLog.Debug().Msgf("push data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
+							m.Mll.MRequest <- core.RingRequest{Opt: BALANCE_NODE_OPT, Headers: []string{n.IP, n.RpcEndpoint}, Token: ringRange[0].RingToken}
+						}
 					}
-				}
-			case NODE_STATE_DEAD:
-				if !m.Mll.localNode(n) { //skip node initial add call
-					rq := make(chan []core.Node, 1)
-					m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: REMOVE_NODE_OPT, Async: rq})
-					ringRange := <-rq
-					close(rq)
-					core.AppLog.Debug().Msgf("Previous %v", ringRange[0])
-					core.AppLog.Debug().Msgf("Removed %v", n)
-					core.AppLog.Debug().Msgf("Next %v", ringRange[1])
-					if !m.Mll.localNode(ringRange[0]) {
-						//pull remote data from >= pre.hash to < added.hash to remote added node
-						core.AppLog.Debug().Msgf("take over data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
+				case NODE_STATE_DEAD:
+					if !m.Mll.localNode(n) { //skip node initial add call
+						rq := make(chan []core.Node, 1)
+						m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: REMOVE_NODE_OPT, Async: rq})
+						ringRange := <-rq
+						close(rq)
+						core.AppLog.Debug().Msgf("Previous %v", ringRange[0])
+						core.AppLog.Debug().Msgf("Removed %v", n)
+						core.AppLog.Debug().Msgf("Next %v", ringRange[1])
+						if !m.Mll.localNode(ringRange[0]) {
+							//pull remote data from >= pre.hash to < added.hash to remote added node
+							core.AppLog.Debug().Msgf("take over data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
+						}
 					}
 				}
 			}
-		}
-		m.Mll.MRequest <- core.RingRequest{Opt: UPDATE_NODE_OPT, Replicas: 1}
-		//update node to ready
-		core.AppLog.Debug().Msg("Ring updated")
-		if stopping {
-			break
+			m.Mll.MRequest <- core.RingRequest{Opt: UPDATE_NODE_OPT, Replicas: 1}
+			//update node to ready
+			core.AppLog.Debug().Msg("Ring updated")
+		case sync := <-m.RSync:
+			core.AppLog.Debug().Msgf("Sync %s", string(sync))
 		}
 	}
+	///
 	m.server.Stop()
 	m.Local.Close()
 	core.AppLog.Info().Msg("local data service provider has stopped")

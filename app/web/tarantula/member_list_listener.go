@@ -40,6 +40,7 @@ type MemberListListener struct {
 	MPing     chan core.Node
 	MConflict chan []core.Node
 	MRequest  chan core.RingRequest
+	MSync     chan<- []byte
 	*memberlist.Memberlist
 	*MemberHashRing
 	*DataServiceProvider
@@ -96,7 +97,7 @@ func (m *MemberListListener) Listen() {
 			case BALANCE_NODE_OPT:
 				for _, mbr := range m.Members() {
 					if mbr.Address() == mr.Headers[0] {
-						core.AppLog.Debug().Msgf("sending message %s",mr.Headers[1])
+						core.AppLog.Debug().Msgf("sending message %s", mr.Headers[1])
 						m.SendToAddress(mbr.FullAddress(), []byte("balance"))
 						break
 					}
@@ -199,6 +200,7 @@ func (m *MemberListListener) NodeMeta(limit int) []byte {
 func (m *MemberListListener) NotifyMsg(msg []byte) {
 	//broadcasting message
 	core.AppLog.Printf("notify msf %s", string(msg))
+	m.MSync <- msg
 }
 
 func (m *MemberListListener) GetBroadcasts(overhead, limit int) [][]byte {

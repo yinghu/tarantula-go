@@ -35,7 +35,10 @@ func (m *MemberlistManager) Start() error {
 	m.MConflict = make(chan []core.Node, NODE_EVENT_BUFFER_SIZE)
 	m.MRequest = make(chan core.RingRequest, NODE_EVENT_BUFFER_SIZE)
 	rwNode := make(chan []core.Node, NODE_EVENT_BUFFER_SIZE)
+	rwSync := make(chan []byte, NODE_EVENT_BUFFER_SIZE)
 	m.WNode = rwNode
+	m.MSync = rwSync
+	m.RSync = rwSync
 	cfg.Events = &cl
 	cfg.Delegate = m
 	cfg.Ping = m
@@ -53,7 +56,7 @@ func (m *MemberlistManager) Start() error {
 	core.AppLog.Printf("node id %d %d", nodeId, int64(nodeId)%1024)
 	m.snowflake = util.NewSnowflake(int64(nodeId)%1024, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	go m.Listen()
-	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode}
+	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode, RSync: rwSync}
 	m.Mll = m.MemberListListener
 	go m.DataServiceProvider.Start()
 	go m.RingUpdated()
@@ -90,5 +93,6 @@ func (m *MemberlistManager) ShutdownHook() {
 	close(m.MConflict)
 	close(m.MRequest)
 	close(m.WNode)
+	close(m.MSync)
 	core.AppLog.Info().Msg("shut down has done successfully.")
 }
