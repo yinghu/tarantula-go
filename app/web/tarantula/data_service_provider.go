@@ -170,8 +170,10 @@ func (m *DataServiceProvider) RingUpdated() {
 			if err != nil {
 				core.AppLog.Warn().Msgf("cannot parse remote data from %s", string(sync))
 			} else {
-				m.DSet <- SetData{Opt: SET_OPT_RECOVER}
 				m.DWait.Add(SET_OPERATOR_NUM)
+				for range SET_OPERATOR_NUM {
+					m.DSet <- SetData{Opt: SET_OPT_RECOVER}
+				}
 				pz := SET_OPERATOR_NUM
 				for _, p := range ds.Hashs {
 					ps := core.RingSync{Remote: ds.Remote, Hashs: []uint32{p}}
