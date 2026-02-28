@@ -51,6 +51,7 @@ start:
 	core.AppLog.Warn().Msgf("pulling data from %s", sync.Remote)
 	for _, h := range sync.Hashs {
 		core.AppLog.Warn().Msgf("recovering data from hash %d", h)
+		//m.ClientPull()
 	}
 	m.DWait.Done()
 	goto start

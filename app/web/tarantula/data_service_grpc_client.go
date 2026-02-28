@@ -2,12 +2,15 @@ package main
 
 import (
 	context "context"
+	"io"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/tarantula/protocol"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
+
+type Next func(data *protocol.Data)
 
 func (m *DataServiceProvider) ClientGet(target *core.Node, request *core.GetRequest) ([]byte, error) {
 	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -33,4 +36,29 @@ func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.SetRequ
 	dsp := protocol.NewDataServiceClient(tcp)
 	kv := protocol.Data{Key: request.Key, Value: request.Value}
 	return dsp.Set(context.Background(), &kv)
+}
+
+func (m *DataServiceProvider) ClientPull(target string,hash uint32,next Next) error{
+	tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return err
+	}
+	defer tcp.Close()
+	dsp := protocol.NewDataServiceClient(tcp)
+	stream, err := dsp.Pull(context.Background(),&protocol.Request{Prefix: hash})
+	if err!=nil{
+		return err
+	}
+	for{
+		data,err := stream.Recv()
+		if err == io.EOF{
+			break
+		}
+		if err != nil{
+			core.AppLog.Debug().Msgf("streaming error %s",err.Error())
+			return err
+		}
+		next(data)
+	}
+	return nil
 }
