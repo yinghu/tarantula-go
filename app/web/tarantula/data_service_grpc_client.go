@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type Next func(data *protocol.Data)
+type Batch func(batch *protocol.DataBatch)
 
 func (m *DataServiceProvider) ClientGet(target *core.Node, request *core.GetRequest) ([]byte, error) {
 	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -38,7 +38,7 @@ func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.SetRequ
 	return dsp.Set(context.Background(), &kv)
 }
 
-func (m *DataServiceProvider) ClientPull(target string,hash uint32,next Next) error{
+func (m *DataServiceProvider) ClientPull(target string,hash uint32,batch Batch) error{
 	tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
@@ -58,7 +58,7 @@ func (m *DataServiceProvider) ClientPull(target string,hash uint32,next Next) er
 			core.AppLog.Debug().Msgf("streaming error %s",err.Error())
 			return err
 		}
-		next(data)
+		batch(data)
 	}
 	return nil
 }

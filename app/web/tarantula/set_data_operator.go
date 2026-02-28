@@ -2,6 +2,7 @@ package main
 
 import (
 	"gameclustering.com/internal/core"
+	"gameclustering.com/tarantula/protocol"
 	badger "github.com/dgraph-io/badger/v4"
 )
 
@@ -19,10 +20,12 @@ type SetRes struct {
 }
 
 type SetData struct {
-	Key   []byte
-	Value []byte
-	Opt   int
-	Msg   chan SetRes
+	//Key    []byte
+	//Value  []byte
+	//Header *protocol.Header
+	Data *protocol.Data
+	Opt  int
+	Msg  chan SetRes
 }
 
 func (m *DataServiceProvider) runSetData(num int) {
@@ -37,7 +40,7 @@ start:
 			return
 		}
 		err := m.Local.Db.Update(func(txn *badger.Txn) error {
-			return txn.Set(sd.Key, sd.Value)
+			return txn.Set(sd.Data.Key, sd.Data.Value)
 		})
 		if err != nil {
 			sd.Msg <- SetRes{Err: err}

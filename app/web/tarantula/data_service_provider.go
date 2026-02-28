@@ -51,13 +51,13 @@ func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*p
 func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Data) (*protocol.Response, error) {
 	msg := make(chan SetRes, 1)
 	defer close(msg)
-	setData := SetData{Key: in.Key, Value: in.Value, Msg: msg}
+	setData := SetData{Data: in, Msg: msg}
 	c.DSet <- setData
 	resp := <-msg
 	return &protocol.Response{Successful: resp.Suc}, resp.Err
 }
 
-func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Data]) error {
+func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.DataBatch]) error {
 	//stream.Send()
 	return nil
 }

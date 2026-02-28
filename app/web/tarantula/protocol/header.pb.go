@@ -27,6 +27,7 @@ type Header struct {
 	FactoryId     int32                  `protobuf:"varint,2,opt,name=factoryId,proto3" json:"factoryId,omitempty"`
 	ClassId       int32                  `protobuf:"varint,3,opt,name=classId,proto3" json:"classId,omitempty"`
 	Timestamp     int64                  `protobuf:"varint,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Size          int32                  `protobuf:"varint,5,opt,name=size,proto3" json:"size,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -89,16 +90,24 @@ func (x *Header) GetTimestamp() int64 {
 	return 0
 }
 
+func (x *Header) GetSize() int32 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
 var File_header_proto protoreflect.FileDescriptor
 
 const file_header_proto_rawDesc = "" +
 	"\n" +
-	"\fheader.proto\x12\bprotocol\"z\n" +
+	"\fheader.proto\x12\bprotocol\"\x8e\x01\n" +
 	"\x06Header\x12\x1a\n" +
 	"\brevision\x18\x01 \x01(\x03R\brevision\x12\x1c\n" +
 	"\tfactoryId\x18\x02 \x01(\x05R\tfactoryId\x12\x18\n" +
 	"\aclassId\x18\x03 \x01(\x05R\aclassId\x12\x1c\n" +
-	"\ttimestamp\x18\x04 \x01(\x03R\ttimestampBO\n" +
+	"\ttimestamp\x18\x04 \x01(\x03R\ttimestamp\x12\x12\n" +
+	"\x04size\x18\x05 \x01(\x05R\x04sizeBO\n" +
 	"\x17com.icodesoftware.protoB\rHeaderFactoryZ%gameclustering.com/tarantula/protocolb\x06proto3"
 
 var (

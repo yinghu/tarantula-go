@@ -37,6 +37,9 @@ func (k *KeyIndex) Write(buffer core.DataBuffer) error {
 	if err := buffer.WriteInt64(k.Header.Timestamp); err != nil {
 		return err
 	}
+	if err := buffer.WriteInt32(k.Header.Size); err != nil {
+		return err
+	}
 	return nil
 }
 func (k *KeyIndex) Read(buffer core.DataBuffer) error {
@@ -60,6 +63,11 @@ func (k *KeyIndex) Read(buffer core.DataBuffer) error {
 		return err
 	}
 	k.Header.Timestamp = ts
+	sz, err := buffer.ReadInt32()
+	if err != nil {
+		return err
+	}
+	k.Header.Size = sz
 	return nil
 }
 func (k *KeyIndex) ReadKey(buffer core.DataBuffer) error {

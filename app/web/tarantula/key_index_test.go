@@ -19,7 +19,7 @@ func TestKeyIndex2(t *testing.T) {
 	defer local.Close()
 	dsp := DataServiceProvider{Local: &local}
 	key := []byte("key1")
-	kw := KeyIndex{Prefix: hash.Sum32(key), Key: key, Header: &protocol.Header{Revision: 1, FactoryId: 1, ClassId: 1, Timestamp: 1}}
+	kw := KeyIndex{Prefix: hash.Sum32(key), Key: key, Header: &protocol.Header{Revision: 1, FactoryId: 1, ClassId: 1, Timestamp: 1,Size: 100}}
 	err = dsp.SaveKeyIndex(&kw)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
@@ -40,5 +40,8 @@ func TestKeyIndex2(t *testing.T) {
 	}
 	if kw.Header.Timestamp != kr.Header.Timestamp {
 		t.Errorf("should be same %d %d",kw.Header.Timestamp,kr.Header.Timestamp)
+	}
+	if kw.Header.Size != kr.Header.Size {
+		t.Errorf("should be same %d %d",kw.Header.Size,kr.Header.Size)
 	}
 }

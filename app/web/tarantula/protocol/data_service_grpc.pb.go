@@ -30,7 +30,7 @@ const (
 type DataServiceClient interface {
 	Get(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Data, error)
 	Set(ctx context.Context, in *Data, opts ...grpc.CallOption) (*Response, error)
-	Pull(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Data], error)
+	Pull(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DataBatch], error)
 }
 
 type dataServiceClient struct {
@@ -61,13 +61,13 @@ func (c *dataServiceClient) Set(ctx context.Context, in *Data, opts ...grpc.Call
 	return out, nil
 }
 
-func (c *dataServiceClient) Pull(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Data], error) {
+func (c *dataServiceClient) Pull(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DataBatch], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &DataService_ServiceDesc.Streams[0], DataService_Pull_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[Request, Data]{ClientStream: stream}
+	x := &grpc.GenericClientStream[Request, DataBatch]{ClientStream: stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (c *dataServiceClient) Pull(ctx context.Context, in *Request, opts ...grpc.
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type DataService_PullClient = grpc.ServerStreamingClient[Data]
+type DataService_PullClient = grpc.ServerStreamingClient[DataBatch]
 
 // DataServiceServer is the server API for DataService service.
 // All implementations must embed UnimplementedDataServiceServer
@@ -86,7 +86,7 @@ type DataService_PullClient = grpc.ServerStreamingClient[Data]
 type DataServiceServer interface {
 	Get(context.Context, *Request) (*Data, error)
 	Set(context.Context, *Data) (*Response, error)
-	Pull(*Request, grpc.ServerStreamingServer[Data]) error
+	Pull(*Request, grpc.ServerStreamingServer[DataBatch]) error
 	mustEmbedUnimplementedDataServiceServer()
 }
 
@@ -103,7 +103,7 @@ func (UnimplementedDataServiceServer) Get(context.Context, *Request) (*Data, err
 func (UnimplementedDataServiceServer) Set(context.Context, *Data) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Set not implemented")
 }
-func (UnimplementedDataServiceServer) Pull(*Request, grpc.ServerStreamingServer[Data]) error {
+func (UnimplementedDataServiceServer) Pull(*Request, grpc.ServerStreamingServer[DataBatch]) error {
 	return status.Error(codes.Unimplemented, "method Pull not implemented")
 }
 func (UnimplementedDataServiceServer) mustEmbedUnimplementedDataServiceServer() {}
@@ -168,11 +168,11 @@ func _DataService_Pull_Handler(srv interface{}, stream grpc.ServerStream) error 
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(DataServiceServer).Pull(m, &grpc.GenericServerStream[Request, Data]{ServerStream: stream})
+	return srv.(DataServiceServer).Pull(m, &grpc.GenericServerStream[Request, DataBatch]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type DataService_PullServer = grpc.ServerStreamingServer[Data]
+type DataService_PullServer = grpc.ServerStreamingServer[DataBatch]
 
 // DataService_ServiceDesc is the grpc.ServiceDesc for DataService service.
 // It's only intended for direct use with grpc.RegisterService,
