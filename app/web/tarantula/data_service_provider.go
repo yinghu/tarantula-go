@@ -57,6 +57,33 @@ func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Data) (*prot
 	return &protocol.Response{Successful: resp.Suc}, resp.Err
 }
 
+func (c *DataServiceProvider) Create(ctx context.Context, in *protocol.Data) (*protocol.Response, error) {
+	msg := make(chan SetRes, 1)
+	defer close(msg)
+	setData := SetData{Data: in, Msg: msg}
+	c.DSet <- setData
+	resp := <-msg
+	return &protocol.Response{Successful: resp.Suc}, resp.Err
+}
+
+func (c *DataServiceProvider) Update(ctx context.Context, in *protocol.Data) (*protocol.Response, error) {
+	msg := make(chan SetRes, 1)
+	defer close(msg)
+	setData := SetData{Data: in, Msg: msg}
+	c.DSet <- setData
+	resp := <-msg
+	return &protocol.Response{Successful: resp.Suc}, resp.Err
+}
+
+func (c *DataServiceProvider) Delete(ctx context.Context, in *protocol.Data) (*protocol.Response, error) {
+	msg := make(chan SetRes, 1)
+	defer close(msg)
+	setData := SetData{Data: in, Msg: msg}
+	c.DSet <- setData
+	resp := <-msg
+	return &protocol.Response{Successful: resp.Suc}, resp.Err
+}
+
 func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.DataBatch]) error {
 	//stream.Send()
 	return nil
@@ -177,7 +204,7 @@ func (m *DataServiceProvider) RingUpdated() {
 }
 
 // internal operations
-func (m *DataServiceProvider) SaveKeyIndex(keyIndex *KeyIndex) error {
+func (m *DataServiceProvider) saveKeyIndex(keyIndex *KeyIndex) error {
 	kBuff := core.NewBuffer(100)
 	if err := keyIndex.WriteKey(kBuff); err != nil {
 		return err
@@ -204,7 +231,7 @@ func (m *DataServiceProvider) SaveKeyIndex(keyIndex *KeyIndex) error {
 	return nil
 }
 
-func (m *DataServiceProvider) LoadKeyIndex(keyIndex *KeyIndex) error {
+func (m *DataServiceProvider) loadKeyIndex(keyIndex *KeyIndex) error {
 	kBuff := core.NewBuffer(100)
 	if err := keyIndex.WriteKey(kBuff); err != nil {
 		return err

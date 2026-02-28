@@ -20,12 +20,12 @@ func TestKeyIndex2(t *testing.T) {
 	dsp := DataServiceProvider{Local: &local}
 	key := []byte("key1")
 	kw := KeyIndex{Prefix: hash.Sum32(key), Key: key, Header: &protocol.Header{Revision: 1, FactoryId: 1, ClassId: 1, Timestamp: 1,Size: 100}}
-	err = dsp.SaveKeyIndex(&kw)
+	err = dsp.saveKeyIndex(&kw)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
 	kr := KeyIndex{Prefix: kw.Prefix, Key: kw.Key, Header: &protocol.Header{}}
-	err = dsp.LoadKeyIndex(&kr)
+	err = dsp.loadKeyIndex(&kr)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}

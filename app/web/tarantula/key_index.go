@@ -1,8 +1,14 @@
 package main
 
 import (
+	"fmt"
+
 	"gameclustering.com/internal/core"
 	"gameclustering.com/tarantula/protocol"
+)
+
+const (
+	COMPOSIT_KEY_MAX int = 500
 )
 
 type KeyIndex struct {
@@ -86,4 +92,19 @@ func (k *KeyIndex) ReadKey(buffer core.DataBuffer) error {
 	}
 	k.Key = key
 	return nil
+}
+
+func (k *KeyIndex) CompositKey() ([]byte, error) {
+	ksz := len(k.Key)
+	if ksz+20 > COMPOSIT_KEY_MAX{
+		return []byte{},fmt.Errorf("Key size overflow %d",ksz)
+	}
+	buffer := core.NewBuffer(COMPOSIT_KEY_MAX)
+	buffer.WriteInt32(k.Header.FactoryId)
+	buffer.WriteInt32(k.Header.ClassId)
+	buffer.WriteInt32(int32(ksz))
+	buffer.Write(k.Key)
+	buffer.WriteInt64(k.Header.Revision)
+	buffer.Flip()
+	return buffer.Read(0)
 }
