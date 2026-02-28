@@ -49,12 +49,17 @@ func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*p
 }
 
 func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Data) (*protocol.Response, error) {
-	msg := make(chan SetRes, 3)
+	msg := make(chan SetRes, 1)
 	defer close(msg)
 	setData := SetData{Key: in.Key, Value: in.Value, Msg: msg}
 	c.DSet <- setData
 	resp := <-msg
 	return &protocol.Response{Successful: resp.Suc}, resp.Err
+}
+
+func (c *DataServiceProvider) Pull(*protocol.Request, grpc.ServerStreamingServer[protocol.Data]) error {
+	
+	return nil
 }
 
 func (c *DataServiceProvider) Start() {

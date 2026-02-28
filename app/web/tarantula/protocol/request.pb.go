@@ -23,7 +23,7 @@ const (
 
 type Request struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Prefix        []byte                 `protobuf:"bytes,1,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	Prefix        uint32                 `protobuf:"varint,1,opt,name=prefix,proto3" json:"prefix,omitempty"`
 	Key           []byte                 `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -59,11 +59,11 @@ func (*Request) Descriptor() ([]byte, []int) {
 	return file_request_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Request) GetPrefix() []byte {
+func (x *Request) GetPrefix() uint32 {
 	if x != nil {
 		return x.Prefix
 	}
-	return nil
+	return 0
 }
 
 func (x *Request) GetKey() []byte {
@@ -79,7 +79,7 @@ const file_request_proto_rawDesc = "" +
 	"\n" +
 	"\rrequest.proto\x12\bprotocol\"3\n" +
 	"\aRequest\x12\x16\n" +
-	"\x06prefix\x18\x01 \x01(\fR\x06prefix\x12\x10\n" +
+	"\x06prefix\x18\x01 \x01(\rR\x06prefix\x12\x10\n" +
 	"\x03key\x18\x02 \x01(\fR\x03keyBP\n" +
 	"\x17com.icodesoftware.protoB\x0eRequestFactoryZ%gameclustering.com/tarantula/protocolb\x06proto3"
 

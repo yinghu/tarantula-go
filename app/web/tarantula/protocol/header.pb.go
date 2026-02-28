@@ -26,6 +26,7 @@ type Header struct {
 	Revision      int64                  `protobuf:"varint,1,opt,name=revision,proto3" json:"revision,omitempty"`
 	FactoryId     int32                  `protobuf:"varint,2,opt,name=factoryId,proto3" json:"factoryId,omitempty"`
 	ClassId       int32                  `protobuf:"varint,3,opt,name=classId,proto3" json:"classId,omitempty"`
+	Timestamp     int64                  `protobuf:"varint,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -81,15 +82,23 @@ func (x *Header) GetClassId() int32 {
 	return 0
 }
 
+func (x *Header) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
 var File_header_proto protoreflect.FileDescriptor
 
 const file_header_proto_rawDesc = "" +
 	"\n" +
-	"\fheader.proto\x12\bprotocol\"\\\n" +
+	"\fheader.proto\x12\bprotocol\"z\n" +
 	"\x06Header\x12\x1a\n" +
 	"\brevision\x18\x01 \x01(\x03R\brevision\x12\x1c\n" +
 	"\tfactoryId\x18\x02 \x01(\x05R\tfactoryId\x12\x18\n" +
-	"\aclassId\x18\x03 \x01(\x05R\aclassIdBO\n" +
+	"\aclassId\x18\x03 \x01(\x05R\aclassId\x12\x1c\n" +
+	"\ttimestamp\x18\x04 \x01(\x03R\ttimestampBO\n" +
 	"\x17com.icodesoftware.protoB\rHeaderFactoryZ%gameclustering.com/tarantula/protocolb\x06proto3"
 
 var (
