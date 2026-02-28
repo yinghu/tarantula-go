@@ -1,8 +1,6 @@
 package main
 
 import (
-	"time"
-
 	"gameclustering.com/internal/core"
 	badger "github.com/dgraph-io/badger/v4"
 )
@@ -29,13 +27,13 @@ type SetData struct {
 
 func (m *DataServiceProvider) runSetData(num int) {
 start:
-	core.AppLog.Debug().Msgf("starting set operation on %d", num)
+	core.AppLog.Debug().Msgf("starting set operator %d", num)
 	m.DWait.Wait()
 	for sd := range m.DSet {
 		if sd.Opt == SET_OPT_RECOVER {
 			break
 		} else if sd.Opt == SET_OPT_CLOSE {
-			core.AppLog.Debug().Msgf("closing set data operation %d", num)
+			core.AppLog.Debug().Msgf("closing set data operator %d", num)
 			return
 		}
 		err := m.Local.Db.Update(func(txn *badger.Txn) error {
@@ -48,12 +46,11 @@ start:
 			sd.Msg <- SetRes{Suc: true}
 		}
 	}
-	core.AppLog.Debug().Msgf("running recover operation %d", num)
+	core.AppLog.Debug().Msgf("running recovery on operator %d", num)
 	sync := <-m.DPull
 	core.AppLog.Warn().Msgf("pulling data from %s", sync.Remote)
 	for _, h := range sync.Hashs {
 		core.AppLog.Warn().Msgf("recovering data from hash %d", h)
-		time.Sleep(5 * time.Second)
 	}
 	m.DWait.Done()
 	goto start
