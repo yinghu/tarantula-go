@@ -75,7 +75,7 @@ func (c *DataServiceProvider) Start() {
 		panic(err)
 	}
 	c.DSet = make(chan SetData, NODE_EVENT_BUFFER_SIZE)
-	c.DPull = make(chan core.RingSync, 1)
+	c.DPull = make(chan core.RingSync, NODE_EVENT_BUFFER_SIZE)
 	for n := range SET_OPERATOR_NUM {
 		go c.runSetData(n)
 	}
