@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"gameclustering.com/internal/core"
 	badger "github.com/dgraph-io/badger/v4"
 )
@@ -33,7 +35,7 @@ start:
 		if sd.Opt == SET_OPT_RECOVER {
 			break
 		} else if sd.Opt == SET_OPT_CLOSE {
-			core.AppLog.Debug().Msgf("closing set data operation %d",num)
+			core.AppLog.Debug().Msgf("closing set data operation %d", num)
 			return
 		}
 		err := m.Local.Db.Update(func(txn *badger.Txn) error {
@@ -51,6 +53,7 @@ start:
 	core.AppLog.Warn().Msgf("pulling data from %s", sync.Remote)
 	for _, h := range sync.Hashs {
 		core.AppLog.Warn().Msgf("recovering data from hash %d", h)
+		time.Sleep(5 * time.Second)
 	}
 	m.DWait.Done()
 	goto start
