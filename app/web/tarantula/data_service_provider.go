@@ -185,7 +185,9 @@ func (m *DataServiceProvider) RingUpdated() {
 		}
 	}
 	//shutdown server
-	m.DSet <- SetData{Opt: SET_OPT_CLOSE}
+	for range SET_OPERATOR_NUM {
+		m.DSet <- SetData{Opt: SET_OPT_CLOSE}
+	}
 	close(m.DSet)
 	close(m.DPull)
 	m.server.Stop()

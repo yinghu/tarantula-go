@@ -33,7 +33,7 @@ start:
 		if sd.Opt == SET_OPT_RECOVER {
 			break
 		} else if sd.Opt == SET_OPT_CLOSE {
-			core.AppLog.Debug().Msg("closing set data operation")
+			core.AppLog.Debug().Msgf("closing set data operation %d",num)
 			return
 		}
 		err := m.Local.Db.Update(func(txn *badger.Txn) error {
@@ -46,7 +46,7 @@ start:
 			sd.Msg <- SetRes{Suc: true}
 		}
 	}
-	core.AppLog.Debug().Msg("running recover operation")
+	core.AppLog.Debug().Msgf("running recover operation %d", num)
 	sync := <-m.DPull
 	core.AppLog.Warn().Msgf("pulling data from %s", sync.Remote)
 	for _, h := range sync.Hashs {
