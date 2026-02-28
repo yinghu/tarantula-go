@@ -57,8 +57,8 @@ func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Data) (*prot
 	return &protocol.Response{Successful: resp.Suc}, resp.Err
 }
 
-func (c *DataServiceProvider) Pull(*protocol.Request, grpc.ServerStreamingServer[protocol.Data]) error {
-	
+func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Data]) error {
+	//stream.Send()
 	return nil
 }
 
