@@ -16,6 +16,7 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 		ringNode := nodes[0]
 		dt, err := m.DataServiceProvider.ClientGet(&ringNode, &get)
 		if err != nil {
+			core.AppLog.Debug().Msgf("TRYING %s", err.Error())
 			retry.Err = err
 			retry.Reties--
 			continue
