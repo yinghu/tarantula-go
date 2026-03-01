@@ -35,8 +35,13 @@ type DataServiceProvider struct {
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Data, error) {
 	data := protocol.Data{}
-	err := c.Local.Db.View(func(txn *badger.Txn) error {
-		item, err := txn.Get(in.Key)
+	getdata := GetData{in}
+	k, err := getdata.K()
+	if err != nil {
+		return &data, err
+	}
+	err = c.Local.Db.View(func(txn *badger.Txn) error {
+		item, err := txn.Get(k)
 		if err != nil {
 			return err
 		}
