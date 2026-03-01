@@ -80,6 +80,9 @@ func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Data) (*prot
 	setData.Header.Size = int32(len(setData.Value))
 	c.DSet <- setData
 	resp := <-msg
+	if resp.Err != nil {
+		core.AppLog.Debug().Msgf("set error %s", resp.Err.Error())
+	}
 	return &protocol.Response{Successful: resp.Suc}, resp.Err
 }
 
