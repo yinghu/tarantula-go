@@ -205,21 +205,7 @@ func (m *DataServiceProvider) RingUpdated() {
 
 // internal operations
 func (m *DataServiceProvider) saveKeyIndex(keyIndex *KeyIndex) error {
-	kBuff := core.NewBuffer(100)
-	if err := keyIndex.WriteKey(kBuff); err != nil {
-		return err
-	}
-	kBuff.Flip()
-	key, err := kBuff.Read(0)
-	if err != nil {
-		return err
-	}
-	kBuff.Clear()
-	if err := keyIndex.Write(kBuff); err != nil {
-		return err
-	}
-	kBuff.Flip()
-	value, err := kBuff.Read(0)
+	key, value, err := keyIndex.Kv()
 	if err != nil {
 		return err
 	}
@@ -232,30 +218,18 @@ func (m *DataServiceProvider) saveKeyIndex(keyIndex *KeyIndex) error {
 }
 
 func (m *DataServiceProvider) loadKeyIndex(keyIndex *KeyIndex) error {
-	kBuff := core.NewBuffer(100)
-	if err := keyIndex.WriteKey(kBuff); err != nil {
-		return err
-	}
-	kBuff.Flip()
-	key, err := kBuff.Read(0)
+
+	key, err := keyIndex.K()
 	if err != nil {
 		return err
 	}
-	kBuff.Clear()
-	if err := m.Local.Db.View(func(txn *badger.Txn) error {
+	return m.Local.Db.View(func(txn *badger.Txn) error {
 		item, err := txn.Get(key)
 		if err != nil {
 			return err
 		}
 		return item.Value(func(val []byte) error {
-			if err := kBuff.Write(val); err != nil {
-				return err
-			}
-			return nil
+			return keyIndex.V(val)
 		})
-	}); err != nil {
-		return err
-	}
-	kBuff.Flip()
-	return keyIndex.Read(kBuff)
+	})
 }

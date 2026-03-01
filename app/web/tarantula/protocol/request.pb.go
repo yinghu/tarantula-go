@@ -25,6 +25,7 @@ type Request struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Prefix        uint32                 `protobuf:"varint,1,opt,name=prefix,proto3" json:"prefix,omitempty"`
 	Key           []byte                 `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+	Header        *Header                `protobuf:"bytes,3,opt,name=header,proto3" json:"header,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -73,14 +74,22 @@ func (x *Request) GetKey() []byte {
 	return nil
 }
 
+func (x *Request) GetHeader() *Header {
+	if x != nil {
+		return x.Header
+	}
+	return nil
+}
+
 var File_request_proto protoreflect.FileDescriptor
 
 const file_request_proto_rawDesc = "" +
 	"\n" +
-	"\rrequest.proto\x12\bprotocol\"3\n" +
+	"\rrequest.proto\x12\bprotocol\x1a\fheader.proto\"]\n" +
 	"\aRequest\x12\x16\n" +
 	"\x06prefix\x18\x01 \x01(\rR\x06prefix\x12\x10\n" +
-	"\x03key\x18\x02 \x01(\fR\x03keyBP\n" +
+	"\x03key\x18\x02 \x01(\fR\x03key\x12(\n" +
+	"\x06header\x18\x03 \x01(\v2\x10.protocol.HeaderR\x06headerBP\n" +
 	"\x17com.icodesoftware.protoB\x0eRequestFactoryZ%gameclustering.com/tarantula/protocolb\x06proto3"
 
 var (
@@ -98,13 +107,15 @@ func file_request_proto_rawDescGZIP() []byte {
 var file_request_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_request_proto_goTypes = []any{
 	(*Request)(nil), // 0: protocol.Request
+	(*Header)(nil),  // 1: protocol.Header
 }
 var file_request_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: protocol.Request.header:type_name -> protocol.Header
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_request_proto_init() }
@@ -112,6 +123,7 @@ func file_request_proto_init() {
 	if File_request_proto != nil {
 		return
 	}
+	file_header_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
