@@ -32,8 +32,21 @@ start:
 			core.AppLog.Debug().Msgf("closing set data operator %d", num)
 			return
 		}
-		err := m.Local.Db.Update(func(txn *badger.Txn) error {
-			return txn.Set(sd.Data.Key, sd.Data.Value)
+		ak, err := sd.K()
+		if err != nil {
+			sd.Msg <- SetRes{Err: err}
+		}
+		ki := sd.KeyIndex()
+		k, v, err := ki.Kv()
+		if err != nil {
+			sd.Msg <- SetRes{Err: err}
+		}
+		err = m.Local.Db.Update(func(txn *badger.Txn) error {
+			err := txn.Set(k, v)
+			if err != nil {
+				return err
+			}
+			return txn.Set(ak, sd.Data.Value)
 		})
 		if err != nil {
 			sd.Msg <- SetRes{Err: err}
