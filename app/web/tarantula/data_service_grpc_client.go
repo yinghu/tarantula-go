@@ -12,7 +12,7 @@ import (
 
 type Batch func(batch *protocol.DataBatch)
 
-func (m *DataServiceProvider) ClientGet(target *core.Node, request *core.GetRequest) ([]byte, error) {
+func (m *DataServiceProvider) ClientGet(target *core.Node, request *core.DataRequest) ([]byte, error) {
 	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func (m *DataServiceProvider) ClientGet(target *core.Node, request *core.GetRequ
 	return dt.Value, nil
 }
 
-func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.SetRequest) (*protocol.Response, error) {
+func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.DataRequest) (*protocol.Response, error) {
 	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return &protocol.Response{}, err
@@ -38,7 +38,7 @@ func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.SetRequ
 	return dsp.Set(context.Background(), &kv)
 }
 
-func (m *DataServiceProvider) ClientCreate(target *core.Node, request *core.SetRequest) (*protocol.Response, error) {
+func (m *DataServiceProvider) ClientCreate(target *core.Node, request *core.DataRequest) (*protocol.Response, error) {
 	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return &protocol.Response{}, err
@@ -49,7 +49,7 @@ func (m *DataServiceProvider) ClientCreate(target *core.Node, request *core.SetR
 	return dsp.Create(context.Background(), &kv)
 }
 
-func (m *DataServiceProvider) ClientUpdate(target *core.Node, request *core.SetRequest) (*protocol.Response, error) {
+func (m *DataServiceProvider) ClientUpdate(target *core.Node, request *core.DataRequest) (*protocol.Response, error) {
 	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return &protocol.Response{}, err
@@ -60,7 +60,7 @@ func (m *DataServiceProvider) ClientUpdate(target *core.Node, request *core.SetR
 	return dsp.Update(context.Background(), &kv)
 }
 
-func (m *DataServiceProvider) ClientDelete(target *core.Node, request *core.SetRequest) (*protocol.Response, error) {
+func (m *DataServiceProvider) ClientDelete(target *core.Node, request *core.DataRequest) (*protocol.Response, error) {
 	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return &protocol.Response{}, err

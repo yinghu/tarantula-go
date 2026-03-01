@@ -2,6 +2,12 @@ package core
 
 const (
 	CLUSTER_PARTITION_NUM int = 271
+
+	GET_DATA_REQUEST    int = 0
+	CREATE_DATA_REQUEST int = 1
+	UPDATE_DATA_REQUEST int = 2
+	DELETE_DATA_REQUEST int = 3
+	RESET_DATA_REQUEST  int = 4
 )
 
 type Node struct {
@@ -67,22 +73,18 @@ type RingRequest struct {
 	Async    chan []Node
 }
 
-type EntityId struct {
+type DataHeader struct {
 	FactoryId int32
 	ClassId   int32
+	Revision  int64
 }
 
-type GetRequest struct {
-	EntityId
-	Prefix []byte
-	Key    []byte
-	Async  chan Chunk
-}
-type SetRequest struct {
-	EntityId
+type DataRequest struct {
+	DataHeader
 	Prefix []byte
 	Key    []byte
 	Value  []byte
+	Opt    int
 	Async  chan Chunk
 }
 
@@ -91,7 +93,5 @@ type ClusterService interface {
 	HashRing(r RingRequest)
 	KeyRing(r RingRequest)
 	RingToken(key []byte) uint32
-	Get(get GetRequest)
-	Set(get SetRequest)
-	//Publish([]byte)
+	Request(r DataRequest)
 }

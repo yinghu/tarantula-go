@@ -5,7 +5,7 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-func (m *MemberListListener) Get(get core.GetRequest) {
+func (m *MemberListListener) get(get core.DataRequest) {
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
 	retry := RetryTrack{Reties: RETRY_MAX}
@@ -30,8 +30,15 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 	core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
 	get.Async <- core.Chunk{Remaining: false, Data: []byte(retry.Err.Error())}
 }
-
-func (m *MemberListListener) Set(set core.SetRequest) {
+func (m *MemberListListener) Request(req core.DataRequest) {
+	switch req.Opt {
+	case core.GET_DATA_REQUEST:
+		m.get(req)
+	case core.UPDATE_DATA_REQUEST:
+		m.set(req)
+	}
+}
+func (m *MemberListListener) set(set core.DataRequest) {
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
 	retry := RetryTrack{Reties: RETRY_MAX}

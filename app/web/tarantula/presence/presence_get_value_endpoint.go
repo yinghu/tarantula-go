@@ -23,10 +23,10 @@ func (p *PresenceGetValueEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Requ
 
 	rq := make(chan core.Chunk, 3)
 	defer close(rq)
-	req := core.GetRequest{Key: []byte(k), Async: rq}
+	req := core.DataRequest{Key: []byte(k), Async: rq,Opt: core.GET_DATA_REQUEST}
 	req.FactoryId = int32(f)
 	req.ClassId = int32(c)
-	p.Get(req)
+	p.Request(req)
 	for c := range rq {
 		if len(c.Data) > 0 {
 			w.Write(util.ToJson(c))
