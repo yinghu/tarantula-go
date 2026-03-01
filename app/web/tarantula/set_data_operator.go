@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"gameclustering.com/internal/core"
 	badger "github.com/dgraph-io/badger/v4"
 )
@@ -37,6 +39,9 @@ start:
 			sd.Msg <- SetRes{Err: err}
 		}
 		ki := sd.KeyIndex()
+		ki.Header.Revision = 100
+		ki.Header.Timestamp = time.Now().UnixMilli()
+		ki.Header.Size = int32(len(sd.Value))
 		k, v, err := ki.Kv()
 		if err != nil {
 			sd.Msg <- SetRes{Err: err}
