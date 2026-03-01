@@ -34,7 +34,7 @@ type DataServiceProvider struct {
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Data, error) {
-	data := protocol.Data{}
+	data := protocol.Data{Header: &protocol.Header{}}
 	getdata := GetData{in}
 	k, err := getdata.K()
 	if err != nil {
@@ -67,6 +67,9 @@ func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*p
 		})
 	})
 	core.AppLog.Debug().Msgf("key index %v", ki)
+	data.Header.Revision = ki.Header.Revision
+	data.Header.FactoryId = ki.Header.FactoryId
+	data.Header.ClassId = ki.Header.ClassId
 	return &data, err
 }
 

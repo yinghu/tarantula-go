@@ -20,10 +20,11 @@ func (m *DataServiceProvider) ClientGet(target *core.Node, request *core.GetRequ
 	defer tcp.Close()
 	dsp := protocol.NewDataServiceClient(tcp)
 	var dt *protocol.Data
-	dt, err = dsp.Get(context.Background(), &protocol.Request{Key: request.Key,Header: &protocol.Header{FactoryId: request.FactoryId,ClassId: request.ClassId}})
+	dt, err = dsp.Get(context.Background(), &protocol.Request{Key: request.Key, Header: &protocol.Header{FactoryId: request.FactoryId, ClassId: request.ClassId}})
 	if err != nil {
 		return nil, err
 	}
+	core.AppLog.Debug().Msgf("get data %v", dt)
 	return dt.Value, nil
 }
 
@@ -34,7 +35,7 @@ func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.SetRequ
 	}
 	defer tcp.Close()
 	dsp := protocol.NewDataServiceClient(tcp)
-	kv := protocol.Data{Key: request.Key, Value: request.Value,Header: &protocol.Header{FactoryId: request.FactoryId,ClassId:request.ClassId}}
+	kv := protocol.Data{Key: request.Key, Value: request.Value, Header: &protocol.Header{FactoryId: request.FactoryId, ClassId: request.ClassId}}
 	return dsp.Set(context.Background(), &kv)
 }
 
