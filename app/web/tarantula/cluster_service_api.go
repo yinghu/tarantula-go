@@ -23,7 +23,6 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 		}
 		get.Async <- core.Chunk{Remaining: false, Data: dt}
 		retry.Suc = true
-		retry.Reties = 0
 		break
 	}
 	if retry.Suc {
