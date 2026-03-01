@@ -5,12 +5,17 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/tarantula/protocol"
+	hash "github.com/spaolacci/murmur3"
 )
 
 type GetData struct {
 	*protocol.Request
 }
 
+func (s *GetData) KeyIndex() KeyIndex {
+	ki := KeyIndex{Prefix: hash.Sum32(s.Key), Header: s.Header, Key: s.Key}
+	return ki
+}
 func (g *GetData) K() ([]byte, error) {
 	ksz := len(g.Key)
 	if ksz+20 > COMPOSIT_KEY_MAX {

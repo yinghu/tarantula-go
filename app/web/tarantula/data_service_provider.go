@@ -40,8 +40,24 @@ func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*p
 	if err != nil {
 		return &data, err
 	}
+	ki := getdata.KeyIndex()
+	ak, err := ki.K()
+	if err != nil {
+		return &data, err
+	}
 	err = c.Local.Db.View(func(txn *badger.Txn) error {
-		item, err := txn.Get(k)
+		item, err := txn.Get(ak)
+		if err != nil {
+			return err
+		}
+		err = item.Value(func(val []byte) error {
+			ki.V(val)
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+		item, err = txn.Get(k)
 		if err != nil {
 			return err
 		}
@@ -50,6 +66,7 @@ func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*p
 			return nil
 		})
 	})
+	core.AppLog.Debug().Msgf("key index %v", ki)
 	return &data, err
 }
 
