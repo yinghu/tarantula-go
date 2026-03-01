@@ -24,7 +24,6 @@ func (m *DataServiceProvider) ClientGet(target *core.Node, request *core.GetRequ
 	if err != nil {
 		return nil, err
 	}
-	core.AppLog.Debug().Msgf("get data %v", dt)
 	return dt.Value, nil
 }
 

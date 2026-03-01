@@ -26,7 +26,6 @@ func (p *PresenceGetValueEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Requ
 	req := core.GetRequest{Key: []byte(k), Async: rq}
 	req.FactoryId = int32(f)
 	req.ClassId = int32(c)
-	core.AppLog.Debug().Msg("Calling get api")
 	p.Get(req)
 	for c := range rq {
 		if len(c.Data) > 0 {

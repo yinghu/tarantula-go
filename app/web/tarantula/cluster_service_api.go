@@ -11,7 +11,6 @@ func (m *MemberListListener) Get(get core.GetRequest) {
 	retry := RetryTrack{Reties: RETRY_MAX}
 
 	for retry.Reties > 0 {
-		core.AppLog.Debug().Msgf("TRYING %d", retry.Reties)
 		m.MRequest <- core.RingRequest{Token: m.RingToken(get.Key), Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]

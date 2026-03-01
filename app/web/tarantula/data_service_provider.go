@@ -66,7 +66,6 @@ func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*p
 			return nil
 		})
 	})
-	core.AppLog.Debug().Msgf("key index %v", ki)
 	data.Header.Revision = ki.Header.Revision
 	data.Header.FactoryId = ki.Header.FactoryId
 	data.Header.ClassId = ki.Header.ClassId
@@ -79,9 +78,6 @@ func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Data) (*prot
 	setData := SetData{Data: in, Msg: msg}
 	c.DSet <- setData
 	resp := <-msg
-	if resp.Err != nil {
-		core.AppLog.Debug().Msgf("set error %s", resp.Err.Error())
-	}
 	return &protocol.Response{Successful: resp.Suc}, resp.Err
 }
 
