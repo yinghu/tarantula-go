@@ -70,7 +70,7 @@
             "Jobs":[
                 {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
                 {"Name":"Edit","Callback":"edit_category"},{"Name":"TokenRing","Callback":"list_token_ring"},{"Name":"KeyRing","Callback":"key_token_ring"},
-                {"Name":"Get","Callback":"get_value"},{"Name":"Set","Callback":"set_value"}, {"Name":"Create","Callback":"create_value"},{"Name":"Update","Callback":"update_value"},
+                {"Name":"Get","Callback":"get_value"},{"Name":"Reset","Callback":"reset_value"}, {"Name":"Create","Callback":"create_value"},{"Name":"Update","Callback":"update_value"},
                  {"Name":"Delete","Callback":"delete_value"}                 
             ]        
         },
