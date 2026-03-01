@@ -1,0 +1,27 @@
+package main
+
+import (
+	"fmt"
+
+	"gameclustering.com/internal/core"
+	"gameclustering.com/tarantula/protocol"
+)
+
+type GetData struct {
+	*protocol.Request
+}
+
+func (g *GetData) K() ([]byte, error) {
+	ksz := len(g.Key)
+	if ksz+20 > COMPOSIT_KEY_MAX {
+		return []byte{}, fmt.Errorf("Key size overflow %d", ksz)
+	}
+	buffer := core.NewBuffer(COMPOSIT_KEY_MAX)
+	buffer.WriteInt32(g.Header.FactoryId)
+	buffer.WriteInt32(g.Header.ClassId)
+	buffer.WriteInt32(int32(ksz))
+	buffer.Write(g.Key)
+	buffer.WriteInt64(g.Header.Revision)
+	buffer.Flip()
+	return buffer.Read(0)
+}

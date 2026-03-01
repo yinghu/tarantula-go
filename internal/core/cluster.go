@@ -67,12 +67,19 @@ type RingRequest struct {
 	Async    chan []Node
 }
 
+type EntityId struct {
+	FactoryId int32
+	ClassId   int32
+}
+
 type GetRequest struct {
+	EntityId
 	Prefix []byte
 	Key    []byte
 	Async  chan Chunk
 }
 type SetRequest struct {
+	EntityId
 	Prefix []byte
 	Key    []byte
 	Value  []byte
