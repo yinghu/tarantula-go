@@ -7,7 +7,6 @@ import (
 	"net"
 	"os"
 	"sync"
-	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
@@ -75,9 +74,9 @@ func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Data) (*prot
 	msg := make(chan SetRes, 1)
 	defer close(msg)
 	setData := SetData{Data: in, Msg: msg}
-	setData.Header.Revision = 109
-	setData.Header.Timestamp = time.Now().UnixMilli()
-	setData.Header.Size = int32(len(setData.Value))
+	//setData.Header.Revision = 109
+	//setData.Header.Timestamp = time.Now().UnixMilli()
+	//setData.Header.Size = int32(len(setData.Value))
 	c.DSet <- setData
 	resp := <-msg
 	if resp.Err != nil {
