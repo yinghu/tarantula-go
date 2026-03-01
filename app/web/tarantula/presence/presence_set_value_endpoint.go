@@ -2,6 +2,7 @@ package presence
 
 import (
 	"net/http"
+	"strconv"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
@@ -16,11 +17,17 @@ func (p *PresenceSetValueEndpoint) ServeHTTP(w http.ResponseWriter, r *http.Requ
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "*")
+	f, _ := strconv.ParseInt(r.PathValue("factoryId"), 10, 32)
+	c, _ := strconv.ParseInt(r.PathValue("classId"), 10, 32)
+
 	k := r.PathValue("key")
 	v := r.PathValue("value")
 	rq := make(chan core.Chunk, 3)
 	defer close(rq)
-	p.Set(core.SetRequest{Key: []byte(k), Value: []byte(v), Async: rq})
+	req := core.SetRequest{Key: []byte(k), Value: []byte(v), Async: rq}
+	req.FactoryId = int32(f)
+	req.ClassId = int32(c)
+	p.Set(req)
 	for c := range rq {
 		if len(c.Data) > 0 {
 			w.Write(util.ToJson(c))
