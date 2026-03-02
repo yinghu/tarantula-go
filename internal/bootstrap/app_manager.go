@@ -17,22 +17,20 @@ import (
 )
 
 type AppManager struct {
-	metr        core.MetricsService
-	imse        item.ItemService
-	auth        core.Authenticator
-	Bsl         BootstrapListener
-	Sql         persistence.Postgresql
-	ctx         string
-	prefix      string
-	nodeName    string
-	nodeId      int
-	etcEndpoints []string
-	standalone  bool
-	AppAuth     core.Authenticator
-	seq         core.Sequence
-	ItemUpdater item.ItemListener
-	tcpPusher   event.Pusher
-	ManagedApps []string
+	metr         core.MetricsService
+	imse         item.ItemService
+	auth         core.Authenticator
+	Bsl          BootstrapListener
+	Sql          persistence.Postgresql
+	F            conf.Env
+	ctx          string
+	prefix       string
+	standalone   bool
+	AppAuth      core.Authenticator
+	seq          core.Sequence
+	ItemUpdater  item.ItemListener
+	tcpPusher    event.Pusher
+	ManagedApps  []string
 }
 
 func (s *AppManager) ItemService() item.ItemService {
@@ -65,9 +63,7 @@ func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 	s.tcpPusher = p
 	s.ctx = f.GroupName
 	s.prefix = f.Prefix
-	s.nodeName = f.NodeName
-	s.nodeId = int(f.NodeId)
-	s.etcEndpoints = f.EtcdEndpoints
+	s.F = f
 	s.standalone = f.Standalone
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
@@ -114,7 +110,7 @@ func (s *AppManager) Shutdown() {
 	s.Sql.Close()
 	lockPrefix := fmt.Sprintf("%s/node", s.prefix)
 	s.Atomic(lockPrefix, func(ctx core.Ctx) error {
-		v, err := ctx.Get(s.nodeName)
+		v, err := ctx.Get(s.F.NodeName)
 		if err != nil {
 			return err
 		}
@@ -124,7 +120,7 @@ func (s *AppManager) Shutdown() {
 			return err
 		}
 		c.Used = false
-		ctx.Put(s.nodeName, string(util.ToJson(c)))
+		ctx.Put(s.F.NodeName, string(util.ToJson(c)))
 		return nil
 	})
 	core.AppLog.Println("app manager shutting down ...")
@@ -243,7 +239,7 @@ func (c *AppManager) Atomic(prefix string, t core.Exec) error {
 		core.AppLog.Printf("Reset Lock prefix %s\n", prefix)
 	}
 	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   c.etcEndpoints,
+		Endpoints:   c.F.EtcdEndpoints,
 		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {
