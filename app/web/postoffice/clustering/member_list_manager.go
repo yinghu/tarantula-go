@@ -27,6 +27,8 @@ func (m *MemberlistManager) Start() error {
 	m.MemberHashRing = &MemberHashRing{nodes: make([]core.Node, 0), weight: NODE_WEIGHT}
 	m.balancing = true
 	cfg := memberlist.DefaultLANConfig()
+	cfg.BindPort = 7946
+	cfg.AdvertisePort = 7947
 	ch := make(chan memberlist.NodeEvent, NODE_EVENT_BUFFER_SIZE) //HAVE TO BUFFER
 	cl := memberlist.ChannelEventDelegate{Ch: ch}
 	m.MEvent = ch
