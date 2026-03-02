@@ -10,6 +10,7 @@ import (
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/postoffice/clustering"
 )
 
 type TopicMap struct {
@@ -34,6 +35,7 @@ type PostofficeService struct {
 	indexQ   chan event.Event
 	topicQ   []chan event.SubscriptionEvent
 	ready    sync.WaitGroup
+	mm       *clustering.MemberlistManager
 }
 
 func (s *PostofficeService) Config() string {
@@ -42,7 +44,7 @@ func (s *PostofficeService) Config() string {
 
 func (s *PostofficeService) Start(env conf.Env, p event.Pusher) error {
 	s.Bsl = s
-	s.AppManager.Start(env,p)
+	s.AppManager.Start(env, p)
 	s.createSchema()
 	s.topics = make(map[int32]event.SubscriptionEvent)
 	s.loadTopics()
@@ -60,13 +62,14 @@ func (s *PostofficeService) Start(env conf.Env, p event.Pusher) error {
 	s.topicQ = append(s.topicQ, tc)
 	go s.inboundEvent(tc)
 
-	//path := env.LocalDir + "/store"
-	//ds := persistence.BadgerLocal{InMemory: env.Bdg.InMemory, Path: path, GcEnabled: true}
-	//err := ds.Open()
-	//if err != nil {
-		//return err
-	//}
-	//s.Ds = &ds
+	m := clustering.MemberlistManager{StoreDir: env.LocalDir}
+	m.Seed = []string{"192.168.1.11", "192.168.1.6", "192.168.1.7"}
+	err := m.Start()
+	if err != nil {
+		core.AppLog.Printf("no cluster can join %s", err.Error())
+		return err
+	}
+	s.mm = &m
 	s.ready.Done()
 	core.AppLog.Printf("Postoffice service started %s %s\n", env.HttpBinding, env.LocalDir)
 	http.Handle("/postoffice/subscribe", bootstrap.Logging(&PostofficeSubscriber{PostofficeService: s}))
@@ -81,7 +84,7 @@ func (s *PostofficeService) Start(env conf.Env, p event.Pusher) error {
 func (s *PostofficeService) Shutdown() {
 	core.AppLog.Println("postoffice service shutting down ...")
 	s.AppManager.Shutdown()
-	//s.Ds.Close()
+	s.mm.ShutdownHook()
 }
 
 func (s *PostofficeService) Create(classId int, topic string) (event.Event, error) {
@@ -199,20 +202,20 @@ func (s *PostofficeService) outboundEvent(c chan CChange) {
 			core.AppLog.Printf("Node Updated : %v\n", c)
 			if c.started {
 				//if c.nodeName == s.Cluster().Local().Name {
-					//pubs[c.nodeName] = &LocalPublisher{s}
+				//pubs[c.nodeName] = &LocalPublisher{s}
 				//} else {
-					sb := event.TcpPublisher{Remote: c.endpoint}
-					for i := range 5 {
-						err := sb.Connect()
-						if err != nil {
-							core.AppLog.Printf("cannot to dial to %s retries: %d", err.Error(), i)
-							time.Sleep(1 * time.Second)
-							continue
-						}
-						core.AppLog.Printf("connected %s\n", c.endpoint)
-						pubs[c.nodeName] = &sb
-						break
+				sb := event.TcpPublisher{Remote: c.endpoint}
+				for i := range 5 {
+					err := sb.Connect()
+					if err != nil {
+						core.AppLog.Printf("cannot to dial to %s retries: %d", err.Error(), i)
+						time.Sleep(1 * time.Second)
+						continue
 					}
+					core.AppLog.Printf("connected %s\n", c.endpoint)
+					pubs[c.nodeName] = &sb
+					break
+				}
 				//}
 			} else {
 				pub, rd := pubs[c.nodeName]

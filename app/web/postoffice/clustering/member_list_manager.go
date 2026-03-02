@@ -20,6 +20,7 @@ type MemberlistManager struct {
 	Seed []string
 	MemberListListener
 	snowflake util.Snowflake
+	StoreDir  string
 }
 
 func (m *MemberlistManager) Start() error {
@@ -57,7 +58,7 @@ func (m *MemberlistManager) Start() error {
 	go m.Listen()
 	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode, RSync: rwSync}
 	m.Mll = m.MemberListListener
-	go m.DataServiceProvider.Start()
+	go m.DataServiceProvider.Start(m.StoreDir)
 	go m.RingUpdated()
 	joined, err := list.Join(m.Seed)
 	if err != nil {

@@ -80,14 +80,14 @@ func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.Server
 	return nil
 }
 
-func (c *DataServiceProvider) Start() {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		panic(err)
-	}
-	path := fmt.Sprintf("%s/%s", homeDir, "tarantula")
+func (c *DataServiceProvider) Start(dir string) {
+	//homeDir, err := os.UserHomeDir()
+	//if err != nil {
+	//panic(err)
+	//}
+	path := fmt.Sprintf("%s/%s", dir, "store")
 	core.AppLog.Printf("creating path %s if not existed", path)
-	err = os.MkdirAll(path, 0755)
+	err := os.MkdirAll(path, 0755)
 	if err != nil {
 		panic(err)
 	}
