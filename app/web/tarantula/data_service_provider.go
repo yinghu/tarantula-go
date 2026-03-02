@@ -11,7 +11,7 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
-	"gameclustering.com/tarantula/protocol"
+	"gameclustering.com/internal/protocol"
 	badger "github.com/dgraph-io/badger/v4"
 	"google.golang.org/grpc"
 )

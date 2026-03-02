@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/tarantula/protocol"
+	"gameclustering.com/internal/protocol"
 	hash "github.com/spaolacci/murmur3"
 )
 

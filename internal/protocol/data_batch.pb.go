@@ -81,8 +81,8 @@ const file_data_batch_proto_rawDesc = "" +
 	"data.proto\"C\n" +
 	"\tDataBatch\x12\x12\n" +
 	"\x04size\x18\x01 \x01(\rR\x04size\x12\"\n" +
-	"\x04list\x18\x02 \x03(\v2\x0e.protocol.DataR\x04listBR\n" +
-	"\x17com.icodesoftware.protoB\x10DataBatchFactoryZ%gameclustering.com/tarantula/protocolb\x06proto3"
+	"\x04list\x18\x02 \x03(\v2\x0e.protocol.DataR\x04listBQ\n" +
+	"\x17com.icodesoftware.protoB\x10DataBatchFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
 	file_data_batch_proto_rawDescOnce sync.Once

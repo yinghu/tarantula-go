@@ -89,8 +89,8 @@ const file_request_proto_rawDesc = "" +
 	"\aRequest\x12\x16\n" +
 	"\x06prefix\x18\x01 \x01(\rR\x06prefix\x12\x10\n" +
 	"\x03key\x18\x02 \x01(\fR\x03key\x12(\n" +
-	"\x06header\x18\x03 \x01(\v2\x10.protocol.HeaderR\x06headerBP\n" +
-	"\x17com.icodesoftware.protoB\x0eRequestFactoryZ%gameclustering.com/tarantula/protocolb\x06proto3"
+	"\x06header\x18\x03 \x01(\v2\x10.protocol.HeaderR\x06headerBO\n" +
+	"\x17com.icodesoftware.protoB\x0eRequestFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
 	file_request_proto_rawDescOnce sync.Once

@@ -2,7 +2,7 @@ package main
 
 import (
 	"gameclustering.com/internal/core"
-	"gameclustering.com/tarantula/protocol"
+	"gameclustering.com/internal/protocol"
 )
 
 type KeyIndex struct {

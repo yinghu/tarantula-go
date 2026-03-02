@@ -32,8 +32,8 @@ const file_data_service_proto_rawDesc = "" +
 	"\x04pull\x12\x11.protocol.Request\x1a\x13.protocol.DataBatch\"\x000\x01\x12.\n" +
 	"\x06create\x12\x0e.protocol.Data\x1a\x12.protocol.Response\"\x00\x12.\n" +
 	"\x06update\x12\x0e.protocol.Data\x1a\x12.protocol.Response\"\x00\x12.\n" +
-	"\x06delete\x12\x0e.protocol.Data\x1a\x12.protocol.Response\"\x00BT\n" +
-	"\x17com.icodesoftware.protoB\x12DataServiceFactoryZ%gameclustering.com/tarantula/protocolb\x06proto3"
+	"\x06delete\x12\x0e.protocol.Data\x1a\x12.protocol.Response\"\x00BS\n" +
+	"\x17com.icodesoftware.protoB\x12DataServiceFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var file_data_service_proto_goTypes = []any{
 	(*Request)(nil),   // 0: protocol.Request

@@ -107,8 +107,8 @@ const file_header_proto_rawDesc = "" +
 	"\tfactoryId\x18\x02 \x01(\x05R\tfactoryId\x12\x18\n" +
 	"\aclassId\x18\x03 \x01(\x05R\aclassId\x12\x1c\n" +
 	"\ttimestamp\x18\x04 \x01(\x03R\ttimestamp\x12\x12\n" +
-	"\x04size\x18\x05 \x01(\x05R\x04sizeBO\n" +
-	"\x17com.icodesoftware.protoB\rHeaderFactoryZ%gameclustering.com/tarantula/protocolb\x06proto3"
+	"\x04size\x18\x05 \x01(\x05R\x04sizeBN\n" +
+	"\x17com.icodesoftware.protoB\rHeaderFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
 	file_header_proto_rawDescOnce sync.Once

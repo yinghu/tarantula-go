@@ -5,7 +5,7 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
-	"gameclustering.com/tarantula/protocol"
+	"gameclustering.com/internal/protocol"
 )
 
 func TestDataOpt(t *testing.T) {

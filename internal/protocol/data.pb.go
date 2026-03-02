@@ -90,8 +90,8 @@ const file_data_proto_rawDesc = "" +
 	"\x04Data\x12(\n" +
 	"\x06header\x18\x01 \x01(\v2\x10.protocol.HeaderR\x06header\x12\x10\n" +
 	"\x03key\x18\x02 \x01(\fR\x03key\x12\x14\n" +
-	"\x05value\x18\x03 \x01(\fR\x05valueBM\n" +
-	"\x17com.icodesoftware.protoB\vDataFactoryZ%gameclustering.com/tarantula/protocolb\x06proto3"
+	"\x05value\x18\x03 \x01(\fR\x05valueBL\n" +
+	"\x17com.icodesoftware.protoB\vDataFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
 	file_data_proto_rawDescOnce sync.Once

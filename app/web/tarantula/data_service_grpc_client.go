@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/tarantula/protocol"
+	"gameclustering.com/internal/protocol"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
