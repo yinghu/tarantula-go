@@ -10,7 +10,6 @@ import (
 	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
-	"gameclustering.com/internal/persistence"
 )
 
 type TopicMap struct {
@@ -61,13 +60,13 @@ func (s *PostofficeService) Start(env conf.Env, p event.Pusher) error {
 	s.topicQ = append(s.topicQ, tc)
 	go s.inboundEvent(tc)
 
-	path := env.LocalDir + "/store"
-	ds := persistence.BadgerLocal{InMemory: env.Bdg.InMemory, Path: path, GcEnabled: true}
-	err := ds.Open()
-	if err != nil {
-		return err
-	}
-	s.Ds = &ds
+	//path := env.LocalDir + "/store"
+	//ds := persistence.BadgerLocal{InMemory: env.Bdg.InMemory, Path: path, GcEnabled: true}
+	//err := ds.Open()
+	//if err != nil {
+		//return err
+	//}
+	//s.Ds = &ds
 	s.ready.Done()
 	core.AppLog.Printf("Postoffice service started %s %s\n", env.HttpBinding, env.LocalDir)
 	http.Handle("/postoffice/subscribe", bootstrap.Logging(&PostofficeSubscriber{PostofficeService: s}))
@@ -82,7 +81,7 @@ func (s *PostofficeService) Start(env conf.Env, p event.Pusher) error {
 func (s *PostofficeService) Shutdown() {
 	core.AppLog.Println("postoffice service shutting down ...")
 	s.AppManager.Shutdown()
-	s.Ds.Close()
+	//s.Ds.Close()
 }
 
 func (s *PostofficeService) Create(classId int, topic string) (event.Event, error) {
