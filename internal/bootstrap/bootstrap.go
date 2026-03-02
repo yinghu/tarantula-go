@@ -42,7 +42,6 @@ type TarantulaContext interface {
 	Start(f conf.Env,p event.Pusher) error
 	Shutdown()
 	event.EventService
-	core.ClusterListener
 	Context() string
 	Service() TarantulaService
 }

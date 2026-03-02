@@ -1,8 +1,7 @@
 package core
 
 const (
-	CLUSTER_PARTITION_NUM int = 271
-
+	
 	GET_DATA_REQUEST    int = 0
 	CREATE_DATA_REQUEST int = 1
 	UPDATE_DATA_REQUEST int = 2
@@ -31,21 +30,7 @@ type Ctx interface {
 
 type Exec func(ctx Ctx) error
 
-type Cluster interface {
-	Group() string
-	Local() Node
-	View() []Node
-	Partition(key []byte) Node
-	Atomic(prefix string, t Exec) error
-	Join() error
-	Wait()
-	Quit()
-	Started()
 
-	OnJoin(join Node)
-	OnLeave(leave Node)
-	Listener() ClusterListener
-}
 
 type Opt struct {
 	IsCreate bool   `json:"IsCreate"`
@@ -53,11 +38,7 @@ type Opt struct {
 	Type     string `json:"Type"`
 }
 
-type ClusterListener interface {
-	KVUpdated(key string, value string, opt Opt)
-	MemberJoined(joined Node)
-	MemberLeft(left Node)
-}
+
 
 type RingSync struct {
 	Remote string   `json:"remote"`
