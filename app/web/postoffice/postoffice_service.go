@@ -199,9 +199,9 @@ func (s *PostofficeService) outboundEvent(c chan CChange) {
 		case c := <-c:
 			core.AppLog.Printf("Node Updated : %v\n", c)
 			if c.started {
-				if c.nodeName == s.Cluster().Local().Name {
-					pubs[c.nodeName] = &LocalPublisher{s}
-				} else {
+				//if c.nodeName == s.Cluster().Local().Name {
+					//pubs[c.nodeName] = &LocalPublisher{s}
+				//} else {
 					sb := event.TcpPublisher{Remote: c.endpoint}
 					for i := range 5 {
 						err := sb.Connect()
@@ -214,7 +214,7 @@ func (s *PostofficeService) outboundEvent(c chan CChange) {
 						pubs[c.nodeName] = &sb
 						break
 					}
-				}
+				//}
 			} else {
 				pub, rd := pubs[c.nodeName]
 				if !rd {

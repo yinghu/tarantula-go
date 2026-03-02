@@ -37,7 +37,7 @@ func (s *PresenceLogin) Login(login bootstrap.Login) {
 		login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.INVALID_TOKEN_CODE)}
 		return
 	}
-	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: s.Cluster().Local().HttpEndpoint}
+	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: ""}
 	ticket, _ := s.AppAuth.CreateTicket(login.SystemId, login.Id, login.AccessControl,bootstrap.TICKET_TIME_OUT_MINUTES)
 	session.Ticket = ticket
 	login.Cc <- core.Chunk{Remaining: false, Data: util.ToJson(session)}

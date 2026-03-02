@@ -45,6 +45,6 @@ func (s *AdminLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 		w.Write(util.ToJson(session))
 		return
 	}
-	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: s.Cluster().Local().HttpEndpoint}
+	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: ""}
 	w.Write(util.ToJson(session))
 }

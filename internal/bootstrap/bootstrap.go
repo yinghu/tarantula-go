@@ -50,7 +50,6 @@ type TarantulaContext interface {
 type TarantulaService interface {
 	ItemService() item.ItemService
 	Metrics() core.MetricsService
-	Cluster() core.Cluster
 	Authenticator() core.Authenticator
 	Sequence() core.Sequence
 	ItemListener() item.ItemListener

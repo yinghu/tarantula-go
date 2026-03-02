@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -11,10 +12,11 @@ import (
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
+	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.etcd.io/etcd/client/v3/concurrency"
 )
 
 type AppManager struct {
-	cls         core.Cluster
 	metr        core.MetricsService
 	imse        item.ItemService
 	auth        core.Authenticator
@@ -22,6 +24,9 @@ type AppManager struct {
 	Sql         persistence.Postgresql
 	ctx         string
 	prefix      string
+	nodeName    string
+	nodeId      int
+	etcEndpoints []string
 	standalone  bool
 	AppAuth     core.Authenticator
 	seq         core.Sequence
@@ -41,9 +46,7 @@ func (s *AppManager) Pusher() event.Pusher {
 func (s *AppManager) Metrics() core.MetricsService {
 	return s.metr
 }
-func (s *AppManager) Cluster() core.Cluster {
-	return s.cls
-}
+
 func (s *AppManager) Authenticator() core.Authenticator {
 	return s.auth
 }
@@ -62,6 +65,9 @@ func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 	s.tcpPusher = p
 	s.ctx = f.GroupName
 	s.prefix = f.Prefix
+	s.nodeName = f.NodeName
+	s.nodeId = int(f.NodeId)
+	s.etcEndpoints = f.EtcdEndpoints
 	s.standalone = f.Standalone
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
@@ -75,7 +81,7 @@ func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 	}
 	s.auth = au
 	ap, err := s.LoadAuth(f.PresenceCtx())
-	
+
 	if err != nil {
 		return err
 	}
@@ -94,7 +100,7 @@ func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 	s.metr = &ms
 	gitStore := persistence.GitItemStore{RepositoryDir: f.HomeDir + "/bin/tarantula", JsonRequester: s}
 	gitStore.Start()
-	is := persistence.ItemDB{Sql: &sql, Gis: &gitStore, Cls: s.cls}
+	is := persistence.ItemDB{Sql: &sql, Gis: &gitStore}
 	err = is.Start()
 	if err != nil {
 		return err
@@ -107,8 +113,8 @@ func (s *AppManager) Shutdown() {
 	util.GitPush()
 	s.Sql.Close()
 	lockPrefix := fmt.Sprintf("%s/node", s.prefix)
-	s.cls.Atomic(lockPrefix, func(ctx core.Ctx) error {
-		v, err := ctx.Get(s.cls.Local().Name)
+	s.Atomic(lockPrefix, func(ctx core.Ctx) error {
+		v, err := ctx.Get(s.nodeName)
 		if err != nil {
 			return err
 		}
@@ -118,7 +124,7 @@ func (s *AppManager) Shutdown() {
 			return err
 		}
 		c.Used = false
-		ctx.Put(s.cls.Local().Name, string(util.ToJson(c)))
+		ctx.Put(s.nodeName, string(util.ToJson(c)))
 		return nil
 	})
 	core.AppLog.Println("app manager shutting down ...")
@@ -164,8 +170,8 @@ func (s *AppManager) Recover(query event.Query) {
 }
 
 func (s AppManager) Load(query event.Query) {
-	e := query.QEvent()  
-	s.PostJsonAsync(fmt.Sprintf("%s/%d", "http://postoffice:8080/postoffice/load",e.ClassId()),e,query.QCc())
+	e := query.QEvent()
+	s.PostJsonAsync(fmt.Sprintf("%s/%d", "http://postoffice:8080/postoffice/load", e.ClassId()), e, query.QCc())
 }
 
 func (s *AppManager) OnEvent(e event.Event) {
@@ -191,7 +197,7 @@ func (s *AppManager) NodeStarted(n core.Node) {
 func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
 	tkn := util.JwtHMac{Alg: core.JWT_ALG, Ksz: core.JWT_KEY_SIZE}
 	ci := util.Aes{Ksz: core.CIPHER_KEY_SIZE}
-	err := s.cls.Atomic(context, func(ctx core.Ctx) error {
+	err := s.Atomic(context, func(ctx core.Ctx) error {
 		jsk, err := ctx.Get(core.JWT_KEY_NAME)
 		if err != nil {
 			core.AppLog.Println("Create new jwt key")
@@ -210,7 +216,7 @@ func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = s.cls.Atomic(context, func(ctx core.Ctx) error {
+	err = s.Atomic(context, func(ctx core.Ctx) error {
 		csk, err := ctx.Get(core.CIPHER_KEY_NAME)
 		if err != nil {
 			core.AppLog.Println("Create new cipher key")
@@ -229,4 +235,29 @@ func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
 		return nil, err
 	}
 	return &AuthManager{Tkn: &tkn, Cipher: &ci, Kid: "presence"}, nil
+}
+
+func (c *AppManager) Atomic(prefix string, t core.Exec) error {
+	if prefix == "" {
+		prefix = c.ctx
+		core.AppLog.Printf("Reset Lock prefix %s\n", prefix)
+	}
+	cli, err := clientv3.New(clientv3.Config{
+		Endpoints:   c.etcEndpoints,
+		DialTimeout: 5 * time.Second,
+	})
+	if err != nil {
+		return err
+	}
+	defer cli.Close()
+	session, err := concurrency.NewSession(cli)
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+	mutex := concurrency.NewMutex(session, prefix+"#lock")
+	ctx := context.Background()
+	mutex.Lock(ctx)
+	defer mutex.Unlock(ctx)
+	return t(&core.EtcdClient{Cli: cli, Prefix: prefix})
 }
