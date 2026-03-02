@@ -12,8 +12,7 @@ services:
       - "7001:7001/tcp"
       - "7946:7946/tcp"
       - "7946:7946/udp"
-    networks:
-      - net
+    network_mode: "host"
     env_file:
       - .env  
   presence:
@@ -142,7 +141,11 @@ services:
 
 networks:
   net:
-    driver: host 
+    driver: bridge 
+    ipam:
+      config:
+        - subnet: 10.20.0.0/16
+          gateway: 10.20.0.1
 volumes:
   volume_postoffice:
   volume_presence:
