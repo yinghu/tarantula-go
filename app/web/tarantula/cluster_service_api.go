@@ -36,6 +36,12 @@ func (m *MemberListListener) Request(req core.DataRequest) {
 		m.get(req)
 	case core.UPDATE_DATA_REQUEST:
 		m.set(req)
+	case core.CREATE_DATA_REQUEST:
+		m.set(req)
+	case core.DELETE_DATA_REQUEST:
+		m.set(req)
+	case core.RESET_DATA_REQUEST:
+		m.set(req)
 	}
 }
 func (m *MemberListListener) set(set core.DataRequest) {
