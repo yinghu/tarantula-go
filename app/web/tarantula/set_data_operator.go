@@ -1,10 +1,9 @@
 package main
 
 import (
-	"time"
+	"fmt"
 
 	"gameclustering.com/internal/core"
-	badger "github.com/dgraph-io/badger/v4"
 )
 
 const (
@@ -13,6 +12,7 @@ const (
 	SET_OPT_CREATE  int = 3
 	SET_OPT_UPDATE  int = 4
 	SET_OPT_DELETE  int = 5
+	SET_OPT_RESET   int = 6
 
 	SET_OPERATOR_NUM int = 8
 )
@@ -34,25 +34,20 @@ start:
 			core.AppLog.Debug().Msgf("closing set data operator %d", num)
 			return
 		}
-		ak, err := sd.K()
-		if err != nil {
-			sd.Msg <- SetRes{Err: err}
+		var err error
+		switch sd.Opt {
+		case SET_OPT_CREATE:
+			err = m.create(sd)
+		case SET_OPT_UPDATE:
+			err = m.update(sd)
+		case SET_OPT_DELETE:
+			err = m.delete(sd)
+		case SET_OPT_RESET:
+			err = m.reset(sd)
+		default:
+			err = fmt.Errorf("opt not supported %d", sd.Opt)
 		}
-		ki := sd.KeyIndex()
-		ki.Header.Revision = 100
-		ki.Header.Timestamp = time.Now().UnixMilli()
-		ki.Header.Size = int32(len(sd.Value))
-		k, v, err := ki.Kv()
-		if err != nil {
-			sd.Msg <- SetRes{Err: err}
-		}
-		err = m.Local.Db.Update(func(txn *badger.Txn) error {
-			err := txn.Set(k, v)
-			if err != nil {
-				return err
-			}
-			return txn.Set(ak, sd.Data.Value)
-		})
+
 		if err != nil {
 			sd.Msg <- SetRes{Err: err}
 

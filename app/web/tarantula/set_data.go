@@ -14,17 +14,17 @@ const (
 
 type SetData struct {
 	*protocol.Data
-	Opt  int
-	Msg  chan SetRes
+	Opt int
+	Msg chan SetRes
 }
 
-func (s *SetData) KeyIndex() KeyIndex {
+// HELPER METHODS
+func (s *SetData) IndexKey() KeyIndex {
 	ki := KeyIndex{Prefix: hash.Sum32(s.Key), Header: s.Header, Key: s.Key}
 	return ki
 }
 
-//HELPER METHODS
-func (s *SetData) K() ([]byte, error) {
+func (s *SetData) DataKey() ([]byte, error) {
 	ksz := len(s.Key)
 	if ksz+20 > COMPOSIT_KEY_MAX {
 		return []byte{}, fmt.Errorf("Key size overflow %d", ksz)
@@ -38,4 +38,3 @@ func (s *SetData) K() ([]byte, error) {
 	buffer.Flip()
 	return buffer.Read(0)
 }
-

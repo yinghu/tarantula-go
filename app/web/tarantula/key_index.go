@@ -92,7 +92,7 @@ func (k *KeyIndex) ReadKey(buffer core.DataBuffer) error {
 
 //HELP METHODS
 
-func (k *KeyIndex) V(val []byte) error {
+func (k *KeyIndex) Val(val []byte) error {
 	kBuff := core.NewBuffer(COMPOSIT_KEY_MAX)
 	if err := kBuff.Write(val); err != nil {
 		return err
@@ -101,7 +101,7 @@ func (k *KeyIndex) V(val []byte) error {
 	return k.Read(kBuff)
 }
 
-func (k *KeyIndex) K() ([]byte, error) {
+func (k *KeyIndex) CompositKey() ([]byte, error) {
 	kBuff := core.NewBuffer(COMPOSIT_KEY_MAX)
 	if err := k.WriteKey(kBuff); err != nil {
 		return nil, err
@@ -109,7 +109,15 @@ func (k *KeyIndex) K() ([]byte, error) {
 	kBuff.Flip()
 	return kBuff.Read(0)
 }
-func (k *KeyIndex) Kv() ([]byte, []byte, error) {
+func (k *KeyIndex) Value() ([]byte, error) {
+	kBuff := core.NewBuffer(COMPOSIT_KEY_MAX)
+	if err := k.Write(kBuff); err != nil {
+		return nil, err
+	}
+	kBuff.Flip()
+	return kBuff.Read(0)
+}
+func (k *KeyIndex) Pair() ([]byte, []byte, error) {
 	kBuff := core.NewBuffer(COMPOSIT_KEY_MAX)
 	if err := k.WriteKey(kBuff); err != nil {
 		return nil, nil, err

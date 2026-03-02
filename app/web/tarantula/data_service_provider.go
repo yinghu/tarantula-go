@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"sync"
+	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
@@ -34,42 +35,8 @@ type DataServiceProvider struct {
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Data, error) {
-	data := protocol.Data{Header: &protocol.Header{}}
 	getdata := GetData{in}
-	k, err := getdata.K()
-	if err != nil {
-		return &data, err
-	}
-	ki := getdata.KeyIndex()
-	ak, err := ki.K()
-	if err != nil {
-		return &data, err
-	}
-	err = c.Local.Db.View(func(txn *badger.Txn) error {
-		item, err := txn.Get(ak)
-		if err != nil {
-			return err
-		}
-		err = item.Value(func(val []byte) error {
-			ki.V(val)
-			return nil
-		})
-		if err != nil {
-			return err
-		}
-		item, err = txn.Get(k)
-		if err != nil {
-			return err
-		}
-		return item.Value(func(val []byte) error {
-			data.Value = val
-			return nil
-		})
-	})
-	data.Header.Revision = ki.Header.Revision
-	data.Header.FactoryId = ki.Header.FactoryId
-	data.Header.ClassId = ki.Header.ClassId
-	return &data, err
+	return c.get(getdata)
 }
 
 func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Data) (*protocol.Response, error) {
@@ -228,32 +195,169 @@ func (m *DataServiceProvider) RingUpdated() {
 }
 
 // internal operations
-func (m *DataServiceProvider) saveKeyIndex(keyIndex *KeyIndex) error {
-	key, value, err := keyIndex.Kv()
+
+func (m *DataServiceProvider) create(sd SetData) error {
+	ki := sd.IndexKey()
+	ki.Header.Revision = 1
+	ki.Header.Timestamp = time.Now().UnixMilli()
+	ki.Header.Size = int32(len(sd.Value))
+	sd.Header.Revision = ki.Header.Revision
+	k, v, err := ki.Pair()
 	if err != nil {
 		return err
 	}
-	if err := m.Local.Db.Update(func(txn *badger.Txn) error {
-		return txn.Set(key, value)
-	}); err != nil {
+	dk, err := sd.DataKey()
+	if err != nil {
 		return err
 	}
-	return nil
+	return m.Local.Db.Update(func(txn *badger.Txn) error {
+		_, err := txn.Get(k)
+		if err == nil {
+			return fmt.Errorf("key already existed")
+		}
+		if err = txn.Set(k, v); err != nil {
+			return err
+		}
+		return txn.Set(dk, sd.Value)
+	})
 }
-
-func (m *DataServiceProvider) loadKeyIndex(keyIndex *KeyIndex) error {
-
-	key, err := keyIndex.K()
+func (m *DataServiceProvider) update(sd SetData) error {
+	ki := sd.IndexKey()
+	k, err := ki.CompositKey()
 	if err != nil {
 		return err
 	}
-	return m.Local.Db.View(func(txn *badger.Txn) error {
-		item, err := txn.Get(key)
+	rev := sd.Header.Revision
+	return m.Local.Db.Update(func(txn *badger.Txn) error {
+		item, err := txn.Get(k)
+		if err != nil {
+			return fmt.Errorf("key not existed %s", err.Error())
+		}
+		if err = item.Value(func(val []byte) error {
+			return ki.Val(val)
+		}); err != nil {
+			return err
+		}
+
+		if ki.Header.Revision != rev {
+			return fmt.Errorf("revison not matched %d %d", ki.Header.Revision, rev)
+		}
+		ki.Header.Revision++
+		ki.Header.Timestamp = time.Now().UnixMilli()
+		ki.Header.Size = int32(len(sd.Value))
+		v, err := ki.Value()
+		if err != nil {
+			return err
+		}
+		if err = txn.Set(k, v); err != nil {
+			return err
+		}
+		sd.Header.Revision = ki.Header.Revision
+		dk, err := sd.DataKey()
+		if err != nil {
+			return err
+		}
+		return txn.Set(dk, sd.Value)
+	})
+}
+func (m *DataServiceProvider) delete(sd SetData) error {
+	ki := sd.IndexKey()
+	k, err := ki.CompositKey()
+	if err != nil {
+		return err
+	}
+	return m.Local.Db.Update(func(txn *badger.Txn) error {
+		item, err := txn.Get(k)
+		if err != nil {
+			return fmt.Errorf("key not existed %s", err.Error())
+		}
+		if err = item.Value(func(val []byte) error {
+			return ki.Val(val)
+		}); err != nil {
+			return err
+		}
+		if err = txn.Delete(k); err != nil {
+			return err
+		}
+		sd.Header.Revision = ki.Header.Revision
+		dk, err := sd.DataKey()
+		if err != nil {
+			return err
+		}
+		return txn.Delete(dk)
+	})
+}
+func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
+	data := protocol.Data{Header: &protocol.Header{}}
+	ki := gd.IndexKey()
+	k, err := ki.CompositKey()
+	if err != nil {
+		return &data, err
+	}
+
+	err = m.Local.Db.View(func(txn *badger.Txn) error {
+		item, err := txn.Get(k)
+		if err != nil {
+			return err
+		}
+		if err = item.Value(func(val []byte) error {
+			return ki.Val(val)
+		}); err != nil {
+			return nil
+		}
+		//check revision with requested revision
+		gd.Header.Revision = ki.Header.Revision
+		dk, err := gd.DataKey()
+		if err != nil {
+			return err
+		}
+		item, err = txn.Get(dk)
 		if err != nil {
 			return err
 		}
 		return item.Value(func(val []byte) error {
-			return keyIndex.V(val)
+			data.Value = val
+			data.Header.Revision = ki.Header.Revision
+			data.Header.Timestamp = ki.Header.Timestamp
+			data.Header.Size = ki.Header.Size
+			return nil
 		})
+	})
+	return &data, err
+}
+
+func (m *DataServiceProvider) reset(sd SetData) error {
+	ki := sd.IndexKey()
+	k, err := ki.CompositKey()
+	if err != nil {
+		return err
+	}
+
+	return m.Local.Db.Update(func(txn *badger.Txn) error {
+		item, err := txn.Get(k)
+		if err != nil {
+			return fmt.Errorf("key not existed %s", err.Error())
+		}
+		if err = item.Value(func(val []byte) error {
+			return ki.Val(val)
+		}); err != nil {
+			return err
+		}
+		ki.Header.Revision = 1
+		ki.Header.Timestamp = time.Now().UnixMilli()
+		ki.Header.Size = int32(len(sd.Value))
+		v, err := ki.Value()
+		if err != nil {
+			return err
+		}
+		if err = txn.Set(k, v); err != nil {
+			return err
+		}
+		sd.Header.Revision = ki.Header.Revision
+		dk, err := sd.DataKey()
+		if err != nil {
+			return err
+		}
+		return txn.Set(dk, sd.Value)
 	})
 }

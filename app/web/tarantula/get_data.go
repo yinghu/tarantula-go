@@ -12,11 +12,11 @@ type GetData struct {
 	*protocol.Request
 }
 
-func (s *GetData) KeyIndex() KeyIndex {
+func (s *GetData) IndexKey() KeyIndex {
 	ki := KeyIndex{Prefix: hash.Sum32(s.Key), Header: s.Header, Key: s.Key}
 	return ki
 }
-func (g *GetData) K() ([]byte, error) {
+func (g *GetData) DataKey() ([]byte, error) {
 	ksz := len(g.Key)
 	if ksz+20 > COMPOSIT_KEY_MAX {
 		return []byte{}, fmt.Errorf("Key size overflow %d", ksz)
