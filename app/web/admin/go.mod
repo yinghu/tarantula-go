@@ -6,8 +6,6 @@ replace gameclustering.com/internal/persistence => ../../../internal/persistence
 
 replace gameclustering.com/internal/util => ../../../internal/util
 
-replace gameclustering.com/internal/cluster => ../../../internal/cluster
-
 replace gameclustering.com/internal/conf => ../../../internal/conf
 
 replace gameclustering.com/internal/event => ../../../internal/event
@@ -32,7 +30,6 @@ require (
 )
 
 require (
-	gameclustering.com/internal/cluster v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect
@@ -74,7 +71,6 @@ require (
 	golang.org/x/crypto v0.44.0 // indirect
 	golang.org/x/net v0.47.0 // indirect
 	golang.org/x/sync v0.18.0 // indirect
-	
 	golang.org/x/sys v0.41.0 // indirect
 	golang.org/x/text v0.31.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250303144028-a0af3efb3deb // indirect

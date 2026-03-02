@@ -6,8 +6,6 @@ replace gameclustering.com/internal/persistence => ../persistence
 
 replace gameclustering.com/internal/util => ../util
 
-replace gameclustering.com/internal/cluster => ../cluster
-
 replace gameclustering.com/internal/conf => ../conf
 
 replace gameclustering.com/internal/event => ../event
@@ -19,7 +17,6 @@ replace gameclustering.com/internal/item => ../item
 replace gameclustering.com/internal/metrics => ../metrics
 
 require (
-	gameclustering.com/internal/cluster v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/conf v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000
@@ -28,6 +25,7 @@ require (
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
 	github.com/prometheus/client_golang v1.23.2
+	go.etcd.io/etcd/client/v3 v3.6.5
 )
 
 require (
@@ -59,7 +57,6 @@ require (
 	github.com/rs/zerolog v1.34.0 // indirect
 	go.etcd.io/etcd/api/v3 v3.6.5 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.6.5 // indirect
-	go.etcd.io/etcd/client/v3 v3.6.5 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel v1.35.0 // indirect
 	go.opentelemetry.io/otel/metric v1.35.0 // indirect
