@@ -11,7 +11,7 @@ services:
     ports:
       - "7001:7001/tcp"
       - "7946:7946/tcp"
-      - "7947:7947/udp"          
+      - "7946:7946/udp"          
     networks:
       - net
     env_file:

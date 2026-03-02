@@ -61,7 +61,6 @@ func (s *PostofficeService) Start(env conf.Env, p event.Pusher) error {
 	tc := make(chan event.SubscriptionEvent, 1)
 	s.topicQ = append(s.topicQ, tc)
 	go s.inboundEvent(tc)
-
 	m := clustering.MemberlistManager{StoreDir: env.LocalDir}
 	m.Seed = []string{"192.168.1.11", "192.168.1.6", "192.168.1.7"}
 	err := m.Start()
@@ -71,7 +70,7 @@ func (s *PostofficeService) Start(env conf.Env, p event.Pusher) error {
 	}
 	s.mm = &m
 	s.ready.Done()
-	core.AppLog.Printf("Postoffice service started %s %s\n", env.HttpBinding, env.LocalDir)
+	core.AppLog.Printf("postoffice service started %s %s", env.HttpBinding, env.LocalDir)
 	http.Handle("/postoffice/subscribe", bootstrap.Logging(&PostofficeSubscriber{PostofficeService: s}))
 	http.Handle("/postoffice/unsubscribe", bootstrap.Logging(&PostofficeUnSubscriber{PostofficeService: s}))
 	http.Handle("/postoffice/publish/{topic}/{cid}", bootstrap.Logging(&PostofficePublisher{PostofficeService: s}))
