@@ -15,9 +15,6 @@ services:
     environment:
       - CLUSTER_GOSSIP_BIND_PORT=7946
       - CLUSTER_JOIN=other-node-service-name:7946
-    deploy:
-      mode: replicated
-      replicas: 3
     networks:
       - net
     env_file:
