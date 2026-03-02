@@ -39,7 +39,7 @@ const (
 
 type TarantulaContext interface {
 	Config() string
-	Start(f conf.Env, c core.Cluster, p event.Pusher) error
+	Start(f conf.Env,p event.Pusher) error
 	Shutdown()
 	event.EventService
 	core.ClusterListener

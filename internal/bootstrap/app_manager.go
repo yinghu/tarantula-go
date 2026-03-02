@@ -56,11 +56,10 @@ func (s *AppManager) ItemListener() item.ItemListener {
 func (s *AppManager) BootstrapListener() BootstrapListener {
 	return s.Bsl
 }
-func (s *AppManager) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
+func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
 	s.ManagedApps = f.ManagedApps
 	s.tcpPusher = p
-	s.cls = c
 	s.ctx = f.GroupName
 	s.prefix = f.Prefix
 	s.standalone = f.Standalone
@@ -101,7 +100,6 @@ func (s *AppManager) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 		return err
 	}
 	s.imse = &is
-	c.Started()
 	return nil
 }
 

@@ -21,9 +21,9 @@ func (s *MahjongService) Config() string {
 	return "/etc/tarantula/mahjong-conf.json"
 }
 
-func (s *MahjongService) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
+func (s *MahjongService) Start(f conf.Env, p event.Pusher) error {
 	s.ItemUpdater = s
-	s.AppManager.Start(f, c, p)
+	s.AppManager.Start(f, p)
 	s.TableIndex = make(map[int64]*MahjongTable)
 	s.Dispatcher = make(chan MahjongPlayToken, 10)
 	go s.dispatch()

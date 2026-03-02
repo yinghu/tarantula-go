@@ -23,8 +23,8 @@ func (s *AdminService) Config() string {
 	return "/etc/tarantula/admin-conf.json"
 }
 
-func (s *AdminService) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
-	s.AppManager.Start(f, c, p)
+func (s *AdminService) Start(f conf.Env, p event.Pusher) error {
+	s.AppManager.Start(f, p)
 	s.managedApps = f.ManagedApps
 	s.contentDir = f.Bin
 	s.assetDir = f.LocalDir + "/asset"

@@ -41,9 +41,9 @@ func (s *PostofficeService) Config() string {
 	return "/etc/tarantula/postoffice-conf.json"
 }
 
-func (s *PostofficeService) Start(env conf.Env, c core.Cluster, p event.Pusher) error {
+func (s *PostofficeService) Start(env conf.Env, p event.Pusher) error {
 	s.Bsl = s
-	s.AppManager.Start(env, c, p)
+	s.AppManager.Start(env,p)
 	s.createSchema()
 	s.topics = make(map[int32]event.SubscriptionEvent)
 	s.loadTopics()
