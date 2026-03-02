@@ -9,7 +9,8 @@ services:
     volumes:
       - volume_postoffice:/home/tarantula/postoffice
     ports:
-      - "5000:5000"          
+      - "5000:5000"
+      - "7946:7946"          
     networks:
       - net
     env_file:
