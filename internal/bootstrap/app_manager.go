@@ -17,20 +17,20 @@ import (
 )
 
 type AppManager struct {
-	metr         core.MetricsService
-	imse         item.ItemService
-	auth         core.Authenticator
-	Bsl          BootstrapListener
-	Sql          persistence.Postgresql
-	F            conf.Env
-	ctx          string
-	prefix       string
-	standalone   bool
-	AppAuth      core.Authenticator
-	seq          core.Sequence
-	ItemUpdater  item.ItemListener
-	tcpPusher    event.Pusher
-	ManagedApps  []string
+	metr        core.MetricsService
+	imse        item.ItemService
+	auth        core.Authenticator
+	Bsl         BootstrapListener
+	Sql         persistence.Postgresql
+	F           conf.Env
+	ctx         string
+	prefix      string
+	standalone  bool
+	AppAuth     core.Authenticator
+	seq         core.Sequence
+	ItemUpdater item.ItemListener
+	tcpPusher   event.Pusher
+	ManagedApps []string
 }
 
 func (s *AppManager) ItemService() item.ItemService {
@@ -69,6 +69,7 @@ func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 	s.seq = &sfk
 	fctx := f.PresenceCtx()
 	if f.AuthLevel >= int(ADMIN_ACCESS_CONTROL) {
+		core.AppLog.Debug().Msgf("using admin auth level %d %s", f.AuthLevel, f.ClusterCtx())
 		fctx = f.ClusterCtx()
 	}
 	au, err := s.LoadAuth(fctx)
