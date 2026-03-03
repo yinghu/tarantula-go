@@ -114,9 +114,9 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			preflight(w, r)
 			return
 		}
-		//w.Header().Set("Access-Control-Allow-Origin", "*")
-		//w.Header().Set("Access-Control-Allow-Headers", "*")
-		//w.Header().Set("Access-Control-Allow-Methods", "*")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "*")
 		if s.AccessControl() == core.PUBLIC_ACCESS_CONTROL {
 			s.Request(core.OnSession{}, w, r)
 			return
