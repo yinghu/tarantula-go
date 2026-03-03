@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 )
@@ -16,7 +15,7 @@ type AdminWebProtected struct {
 }
 
 func (s *AdminWebProtected) AccessControl() int32 {
-	return bootstrap.ADMIN_ACCESS_CONTROL
+	return core.ADMIN_ACCESS_CONTROL
 }
 func (s *AdminWebProtected) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()

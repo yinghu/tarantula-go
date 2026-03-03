@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
@@ -16,7 +15,7 @@ type CSMessager struct {
 }
 
 func (s *CSMessager) AccessControl() int32 {
-	return bootstrap.ADMIN_ACCESS_CONTROL
+	return core.ADMIN_ACCESS_CONTROL
 }
 func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()

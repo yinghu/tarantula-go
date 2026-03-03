@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 )
@@ -14,7 +13,7 @@ type CategoryLoader struct {
 }
 
 func (s *CategoryLoader) AccessControl() int32 {
-	return bootstrap.ADMIN_ACCESS_CONTROL
+	return core.ADMIN_ACCESS_CONTROL
 }
 func (s *CategoryLoader) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
@@ -47,6 +46,6 @@ func (s *CategoryLoader) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	list := s.ItemService().LoadCategories(int32(sp),target)
+	list := s.ItemService().LoadCategories(int32(sp), target)
 	w.Write(util.ToJson(list))
 }

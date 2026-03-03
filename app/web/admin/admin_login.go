@@ -14,7 +14,7 @@ type AdminLogin struct {
 }
 
 func (s *AdminLogin) AccessControl() int32 {
-	return bootstrap.PUBLIC_ACCESS_CONTROL
+	return core.PUBLIC_ACCESS_CONTROL
 }
 func (s *AdminLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()

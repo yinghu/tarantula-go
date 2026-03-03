@@ -53,7 +53,7 @@ func (s *MahjongService) VerifyTicket(ticket string) (core.OnSession, error) {
 	if err != nil {
 		return session, err
 	}
-	if session.AccessControl < bootstrap.PROTECTED_ACCESS_CONTROL {
+	if session.AccessControl < core.PROTECTED_ACCESS_CONTROL {
 		return session, fmt.Errorf("player access control required %d", session.AccessControl)
 	}
 	return session, nil

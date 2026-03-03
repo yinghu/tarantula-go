@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 )
@@ -16,7 +15,7 @@ type AssetDownload struct {
 }
 
 func (s *AssetDownload) AccessControl() int32 {
-	return bootstrap.PROTECTED_ACCESS_CONTROL
+	return core.PROTECTED_ACCESS_CONTROL
 }
 
 func (s *AssetDownload) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {

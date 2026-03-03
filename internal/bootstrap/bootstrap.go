@@ -9,12 +9,6 @@ import (
 	"gameclustering.com/internal/item"
 )
 
-const (
-	PUBLIC_ACCESS_CONTROL    int32 = 0
-	PROTECTED_ACCESS_CONTROL int32 = 1
-	ADMIN_ACCESS_CONTROL     int32 = 30
-	SUDO_ACCESS_CONTROL      int32 = 100
-)
 
 const (
 	STANDALONE_APP     int    = 200000

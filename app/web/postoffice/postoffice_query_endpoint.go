@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
@@ -17,7 +16,7 @@ type PostofficeQueryer struct {
 }
 
 func (s *PostofficeQueryer) AccessControl() int32 {
-	return bootstrap.ADMIN_ACCESS_CONTROL
+	return core.ADMIN_ACCESS_CONTROL
 }
 
 func (s *PostofficeQueryer) query(query event.Query) {

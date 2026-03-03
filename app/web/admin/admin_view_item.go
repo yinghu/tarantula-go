@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 )
@@ -14,7 +13,7 @@ type AdminItemViewer struct {
 }
 
 func (s *AdminItemViewer) AccessControl() int32 {
-	return bootstrap.SUDO_ACCESS_CONTROL
+	return core.SUDO_ACCESS_CONTROL
 }
 func (s *AdminItemViewer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()

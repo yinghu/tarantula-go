@@ -17,7 +17,7 @@ type PresenceLogin struct {
 }
 
 func (s *PresenceLogin) AccessControl() int32 {
-	return bootstrap.PUBLIC_ACCESS_CONTROL
+	return core.PUBLIC_ACCESS_CONTROL
 }
 
 func (s *PresenceLogin) Login(login bootstrap.Login) {

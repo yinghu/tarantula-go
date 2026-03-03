@@ -24,7 +24,7 @@ func (s *AdminService) Config() string {
 }
 
 func (s *AdminService) Start(f conf.Env, p event.Pusher) error {
-	f.AuthLevel = bootstrap.ADMIN_ACCESS_CONTROL
+	f.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	s.AppManager.Start(f, p)
 	s.managedApps = f.ManagedApps
 	s.contentDir = f.Bin
@@ -39,7 +39,7 @@ func (s *AdminService) Start(f conf.Env, p event.Pusher) error {
 	if err != nil {
 		return err
 	}
-	err = s.SaveLogin(&bootstrap.Login{Name: "root", Hash: hash, AccessControl: bootstrap.SUDO_ACCESS_CONTROL})
+	err = s.SaveLogin(&bootstrap.Login{Name: "root", Hash: hash, AccessControl: core.SUDO_ACCESS_CONTROL})
 	if err != nil {
 		core.AppLog.Printf("Root already existed %s\n", err.Error())
 	}

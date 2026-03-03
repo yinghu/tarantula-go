@@ -132,7 +132,7 @@ func (s *AppManager) VerifyTicket(ticket string) (core.OnSession, error) {
 	if err != nil {
 		return session, err
 	}
-	if session.AccessControl < ADMIN_ACCESS_CONTROL {
+	if session.AccessControl < core.ADMIN_ACCESS_CONTROL {
 		return session, fmt.Errorf("admin access control required %d", session.AccessControl)
 	}
 	return session, nil

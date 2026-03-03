@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
@@ -15,7 +14,7 @@ type PostofficeSubscriber struct {
 }
 
 func (s *PostofficeSubscriber) AccessControl() int32 {
-	return bootstrap.ADMIN_ACCESS_CONTROL
+	return core.ADMIN_ACCESS_CONTROL
 }
 
 func (s *PostofficeSubscriber) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {

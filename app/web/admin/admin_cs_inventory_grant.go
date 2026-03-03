@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
@@ -15,7 +14,7 @@ type CSGranter struct {
 }
 
 func (s *CSGranter) AccessControl() int32 {
-	return bootstrap.ADMIN_ACCESS_CONTROL
+	return core.ADMIN_ACCESS_CONTROL
 }
 func (s *CSGranter) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()

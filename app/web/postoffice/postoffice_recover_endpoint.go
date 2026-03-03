@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
@@ -16,7 +15,7 @@ type PostofficeRecoverer struct {
 }
 
 func (s *PostofficeRecoverer) AccessControl() int32 {
-	return bootstrap.ADMIN_ACCESS_CONTROL
+	return core.ADMIN_ACCESS_CONTROL
 }
 
 func (s *PostofficeRecoverer) recover(query event.Query) {

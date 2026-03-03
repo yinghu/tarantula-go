@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 )
@@ -21,7 +20,7 @@ type KeyExpiration struct {
 }
 
 func (s *AdminCreateAccessKey) AccessControl() int32 {
-	return bootstrap.ADMIN_ACCESS_CONTROL
+	return core.ADMIN_ACCESS_CONTROL
 }
 func (s *AdminCreateAccessKey) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()

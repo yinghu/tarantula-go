@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 )
 
@@ -13,7 +12,7 @@ type MemberHashRingEndpoint struct {
 }
 
 func (s *MemberHashRingEndpoint) AccessControl() int32 {
-	return bootstrap.ADMIN_ACCESS_CONTROL
+	return core.ADMIN_ACCESS_CONTROL
 }
 
 func (s *MemberHashRingEndpoint) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {

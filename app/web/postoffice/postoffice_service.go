@@ -44,7 +44,7 @@ func (s *PostofficeService) Config() string {
 
 func (s *PostofficeService) Start(env conf.Env, p event.Pusher) error {
 	s.Bsl = s
-	env.AuthLevel = bootstrap.ADMIN_ACCESS_CONTROL
+	env.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	s.AppManager.Start(env, p)
 
 	s.createSchema()
@@ -178,7 +178,7 @@ func (s *PostofficeService) outboundEvent(c chan CChange) {
 	for {
 		select {
 		case e := <-s.outboundQ:
-			ticket, err := s.AppAuth.CreateTicket(0, 0, bootstrap.ADMIN_ACCESS_CONTROL, bootstrap.TICKET_TIME_OUT_MINUTES)
+			ticket, err := s.AppAuth.CreateTicket(0, 0, core.ADMIN_ACCESS_CONTROL, bootstrap.TICKET_TIME_OUT_MINUTES)
 			if err != nil {
 				core.AppLog.Printf("Ticket error %s\n", err.Error())
 				continue

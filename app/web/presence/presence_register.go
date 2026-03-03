@@ -17,13 +17,13 @@ type PresenceRegister struct {
 }
 
 func (s *PresenceRegister) AccessControl() int32 {
-	return bootstrap.PUBLIC_ACCESS_CONTROL
+	return core.PUBLIC_ACCESS_CONTROL
 }
 
 func (s *PresenceRegister) Register(login bootstrap.Login) {
 	id, _ := s.Sequence().Id()
 	login.SystemId = id
-	login.AccessControl = bootstrap.PROTECTED_ACCESS_CONTROL
+	login.AccessControl = core.PROTECTED_ACCESS_CONTROL
 	hash, _ := s.Authenticator().HashPassword(login.Hash)
 	login.Hash = hash
 	err := s.SaveLogin(&login)

@@ -34,7 +34,7 @@ func (s *PresenceChangePwd) chnagePwd(login bootstrap.Login) {
 }
 
 func (s *PresenceChangePwd) AccessControl() int32 {
-	return bootstrap.PROTECTED_ACCESS_CONTROL
+	return core.PROTECTED_ACCESS_CONTROL
 }
 
 func (s *PresenceChangePwd) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
