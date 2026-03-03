@@ -28,7 +28,6 @@ func AppBootstrap(tcx TarantulaContext) {
 	e := event.TcpEndpoint{Endpoint: f.Evp.TcpEndpoint, Service: tcx, OutboundEnabled: f.Evp.OutboundEnabled}
 	if f.Evp.Enabled {
 		go func() {
-			
 			e.Open()
 		}()
 	}
