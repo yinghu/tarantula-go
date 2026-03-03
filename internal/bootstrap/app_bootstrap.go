@@ -72,6 +72,7 @@ func illegalAccess(w http.ResponseWriter, r *http.Request) {
 	w.Write(util.ToJson(session))
 }
 func preflight(w http.ResponseWriter, r *http.Request) {
+	core.AppLog.Debug().Msg("checking options header here")
 	defer r.Body.Close()
 	w.WriteHeader(http.StatusNoContent)
 }
