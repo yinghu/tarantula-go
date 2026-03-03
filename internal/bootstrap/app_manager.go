@@ -68,7 +68,7 @@ func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
 	fctx := f.PresenceCtx()
-	if f.GroupName == "admin" {
+	if f.AuthLevel >= int(ADMIN_ACCESS_CONTROL) {
 		fctx = f.ClusterCtx()
 	}
 	au, err := s.LoadAuth(fctx)

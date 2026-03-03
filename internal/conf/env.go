@@ -51,6 +51,7 @@ type Env struct {
 	Bin           string        `json:"-"`
 	HomeDir       string        `json:"-"`
 	LogTruncated  bool          `json:"LogTruncated"`
+	AuthLevel     int           `json:"-"`
 }
 
 func (f *Env) ClusterCtx() string {
