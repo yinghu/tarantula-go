@@ -70,7 +70,6 @@ type DataRequest struct {
 }
 
 type ClusterService interface {
-	Sequence
 	HashRing(r RingRequest)
 	KeyRing(r RingRequest)
 	RingToken(key []byte) uint32
