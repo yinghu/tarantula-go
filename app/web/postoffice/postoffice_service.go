@@ -44,9 +44,9 @@ func (s *PostofficeService) Config() string {
 
 func (s *PostofficeService) Start(env conf.Env, p event.Pusher) error {
 	s.Bsl = s
-	env.AuthLevel = int(bootstrap.ADMIN_ACCESS_CONTROL)
+	env.AuthLevel = bootstrap.ADMIN_ACCESS_CONTROL
 	s.AppManager.Start(env, p)
-	
+
 	s.createSchema()
 	s.topics = make(map[int32]event.SubscriptionEvent)
 	s.loadTopics()

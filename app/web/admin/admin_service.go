@@ -24,7 +24,7 @@ func (s *AdminService) Config() string {
 }
 
 func (s *AdminService) Start(f conf.Env, p event.Pusher) error {
-	f.AuthLevel = int(bootstrap.ADMIN_ACCESS_CONTROL)
+	f.AuthLevel = bootstrap.ADMIN_ACCESS_CONTROL
 	s.AppManager.Start(f, p)
 	s.managedApps = f.ManagedApps
 	s.contentDir = f.Bin

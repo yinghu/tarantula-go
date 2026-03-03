@@ -35,7 +35,6 @@ type EventEndpoint struct {
 
 type Env struct {
 	Prefix        string        `json:"Prefix"`
-	Clustering    bool          `json:"Clustering"`
 	Standalone    bool          `json:"Standalone"`
 	GroupName     string        `json:"GroupName"`
 	NodeName      string        `json:"NodeName"`
@@ -51,11 +50,14 @@ type Env struct {
 	Bin           string        `json:"-"`
 	HomeDir       string        `json:"-"`
 	LogTruncated  bool          `json:"LogTruncated"`
-	AuthLevel     int           `json:"-"`
+	AuthLevel     int32         `json:"AuthLevel"`
 }
 
-func (f *Env) ClusterCtx() string {
-	return f.Prefix + "/" + f.GroupName
+func (f *Env) AuthCtx() string {
+	if f.AuthLevel >= 30 {
+		return f.Prefix + "/admin"
+	}
+	return f.Prefix + "/presence"
 }
 
 func (f *Env) PresenceCtx() string {
