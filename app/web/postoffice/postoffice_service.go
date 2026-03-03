@@ -62,7 +62,7 @@ func (s *PostofficeService) Start(env conf.Env, p event.Pusher) error {
 	s.topicQ = append(s.topicQ, tc)
 	go s.inboundEvent(tc)
 	m := clustering.MemberlistManager{StoreDir: env.LocalDir}
-	m.Seed = []string{"192.168.1.11", "192.168.1.6", "192.168.1.7"}
+	m.Seed = []string{"192.168.1.11", "192.168.1.6", "192.168.1.7", "postoffice"}
 	err := m.Start()
 	if err != nil {
 		core.AppLog.Printf("no cluster can join %s", err.Error())
