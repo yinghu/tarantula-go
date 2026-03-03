@@ -71,6 +71,10 @@ func illegalAccess(w http.ResponseWriter, r *http.Request) {
 	session := core.OnSession{Successful: false, Message: ILLEGAL_ACCESS_MSG, ErrorCode: ILLEGAL_ACCESS_CODE}
 	w.Write(util.ToJson(session))
 }
+func preflight(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	w.WriteHeader(http.StatusNoContent)
+}
 
 func metricsHandler(auth core.Authenticator, h http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -102,7 +106,10 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			metrics.HTTP_REQUEST_METRICS.WithLabelValues(r.URL.Path).Observe(dur.Seconds())
 
 		}()
-		core.AppLog.Debug().Msgf("REQUEST METHOD : %s", r.Method)
+		if r.Method == "OPTIONS" {
+			preflight(w, r)
+			return
+		}
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "*")
