@@ -23,9 +23,6 @@ type Sql struct {
 	DatabaseURL string `json:"DatabaseURL"`
 }
 
-type LocalStore struct {
-	InMemory bool `json:"InMemory"`
-}
 
 type EventEndpoint struct {
 	Enabled         bool   `json:"Enabled"`
@@ -46,7 +43,6 @@ type Env struct {
 	EtcdEndpoints []string      `json:"EtcdEndpoints"`
 	ManagedApps   []string      `json:"ManagedApps"`
 	Pgs           Sql           `json:"Sql"`
-	Bdg           LocalStore    `json:"LocalStore"`
 	Bin           string        `json:"-"`
 	HomeDir       string        `json:"-"`
 	LogTruncated  bool          `json:"LogTruncated"`

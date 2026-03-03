@@ -32,7 +32,7 @@ func AppBootstrap(tcx TarantulaContext) {
 		}()
 	}
 	go func() {
-		
+
 		err := tcx.Start(f, &e)
 		if err != nil {
 			core.AppLog.Printf("Error %s\n", err.Error())
@@ -102,6 +102,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			metrics.HTTP_REQUEST_METRICS.WithLabelValues(r.URL.Path).Observe(dur.Seconds())
 
 		}()
+		core.AppLog.Debug().Msgf("REQUEST METHOD : %s", r.Method)
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "*")
