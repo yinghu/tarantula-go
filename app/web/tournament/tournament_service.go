@@ -26,7 +26,6 @@ func (s *TournamentService) Config() string {
 
 func (s *TournamentService) Start(f conf.Env,  p event.Pusher) error {
 	s.ItemUpdater = s
-	s.Bsl = s
 	s.AppManager.Start(f, p)
 	s.createSchema()
 	s.tournaments = make(map[int64]Tournament)

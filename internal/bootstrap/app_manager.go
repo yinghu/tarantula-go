@@ -17,20 +17,16 @@ import (
 )
 
 type AppManager struct {
-	metr         core.MetricsService
-	imse         item.ItemService
-	auth         core.Authenticator
-	Bsl          BootstrapListener
-	Sql          persistence.Postgresql
-	F            conf.Env
-	ctx          string
-	prefix       string
-	standalone   bool
-	AppAuth      core.Authenticator
-	seq          core.Sequence
-	ItemUpdater  item.ItemListener
-	tcpPusher    event.Pusher
-	ManagedApps  []string
+	metr        core.MetricsService
+	imse        item.ItemService
+	auth        core.Authenticator
+	Sql         persistence.Postgresql
+	F           conf.Env
+	AppAuth     core.Authenticator
+	seq         core.Sequence
+	ItemUpdater item.ItemListener
+	tcpPusher   event.Pusher
+	ManagedApps []string
 }
 
 func (s *AppManager) ItemService() item.ItemService {
@@ -54,17 +50,15 @@ func (s *AppManager) Sequence() core.Sequence {
 func (s *AppManager) ItemListener() item.ItemListener {
 	return s.ItemUpdater
 }
-func (s *AppManager) BootstrapListener() BootstrapListener {
-	return s.Bsl
+
+func (s *AppManager) Name() string {
+	return s.F.GroupName
 }
 func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
 	s.ManagedApps = f.ManagedApps
 	s.tcpPusher = p
-	s.ctx = f.GroupName
-	s.prefix = f.Prefix
 	s.F = f
-	s.standalone = f.Standalone
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
 	fctx := f.AuthCtx()
@@ -105,7 +99,7 @@ func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 func (s *AppManager) Shutdown() {
 	util.GitPush()
 	s.Sql.Close()
-	lockPrefix := fmt.Sprintf("%s/node", s.prefix)
+	lockPrefix := fmt.Sprintf("%s/node", s.F.Prefix)
 	s.Atomic(lockPrefix, func(ctx core.Ctx) error {
 		v, err := ctx.Get(s.F.NodeName)
 		if err != nil {
@@ -176,7 +170,7 @@ func (s *AppManager) OnError(e event.Event, err error) {
 }
 
 func (s *AppManager) Context() string {
-	return s.ctx
+	return s.F.GroupName
 }
 
 func (s *AppManager) Service() TarantulaService {
@@ -232,7 +226,7 @@ func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
 
 func (c *AppManager) Atomic(prefix string, t core.Exec) error {
 	if prefix == "" {
-		prefix = c.ctx
+		prefix = c.F.GroupName
 		core.AppLog.Printf("Reset Lock prefix %s\n", prefix)
 	}
 	cli, err := clientv3.New(clientv3.Config{

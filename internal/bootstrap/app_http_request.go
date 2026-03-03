@@ -12,7 +12,7 @@ import (
 )
 
 func (s *AppManager) PostJsonAsync(url string, payload any, ch chan core.Chunk) {
-	if s.standalone {
+	if s.F.Standalone {
 		ch <- core.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: STANDALONE_APP, Message: STANDALONE_APP_MSG})}
 		return
 	}
@@ -72,7 +72,7 @@ func (s *AppManager) PostJsonAsync(url string, payload any, ch chan core.Chunk) 
 }
 
 func (s *AppManager) PostJsonSync(url string, payload any) core.OnSession {
-	if s.standalone {
+	if s.F.Standalone {
 		return core.OnSession{ErrorCode: STANDALONE_APP, Message: STANDALONE_APP_MSG}
 	}
 	tick, err := s.AppAuth.CreateToken(1, 1, core.SUDO_ACCESS_CONTROL)

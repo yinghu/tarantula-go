@@ -74,9 +74,6 @@ func illegalAccess(w http.ResponseWriter, r *http.Request) {
 func preflight(w http.ResponseWriter, r *http.Request) {
 	core.AppLog.Debug().Msg("checking options header here")
 	defer r.Body.Close()
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "*")
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -105,18 +102,18 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 		var code int32 = 0
 		defer func() {
 			dur := time.Since(start)
-			ms := core.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: "node", ReqId: stub, ReqCode: code}
+			ms := core.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.Name(), ReqId: stub, ReqCode: code}
 			s.Metrics().WebRequest(ms)
 			metrics.HTTP_REQUEST_METRICS.WithLabelValues(r.URL.Path).Observe(dur.Seconds())
 
 		}()
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "*")
 		if r.Method == "OPTIONS" {
 			preflight(w, r)
 			return
 		}
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "*")
 		if s.AccessControl() == core.PUBLIC_ACCESS_CONTROL {
 			s.Request(core.OnSession{}, w, r)
 			return

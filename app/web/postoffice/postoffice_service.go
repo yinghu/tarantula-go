@@ -43,7 +43,6 @@ func (s *PostofficeService) Config() string {
 }
 
 func (s *PostofficeService) Start(env conf.Env, p event.Pusher) error {
-	s.Bsl = s
 	env.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	s.AppManager.Start(env, p)
 

@@ -9,7 +9,6 @@ import (
 	"gameclustering.com/internal/item"
 )
 
-
 const (
 	STANDALONE_APP     int    = 200000
 	STANDALONE_APP_MSG string = "publish skipped"
@@ -46,19 +45,14 @@ type TarantulaService interface {
 	Authenticator() core.Authenticator
 	Sequence() core.Sequence
 	ItemListener() item.ItemListener
-	BootstrapListener() BootstrapListener
 	Pusher() event.Pusher
 }
 
 type TarantulaApp interface {
 	TarantulaService
 	AccessControl() int32
+	Name() string
 	Request(sesion core.OnSession, w http.ResponseWriter, r *http.Request)
-}
-
-type BootstrapListener interface {
-	NodeStarted(n core.Node)
-	NodeStopped(n core.Node)
 }
 
 type Login struct {
