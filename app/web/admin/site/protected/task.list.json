@@ -72,7 +72,7 @@
                 {"Name":"ParseSnowFlakeId","Form":"/admin/webprotected/parse.snow.flake.id.json","Path":"/admin/snowflake/parse","Type":5},
                 {"Name":"SyncRepo","Form":"/admin/webprotected/sync.repository.json","Path":"/admin/repo/sync","Type":5},
                 {"Name":"AddTopic","Form":"/admin/webprotected/admin.add.topic.json","Path":"/admin/topic/subscribe","Type":5},
-                {"Name":"CreateKey","Form":"/admin/webprotected/admin.create.access.key.json","Path":"/admin/accesskey","Type":5}
+                {"Name":"CreateAccessKey","Form":"/admin/webprotected/admin.create.access.key.json","Path":"/admin/accesskey","Type":12}
             ]        
         },
         {
