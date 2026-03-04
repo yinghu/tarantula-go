@@ -10,7 +10,7 @@
         {
             "Name":"Component","ScopeSequence":2,"Icon":"component_exchange",
             "Jobs":[
-                {"Name":"Edit","Callback":"edit_category"}           
+                {"Name":"Edit","Callback":"edit_category"},        
                 {"Name":"New Enum","Callback":"create_new_enum","Type":5},{"Name":"New Category","Callback":"create_new_category","Type":4},
                 {"Name":"Edit","Callback":"edit_category","Type":3}           
             ]    
