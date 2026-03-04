@@ -75,6 +75,7 @@ func (s *AdminService) Start(f conf.Env, p event.Pusher) error {
 	http.Handle("/admin/password", bootstrap.Logging(&AdminChangePwd{AdminService: s}))
 	http.Handle("/admin/accesskey", bootstrap.Logging(&AdminCreateAccessKey{AdminService: s}))
 	http.Handle("/admin/login", bootstrap.Logging(&AdminLogin{AdminService: s}))
+	
 	fmt.Printf("Admin service started %s\n", f.HttpBinding)
 	return nil
 }

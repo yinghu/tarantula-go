@@ -1,0 +1,38 @@
+name: tarantula-sql
+services:
+  etcd0:
+    image: tarantula.etcd:v1.0
+    container_name: etcd0
+    hostname: etcd0
+    restart: unless-stopped
+    ports:
+      - "2380:2380"
+      - "2379:2379"
+    networks:
+      - tarantula-net      
+    volumes:
+      - volume_etcd0:/var/tarantula/etcd/data
+
+  sql_db:
+    image: postgres:16.2-alpine
+    container_name: postgresql
+    hostname: postgresql
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: tarantula
+    ports:
+      - "5432:5432"
+    networks:
+      - tarantula-net      
+    volumes:
+      - volume_postgres:/var/lib/postgresql/data
+
+networks:
+  tarantula-net:
+    external: true
+
+volumes:
+  volume_postgres:
+  volume_etcd0:
