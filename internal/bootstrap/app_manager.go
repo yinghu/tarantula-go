@@ -2,7 +2,6 @@ package bootstrap
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -99,21 +98,6 @@ func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 func (s *AppManager) Shutdown() {
 	util.GitPush()
 	s.Sql.Close()
-	lockPrefix := fmt.Sprintf("%s/node", s.F.Prefix)
-	s.Atomic(lockPrefix, func(ctx core.Ctx) error {
-		v, err := ctx.Get(s.F.NodeName)
-		if err != nil {
-			return err
-		}
-		c := conf.Config{}
-		err = json.Unmarshal([]byte(v), &c)
-		if err != nil {
-			return err
-		}
-		c.Used = false
-		ctx.Put(s.F.NodeName, string(util.ToJson(c)))
-		return nil
-	})
 	core.AppLog.Println("app manager shutting down ...")
 }
 

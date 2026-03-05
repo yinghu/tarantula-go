@@ -10,6 +10,10 @@
   build.bat|build.sh [version]
 
 # Setup etcd and postgresql before run docker compose 
-  
+
+to access 
+docker exec -it postgresql psql -U postgres 
+
+
 
 windows stop 80 : NET stop HTTP 

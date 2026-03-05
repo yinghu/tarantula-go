@@ -27,10 +27,10 @@ func (s *AdminService) Start(f conf.Env, p event.Pusher) error {
 	f.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	s.AppManager.Start(f, p)
 	s.managedApps = f.ManagedApps
-	s.contentDir = f.Bin
-	s.assetDir = f.LocalDir + "/asset"
+	s.contentDir = fmt.Sprintf("%s/%s",f.HomeDir,"bin")
+	s.assetDir = fmt.Sprintf("%s/%s/%s",f.HomeDir,f.GroupName,"asset")
 	os.MkdirAll(s.assetDir, 0755)
-	s.publishDir = f.Bin + "/tarantula"
+	s.publishDir = s.contentDir + "/tarantula"
 	err := s.createSchema()
 	if err != nil {
 		return err

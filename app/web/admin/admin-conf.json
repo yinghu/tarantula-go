@@ -1,18 +1,13 @@
 {
-	"Clustering" : true,
 	"LogTruncated":true,
     "GroupName" :"admin",
-	"NodeName" :   "a01",
+	"NodeName" :   "admin.1",
 	"NodeId"     :   1,
 	"HttpBinding":  ":8080",
 	"HttpEndpoint":  "192.168.1.3",
 	"EtcdEndpoints": ["192.168.1.7:2379"],
-	"LocalDir":"",
 	"Sql":{
-		"DatabaseURL"  : "postgres://postgres:password@192.168.1.7:5432"	
-	},
-	"LocalStore":{
-		"InMemory":false
+		"DatabaseURL"  : "postgres://postgres:password@postgresql:5432"	
 	},
 	"EventEndpoint":{
 		"Enabled":false,

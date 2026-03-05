@@ -1,4 +1,4 @@
-name: tarantula-sql
+name: tarantula-service
 services:
   etcd0:
     image: tarantula.etcd:v1.0
