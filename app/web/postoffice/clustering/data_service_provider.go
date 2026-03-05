@@ -16,7 +16,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-
 type DataServiceProvider struct {
 	protocol.UnimplementedDataServiceServer
 	Local  *persistence.BadgerLocal
@@ -73,15 +72,26 @@ func (c *DataServiceProvider) Delete(ctx context.Context, in *protocol.Data) (*p
 }
 
 func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.DataBatch]) error {
+
 	//stream.Send()
 	return nil
 }
 
+func (c *DataServiceProvider) HashRing(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.HashNode]) error {
+	rq := make(chan []core.Node, 1)
+	defer close(rq)
+	c.Mll.rangeRing(core.RingRequest{Async: rq, Opt: ALL_RING_OPT})
+	ring := <-rq
+	for _, n := range ring {
+		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name}
+		if err := stream.Send(&hn); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (c *DataServiceProvider) Start(dir string) {
-	//homeDir, err := os.UserHomeDir()
-	//if err != nil {
-	//panic(err)
-	//}
 	path := fmt.Sprintf("%s/%s", dir, "store")
 	core.AppLog.Printf("creating path %s if not existed", path)
 	err := os.MkdirAll(path, 0755)

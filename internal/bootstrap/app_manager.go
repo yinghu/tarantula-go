@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"context"
 	"fmt"
+	"io"
 	"time"
 
 	"gameclustering.com/internal/conf"
@@ -10,9 +11,12 @@ import (
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/concurrency"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type AppManager struct {
@@ -48,6 +52,10 @@ func (s *AppManager) Sequence() core.Sequence {
 }
 func (s *AppManager) ItemListener() item.ItemListener {
 	return s.ItemUpdater
+}
+
+func (c *AppManager) Cluster() core.ClusterService {
+	return c
 }
 
 func (s *AppManager) Name() string {
@@ -166,8 +174,6 @@ func (s *AppManager) Service() TarantulaService {
 	return s
 }
 
-
-
 func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
 	tkn := util.JwtHMac{Alg: core.JWT_ALG, Ksz: core.JWT_KEY_SIZE}
 	ci := util.Aes{Ksz: core.CIPHER_KEY_SIZE}
@@ -235,3 +241,35 @@ func (c *AppManager) Atomic(prefix string, t core.Exec) error {
 	defer mutex.Unlock(ctx)
 	return t(&core.EtcdClient{Cli: cli, Prefix: prefix})
 }
+
+func (c *AppManager) HashRing(r core.RingRequest) {
+	tcp, err := grpc.NewClient(fmt.Sprintf("postoffice:%d", core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return
+	}
+	defer tcp.Close()
+	dsp := protocol.NewDataServiceClient(tcp)
+	stream, err := dsp.HashRing(context.Background(), &protocol.Request{})
+	if err != nil {
+		return
+	}
+	ring := make([]core.Node, 0)
+	for {
+		data, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
+			break
+		}
+		core.AppLog.Debug().Msgf("Rev : %v", data)
+		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint})
+	}
+	r.Async <- ring
+}
+func (c *AppManager) KeyRing(r core.RingRequest) {}
+func (c *AppManager) RingToken(key []byte) uint32 {
+	return 1
+}
+func (c *AppManager) Request(r core.DataRequest) {}

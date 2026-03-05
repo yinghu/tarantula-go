@@ -46,6 +46,7 @@ type TarantulaService interface {
 	Sequence() core.Sequence
 	ItemListener() item.ItemListener
 	Pusher() event.Pusher
+	Cluster() core.ClusterService
 }
 
 type TarantulaApp interface {
