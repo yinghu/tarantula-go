@@ -73,7 +73,7 @@ func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 	}
 	s.AppAuth = ap
 	dbCreate := persistence.Postgresql{Url: f.Pgs.DatabaseURL + "/postgres"}
-	err = dbCreate.CreateDatabase(fmt.Sprintf("CREATE IF NOT EXISTS %s_%s_%s", f.Prefix, "tarantula", f.GroupName))
+	err = dbCreate.CreateDatabase(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s_%s_%s", f.Prefix, "tarantula", f.GroupName))
 	if err != nil {
 		core.AppLog.Warn().Msgf("failed to create database %s", err.Error())
 		return err
