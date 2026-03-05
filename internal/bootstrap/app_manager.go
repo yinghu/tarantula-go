@@ -76,7 +76,6 @@ func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 	err = dbCreate.CreateDatabase(fmt.Sprintf("CREATE DATABASE %s_%s_%s", f.Prefix, "tarantula", f.GroupName))
 	if err != nil {
 		core.AppLog.Warn().Msgf("failed to create database %s", err.Error())
-		return err
 	}
 	sql := persistence.Postgresql{Url: f.Pgs.DatabaseURL + "/" + f.Prefix + "_tarantula_" + f.GroupName}
 	err = sql.Create()
