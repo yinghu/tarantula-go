@@ -166,9 +166,7 @@ func (s *AppManager) Service() TarantulaService {
 	return s
 }
 
-func (s *AppManager) NodeStarted(n core.Node) {
-	core.AppLog.Printf("Node started %s\n", n.Name)
-}
+
 
 func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
 	tkn := util.JwtHMac{Alg: core.JWT_ALG, Ksz: core.JWT_KEY_SIZE}

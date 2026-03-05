@@ -49,7 +49,7 @@ type MemberListListener struct {
 
 func (m *MemberListListener) toNode(e *memberlist.Node) core.Node {
 	parts := strings.Split(e.Address(), ":")
-	return core.Node{Name: e.Name, Meta: string(e.Meta), IP: e.Address(), RpcEndpoint: fmt.Sprintf("%s:%d", parts[0], RPC_PORT), State: int(e.State)}
+	return core.Node{Name: e.Name, Meta: string(e.Meta), IP: e.Address(), RpcEndpoint: fmt.Sprintf("%s:%d", parts[0], core.RPC_PORT), State: int(e.State)}
 }
 
 // event dispatch from event delegate

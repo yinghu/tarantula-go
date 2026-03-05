@@ -1,7 +1,8 @@
 package core
 
 const (
-	
+	RPC_PORT int = 7001
+
 	GET_DATA_REQUEST    int = 0
 	CREATE_DATA_REQUEST int = 1
 	UPDATE_DATA_REQUEST int = 2
@@ -30,15 +31,11 @@ type Ctx interface {
 
 type Exec func(ctx Ctx) error
 
-
-
 type Opt struct {
 	IsCreate bool   `json:"IsCreate"`
 	IsModify bool   `json:"IsModify"`
 	Type     string `json:"Type"`
 }
-
-
 
 type RingSync struct {
 	Remote string   `json:"remote"`

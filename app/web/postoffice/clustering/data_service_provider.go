@@ -16,9 +16,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	RPC_PORT int = 7001
-)
 
 type DataServiceProvider struct {
 	protocol.UnimplementedDataServiceServer
@@ -102,7 +99,7 @@ func (c *DataServiceProvider) Start(dir string) {
 		go c.runSetData(n)
 	}
 
-	tcp, err := net.Listen("tcp", fmt.Sprintf(":%d", RPC_PORT))
+	tcp, err := net.Listen("tcp", fmt.Sprintf(":%d", core.RPC_PORT))
 	if err != nil {
 		panic(err)
 	}
