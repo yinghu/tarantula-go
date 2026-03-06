@@ -9,7 +9,7 @@ services:
       - "2380:2380"
       - "2379:2379"
     networks:
-      - tarantula-net      
+      - tarantula-service-net      
     volumes:
       - volume_etcd0:/var/tarantula/etcd/data
 
@@ -25,12 +25,12 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - tarantula-net      
+      - tarantula-service-net      
     volumes:
       - volume_postgres:/var/lib/postgresql/data
 
 networks:
-  tarantula-net:
+  tarantula-service-net:
     external: true
 
 volumes:
