@@ -8,7 +8,8 @@ services:
     image: tarantula.postoffice:${VERSION}
     volumes:
       - volume_postoffice:/home/tarantula/postoffice
-    net_mode: "host"
+    networks:
+      - tarantula-net
     env_file:
       - .env  
   presence:
