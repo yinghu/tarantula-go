@@ -242,9 +242,9 @@ func (c *AppManager) Atomic(prefix string, t core.Exec) error {
 	return t(&core.EtcdClient{Cli: cli, Prefix: prefix})
 }
 
-//ClusterService api
+// ClusterService api
 func (c *AppManager) HashRing(r core.RingRequest) {
-	tcp, err := grpc.NewClient(fmt.Sprintf("postoffice:%d", core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	tcp, err := grpc.NewClient(fmt.Sprintf("10.20.0.1:%d", core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return
 	}
@@ -271,7 +271,7 @@ func (c *AppManager) HashRing(r core.RingRequest) {
 }
 
 func (c *AppManager) KeyRing(r core.RingRequest) {
-	tcp, err := grpc.NewClient(fmt.Sprintf("postoffice:%d", core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	tcp, err := grpc.NewClient(fmt.Sprintf("10.20.0.1:%d", core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return
 	}
@@ -301,4 +301,6 @@ func (c *AppManager) RingToken(key []byte) uint32 {
 	return util.Hash(key)
 }
 
-func (c *AppManager) Request(r core.DataRequest) {}
+func (c *AppManager) Request(r core.DataRequest) {
+
+}
