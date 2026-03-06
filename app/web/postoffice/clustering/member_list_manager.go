@@ -4,9 +4,7 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/util"
 	"github.com/hashicorp/memberlist"
-	"github.com/spaolacci/murmur3"
 )
 
 const (
@@ -19,9 +17,9 @@ const (
 type MemberlistManager struct {
 	Seed []string
 	MemberListListener
-	snowflake util.Snowflake
-	StoreDir  string
-	Binding   string
+
+	StoreDir string
+	Binding  string
 }
 
 func (m *MemberlistManager) Start() error {
@@ -53,9 +51,6 @@ func (m *MemberlistManager) Start() error {
 		return err
 	}
 	m.Memberlist = list
-	nodeId := murmur3.Sum64(m.LocalNode().Addr)
-	core.AppLog.Printf("node id %d %d", nodeId, int64(nodeId)%1024)
-	m.snowflake = util.NewSnowflake(int64(nodeId)%1024, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	go m.Listen()
 	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode, RSync: rwSync}
 	m.Mll = m.MemberListListener
@@ -68,13 +63,6 @@ func (m *MemberlistManager) Start() error {
 	}
 	core.AppLog.Printf("total nodes have joined %d", joined)
 	return nil
-}
-
-func (m *MemberlistManager) Id() (int64, error) {
-	return m.snowflake.Id()
-}
-func (m *MemberlistManager) Parse(snowflakeId int64) (int64, int64, int64) {
-	return m.snowflake.Parse(snowflakeId)
 }
 
 func (m *MemberlistManager) ShutdownHook() {
