@@ -107,7 +107,7 @@ func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 		return err
 	}
 	s.imse = &is
-	tcp, err := grpc.NewClient(fmt.Sprintf("postoffice:%d", core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	tcp, err := grpc.NewClient(fmt.Sprintf("%s:%d", f.Host, core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		core.AppLog.Warn().Msgf("grpc connect failed %s", err.Error())
 		return err
@@ -253,11 +253,7 @@ func (c *AppManager) Atomic(prefix string, t core.Exec) error {
 
 // ClusterService api
 func (c *AppManager) HashRing(r core.RingRequest) {
-	//tcp, err := grpc.NewClient(fmt.Sprintf("postoffice:%d", core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
-	//if err != nil {
-		//return
-	//}
-	//defer tcp.Close()
+
 	dsp := protocol.NewDataServiceClient(c.rpc)
 	stream, err := dsp.HashRing(context.Background(), &protocol.Request{Prefix: 0})
 	if err != nil {
@@ -280,11 +276,7 @@ func (c *AppManager) HashRing(r core.RingRequest) {
 }
 
 func (c *AppManager) KeyRing(r core.RingRequest) {
-	//tcp, err := grpc.NewClient(fmt.Sprintf("postoffice:%d", core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
-	//if err != nil {
-		//return
-	//}
-	//defer tcp.Close()
+
 	dsp := protocol.NewDataServiceClient(c.rpc)
 	stream, err := dsp.KeyRing(context.Background(), &protocol.Request{Prefix: r.Token})
 	if err != nil {

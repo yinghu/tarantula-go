@@ -6,10 +6,9 @@ services:
     container_name: postoffice
     hostname: postoffice
     image: tarantula.postoffice:${VERSION}
+    network_mode: "host"
     volumes:
       - volume_postoffice:/home/tarantula/postoffice
-    networks:
-      - tarantula-app-net
     env_file:
       - .env  
   presence:

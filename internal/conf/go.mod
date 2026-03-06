@@ -6,10 +6,7 @@ replace gameclustering.com/internal/core => ../core
 
 replace gameclustering.com/internal/util => ../util
 
-require (
-	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
-	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
-)
+require gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
 
 require (
 	github.com/0xc0d/encoding v0.1.0 // indirect
@@ -26,7 +23,6 @@ require (
 	go.etcd.io/etcd/client/v3 v3.6.5 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
 	golang.org/x/text v0.24.0 // indirect

@@ -27,6 +27,7 @@ type Env struct {
 	GroupName     string        `json:"GroupName"`
 	NodeName      string        `json:"NodeName"`
 	NodeId        int64         `json:"NodeId"`
+	Host          string        `json:"Host"`
 	HttpBinding   string        `json:"HttpBinding"`
 	HttpEndpoint  string        `json:"HttpEndpoint"`
 	Evp           EventEndpoint `json:"EventEndpoint"`
@@ -76,6 +77,7 @@ func (f *Env) Load(fn string) error {
 
 	c, exists := os.LookupEnv("HOST")
 	if exists {
+		f.Host = c
 		f.HttpEndpoint = c
 		parts := strings.Split(f.Evp.TcpEndpoint, ":")
 		f.Evp.TcpEndpoint = parts[0] + "://" + c + ":" + parts[2]
