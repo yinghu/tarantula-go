@@ -8,6 +8,9 @@ const (
 	UPDATE_DATA_REQUEST int = 2
 	DELETE_DATA_REQUEST int = 3
 	RESET_DATA_REQUEST  int = 4
+
+	REPLICA_RING_OPT int = 0
+	ALL_RING_OPT     int = 3
 )
 
 type Node struct {

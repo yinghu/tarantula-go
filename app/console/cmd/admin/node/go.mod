@@ -15,6 +15,8 @@ replace gameclustering.com/internal/conf => ../../../../../internal/conf
 
 replace gameclustering.com/internal/util => ../../../../../internal/util
 
+replace gameclustering.com/internal/protocol => ../../../../../internal/protocol
+
 require (
 	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/coreos/go-semver v0.3.1 // indirect
@@ -26,6 +28,7 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/rs/zerolog v1.34.0 // indirect
+	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
 	go.etcd.io/etcd/api/v3 v3.6.5 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.6.5 // indirect

@@ -26,6 +26,7 @@ const (
 	DataService_Update_FullMethodName   = "/protocol.DataService/update"
 	DataService_Delete_FullMethodName   = "/protocol.DataService/delete"
 	DataService_HashRing_FullMethodName = "/protocol.DataService/hashRing"
+	DataService_KeyRing_FullMethodName  = "/protocol.DataService/keyRing"
 )
 
 // DataServiceClient is the client API for DataService service.
@@ -40,6 +41,7 @@ type DataServiceClient interface {
 	Delete(ctx context.Context, in *Data, opts ...grpc.CallOption) (*Response, error)
 	// cluster service API hook
 	HashRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error)
+	KeyRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error)
 }
 
 type dataServiceClient struct {
@@ -138,6 +140,25 @@ func (c *dataServiceClient) HashRing(ctx context.Context, in *Request, opts ...g
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type DataService_HashRingClient = grpc.ServerStreamingClient[HashNode]
 
+func (c *dataServiceClient) KeyRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &DataService_ServiceDesc.Streams[2], DataService_KeyRing_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[Request, HashNode]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type DataService_KeyRingClient = grpc.ServerStreamingClient[HashNode]
+
 // DataServiceServer is the server API for DataService service.
 // All implementations must embed UnimplementedDataServiceServer
 // for forward compatibility.
@@ -150,6 +171,7 @@ type DataServiceServer interface {
 	Delete(context.Context, *Data) (*Response, error)
 	// cluster service API hook
 	HashRing(*Request, grpc.ServerStreamingServer[HashNode]) error
+	KeyRing(*Request, grpc.ServerStreamingServer[HashNode]) error
 	mustEmbedUnimplementedDataServiceServer()
 }
 
@@ -180,6 +202,9 @@ func (UnimplementedDataServiceServer) Delete(context.Context, *Data) (*Response,
 }
 func (UnimplementedDataServiceServer) HashRing(*Request, grpc.ServerStreamingServer[HashNode]) error {
 	return status.Error(codes.Unimplemented, "method HashRing not implemented")
+}
+func (UnimplementedDataServiceServer) KeyRing(*Request, grpc.ServerStreamingServer[HashNode]) error {
+	return status.Error(codes.Unimplemented, "method KeyRing not implemented")
 }
 func (UnimplementedDataServiceServer) mustEmbedUnimplementedDataServiceServer() {}
 func (UnimplementedDataServiceServer) testEmbeddedByValue()                     {}
@@ -314,6 +339,17 @@ func _DataService_HashRing_Handler(srv interface{}, stream grpc.ServerStream) er
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type DataService_HashRingServer = grpc.ServerStreamingServer[HashNode]
 
+func _DataService_KeyRing_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Request)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(DataServiceServer).KeyRing(m, &grpc.GenericServerStream[Request, HashNode]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type DataService_KeyRingServer = grpc.ServerStreamingServer[HashNode]
+
 // DataService_ServiceDesc is the grpc.ServiceDesc for DataService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -351,6 +387,11 @@ var DataService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "hashRing",
 			Handler:       _DataService_HashRing_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "keyRing",
+			Handler:       _DataService_KeyRing_Handler,
 			ServerStreams: true,
 		},
 	},

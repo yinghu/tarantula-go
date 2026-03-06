@@ -11,10 +11,7 @@ import (
 )
 
 const (
-	REPLICA_RING_OPT int = 0
-
-	ALL_RING_OPT int = 3
-
+	
 	ADD_NODE_OPT    = 5
 	REMOVE_NODE_OPT = 6
 	UPDATE_NODE_OPT = 7
@@ -78,10 +75,10 @@ func (m *MemberListListener) Listen() {
 			m.OnConflict(mc)
 		case mr := <-m.MRequest:
 			switch mr.Opt {
-			case REPLICA_RING_OPT:
+			case core.REPLICA_RING_OPT:
 				nodes := m.keyRing(mr.Token, mr.Replicas)
 				mr.Async <- nodes
-			case ALL_RING_OPT:
+			case core.ALL_RING_OPT:
 				nodes := make([]core.Node, 0)
 				for _, n := range m.nodes {
 					nodes = append(nodes, n)

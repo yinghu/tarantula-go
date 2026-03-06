@@ -6,6 +6,7 @@ replace gameclustering.com/internal/core => ../core
 
 require (
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
+	github.com/spaolacci/murmur3 v1.1.0
 	golang.org/x/crypto v0.37.0
 )
 

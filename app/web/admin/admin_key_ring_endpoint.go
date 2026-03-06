@@ -7,19 +7,19 @@ import (
 	"gameclustering.com/internal/core"
 )
 
-type AdminHashRingEndpoint struct {
+type AdminKeyRingEndpoint struct {
 	*AdminService
 }
 
-func (s *AdminHashRingEndpoint) AccessControl() int32 {
+func (s *AdminKeyRingEndpoint) AccessControl() int32 {
 	return core.ADMIN_ACCESS_CONTROL
 }
 
-func (s *AdminHashRingEndpoint) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
+func (s *AdminKeyRingEndpoint) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
-	s.Cluster().HashRing(core.RingRequest{Async: rq, Opt: core.ALL_RING_OPT})
+	s.Cluster().HashRing(core.RingRequest{Async: rq, Opt: core.REPLICA_RING_OPT,Token: 1})
 	n := <-rq
 	data, err := json.Marshal(n)
 	if err != nil {

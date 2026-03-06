@@ -242,6 +242,7 @@ func (c *AppManager) Atomic(prefix string, t core.Exec) error {
 	return t(&core.EtcdClient{Cli: cli, Prefix: prefix})
 }
 
+//ClusterService api
 func (c *AppManager) HashRing(r core.RingRequest) {
 	tcp, err := grpc.NewClient(fmt.Sprintf("postoffice:%d", core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -249,7 +250,7 @@ func (c *AppManager) HashRing(r core.RingRequest) {
 	}
 	defer tcp.Close()
 	dsp := protocol.NewDataServiceClient(tcp)
-	stream, err := dsp.HashRing(context.Background(), &protocol.Request{})
+	stream, err := dsp.HashRing(context.Background(), &protocol.Request{Prefix: 0})
 	if err != nil {
 		return
 	}
@@ -268,8 +269,36 @@ func (c *AppManager) HashRing(r core.RingRequest) {
 	}
 	r.Async <- ring
 }
-func (c *AppManager) KeyRing(r core.RingRequest) {}
-func (c *AppManager) RingToken(key []byte) uint32 {
-	return 1
+
+func (c *AppManager) KeyRing(r core.RingRequest) {
+	tcp, err := grpc.NewClient(fmt.Sprintf("postoffice:%d", core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return
+	}
+	defer tcp.Close()
+	dsp := protocol.NewDataServiceClient(tcp)
+	stream, err := dsp.KeyRing(context.Background(), &protocol.Request{Prefix: r.Token})
+	if err != nil {
+		return
+	}
+	ring := make([]core.Node, 0)
+	for {
+		data, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
+			break
+		}
+		core.AppLog.Debug().Msgf("Rev : %v", data)
+		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint})
+	}
+	r.Async <- ring
 }
+
+func (c *AppManager) RingToken(key []byte) uint32 {
+	return util.Hash(key)
+}
+
 func (c *AppManager) Request(r core.DataRequest) {}

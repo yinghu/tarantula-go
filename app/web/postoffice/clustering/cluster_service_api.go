@@ -167,11 +167,11 @@ func (m *MemberListListener) set(set core.DataRequest) {
 
 func (m *MemberListListener) KeyRing(r core.RingRequest) {
 	r.Replicas = REPLICA_MAX
-	r.Opt = REPLICA_RING_OPT
+	r.Opt = core.REPLICA_RING_OPT
 	m.MRequest <- r
 }
 
 func (m *MemberListListener) HashRing(r core.RingRequest) {
-	r.Opt = ALL_RING_OPT
+	r.Opt = core.ALL_RING_OPT
 	m.MRequest <- r
 }

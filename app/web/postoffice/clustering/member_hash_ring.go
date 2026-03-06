@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"gameclustering.com/internal/core"
-	"github.com/spaolacci/murmur3"
+	"gameclustering.com/internal/util"
 )
 
 func cmp(n1, n2 core.Node) int {
@@ -87,7 +87,7 @@ func (m *MemberHashRing) OnConflict(nodes []core.Node) {
 
 // hash ring operations
 func (m *MemberHashRing) RingToken(key []byte) uint32 {
-	return murmur3.Sum32(key)
+	return util.Hash(key)
 }
 
 func (m *MemberHashRing) rangeNodeAdded(t uint32) []core.Node {

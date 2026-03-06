@@ -25,7 +25,7 @@ var File_data_service_proto protoreflect.FileDescriptor
 const file_data_service_proto_rawDesc = "" +
 	"\n" +
 	"\x12data_service.proto\x12\bprotocol\x1a\n" +
-	"data.proto\x1a\rrequest.proto\x1a\x0eresponse.proto\x1a\x10data_batch.proto\x1a\x0fhash_node.proto2\xe1\x02\n" +
+	"data.proto\x1a\rrequest.proto\x1a\x0eresponse.proto\x1a\x10data_batch.proto\x1a\x0fhash_node.proto2\x97\x03\n" +
 	"\vDataService\x12*\n" +
 	"\x03get\x12\x11.protocol.Request\x1a\x0e.protocol.Data\"\x00\x12+\n" +
 	"\x03set\x12\x0e.protocol.Data\x1a\x12.protocol.Response\"\x00\x122\n" +
@@ -33,7 +33,8 @@ const file_data_service_proto_rawDesc = "" +
 	"\x06create\x12\x0e.protocol.Data\x1a\x12.protocol.Response\"\x00\x12.\n" +
 	"\x06update\x12\x0e.protocol.Data\x1a\x12.protocol.Response\"\x00\x12.\n" +
 	"\x06delete\x12\x0e.protocol.Data\x1a\x12.protocol.Response\"\x00\x125\n" +
-	"\bhashRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01BS\n" +
+	"\bhashRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01\x124\n" +
+	"\akeyRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01BS\n" +
 	"\x17com.icodesoftware.protoB\x12DataServiceFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var file_data_service_proto_goTypes = []any{
@@ -51,15 +52,17 @@ var file_data_service_proto_depIdxs = []int32{
 	1, // 4: protocol.DataService.update:input_type -> protocol.Data
 	1, // 5: protocol.DataService.delete:input_type -> protocol.Data
 	0, // 6: protocol.DataService.hashRing:input_type -> protocol.Request
-	1, // 7: protocol.DataService.get:output_type -> protocol.Data
-	2, // 8: protocol.DataService.set:output_type -> protocol.Response
-	3, // 9: protocol.DataService.pull:output_type -> protocol.DataBatch
-	2, // 10: protocol.DataService.create:output_type -> protocol.Response
-	2, // 11: protocol.DataService.update:output_type -> protocol.Response
-	2, // 12: protocol.DataService.delete:output_type -> protocol.Response
-	4, // 13: protocol.DataService.hashRing:output_type -> protocol.HashNode
-	7, // [7:14] is the sub-list for method output_type
-	0, // [0:7] is the sub-list for method input_type
+	0, // 7: protocol.DataService.keyRing:input_type -> protocol.Request
+	1, // 8: protocol.DataService.get:output_type -> protocol.Data
+	2, // 9: protocol.DataService.set:output_type -> protocol.Response
+	3, // 10: protocol.DataService.pull:output_type -> protocol.DataBatch
+	2, // 11: protocol.DataService.create:output_type -> protocol.Response
+	2, // 12: protocol.DataService.update:output_type -> protocol.Response
+	2, // 13: protocol.DataService.delete:output_type -> protocol.Response
+	4, // 14: protocol.DataService.hashRing:output_type -> protocol.HashNode
+	4, // 15: protocol.DataService.keyRing:output_type -> protocol.HashNode
+	8, // [8:16] is the sub-list for method output_type
+	0, // [0:8] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
