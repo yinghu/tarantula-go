@@ -77,6 +77,7 @@ func (s *AdminService) Start(f conf.Env, p event.Pusher) error {
 	http.Handle("/admin/login", bootstrap.Logging(&AdminLogin{AdminService: s}))
 
 	http.Handle("/admin/presence/hashring", bootstrap.Logging(&AdminHashRingEndpoint{AdminService: s}))
+	http.Handle("/admin/presence/keyring/{key}", bootstrap.Logging(&AdminKeyRingEndpoint{AdminService: s}))
 
 	fmt.Printf("Admin service started %s\n", f.HttpBinding)
 	return nil
