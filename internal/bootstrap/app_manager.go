@@ -30,6 +30,7 @@ type AppManager struct {
 	ItemUpdater item.ItemListener
 	tcpPusher   event.Pusher
 	ManagedApps []string
+	rpc         *grpc.ClientConn
 }
 
 func (s *AppManager) ItemService() item.ItemService {
@@ -93,6 +94,7 @@ func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 	s.Sql = sql
 	ms := persistence.MetricsDB{Sql: &sql}
 	err = ms.Start()
+
 	if err != nil {
 		return err
 	}
@@ -105,10 +107,17 @@ func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 		return err
 	}
 	s.imse = &is
+	tcp, err := grpc.NewClient(fmt.Sprintf("postoffice:%d", core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		core.AppLog.Warn().Msgf("grpc connect failed %s", err.Error())
+		return err
+	}
+	s.rpc = tcp
 	return nil
 }
 
 func (s *AppManager) Shutdown() {
+	s.rpc.Close()
 	util.GitPush()
 	s.Sql.Close()
 	core.AppLog.Println("app manager shutting down ...")
@@ -242,14 +251,14 @@ func (c *AppManager) Atomic(prefix string, t core.Exec) error {
 	return t(&core.EtcdClient{Cli: cli, Prefix: prefix})
 }
 
-//ClusterService api
+// ClusterService api
 func (c *AppManager) HashRing(r core.RingRequest) {
-	tcp, err := grpc.NewClient(fmt.Sprintf("postoffice:%d", core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return
-	}
-	defer tcp.Close()
-	dsp := protocol.NewDataServiceClient(tcp)
+	//tcp, err := grpc.NewClient(fmt.Sprintf("postoffice:%d", core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	//if err != nil {
+		//return
+	//}
+	//defer tcp.Close()
+	dsp := protocol.NewDataServiceClient(c.rpc)
 	stream, err := dsp.HashRing(context.Background(), &protocol.Request{Prefix: 0})
 	if err != nil {
 		return
@@ -271,12 +280,12 @@ func (c *AppManager) HashRing(r core.RingRequest) {
 }
 
 func (c *AppManager) KeyRing(r core.RingRequest) {
-	tcp, err := grpc.NewClient(fmt.Sprintf("postoffice:%d", core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return
-	}
-	defer tcp.Close()
-	dsp := protocol.NewDataServiceClient(tcp)
+	//tcp, err := grpc.NewClient(fmt.Sprintf("postoffice:%d", core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	//if err != nil {
+		//return
+	//}
+	//defer tcp.Close()
+	dsp := protocol.NewDataServiceClient(c.rpc)
 	stream, err := dsp.KeyRing(context.Background(), &protocol.Request{Prefix: r.Token})
 	if err != nil {
 		return
@@ -302,5 +311,5 @@ func (c *AppManager) RingToken(key []byte) uint32 {
 }
 
 func (c *AppManager) Request(r core.DataRequest) {
-	
+
 }
