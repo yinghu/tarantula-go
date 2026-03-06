@@ -20,7 +20,7 @@ func (s *AdminKeyRingEndpoint) Request(rs core.OnSession, w http.ResponseWriter,
 	key := r.PathValue("key")
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
-	s.Cluster().HashRing(core.RingRequest{Async: rq, Opt: core.REPLICA_RING_OPT, Token: s.Cluster().RingToken([]byte(key))})
+	s.Cluster().KeyRing(core.RingRequest{Async: rq, Opt: core.REPLICA_RING_OPT, Token: s.Cluster().RingToken([]byte(key))})
 	n := <-rq
 	data, err := json.Marshal(n)
 	if err != nil {
