@@ -1,4 +1,4 @@
-name: tarantula
+name: tarantula-app
 services:
   postoffice:
     stop_grace_period: 20s
@@ -9,7 +9,7 @@ services:
     volumes:
       - volume_postoffice:/home/tarantula/postoffice
     networks:
-      - tarantula-net
+      - tarantula-app-net
     env_file:
       - .env  
   presence:
@@ -23,7 +23,7 @@ services:
     depends_on:
       - postoffice     
     networks:
-      - tarantula-net
+      - tarantula-app-net
     env_file:
       - .env 
   asset:
@@ -37,7 +37,7 @@ services:
     depends_on:
       - postoffice  
     networks:
-      - tarantula-net
+      - tarantula-app-net
     env_file:
       - .env  
   inventory:
@@ -51,7 +51,7 @@ services:
     depends_on:
       - postoffice  
     networks:
-      - tarantula-net
+      - tarantula-app-net
     env_file:
       - .env  
   tournament:
@@ -65,7 +65,7 @@ services:
     depends_on:
       - postoffice    
     networks:
-      - tarantula-net
+      - tarantula-app-net
     env_file:
       - .env  
   mahjong:
@@ -81,7 +81,7 @@ services:
     depends_on:
       - postoffice    
     networks:
-      - tarantula-net
+      - tarantula-app-net
     env_file:
       - .env                   
   admin:
@@ -99,7 +99,7 @@ services:
       - mahjong
       - presence
     networks:
-      - tarantula-net
+      - tarantula-app-net
     env_file:
       - .env  
   node:
@@ -111,7 +111,7 @@ services:
     ports:
       - "9100:9100"
     networks:
-      - tarantula-net     
+      - tarantula-app-net     
   prometheus:
     stop_grace_period: 20s
     restart: unless-stopped
@@ -123,7 +123,7 @@ services:
     ports:
       - "9090:9090"
     networks:
-      - tarantula-net  
+      - tarantula-app-net  
   web:
     restart: unless-stopped
     container_name: web
@@ -134,10 +134,10 @@ services:
     depends_on:
       - admin
     networks:
-      - tarantula-net
+      - tarantula-app-net
 
 networks:
-  tarantula-net:
+  tarantula-app-net:
     external: true
 volumes:
   volume_postoffice:

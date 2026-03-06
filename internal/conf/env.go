@@ -102,7 +102,12 @@ func (f *Env) Load(fn string) error {
 		parts := strings.Split(c, ",")
 		f.EtcdEndpoints = append(f.EtcdEndpoints, parts...)
 	}
-	core.AppLog.Debug().Msgf("CONF : %s %s %s %d %s %s %s", f.Prefix, f.GroupName, f.NodeName, f.NodeId, f.HttpEndpoint, f.Evp.TcpEndpoint, f.EtcdEndpoints[0])
+
+	c, exists = os.LookupEnv("SQL_ENDPOINT")
+	if exists {
+		f.Pgs.DatabaseURL = c
+	}
+	core.AppLog.Debug().Msgf("CONF : %s %s %s %d %s %s %s %s", f.Prefix, f.GroupName, f.NodeName, f.NodeId, f.HttpEndpoint, f.Evp.TcpEndpoint, f.EtcdEndpoints[0], f.Pgs.DatabaseURL)
 
 	return nil
 }
