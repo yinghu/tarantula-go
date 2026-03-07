@@ -1,5 +1,5 @@
 {
-    "LogTruncated":false,
+    "LogTruncated":true,
 	"GroupName" :"postoffice",
 	"NodeName" :   "postoffice.5",
 	"NodeId"     :   5,
