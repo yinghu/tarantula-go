@@ -178,7 +178,7 @@ func (s *PostofficeService) outboundEvent(c chan CChange) {
 	for {
 		select {
 		case e := <-s.outboundQ:
-			ticket, err := s.AppAuth.CreateTicket(0, 0, core.ADMIN_ACCESS_CONTROL, bootstrap.TICKET_TIME_OUT_MINUTES)
+			ticket, err := s.Authenticator().CreateTicket(0, 0, core.ADMIN_ACCESS_CONTROL, bootstrap.TICKET_TIME_OUT_MINUTES)
 			if err != nil {
 				core.AppLog.Printf("Ticket error %s\n", err.Error())
 				continue
