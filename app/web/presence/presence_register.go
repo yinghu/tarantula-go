@@ -37,7 +37,7 @@ func (s *PresenceRegister) Register(login bootstrap.Login) {
 		return
 	}
 	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: ""}
-	ticket, _ := s.AppAuth.CreateTicket(login.SystemId, login.Id, login.AccessControl,bootstrap.TICKET_TIME_OUT_MINUTES)
+	ticket, _ := s.Authenticator().CreateTicket(login.SystemId, login.Id, login.AccessControl,bootstrap.TICKET_TIME_OUT_MINUTES)
 	session.Ticket = ticket
 	login.Cc <- core.Chunk{Remaining: false, Data: util.ToJson(session)}
 	go func() {
