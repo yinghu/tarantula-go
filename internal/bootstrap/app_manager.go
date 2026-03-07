@@ -245,7 +245,7 @@ func (c *AppManager) Atomic(prefix string, t core.Exec) error {
 // ClusterService api
 func (c *AppManager) HashRing(r core.RingRequest) {
 
-	dsp := protocol.NewDataServiceClient(c.rpc)
+	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	stream, err := dsp.HashRing(context.Background(), &protocol.Request{Prefix: 0})
 	if err != nil {
 		return
@@ -268,7 +268,7 @@ func (c *AppManager) HashRing(r core.RingRequest) {
 
 func (c *AppManager) KeyRing(r core.RingRequest) {
 
-	dsp := protocol.NewDataServiceClient(c.rpc)
+	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	stream, err := dsp.KeyRing(context.Background(), &protocol.Request{Prefix: r.Token})
 	if err != nil {
 		return
@@ -294,5 +294,6 @@ func (c *AppManager) RingToken(key []byte) uint32 {
 }
 
 func (c *AppManager) Request(r core.DataRequest) {
-
+	//dsp := protocol.NewDataServiceClient(c.rpc)	
+	//dsp.Request()
 }

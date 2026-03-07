@@ -165,13 +165,3 @@ func (m *MemberListListener) set(set core.DataRequest) {
 	set.Async <- core.Chunk{Remaining: false, Data: []byte(retry.Err.Error())}
 }
 
-func (m *MemberListListener) KeyRing(r core.RingRequest) {
-	r.Replicas = REPLICA_MAX
-	r.Opt = core.REPLICA_RING_OPT
-	m.MRequest <- r
-}
-
-func (m *MemberListListener) HashRing(r core.RingRequest) {
-	r.Opt = core.ALL_RING_OPT
-	m.MRequest <- r
-}
