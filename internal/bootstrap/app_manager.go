@@ -25,7 +25,7 @@ type AppManager struct {
 	auth        core.Authenticator
 	Sql         persistence.Postgresql
 	F           conf.Env
-	AppAuth     core.Authenticator
+	//AppAuth     core.Authenticator
 	seq         core.Sequence
 	ItemUpdater item.ItemListener
 	tcpPusher   event.Pusher
@@ -69,18 +69,12 @@ func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
 	s.F = f
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
-	fctx := f.AuthCtx()
+	fctx := f.PresenceCtx()
 	au, err := s.LoadAuth(fctx)
 	if err != nil {
 		return nil
 	}
 	s.auth = au
-	ap, err := s.LoadAuth(f.PresenceCtx())
-
-	if err != nil {
-		return err
-	}
-	s.AppAuth = ap
 	dbCreate := persistence.Postgresql{Url: f.Pgs.DatabaseURL + "/postgres"}
 	err = dbCreate.CreateDatabase(fmt.Sprintf("CREATE DATABASE %s_%s_%s", f.Prefix, "tarantula", f.GroupName))
 	if err != nil {

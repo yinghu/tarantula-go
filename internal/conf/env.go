@@ -39,13 +39,6 @@ type Env struct {
 	AuthLevel     int32         `json:"AuthLevel"`
 }
 
-func (f *Env) AuthCtx() string {
-	if f.AuthLevel >= core.ADMIN_ACCESS_CONTROL {
-		return f.Prefix + "/admin"
-	}
-	return f.Prefix + "/presence"
-}
-
 func (f *Env) PresenceCtx() string {
 	return f.Prefix + "/presence"
 }
