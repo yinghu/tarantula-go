@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
@@ -24,7 +23,7 @@ func (s *TournamentService) Config() string {
 	return "/etc/tarantula/tournament-conf.json"
 }
 
-func (s *TournamentService) Start(f conf.Env,  p event.Pusher) error {
+func (s *TournamentService) Start(f core.Env,  p event.Pusher) error {
 	s.ItemUpdater = s
 	s.AppManager.Start(f, p)
 	s.createSchema()

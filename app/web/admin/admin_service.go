@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
@@ -23,7 +22,7 @@ func (s *AdminService) Config() string {
 	return "/etc/tarantula/admin-conf.json"
 }
 
-func (s *AdminService) Start(f conf.Env, p event.Pusher) error {
+func (s *AdminService) Start(f core.Env, p event.Pusher) error {
 	f.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	s.AppManager.Start(f, p)
 	s.managedApps = f.ManagedApps

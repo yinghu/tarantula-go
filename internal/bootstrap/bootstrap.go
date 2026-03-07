@@ -3,7 +3,6 @@ package bootstrap
 import (
 	"net/http"
 
-	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
@@ -32,7 +31,7 @@ const (
 
 type TarantulaContext interface {
 	Config() string
-	Start(f conf.Env, p event.Pusher) error
+	Start(f core.Env, p event.Pusher) error
 	Shutdown()
 	event.EventService
 	Context() string

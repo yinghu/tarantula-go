@@ -4,17 +4,11 @@ go 1.24.2
 
 replace gameclustering.com/cmd/player => ./player
 
-replace gameclustering.com/cmd/admin => ./admin
-
-replace gameclustering.com/cmd/admin/node => ./admin/node
-
 replace gameclustering.com/internal/bootstrap => ../../../internal/bootstrap
 
 replace gameclustering.com/internal/persistence => ../../../internal/persistence
 
 replace gameclustering.com/internal/util => ../../../internal/util
-
-replace gameclustering.com/internal/conf => ../../../internal/conf
 
 replace gameclustering.com/internal/event => ../../../internal/event
 
@@ -27,15 +21,12 @@ replace gameclustering.com/internal/metrics => ../../../internal/metrics
 replace gameclustering.com/internal/protocol => ../../../internal/protocol
 
 require (
-	gameclustering.com/cmd/admin v0.0.0-00010101000000-000000000000
 	gameclustering.com/cmd/player v0.0.0-00010101000000-000000000000
 	github.com/spf13/cobra v1.10.1
 )
 
 require (
-	gameclustering.com/cmd/admin/node v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/bootstrap v0.0.0-00010101000000-000000000000 // indirect
-	gameclustering.com/internal/conf v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000 // indirect

@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
@@ -19,7 +18,7 @@ func (s *AssetService) Config() string {
 	return "/etc/tarantula/asset-conf.json"
 }
 
-func (s *AssetService) Start(f conf.Env, p event.Pusher) error {
+func (s *AssetService) Start(f core.Env, p event.Pusher) error {
 	s.ItemUpdater = s
 	s.AppManager.Start(f, p)
 	s.assetDir = fmt.Sprintf("%s/%s", f.HomeDir, f.GroupName)

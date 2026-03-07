@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/conf"
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
 
@@ -16,7 +16,7 @@ func (s *InventoryService) Config() string {
 	return "/etc/tarantula/inventory-conf.json"
 }
 
-func (s *InventoryService) Start(f conf.Env, p event.Pusher) error {
+func (s *InventoryService) Start(f core.Env, p event.Pusher) error {
 	s.ItemUpdater = s
 	s.AppManager.Start(f, p)
 	s.createSchema()

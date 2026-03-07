@@ -4,18 +4,15 @@
 	"NodeName" :   "postoffice.5",
 	"NodeId"     :   5,
 	"HttpBinding":  ":8080",
-	"HttpEndpoint":  "192.168.1.3:8080",
-	"EtcdEndpoints": ["192.168.1.7:2379"],
-	"LocalDir":"",
+	"HttpEndpoint":  "192.168.1.6:8080",
+	"EtcdEndpoints": ["192.168.1.6:2379"],
 	"Presence":"presence",
 	"Sql":{
-		"DatabaseURL"  : "postgres://postgres:password@postgresql:5432"	
-	},
-	"LocalStore":{
-		"InMemory":false
+		"Enabled":false,
+		"DatabaseURL"  : "postgres://postgres:password@192.168.1.6:5432"	
 	},
 	"EventEndpoint":{
 		"Enabled":false,
-		"TcpEndpoint"  : "tcp://192.168.1.3:5000"
+		"TcpEndpoint"  : "tcp://192.168.1.6:5000"
 	}
 }

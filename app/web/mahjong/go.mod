@@ -8,8 +8,6 @@ replace gameclustering.com/internal/persistence => ../../../internal/persistence
 
 replace gameclustering.com/internal/util => ../../../internal/util
 
-replace gameclustering.com/internal/conf => ../../../internal/conf
-
 replace gameclustering.com/internal/event => ../../../internal/event
 
 replace gameclustering.com/internal/core => ../../../internal/core
@@ -24,7 +22,6 @@ replace gameclustering.com/internal/protocol => ../../../internal/protocol
 
 require (
 	gameclustering.com/internal/bootstrap v0.0.0-00010101000000-000000000000
-	gameclustering.com/internal/conf v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000

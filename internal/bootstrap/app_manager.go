@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"time"
-
-	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
@@ -24,7 +22,7 @@ type AppManager struct {
 	imse item.ItemService
 	auth core.Authenticator
 	Sql  persistence.Postgresql
-	F    conf.Env
+	F    core.Env
 	//AppAuth     core.Authenticator
 	seq         core.Sequence
 	ItemUpdater item.ItemListener
@@ -62,7 +60,7 @@ func (c *AppManager) Cluster() core.ClusterService {
 func (s *AppManager) Name() string {
 	return s.F.GroupName
 }
-func (s *AppManager) Start(f conf.Env, p event.Pusher) error {
+func (s *AppManager) Start(f core.Env, p event.Pusher) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
 	s.ManagedApps = f.ManagedApps
 	s.tcpPusher = p

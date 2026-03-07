@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/postoffice/clustering"
@@ -42,7 +41,7 @@ func (s *PostofficeService) Config() string {
 	return "/etc/tarantula/postoffice-conf.json"
 }
 
-func (s *PostofficeService) Start(env conf.Env, p event.Pusher) error {
+func (s *PostofficeService) Start(env core.Env, p event.Pusher) error {
 	env.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	s.AppManager.Start(env, p)
 

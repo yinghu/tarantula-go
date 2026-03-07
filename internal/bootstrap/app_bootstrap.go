@@ -9,7 +9,6 @@ import (
 	"syscall"
 	"time"
 
-	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/metrics"
@@ -18,7 +17,7 @@ import (
 )
 
 func AppBootstrap(tcx TarantulaContext) {
-	f := conf.Env{}
+	f := core.Env{}
 	err := f.Load(tcx.Config())
 	if err != nil {
 		fmt.Printf("Config not existed %s\n", err.Error())

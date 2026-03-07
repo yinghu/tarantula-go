@@ -6,17 +6,11 @@ replace gameclustering.com/cmd => ./cmd
 
 replace gameclustering.com/cmd/player => ./cmd/player
 
-replace gameclustering.com/cmd/admin => ./cmd/admin
-
-replace gameclustering.com/cmd/admin/node => ./cmd/admin/node
-
 replace gameclustering.com/internal/bootstrap => ../../internal/bootstrap
 
 replace gameclustering.com/internal/persistence => ../../internal/persistence
 
 replace gameclustering.com/internal/util => ../../internal/util
-
-replace gameclustering.com/internal/conf => ../../internal/conf
 
 replace gameclustering.com/internal/event => ../../internal/event
 
@@ -31,11 +25,8 @@ replace gameclustering.com/internal/protocol => ../../internal/protocol
 require gameclustering.com/cmd v0.0.0-00010101000000-000000000000
 
 require (
-	gameclustering.com/cmd/admin v0.0.0-00010101000000-000000000000 // indirect
-	gameclustering.com/cmd/admin/node v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/cmd/player v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/bootstrap v0.0.0-00010101000000-000000000000 // indirect
-	gameclustering.com/internal/conf v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000 // indirect

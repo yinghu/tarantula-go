@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
@@ -21,7 +20,7 @@ func (s *MahjongService) Config() string {
 	return "/etc/tarantula/mahjong-conf.json"
 }
 
-func (s *MahjongService) Start(f conf.Env, p event.Pusher) error {
+func (s *MahjongService) Start(f core.Env, p event.Pusher) error {
 	s.ItemUpdater = s
 	s.AppManager.Start(f, p)
 	s.TableIndex = make(map[int64]*MahjongTable)

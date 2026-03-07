@@ -1,4 +1,4 @@
-package conf
+package core
 
 import (
 	"encoding/json"
@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"gameclustering.com/internal/core"
 )
 
 type Sql struct {
@@ -65,7 +64,7 @@ func (f *Env) Load(fn string) error {
 	if err != nil {
 		return err
 	}
-	core.CreateAppLog(mountDir, f.LogTruncated)
+	CreateAppLog(mountDir, f.LogTruncated)
 	f.Prefix = "dev"
 
 	c, exists := os.LookupEnv("HOST")
@@ -102,7 +101,7 @@ func (f *Env) Load(fn string) error {
 	if exists {
 		f.Pgs.DatabaseURL = c
 	}
-	core.AppLog.Debug().Msgf("CONF : %s %s %s %d %s %s %s %s", f.Prefix, f.GroupName, f.NodeName, f.NodeId, f.HttpEndpoint, f.Evp.TcpEndpoint, f.EtcdEndpoints[0], f.Pgs.DatabaseURL)
+	AppLog.Debug().Msgf("CONF : %s %s %s %d %s %s %s %s", f.Prefix, f.GroupName, f.NodeName, f.NodeId, f.HttpEndpoint, f.Evp.TcpEndpoint, f.EtcdEndpoints[0], f.Pgs.DatabaseURL)
 
 	return nil
 }

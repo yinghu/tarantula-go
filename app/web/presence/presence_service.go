@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
@@ -21,7 +20,7 @@ func (s *PresenceService) Config() string {
 	return "/etc/tarantula/presence-conf.json"
 }
 
-func (s *PresenceService) Start(env conf.Env,  p event.Pusher) error {
+func (s *PresenceService) Start(env core.Env,  p event.Pusher) error {
 	s.ItemUpdater = s
 	err := s.AppManager.Start(env, p)
 	if err != nil {
