@@ -64,7 +64,7 @@ func (f *Env) Load(fn string) error {
 	if err != nil {
 		return err
 	}
-	CreateAppLog(mountDir, f.LogTruncated)
+	CreateAppLog(mountDir, f.LogTruncated, f.Standalone)
 	f.Prefix = "dev"
 
 	c, exists := os.LookupEnv("HOST")

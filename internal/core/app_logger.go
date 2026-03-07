@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/rs/zerolog"
@@ -11,8 +10,11 @@ var (
 	AppLog zerolog.Logger
 )
 
-func CreateAppLog(dir string, truncated bool) {
-	fmt.Printf("Creating app log %s\n", dir)
+func CreateAppLog(dir string, truncated bool, standAlone bool) {
+	if standAlone {
+		CreateTestLog()
+		return
+	}
 	err := os.MkdirAll(dir+"/log", 0755)
 	if err != nil {
 		AppLog = zerolog.New(os.Stderr)
@@ -33,5 +35,5 @@ func CreateAppLog(dir string, truncated bool) {
 
 func CreateTestLog() {
 	AppLog = zerolog.New(os.Stderr)
-	AppLog.Info().Msg("Initialized app log")
+	AppLog.Info().Msg("Initialized test app log")
 }
