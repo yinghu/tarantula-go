@@ -7,10 +7,10 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
 )
 
 type Sql struct {
+	Enabled     bool   `json:"Enabled"`
 	DatabaseURL string `json:"DatabaseURL"`
 }
 

@@ -23,7 +23,6 @@ type AppManager struct {
 	auth core.Authenticator
 	Sql  persistence.Postgresql
 	F    core.Env
-	//AppAuth     core.Authenticator
 	seq         core.Sequence
 	ItemUpdater item.ItemListener
 	tcpPusher   event.Pusher
