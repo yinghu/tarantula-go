@@ -83,7 +83,7 @@ func (c *DataServiceProvider) HashRing(request *protocol.Request, stream grpc.Se
 	c.Mll.rangeRing(core.RingRequest{Async: rq, Opt: core.ALL_RING_OPT})
 	ring := <-rq
 	for _, n := range ring {
-		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name}
+		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name,Address: n.IP}
 		if err := stream.Send(&hn); err != nil {
 			return err
 		}
@@ -97,7 +97,7 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 	c.Mll.rangeRing(core.RingRequest{Async: rq, Opt: core.REPLICA_RING_OPT, Token: request.Prefix})
 	ring := <-rq
 	for _, n := range ring {
-		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name}
+		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name,Address: n.IP}
 		if err := stream.Send(&hn); err != nil {
 			return err
 		}

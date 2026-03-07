@@ -20,11 +20,11 @@ import (
 )
 
 type AppManager struct {
-	metr        core.MetricsService
-	imse        item.ItemService
-	auth        core.Authenticator
-	Sql         persistence.Postgresql
-	F           conf.Env
+	metr core.MetricsService
+	imse item.ItemService
+	auth core.Authenticator
+	Sql  persistence.Postgresql
+	F    conf.Env
 	//AppAuth     core.Authenticator
 	seq         core.Sequence
 	ItemUpdater item.ItemListener
@@ -264,7 +264,7 @@ func (c *AppManager) HashRing(r core.RingRequest) {
 			break
 		}
 		core.AppLog.Debug().Msgf("Rev : %v", data)
-		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint})
+		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
 	}
 	r.Async <- ring
 }
@@ -287,7 +287,7 @@ func (c *AppManager) KeyRing(r core.RingRequest) {
 			break
 		}
 		core.AppLog.Debug().Msgf("Rev : %v", data)
-		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint})
+		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
 	}
 	r.Async <- ring
 }
