@@ -17,7 +17,6 @@ func (s *AdminLogin) AccessControl() int32 {
 	return core.PUBLIC_ACCESS_CONTROL
 }
 func (s *AdminLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
-	//s.Cluster().HashRing(core.RingRequest{Opt:0,})
 	defer r.Body.Close()
 	var login bootstrap.Login
 	err := json.NewDecoder(r.Body).Decode(&login)

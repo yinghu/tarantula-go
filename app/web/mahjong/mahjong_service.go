@@ -49,7 +49,7 @@ func (s *MahjongService) Create(classId int, topic string) (event.Event, error) 
 	return &me, nil
 }
 func (s *MahjongService) VerifyTicket(ticket string) (core.OnSession, error) {
-	session, err := s.AppAuth.ValidateTicket(ticket)
+	session, err := s.Authenticator().ValidateTicket(ticket)
 	if err != nil {
 		return session, err
 	}
