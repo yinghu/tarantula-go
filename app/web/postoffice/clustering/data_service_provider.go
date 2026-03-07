@@ -78,7 +78,6 @@ func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.Server
 	return nil
 }
 
-
 func (c *DataServiceProvider) Start(dir string) {
 	path := fmt.Sprintf("%s/%s", dir, "store")
 	core.AppLog.Printf("creating path %s if not existed", path)
@@ -104,6 +103,7 @@ func (c *DataServiceProvider) Start(dir string) {
 	rpc := grpc.NewServer()
 	c.server = rpc
 	protocol.RegisterDataServiceServer(rpc, c)
+	protocol.RegisterPostofficeServiceServer(rpc, c)
 	core.AppLog.Printf("local data service provider started on : %s", tcp.Addr().String())
 	err = rpc.Serve(tcp)
 	if err != nil {
