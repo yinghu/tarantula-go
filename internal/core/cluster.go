@@ -11,9 +11,7 @@ const (
 	UPDATE_DATA_REQUEST int32 = 12
 	DELETE_DATA_REQUEST int32 = 13
 	RESET_DATA_REQUEST  int32 = 14
-
-	REPLICA_RING_OPT int32 = 100
-	ALL_RING_OPT     int32 = 300
+	
 )
 
 type Node struct {

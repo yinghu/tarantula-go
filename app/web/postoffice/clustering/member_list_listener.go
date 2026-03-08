@@ -11,12 +11,13 @@ import (
 )
 
 const (
-	
-	ADD_NODE_OPT    = 5
-	REMOVE_NODE_OPT = 6
-	UPDATE_NODE_OPT = 7
-	SYNC_NODE_OPT   = 8
-	CLOSE_RING_OPT  = 99
+	REPLICA_RING_OPT int32 = 1
+	ALL_RING_OPT     int32 = 3
+	ADD_NODE_OPT    int32 = 5
+	REMOVE_NODE_OPT int32 = 6
+	UPDATE_NODE_OPT int32 = 7
+	SYNC_NODE_OPT   int32 = 8
+	CLOSE_RING_OPT  int32 = 99
 
 	NODE_STATE_LIVE = 0
 	NODE_STATE_DEAD = 3
@@ -75,10 +76,10 @@ func (m *MemberListListener) Listen() {
 			m.OnConflict(mc)
 		case mr := <-m.MRequest:
 			switch mr.Opt {
-			case core.REPLICA_RING_OPT:
+			case REPLICA_RING_OPT:
 				nodes := m.keyRing(mr.Token, mr.Replicas)
 				mr.Async <- nodes
-			case core.ALL_RING_OPT:
+			case ALL_RING_OPT:
 				nodes := make([]core.Node, 0)
 				for _, n := range m.nodes {
 					nodes = append(nodes, n)
@@ -113,9 +114,6 @@ func (m *MemberListListener) rangeRing(r core.RingRequest) {
 func (m *MemberListListener) localNode(node core.Node) bool {
 	return strings.HasPrefix(node.Name, m.LocalNode().Name)
 }
-
-
-
 
 // delegate
 func (m *MemberListListener) NodeMeta(limit int) []byte {

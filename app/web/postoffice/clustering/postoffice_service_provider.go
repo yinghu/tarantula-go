@@ -12,7 +12,7 @@ import (
 func (c *DataServiceProvider) HashRing(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.HashNode]) error {
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
-	c.Mll.rangeRing(core.RingRequest{Async: rq, Opt: core.ALL_RING_OPT})
+	c.Mll.rangeRing(core.RingRequest{Async: rq, Opt: ALL_RING_OPT})
 	ring := <-rq
 	for _, n := range ring {
 		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name, Address: n.IP}
@@ -26,7 +26,7 @@ func (c *DataServiceProvider) HashRing(request *protocol.Request, stream grpc.Se
 func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.HashNode]) error {
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
-	c.Mll.rangeRing(core.RingRequest{Async: rq, Opt: core.REPLICA_RING_OPT, Token: request.Prefix})
+	c.Mll.rangeRing(core.RingRequest{Async: rq, Opt: REPLICA_RING_OPT, Token: request.Prefix})
 	ring := <-rq
 	for _, n := range ring {
 		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name, Address: n.IP}
@@ -52,7 +52,7 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request, ch chan *protocol
 	defer close(rq)
 	retry := RetryTrack{Reties: RETRY_MAX}
 	for retry.Reties > 0 {
-		c.Mll.MRequest <- core.RingRequest{Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
+		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
 		resp, err := c.clientCreate(&ringNode, set)
