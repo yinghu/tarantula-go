@@ -20,7 +20,7 @@ func TestDataOpt(t *testing.T) {
 	k := []byte("key1")
 	v := []byte("value1")
 	data := protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: 100, ClassId: 300}}
-	dset := SetData{Data: &data, Opt: SET_OPT_CREATE}
+	dset := SetData{Data: &data, Opt: core.CREATE_DATA_REQUEST}
 	err = dsp.create(dset)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
@@ -47,7 +47,7 @@ func TestDataOpt(t *testing.T) {
 	core.AppLog.Debug().Msgf("ERROR :%s", err.Error())
 	data.Header.Revision = 1
 	data.Value = []byte("value123")
-	dupdate := SetData{Data: &data, Opt: SET_OPT_UPDATE}
+	dupdate := SetData{Data: &data, Opt: core.UPDATE_DATA_REQUEST}
 	err = dsp.update(dupdate)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
@@ -69,13 +69,13 @@ func TestDataOpt(t *testing.T) {
 	}
 	data.Header.Revision = 100
 	data.Value = []byte("value123678")
-	rupdate := SetData{Data: &data, Opt: SET_OPT_RESET}
+	rupdate := SetData{Data: &data, Opt: core.RESET_DATA_REQUEST}
 	err = dsp.reset(rupdate)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
 
-	ddelete := SetData{Data: &data, Opt: SET_OPT_DELETE}
+	ddelete := SetData{Data: &data, Opt: core.DELETE_DATA_REQUEST}
 	err = dsp.delete(ddelete)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())

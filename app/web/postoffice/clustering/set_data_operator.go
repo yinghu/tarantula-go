@@ -7,12 +7,7 @@ import (
 )
 
 const (
-	SET_OPT_RECOVER int = 1
-	SET_OPT_CLOSE   int = 2
-	SET_OPT_CREATE  int = 3
-	SET_OPT_UPDATE  int = 4
-	SET_OPT_DELETE  int = 5
-	SET_OPT_RESET   int = 6
+
 
 	SET_OPERATOR_NUM int = 8
 )
@@ -28,21 +23,21 @@ start:
 	core.AppLog.Debug().Msgf("starting set operator %d", num)
 	m.DWait.Wait()
 	for sd := range m.DSet {
-		if sd.Opt == SET_OPT_RECOVER {
+		if sd.Opt == core.SET_OPT_RECOVER {
 			break
-		} else if sd.Opt == SET_OPT_CLOSE {
+		} else if sd.Opt == core.SET_OPT_CLOSE {
 			core.AppLog.Debug().Msgf("closing set data operator %d", num)
 			return
 		}
 		var err error
 		switch sd.Opt {
-		case SET_OPT_CREATE:
+		case core.CREATE_DATA_REQUEST:
 			err = m.create(sd)
-		case SET_OPT_UPDATE:
+		case core.UPDATE_DATA_REQUEST:
 			err = m.update(sd)
-		case SET_OPT_DELETE:
+		case core.DELETE_DATA_REQUEST:
 			err = m.delete(sd)
-		case SET_OPT_RESET:
+		case core.RESET_DATA_REQUEST:
 			err = m.reset(sd)
 		default:
 			err = fmt.Errorf("opt not supported %d", sd.Opt)

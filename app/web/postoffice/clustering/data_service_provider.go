@@ -48,7 +48,7 @@ func (c *DataServiceProvider) Reset(ctx context.Context, in *protocol.Request) (
 func (c *DataServiceProvider) Create(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
 	msg := make(chan SetRes, 1)
 	defer close(msg)
-	setData := SetData{Data: in.Data, Msg: msg}
+	setData := SetData{Opt:in.Opt,Data: in.Data, Msg: msg}
 	c.DSet <- setData
 	resp := <-msg
 	return &protocol.Response{Successful: resp.Suc}, resp.Err
@@ -164,7 +164,7 @@ func (m *DataServiceProvider) RingUpdated() {
 			} else {
 				m.DWait.Add(SET_OPERATOR_NUM)
 				for range SET_OPERATOR_NUM {
-					m.DSet <- SetData{Opt: SET_OPT_RECOVER}
+					m.DSet <- SetData{Opt: core.SET_OPT_RECOVER}
 				}
 				pz := SET_OPERATOR_NUM
 				for _, p := range ds.Hashs {
@@ -180,7 +180,7 @@ func (m *DataServiceProvider) RingUpdated() {
 	}
 	//shutdown server
 	for range SET_OPERATOR_NUM {
-		m.DSet <- SetData{Opt: SET_OPT_CLOSE}
+		m.DSet <- SetData{Opt: core.SET_OPT_CLOSE}
 	}
 	close(m.DSet)
 	close(m.DPull)

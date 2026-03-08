@@ -14,7 +14,7 @@ const (
 
 type SetData struct {
 	*protocol.Data
-	Opt int
+	Opt int32
 	Msg chan SetRes
 }
 

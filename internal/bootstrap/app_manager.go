@@ -297,7 +297,7 @@ func (c *AppManager) RingToken(key []byte) uint32 {
 func (c *AppManager) Request(r core.DataRequest) {
 
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	req := protocol.Request{Opt: int32(r.Opt), Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId}}}
+	req := protocol.Request{Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId}}}
 	stream, err := dsp.Request(context.Background(), &req)
 	if err != nil {
 		r.Async <- core.Chunk{Remaining: false, Data: []byte(err.Error())}

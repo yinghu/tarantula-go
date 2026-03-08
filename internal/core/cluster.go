@@ -3,14 +3,17 @@ package core
 const (
 	RPC_PORT int = 7001
 
-	GET_DATA_REQUEST    int = 0
-	CREATE_DATA_REQUEST int = 1
-	UPDATE_DATA_REQUEST int = 2
-	DELETE_DATA_REQUEST int = 3
-	RESET_DATA_REQUEST  int = 4
+	SET_OPT_RECOVER int32 = 1
+	SET_OPT_CLOSE   int32 = 2
 
-	REPLICA_RING_OPT int = 0
-	ALL_RING_OPT     int = 3
+	GET_DATA_REQUEST    int32 = 10
+	CREATE_DATA_REQUEST int32 = 11
+	UPDATE_DATA_REQUEST int32 = 12
+	DELETE_DATA_REQUEST int32 = 13
+	RESET_DATA_REQUEST  int32 = 14
+
+	REPLICA_RING_OPT int32 = 100
+	ALL_RING_OPT     int32 = 300
 )
 
 type Node struct {
@@ -46,7 +49,7 @@ type RingSync struct {
 }
 
 type RingRequest struct {
-	Opt      int
+	Opt      int32
 	Address  string
 	Source   RingSync
 	Token    uint32
@@ -62,10 +65,10 @@ type DataHeader struct {
 
 type DataRequest struct {
 	DataHeader
-	Prefix []byte
+	Prefix int32
 	Key    []byte
 	Value  []byte
-	Opt    int
+	Opt    int32
 	Async  chan Chunk
 }
 
