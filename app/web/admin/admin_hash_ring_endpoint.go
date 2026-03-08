@@ -19,7 +19,7 @@ func (s *AdminHashRingEndpoint) Request(rs core.OnSession, w http.ResponseWriter
 	defer r.Body.Close()
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
-	s.Cluster().HashRing(core.RingRequest{Async: rq, Opt: core.ALL_RING_OPT})
+	s.Cluster().HashRing(core.RingRequest{Async: rq})
 	n := <-rq
 	data, err := json.Marshal(n)
 	if err != nil {
