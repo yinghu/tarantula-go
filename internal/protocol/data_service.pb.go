@@ -24,36 +24,33 @@ var File_data_service_proto protoreflect.FileDescriptor
 
 const file_data_service_proto_rawDesc = "" +
 	"\n" +
-	"\x12data_service.proto\x12\bprotocol\x1a\n" +
-	"data.proto\x1a\rrequest.proto\x1a\x0eresponse.proto\x1a\x10data_batch.proto2\xaa\x02\n" +
-	"\vDataService\x12*\n" +
-	"\x03get\x12\x11.protocol.Request\x1a\x0e.protocol.Data\"\x00\x12+\n" +
-	"\x03set\x12\x0e.protocol.Data\x1a\x12.protocol.Response\"\x00\x122\n" +
-	"\x04pull\x12\x11.protocol.Request\x1a\x13.protocol.DataBatch\"\x000\x01\x12.\n" +
-	"\x06create\x12\x0e.protocol.Data\x1a\x12.protocol.Response\"\x00\x12.\n" +
-	"\x06update\x12\x0e.protocol.Data\x1a\x12.protocol.Response\"\x00\x12.\n" +
-	"\x06delete\x12\x0e.protocol.Data\x1a\x12.protocol.Response\"\x00BS\n" +
+	"\x12data_service.proto\x12\bprotocol\x1a\rrequest.proto\x1a\x0eresponse.proto2\xbb\x02\n" +
+	"\vDataService\x120\n" +
+	"\x03get\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x000\x01\x12.\n" +
+	"\x03set\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x00\x121\n" +
+	"\x04pull\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x000\x01\x121\n" +
+	"\x06create\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x00\x121\n" +
+	"\x06update\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x00\x121\n" +
+	"\x06delete\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x00BS\n" +
 	"\x17com.icodesoftware.protoB\x12DataServiceFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var file_data_service_proto_goTypes = []any{
-	(*Request)(nil),   // 0: protocol.Request
-	(*Data)(nil),      // 1: protocol.Data
-	(*Response)(nil),  // 2: protocol.Response
-	(*DataBatch)(nil), // 3: protocol.DataBatch
+	(*Request)(nil),  // 0: protocol.Request
+	(*Response)(nil), // 1: protocol.Response
 }
 var file_data_service_proto_depIdxs = []int32{
 	0, // 0: protocol.DataService.get:input_type -> protocol.Request
-	1, // 1: protocol.DataService.set:input_type -> protocol.Data
+	0, // 1: protocol.DataService.set:input_type -> protocol.Request
 	0, // 2: protocol.DataService.pull:input_type -> protocol.Request
-	1, // 3: protocol.DataService.create:input_type -> protocol.Data
-	1, // 4: protocol.DataService.update:input_type -> protocol.Data
-	1, // 5: protocol.DataService.delete:input_type -> protocol.Data
-	1, // 6: protocol.DataService.get:output_type -> protocol.Data
-	2, // 7: protocol.DataService.set:output_type -> protocol.Response
-	3, // 8: protocol.DataService.pull:output_type -> protocol.DataBatch
-	2, // 9: protocol.DataService.create:output_type -> protocol.Response
-	2, // 10: protocol.DataService.update:output_type -> protocol.Response
-	2, // 11: protocol.DataService.delete:output_type -> protocol.Response
+	0, // 3: protocol.DataService.create:input_type -> protocol.Request
+	0, // 4: protocol.DataService.update:input_type -> protocol.Request
+	0, // 5: protocol.DataService.delete:input_type -> protocol.Request
+	1, // 6: protocol.DataService.get:output_type -> protocol.Response
+	1, // 7: protocol.DataService.set:output_type -> protocol.Response
+	1, // 8: protocol.DataService.pull:output_type -> protocol.Response
+	1, // 9: protocol.DataService.create:output_type -> protocol.Response
+	1, // 10: protocol.DataService.update:output_type -> protocol.Response
+	1, // 11: protocol.DataService.delete:output_type -> protocol.Response
 	6, // [6:12] is the sub-list for method output_type
 	0, // [0:6] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -66,10 +63,8 @@ func file_data_service_proto_init() {
 	if File_data_service_proto != nil {
 		return
 	}
-	file_data_proto_init()
 	file_request_proto_init()
 	file_response_proto_init()
-	file_data_batch_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -26,6 +26,7 @@ type Response struct {
 	Successful    bool                   `protobuf:"varint,1,opt,name=successful,proto3" json:"successful,omitempty"`
 	Code          int32                  `protobuf:"varint,2,opt,name=code,proto3" json:"code,omitempty"`
 	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *DataSet               `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -81,17 +82,25 @@ func (x *Response) GetMessage() string {
 	return ""
 }
 
+func (x *Response) GetData() *DataSet {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
 var File_response_proto protoreflect.FileDescriptor
 
 const file_response_proto_rawDesc = "" +
 	"\n" +
-	"\x0eresponse.proto\x12\bprotocol\"X\n" +
+	"\x0eresponse.proto\x12\bprotocol\x1a\x0edata_set.proto\"\x7f\n" +
 	"\bResponse\x12\x1e\n" +
 	"\n" +
 	"successful\x18\x01 \x01(\bR\n" +
 	"successful\x12\x12\n" +
 	"\x04code\x18\x02 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x03 \x01(\tR\amessageBP\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\x12%\n" +
+	"\x04data\x18\x04 \x01(\v2\x11.protocol.DataSetR\x04dataBP\n" +
 	"\x17com.icodesoftware.protoB\x0fResponseFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -109,13 +118,15 @@ func file_response_proto_rawDescGZIP() []byte {
 var file_response_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_response_proto_goTypes = []any{
 	(*Response)(nil), // 0: protocol.Response
+	(*DataSet)(nil),  // 1: protocol.DataSet
 }
 var file_response_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: protocol.Response.data:type_name -> protocol.DataSet
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_response_proto_init() }
@@ -123,6 +134,7 @@ func file_response_proto_init() {
 	if File_response_proto != nil {
 		return
 	}
+	file_data_set_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

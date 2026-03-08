@@ -31,7 +31,7 @@ type PostofficeServiceClient interface {
 	// cluster service API hook
 	HashRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error)
 	KeyRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error)
-	Request(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Data, error)
+	Request(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error)
 }
 
 type postofficeServiceClient struct {
@@ -80,15 +80,24 @@ func (c *postofficeServiceClient) KeyRing(ctx context.Context, in *Request, opts
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type PostofficeService_KeyRingClient = grpc.ServerStreamingClient[HashNode]
 
-func (c *postofficeServiceClient) Request(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Data, error) {
+func (c *postofficeServiceClient) Request(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Data)
-	err := c.cc.Invoke(ctx, PostofficeService_Request_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &PostofficeService_ServiceDesc.Streams[2], PostofficeService_Request_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[Request, Response]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type PostofficeService_RequestClient = grpc.ServerStreamingClient[Response]
 
 // PostofficeServiceServer is the server API for PostofficeService service.
 // All implementations must embed UnimplementedPostofficeServiceServer
@@ -97,7 +106,7 @@ type PostofficeServiceServer interface {
 	// cluster service API hook
 	HashRing(*Request, grpc.ServerStreamingServer[HashNode]) error
 	KeyRing(*Request, grpc.ServerStreamingServer[HashNode]) error
-	Request(context.Context, *Request) (*Data, error)
+	Request(*Request, grpc.ServerStreamingServer[Response]) error
 	mustEmbedUnimplementedPostofficeServiceServer()
 }
 
@@ -114,8 +123,8 @@ func (UnimplementedPostofficeServiceServer) HashRing(*Request, grpc.ServerStream
 func (UnimplementedPostofficeServiceServer) KeyRing(*Request, grpc.ServerStreamingServer[HashNode]) error {
 	return status.Error(codes.Unimplemented, "method KeyRing not implemented")
 }
-func (UnimplementedPostofficeServiceServer) Request(context.Context, *Request) (*Data, error) {
-	return nil, status.Error(codes.Unimplemented, "method Request not implemented")
+func (UnimplementedPostofficeServiceServer) Request(*Request, grpc.ServerStreamingServer[Response]) error {
+	return status.Error(codes.Unimplemented, "method Request not implemented")
 }
 func (UnimplementedPostofficeServiceServer) mustEmbedUnimplementedPostofficeServiceServer() {}
 func (UnimplementedPostofficeServiceServer) testEmbeddedByValue()                           {}
@@ -160,23 +169,16 @@ func _PostofficeService_KeyRing_Handler(srv interface{}, stream grpc.ServerStrea
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type PostofficeService_KeyRingServer = grpc.ServerStreamingServer[HashNode]
 
-func _PostofficeService_Request_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
-	if err := dec(in); err != nil {
-		return nil, err
+func _PostofficeService_Request_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Request)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(PostofficeServiceServer).Request(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PostofficeService_Request_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostofficeServiceServer).Request(ctx, req.(*Request))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(PostofficeServiceServer).Request(m, &grpc.GenericServerStream[Request, Response]{ServerStream: stream})
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type PostofficeService_RequestServer = grpc.ServerStreamingServer[Response]
 
 // PostofficeService_ServiceDesc is the grpc.ServiceDesc for PostofficeService service.
 // It's only intended for direct use with grpc.RegisterService,
@@ -184,12 +186,7 @@ func _PostofficeService_Request_Handler(srv interface{}, ctx context.Context, de
 var PostofficeService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "protocol.PostofficeService",
 	HandlerType: (*PostofficeServiceServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "request",
-			Handler:    _PostofficeService_Request_Handler,
-		},
-	},
+	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "hashRing",
@@ -199,6 +196,11 @@ var PostofficeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "keyRing",
 			Handler:       _PostofficeService_KeyRing_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "request",
+			Handler:       _PostofficeService_Request_Handler,
 			ServerStreams: true,
 		},
 	},

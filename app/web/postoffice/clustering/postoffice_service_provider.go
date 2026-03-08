@@ -1,8 +1,6 @@
 package clustering
 
 import (
-	context "context"
-
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/grpc"
@@ -36,7 +34,7 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 	return nil
 }
 
-func (c *DataServiceProvider) Request(ctx context.Context, in *protocol.Request) (*protocol.Data, error) {
+func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
 	//getdata := GetData{in}
-	return nil, nil //c.get(getdata)
+	return nil //c.get(getdata)
 }

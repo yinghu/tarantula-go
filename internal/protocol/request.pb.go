@@ -23,11 +23,9 @@ const (
 
 type Request struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Prefix        uint32                 `protobuf:"varint,1,opt,name=prefix,proto3" json:"prefix,omitempty"`
-	Key           []byte                 `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
-	Header        *Header                `protobuf:"bytes,3,opt,name=header,proto3" json:"header,omitempty"`
-	Value         []byte                 `protobuf:"bytes,4,opt,name=value,proto3" json:"value,omitempty"`
-	Opt           int32                  `protobuf:"varint,5,opt,name=opt,proto3" json:"opt,omitempty"`
+	Opt           int32                  `protobuf:"varint,1,opt,name=opt,proto3" json:"opt,omitempty"`
+	Prefix        uint32                 `protobuf:"varint,2,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	Data          *Data                  `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -62,34 +60,6 @@ func (*Request) Descriptor() ([]byte, []int) {
 	return file_request_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Request) GetPrefix() uint32 {
-	if x != nil {
-		return x.Prefix
-	}
-	return 0
-}
-
-func (x *Request) GetKey() []byte {
-	if x != nil {
-		return x.Key
-	}
-	return nil
-}
-
-func (x *Request) GetHeader() *Header {
-	if x != nil {
-		return x.Header
-	}
-	return nil
-}
-
-func (x *Request) GetValue() []byte {
-	if x != nil {
-		return x.Value
-	}
-	return nil
-}
-
 func (x *Request) GetOpt() int32 {
 	if x != nil {
 		return x.Opt
@@ -97,17 +67,30 @@ func (x *Request) GetOpt() int32 {
 	return 0
 }
 
+func (x *Request) GetPrefix() uint32 {
+	if x != nil {
+		return x.Prefix
+	}
+	return 0
+}
+
+func (x *Request) GetData() *Data {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
 var File_request_proto protoreflect.FileDescriptor
 
 const file_request_proto_rawDesc = "" +
 	"\n" +
-	"\rrequest.proto\x12\bprotocol\x1a\fheader.proto\"\x85\x01\n" +
-	"\aRequest\x12\x16\n" +
-	"\x06prefix\x18\x01 \x01(\rR\x06prefix\x12\x10\n" +
-	"\x03key\x18\x02 \x01(\fR\x03key\x12(\n" +
-	"\x06header\x18\x03 \x01(\v2\x10.protocol.HeaderR\x06header\x12\x14\n" +
-	"\x05value\x18\x04 \x01(\fR\x05value\x12\x10\n" +
-	"\x03opt\x18\x05 \x01(\x05R\x03optBO\n" +
+	"\rrequest.proto\x12\bprotocol\x1a\n" +
+	"data.proto\"W\n" +
+	"\aRequest\x12\x10\n" +
+	"\x03opt\x18\x01 \x01(\x05R\x03opt\x12\x16\n" +
+	"\x06prefix\x18\x02 \x01(\rR\x06prefix\x12\"\n" +
+	"\x04data\x18\x03 \x01(\v2\x0e.protocol.DataR\x04dataBO\n" +
 	"\x17com.icodesoftware.protoB\x0eRequestFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -125,10 +108,10 @@ func file_request_proto_rawDescGZIP() []byte {
 var file_request_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_request_proto_goTypes = []any{
 	(*Request)(nil), // 0: protocol.Request
-	(*Header)(nil),  // 1: protocol.Header
+	(*Data)(nil),    // 1: protocol.Data
 }
 var file_request_proto_depIdxs = []int32{
-	1, // 0: protocol.Request.header:type_name -> protocol.Header
+	1, // 0: protocol.Request.data:type_name -> protocol.Data
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -141,7 +124,7 @@ func file_request_proto_init() {
 	if File_request_proto != nil {
 		return
 	}
-	file_header_proto_init()
+	file_data_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

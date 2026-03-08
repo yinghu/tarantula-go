@@ -24,18 +24,17 @@ var File_postoffice_service_proto protoreflect.FileDescriptor
 
 const file_postoffice_service_proto_rawDesc = "" +
 	"\n" +
-	"\x18postoffice_service.proto\x12\bprotocol\x1a\n" +
-	"data.proto\x1a\rrequest.proto\x1a\x0fhash_node.proto2\xb0\x01\n" +
+	"\x18postoffice_service.proto\x12\bprotocol\x1a\rrequest.proto\x1a\x0eresponse.proto\x1a\x0fhash_node.proto2\xb6\x01\n" +
 	"\x11PostofficeService\x125\n" +
 	"\bhashRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01\x124\n" +
-	"\akeyRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01\x12.\n" +
-	"\arequest\x12\x11.protocol.Request\x1a\x0e.protocol.Data\"\x00BS\n" +
+	"\akeyRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01\x124\n" +
+	"\arequest\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x000\x01BS\n" +
 	"\x17com.icodesoftware.protoB\x12DataServiceFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var file_postoffice_service_proto_goTypes = []any{
 	(*Request)(nil),  // 0: protocol.Request
 	(*HashNode)(nil), // 1: protocol.HashNode
-	(*Data)(nil),     // 2: protocol.Data
+	(*Response)(nil), // 2: protocol.Response
 }
 var file_postoffice_service_proto_depIdxs = []int32{
 	0, // 0: protocol.PostofficeService.hashRing:input_type -> protocol.Request
@@ -43,7 +42,7 @@ var file_postoffice_service_proto_depIdxs = []int32{
 	0, // 2: protocol.PostofficeService.request:input_type -> protocol.Request
 	1, // 3: protocol.PostofficeService.hashRing:output_type -> protocol.HashNode
 	1, // 4: protocol.PostofficeService.keyRing:output_type -> protocol.HashNode
-	2, // 5: protocol.PostofficeService.request:output_type -> protocol.Data
+	2, // 5: protocol.PostofficeService.request:output_type -> protocol.Response
 	3, // [3:6] is the sub-list for method output_type
 	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -56,8 +55,8 @@ func file_postoffice_service_proto_init() {
 	if File_postoffice_service_proto != nil {
 		return
 	}
-	file_data_proto_init()
 	file_request_proto_init()
+	file_response_proto_init()
 	file_hash_node_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{

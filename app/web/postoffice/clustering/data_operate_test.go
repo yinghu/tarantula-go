@@ -25,7 +25,7 @@ func TestDataOpt(t *testing.T) {
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
-	req := protocol.Request{Key: k, Header: &protocol.Header{FactoryId: 100, ClassId: 300}}
+	req := protocol.Request{Data: &data}
 	dget := GetData{Request: &req}
 	d, err := dsp.get(dget)
 	if err != nil {
@@ -52,7 +52,7 @@ func TestDataOpt(t *testing.T) {
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
-	req1 := protocol.Request{Key: k, Header: &protocol.Header{FactoryId: 100, ClassId: 300}}
+	req1 := protocol.Request{Data: &data}
 	dget1 := GetData{Request: &req1}
 	d1, err := dsp.get(dget1)
 	if err != nil {
@@ -67,24 +67,24 @@ func TestDataOpt(t *testing.T) {
 	if string(d1.Value) != string("value123") {
 		t.Errorf("should be same values %s %s", string(d1.Value), string(v))
 	}
-	data.Header.Revision = 100 
+	data.Header.Revision = 100
 	data.Value = []byte("value123678")
 	rupdate := SetData{Data: &data, Opt: SET_OPT_RESET}
 	err = dsp.reset(rupdate)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
-	
-	ddelete := SetData{Data: &data,Opt: SET_OPT_DELETE}
+
+	ddelete := SetData{Data: &data, Opt: SET_OPT_DELETE}
 	err = dsp.delete(ddelete)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
-	req2 := protocol.Request{Key: k, Header: &protocol.Header{FactoryId: 100, ClassId: 300}}
+	req2 := protocol.Request{Data: &data}
 	dget2 := GetData{Request: &req2}
 	_, err = dsp.get(dget2)
 	if err == nil {
 		t.Errorf("should be error")
 	}
-	core.AppLog.Debug().Msgf("DELETED %s",err.Error())
+	core.AppLog.Debug().Msgf("DELETED %s", err.Error())
 }

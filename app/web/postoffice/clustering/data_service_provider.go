@@ -31,48 +31,48 @@ type DataServiceProvider struct {
 	DWait sync.WaitGroup
 }
 
-func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Data, error) {
-	getdata := GetData{in}
-	return c.get(getdata)
+func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
+	//getdata := GetData{in}
+	return nil
 }
 
-func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Data) (*protocol.Response, error) {
+func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
 	msg := make(chan SetRes, 1)
 	defer close(msg)
-	setData := SetData{Data: in, Msg: msg}
+	setData := SetData{Data: in.Data, Msg: msg}
 	c.DSet <- setData
 	resp := <-msg
 	return &protocol.Response{Successful: resp.Suc}, resp.Err
 }
 
-func (c *DataServiceProvider) Create(ctx context.Context, in *protocol.Data) (*protocol.Response, error) {
+func (c *DataServiceProvider) Create(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
 	msg := make(chan SetRes, 1)
 	defer close(msg)
-	setData := SetData{Data: in, Msg: msg}
+	setData := SetData{Data: in.Data, Msg: msg}
 	c.DSet <- setData
 	resp := <-msg
 	return &protocol.Response{Successful: resp.Suc}, resp.Err
 }
 
-func (c *DataServiceProvider) Update(ctx context.Context, in *protocol.Data) (*protocol.Response, error) {
+func (c *DataServiceProvider) Update(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
 	msg := make(chan SetRes, 1)
 	defer close(msg)
-	setData := SetData{Data: in, Msg: msg}
+	setData := SetData{Data: in.Data, Msg: msg}
 	c.DSet <- setData
 	resp := <-msg
 	return &protocol.Response{Successful: resp.Suc}, resp.Err
 }
 
-func (c *DataServiceProvider) Delete(ctx context.Context, in *protocol.Data) (*protocol.Response, error) {
+func (c *DataServiceProvider) Delete(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
 	msg := make(chan SetRes, 1)
 	defer close(msg)
-	setData := SetData{Data: in, Msg: msg}
+	setData := SetData{Data: in.Data, Msg: msg}
 	c.DSet <- setData
 	resp := <-msg
 	return &protocol.Response{Successful: resp.Suc}, resp.Err
 }
 
-func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.DataBatch]) error {
+func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
 
 	//stream.Send()
 	return nil
@@ -301,7 +301,7 @@ func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
 			return nil
 		}
 		//check revision with requested revision
-		gd.Header.Revision = ki.Header.Revision
+		gd.Data.Header.Revision = ki.Header.Revision
 		dk, err := gd.DataKey()
 		if err != nil {
 			return err

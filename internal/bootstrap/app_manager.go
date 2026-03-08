@@ -294,6 +294,19 @@ func (c *AppManager) RingToken(key []byte) uint32 {
 }
 
 func (c *AppManager) Request(r core.DataRequest) {
-	//dsp := protocol.NewDataServiceClient(c.rpc)	
-	//dsp.Request()
+	//dsp := protocol.NewPostofficeServiceClient(c.rpc)
+	//req := protocol.Request{}	
+	
+	switch r.Opt{
+	case core.CREATE_DATA_REQUEST:
+	case core.UPDATE_DATA_REQUEST:
+	case core.GET_DATA_REQUEST:
+	case core.DELETE_DATA_REQUEST:		
+	}
+	//dsp := protocol.NewPostofficeServiceClient(c.rpc)
+	//req := protocol.Request{}	
+	//data, err := dsp.Request(context.Background(),&req)
+	//if err!=nil{
+		//r<-   
+	//}
 }
