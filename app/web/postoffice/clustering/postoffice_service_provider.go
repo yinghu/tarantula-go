@@ -35,6 +35,7 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 }
 
 func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
+	
 	//getdata := GetData{in}
 	return nil //c.get(getdata)
 }

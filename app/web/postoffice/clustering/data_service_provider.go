@@ -36,7 +36,7 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 	return nil
 }
 
-func (c *DataServiceProvider) Set(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
+func (c *DataServiceProvider) Reset(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
 	msg := make(chan SetRes, 1)
 	defer close(msg)
 	setData := SetData{Data: in.Data, Msg: msg}

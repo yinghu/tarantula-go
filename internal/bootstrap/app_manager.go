@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"time"
+
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
@@ -18,11 +19,11 @@ import (
 )
 
 type AppManager struct {
-	metr core.MetricsService
-	imse item.ItemService
-	auth core.Authenticator
-	Sql  persistence.Postgresql
-	F    core.Env
+	metr        core.MetricsService
+	imse        item.ItemService
+	auth        core.Authenticator
+	Sql         persistence.Postgresql
+	F           core.Env
 	seq         core.Sequence
 	ItemUpdater item.ItemListener
 	tcpPusher   event.Pusher
@@ -294,19 +295,20 @@ func (c *AppManager) RingToken(key []byte) uint32 {
 }
 
 func (c *AppManager) Request(r core.DataRequest) {
+	r.Async <- core.Chunk{Remaining: false, Data: []byte("hello")}
 	//dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	//req := protocol.Request{}	
-	
-	switch r.Opt{
-	case core.CREATE_DATA_REQUEST:
-	case core.UPDATE_DATA_REQUEST:
-	case core.GET_DATA_REQUEST:
-	case core.DELETE_DATA_REQUEST:		
-	}
+	//req := protocol.Request{Opt: int32(r.Opt),Data: &protocol.Data{r}}
+
+	//switch r.Opt{
+	//case core.CREATE_DATA_REQUEST:
+	//case core.UPDATE_DATA_REQUEST:
+	//case core.GET_DATA_REQUEST:
+	//case core.DELETE_DATA_REQUEST:
+	//}
 	//dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	//req := protocol.Request{}	
+	//req := protocol.Request{}
 	//data, err := dsp.Request(context.Background(),&req)
 	//if err!=nil{
-		//r<-   
+	//r<-
 	//}
 }

@@ -5,7 +5,7 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
-	hash "github.com/spaolacci/murmur3"
+	"gameclustering.com/internal/util"
 )
 
 const (
@@ -20,7 +20,7 @@ type SetData struct {
 
 // HELPER METHODS
 func (s *SetData) IndexKey() KeyIndex {
-	ki := KeyIndex{Prefix: hash.Sum32(s.Key), Header: s.Header, Key: s.Key}
+	ki := KeyIndex{Prefix: util.Hash(s.Key), Header: s.Header, Key: s.Key}
 	return ki
 }
 

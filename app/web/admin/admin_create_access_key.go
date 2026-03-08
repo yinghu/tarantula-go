@@ -23,6 +23,12 @@ func (s *AdminCreateAccessKey) AccessControl() int32 {
 	return core.ADMIN_ACCESS_CONTROL
 }
 func (s *AdminCreateAccessKey) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
+	rq := make(chan core.Chunk, 1)
+	defer close(rq)
+	creq := core.DataRequest{Opt: core.CREATE_DATA_REQUEST, Key: []byte("key1"), Value: []byte("value1"), Async: rq}
+	s.Cluster().Request(creq)
+	chunk := <-rq
+	core.AppLog.Debug().Msgf("Chunk %s", string(chunk.Data))
 	defer r.Body.Close()
 	var cp KeyExpiration
 	err := json.NewDecoder(r.Body).Decode(&cp)
@@ -42,4 +48,5 @@ func (s *AdminCreateAccessKey) Request(rs core.OnSession, w http.ResponseWriter,
 	}
 	cp.Key = key
 	w.Write(util.ToJson(cp))
+
 }

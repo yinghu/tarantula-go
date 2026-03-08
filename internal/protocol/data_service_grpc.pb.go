@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	DataService_Get_FullMethodName    = "/protocol.DataService/get"
-	DataService_Set_FullMethodName    = "/protocol.DataService/set"
+	DataService_Reset_FullMethodName  = "/protocol.DataService/reset"
 	DataService_Pull_FullMethodName   = "/protocol.DataService/pull"
 	DataService_Create_FullMethodName = "/protocol.DataService/create"
 	DataService_Update_FullMethodName = "/protocol.DataService/update"
@@ -32,7 +32,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DataServiceClient interface {
 	Get(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error)
-	Set(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	Reset(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	Pull(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error)
 	Create(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	Update(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
@@ -66,10 +66,10 @@ func (c *dataServiceClient) Get(ctx context.Context, in *Request, opts ...grpc.C
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type DataService_GetClient = grpc.ServerStreamingClient[Response]
 
-func (c *dataServiceClient) Set(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+func (c *dataServiceClient) Reset(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Response)
-	err := c.cc.Invoke(ctx, DataService_Set_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, DataService_Reset_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (c *dataServiceClient) Delete(ctx context.Context, in *Request, opts ...grp
 // for forward compatibility.
 type DataServiceServer interface {
 	Get(*Request, grpc.ServerStreamingServer[Response]) error
-	Set(context.Context, *Request) (*Response, error)
+	Reset(context.Context, *Request) (*Response, error)
 	Pull(*Request, grpc.ServerStreamingServer[Response]) error
 	Create(context.Context, *Request) (*Response, error)
 	Update(context.Context, *Request) (*Response, error)
@@ -148,8 +148,8 @@ type UnimplementedDataServiceServer struct{}
 func (UnimplementedDataServiceServer) Get(*Request, grpc.ServerStreamingServer[Response]) error {
 	return status.Error(codes.Unimplemented, "method Get not implemented")
 }
-func (UnimplementedDataServiceServer) Set(context.Context, *Request) (*Response, error) {
-	return nil, status.Error(codes.Unimplemented, "method Set not implemented")
+func (UnimplementedDataServiceServer) Reset(context.Context, *Request) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method Reset not implemented")
 }
 func (UnimplementedDataServiceServer) Pull(*Request, grpc.ServerStreamingServer[Response]) error {
 	return status.Error(codes.Unimplemented, "method Pull not implemented")
@@ -195,20 +195,20 @@ func _DataService_Get_Handler(srv interface{}, stream grpc.ServerStream) error {
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type DataService_GetServer = grpc.ServerStreamingServer[Response]
 
-func _DataService_Set_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _DataService_Reset_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DataServiceServer).Set(ctx, in)
+		return srv.(DataServiceServer).Reset(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: DataService_Set_FullMethodName,
+		FullMethod: DataService_Reset_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DataServiceServer).Set(ctx, req.(*Request))
+		return srv.(DataServiceServer).Reset(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -286,8 +286,8 @@ var DataService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*DataServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "set",
-			Handler:    _DataService_Set_Handler,
+			MethodName: "reset",
+			Handler:    _DataService_Reset_Handler,
 		},
 		{
 			MethodName: "create",
