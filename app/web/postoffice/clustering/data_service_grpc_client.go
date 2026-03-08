@@ -40,17 +40,6 @@ func (m *DataServiceProvider) ClientSet(target *core.Node, request *core.DataReq
 	return &resp, nil
 }
 
-func (m *DataServiceProvider) ClientCreate(target *core.Node, request *core.DataRequest) (*protocol.Response, error) {
-	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return &protocol.Response{}, err
-	}
-	defer tcp.Close()
-	dsp := protocol.NewDataServiceClient(tcp)
-	//kv := protocol.Data{Key: request.Key, Value: request.Value}
-	req := protocol.Request{}
-	return dsp.Create(context.Background(), &req)
-}
 
 func (m *DataServiceProvider) ClientUpdate(target *core.Node, request *core.DataRequest) (*protocol.Response, error) {
 	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))

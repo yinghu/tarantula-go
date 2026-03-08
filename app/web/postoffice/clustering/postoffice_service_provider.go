@@ -1,9 +1,12 @@
 package clustering
 
 import (
+	context "context"
+
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func (c *DataServiceProvider) HashRing(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.HashNode]) error {
@@ -35,9 +38,46 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 }
 
 func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
-	resp := protocol.Response{Successful: true, Message: "hello"}
-	stream.Send(&resp)
-	stream.Send(&resp)
-	stream.Send(&resp)
+	rc := make(chan *protocol.Response, 3)
+	c.runCreate(request, rc)
 	return nil
+}
+
+func (c *DataServiceProvider) runCreate(set *protocol.Request, ch chan *protocol.Response) {
+	rq := make(chan []core.Node, 3)
+	defer close(rq)
+	retry := RetryTrack{Reties: RETRY_MAX}
+	for retry.Reties > 0 {
+		c.Mll.MRequest <- core.RingRequest{Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
+		nodes := <-rq
+		ringNode := nodes[0]
+		resp, err := c.clientCreate(&ringNode, set)
+		if err != nil {
+			retry.Err = err
+			retry.Reties--
+			continue
+		}
+		ch <- resp
+		retry.Suc = true
+		slaves := nodes[1:]
+		for _, slave := range slaves {
+			c.clientCreate(&slave, set)
+		}
+		break
+	}
+	if retry.Suc {
+		return
+	}
+	core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
+	ch <- &protocol.Response{Successful: false, Message: retry.Err.Error()}
+}
+
+func (m *DataServiceProvider) clientCreate(target *core.Node, request *protocol.Request) (*protocol.Response, error) {
+	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return &protocol.Response{}, err
+	}
+	defer tcp.Close()
+	dsp := protocol.NewDataServiceClient(tcp)
+	return dsp.Create(context.Background(), request)
 }

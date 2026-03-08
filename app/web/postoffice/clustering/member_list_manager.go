@@ -54,7 +54,7 @@ func (m *MemberlistManager) Start() error {
 	m.Memberlist = list
 	go m.Listen()
 	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode, RSync: rwSync}
-	m.Mll = m.MemberListListener
+	m.Mll = &m.MemberListListener
 	go m.DataServiceProvider.Start(m.StoreDir)
 	go m.RingUpdated()
 	joined, err := list.Join(m.Seed)

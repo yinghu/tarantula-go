@@ -23,7 +23,7 @@ type DataServiceProvider struct {
 	RNode  <-chan []core.Node
 	RSync  <-chan []byte
 	server *grpc.Server
-	Mll    MemberListListener
+	Mll    *MemberListListener
 
 	//write worker chan
 	DSet  chan SetData
