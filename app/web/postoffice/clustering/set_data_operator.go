@@ -7,8 +7,6 @@ import (
 )
 
 const (
-
-
 	SET_OPERATOR_NUM int = 8
 )
 
@@ -20,8 +18,8 @@ type SetRes struct {
 
 func (m *DataServiceProvider) runSetData(num int) {
 start:
-	core.AppLog.Debug().Msgf("starting set operator %d", num)
 	m.DWait.Wait()
+	core.AppLog.Debug().Msgf("starting set operator %d", num)
 	for sd := range m.DSet {
 		if sd.Opt == core.SET_OPT_RECOVER {
 			break
