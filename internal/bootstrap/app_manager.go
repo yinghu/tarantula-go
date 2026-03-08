@@ -295,20 +295,25 @@ func (c *AppManager) RingToken(key []byte) uint32 {
 }
 
 func (c *AppManager) Request(r core.DataRequest) {
-	r.Async <- core.Chunk{Remaining: false, Data: []byte("hello")}
-	//dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	//req := protocol.Request{Opt: int32(r.Opt),Data: &protocol.Data{r}}
 
-	//switch r.Opt{
-	//case core.CREATE_DATA_REQUEST:
-	//case core.UPDATE_DATA_REQUEST:
-	//case core.GET_DATA_REQUEST:
-	//case core.DELETE_DATA_REQUEST:
-	//}
-	//dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	//req := protocol.Request{}
-	//data, err := dsp.Request(context.Background(),&req)
-	//if err!=nil{
-	//r<-
-	//}
+	dsp := protocol.NewPostofficeServiceClient(c.rpc)
+	req := protocol.Request{Opt: int32(r.Opt), Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId}}}
+	stream, err := dsp.Request(context.Background(), &req)
+	if err != nil {
+		r.Async <- core.Chunk{Remaining: false, Data: []byte(err.Error())}
+		return
+	}
+	for {
+		resp, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
+			break
+		}
+		core.AppLog.Debug().Msgf("Rev : %v", resp)
+		r.Async <- core.Chunk{Remaining: true, Data: []byte("data")}
+	}
+	r.Async <- core.Chunk{Remaining: false}
 }

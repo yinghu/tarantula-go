@@ -27,8 +27,12 @@ func (s *AdminCreateAccessKey) Request(rs core.OnSession, w http.ResponseWriter,
 	defer close(rq)
 	creq := core.DataRequest{Opt: core.CREATE_DATA_REQUEST, Key: []byte("key1"), Value: []byte("value1"), Async: rq}
 	s.Cluster().Request(creq)
-	chunk := <-rq
-	core.AppLog.Debug().Msgf("Chunk %s", string(chunk.Data))
+	for chunk := range rq {
+		core.AppLog.Debug().Msgf("Chunk %s", string(chunk.Data))
+		if !chunk.Remaining {
+			break
+		}
+	}
 	defer r.Body.Close()
 	var cp KeyExpiration
 	err := json.NewDecoder(r.Body).Decode(&cp)
