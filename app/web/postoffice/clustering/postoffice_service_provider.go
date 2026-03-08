@@ -39,7 +39,10 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 
 func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
 	rc := make(chan *protocol.Response, 3)
+	defer close(rc)
 	c.runCreate(request, rc)
+	resp := <-rc
+	stream.Send(resp)
 	return nil
 }
 
