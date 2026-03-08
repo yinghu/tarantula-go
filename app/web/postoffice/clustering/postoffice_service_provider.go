@@ -38,6 +38,7 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 }
 
 func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
+	core.AppLog.Debug().Msgf("requesting data %v", request)
 	rc := make(chan *protocol.Response, 3)
 	defer close(rc)
 	c.runCreate(request, rc)
