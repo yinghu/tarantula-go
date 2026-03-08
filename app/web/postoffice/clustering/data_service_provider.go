@@ -48,7 +48,7 @@ func (c *DataServiceProvider) Reset(ctx context.Context, in *protocol.Request) (
 func (c *DataServiceProvider) Create(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
 	msg := make(chan SetRes, 1)
 	defer close(msg)
-	setData := SetData{Opt:in.Opt,Data: in.Data, Msg: msg}
+	setData := SetData{Opt: in.Opt, Data: in.Data, Msg: msg}
 	c.DSet <- setData
 	resp := <-msg
 	return &protocol.Response{Successful: resp.Suc}, resp.Err
@@ -57,7 +57,7 @@ func (c *DataServiceProvider) Create(ctx context.Context, in *protocol.Request) 
 func (c *DataServiceProvider) Update(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
 	msg := make(chan SetRes, 1)
 	defer close(msg)
-	setData := SetData{Data: in.Data, Msg: msg}
+	setData := SetData{Opt: in.Opt, Data: in.Data, Msg: msg}
 	c.DSet <- setData
 	resp := <-msg
 	return &protocol.Response{Successful: resp.Suc}, resp.Err
