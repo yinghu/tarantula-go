@@ -1,17 +1,17 @@
 package event
 
 const (
-	CLOSE_CID           int = 0
-	STAT_CID            int = 1
-	LOGIN_CID           int = 2
-	MESSAGE_CID         int = 3
-	TOURNAMENT_CID      int = 4
-	SUBSCRIPTION_CID    int = 5
+	CLOSE_CID            int = 0
+	STAT_CID             int = 1
+	LOGIN_CID            int = 2
+	MESSAGE_CID          int = 3
+	TOURNAMENT_CID       int = 4
+	SUBSCRIPTION_CID     int = 5
 	TOURNAMENT_SCORE_CID int = 6
-	INVENTORY_CID       int = 7
-	JOIN_CID            int = 8
-	KICKOFF_CID         int = 9
-	REGISTER_CID        int = 10
+	INVENTORY_CID        int = 7
+	JOIN_CID             int = 8
+	KICKOFF_CID          int = 9
+	REGISTER_CID         int = 10
 
 	LOGIN_ETAG        string = "lgn"
 	MESSAGE_ETAG      string = "msg"
@@ -25,6 +25,8 @@ const (
 	STAT_ETAG string = "stat"
 
 	STAT_TOTAL string = "total"
+
+	EVENT_FACTORY_ID int = 1
 )
 
 func CreateEvent(cid int) Event {

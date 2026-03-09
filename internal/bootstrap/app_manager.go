@@ -133,23 +133,24 @@ func (s *AppManager) Send(e event.Event) error {
 	buff := core.NewBuffer(200)
 	e.WriteKey(buff)
 	buff.Flip()
-	k,_ := buff.Read(0)
+	k, _ := buff.Read(0)
 	buff.Clear()
 	e.Write(buff)
 	buff.Flip()
-	v,_ := buff.Read(0)
-	req := core.DataRequest{Key: k,Value: v,Opt: core.CREATE_DATA_REQUEST}
+	v, _ := buff.Read(0)
+	req := core.DataRequest{Key: k, Value: v, Opt: core.CREATE_DATA_REQUEST}
+	req.FactoryId = int32(event.EVENT_FACTORY_ID)
 	req.ClassId = int32(e.ClassId())
-	aq := make(chan core.Chunk,3)
+	aq := make(chan core.Chunk, 3)
 	req.Async = aq
 	defer close(aq)
 	s.Cluster().Request(req)
-	for c:= range aq{
-		if !c.Remaining{
+	for c := range aq {
+		if !c.Remaining {
 			break
 		}
 	}
-	return  nil
+	return nil
 }
 func (s *AppManager) List(query event.Query) {
 	s.PostJsonAsync(fmt.Sprintf("%s/%d", "http://postoffice:8080/postoffice/query", query.QId()), query, query.QCc())

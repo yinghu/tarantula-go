@@ -5,7 +5,9 @@ type Persistentable interface {
 	WriteKey(key DataBuffer) error
 	Read(value DataBuffer) error
 	ReadKey(key DataBuffer) error
+	FactoryId() int
 	ClassId() int
+
 	Revision() int64
 	Timestamp() int64
 	OnTimestamp(tsp int64)
@@ -34,6 +36,10 @@ func (s *PersistentableObj) Read(value DataBuffer) error {
 
 func (s *PersistentableObj) ReadKey(value DataBuffer) error {
 	return nil
+}
+
+func (s *PersistentableObj) FactoryId() int {
+	return 0
 }
 
 func (s *PersistentableObj) ClassId() int {
@@ -70,7 +76,7 @@ type ListingOpt struct {
 type Transaction interface {
 	Get(p Persistentable) error
 	Set(p Persistentable) error
-	Del(p Persistentable) error	
+	Del(p Persistentable) error
 	Commit() error
 	Rollback()
 }
