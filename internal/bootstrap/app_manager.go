@@ -312,8 +312,10 @@ func (c *AppManager) Request(r core.DataRequest) {
 			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
 			break
 		}
-		for _, d := range resp.Data.List {
-			core.AppLog.Debug().Msgf("Rev : %v", d)
+		if resp.Successful {
+			for _, d := range resp.Data.List {
+				core.AppLog.Debug().Msgf("Rev : %v", d)
+			}
 		}
 		r.Async <- core.Chunk{Remaining: true, Data: []byte("data")}
 	}
