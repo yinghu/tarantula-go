@@ -32,7 +32,9 @@ type DataServiceProvider struct {
 }
 
 func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
-	//getdata := GetData{in}
+	stream.Send(&protocol.Response{Successful: true, Message: "hello1`"})
+	stream.Send(&protocol.Response{Successful: true, Message: "hello2`"})
+	stream.Send(&protocol.Response{Successful: false, Message: "hello3`"})
 	return nil
 }
 

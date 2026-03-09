@@ -3,6 +3,7 @@ package clustering
 import (
 	context "context"
 	"fmt"
+	"io"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
@@ -50,8 +51,12 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 		rc := make(chan *protocol.Response, 3)
 		defer close(rc)
 		c.runGet(request, rc)
-		resp := <-rc
-		stream.Send(resp)
+		for resp := range rc {
+			stream.Send(resp)
+			if !resp.Successful {
+				break
+			}
+		}
 	case core.UPDATE_DATA_REQUEST:
 		rc := make(chan *protocol.Response, 3)
 		defer close(rc)
@@ -252,17 +257,31 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		resp, err := c.clientGet(&ringNode, set)
+		tcp, err := grpc.NewClient(ringNode.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
-			retry.Err = err
-			retry.Reties--
+			retry.Reties++
 			continue
 		}
-		ch <- resp
-		retry.Suc = true
-		if !resp.Successful {
-			break
+		defer tcp.Close()
+		dsp := protocol.NewDataServiceClient(tcp)
+		stream, err := dsp.Get(context.Background(), set)
+		if err != nil {
+			retry.Reties++
+			continue
 		}
+		for {
+			data, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				core.AppLog.Debug().Msgf("streaming error %s", err.Error())
+				break
+			}
+			core.AppLog.Debug().Msgf("Rev : %v", data)
+			ch <- data
+		}
+		retry.Suc = true
 		break
 	}
 	if retry.Suc {
@@ -272,12 +291,3 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 	ch <- &protocol.Response{Successful: false, Message: retry.Err.Error()}
 }
 
-func (m *DataServiceProvider) clientGet(target *core.Node, request *protocol.Request) (*protocol.Response, error) {
-	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return &protocol.Response{}, err
-	}
-	defer tcp.Close()
-	dsp := protocol.NewDataServiceClient(tcp)
-	return dsp.Create(context.Background(), request)
-}
