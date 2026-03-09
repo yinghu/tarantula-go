@@ -130,15 +130,26 @@ func (s *AppManager) VerifyTicket(ticket string) (core.OnSession, error) {
 	return session, nil
 }
 func (s *AppManager) Send(e event.Event) error {
-	for i := range 5 {
-		ret := s.PostJsonSync(fmt.Sprintf("%s/%s/%d", "http://postoffice:8080/postoffice/publish", e.Topic(), e.ClassId()), e)
-		if ret.ErrorCode == 0 {
-			return nil
+	buff := core.NewBuffer(200)
+	e.WriteKey(buff)
+	buff.Flip()
+	k,_ := buff.Read(0)
+	buff.Clear()
+	e.Write(buff)
+	buff.Flip()
+	v,_ := buff.Read(0)
+	req := core.DataRequest{Key: k,Value: v,Opt: core.CREATE_DATA_REQUEST}
+	req.ClassId = int32(e.ClassId())
+	aq := make(chan core.Chunk,3)
+	req.Async = aq
+	defer close(aq)
+	s.Cluster().Request(req)
+	for c:= range aq{
+		if !c.Remaining{
+			break
 		}
-		time.Sleep(100 * time.Millisecond)
-		core.AppLog.Printf("Retries: %d %v\n", i, ret)
 	}
-	return fmt.Errorf("failed after retries")
+	return  nil
 }
 func (s *AppManager) List(query event.Query) {
 	s.PostJsonAsync(fmt.Sprintf("%s/%d", "http://postoffice:8080/postoffice/query", query.QId()), query, query.QCc())

@@ -30,8 +30,6 @@ start:
 			} else {
 				var data []*protocol.Data
 				data = append(data, &protocol.Data{Header: &protocol.Header{Revision: ki.Header.Revision}})
-				data = append(data, &protocol.Data{Header: &protocol.Header{Revision: ki.Header.Revision+1}})
-				
 				sd.Resp <- &protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
 			}
 		case core.UPDATE_DATA_REQUEST:

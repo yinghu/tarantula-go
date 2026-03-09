@@ -46,6 +46,7 @@ func (c *DataServiceProvider) Reset(ctx context.Context, in *protocol.Request) (
 }
 
 func (c *DataServiceProvider) Create(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
+	core.AppLog.Debug().Msg("creating data")
 	msg := make(chan *protocol.Response, 1)
 	defer close(msg)
 	setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
