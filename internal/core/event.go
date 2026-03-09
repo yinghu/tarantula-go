@@ -1,11 +1,11 @@
-package event
+package core
 
 import (
-	"gameclustering.com/internal/core"
+	"time"
 )
 
 type IndexListener interface {
-	LocalStore() core.DataStore
+	LocalStore() DataStore
 	Index(e Event)
 }
 
@@ -16,15 +16,15 @@ type EventListener interface {
 
 type EventService interface {
 	EventCreator
-	VerifyTicket(ticket string) (core.OnSession, error)
+	VerifyTicket(ticket string) (OnSession, error)
 	EventListener
 	Postoffice
 }
 
 type Event interface {
-	Inbound(buff core.DataBuffer) error
-	Outbound(buff core.DataBuffer) error
-	core.Persistentable
+	Inbound(buff DataBuffer) error
+	Outbound(buff DataBuffer) error
+	Persistentable
 	OnListener(el EventListener)
 	Listener() EventListener
 	OnIndex(ix IndexListener)
@@ -39,6 +39,18 @@ type Event interface {
 
 type EventCreator interface {
 	Create(classId int, topic string) (Event, error)
+}
+
+type Query interface {
+	QId() int32
+	QTag() string
+	QTopic() string
+	QStartTime() time.Time
+	QEndTime() time.Time
+	QLimit() int32
+	QCriteria(b DataBuffer) error
+	QCc() chan Chunk
+	QEvent() Event
 }
 
 type Postoffice interface {
@@ -60,7 +72,7 @@ type Pusher interface {
 
 type EventObj struct {
 	Callback EventListener `json:"-"`
-	core.PersistentableObj
+	PersistentableObj
 	ETopic string `json:"Topic"`
 	EOid   int64  `json:"Oid,string"`
 }
@@ -73,10 +85,10 @@ func (s *EventObj) Topic() string {
 	return s.ETopic
 }
 
-func (s *EventObj) Inbound(buff core.DataBuffer) error {
+func (s *EventObj) Inbound(buff DataBuffer) error {
 	return nil
 }
-func (s *EventObj) Outbound(buff core.DataBuffer) error {
+func (s *EventObj) Outbound(buff DataBuffer) error {
 	return nil
 }
 func (s *EventObj) OnListener(el EventListener) {

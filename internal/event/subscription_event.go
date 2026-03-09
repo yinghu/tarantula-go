@@ -8,7 +8,7 @@ type SubscriptionEvent struct {
 	Id       int32  `json:"Id"`
 	App      string `json:"App"`
 	Name     string `json:"Name"`
-	EventObj `json:"-"`
+	core.EventObj `json:"-"`
 }
 
 func (s *SubscriptionEvent) ClassId() int {

@@ -10,7 +10,7 @@ type TournamentEvent struct {
 	SystemId     int64 `json:"SystemId,string"`
 	Score        int64 `json:"Score,string"`
 	LastUpdated  int64 `json:"LastUpdated,string"`
-	EventObj     `json:"-"`
+	core.EventObj     `json:"-"`
 }
 
 func (s *TournamentEvent) ClassId() int {
@@ -108,7 +108,7 @@ func (s *TournamentEvent) Inbound(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *TournamentEvent) OnIndex(idx IndexListener) {
+func (s *TournamentEvent) OnIndex(idx core.IndexListener) {
 	tx := idx.LocalStore().Tx()
 	defer tx.Rollback()
 	err := tx.Set(s)

@@ -20,7 +20,7 @@ func (s *MahjongService) Config() string {
 	return "/etc/tarantula/mahjong-conf.json"
 }
 
-func (s *MahjongService) Start(f core.Env, p event.Pusher) error {
+func (s *MahjongService) Start(f core.Env, p core.Pusher) error {
 	s.ItemUpdater = s
 	s.AppManager.Start(f, p)
 	s.TableIndex = make(map[int64]*MahjongTable)
@@ -36,7 +36,7 @@ func (s *MahjongService) Shutdown() {
 	s.AppManager.Shutdown()
 }
 
-func (s *MahjongService) Create(classId int, topic string) (event.Event, error) {
+func (s *MahjongService) Create(classId int, topic string) (core.Event, error) {
 	e := event.CreateEvent(classId)
 	if e != nil {
 		e.OnTopic(topic)
@@ -58,11 +58,11 @@ func (s *MahjongService) VerifyTicket(ticket string) (core.OnSession, error) {
 	return session, nil
 }
 
-func (s *MahjongService) OnError(e event.Event, err error) {
+func (s *MahjongService) OnError(e core.Event, err error) {
 	core.AppLog.Printf("On event error %s\n", err.Error())
 }
 
-func (s *MahjongService) OnEvent(e event.Event) {
+func (s *MahjongService) OnEvent(e core.Event) {
 	switch e.ClassId() {
 	case event.MESSAGE_CID:
 		s.Pusher().Push(e)

@@ -19,7 +19,7 @@ func (s *PostofficeQueryer) AccessControl() int32 {
 	return core.ADMIN_ACCESS_CONTROL
 }
 
-func (s *PostofficeQueryer) query(query event.Query) {
+func (s *PostofficeQueryer) query(query core.Query) {
 	buff := core.BufferProxy{}
 	buff.NewProxy(100)
 	query.QCriteria(&buff)

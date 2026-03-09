@@ -10,7 +10,7 @@ type StatEvent struct {
 	Tag      string `json:"Tag"`
 	Name     string `json:"Name"`
 	Count    uint32 `json:"Count"`
-	EventObj `json:"-"`
+	core.EventObj `json:"-"`
 }
 
 func (s *StatEvent) ClassId() int {

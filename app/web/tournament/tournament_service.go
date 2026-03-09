@@ -23,7 +23,7 @@ func (s *TournamentService) Config() string {
 	return "/etc/tarantula/tournament-conf.json"
 }
 
-func (s *TournamentService) Start(f core.Env,  p event.Pusher) error {
+func (s *TournamentService) Start(f core.Env, p core.Pusher) error {
 	s.ItemUpdater = s
 	s.AppManager.Start(f, p)
 	s.createSchema()
@@ -44,7 +44,7 @@ func (s *TournamentService) Start(f core.Env,  p event.Pusher) error {
 	return nil
 }
 
-func (s *TournamentService) OnEvent(e event.Event) {
+func (s *TournamentService) OnEvent(e core.Event) {
 	te, isTe := e.(*event.TournamentEvent)
 	if isTe {
 		tmnt := s.tournaments[te.TournamentId]

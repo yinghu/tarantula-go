@@ -18,7 +18,7 @@ func (s *PostofficeRecoverer) AccessControl() int32 {
 	return core.ADMIN_ACCESS_CONTROL
 }
 
-func (s *PostofficeRecoverer) recover(query event.Query) {
+func (s *PostofficeRecoverer) recover(query core.Query) {
 	buff := core.BufferProxy{}
 	buff.NewProxy(100)
 	query.QCriteria(&buff)

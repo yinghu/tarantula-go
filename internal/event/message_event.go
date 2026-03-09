@@ -11,7 +11,7 @@ type MessageEvent struct {
 	Message  string    `json:"message"`
 	DateTime time.Time `json:"dataTime"`
 	Source   string    `json:"source"`
-	EventObj
+	core.EventObj
 }
 
 func (s *MessageEvent) ClassId() int {
@@ -114,7 +114,7 @@ func (s *MessageEvent) Inbound(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *MessageEvent) OnIndex(idx IndexListener) {
+func (s *MessageEvent) OnIndex(idx core.IndexListener) {
 	idx.LocalStore().Save(s)
 	idx.Index(s)
 }

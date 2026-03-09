@@ -11,7 +11,7 @@ type OutboundSocket struct {
 	C       net.Conn
 	B       core.DataBuffer
 	Flag    int64
-	Pending chan Event
+	Pending chan core.Event
 }
 
 func (out *OutboundSocket) Subscribe() {

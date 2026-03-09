@@ -1,5 +1,7 @@
 package event
 
+import "gameclustering.com/internal/core"
+
 const (
 	CLOSE_CID            int = 0
 	STAT_CID             int = 1
@@ -29,7 +31,7 @@ const (
 	EVENT_FACTORY_ID int = 1
 )
 
-func CreateEvent(cid int) Event {
+func CreateEvent(cid int) core.Event {
 	switch cid {
 	case STAT_CID:
 		return &StatEvent{}

@@ -13,7 +13,7 @@ import (
 type SampleCreator struct {
 }
 
-func (s *SampleCreator) Create(cid int, topic string) (Event, error) {
+func (s *SampleCreator) Create(cid int, topic string) (core.Event, error) {
 	e := CreateEvent(cid)
 	e.OnTopic(topic)
 	e.OnListener(s)
@@ -24,22 +24,22 @@ func (s *SampleCreator) VerifyTicket(ticket string) (core.OnSession, error) {
 	sess := core.OnSession{Successful: true, SystemId: 100}
 	return sess, nil
 }
-func (s *SampleCreator) OnError(e Event, err error) {
+func (s *SampleCreator) OnError(e core.Event, err error) {
 	fmt.Printf("On event error %v %s\n", e, err.Error())
 }
 
-func (s *SampleCreator) OnEvent(e Event) {
+func (s *SampleCreator) OnEvent(e core.Event) {
 	fmt.Printf("On event %v\n", e)
 
 }
-func (s *SampleCreator) Send(e Event) error {
+func (s *SampleCreator) Send(e core.Event) error {
 	return nil
 }
-func (s *SampleCreator) List(q Query)    {}
-func (s *SampleCreator) Recover(q Query) {}
-func (s *SampleCreator) Load(e Query)    {}
+func (s *SampleCreator) List(q core.Query)    {}
+func (s *SampleCreator) Recover(q core.Query) {}
+func (s *SampleCreator) Load(e core.Query)    {}
 
-func createEvent() Event {
+func createEvent() core.Event {
 	sub := SubscriptionEvent{}
 	return &sub
 }

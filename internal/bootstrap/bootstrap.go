@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
 )
 
@@ -31,9 +30,9 @@ const (
 
 type TarantulaContext interface {
 	Config() string
-	Start(f core.Env, p event.Pusher) error
+	Start(f core.Env, p core.Pusher) error
 	Shutdown()
-	event.EventService
+	core.EventService
 	Context() string
 	Service() TarantulaService
 }
@@ -44,7 +43,7 @@ type TarantulaService interface {
 	Authenticator() core.Authenticator
 	Sequence() core.Sequence
 	ItemListener() item.ItemListener
-	Pusher() event.Pusher
+	Pusher() core.Pusher
 	Cluster() core.ClusterService
 }
 

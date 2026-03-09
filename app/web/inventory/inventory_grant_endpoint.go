@@ -57,7 +57,7 @@ func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *
 	}
 	w.Write(util.ToJson(core.OnSession{Successful: true, Message: "granted"}))
 }
-func (s *InventoryGranter) sendEvent(e event.Event) {
+func (s *InventoryGranter) sendEvent(e core.Event) {
 	oid, _ := s.Sequence().Id()
 	e.OnOId(oid)
 	e.OnTopic("inventory")

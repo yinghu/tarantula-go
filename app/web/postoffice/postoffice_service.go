@@ -27,11 +27,11 @@ type PostofficeService struct {
 	bootstrap.AppManager
 	Ds core.DataStore
 	TopicMap
-	outboundQ chan event.Event
+	outboundQ chan core.Event
 	cchangeQ  []chan CChange
 
-	inboundQ chan event.Event
-	indexQ   chan event.Event
+	inboundQ chan core.Event
+	indexQ   chan core.Event
 	topicQ   []chan event.SubscriptionEvent
 	ready    sync.WaitGroup
 	mm       *clustering.MemberlistManager
@@ -41,7 +41,7 @@ func (s *PostofficeService) Config() string {
 	return "/etc/tarantula/postoffice-conf.json"
 }
 
-func (s *PostofficeService) Start(env core.Env, p event.Pusher) error {
+func (s *PostofficeService) Start(env core.Env, p core.Pusher) error {
 	env.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	s.AppManager.Start(env, p)
 
@@ -50,13 +50,13 @@ func (s *PostofficeService) Start(env core.Env, p event.Pusher) error {
 	s.loadTopics()
 	s.ready = sync.WaitGroup{}
 	s.ready.Add(1)
-	s.outboundQ = make(chan event.Event, 10)
+	s.outboundQ = make(chan core.Event, 10)
 	s.cchangeQ = make([]chan CChange, 0)
 	ec := make(chan CChange, 1)
 	s.cchangeQ = append(s.cchangeQ, ec)
 	go s.outboundEvent(ec)
-	s.indexQ = make(chan event.Event, 10)
-	s.inboundQ = make(chan event.Event, 10)
+	s.indexQ = make(chan core.Event, 10)
+	s.inboundQ = make(chan core.Event, 10)
 	s.topicQ = make([]chan event.SubscriptionEvent, 0)
 	tc := make(chan event.SubscriptionEvent, 1)
 	s.topicQ = append(s.topicQ, tc)
@@ -88,7 +88,7 @@ func (s *PostofficeService) Shutdown() {
 	s.mm.ShutdownHook()
 }
 
-func (s *PostofficeService) Create(classId int, topic string) (event.Event, error) {
+func (s *PostofficeService) Create(classId int, topic string) (core.Event, error) {
 	me := event.CreateEvent(classId)
 	me.OnListener(s)
 	me.OnTopic(topic)
@@ -98,16 +98,16 @@ func (s *PostofficeService) Create(classId int, topic string) (event.Event, erro
 	return me, nil
 }
 
-func (s *PostofficeService) OnError(e event.Event, err error) {
+func (s *PostofficeService) OnError(e core.Event, err error) {
 	core.AppLog.Printf("On event error %s\n", err.Error())
 }
 
-func (s *PostofficeService) Index(e event.Event) {
+func (s *PostofficeService) Index(e core.Event) {
 	core.AppLog.Printf("On event index %v\n", e)
 	s.indexQ <- e
 }
 
-func (s *PostofficeService) OnEvent(e event.Event) {
+func (s *PostofficeService) OnEvent(e core.Event) {
 	se, isSe := e.(*event.SubscriptionEvent)
 	if isSe {
 		for i := range s.topicQ {
@@ -120,7 +120,7 @@ func (s *PostofficeService) OnEvent(e event.Event) {
 func (s *PostofficeService) LocalStore() core.DataStore {
 	return s.Ds
 }
-func (s *PostofficeService) Publish(e event.Event) {
+func (s *PostofficeService) Publish(e core.Event) {
 	s.outboundQ <- e
 }
 
@@ -138,7 +138,7 @@ func (s *PostofficeService) NodeStopped(n core.Node) {
 	}
 }
 
-func (s *PostofficeService) onRetry(e event.Event) {
+func (s *PostofficeService) onRetry(e core.Event) {
 	core.AppLog.Printf("Retrying %v\n", e)
 }
 func (s *PostofficeService) inboundEvent(t chan event.SubscriptionEvent) {
@@ -171,7 +171,7 @@ func (s *PostofficeService) inboundEvent(t chan event.SubscriptionEvent) {
 	}
 }
 func (s *PostofficeService) outboundEvent(c chan CChange) {
-	pubs := make(map[string]event.Publisher)
+	pubs := make(map[string]core.Publisher)
 	localListener := LocalEventListener{s}
 	for {
 		select {

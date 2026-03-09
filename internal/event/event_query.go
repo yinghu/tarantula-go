@@ -20,7 +20,7 @@ const (
 	QT_SCORE_QID     int32 = 101
 )
 
-func CreateQuery(qid int32) Query {
+func CreateQuery(qid int32) core.Query {
 	switch qid {
 	case TAG_MESSAGE_QID:
 		q := QWithTag{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan core.Chunk, 3)}
@@ -59,18 +59,6 @@ func CreateQuery(qid int32) Query {
 	}
 }
 
-type Query interface {
-	QId() int32
-	QTag() string
-	QTopic() string
-	QStartTime() time.Time
-	QEndTime() time.Time
-	QLimit() int32
-	QCriteria(b core.DataBuffer) error
-	QCc() chan core.Chunk
-	QEvent() Event
-}
-
 type QWithTag struct {
 	Id        int32           `json:"-"`
 	Tag       string          `json:"Tag"`
@@ -79,7 +67,7 @@ type QWithTag struct {
 	StartTime time.Time       `json:"StartTime"`
 	EndTime   time.Time       `json:"EndTime"`
 	Cc        chan core.Chunk `json:"-"`
-	Ee        Event
+	Ee        core.Event
 }
 
 func (q *QWithTag) QCriteria(buff core.DataBuffer) error {
@@ -111,6 +99,6 @@ func (q *QWithTag) QCc() chan core.Chunk {
 	return q.Cc
 }
 
-func (q *QWithTag) QEvent() Event {
+func (q *QWithTag) QEvent() core.Event {
 	return q.Ee
 }

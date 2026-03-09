@@ -26,7 +26,7 @@ type AppManager struct {
 	F           core.Env
 	seq         core.Sequence
 	ItemUpdater item.ItemListener
-	tcpPusher   event.Pusher
+	tcpPusher   core.Pusher
 	ManagedApps []string
 	rpc         *grpc.ClientConn
 }
@@ -35,7 +35,7 @@ func (s *AppManager) ItemService() item.ItemService {
 	return s.imse
 }
 
-func (s *AppManager) Pusher() event.Pusher {
+func (s *AppManager) Pusher() core.Pusher {
 	return s.tcpPusher
 }
 
@@ -60,7 +60,7 @@ func (c *AppManager) Cluster() core.ClusterService {
 func (s *AppManager) Name() string {
 	return s.F.GroupName
 }
-func (s *AppManager) Start(f core.Env, p event.Pusher) error {
+func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
 	s.ManagedApps = f.ManagedApps
 	s.tcpPusher = p
@@ -115,7 +115,7 @@ func (s *AppManager) Shutdown() {
 	core.AppLog.Println("app manager shutting down ...")
 }
 
-func (s *AppManager) Create(classId int, topic string) (event.Event, error) {
+func (s *AppManager) Create(classId int, topic string) (core.Event, error) {
 	return nil, nil
 }
 
@@ -129,7 +129,7 @@ func (s *AppManager) VerifyTicket(ticket string) (core.OnSession, error) {
 	}
 	return session, nil
 }
-func (s *AppManager) Send(e event.Event) error {
+func (s *AppManager) Send(e core.Event) error {
 	buff := core.NewBuffer(200)
 	e.WriteKey(buff)
 	buff.Flip()
@@ -152,10 +152,10 @@ func (s *AppManager) Send(e event.Event) error {
 	}
 	return nil
 }
-func (s *AppManager) List(query event.Query) {
+func (s *AppManager) List(query core.Query) {
 	s.PostJsonAsync(fmt.Sprintf("%s/%d", "http://postoffice:8080/postoffice/query", query.QId()), query, query.QCc())
 }
-func (s *AppManager) Recover(query event.Query) {
+func (s *AppManager) Recover(query core.Query) {
 	for i := range 5 {
 		ret := s.PostJsonSync(fmt.Sprintf("%s/%d", "http://postoffice:8080/postoffice/recover", query.QId()), query)
 		if ret.ErrorCode == 0 {
@@ -166,16 +166,16 @@ func (s *AppManager) Recover(query event.Query) {
 	}
 }
 
-func (s AppManager) Load(query event.Query) {
+func (s AppManager) Load(query core.Query) {
 	e := query.QEvent()
 	s.PostJsonAsync(fmt.Sprintf("%s/%d", "http://postoffice:8080/postoffice/load", e.ClassId()), e, query.QCc())
 }
 
-func (s *AppManager) OnEvent(e event.Event) {
+func (s *AppManager) OnEvent(e core.Event) {
 
 }
 
-func (s *AppManager) OnError(e event.Event, err error) {
+func (s *AppManager) OnError(e core.Event, err error) {
 
 }
 

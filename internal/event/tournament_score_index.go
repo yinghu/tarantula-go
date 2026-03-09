@@ -12,7 +12,7 @@ type TournamentScoreIndex struct {
 	Score        int64 `json:"Score,string"`
 	UpdateTime   int64 `json:"UpdateTime,string"`
 	SystemId     int64 `json:"SystemId,string"`
-	EventObj     `json:"-"`
+	core.EventObj     `json:"-"`
 }
 
 func (s *TournamentScoreIndex) ClassId() int {

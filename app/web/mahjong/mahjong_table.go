@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
 
@@ -33,7 +32,7 @@ type MahjongTable struct {
 	Discarded     []mj.Tile         `json:"Discharged"`
 	Solo          bool
 	Turn          chan MahjongPlayToken `json:"-"`
-	event.Pusher  `json:"-"`
+	core.Pusher   `json:"-"`
 	core.Sequence `json:"-"`
 	Sync          chan MahjongPlayToken `json:"-"`
 	skips         []MahjongDiscardEvent
@@ -497,7 +496,7 @@ func (m *MahjongTable) deal(p int) error {
 	return nil
 }
 
-func (m *MahjongTable) Update(e event.Event) {
+func (m *MahjongTable) Update(e core.Event) {
 	if e.RecipientId() > 0 {
 		m.Push(e)
 		return

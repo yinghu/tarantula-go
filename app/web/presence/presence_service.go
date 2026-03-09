@@ -5,7 +5,6 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
 )
@@ -20,7 +19,7 @@ func (s *PresenceService) Config() string {
 	return "/etc/tarantula/presence-conf.json"
 }
 
-func (s *PresenceService) Start(env core.Env,  p event.Pusher) error {
+func (s *PresenceService) Start(env core.Env, p core.Pusher) error {
 	s.ItemUpdater = s
 	err := s.AppManager.Start(env, p)
 	if err != nil {
@@ -56,6 +55,6 @@ func (s *PresenceService) Shutdown() {
 	core.AppLog.Printf("Presence service shut down\n")
 }
 
-func (s *PresenceService) OnEvent(e event.Event) {
+func (s *PresenceService) OnEvent(e core.Event) {
 	core.AppLog.Printf("%v\n", e)
 }

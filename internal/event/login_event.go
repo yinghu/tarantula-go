@@ -10,7 +10,7 @@ type LoginEvent struct {
 	Name      string    `json:"login"`
 	SystemId  int64     `json:"systemId,string"`
 	LoginTime time.Time `json:"loginTime"`
-	EventObj
+	core.EventObj
 }
 
 func (s *LoginEvent) ClassId() int {

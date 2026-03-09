@@ -29,7 +29,7 @@ func (s *TcpPublisher) Close() error {
 	return s.client.Close()
 }
 
-func (s *TcpPublisher) Subscribe(cr EventCreator, ec EventListener) {
+func (s *TcpPublisher) Subscribe(cr core.EventCreator, ec core.EventListener) {
 	buff := core.NewBuffer(TCP_READ_BUFFER_SIZE)
 	data := make([]byte, TCP_READ_BUFFER_SIZE)
 	for {
@@ -65,7 +65,7 @@ func (s *TcpPublisher) Subscribe(cr EventCreator, ec EventListener) {
 	}
 }
 
-func (s *TcpPublisher) Join(e Event) error {
+func (s *TcpPublisher) Join(e core.Event) error {
 	s.pub.Clear()
 	err := s.pub.WriteInt32(int32(e.ClassId()))
 	if err != nil {
@@ -93,7 +93,7 @@ func (s *TcpPublisher) Join(e Event) error {
 	return nil
 }
 
-func (s *TcpPublisher) Publish(e Event, ticket string) error {
+func (s *TcpPublisher) Publish(e core.Event, ticket string) error {
 	s.pub.Clear()
 	err := s.pub.WriteInt32(int32(e.ClassId()))
 	if err != nil {

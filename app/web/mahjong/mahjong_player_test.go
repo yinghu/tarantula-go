@@ -4,14 +4,13 @@ import (
 	"testing"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
 
 type SamplePusher struct {
 }
 
-func (p *SamplePusher) Push(e event.Event) {
+func (p *SamplePusher) Push(e core.Event) {
 
 }
 

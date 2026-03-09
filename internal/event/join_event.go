@@ -11,7 +11,7 @@ type JoinEvent struct {
 	Client   net.Conn
 	SystemId int64
 	Flag     int64
-	EventObj
+	core.EventObj
 }
 
 func (s *JoinEvent) ClassId() int {
