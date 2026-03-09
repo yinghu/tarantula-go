@@ -250,6 +250,7 @@ func (m *DataServiceProvider) clientReset(target *core.Node, request *protocol.R
 }
 
 func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Response) {
+	core.AppLog.Debug().Msg("running get opt")
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
 	retry := RetryTrack{Reties: RETRY_MAX}
@@ -290,4 +291,3 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 	core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
 	ch <- &protocol.Response{Successful: false, Message: retry.Err.Error()}
 }
-
