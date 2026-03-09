@@ -37,39 +37,39 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 }
 
 func (c *DataServiceProvider) Reset(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
-	msg := make(chan SetRes, 1)
+	msg := make(chan *protocol.Response, 1)
 	defer close(msg)
-	setData := SetData{Data: in.Data, Msg: msg}
+	setData := SetData{Data: in.Data, Resp: msg}
 	c.DSet <- setData
 	resp := <-msg
-	return &protocol.Response{Successful: resp.Suc}, resp.Err
+	return resp, nil
 }
 
 func (c *DataServiceProvider) Create(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
-	msg := make(chan SetRes, 1)
+	msg := make(chan *protocol.Response, 1)
 	defer close(msg)
-	setData := SetData{Opt: in.Opt, Data: in.Data, Msg: msg}
+	setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
 	c.DSet <- setData
 	resp := <-msg
-	return &protocol.Response{Successful: resp.Suc}, resp.Err
+	return resp, nil
 }
 
 func (c *DataServiceProvider) Update(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
-	msg := make(chan SetRes, 1)
+	msg := make(chan *protocol.Response, 1)
 	defer close(msg)
-	setData := SetData{Opt: in.Opt, Data: in.Data, Msg: msg}
+	setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
 	c.DSet <- setData
 	resp := <-msg
-	return &protocol.Response{Successful: resp.Suc}, resp.Err
+	return resp, nil
 }
 
 func (c *DataServiceProvider) Delete(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
-	msg := make(chan SetRes, 1)
+	msg := make(chan *protocol.Response, 1)
 	defer close(msg)
-	setData := SetData{Data: in.Data, Msg: msg}
+	setData := SetData{Data: in.Data, Resp: msg}
 	c.DSet <- setData
 	resp := <-msg
-	return &protocol.Response{Successful: resp.Suc}, resp.Err
+	return resp, nil
 }
 
 func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
@@ -191,7 +191,7 @@ func (m *DataServiceProvider) RingUpdated() {
 
 // internal operations
 
-func (m *DataServiceProvider) create(sd SetData) error {
+func (m *DataServiceProvider) create(sd SetData) (KeyIndex, error) {
 	ki := sd.IndexKey()
 	ki.Header.Revision = 1
 	ki.Header.Timestamp = time.Now().UnixMilli()
@@ -199,13 +199,13 @@ func (m *DataServiceProvider) create(sd SetData) error {
 	sd.Header.Revision = ki.Header.Revision
 	k, v, err := ki.Pair()
 	if err != nil {
-		return err
+		return ki, err
 	}
 	dk, err := sd.DataKey()
 	if err != nil {
-		return err
+		return ki, err
 	}
-	return m.Local.Db.Update(func(txn *badger.Txn) error {
+	err = m.Local.Db.Update(func(txn *badger.Txn) error {
 		_, err := txn.Get(k)
 		if err == nil {
 			return fmt.Errorf("key already existed")
@@ -215,6 +215,7 @@ func (m *DataServiceProvider) create(sd SetData) error {
 		}
 		return txn.Set(dk, sd.Value)
 	})
+	return ki, err
 }
 func (m *DataServiceProvider) update(sd SetData) error {
 	ki := sd.IndexKey()

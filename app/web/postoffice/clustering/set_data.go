@@ -14,8 +14,8 @@ const (
 
 type SetData struct {
 	*protocol.Data
-	Opt int32
-	Msg chan SetRes
+	Opt  int32
+	Resp chan *protocol.Response
 }
 
 // HELPER METHODS

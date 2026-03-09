@@ -4,17 +4,12 @@ import (
 	"fmt"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 )
 
 const (
 	SET_OPERATOR_NUM int = 8
 )
-
-type SetRes struct {
-	Suc  bool
-	Code int
-	Err  error
-}
 
 func (m *DataServiceProvider) runSetData(num int) {
 start:
@@ -27,25 +22,24 @@ start:
 			core.AppLog.Debug().Msgf("closing set data operator %d", num)
 			return
 		}
-		var err error
 		switch sd.Opt {
 		case core.CREATE_DATA_REQUEST:
-			err = m.create(sd)
+			ki, err := m.create(sd)
+			if err != nil {
+				sd.Resp <- &protocol.Response{Successful: false, Message: err.Error()}
+			} else {
+				var data []*protocol.Data
+				data = append(data, &protocol.Data{Header: &protocol.Header{Revision: ki.Rev}})
+				sd.Resp <- &protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
+			}
 		case core.UPDATE_DATA_REQUEST:
-			err = m.update(sd)
+			//err = m.update(sd)
 		case core.DELETE_DATA_REQUEST:
-			err = m.delete(sd)
+			//err = m.delete(sd)
 		case core.RESET_DATA_REQUEST:
-			err = m.reset(sd)
+			//err = m.reset(sd)
 		default:
-			err = fmt.Errorf("opt not supported %d", sd.Opt)
-		}
-
-		if err != nil {
-			sd.Msg <- SetRes{Err: err}
-
-		} else {
-			sd.Msg <- SetRes{Suc: true}
+			sd.Resp <- &protocol.Response{Successful: false, Message: fmt.Sprintf("opt not supported %d", sd.Opt)}
 		}
 	}
 	core.AppLog.Debug().Msgf("running recovery on operator %d", num)

@@ -25,7 +25,7 @@ func (s *AdminCreateAccessKey) AccessControl() int32 {
 func (s *AdminCreateAccessKey) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	rq := make(chan core.Chunk, 10)
 	defer close(rq)
-	creq := core.DataRequest{Opt: core.CREATE_DATA_REQUEST, Key: []byte("key1"), Value: []byte("value1"), Async: rq}
+	creq := core.DataRequest{Opt: core.CREATE_DATA_REQUEST, Key: []byte("key2"), Value: []byte("value2"), Async: rq}
 	s.Cluster().Request(creq)
 	for chunk := range rq {
 		core.AppLog.Debug().Msgf("Chunk %s", string(chunk.Data))

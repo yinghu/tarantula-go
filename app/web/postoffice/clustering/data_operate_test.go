@@ -21,7 +21,7 @@ func TestDataOpt(t *testing.T) {
 	v := []byte("value1")
 	data := protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: 100, ClassId: 300}}
 	dset := SetData{Data: &data, Opt: core.CREATE_DATA_REQUEST}
-	err = dsp.create(dset)
+	_,err = dsp.create(dset)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
@@ -40,7 +40,7 @@ func TestDataOpt(t *testing.T) {
 	if string(d.Value) != string(v) {
 		t.Errorf("should be same values %s %s", string(d.Value), string(v))
 	}
-	err = dsp.create(dset)
+	_,err = dsp.create(dset)
 	if err == nil {
 		t.Error("should be an error")
 	}
