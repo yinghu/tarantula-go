@@ -29,8 +29,9 @@ start:
 				sd.Resp <- &protocol.Response{Successful: false, Message: err.Error()}
 			} else {
 				var data []*protocol.Data
-				data = append(data, &protocol.Data{Header: &protocol.Header{Revision: ki.Rev + 10}})
-				data = append(data, &protocol.Data{Header: &protocol.Header{Revision: 11}})
+				data = append(data, &protocol.Data{Header: &protocol.Header{Revision: ki.Header.Revision}})
+				data = append(data, &protocol.Data{Header: &protocol.Header{Revision: ki.Header.Revision+1}})
+				
 				sd.Resp <- &protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
 			}
 		case core.UPDATE_DATA_REQUEST:
