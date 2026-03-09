@@ -252,7 +252,7 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		resp, err := c.clientReset(&ringNode, set)
+		resp, err := c.clientGet(&ringNode, set)
 		if err != nil {
 			retry.Err = err
 			retry.Reties--
@@ -262,10 +262,6 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 		retry.Suc = true
 		if !resp.Successful {
 			break
-		}
-		slaves := nodes[1:]
-		for _, slave := range slaves {
-			c.clientGet(&slave, set)
 		}
 		break
 	}
