@@ -335,9 +335,9 @@ func (c *AppManager) Request(r core.DataRequest) {
 			break
 		}
 		if resp.Successful {
-			for _, d := range resp.Data.List {
-				core.AppLog.Debug().Msgf("Rev : %v", d)
-			}
+			//for _, d := range resp.Data.List {
+				core.AppLog.Debug().Msgf("Rev : %v",resp)
+			//}
 		}
 		r.Async <- core.Chunk{Remaining: true, Data: []byte("data")}
 	}

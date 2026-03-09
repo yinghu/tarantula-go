@@ -26,11 +26,6 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 		return
 	}
 	me := event.CreateQuery(int32(qid))
-	//err = json.NewDecoder(r.Body).Decode(&me)
-	//if err != nil {
-	//w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
-	//return
-	//}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	defer close(me.QCc())
