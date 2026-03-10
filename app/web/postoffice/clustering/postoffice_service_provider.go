@@ -286,7 +286,7 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 			//break
 			//}
 		}
-		ch <- &protocol.Response{Successful: false, Message: "ended"}
+		//ch <- &protocol.Response{Successful: false, Message: "ended"}
 		retry.Suc = true
 		break
 	}
