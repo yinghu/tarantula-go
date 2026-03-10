@@ -57,6 +57,16 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 			}
 			stream.Send(resp)
 		}
+	case core.QUERY_DATA_REQUEST:
+		rc := make(chan *protocol.Response, 3)
+		defer close(rc)
+		go c.runGet(request, rc)
+		for resp := range rc {
+			if !resp.Successful {
+				break
+			}
+			stream.Send(resp)
+		}
 	case core.UPDATE_DATA_REQUEST:
 		rc := make(chan *protocol.Response, 3)
 		defer close(rc)
