@@ -40,8 +40,25 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 	q.QRead(buff)
 	core.AppLog.Debug().Msgf("query : %v", q)
 	c.Local.Db.View(func(txn *badger.Txn) error {
-		//txn.NewIterator()
-		return nil	
+		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: true}
+		it := txn.NewIterator(op)
+		defer it.Close()
+		p := []byte(q.QTag())
+		buff := core.NewBuffer(200)
+		for it.Seek(p); it.ValidForPrefix(p); it.Next() {
+			p = []byte(q.QTag())
+			item := it.Item()
+			item.Value(func(val []byte) error {
+				me := event.MessageEvent{}
+				buff.Write(val)
+				buff.Flip()
+				me.ReadKey(buff)
+				me.Read(buff)
+				core.AppLog.Debug().Msgf("msg : %s", me.Message)
+				return nil
+			})
+		}
+		return nil
 	})
 
 	stream.Send(&protocol.Response{Successful: true, Message: "hello1"})
