@@ -320,7 +320,6 @@ func (c *AppManager) Request(r core.DataRequest) {
 	for {
 		resp, err := stream.Recv()
 		if err == io.EOF {
-			core.AppLog.Debug().Msgf("EOF %s", err.Error())
 			break
 		}
 		if err != nil {
@@ -330,6 +329,5 @@ func (c *AppManager) Request(r core.DataRequest) {
 		core.AppLog.Debug().Msgf("Rev : %v", resp)
 		r.Async <- core.Chunk{Remaining: true, Data: resp}
 	}
-	core.AppLog.Debug().Msg("end call")
 	r.Async <- core.Chunk{Remaining: false}
 }

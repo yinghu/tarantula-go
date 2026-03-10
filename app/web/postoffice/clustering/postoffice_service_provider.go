@@ -273,7 +273,6 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 		for {
 			data, err := stream.Recv()
 			if err == io.EOF {
-				core.AppLog.Debug().Msg("EOF!!!")
 				break
 			}
 			if err != nil {
@@ -282,11 +281,11 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 			}
 			core.AppLog.Debug().Msgf("Rev : %v", data)
 			ch <- data
-			//if !data.Successful {
-			//break
-			//}
+			if !data.Successful {
+				break
+			}
 		}
-		ch <- &protocol.Response{Successful: false, Message: "ended"}
+		ch <- &protocol.Response{Successful: false}
 		retry.Suc = true
 		break
 	}
