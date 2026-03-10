@@ -48,7 +48,7 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 		resp := <-rc
 		stream.Send(resp)
 	case core.GET_DATA_REQUEST:
-		rc := make(chan *protocol.Response, 10)
+		rc := make(chan *protocol.Response, 3)
 		defer close(rc)
 		c.runGet(request, rc)
 		for resp := range rc {
