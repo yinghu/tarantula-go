@@ -155,16 +155,8 @@ func (s *AppManager) Send(e core.Event) error {
 }
 func (s *AppManager) List(query core.Query) {
 	req := core.DataRequest{Prefix: query.QId(), Opt: core.GET_DATA_REQUEST}
-	aq := make(chan core.Chunk, 3)
-	req.Async = aq
-	defer close(aq)
+	req.Async = query.QCc()
 	s.Cluster().Request(req)
-	for c := range aq {
-		query.QCc() <- c
-		if !c.Remaining {
-			break
-		}
-	}
 }
 func (s *AppManager) Recover(query core.Query) {
 	for i := range 5 {

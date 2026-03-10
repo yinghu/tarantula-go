@@ -31,12 +31,10 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 	defer close(me.QCc())
 	go s.List(me)
 	for c := range me.QCc() {
-		cv, _ := c.Data.([]byte)
-		if len(cv) > 0 {
-			w.Write(util.ToJson(me))
-		}
 		if !c.Remaining {
 			break
 		}
+		core.AppLog.Debug().Msgf("STREAMING DATA : %v", c.Data)
 	}
+	w.Write(util.ToJson(me))
 }
