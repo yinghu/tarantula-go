@@ -149,6 +149,7 @@ func (s *AppManager) Send(e core.Event) error {
 		if !c.Remaining {
 			break
 		}
+		core.AppLog.Debug().Msgf("payload %v", c.Data)
 	}
 	return nil
 }
@@ -317,12 +318,11 @@ func (c *AppManager) RingToken(key []byte) uint32 {
 }
 
 func (c *AppManager) Request(r core.DataRequest) {
-
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	req := protocol.Request{Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId}}}
 	stream, err := dsp.Request(context.Background(), &req)
 	if err != nil {
-		r.Async <- core.Chunk{Remaining: false, Data: []byte(err.Error())}
+		r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: err.Error()}}
 		return
 	}
 	for {
@@ -334,12 +334,8 @@ func (c *AppManager) Request(r core.DataRequest) {
 			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
 			break
 		}
-		if resp.Successful {
-			//for _, d := range resp.Data.List {
-				core.AppLog.Debug().Msgf("Rev : %v",resp)
-			//}
-		}
-		r.Async <- core.Chunk{Remaining: true, Data: []byte("data")}
+		core.AppLog.Debug().Msgf("Rev : %v", resp)
+		r.Async <- core.Chunk{Remaining: true, Data: resp}
 	}
 	r.Async <- core.Chunk{Remaining: false}
 }
