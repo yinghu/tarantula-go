@@ -39,6 +39,11 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 	buff.Flip()
 	q.QRead(buff)
 	core.AppLog.Debug().Msgf("query : %v", q)
+	c.Local.Db.View(func(txn *badger.Txn) error {
+		//txn.NewIterator()
+		return nil	
+	})
+
 	stream.Send(&protocol.Response{Successful: true, Message: "hello1"})
 	stream.Send(&protocol.Response{Successful: true, Message: "hello2"})
 	stream.Send(&protocol.Response{Successful: true, Message: "hello3"})

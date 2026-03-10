@@ -43,7 +43,7 @@ func TestTournamentEvent(t *testing.T) {
 	}
 	tq := event.QScore{TournamentId: TID,InstanceId: IID}
 	prx := core.NewBuffer(100)
-	tq.QCriteria(prx)
+	tq.QWrite(prx)
 	prx.Flip()
 	q,_:=prx.Read(0)
 	opt := core.ListingOpt{Prefix: q,Reverse: true}
