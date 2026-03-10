@@ -52,10 +52,10 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 		defer close(rc)
 		go c.runGet(request, rc)
 		for resp := range rc {
-			stream.Send(resp)
 			if !resp.Successful {
 				break
 			}
+			stream.Send(resp)
 		}
 	case core.UPDATE_DATA_REQUEST:
 		rc := make(chan *protocol.Response, 3)
@@ -286,7 +286,7 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 			//break
 			//}
 		}
-		//ch <- &protocol.Response{Successful: false, Message: "ended"}
+		ch <- &protocol.Response{Successful: false, Message: "ended"}
 		retry.Suc = true
 		break
 	}
