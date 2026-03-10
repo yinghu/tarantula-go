@@ -22,7 +22,7 @@ func (s *PostofficeQueryer) AccessControl() int32 {
 func (s *PostofficeQueryer) query(query core.Query) {
 	buff := core.BufferProxy{}
 	buff.NewProxy(100)
-	query.QCriteria(&buff)
+	query.QWrite(&buff)
 	buff.Flip()
 	stat := event.StatEvent{Tag: query.QTag(), Name: event.STAT_TOTAL}
 	err := s.Ds.Load(&stat)
@@ -66,7 +66,7 @@ func (s *PostofficeQueryer) Request(rs core.OnSession, w http.ResponseWriter, r 
 		w.Write(util.ToJson(session))
 		return
 	}
-	me := event.CreateQuery(int32(qid))
+	me := event.CreateQuery(uint32(qid))
 	err = json.NewDecoder(r.Body).Decode(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))

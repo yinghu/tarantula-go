@@ -11,8 +11,9 @@ const (
 	UPDATE_DATA_REQUEST int32 = 12
 	DELETE_DATA_REQUEST int32 = 13
 	RESET_DATA_REQUEST  int32 = 14
-	
+	QUERY_DATA_REQUEST  int32 = 15
 )
+
 type Chunk struct {
 	Remaining bool
 	Data      any
@@ -64,14 +65,14 @@ type DataHeader struct {
 	Revision  int64
 }
 
-
 type DataRequest struct {
 	DataHeader
-	Prefix int32
-	Key    []byte
-	Value  []byte
-	Opt    int32
-	Async  chan Chunk
+	Prefix   uint32
+	Key      []byte
+	Value    []byte
+	Opt      int32
+	Criteria Query
+	Async    chan Chunk
 }
 
 type ClusterService interface {

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	badger "github.com/dgraph-io/badger/v4"
@@ -32,6 +33,12 @@ type DataServiceProvider struct {
 }
 
 func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
+	q := event.CreateQuery(request.Query.Id)
+	buff := core.NewBuffer(100)
+	buff.Write(request.Query.Criteria)
+	buff.Flip()
+	q.QRead(buff)
+	core.AppLog.Debug().Msgf("query : %v", q)
 	stream.Send(&protocol.Response{Successful: true, Message: "hello1"})
 	stream.Send(&protocol.Response{Successful: true, Message: "hello2"})
 	stream.Send(&protocol.Response{Successful: true, Message: "hello3"})

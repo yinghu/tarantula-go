@@ -8,19 +8,19 @@ import (
 
 const (
 	//query with tag
-	TAG_MESSAGE_QID    int32 = 0
-	TAG_LOGIN_QID      int32 = 1
-	TAG_TOURNAMENT_QID int32 = 2
-	TAG_INVENTORY_QID  int32 = 3
-	TAG_KICKOFF_QID    int32 = 4
-	TAG_REGISTER_QID   int32 = 5
+	TAG_MESSAGE_QID    uint32 = 0
+	TAG_LOGIN_QID      uint32 = 1
+	TAG_TOURNAMENT_QID uint32 = 2
+	TAG_INVENTORY_QID  uint32 = 3
+	TAG_KICKOFF_QID    uint32 = 4
+	TAG_REGISTER_QID   uint32 = 5
 
 	//query criteria
-	Q_TOURNAMENT_QID int32 = 100
-	QT_SCORE_QID     int32 = 101
+	Q_TOURNAMENT_QID uint32 = 100
+	QT_SCORE_QID     uint32 = 101
 )
 
-func CreateQuery(qid int32) core.Query {
+func CreateQuery(qid uint32) core.Query {
 	switch qid {
 	case TAG_MESSAGE_QID:
 		q := QWithTag{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan core.Chunk, 3)}
@@ -60,7 +60,7 @@ func CreateQuery(qid int32) core.Query {
 }
 
 type QWithTag struct {
-	Id        int32           `json:"-"`
+	Id        uint32          `json:"-"`
 	Tag       string          `json:"Tag"`
 	Topic     string          `json:"Topic"`
 	Limit     int32           `json:"Limit"`
@@ -70,12 +70,47 @@ type QWithTag struct {
 	Ee        core.Event
 }
 
-func (q *QWithTag) QCriteria(buff core.DataBuffer) error {
-	buff.WriteString(q.Tag)
+func (q *QWithTag) QRead(buff core.DataBuffer) error {
+	tag, err := buff.ReadString()
+	if err != nil {
+		return err
+	}
+	q.Tag = tag
+	st, err := buff.ReadInt64()
+	if err != nil {
+		return err
+	}
+	q.StartTime = time.UnixMilli(st)
+	et, err := buff.ReadInt64()
+	if err != nil {
+		return err
+	}
+	q.EndTime = time.UnixMilli(et)
+	lm, err := buff.ReadInt32()
+	if err != nil {
+		return err
+	}
+	q.Limit = lm
 	return nil
 }
 
-func (q *QWithTag) QId() int32 {
+func (q *QWithTag) QWrite(buff core.DataBuffer) error {
+	if err := buff.WriteString(q.Tag); err != nil {
+		return err
+	}
+	if err := buff.WriteInt64(q.StartTime.UnixMilli()); err != nil {
+		return err
+	}
+	if err := buff.WriteInt64(q.EndTime.UnixMilli()); err != nil {
+		return err
+	}
+	if err := buff.WriteInt32(q.Limit); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (q *QWithTag) QId() uint32 {
 	return q.Id
 }
 

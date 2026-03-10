@@ -42,13 +42,14 @@ type EventCreator interface {
 }
 
 type Query interface {
-	QId() int32
+	QId() uint32
 	QTag() string
 	QTopic() string
 	QStartTime() time.Time
 	QEndTime() time.Time
 	QLimit() int32
-	QCriteria(b DataBuffer) error
+	QRead(b DataBuffer) error
+	QWrite(b DataBuffer) error
 	QCc() chan Chunk
 	QEvent() Event
 }

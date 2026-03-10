@@ -154,7 +154,7 @@ func (s *AppManager) Send(e core.Event) error {
 	return nil
 }
 func (s *AppManager) List(query core.Query) {
-	req := core.DataRequest{Prefix: query.QId(), Opt: core.GET_DATA_REQUEST}
+	req := core.DataRequest{Opt: core.QUERY_DATA_REQUEST, Criteria: query}
 	req.Async = query.QCc()
 	s.Cluster().Request(req)
 }
@@ -312,6 +312,14 @@ func (c *AppManager) RingToken(key []byte) uint32 {
 func (c *AppManager) Request(r core.DataRequest) {
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	req := protocol.Request{Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId}}}
+	if r.Opt == core.QUERY_DATA_REQUEST {
+		buff := core.NewBuffer(100)
+		r.Criteria.QWrite(buff)
+		buff.Flip()
+		dt, _ := buff.Read(0)
+		q := protocol.Query{Id: r.Criteria.QId(), Criteria: dt}
+		req.Query = &q
+	}
 	stream, err := dsp.Request(context.Background(), &req)
 	if err != nil {
 		r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: err.Error()}}

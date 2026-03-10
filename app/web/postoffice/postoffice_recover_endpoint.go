@@ -21,7 +21,7 @@ func (s *PostofficeRecoverer) AccessControl() int32 {
 func (s *PostofficeRecoverer) recover(query core.Query) {
 	buff := core.BufferProxy{}
 	buff.NewProxy(100)
-	query.QCriteria(&buff)
+	query.QWrite(&buff)
 	buff.Flip()
 	stat := event.StatEvent{Tag: query.QTag(), Name: event.STAT_TOTAL}
 	err := s.Ds.Load(&stat)
@@ -61,7 +61,7 @@ func (s *PostofficeRecoverer) Request(rs core.OnSession, w http.ResponseWriter, 
 		w.Write(util.ToJson(session))
 		return
 	}
-	me := event.CreateQuery(int32(qid))
+	me := event.CreateQuery(uint32(qid))
 	defer close(me.QCc())
 	err = json.NewDecoder(r.Body).Decode(&me)
 	if err != nil {
