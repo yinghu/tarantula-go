@@ -38,18 +38,23 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 	buff.Write(request.Query.Criteria)
 	buff.Flip()
 	q.QRead(buff)
+	buff.Clear()
+	buff.WriteString(q.QTag())
+	buff.Flip()
+	px, _ := buff.Read(0)
+	p := px
 	core.AppLog.Debug().Msgf("query : %v", q)
 	c.Local.Db.View(func(txn *badger.Txn) error {
 		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: true}
 		it := txn.NewIterator(op)
 		defer it.Close()
-		p := []byte(q.QTag())
-		buff := core.NewBuffer(200)
+
 		for it.Seek(p); it.ValidForPrefix(p); it.Next() {
-			p = []byte(q.QTag())
+			p = px
 			item := it.Item()
 			item.Value(func(val []byte) error {
 				me := event.MessageEvent{}
+				buff.Clear()
 				buff.Write(val)
 				buff.Flip()
 				me.ReadKey(buff)
