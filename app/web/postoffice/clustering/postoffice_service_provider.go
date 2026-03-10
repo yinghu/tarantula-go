@@ -282,6 +282,7 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 			core.AppLog.Debug().Msgf("Rev : %v", data)
 			ch <- data
 		}
+		ch <- &protocol.Response{Successful: false}
 		retry.Suc = true
 		break
 	}
