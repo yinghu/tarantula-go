@@ -77,7 +77,8 @@ func (s *PostofficeQueryer) Request(rs core.OnSession, w http.ResponseWriter, r 
 	defer close(me.QCc())
 	go s.query(me)
 	for c := range me.QCc() {
-		n, err := w.Write(c.Data)
+		cv,_ := c.Data.([]byte)
+		n, err := w.Write(cv)
 		if err != nil {
 			core.AppLog.Printf("Write error %s Num : %d\n", err.Error(), n)
 		}

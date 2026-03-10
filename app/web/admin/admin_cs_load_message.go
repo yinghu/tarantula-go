@@ -31,8 +31,9 @@ func (s *CSMessageLoader) Request(rs core.OnSession, w http.ResponseWriter, r *h
 	s.Load(&q)
 	defer close(q.QCc())
 	for c := range q.QCc() {
-		if len(c.Data) > 0 {
-			w.Write(c.Data)
+		cv, _ := c.Data.([]byte)
+		if len(cv) > 0 {
+			w.Write(cv)
 		}
 		if !c.Remaining {
 			break

@@ -13,7 +13,10 @@ const (
 	RESET_DATA_REQUEST  int32 = 14
 	
 )
-
+type Chunk struct {
+	Remaining bool
+	Data      any
+}
 type Node struct {
 	Name         string `json:"name"`
 	RingToken    uint32 `json:"ringToken"`

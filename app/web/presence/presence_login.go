@@ -71,7 +71,8 @@ func (s *PresenceLogin) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 	login.Cc = listener
 	go s.Login(login)
 	for c := range listener {
-		w.Write(c.Data)
+		cv,_ := c.Data.([]byte)
+		w.Write(cv)
 		if !c.Remaining {
 			break
 		}
