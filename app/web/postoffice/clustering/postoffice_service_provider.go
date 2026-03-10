@@ -48,12 +48,13 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 		resp := <-rc
 		stream.Send(resp)
 	case core.GET_DATA_REQUEST:
-		rc := make(chan *protocol.Response, 3)
+		rc := make(chan *protocol.Response, 10)
 		defer close(rc)
 		c.runGet(request, rc)
 		for resp := range rc {
 			stream.Send(resp)
 			if !resp.Successful {
+				core.AppLog.Debug().Msgf("REQ : %v", resp)
 				break
 			}
 		}
