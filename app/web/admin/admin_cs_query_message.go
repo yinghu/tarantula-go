@@ -32,6 +32,7 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 	go s.List(me)
 	for c := range me.QCc() {
 		if !c.Remaining {
+			core.AppLog.Debug().Msgf("LAST STREAMING DATA : %v", c)
 			break
 		}
 		core.AppLog.Debug().Msgf("STREAMING DATA : %v", c.Data)
