@@ -35,6 +35,7 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 	stream.Send(&protocol.Response{Successful: true, Message: "hello1"})
 	stream.Send(&protocol.Response{Successful: true, Message: "hello2"})
 	stream.Send(&protocol.Response{Successful: true, Message: "hello3"})
+	stream.Send(&protocol.Response{Successful: false, Message: "hello4"})
 	return nil
 }
 
