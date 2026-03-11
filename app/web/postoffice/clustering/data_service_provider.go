@@ -52,11 +52,16 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 	core.AppLog.Debug().Msgf("query : %d %d ", q.QLimit(), q.QOffset())
 	go func() {
 		limit := q.QLimit()
+		offset := q.QOffset()
 		c.Local.Db.View(func(txn *badger.Txn) error {
 			op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
 			it := txn.NewIterator(op)
 			defer it.Close()
 			for it.Seek(p); it.ValidForPrefix(p); it.Next() {
+				if offset > 0 {
+					offset--
+					continue
+				}
 				p = px
 				item := it.Item()
 				k := append([]byte{}, item.Key()[12:]...)
