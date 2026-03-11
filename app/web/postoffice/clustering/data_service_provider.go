@@ -42,30 +42,41 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 	buff.WriteInt32(q.QFactoryId())
 	buff.WriteInt32(q.QClassId())
 	buff.Flip()
-	px, _ := buff.Read(0)
+	px, err := buff.Read(0)
+	if err != nil {
+		return err
+	}
 	p := px
-
-	c.Local.Db.View(func(txn *badger.Txn) error {
-		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
-		it := txn.NewIterator(op)
-		defer it.Close()
-		for it.Seek(p); it.ValidForPrefix(p); it.Next() {
-			p = px
-			item := it.Item()
-			k := item.Key()[12:]
-			item.Value(func(val []byte) error {
-				if q.QFilter(k, val) {
-					resp := protocol.Response{Successful: true}
-					data := protocol.Data{Key: k, Value: val, Header: &protocol.Header{}}
-					dset := protocol.DataSet{List: []*protocol.Data{&data}}
-					resp.Data = &dset
-					stream.Send(&resp)
-				}
-				return nil
-			})
-		}
-		return nil
-	})
+	rc := make(chan *protocol.Response, 3)
+	dset := make([]*protocol.Data, 0)
+	go func() {
+		limit := q.QLimit()
+		c.Local.Db.View(func(txn *badger.Txn) error {
+			op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
+			it := txn.NewIterator(op)
+			defer it.Close()
+			for it.Seek(p); it.ValidForPrefix(p); it.Next() {
+				p = px
+				item := it.Item()
+				k := item.Key()[12:]
+				item.Value(func(val []byte) error {
+					if q.QFilter(k, val) {
+						dset = append(dset, &protocol.Data{Key: k, Value: val})
+						limit--
+					}
+					if limit == 0 {
+						return fmt.Errorf("orverflow")
+					}
+					return nil
+				})
+			}
+			return nil
+		})
+		resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: dset}}
+		rc <- &resp
+	}()
+	rs := <-rc
+	stream.Send(rs)
 	return nil
 }
 
