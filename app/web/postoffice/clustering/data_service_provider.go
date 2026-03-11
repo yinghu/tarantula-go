@@ -59,15 +59,16 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 			for it.Seek(p); it.ValidForPrefix(p); it.Next() {
 				p = px
 				item := it.Item()
-				k := item.Key()[12:]
+				k := append([]byte{}, item.Key()[12:]...)
 				item.Value(func(val []byte) error {
 					if q.QFilter(k, val) {
-						dset = append(dset, &protocol.Data{Key: k, Value: val})
+						v := append([]byte{}, val...)
+						dset = append(dset, &protocol.Data{Key: k, Value: v})
 						limit--
 					}
 					return nil
 				})
-				if limit==0{
+				if limit == 0 {
 					break
 				}
 			}
