@@ -41,6 +41,7 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 	buff.Clear()
 	buff.WriteInt32(core.EVENT_FACTORY_ID)
 	buff.WriteInt32(event.MESSAGE_CID)
+	buff.WriteString(q.QTag())
 	buff.Flip()
 	px, _ := buff.Read(0)
 	p := px
@@ -49,7 +50,6 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
 		it := txn.NewIterator(op)
 		defer it.Close()
-
 		for it.Seek(p); it.ValidForPrefix(p); it.Next() {
 			p = px
 			item := it.Item()
@@ -61,7 +61,6 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 		}
 		return nil
 	})
-
 	stream.Send(&protocol.Response{Successful: true, Message: "hello1"})
 	stream.Send(&protocol.Response{Successful: true, Message: "hello2"})
 	stream.Send(&protocol.Response{Successful: true, Message: "hello3"})
