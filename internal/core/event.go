@@ -54,6 +54,7 @@ type Query interface {
 	QStartTime() time.Time
 	QEndTime() time.Time
 	QLimit() int32
+	QOffset() int32
 	QRead(b DataBuffer) error
 	QWrite(b DataBuffer) error
 	QCc() chan Chunk

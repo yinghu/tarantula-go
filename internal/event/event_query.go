@@ -78,16 +78,17 @@ func CreateQuery(qid uint32) core.Query {
 }
 
 type QWithTag struct {
-	Id        uint32 `json:"-"`
-	FactoryId int32
-	ClassId   int32
+	Id        uint32          `json:"-"`
+	FactoryId int32           `json:"-"`
+	ClassId   int32           `json:"-"`
 	Tag       string          `json:"Tag"`
 	Topic     string          `json:"Topic"`
 	Limit     int32           `json:"Limit"`
+	Offset    int32           `json:"Offset"`
 	StartTime time.Time       `json:"StartTime"`
 	EndTime   time.Time       `json:"EndTime"`
 	Cc        chan core.Chunk `json:"-"`
-	Ee        core.Event
+	Ee        core.Event      `json:"-"`
 }
 
 func (q *QWithTag) QRead(buff core.DataBuffer) error {
@@ -111,6 +112,12 @@ func (q *QWithTag) QRead(buff core.DataBuffer) error {
 		return err
 	}
 	q.Limit = lm
+	off, err := buff.ReadInt32()
+	if err != nil {
+		return err
+	}
+	q.Offset = off
+
 	return nil
 }
 
@@ -125,6 +132,9 @@ func (q *QWithTag) QWrite(buff core.DataBuffer) error {
 		return err
 	}
 	if err := buff.WriteInt32(q.Limit); err != nil {
+		return err
+	}
+	if err := buff.WriteInt32(q.Offset); err != nil {
 		return err
 	}
 	return nil
@@ -153,6 +163,10 @@ func (q *QWithTag) QEndTime() time.Time {
 }
 func (q *QWithTag) QLimit() int32 {
 	return q.Limit
+}
+
+func (q *QWithTag) QOffset() int32 {
+	return q.Offset
 }
 
 func (q *QWithTag) QCc() chan core.Chunk {

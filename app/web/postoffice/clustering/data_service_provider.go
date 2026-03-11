@@ -49,6 +49,7 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 	p := px
 	rc := make(chan *protocol.Response, 3)
 	dset := make([]*protocol.Data, 0)
+	core.AppLog.Debug().Msgf("query : %d %d ", q.QLimit(), q.QOffset())
 	go func() {
 		limit := q.QLimit()
 		c.Local.Db.View(func(txn *badger.Txn) error {
@@ -64,11 +65,11 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 						dset = append(dset, &protocol.Data{Key: k, Value: val})
 						limit--
 					}
-					if limit == 0 {
-						return fmt.Errorf("orverflow")
-					}
 					return nil
 				})
+				if limit==0{
+					break
+				}
 			}
 			return nil
 		})
