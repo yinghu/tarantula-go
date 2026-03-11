@@ -7,6 +7,7 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -41,6 +42,14 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 			break
 		}
 		core.AppLog.Debug().Msgf("STREAMING DATA : %v", c.Data)
+		resp, ok := c.Data.(*protocol.Response)
+		if ok {
+			for _, data := range resp.Data.List {
+				me := event.MessageEvent{}
+				core.Import(&me, data.Key, data.Value, 200)
+				core.AppLog.Debug().Msgf("Data : %v", me)
+			}
+		}
 	}
 	w.Write(util.ToJson(me))
 }
