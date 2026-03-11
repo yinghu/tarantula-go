@@ -46,17 +46,16 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 	p := px
 	core.AppLog.Debug().Msgf("query : %v", q)
 	c.Local.Db.View(func(txn *badger.Txn) error {
-		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: true}
+		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
 		it := txn.NewIterator(op)
 		defer it.Close()
 
 		for it.Seek(p); it.ValidForPrefix(p); it.Next() {
 			p = px
 			item := it.Item()
+			core.AppLog.Debug().Msgf("msg k : %s", string(item.Key()))
 			item.Value(func(val []byte) error {
-				//me := event.MessageEvent{}
-				//core.Import(item.Key())
-				core.AppLog.Debug().Msgf("msg : %s", string(val))
+				core.AppLog.Debug().Msgf("msg v : %s", string(val))
 				return nil
 			})
 		}
