@@ -52,9 +52,11 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 		for it.Seek(p); it.ValidForPrefix(p); it.Next() {
 			p = px
 			item := it.Item()
-			core.AppLog.Debug().Msgf("msg k : %s", string(item.Key()))
+			k := item.Key()[12:]
 			item.Value(func(val []byte) error {
-				core.AppLog.Debug().Msgf("msg v : %s", string(val))
+				if q.QFilter(k, val) {
+					core.AppLog.Debug().Msgf("msg v : %s", string(val))
+				}
 				return nil
 			})
 		}

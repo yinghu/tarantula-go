@@ -146,5 +146,11 @@ func (q *QWithTag) QEvent() core.Event {
 }
 
 func (q *QWithTag) QFilter(k, v []byte) bool {
+	buff := core.NewBuffer(100)
+	buff.Write(k)
+	buff.Flip()
+	tag, _ := buff.ReadString()
+	oid, _ := buff.ReadInt64()
+	core.AppLog.Debug().Msgf("filter %s %d", tag, oid)
 	return true
 }
