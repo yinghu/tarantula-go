@@ -20,6 +20,24 @@ const (
 	QT_SCORE_QID     uint32 = 101
 )
 
+func Import(q core.Query, data []byte, bufferiSize int) error {
+	buff := core.NewBuffer(bufferiSize)
+	if err := buff.Write(data); err != nil {
+		return err
+	}
+	buff.Flip()
+	return q.QRead(buff)
+}
+func Export(q core.Query, buffSize int) ([]byte, error) {
+	var v []byte
+	buff := core.NewBuffer(buffSize)
+	if err := q.QRead(buff); err != nil {
+		return v, nil
+	}
+	buff.Flip()
+	return buff.Read(0)
+}
+
 func CreateQuery(qid uint32) core.Query {
 	switch qid {
 	case TAG_MESSAGE_QID:

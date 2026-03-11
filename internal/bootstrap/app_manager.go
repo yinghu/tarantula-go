@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
@@ -129,9 +130,9 @@ func (s *AppManager) VerifyTicket(ticket string) (core.OnSession, error) {
 	return session, nil
 }
 func (s *AppManager) Send(e core.Event) error {
-	k,v,err := core.Export(e,200)
-	if err!=nil{
-		return  err
+	k, v, err := core.Export(e, 200)
+	if err != nil {
+		return err
 	}
 	req := core.DataRequest{Key: k, Value: v, Opt: core.CREATE_DATA_REQUEST}
 	req.FactoryId = e.FactoryId()
@@ -271,7 +272,6 @@ func (c *AppManager) HashRing(r core.RingRequest) {
 			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
 			break
 		}
-		//core.AppLog.Debug().Msgf("Rev : %v", data)
 		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
 	}
 	r.Async <- ring
@@ -294,7 +294,6 @@ func (c *AppManager) KeyRing(r core.RingRequest) {
 			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
 			break
 		}
-		//core.AppLog.Debug().Msgf("Rev : %v", data)
 		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
 	}
 	r.Async <- ring
@@ -308,10 +307,11 @@ func (c *AppManager) Request(r core.DataRequest) {
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	req := protocol.Request{Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId}}}
 	if r.Opt == core.QUERY_DATA_REQUEST {
-		buff := core.NewBuffer(100)
-		r.Criteria.QWrite(buff)
-		buff.Flip()
-		dt, _ := buff.Read(0)
+		dt, err := event.Export(r.Criteria, 100)
+		if err != nil {
+			r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: err.Error()}}
+			return
+		}
 		q := protocol.Query{Id: r.Criteria.QId(), Criteria: dt}
 		req.Query = &q
 	}
@@ -326,10 +326,9 @@ func (c *AppManager) Request(r core.DataRequest) {
 			break
 		}
 		if err != nil {
-			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
+			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
 			break
 		}
-		//core.AppLog.Debug().Msgf("Rev : %v", resp)
 		r.Async <- core.Chunk{Remaining: true, Data: resp}
 	}
 	r.Async <- core.Chunk{Remaining: false}

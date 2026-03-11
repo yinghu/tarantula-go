@@ -34,11 +34,11 @@ type DataServiceProvider struct {
 
 func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
 	q := event.CreateQuery(request.Query.Id)
+	err := event.Import(q, request.Query.Criteria, 100)
+	if err != nil {
+		return err
+	}
 	buff := core.NewBuffer(100)
-	buff.Write(request.Query.Criteria)
-	buff.Flip()
-	q.QRead(buff)
-	buff.Clear()
 	buff.WriteInt32(q.QFactoryId())
 	buff.WriteInt32(q.QClassId())
 	buff.Flip()
@@ -56,7 +56,7 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 			item.Value(func(val []byte) error {
 				if q.QFilter(k, val) {
 					resp := protocol.Response{Successful: true}
-					data := protocol.Data{Key: k,Value:val,Header: &protocol.Header{}}
+					data := protocol.Data{Key: k, Value: val, Header: &protocol.Header{}}
 					dset := protocol.DataSet{List: []*protocol.Data{&data}}
 					resp.Data = &dset
 					stream.Send(&resp)
