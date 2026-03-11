@@ -31,7 +31,7 @@ func Import(q core.Query, data []byte, bufferiSize int) error {
 func Export(q core.Query, buffSize int) ([]byte, error) {
 	var v []byte
 	buff := core.NewBuffer(buffSize)
-	if err := q.QRead(buff); err != nil {
+	if err := q.QWrite(buff); err != nil {
 		return v, nil
 	}
 	buff.Flip()
