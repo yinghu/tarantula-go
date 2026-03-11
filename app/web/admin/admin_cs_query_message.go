@@ -37,7 +37,7 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 	w.WriteHeader(http.StatusOK)
 	defer close(me.QCc())
 	go s.List(me)
-	//w.Write([]byte("["))
+	ms := make([]event.MessageEvent, 0)
 	for c := range me.QCc() {
 		if !c.Remaining {
 			break
@@ -48,11 +48,9 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 				me := event.MessageEvent{}
 				core.Import(&me, data.Key, data.Value, 200)
 				core.AppLog.Debug().Msgf("Data : %v", me)
-				//w.Write(util.ToJson(me))
-
+				ms = append(ms, me)
 			}
 		}
 	}
-	//w.Write([]byte("]"))
-	w.Write(util.ToJson(me))
+	w.Write(util.ToJson(ms))
 }
