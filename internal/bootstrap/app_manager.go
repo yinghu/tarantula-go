@@ -271,7 +271,7 @@ func (c *AppManager) HashRing(r core.RingRequest) {
 			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
 			break
 		}
-		core.AppLog.Debug().Msgf("Rev : %v", data)
+		//core.AppLog.Debug().Msgf("Rev : %v", data)
 		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
 	}
 	r.Async <- ring
@@ -294,7 +294,7 @@ func (c *AppManager) KeyRing(r core.RingRequest) {
 			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
 			break
 		}
-		core.AppLog.Debug().Msgf("Rev : %v", data)
+		//core.AppLog.Debug().Msgf("Rev : %v", data)
 		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
 	}
 	r.Async <- ring
@@ -329,7 +329,7 @@ func (c *AppManager) Request(r core.DataRequest) {
 			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
 			break
 		}
-		core.AppLog.Debug().Msgf("Rev : %v", resp)
+		//core.AppLog.Debug().Msgf("Rev : %v", resp)
 		r.Async <- core.Chunk{Remaining: true, Data: resp}
 	}
 	r.Async <- core.Chunk{Remaining: false}
