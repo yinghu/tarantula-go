@@ -95,6 +95,7 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request, ch chan *protocol
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
 	retry := RetryTrack{Reties: RETRY_MAX}
+	core.AppLog.Debug().Msgf("prefix %d", set.Prefix)
 	for retry.Reties > 0 {
 		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq

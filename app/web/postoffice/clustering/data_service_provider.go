@@ -68,7 +68,7 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 				item.Value(func(val []byte) error {
 					if q.QFilter(k, val) {
 						v := append([]byte{}, val...)
-						dset = append(dset, &protocol.Data{Key: k, Value: v})
+						dset = append(dset, &protocol.Data{Key: k, Value: v,Header: &protocol.Header{}})
 						limit--
 					}
 					return nil

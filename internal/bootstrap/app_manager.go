@@ -135,6 +135,7 @@ func (s *AppManager) Send(e core.Event) error {
 		return err
 	}
 	req := core.DataRequest{Key: k, Value: v, Opt: core.CREATE_DATA_REQUEST}
+	req.Prefix = s.Cluster().RingToken([]byte(e.ETag()))
 	req.FactoryId = e.FactoryId()
 	req.ClassId = e.ClassId()
 	aq := make(chan core.Chunk, 3)
@@ -305,7 +306,7 @@ func (c *AppManager) RingToken(key []byte) uint32 {
 
 func (c *AppManager) Request(r core.DataRequest) {
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	req := protocol.Request{Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId}}}
+	req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId}}}
 	if r.Opt == core.QUERY_DATA_REQUEST {
 		dt, err := event.Export(r.Criteria, 100)
 		if err != nil {
