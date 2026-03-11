@@ -36,7 +36,7 @@ func (s *MahjongService) Shutdown() {
 	s.AppManager.Shutdown()
 }
 
-func (s *MahjongService) Create(classId int, topic string) (core.Event, error) {
+func (s *MahjongService) Create(classId int32, topic string) (core.Event, error) {
 	e := event.CreateEvent(classId)
 	if e != nil {
 		e.OnTopic(topic)

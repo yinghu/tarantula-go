@@ -13,7 +13,7 @@ type RegisterEvent struct {
 	core.EventObj
 }
 
-func (s *RegisterEvent) ClassId() int {
+func (s *RegisterEvent) ClassId() int32 {
 	return REGISTER_CID
 }
 

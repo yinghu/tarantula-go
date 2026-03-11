@@ -4,6 +4,10 @@ import (
 	"time"
 )
 
+const (
+	EVENT_FACTORY_ID int32 = 1
+)
+
 type IndexListener interface {
 	LocalStore() DataStore
 	Index(e Event)
@@ -38,7 +42,7 @@ type Event interface {
 }
 
 type EventCreator interface {
-	Create(classId int, topic string) (Event, error)
+	Create(classId int32, topic string) (Event, error)
 }
 
 type Query interface {
@@ -115,4 +119,8 @@ func (s *EventObj) RecipientId() int64 {
 
 func (s *EventObj) OnRecipientId(recipientId int64) {
 
+}
+
+func (s *EventObj) FactoryId() int32 {
+	return EVENT_FACTORY_ID
 }

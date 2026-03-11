@@ -1,12 +1,56 @@
 package core
 
+func Export(obj Persistentable, buffSize int) ([]byte, []byte, error) {
+	buff := NewBuffer(buffSize)
+	var k []byte
+	var v []byte
+	if err := obj.WriteKey(buff); err != nil {
+		return k, v, err
+	}
+	buff.Flip()
+	k, err := buff.Read(0)
+	if err != nil {
+		return k, v, err
+	}
+	buff.Clear()
+	if err := obj.Write(buff); err != nil {
+		return k, v, err
+	}
+	buff.Flip()
+	v, err = buff.Read(0)
+	if err != nil {
+		return k, v, err
+	}
+	return k, v, nil
+}
+
+func Import(obj Persistentable, k, v []byte, buffSize int) error {
+	buff := NewBuffer(buffSize)
+	if err := buff.Write(k); err != nil {
+		return err
+	}
+	buff.Flip()
+	if err := obj.ReadKey(buff); err != nil {
+		return err
+	}
+	buff.Clear()
+	if err := buff.Write(v); err != nil {
+		return err
+	}
+	buff.Flip()
+	if err := obj.Read(buff); err != nil {
+		return err
+	}
+	return nil
+}
+
 type Persistentable interface {
 	Write(value DataBuffer) error
 	WriteKey(key DataBuffer) error
 	Read(value DataBuffer) error
 	ReadKey(key DataBuffer) error
-	FactoryId() int
-	ClassId() int
+	FactoryId() int32
+	ClassId() int32
 
 	Revision() int64
 	Timestamp() int64
@@ -38,11 +82,11 @@ func (s *PersistentableObj) ReadKey(value DataBuffer) error {
 	return nil
 }
 
-func (s *PersistentableObj) FactoryId() int {
+func (s *PersistentableObj) FactoryId() int32 {
 	return 0
 }
 
-func (s *PersistentableObj) ClassId() int {
+func (s *PersistentableObj) ClassId() int32 {
 	return 0
 }
 

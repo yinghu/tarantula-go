@@ -11,7 +11,7 @@ type SubscriptionEvent struct {
 	core.EventObj `json:"-"`
 }
 
-func (s *SubscriptionEvent) ClassId() int {
+func (s *SubscriptionEvent) ClassId() int32 {
 	return SUBSCRIPTION_CID
 }
 

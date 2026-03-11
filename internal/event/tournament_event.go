@@ -13,7 +13,7 @@ type TournamentEvent struct {
 	core.EventObj     `json:"-"`
 }
 
-func (s *TournamentEvent) ClassId() int {
+func (s *TournamentEvent) ClassId() int32 {
 	return TOURNAMENT_CID
 }
 

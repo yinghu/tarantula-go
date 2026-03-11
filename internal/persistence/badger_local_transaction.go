@@ -46,7 +46,7 @@ func (t *BadgerLocalTransaction) Get(p core.Persistentable) error {
 	if err != nil {
 		return err
 	}
-	if p.ClassId() != int(cid) {
+	if p.ClassId() != cid {
 		return fmt.Errorf("class id not matched %d , %d", cid, p.ClassId())
 	}
 	crv, err := t.value.ReadInt64()

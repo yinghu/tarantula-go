@@ -6,6 +6,6 @@ type CloseEvent struct {
 	core.EventObj `json:"-"`
 }
 
-func (s *CloseEvent) ClassId() int {
+func (s *CloseEvent) ClassId() int32 {
 	return CLOSE_CID
 }

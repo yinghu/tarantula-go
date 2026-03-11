@@ -113,7 +113,7 @@ func (s *TcpEndpoint) inbound(client net.Conn, systemId int64) {
 			buff.Clear()
 			continue
 		}
-		e, err := s.Service.Create(int(cid), topic)
+		e, err := s.Service.Create(cid, topic)
 		if err != nil {
 			core.AppLog.Printf("invalid class id error %s\n", err.Error())
 			buff.Clear()

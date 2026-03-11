@@ -5,17 +5,17 @@ import (
 )
 
 const (
-	M_TOKEN_CID     int = 100
-	M_DICE_CID      int = 101
-	M_HAND_CID      int = 102
-	M_TABLE_CID     int = 103
-	M_SIT_CID       int = 104
-	M_CLAIM_CID     int = 105
-	M_RESET_CID     int = 106
-	M_DISCHARGE_CID int = 107
-	M_KNOG_CID      int = 108
-	M_TURN_CID      int = 109
-	M_ERR_CID       int = 911
+	M_TOKEN_CID     int32 = 100
+	M_DICE_CID      int32 = 101
+	M_HAND_CID      int32 = 102
+	M_TABLE_CID     int32 = 103
+	M_SIT_CID       int32 = 104
+	M_CLAIM_CID     int32 = 105
+	M_RESET_CID     int32 = 106
+	M_DISCHARGE_CID int32 = 107
+	M_KNOG_CID      int32 = 108
+	M_TURN_CID      int32 = 109
+	M_ERR_CID       int32 = 911
 )
 
 type MahjongEvent struct {
@@ -23,7 +23,7 @@ type MahjongEvent struct {
 	MahjongEventObj
 }
 
-func (s *MahjongEvent) ClassId() int {
+func (s *MahjongEvent) ClassId() int32 {
 	return M_TOKEN_CID
 }
 

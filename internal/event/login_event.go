@@ -13,7 +13,7 @@ type LoginEvent struct {
 	core.EventObj
 }
 
-func (s *LoginEvent) ClassId() int {
+func (s *LoginEvent) ClassId() int32 {
 	return LOGIN_CID
 }
 

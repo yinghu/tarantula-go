@@ -2,8 +2,10 @@ package clustering
 
 import (
 	"testing"
+	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 )
@@ -21,7 +23,7 @@ func TestDataOpt(t *testing.T) {
 	v := []byte("value1")
 	data := protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: 100, ClassId: 300}}
 	dset := SetData{Data: &data, Opt: core.CREATE_DATA_REQUEST}
-	_,err = dsp.create(dset)
+	_, err = dsp.create(dset)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
@@ -40,7 +42,7 @@ func TestDataOpt(t *testing.T) {
 	if string(d.Value) != string(v) {
 		t.Errorf("should be same values %s %s", string(d.Value), string(v))
 	}
-	_,err = dsp.create(dset)
+	_, err = dsp.create(dset)
 	if err == nil {
 		t.Error("should be an error")
 	}
@@ -87,4 +89,30 @@ func TestDataOpt(t *testing.T) {
 		t.Errorf("should be error")
 	}
 	core.AppLog.Debug().Msgf("DELETED %s", err.Error())
+	// message event
+	me := event.MessageEvent{Message: "hello", Title: "login", DateTime: time.Now(), Source: "presence"}
+	me.OnOId(1100)
+	k, v, err = core.Export(&me, 100)
+	if err != nil {
+		t.Errorf("should not be an error %s", err.Error())
+		return
+	}
+	core.AppLog.Debug().Msgf("k %d v %d", len(k), len(v))
+	mx := event.MessageEvent{}
+	err = core.Import(&mx,k,v,100)
+	if err != nil {
+		t.Errorf("should not be an error %s", err.Error())
+		return
+	}
+	core.AppLog.Debug().Msgf("me %v", me)
+	core.AppLog.Debug().Msgf("mx %v", mx)
+    mset := protocol.Data{Key: k,Value: v,Header: &protocol.Header{FactoryId: int32(me.FactoryId()),ClassId: int32(me.ClassId())}}
+	set := SetData{Data: &mset}
+	ki, err := dsp.create(set)
+	if err != nil {
+		t.Errorf("should not be an error %s", err.Error())
+		return
+	}
+	core.AppLog.Debug().Msgf("ki %v",ki)
+
 }

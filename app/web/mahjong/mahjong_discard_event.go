@@ -13,7 +13,7 @@ type MahjongDiscardEvent struct {
 	MahjongEventObj
 }
 
-func (s *MahjongDiscardEvent) ClassId() int {
+func (s *MahjongDiscardEvent) ClassId() int32 {
 	return M_DISCHARGE_CID
 }
 

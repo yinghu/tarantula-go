@@ -13,7 +13,7 @@ import (
 type SampleCreator struct {
 }
 
-func (s *SampleCreator) Create(cid int, topic string) (core.Event, error) {
+func (s *SampleCreator) Create(cid int32, topic string) (core.Event, error) {
 	e := CreateEvent(cid)
 	e.OnTopic(topic)
 	e.OnListener(s)

@@ -13,6 +13,7 @@ func NewBuffer(size int) DataBuffer {
 	return &bf
 }
 
+
 type BufferProxy struct {
 	data *buffer.ByteBuffer
 }

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
@@ -115,7 +114,7 @@ func (s *AppManager) Shutdown() {
 	core.AppLog.Println("app manager shutting down ...")
 }
 
-func (s *AppManager) Create(classId int, topic string) (core.Event, error) {
+func (s *AppManager) Create(classId int32, topic string) (core.Event, error) {
 	return nil, nil
 }
 
@@ -139,7 +138,7 @@ func (s *AppManager) Send(e core.Event) error {
 	buff.Flip()
 	v, _ := buff.Read(0)
 	req := core.DataRequest{Key: k, Value: v, Opt: core.CREATE_DATA_REQUEST}
-	req.FactoryId = int32(event.EVENT_FACTORY_ID)
+	req.FactoryId = core.EVENT_FACTORY_ID
 	req.ClassId = int32(e.ClassId())
 	aq := make(chan core.Chunk, 3)
 	req.Async = aq

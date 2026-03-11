@@ -16,7 +16,7 @@ type InventoryEvent struct {
 	core.EventObj    `json:"-"`
 }
 
-func (s *InventoryEvent) ClassId() int {
+func (s *InventoryEvent) ClassId() int32 {
 	return INVENTORY_CID
 }
 

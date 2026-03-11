@@ -9,7 +9,7 @@ type MahjongResetEvent struct {
 	MahjongEventObj
 }
 
-func (s *MahjongResetEvent) ClassId() int {
+func (s *MahjongResetEvent) ClassId() int32 {
 	return M_RESET_CID
 }
 

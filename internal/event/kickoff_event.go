@@ -9,7 +9,7 @@ type KickoffEvent struct {
 	core.EventObj
 }
 
-func (s *KickoffEvent) ClassId() int {
+func (s *KickoffEvent) ClassId() int32 {
 	return KICKOFF_CID
 }
 
