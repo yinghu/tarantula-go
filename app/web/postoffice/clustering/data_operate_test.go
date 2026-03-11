@@ -8,6 +8,7 @@ import (
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
+	badger "github.com/dgraph-io/badger/v4"
 )
 
 func TestDataOpt(t *testing.T) {
@@ -99,20 +100,36 @@ func TestDataOpt(t *testing.T) {
 	}
 	core.AppLog.Debug().Msgf("k %d v %d", len(k), len(v))
 	mx := event.MessageEvent{}
-	err = core.Import(&mx,k,v,100)
+	err = core.Import(&mx, k, v, 100)
 	if err != nil {
 		t.Errorf("should not be an error %s", err.Error())
 		return
 	}
-	core.AppLog.Debug().Msgf("me %v", me)
-	core.AppLog.Debug().Msgf("mx %v", mx)
-    mset := protocol.Data{Key: k,Value: v,Header: &protocol.Header{FactoryId: int32(me.FactoryId()),ClassId: int32(me.ClassId())}}
+	core.AppLog.Debug().Msgf("me %d %d", me.FactoryId(), me.ClassId())
+	core.AppLog.Debug().Msgf("mx %d %d", mx.FactoryId(), mx.ClassId())
+	mset := protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: me.FactoryId(), ClassId: me.ClassId()}}
 	set := SetData{Data: &mset}
 	ki, err := dsp.create(set)
 	if err != nil {
 		t.Errorf("should not be an error %s", err.Error())
 		return
 	}
-	core.AppLog.Debug().Msgf("ki %v",ki)
+	core.AppLog.Debug().Msgf("ki %v", ki)
+	buff := core.NewBuffer(100)
+	buff.WriteInt32(core.EVENT_FACTORY_ID)
+	buff.WriteInt32(event.MESSAGE_CID)
+	buff.Flip()
+	px, _ := buff.Read(0)
+	p := px
+	dsp.Local.Db.View(func(txn *badger.Txn) error {
+		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
+		it := txn.NewIterator(op)
+		defer it.Close()
+		for it.Seek(p); it.ValidForPrefix(p); it.Next() {
+			p = px
+			core.AppLog.Debug().Msg("one")
+		}
+		return nil
+	})
 
 }

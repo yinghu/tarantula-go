@@ -39,7 +39,8 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 	buff.Flip()
 	q.QRead(buff)
 	buff.Clear()
-	buff.WriteString(q.QTag())
+	buff.WriteInt32(core.EVENT_FACTORY_ID)
+	buff.WriteInt32(event.MESSAGE_CID)
 	buff.Flip()
 	px, _ := buff.Read(0)
 	p := px
@@ -53,13 +54,9 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 			p = px
 			item := it.Item()
 			item.Value(func(val []byte) error {
-				me := event.MessageEvent{}
-				buff.Clear()
-				buff.Write(val)
-				buff.Flip()
-				me.ReadKey(buff)
-				me.Read(buff)
-				core.AppLog.Debug().Msgf("msg : %s", me.Message)
+				//me := event.MessageEvent{}
+				//core.Import(item.Key())
+				core.AppLog.Debug().Msgf("msg : %s", string(val))
 				return nil
 			})
 		}
