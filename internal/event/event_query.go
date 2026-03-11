@@ -23,7 +23,7 @@ const (
 func CreateQuery(qid uint32) core.Query {
 	switch qid {
 	case TAG_MESSAGE_QID:
-		q := QWithTag{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan core.Chunk, 3)}
+		q := QWithTag{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan core.Chunk, 3), FactoryId: core.EVENT_FACTORY_ID, ClassId: MESSAGE_CID}
 		return &q
 	case TAG_LOGIN_QID:
 		q := QWithTag{Id: qid, Tag: LOGIN_ETAG, Cc: make(chan core.Chunk, 3)}
@@ -60,7 +60,9 @@ func CreateQuery(qid uint32) core.Query {
 }
 
 type QWithTag struct {
-	Id        uint32          `json:"-"`
+	Id        uint32 `json:"-"`
+	FactoryId int32
+	ClassId   int32
 	Tag       string          `json:"Tag"`
 	Topic     string          `json:"Topic"`
 	Limit     int32           `json:"Limit"`
@@ -113,7 +115,12 @@ func (q *QWithTag) QWrite(buff core.DataBuffer) error {
 func (q *QWithTag) QId() uint32 {
 	return q.Id
 }
-
+func (q *QWithTag) QFactoryId() int32 {
+	return q.FactoryId
+}
+func (q *QWithTag) QClassId() int32 {
+	return q.ClassId
+}
 func (q *QWithTag) QTag() string {
 	return q.Tag
 }
@@ -136,4 +143,8 @@ func (q *QWithTag) QCc() chan core.Chunk {
 
 func (q *QWithTag) QEvent() core.Event {
 	return q.Ee
+}
+
+func (q *QWithTag) QFilter(k, v []byte) bool {
+	return true
 }

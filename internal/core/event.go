@@ -47,6 +47,8 @@ type EventCreator interface {
 
 type Query interface {
 	QId() uint32
+	QFactoryId() int32
+	QClassId() int32
 	QTag() string
 	QTopic() string
 	QStartTime() time.Time
@@ -56,6 +58,7 @@ type Query interface {
 	QWrite(b DataBuffer) error
 	QCc() chan Chunk
 	QEvent() Event
+	QFilter(k, v []byte) bool
 }
 
 type Postoffice interface {

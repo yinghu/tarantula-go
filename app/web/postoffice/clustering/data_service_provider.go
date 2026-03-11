@@ -39,9 +39,8 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 	buff.Flip()
 	q.QRead(buff)
 	buff.Clear()
-	buff.WriteInt32(core.EVENT_FACTORY_ID)
-	buff.WriteInt32(event.MESSAGE_CID)
-	buff.WriteString(q.QTag())
+	buff.WriteInt32(q.QFactoryId())
+	buff.WriteInt32(q.QClassId())
 	buff.Flip()
 	px, _ := buff.Read(0)
 	p := px
