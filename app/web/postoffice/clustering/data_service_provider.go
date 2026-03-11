@@ -44,7 +44,6 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 	buff.Flip()
 	px, _ := buff.Read(0)
 	p := px
-	core.AppLog.Debug().Msgf("query : %v", q)
 
 	c.Local.Db.View(func(txn *badger.Txn) error {
 		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
@@ -61,7 +60,6 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 					dset := protocol.DataSet{List: []*protocol.Data{&data}}
 					resp.Data = &dset
 					stream.Send(&resp)
-					core.AppLog.Debug().Msgf("msg v : %s", string(val))
 				}
 				return nil
 			})

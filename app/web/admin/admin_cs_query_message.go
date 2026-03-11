@@ -41,7 +41,6 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 		if !c.Remaining {
 			break
 		}
-		core.AppLog.Debug().Msgf("STREAMING DATA : %v", c.Data)
 		resp, ok := c.Data.(*protocol.Response)
 		if ok {
 			for _, data := range resp.Data.List {

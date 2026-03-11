@@ -260,7 +260,6 @@ func (m *DataServiceProvider) clientReset(target *core.Node, request *protocol.R
 }
 
 func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Response) {
-	core.AppLog.Debug().Msg("running get opt")
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
 	retry := RetryTrack{Reties: RETRY_MAX}
@@ -289,7 +288,6 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 				core.AppLog.Debug().Msgf("streaming error %s", err.Error())
 				break
 			}
-			core.AppLog.Debug().Msgf("Rev : %v", data)
 			ch <- data
 			if !data.Successful {
 				break
