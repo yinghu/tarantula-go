@@ -129,17 +129,13 @@ func (s *AppManager) VerifyTicket(ticket string) (core.OnSession, error) {
 	return session, nil
 }
 func (s *AppManager) Send(e core.Event) error {
-	buff := core.NewBuffer(200)
-	e.WriteKey(buff)
-	buff.Flip()
-	k, _ := buff.Read(0)
-	buff.Clear()
-	e.Write(buff)
-	buff.Flip()
-	v, _ := buff.Read(0)
+	k,v,err := core.Export(e,200)
+	if err!=nil{
+		return  err
+	}
 	req := core.DataRequest{Key: k, Value: v, Opt: core.CREATE_DATA_REQUEST}
-	req.FactoryId = core.EVENT_FACTORY_ID
-	req.ClassId = int32(e.ClassId())
+	req.FactoryId = e.FactoryId()
+	req.ClassId = e.ClassId()
 	aq := make(chan core.Chunk, 3)
 	req.Async = aq
 	defer close(aq)
