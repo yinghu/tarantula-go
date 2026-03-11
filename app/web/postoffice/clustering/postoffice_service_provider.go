@@ -95,9 +95,15 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request, ch chan *protocol
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
 	retry := RetryTrack{Reties: RETRY_MAX}
-	core.AppLog.Debug().Msgf("prefix %d", set.Prefix)
+	var rt uint32
+	if set.Prefix > 0 {
+		rt = set.Prefix
+		core.AppLog.Debug().Msgf("using prefix %d", set.Prefix)
+	} else {
+		rt = c.Mll.RingToken(set.Data.Key)
+	}
 	for retry.Reties > 0 {
-		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
+		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: rt, Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
 		resp, err := c.clientCreate(&ringNode, set)
