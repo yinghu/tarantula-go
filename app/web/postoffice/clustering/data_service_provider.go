@@ -45,6 +45,7 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 	px, _ := buff.Read(0)
 	p := px
 	core.AppLog.Debug().Msgf("query : %v", q)
+
 	c.Local.Db.View(func(txn *badger.Txn) error {
 		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
 		it := txn.NewIterator(op)
@@ -55,6 +56,11 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 			k := item.Key()[12:]
 			item.Value(func(val []byte) error {
 				if q.QFilter(k, val) {
+					resp := protocol.Response{Successful: true}
+					data := protocol.Data{Key: k,Value:val,Header: &protocol.Header{}}
+					dset := protocol.DataSet{List: []*protocol.Data{&data}}
+					resp.Data = &dset
+					stream.Send(&resp)
 					core.AppLog.Debug().Msgf("msg v : %s", string(val))
 				}
 				return nil
@@ -62,12 +68,12 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 		}
 		return nil
 	})
-	stream.Send(&protocol.Response{Successful: true, Message: "hello1"})
-	stream.Send(&protocol.Response{Successful: true, Message: "hello2"})
-	stream.Send(&protocol.Response{Successful: true, Message: "hello3"})
-	stream.Send(&protocol.Response{Successful: true, Message: "hello4"})
-	stream.Send(&protocol.Response{Successful: true, Message: "hello5"})
-	stream.Send(&protocol.Response{Successful: true, Message: "hello6"})
+	//stream.Send(&protocol.Response{Successful: true, Message: "hello1"})
+	//stream.Send(&protocol.Response{Successful: true, Message: "hello2"})
+	//stream.Send(&protocol.Response{Successful: true, Message: "hello3"})
+	//stream.Send(&protocol.Response{Successful: true, Message: "hello4"})
+	//stream.Send(&protocol.Response{Successful: true, Message: "hello5"})
+	//stream.Send(&protocol.Response{Successful: true, Message: "hello6"})
 	return nil
 }
 

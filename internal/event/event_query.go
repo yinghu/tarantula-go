@@ -151,6 +151,7 @@ func (q *QWithTag) QFilter(k, v []byte) bool {
 	buff.Flip()
 	tag, _ := buff.ReadString()
 	oid, _ := buff.ReadInt64()
-	core.AppLog.Debug().Msgf("filter %s %d", tag, oid)
+	rev, _ := buff.ReadInt64()
+	core.AppLog.Debug().Msgf("filter %s %d %d", tag, oid, rev)
 	return true
 }
