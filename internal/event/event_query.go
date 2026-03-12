@@ -41,7 +41,7 @@ func Export(q core.Query, buffSize int) ([]byte, error) {
 func CreateQuery(qid uint32) core.Query {
 	switch qid {
 	case TAG_MESSAGE_QID:
-		q := QWithTag{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan core.Chunk, 3), FactoryId: core.EVENT_FACTORY_ID, ClassId: MESSAGE_CID}
+		q := QWithTag{Id: qid, Cc: make(chan core.Chunk, 3), FactoryId: core.EVENT_FACTORY_ID, ClassId: MESSAGE_CID}
 		return &q
 	case TAG_LOGIN_QID:
 		q := QWithTag{Id: qid, Tag: LOGIN_ETAG, Cc: make(chan core.Chunk, 3)}
@@ -72,7 +72,7 @@ func CreateQuery(qid uint32) core.Query {
 		q.Cc = make(chan core.Chunk, 3)
 		return &q
 	default:
-		q := QWithTag{Id: qid, Tag: MESSAGE_ETAG, Cc: make(chan core.Chunk, 3)}
+		q := QWithTag{Id: qid, Cc: make(chan core.Chunk, 3)}
 		return &q
 	}
 }
