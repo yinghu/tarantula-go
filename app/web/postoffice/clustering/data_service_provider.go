@@ -111,7 +111,6 @@ func (c *DataServiceProvider) Create(ctx context.Context, in *protocol.Request) 
 	msg := make(chan *protocol.Response, 1)
 	defer close(msg)
 	setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
-	//core.AppLog.Debug().Msgf("creating data %d %d", setData.Header.FactoryId, setData.Header.ClassId)
 	c.DSet <- setData
 	resp := <-msg
 	return resp, nil
