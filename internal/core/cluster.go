@@ -51,7 +51,7 @@ type RingSync struct {
 }
 
 type RingRequest struct {
-	Opt      int32
+	Opt      uint32
 	Address  string
 	Source   RingSync
 	Token    uint32
