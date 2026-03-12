@@ -63,6 +63,7 @@ type DataHeader struct {
 	FactoryId uint32
 	ClassId   uint32
 	Revision  uint64
+	Mutable   bool
 }
 
 type DataRequest struct {
