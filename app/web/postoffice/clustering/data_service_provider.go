@@ -39,8 +39,8 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 		return err
 	}
 	buff := core.NewBuffer(100)
-	buff.WriteInt32(q.QFactoryId())
-	buff.WriteInt32(q.QClassId())
+	buff.WriteUInt32(q.QFactoryId())
+	buff.WriteUInt32(q.QClassId())
 	buff.Flip()
 	px, err := buff.Read(0)
 	if err != nil {
@@ -246,8 +246,8 @@ func (m *DataServiceProvider) RingUpdated() {
 func (m *DataServiceProvider) create(sd SetData) (KeyIndex, error) {
 	ki := sd.IndexKey()
 	ki.Header.Revision = 1
-	ki.Header.Timestamp = time.Now().UnixMilli()
-	ki.Header.Size = int32(len(sd.Value))
+	ki.Header.Timestamp = uint64(time.Now().UnixMilli())
+	ki.Header.Size = uint32(len(sd.Value))
 	sd.Header.Revision = ki.Header.Revision
 	k, v, err := ki.Pair()
 	if err != nil {
@@ -291,8 +291,8 @@ func (m *DataServiceProvider) update(sd SetData) error {
 			return fmt.Errorf("revison not matched %d %d", ki.Header.Revision, rev)
 		}
 		ki.Header.Revision++
-		ki.Header.Timestamp = time.Now().UnixMilli()
-		ki.Header.Size = int32(len(sd.Value))
+		ki.Header.Timestamp = uint64(time.Now().UnixMilli())
+		ki.Header.Size = uint32(len(sd.Value))
 		v, err := ki.Value()
 		if err != nil {
 			return err
@@ -392,8 +392,8 @@ func (m *DataServiceProvider) reset(sd SetData) error {
 			return err
 		}
 		ki.Header.Revision = 1
-		ki.Header.Timestamp = time.Now().UnixMilli()
-		ki.Header.Size = int32(len(sd.Value))
+		ki.Header.Timestamp = uint64(time.Now().UnixMilli())
+		ki.Header.Size = uint32(len(sd.Value))
 		v, err := ki.Value()
 		if err != nil {
 			return err

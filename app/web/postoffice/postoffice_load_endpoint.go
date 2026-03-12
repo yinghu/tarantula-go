@@ -26,7 +26,7 @@ func (s *PostofficeLoader) Request(rs core.OnSession, w http.ResponseWriter, r *
 		w.Write(util.ToJson(session))
 		return
 	}
-	me := event.CreateEvent(int32(qid))
+	me := event.CreateEvent(uint32(qid))
 	err = json.NewDecoder(r.Body).Decode(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))

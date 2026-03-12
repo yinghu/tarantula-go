@@ -24,7 +24,7 @@ const (
 type Response struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Successful    bool                   `protobuf:"varint,1,opt,name=successful,proto3" json:"successful,omitempty"`
-	Code          int32                  `protobuf:"varint,2,opt,name=code,proto3" json:"code,omitempty"`
+	Code          uint32                 `protobuf:"fixed32,2,opt,name=code,proto3" json:"code,omitempty"`
 	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
 	Data          *DataSet               `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -68,7 +68,7 @@ func (x *Response) GetSuccessful() bool {
 	return false
 }
 
-func (x *Response) GetCode() int32 {
+func (x *Response) GetCode() uint32 {
 	if x != nil {
 		return x.Code
 	}
@@ -98,7 +98,7 @@ const file_response_proto_rawDesc = "" +
 	"\n" +
 	"successful\x18\x01 \x01(\bR\n" +
 	"successful\x12\x12\n" +
-	"\x04code\x18\x02 \x01(\x05R\x04code\x12\x18\n" +
+	"\x04code\x18\x02 \x01(\aR\x04code\x12\x18\n" +
 	"\amessage\x18\x03 \x01(\tR\amessage\x12%\n" +
 	"\x04data\x18\x04 \x01(\v2\x11.protocol.DataSetR\x04dataBP\n" +
 	"\x17com.icodesoftware.protoB\x0fResponseFactoryZ$gameclustering.com/internal/protocolb\x06proto3"

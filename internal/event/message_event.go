@@ -15,7 +15,7 @@ type MessageEvent struct {
 	core.EventObj
 }
 
-func (s *MessageEvent) ClassId() int32 {
+func (s *MessageEvent) ClassId() uint32 {
 	return MESSAGE_CID
 }
 

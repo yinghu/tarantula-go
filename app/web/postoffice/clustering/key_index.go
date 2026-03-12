@@ -18,10 +18,10 @@ func (k *KeyIndex) WriteKey(buffer core.DataBuffer) error {
 	if err := buffer.WriteUInt32(k.Prefix); err != nil {
 		return err
 	}
-	if err := buffer.WriteInt32(k.Header.FactoryId); err != nil {
+	if err := buffer.WriteUInt32(k.Header.FactoryId); err != nil {
 		return err
 	}
-	if err := buffer.WriteInt32(k.Header.ClassId); err != nil {
+	if err := buffer.WriteUInt32(k.Header.ClassId); err != nil {
 		return err
 	}
 	if err := buffer.WriteInt32(int32(len(k.Key))); err != nil {
@@ -33,29 +33,29 @@ func (k *KeyIndex) WriteKey(buffer core.DataBuffer) error {
 	return nil
 }
 func (k *KeyIndex) Write(buffer core.DataBuffer) error {
-	if err := buffer.WriteInt64(k.Header.Revision); err != nil {
+	if err := buffer.WriteUInt64(k.Header.Revision); err != nil {
 		return err
 	}
-	if err := buffer.WriteInt64(k.Header.Timestamp); err != nil {
+	if err := buffer.WriteUInt64(k.Header.Timestamp); err != nil {
 		return err
 	}
-	if err := buffer.WriteInt32(k.Header.Size); err != nil {
+	if err := buffer.WriteUInt32(k.Header.Size); err != nil {
 		return err
 	}
 	return nil
 }
 func (k *KeyIndex) Read(buffer core.DataBuffer) error {
-	rev, err := buffer.ReadInt64()
+	rev, err := buffer.ReadUInt64()
 	if err != nil {
 		return err
 	}
 	k.Header.Revision = rev
-	ts, err := buffer.ReadInt64()
+	ts, err := buffer.ReadUInt64()
 	if err != nil {
 		return err
 	}
 	k.Header.Timestamp = ts
-	sz, err := buffer.ReadInt32()
+	sz, err := buffer.ReadUInt32()
 	if err != nil {
 		return err
 	}
@@ -68,12 +68,12 @@ func (k *KeyIndex) ReadKey(buffer core.DataBuffer) error {
 		return err
 	}
 	k.Prefix = prefix
-	fid, err := buffer.ReadInt32()
+	fid, err := buffer.ReadUInt32()
 	if err != nil {
 		return err
 	}
 	k.Header.FactoryId = fid
-	cid, err := buffer.ReadInt32()
+	cid, err := buffer.ReadUInt32()
 	if err != nil {
 		return err
 	}

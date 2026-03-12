@@ -10,7 +10,7 @@ type MahjongDiceEvent struct {
 	MahjongEventObj
 }
 
-func (s *MahjongDiceEvent) ClassId() int32 {
+func (s *MahjongDiceEvent) ClassId() uint32 {
 	return M_DICE_CID
 }
 

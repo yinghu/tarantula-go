@@ -9,7 +9,7 @@ type MahjongSitEvent struct {
 	MahjongEventObj
 }
 
-func (s *MahjongSitEvent) ClassId() int32 {
+func (s *MahjongSitEvent) ClassId() uint32 {
 	return M_SIT_CID
 }
 

@@ -88,7 +88,7 @@ func (s *PostofficeService) Shutdown() {
 	s.mm.ShutdownHook()
 }
 
-func (s *PostofficeService) Create(classId int32, topic string) (core.Event, error) {
+func (s *PostofficeService) Create(classId uint32, topic string) (core.Event, error) {
 	me := event.CreateEvent(classId)
 	me.OnListener(s)
 	me.OnTopic(topic)

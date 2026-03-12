@@ -15,7 +15,7 @@ type TournamentScoreIndex struct {
 	core.EventObj     `json:"-"`
 }
 
-func (s *TournamentScoreIndex) ClassId() int32 {
+func (s *TournamentScoreIndex) ClassId() uint32 {
 	return TOURNAMENT_SCORE_CID
 }
 

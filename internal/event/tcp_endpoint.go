@@ -89,7 +89,7 @@ func (s *TcpEndpoint) inbound(client net.Conn, systemId int64) {
 			continue
 		}
 		buff.Flip()
-		cid, err := buff.ReadInt32()
+		cid, err := buff.ReadUInt32()
 		if err != nil {
 			core.AppLog.Printf("read class id error %s\n", err.Error())
 			buff.Clear()

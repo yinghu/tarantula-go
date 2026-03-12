@@ -3,15 +3,15 @@ package core
 const (
 	RPC_PORT int = 7001
 
-	SET_OPT_RECOVER int32 = 1
-	SET_OPT_CLOSE   int32 = 2
+	SET_OPT_RECOVER uint32 = 1
+	SET_OPT_CLOSE   uint32 = 2
 
-	GET_DATA_REQUEST    int32 = 10
-	CREATE_DATA_REQUEST int32 = 11
-	UPDATE_DATA_REQUEST int32 = 12
-	DELETE_DATA_REQUEST int32 = 13
-	RESET_DATA_REQUEST  int32 = 14
-	QUERY_DATA_REQUEST  int32 = 15
+	GET_DATA_REQUEST    uint32 = 10
+	CREATE_DATA_REQUEST uint32 = 11
+	UPDATE_DATA_REQUEST uint32 = 12
+	DELETE_DATA_REQUEST uint32 = 13
+	RESET_DATA_REQUEST  uint32 = 14
+	QUERY_DATA_REQUEST  uint32 = 15
 )
 
 type Chunk struct {
@@ -60,9 +60,9 @@ type RingRequest struct {
 }
 
 type DataHeader struct {
-	FactoryId int32
-	ClassId   int32
-	Revision  int64
+	FactoryId uint32
+	ClassId   uint32
+	Revision  uint64
 }
 
 type DataRequest struct {
@@ -70,7 +70,7 @@ type DataRequest struct {
 	Prefix   uint32
 	Key      []byte
 	Value    []byte
-	Opt      int32
+	Opt      uint32
 	Criteria Query
 	Async    chan Chunk
 }

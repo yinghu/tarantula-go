@@ -14,7 +14,7 @@ type JoinEvent struct {
 	core.EventObj
 }
 
-func (s *JoinEvent) ClassId() int32 {
+func (s *JoinEvent) ClassId() uint32 {
 	return JOIN_CID
 }
 

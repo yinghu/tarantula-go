@@ -42,7 +42,7 @@ func (t *BadgerLocalTransaction) Get(p core.Persistentable) error {
 	if err != nil {
 		return err
 	}
-	cid, err := t.value.ReadInt32()
+	cid, err := t.value.ReadUInt32()
 	if err != nil {
 		return err
 	}

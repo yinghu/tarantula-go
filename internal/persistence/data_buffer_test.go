@@ -25,7 +25,7 @@ type sample struct {
 	core.PersistentableObj
 }
 
-func (s *sample) ClassId() int32 {
+func (s *sample) ClassId() uint32 {
 	return 12
 }
 func (s *sample) ETag() string {

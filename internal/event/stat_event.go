@@ -13,7 +13,7 @@ type StatEvent struct {
 	core.EventObj `json:"-"`
 }
 
-func (s *StatEvent) ClassId() int32 {
+func (s *StatEvent) ClassId() uint32 {
 	return STAT_CID
 }
 

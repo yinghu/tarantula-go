@@ -23,7 +23,7 @@ const (
 
 type DataSet struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Size          uint32                 `protobuf:"varint,1,opt,name=size,proto3" json:"size,omitempty"`
+	Size          uint32                 `protobuf:"fixed32,1,opt,name=size,proto3" json:"size,omitempty"`
 	List          []*Data                `protobuf:"bytes,2,rep,name=list,proto3" json:"list,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -80,7 +80,7 @@ const file_data_set_proto_rawDesc = "" +
 	"\x0edata_set.proto\x12\bprotocol\x1a\n" +
 	"data.proto\"A\n" +
 	"\aDataSet\x12\x12\n" +
-	"\x04size\x18\x01 \x01(\rR\x04size\x12\"\n" +
+	"\x04size\x18\x01 \x01(\aR\x04size\x12\"\n" +
 	"\x04list\x18\x02 \x03(\v2\x0e.protocol.DataR\x04listBQ\n" +
 	"\x17com.icodesoftware.protoB\x10DataBatchFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 

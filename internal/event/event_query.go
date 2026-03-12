@@ -79,8 +79,8 @@ func CreateQuery(qid uint32) core.Query {
 
 type QWithTag struct {
 	Id        uint32          `json:"-"`
-	FactoryId int32           `json:"-"`
-	ClassId   int32           `json:"-"`
+	FactoryId uint32           `json:"-"`
+	ClassId   uint32           `json:"-"`
 	Tag       string          `json:"Tag"`
 	Topic     string          `json:"Topic"`
 	Limit     int32           `json:"Limit"`
@@ -143,10 +143,10 @@ func (q *QWithTag) QWrite(buff core.DataBuffer) error {
 func (q *QWithTag) QId() uint32 {
 	return q.Id
 }
-func (q *QWithTag) QFactoryId() int32 {
+func (q *QWithTag) QFactoryId() uint32 {
 	return q.FactoryId
 }
-func (q *QWithTag) QClassId() int32 {
+func (q *QWithTag) QClassId() uint32 {
 	return q.ClassId
 }
 func (q *QWithTag) QTag() string {

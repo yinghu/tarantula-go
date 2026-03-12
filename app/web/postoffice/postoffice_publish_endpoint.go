@@ -25,7 +25,7 @@ func (s *PostofficePublisher) Request(rs core.OnSession, w http.ResponseWriter, 
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	me, err := s.Create(int32(cid), topic)
+	me, err := s.Create(uint32(cid), topic)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return

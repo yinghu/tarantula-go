@@ -23,11 +23,11 @@ const (
 
 type Header struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Revision      int64                  `protobuf:"varint,1,opt,name=revision,proto3" json:"revision,omitempty"`
-	FactoryId     int32                  `protobuf:"varint,2,opt,name=factoryId,proto3" json:"factoryId,omitempty"`
-	ClassId       int32                  `protobuf:"varint,3,opt,name=classId,proto3" json:"classId,omitempty"`
-	Timestamp     int64                  `protobuf:"varint,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	Size          int32                  `protobuf:"varint,5,opt,name=size,proto3" json:"size,omitempty"`
+	Revision      uint64                 `protobuf:"fixed64,1,opt,name=revision,proto3" json:"revision,omitempty"`
+	FactoryId     uint32                 `protobuf:"fixed32,2,opt,name=factoryId,proto3" json:"factoryId,omitempty"`
+	ClassId       uint32                 `protobuf:"fixed32,3,opt,name=classId,proto3" json:"classId,omitempty"`
+	Timestamp     uint64                 `protobuf:"fixed64,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Size          uint32                 `protobuf:"fixed32,5,opt,name=size,proto3" json:"size,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -62,35 +62,35 @@ func (*Header) Descriptor() ([]byte, []int) {
 	return file_header_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Header) GetRevision() int64 {
+func (x *Header) GetRevision() uint64 {
 	if x != nil {
 		return x.Revision
 	}
 	return 0
 }
 
-func (x *Header) GetFactoryId() int32 {
+func (x *Header) GetFactoryId() uint32 {
 	if x != nil {
 		return x.FactoryId
 	}
 	return 0
 }
 
-func (x *Header) GetClassId() int32 {
+func (x *Header) GetClassId() uint32 {
 	if x != nil {
 		return x.ClassId
 	}
 	return 0
 }
 
-func (x *Header) GetTimestamp() int64 {
+func (x *Header) GetTimestamp() uint64 {
 	if x != nil {
 		return x.Timestamp
 	}
 	return 0
 }
 
-func (x *Header) GetSize() int32 {
+func (x *Header) GetSize() uint32 {
 	if x != nil {
 		return x.Size
 	}
@@ -103,11 +103,11 @@ const file_header_proto_rawDesc = "" +
 	"\n" +
 	"\fheader.proto\x12\bprotocol\"\x8e\x01\n" +
 	"\x06Header\x12\x1a\n" +
-	"\brevision\x18\x01 \x01(\x03R\brevision\x12\x1c\n" +
-	"\tfactoryId\x18\x02 \x01(\x05R\tfactoryId\x12\x18\n" +
-	"\aclassId\x18\x03 \x01(\x05R\aclassId\x12\x1c\n" +
-	"\ttimestamp\x18\x04 \x01(\x03R\ttimestamp\x12\x12\n" +
-	"\x04size\x18\x05 \x01(\x05R\x04sizeBN\n" +
+	"\brevision\x18\x01 \x01(\x06R\brevision\x12\x1c\n" +
+	"\tfactoryId\x18\x02 \x01(\aR\tfactoryId\x12\x18\n" +
+	"\aclassId\x18\x03 \x01(\aR\aclassId\x12\x1c\n" +
+	"\ttimestamp\x18\x04 \x01(\x06R\ttimestamp\x12\x12\n" +
+	"\x04size\x18\x05 \x01(\aR\x04sizeBN\n" +
 	"\x17com.icodesoftware.protoB\rHeaderFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (

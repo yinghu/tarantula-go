@@ -14,7 +14,7 @@ const (
 
 type SetData struct {
 	*protocol.Data
-	Opt  int32
+	Opt  uint32
 	Resp chan *protocol.Response
 }
 
@@ -30,11 +30,11 @@ func (s *SetData) DataKey() ([]byte, error) {
 		return []byte{}, fmt.Errorf("Key size overflow %d", ksz)
 	}
 	buffer := core.NewBuffer(COMPOSIT_KEY_MAX)
-	buffer.WriteInt32(s.Header.FactoryId)
-	buffer.WriteInt32(s.Header.ClassId)
-	buffer.WriteInt32(int32(ksz))
+	buffer.WriteUInt32(s.Header.FactoryId)
+	buffer.WriteUInt32(s.Header.ClassId)
+	buffer.WriteUInt32(uint32(ksz))
 	buffer.Write(s.Key)
-	buffer.WriteInt64(s.Header.Revision)
+	buffer.WriteUInt64(s.Header.Revision)
 	buffer.Flip()
 	return buffer.Read(0)
 }

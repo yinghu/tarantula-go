@@ -24,11 +24,11 @@ func (s *GetData) DataKey() ([]byte, error) {
 		return []byte{}, fmt.Errorf("Key size overflow %d", ksz)
 	}
 	buffer := core.NewBuffer(COMPOSIT_KEY_MAX)
-	buffer.WriteInt32(data.Header.FactoryId)
-	buffer.WriteInt32(data.Header.ClassId)
+	buffer.WriteUInt32(data.Header.FactoryId)
+	buffer.WriteUInt32(data.Header.ClassId)
 	buffer.WriteInt32(int32(ksz))
 	buffer.Write(data.Key)
-	buffer.WriteInt64(data.Header.Revision)
+	buffer.WriteUInt64(data.Header.Revision)
 	buffer.Flip()
 	return buffer.Read(0)
 }

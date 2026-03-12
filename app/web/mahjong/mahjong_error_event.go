@@ -10,7 +10,7 @@ type MahjongErrorEvent struct {
 	MahjongEventObj
 }
 
-func (s *MahjongErrorEvent) ClassId() int32 {
+func (s *MahjongErrorEvent) ClassId() uint32 {
 	return M_ERR_CID
 }
 

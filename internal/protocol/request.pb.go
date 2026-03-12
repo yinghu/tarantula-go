@@ -23,8 +23,8 @@ const (
 
 type Request struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Opt           int32                  `protobuf:"varint,1,opt,name=opt,proto3" json:"opt,omitempty"`
-	Prefix        uint32                 `protobuf:"varint,2,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	Opt           uint32                 `protobuf:"fixed32,1,opt,name=opt,proto3" json:"opt,omitempty"`
+	Prefix        uint32                 `protobuf:"fixed32,2,opt,name=prefix,proto3" json:"prefix,omitempty"`
 	Data          *Data                  `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
 	Query         *Query                 `protobuf:"bytes,4,opt,name=query,proto3" json:"query,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -61,7 +61,7 @@ func (*Request) Descriptor() ([]byte, []int) {
 	return file_request_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Request) GetOpt() int32 {
+func (x *Request) GetOpt() uint32 {
 	if x != nil {
 		return x.Opt
 	}
@@ -96,8 +96,8 @@ const file_request_proto_rawDesc = "" +
 	"\rrequest.proto\x12\bprotocol\x1a\n" +
 	"data.proto\x1a\vquery.proto\"~\n" +
 	"\aRequest\x12\x10\n" +
-	"\x03opt\x18\x01 \x01(\x05R\x03opt\x12\x16\n" +
-	"\x06prefix\x18\x02 \x01(\rR\x06prefix\x12\"\n" +
+	"\x03opt\x18\x01 \x01(\aR\x03opt\x12\x16\n" +
+	"\x06prefix\x18\x02 \x01(\aR\x06prefix\x12\"\n" +
 	"\x04data\x18\x03 \x01(\v2\x0e.protocol.DataR\x04data\x12%\n" +
 	"\x05query\x18\x04 \x01(\v2\x0f.protocol.QueryR\x05queryBO\n" +
 	"\x17com.icodesoftware.protoB\x0eRequestFactoryZ$gameclustering.com/internal/protocolb\x06proto3"

@@ -12,7 +12,7 @@ type MahjongClaimEvent struct {
 	MahjongEventObj
 }
 
-func (s *MahjongClaimEvent) ClassId() int32 {
+func (s *MahjongClaimEvent) ClassId() uint32 {
 	return M_CLAIM_CID
 }
 

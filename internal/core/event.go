@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	EVENT_FACTORY_ID int32 = 1
+	EVENT_FACTORY_ID uint32 = 1
 )
 
 type IndexListener interface {
@@ -42,13 +42,13 @@ type Event interface {
 }
 
 type EventCreator interface {
-	Create(classId int32, topic string) (Event, error)
+	Create(classId uint32, topic string) (Event, error)
 }
 
 type Query interface {
 	QId() uint32
-	QFactoryId() int32
-	QClassId() int32
+	QFactoryId() uint32
+	QClassId() uint32
 	QTag() string
 	QTopic() string
 	QStartTime() time.Time
@@ -125,6 +125,6 @@ func (s *EventObj) OnRecipientId(recipientId int64) {
 
 }
 
-func (s *EventObj) FactoryId() int32 {
+func (s *EventObj) FactoryId() uint32 {
 	return EVENT_FACTORY_ID
 }

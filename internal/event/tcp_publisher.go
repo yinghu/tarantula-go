@@ -48,7 +48,7 @@ func (s *TcpPublisher) Subscribe(cr core.EventCreator, ec core.EventListener) {
 			continue
 		}
 		buff.Flip()
-		cid, err := buff.ReadInt32()
+		cid, err := buff.ReadUInt32()
 		if err != nil {
 			buff.Clear()
 			continue

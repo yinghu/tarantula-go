@@ -116,8 +116,8 @@ func TestDataOpt(t *testing.T) {
 	}
 	core.AppLog.Debug().Msgf("ki %v", ki)
 	buff := core.NewBuffer(100)
-	buff.WriteInt32(core.EVENT_FACTORY_ID)
-	buff.WriteInt32(event.MESSAGE_CID)
+	buff.WriteUInt32(core.EVENT_FACTORY_ID)
+	buff.WriteUInt32(event.MESSAGE_CID)
 	buff.Flip()
 	px, _ := buff.Read(0)
 	p := px

@@ -12,7 +12,7 @@ type MahjongHandEvent struct {
 	MahjongEventObj
 }
 
-func (s *MahjongHandEvent) ClassId() int32 {
+func (s *MahjongHandEvent) ClassId() uint32 {
 	return M_HAND_CID
 }
 

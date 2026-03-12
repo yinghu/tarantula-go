@@ -115,7 +115,7 @@ func (s *AppManager) Shutdown() {
 	core.AppLog.Println("app manager shutting down ...")
 }
 
-func (s *AppManager) Create(classId int32, topic string) (core.Event, error) {
+func (s *AppManager) Create(classId uint32, topic string) (core.Event, error) {
 	return nil, nil
 }
 

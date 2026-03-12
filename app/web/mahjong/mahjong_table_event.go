@@ -12,7 +12,7 @@ type MahjongTableEvent struct {
 	MahjongTimeoutObj
 }
 
-func (s *MahjongTableEvent) ClassId() int32 {
+func (s *MahjongTableEvent) ClassId() uint32 {
 	return M_TABLE_CID
 }
 
