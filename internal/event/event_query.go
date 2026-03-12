@@ -185,5 +185,5 @@ func (q *QWithTag) QFilter(k, v []byte) bool {
 	oid, _ := buff.ReadInt64()
 	rev, _ := buff.ReadInt64()
 	core.AppLog.Debug().Msgf("filter %s %d %d", tag, oid, rev)
-	return true
+	return tag == q.Tag
 }
