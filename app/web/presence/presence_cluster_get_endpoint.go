@@ -5,6 +5,7 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -36,10 +37,12 @@ func (s *PresenceClusterGet) Request(rs core.OnSession, w http.ResponseWriter, r
 	s.Cluster().Request(req)
 	for c := range aq {
 		if !c.Remaining {
-			core.AppLog.Debug().Msgf("crt %v", c)
 			break
 		}
-		core.AppLog.Debug().Msgf("payload %v", c.Data)
+		resp, ok := c.Data.(*protocol.Response)
+		if ok {
+			core.AppLog.Debug().Msgf("payload %v, %s", resp.Successful, resp.Message)
+		}
 	}
 	w.Write(util.ToJson(co))
 }
