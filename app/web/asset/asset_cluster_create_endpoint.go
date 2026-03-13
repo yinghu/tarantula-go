@@ -33,6 +33,7 @@ func (s *AssetClusterCreate) Request(rs core.OnSession, w http.ResponseWriter, r
 	req := core.DataRequest{Key: k, Value: v, Opt: core.CREATE_DATA_REQUEST}
 	req.FactoryId = co.FactoryId()
 	req.ClassId = co.ClassId()
+	req.Mutable = co.Mutable
 	aq := make(chan core.Chunk, 3)
 	req.Async = aq
 	defer close(aq)

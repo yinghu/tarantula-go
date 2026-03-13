@@ -7,6 +7,7 @@ type ClusterObject struct {
 	Type     string `json:"type"`
 	Balance  int32  `json:"balance"`
 	SystemId int64  `json:"systemId,string"`
+	Mutable  bool   `json:"mutable"`
 	core.PersistentableObj
 }
 
