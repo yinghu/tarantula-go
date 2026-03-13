@@ -23,7 +23,7 @@ func TestDataOpt(t *testing.T) {
 	dsp := DataServiceProvider{Local: &local}
 	k := []byte("key1")
 	v := []byte("value1")
-	data := protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: 100, ClassId: 300}}
+	data := protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: 100, ClassId: 300, Mutable: true}}
 	dset := SetData{Data: &data, Opt: core.CREATE_DATA_REQUEST}
 	_, err = dsp.create(dset)
 	if err != nil {
@@ -52,7 +52,7 @@ func TestDataOpt(t *testing.T) {
 	data.Header.Revision = 1
 	data.Value = []byte("value123")
 	dupdate := SetData{Data: &data, Opt: core.UPDATE_DATA_REQUEST}
-	err = dsp.update(dupdate)
+	_, err = dsp.update(dupdate)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
@@ -147,27 +147,26 @@ func TestDataOpt(t *testing.T) {
 		return
 	}
 	core.AppLog.Debug().Msgf("KEY INDEX : %v", cx)
-	
-	
+
 	coo := bootstrap.ClusterObject{Key: "tkey"}
-	ckk,_,err := core.Export(&coo,100)
+	ckk, _, err := core.Export(&coo, 100)
 	if err != nil {
 		t.Errorf("should not be an error %s", err.Error())
 		return
 	}
-	cor := protocol.Data{Key: ckk,Header: &protocol.Header{ClassId: co.ClassId(), FactoryId: co.FactoryId()}}
+	cor := protocol.Data{Key: ckk, Header: &protocol.Header{ClassId: co.ClassId(), FactoryId: co.FactoryId()}}
 	gd := GetData{&protocol.Request{Data: &cor}}
 	cd, err := dsp.get(gd)
 	if err != nil {
 		t.Errorf("should not be an error %s", err.Error())
 		return
 	}
-	err = core.Import(&coo,ckk,cd.Value,100)
+	err = core.Import(&coo, ckk, cd.Value, 100)
 	if err != nil {
 		t.Errorf("should not be an error %s", err.Error())
 		return
 	}
 	core.AppLog.Debug().Msgf("K V : %v", coo)
 	core.AppLog.Debug().Msgf("K V : %v", cd)
-	
+
 }

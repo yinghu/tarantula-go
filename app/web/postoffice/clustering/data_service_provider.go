@@ -280,14 +280,14 @@ func (m *DataServiceProvider) create(sd SetData) (KeyIndex, error) {
 	})
 	return ki, err
 }
-func (m *DataServiceProvider) update(sd SetData) error {
+func (m *DataServiceProvider) update(sd SetData) (KeyIndex, error) {
 	ki := sd.IndexKey()
 	k, err := ki.CompositKey()
 	if err != nil {
-		return err
+		return ki, err
 	}
 	rev := sd.Header.Revision
-	return m.Local.Db.Update(func(txn *badger.Txn) error {
+	err = m.Local.Db.Update(func(txn *badger.Txn) error {
 		item, err := txn.Get(k)
 		if err != nil {
 			return fmt.Errorf("key not existed %s", err.Error())
@@ -298,7 +298,9 @@ func (m *DataServiceProvider) update(sd SetData) error {
 		}); err != nil {
 			return err
 		}
-
+		if !ki.Header.Mutable {
+			return fmt.Errorf("cannot update on immutable %v", ki.Header.Mutable)
+		}
 		if ki.Header.Revision != rev {
 			return fmt.Errorf("revison not matched %d %d", ki.Header.Revision, rev)
 		}
@@ -319,6 +321,7 @@ func (m *DataServiceProvider) update(sd SetData) error {
 		}
 		return txn.Set(dk, sd.Value)
 	})
+	return ki, err
 }
 func (m *DataServiceProvider) delete(sd SetData) error {
 	ki := sd.IndexKey()

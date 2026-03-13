@@ -33,7 +33,14 @@ start:
 				sd.Resp <- &protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
 			}
 		case core.UPDATE_DATA_REQUEST:
-			//err = m.update(sd)
+			ki, err := m.update(sd)
+			if err != nil {
+				sd.Resp <- &protocol.Response{Successful: false, Message: err.Error()}
+			} else {
+				var data []*protocol.Data
+				data = append(data, &protocol.Data{Header: &protocol.Header{Revision: ki.Header.Revision}})
+				sd.Resp <- &protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
+			}
 		case core.DELETE_DATA_REQUEST:
 			//err = m.delete(sd)
 		case core.RESET_DATA_REQUEST:

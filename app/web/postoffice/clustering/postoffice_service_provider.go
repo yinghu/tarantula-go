@@ -179,7 +179,7 @@ func (m *DataServiceProvider) clientUpdate(target *core.Node, request *protocol.
 	}
 	defer tcp.Close()
 	dsp := protocol.NewDataServiceClient(tcp)
-	return dsp.Create(context.Background(), request)
+	return dsp.Update(context.Background(), request)
 }
 
 func (c *DataServiceProvider) runDelete(set *protocol.Request, ch chan *protocol.Response) {
@@ -294,7 +294,6 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 			}
 			if err != nil {
 				core.AppLog.Debug().Msgf("run get streaming error %s", err.Error())
-				core.AppLog.Debug().Msgf("run get streaming error %v", data)
 				crt.Code = 400001
 				crt.Message = err.Error()
 				break
