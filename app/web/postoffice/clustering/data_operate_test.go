@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
@@ -132,4 +133,41 @@ func TestDataOpt(t *testing.T) {
 		return nil
 	})
 
+	co := bootstrap.ClusterObject{Key: "tkey", Type: "gem", Balance: 100, SystemId: 100}
+	ck, cv, err := core.Export(&co, 100)
+	if err != nil {
+		t.Errorf("should not be an error %s", err.Error())
+		return
+	}
+	cr := protocol.Data{Key: ck, Value: cv, Header: &protocol.Header{ClassId: co.ClassId(), FactoryId: co.FactoryId()}}
+	sd := SetData{Data: &cr}
+	cx, err := dsp.create(sd)
+	if err != nil {
+		t.Errorf("should not be an error %s", err.Error())
+		return
+	}
+	core.AppLog.Debug().Msgf("KEY INDEX : %v", cx)
+	
+	
+	coo := bootstrap.ClusterObject{Key: "tkey"}
+	ckk,_,err := core.Export(&coo,100)
+	if err != nil {
+		t.Errorf("should not be an error %s", err.Error())
+		return
+	}
+	cor := protocol.Data{Key: ckk,Header: &protocol.Header{ClassId: co.ClassId(), FactoryId: co.FactoryId()}}
+	gd := GetData{&protocol.Request{Data: &cor}}
+	cd, err := dsp.get(gd)
+	if err != nil {
+		t.Errorf("should not be an error %s", err.Error())
+		return
+	}
+	err = core.Import(&coo,ckk,cd.Value,100)
+	if err != nil {
+		t.Errorf("should not be an error %s", err.Error())
+		return
+	}
+	core.AppLog.Debug().Msgf("K V : %v", coo)
+	core.AppLog.Debug().Msgf("K V : %v", cd)
+	
 }

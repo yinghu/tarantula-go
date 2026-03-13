@@ -37,7 +37,7 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 		getdata := GetData{request}
 		data, err := c.get(getdata)
 		if err != nil {
-			return nil
+			return err
 		}
 		resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: []*protocol.Data{data}}}
 		return stream.Send(&resp)
@@ -364,9 +364,9 @@ func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
 			v := append([]byte{}, val...)
 			return ki.Val(v)
 		}); err != nil {
-			return nil
+			return err
 		}
-		//check revision with requested revision
+		//use latest revision
 		gd.Data.Header.Revision = ki.Header.Revision
 		dk, err := gd.DataKey()
 		if err != nil {
