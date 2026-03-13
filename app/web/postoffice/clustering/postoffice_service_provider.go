@@ -294,6 +294,8 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 			}
 			if err != nil {
 				core.AppLog.Debug().Msgf("run get streaming error %s", err.Error())
+				core.AppLog.Debug().Msgf("run get streaming error %v", data)
+				crt.Code = 400001
 				crt.Message = err.Error()
 				break
 			}
