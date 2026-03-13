@@ -31,7 +31,6 @@ func AppBootstrap(tcx TarantulaContext) {
 		}()
 	}
 	go func() {
-
 		err := tcx.Start(f, &e)
 		if err != nil {
 			core.AppLog.Printf("Error %s\n", err.Error())
