@@ -321,6 +321,7 @@ func (c *AppManager) Request(r core.DataRequest) {
 		r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: err.Error()}}
 		return
 	}
+	crt := core.Chunk{Remaining: false}
 	for {
 		resp, err := stream.Recv()
 		if err == io.EOF {
@@ -328,9 +329,10 @@ func (c *AppManager) Request(r core.DataRequest) {
 		}
 		if err != nil {
 			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
+			crt.Data = err
 			break
 		}
 		r.Async <- core.Chunk{Remaining: true, Data: resp}
 	}
-	r.Async <- core.Chunk{Remaining: false}
+	r.Async <- crt
 }
