@@ -6,7 +6,7 @@ type ClusterObject struct {
 	Key      string `json:"key"`
 	Type     string `json:"type"`
 	Balance  int32  `json:"balance"`
-	SystemId int64  `json:"systemId:string"`
+	SystemId int64  `json:"systemId,string"`
 	core.PersistentableObj
 }
 
