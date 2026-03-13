@@ -286,6 +286,7 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 			retry.Reties++
 			continue
 		}
+		crt := protocol.Response{Successful: false}
 		for {
 			data, err := stream.Recv()
 			if err == io.EOF {
@@ -293,6 +294,7 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 			}
 			if err != nil {
 				core.AppLog.Debug().Msgf("streaming error %s", err.Error())
+				crt.Message = err.Error()
 				break
 			}
 			ch <- data
@@ -300,7 +302,7 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 				break
 			}
 		}
-		ch <- &protocol.Response{Successful: false}
+		ch <- &crt
 		retry.Suc = true
 		break
 	}
