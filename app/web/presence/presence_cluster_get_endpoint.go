@@ -36,7 +36,7 @@ func (s *PresenceClusterGet) Request(rs core.OnSession, w http.ResponseWriter, r
 	s.Cluster().Request(req)
 	for c := range aq {
 		if !c.Remaining {
-			core.AppLog.Debug().Msgf("crt %v", c.Data)
+			core.AppLog.Debug().Msgf("crt %v", c)
 			break
 		}
 		core.AppLog.Debug().Msgf("payload %v", c.Data)

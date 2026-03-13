@@ -293,7 +293,7 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 				break
 			}
 			if err != nil {
-				core.AppLog.Debug().Msgf("streaming error %s", err.Error())
+				core.AppLog.Debug().Msgf("run get streaming error %s", err.Error())
 				crt.Message = err.Error()
 				break
 			}
