@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
@@ -9,28 +8,26 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-type AssetClusterCreate struct {
-	*AssetService
+type PresenceClusterGet struct {
+	*PresenceService
 }
 
-func (s *AssetClusterCreate) AccessControl() int32 {
+func (s *PresenceClusterGet) AccessControl() int32 {
 	return core.PROTECTED_ACCESS_CONTROL
 }
 
-func (s *AssetClusterCreate) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
+func (s *PresenceClusterGet) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+	kn := r.PathValue("key")
+
 	var co bootstrap.ClusterObject
-	err := json.NewDecoder(r.Body).Decode(&co)
+	co.Key = kn
+	k, _, err := core.Export(&co, 200)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	k, v, err := core.Export(&co, 200)
-	if err != nil {
-		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
-		return
-	}
-	req := core.DataRequest{Key: k, Value: v, Opt: core.CREATE_DATA_REQUEST}
+	req := core.DataRequest{Key: k, Opt: core.GET_DATA_REQUEST}
 	req.FactoryId = co.FactoryId()
 	req.ClassId = co.ClassId()
 	aq := make(chan core.Chunk, 3)
@@ -42,6 +39,7 @@ func (s *AssetClusterCreate) Request(rs core.OnSession, w http.ResponseWriter, r
 			break
 		}
 		core.AppLog.Debug().Msgf("payload %v", c.Data)
-		w.Write(util.ToJson(c.Data))
+
 	}
+	w.Write(util.ToJson(co))
 }

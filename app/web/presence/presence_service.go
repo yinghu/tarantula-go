@@ -48,6 +48,7 @@ func (s *PresenceService) Start(env core.Env, p core.Pusher) error {
 	http.Handle("/presence/register", bootstrap.Logging(&PresenceRegister{PresenceService: s}))
 	http.Handle("/presence/login", bootstrap.Logging(&PresenceLogin{PresenceService: s}))
 	http.Handle("/presence/password", bootstrap.Logging(&PresenceChangePwd{PresenceService: s}))
+	http.Handle("/presence/cluster/get/{key}", bootstrap.Logging(&PresenceClusterGet{PresenceService: s}))
 	return nil
 }
 func (s *PresenceService) Shutdown() {
