@@ -38,8 +38,8 @@ func (s *PostofficeQueryer) query(query core.Query) {
 		lmt--
 		mc--
 		cid, _ := v.ReadInt32()
-		rev, _ := v.ReadInt64()
-		tm, _ := v.ReadInt64()
+		rev, _ := v.ReadUInt64()
+		tm, _ := v.ReadUInt64()
 		e := event.CreateEvent(uint32(cid))
 		if e == nil {
 			return true
@@ -77,7 +77,7 @@ func (s *PostofficeQueryer) Request(rs core.OnSession, w http.ResponseWriter, r 
 	defer close(me.QCc())
 	go s.query(me)
 	for c := range me.QCc() {
-		cv,_ := c.Data.([]byte)
+		cv, _ := c.Data.([]byte)
 		n, err := w.Write(cv)
 		if err != nil {
 			core.AppLog.Printf("Write error %s Num : %d\n", err.Error(), n)

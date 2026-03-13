@@ -45,6 +45,9 @@ func (s *PresenceClusterGet) Request(rs core.OnSession, w http.ResponseWriter, r
 			if resp.Successful {
 				dt := resp.Data.List[0]
 				core.Import(&co, k, dt.Value, 100)
+				co.Mutable = dt.Header.Mutable
+				co.Rev = dt.Header.Revision
+				co.Tsp = dt.Header.Timestamp
 			}
 		}
 	}

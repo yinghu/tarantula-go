@@ -8,7 +8,8 @@ type ClusterObject struct {
 	Balance  int32  `json:"balance"`
 	SystemId int64  `json:"systemId,string"`
 	Mutable  bool   `json:"mutable"`
-	core.PersistentableObj
+
+	core.PersistentableObj `json:"header"`
 }
 
 func (c *ClusterObject) FactoryId() uint32 {

@@ -34,8 +34,8 @@ func (s *PostofficeRecoverer) recover(query core.Query) {
 	s.Ds.Query(core.ListingOpt{Prefix: kp}, func(k, v core.DataBuffer) bool {
 		lmt++
 		cid, _ := v.ReadInt32()
-		rev, _ := v.ReadInt64()
-		tm, _ := v.ReadInt64()
+		rev, _ := v.ReadUInt64()
+		tm, _ := v.ReadUInt64()
 		e := event.CreateEvent(uint32(cid))
 		if e == nil {
 			return true

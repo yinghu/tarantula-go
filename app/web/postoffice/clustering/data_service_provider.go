@@ -382,6 +382,7 @@ func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
 			data.Header.Revision = ki.Header.Revision
 			data.Header.Timestamp = ki.Header.Timestamp
 			data.Header.Size = ki.Header.Size
+			data.Header.Mutable = ki.Header.Mutable
 			return nil
 		})
 	})
