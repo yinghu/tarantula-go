@@ -42,6 +42,10 @@ func (s *PresenceClusterGet) Request(rs core.OnSession, w http.ResponseWriter, r
 		resp, ok := c.Data.(*protocol.Response)
 		if ok {
 			core.AppLog.Debug().Msgf("payload %v, %s", resp.Successful, resp.Message)
+			if resp.Successful {
+				dt := resp.Data.List[0]
+				core.Import(&co, k, dt.Value, 100)
+			}
 		}
 	}
 	w.Write(util.ToJson(co))
