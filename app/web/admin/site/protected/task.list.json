@@ -60,8 +60,8 @@
             "Jobs":[
                 {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}
                 ,{"Name":"TokenRing","Type":6},{"Name":"KeyRing","Type":11},
-                {"Name":"Get","Type":5},{"Name":"Reset","Type":5}, {"Name":"Create","Type":5},
-                {"Name":"Update","Type":5}, {"Name":"Delete","Type":5}                 
+                {"Name":"Get","Type":101},{"Name":"Reset","Type":103}, {"Name":"Create","Type":100},
+                {"Name":"Update","Type":102}, {"Name":"Delete","Type":104}                 
             ]        
         },
         {
