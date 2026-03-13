@@ -37,7 +37,7 @@ func (s *PresenceLogin) Login(login bootstrap.Login) {
 		login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.INVALID_TOKEN_CODE)}
 		return
 	}
-	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: ""}
+	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: s.F.Host}
 	ticket, _ := s.Authenticator().CreateTicket(login.SystemId, login.Id, login.AccessControl, bootstrap.TICKET_TIME_OUT_MINUTES)
 	session.Ticket = ticket
 	login.Cc <- core.Chunk{Remaining: false, Data: util.ToJson(session)}
@@ -71,7 +71,7 @@ func (s *PresenceLogin) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 	login.Cc = listener
 	go s.Login(login)
 	for c := range listener {
-		cv,_ := c.Data.([]byte)
+		cv, _ := c.Data.([]byte)
 		w.Write(cv)
 		if !c.Remaining {
 			break
