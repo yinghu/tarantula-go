@@ -63,3 +63,5 @@ type Login struct {
 	AccessControl int32           `json:"accessControl,string"`
 	Cc            chan core.Chunk `json:"-"`
 }
+
+

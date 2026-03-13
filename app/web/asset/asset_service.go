@@ -28,5 +28,7 @@ func (s *AssetService) Start(f core.Env, p core.Pusher) error {
 	core.AppLog.Printf("Asset service started %s %s\n", f.HttpBinding, s.assetDir)
 	http.Handle("/asset/upload/{name}", bootstrap.Logging(&AssetUpload{AssetService: s}))
 	http.Handle("/asset/download/{name}", bootstrap.Logging(&AssetDownload{AssetService: s}))
+	http.Handle("/asset/cluster/create", bootstrap.Logging(&AssetClusterCreate{AssetService: s}))
+
 	return nil
 }
