@@ -49,11 +49,11 @@ func (t *BadgerLocalTransaction) Get(p core.Persistentable) error {
 	if p.ClassId() != cid {
 		return fmt.Errorf("class id not matched %d , %d", cid, p.ClassId())
 	}
-	crv, err := t.value.ReadInt64()
+	crv, err := t.value.ReadUInt64()
 	if err != nil {
 		return err
 	}
-	ctm, err := t.value.ReadInt64()
+	ctm, err := t.value.ReadUInt64()
 	if err != nil {
 		return err
 	}
@@ -74,21 +74,21 @@ func (t *BadgerLocalTransaction) Set(p core.Persistentable) error {
 		return err
 	}
 	item, err := t.ctx.Get(pk)
-	var rev int64 = 0
+	var rev uint64 = 0
 	if err == nil {
 		err = item.Value(func(val []byte) error {
 			return t.value.Write(val)
 		})
 		if err == nil {
 			t.value.Flip()
-			cid, err := t.value.ReadInt32()
+			cid, err := t.value.ReadUInt32()
 			if err != nil {
 				return err
 			}
-			if cid != int32(p.ClassId()) {
+			if cid != p.ClassId() {
 				return fmt.Errorf("class id not matched %d , %d", cid, p.ClassId())
 			}
-			crv, err := t.value.ReadInt64()
+			crv, err := t.value.ReadUInt64()
 			if err != nil {
 				return err
 			}
@@ -99,13 +99,13 @@ func (t *BadgerLocalTransaction) Set(p core.Persistentable) error {
 		}
 	}
 	t.value.Clear()
-	if err := t.value.WriteInt32(int32(p.ClassId())); err != nil {
+	if err := t.value.WriteUInt32(p.ClassId()); err != nil {
 		return err
 	}
-	if err := t.value.WriteInt64(int64(p.Revision() + 1)); err != nil {
+	if err := t.value.WriteUInt64(p.Revision() + 1); err != nil {
 		return err
 	}
-	if err := t.value.WriteInt64(p.Timestamp()); err != nil {
+	if err := t.value.WriteUInt64(p.Timestamp()); err != nil {
 		return err
 	}
 	if err := p.Write(t.value); err != nil {
@@ -149,9 +149,9 @@ func (t *BadgerLocalTransaction) Set(p core.Persistentable) error {
 		se.Count = 1
 	}
 	t.value.Clear()
-	t.value.WriteInt32(int32(se.ClassId()))
-	t.value.WriteInt64(se.Revision())
-	t.value.WriteInt64(time.Now().UnixMilli())
+	t.value.WriteUInt32(se.ClassId())
+	t.value.WriteUInt64(se.Revision())
+	t.value.WriteUInt64(uint64(time.Now().UnixMilli()))
 	se.Write(t.value)
 	t.value.Flip()
 	sv, _ := t.value.Read(0)
