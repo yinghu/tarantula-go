@@ -306,7 +306,7 @@ func (c *AppManager) RingToken(key []byte) uint32 {
 
 func (c *AppManager) Request(r core.DataRequest) {
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId}}}
+	req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
 	if r.Opt == core.QUERY_DATA_REQUEST {
 		dt, err := event.Export(r.Criteria, 100)
 		if err != nil {
