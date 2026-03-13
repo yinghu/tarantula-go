@@ -52,10 +52,10 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 		defer close(rc)
 		go c.runGet(request, rc)
 		for resp := range rc {
+			stream.Send(resp)
 			if !resp.Successful {
 				break
 			}
-			stream.Send(resp)
 		}
 	case core.QUERY_DATA_REQUEST:
 		rc := make(chan *protocol.Response, 3)
