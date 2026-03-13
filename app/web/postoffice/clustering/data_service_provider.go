@@ -292,7 +292,8 @@ func (m *DataServiceProvider) update(sd SetData) error {
 			return fmt.Errorf("key not existed %s", err.Error())
 		}
 		if err = item.Value(func(val []byte) error {
-			return ki.Val(val)
+			v := append([]byte{}, val...)
+			return ki.Val(v)
 		}); err != nil {
 			return err
 		}
@@ -346,6 +347,7 @@ func (m *DataServiceProvider) delete(sd SetData) error {
 	})
 }
 func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
+	core.AppLog.Debug().Msgf("get %v", gd)
 	data := protocol.Data{Header: &protocol.Header{}}
 	ki := gd.IndexKey()
 	k, err := ki.CompositKey()
@@ -359,7 +361,8 @@ func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
 			return err
 		}
 		if err = item.Value(func(val []byte) error {
-			return ki.Val(val)
+			v := append([]byte{}, val...)
+			return ki.Val(v)
 		}); err != nil {
 			return nil
 		}
@@ -374,7 +377,8 @@ func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
 			return err
 		}
 		return item.Value(func(val []byte) error {
-			data.Value = val
+			v := append([]byte{}, val...)
+			data.Value = v
 			data.Header.Revision = ki.Header.Revision
 			data.Header.Timestamp = ki.Header.Timestamp
 			data.Header.Size = ki.Header.Size

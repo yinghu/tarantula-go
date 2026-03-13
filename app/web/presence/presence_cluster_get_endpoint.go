@@ -39,7 +39,6 @@ func (s *PresenceClusterGet) Request(rs core.OnSession, w http.ResponseWriter, r
 			break
 		}
 		core.AppLog.Debug().Msgf("payload %v", c.Data)
-
 	}
 	w.Write(util.ToJson(co))
 }
