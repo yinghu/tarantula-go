@@ -258,6 +258,7 @@ func (m *DataServiceProvider) create(sd SetData) (KeyIndex, error) {
 	ki.Header.Revision = 1
 	ki.Header.Timestamp = uint64(time.Now().UnixMilli())
 	ki.Header.Size = uint32(len(sd.Value))
+	ki.Header.Mutable = sd.Header.Mutable
 	sd.Header.Revision = ki.Header.Revision
 	k, v, err := ki.Pair()
 	if err != nil {
