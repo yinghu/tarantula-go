@@ -90,7 +90,7 @@
         {
             "Name":"APITool","ScopeSequence":0,"Icon":"api","Callback":"on_player_login",
             "Jobs":[
-                {"Name":"Register","Form":"/admin/register.json","Path":"/presence/register","Type":5},
+                {"Name":"Register","Type":16},
                 {"Name":"Login","Form":"/admin/login.json","Path":"/presence/login","Type":5},
                 {"Name":"ViewItem","Form":"/admin/webprotected/view.item.json","Path":"/presence/login","Type":5},
                 {"Name":"TournamentList","Path":"/tournament/list","Type":5},
