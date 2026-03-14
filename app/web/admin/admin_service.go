@@ -77,6 +77,9 @@ func (s *AdminService) Start(f core.Env, p core.Pusher) error {
 	http.Handle("/admin/presence/hashring", bootstrap.Logging(&AdminHashRingEndpoint{AdminService: s}))
 	http.Handle("/admin/presence/keyring/{key}", bootstrap.Logging(&AdminKeyRingEndpoint{AdminService: s}))
 
+	http.Handle("/admin/cluster/delete/{key}", bootstrap.Logging(&AdminClusterDelete{AdminService: s}))
+	http.Handle("/admin/cluster/reset", bootstrap.Logging(&AdminClusterReset{AdminService: s}))
+
 	fmt.Printf("Admin service started %s\n", f.HttpBinding)
 	return nil
 }
