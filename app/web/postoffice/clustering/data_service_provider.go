@@ -135,8 +135,7 @@ func (c *DataServiceProvider) Delete(ctx context.Context, in *protocol.Request) 
 }
 
 func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
-
-	//stream.Send()
+	
 	return nil
 }
 

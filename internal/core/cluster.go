@@ -12,6 +12,8 @@ const (
 	DELETE_DATA_REQUEST uint32 = 13
 	RESET_DATA_REQUEST  uint32 = 14
 	QUERY_DATA_REQUEST  uint32 = 15
+
+	PULL_DATA_REQUEST uint32 = 16
 )
 
 type Chunk struct {

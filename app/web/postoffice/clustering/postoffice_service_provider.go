@@ -85,6 +85,16 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 		c.runReset(request, rc)
 		resp := <-rc
 		stream.Send(resp)
+	case core.PULL_DATA_REQUEST:
+		rc := make(chan *protocol.Response, 3)
+		defer close(rc)
+		go c.runPull(request, rc)
+		for resp := range rc {
+			if !resp.Successful {
+				break
+			}
+			stream.Send(resp)
+		}
 	default:
 		stream.Send(&protocol.Response{Successful: false, Message: fmt.Sprintf("request opt not suuported %d", request.Opt)})
 	}
@@ -312,4 +322,9 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 	}
 	core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
 	ch <- &protocol.Response{Successful: false, Message: retry.Err.Error()}
+}
+
+func (c *DataServiceProvider) runPull(set *protocol.Request, ch chan *protocol.Response) {
+	ch <- &protocol.Response{Successful: false, Message: fmt.Sprintf("pending %d", set.Opt)}
+	//c.Pull()
 }

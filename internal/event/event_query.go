@@ -18,6 +18,8 @@ const (
 	//query criteria
 	Q_TOURNAMENT_QID uint32 = 100
 	QT_SCORE_QID     uint32 = 101
+
+	RING_PULL_QID uint32 = 200
 )
 
 func Import(q core.Query, data []byte, bufferiSize int) error {
@@ -79,8 +81,8 @@ func CreateQuery(qid uint32) core.Query {
 
 type QWithTag struct {
 	Id        uint32          `json:"-"`
-	FactoryId uint32           `json:"-"`
-	ClassId   uint32           `json:"-"`
+	FactoryId uint32          `json:"-"`
+	ClassId   uint32          `json:"-"`
 	Tag       string          `json:"Tag"`
 	Topic     string          `json:"Topic"`
 	Limit     int32           `json:"Limit"`
