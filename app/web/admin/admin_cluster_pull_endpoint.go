@@ -40,6 +40,6 @@ func (s *AdminClusterPull) Request(rs core.OnSession, w http.ResponseWriter, r *
 			break
 		}
 		core.AppLog.Debug().Msgf("payload %v", c.Data)
-		w.Write(util.ToJson(c.Data))
 	}
+	w.Write(util.ToJson(core.OnSession{Successful: false, Message: "pending"}))
 }

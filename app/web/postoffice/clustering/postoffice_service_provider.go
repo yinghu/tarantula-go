@@ -325,6 +325,8 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 }
 
 func (c *DataServiceProvider) runPull(set *protocol.Request, ch chan *protocol.Response) {
+	core.AppLog.Debug().Msgf("RUN PULL %v", set)
+	ch <- &protocol.Response{Successful: false, Message: fmt.Sprintf("pending %d", set.Opt)}
 	ch <- &protocol.Response{Successful: false, Message: fmt.Sprintf("pending %d", set.Opt)}
 	//c.Pull()
 }
