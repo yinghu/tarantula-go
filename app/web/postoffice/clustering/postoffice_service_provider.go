@@ -330,7 +330,7 @@ func (c *DataServiceProvider) runPull(target string, set *protocol.Request, ch c
 		c.pull()
 		return
 	}
-	core.AppLog.Debug().Msgf("run remote pull %v", set)
+	core.AppLog.Debug().Msgf("run remote pull %v", target)
 	tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		ch <- &protocol.Response{Successful: false, Message: err.Error()}
