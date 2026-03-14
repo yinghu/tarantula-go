@@ -350,11 +350,12 @@ func (c *DataServiceProvider) runPull(target string, set *protocol.Request, ch c
 			break
 		}
 		if err != nil {
-			core.AppLog.Debug().Msgf("run get streaming error %s", err.Error())
+			core.AppLog.Debug().Msgf("run pull streaming error %s", err.Error())
 			crt.Code = 400001
 			crt.Message = err.Error()
 			break
 		}
+		core.AppLog.Debug().Msgf("pull data %v",data)
 		ch <- data
 		if !data.Successful {
 			break
