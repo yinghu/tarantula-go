@@ -88,7 +88,7 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 	case core.PULL_DATA_REQUEST:
 		rc := make(chan *protocol.Response, 3)
 		defer close(rc)
-		go c.runPull(request, rc)
+		go c.runPull("", request, rc)
 		for resp := range rc {
 			if !resp.Successful {
 				break
@@ -324,9 +324,41 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 	ch <- &protocol.Response{Successful: false, Message: retry.Err.Error()}
 }
 
-func (c *DataServiceProvider) runPull(set *protocol.Request, ch chan *protocol.Response) {
-	core.AppLog.Debug().Msgf("RUN PULL %v", set)
-	ch <- &protocol.Response{Successful: true, Message: fmt.Sprintf("pending %d", set.Opt)}
-	ch <- &protocol.Response{Successful: false, Message: fmt.Sprintf("pending %d", set.Opt)}
-	//c.Pull()
+func (c *DataServiceProvider) runPull(target string, set *protocol.Request, ch chan *protocol.Response) {
+	if target == "" {
+		core.AppLog.Debug().Msgf("run local pull %v", set)
+		c.pull()
+		return
+	}
+	core.AppLog.Debug().Msgf("run remote pull %v", set)
+	tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		ch <- &protocol.Response{Successful: false, Message: err.Error()}
+		return
+	}
+	defer tcp.Close()
+	dsp := protocol.NewDataServiceClient(tcp)
+	stream, err := dsp.Pull(context.Background(), set)
+	if err != nil {
+		ch <- &protocol.Response{Successful: false, Message: err.Error()}
+		return
+	}
+	crt := protocol.Response{Successful: false}
+	for {
+		data, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			core.AppLog.Debug().Msgf("run get streaming error %s", err.Error())
+			crt.Code = 400001
+			crt.Message = err.Error()
+			break
+		}
+		ch <- data
+		if !data.Successful {
+			break
+		}
+	}
+	ch <- &crt
 }

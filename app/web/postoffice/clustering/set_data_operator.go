@@ -68,7 +68,16 @@ start:
 	core.AppLog.Warn().Msgf("pulling data from %s", sync.Remote)
 	for _, h := range sync.Hashs {
 		core.AppLog.Warn().Msgf("recovering data from hash %d", h)
-		//m.ClientPull()
+		req := protocol.Request{}
+		ch := make(chan *protocol.Response, 3)
+		m.runPull(sync.Remote, &req, ch)
+		for resp := range ch {
+			core.AppLog.Debug().Msgf("REV %v", resp)
+			if !resp.Successful {
+				break
+			}
+		}
+		close(ch)
 	}
 	m.DWait.Done()
 	goto start
