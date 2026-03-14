@@ -323,21 +323,25 @@ func (m *DataServiceProvider) update(sd SetData) (KeyIndex, error) {
 	})
 	return ki, err
 }
-func (m *DataServiceProvider) delete(sd SetData) error {
+func (m *DataServiceProvider) delete(sd SetData) (KeyIndex, error) {
 	ki := sd.IndexKey()
 	k, err := ki.CompositKey()
 	if err != nil {
-		return err
+		return ki, err
 	}
-	return m.Local.Db.Update(func(txn *badger.Txn) error {
+	err = m.Local.Db.Update(func(txn *badger.Txn) error {
 		item, err := txn.Get(k)
 		if err != nil {
 			return fmt.Errorf("key not existed %s", err.Error())
 		}
 		if err = item.Value(func(val []byte) error {
-			return ki.Val(val)
+			v := append([]byte{}, val...)
+			return ki.Val(v)
 		}); err != nil {
 			return err
+		}
+		if !ki.Header.Mutable {
+			return fmt.Errorf("cannot delete on immutable %v", ki.Header.Mutable)
 		}
 		if err = txn.Delete(k); err != nil {
 			return err
@@ -349,9 +353,9 @@ func (m *DataServiceProvider) delete(sd SetData) error {
 		}
 		return txn.Delete(dk)
 	})
+	return ki, err
 }
 func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
-	core.AppLog.Debug().Msgf("get %v", gd)
 	data := protocol.Data{Header: &protocol.Header{}}
 	ki := gd.IndexKey()
 	k, err := ki.CompositKey()
@@ -393,22 +397,25 @@ func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
 	return &data, err
 }
 
-func (m *DataServiceProvider) reset(sd SetData) error {
+func (m *DataServiceProvider) reset(sd SetData) (KeyIndex, error) {
 	ki := sd.IndexKey()
 	k, err := ki.CompositKey()
 	if err != nil {
-		return err
+		return ki, err
 	}
-
-	return m.Local.Db.Update(func(txn *badger.Txn) error {
+	err = m.Local.Db.Update(func(txn *badger.Txn) error {
 		item, err := txn.Get(k)
 		if err != nil {
 			return fmt.Errorf("key not existed %s", err.Error())
 		}
 		if err = item.Value(func(val []byte) error {
-			return ki.Val(val)
+			v := append([]byte{}, val...)
+			return ki.Val(v)
 		}); err != nil {
 			return err
+		}
+		if !ki.Header.Mutable {
+			return fmt.Errorf("cannot reset on immutable %v", ki.Header.Mutable)
 		}
 		ki.Header.Revision = 1
 		ki.Header.Timestamp = uint64(time.Now().UnixMilli())
@@ -427,4 +434,5 @@ func (m *DataServiceProvider) reset(sd SetData) error {
 		}
 		return txn.Set(dk, sd.Value)
 	})
+	return ki, err
 }

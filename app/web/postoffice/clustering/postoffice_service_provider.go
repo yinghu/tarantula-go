@@ -148,7 +148,7 @@ func (c *DataServiceProvider) runUpdate(set *protocol.Request, ch chan *protocol
 		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		resp, err := c.clientCreate(&ringNode, set)
+		resp, err := c.clientUpdate(&ringNode, set)
 		if err != nil {
 			retry.Err = err
 			retry.Reties--
@@ -190,7 +190,7 @@ func (c *DataServiceProvider) runDelete(set *protocol.Request, ch chan *protocol
 		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		resp, err := c.clientCreate(&ringNode, set)
+		resp, err := c.clientDelete(&ringNode, set)
 		if err != nil {
 			retry.Err = err
 			retry.Reties--
@@ -221,7 +221,7 @@ func (m *DataServiceProvider) clientDelete(target *core.Node, request *protocol.
 	}
 	defer tcp.Close()
 	dsp := protocol.NewDataServiceClient(tcp)
-	return dsp.Create(context.Background(), request)
+	return dsp.Delete(context.Background(), request)
 }
 
 func (c *DataServiceProvider) runReset(set *protocol.Request, ch chan *protocol.Response) {
@@ -245,7 +245,7 @@ func (c *DataServiceProvider) runReset(set *protocol.Request, ch chan *protocol.
 		}
 		slaves := nodes[1:]
 		for _, slave := range slaves {
-			c.clientDelete(&slave, set)
+			c.clientReset(&slave, set)
 		}
 		break
 	}
@@ -263,7 +263,7 @@ func (m *DataServiceProvider) clientReset(target *core.Node, request *protocol.R
 	}
 	defer tcp.Close()
 	dsp := protocol.NewDataServiceClient(tcp)
-	return dsp.Create(context.Background(), request)
+	return dsp.Reset(context.Background(), request)
 }
 
 func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Response) {

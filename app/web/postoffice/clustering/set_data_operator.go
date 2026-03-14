@@ -42,9 +42,23 @@ start:
 				sd.Resp <- &protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
 			}
 		case core.DELETE_DATA_REQUEST:
-			//err = m.delete(sd)
+			ki, err := m.delete(sd)
+			if err != nil {
+				sd.Resp <- &protocol.Response{Successful: false, Message: err.Error()}
+			} else {
+				var data []*protocol.Data
+				data = append(data, &protocol.Data{Header: &protocol.Header{Revision: ki.Header.Revision}})
+				sd.Resp <- &protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
+			}
 		case core.RESET_DATA_REQUEST:
-			//err = m.reset(sd)
+			ki, err := m.reset(sd)
+			if err != nil {
+				sd.Resp <- &protocol.Response{Successful: false, Message: err.Error()}
+			} else {
+				var data []*protocol.Data
+				data = append(data, &protocol.Data{Header: &protocol.Header{Revision: ki.Header.Revision}})
+				sd.Resp <- &protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
+			}
 		default:
 			sd.Resp <- &protocol.Response{Successful: false, Message: fmt.Sprintf("opt not supported %d", sd.Opt)}
 		}

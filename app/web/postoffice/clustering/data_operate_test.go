@@ -74,13 +74,13 @@ func TestDataOpt(t *testing.T) {
 	data.Header.Revision = 100
 	data.Value = []byte("value123678")
 	rupdate := SetData{Data: &data, Opt: core.RESET_DATA_REQUEST}
-	err = dsp.reset(rupdate)
+	_,err = dsp.reset(rupdate)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
 
 	ddelete := SetData{Data: &data, Opt: core.DELETE_DATA_REQUEST}
-	err = dsp.delete(ddelete)
+	_,err = dsp.delete(ddelete)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
