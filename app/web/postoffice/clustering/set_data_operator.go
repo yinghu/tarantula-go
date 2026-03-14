@@ -60,7 +60,7 @@ start:
 				sd.Resp <- &protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
 			}
 		default:
-			sd.Resp <- &protocol.Response{Successful: false, Message: fmt.Sprintf("opt not supported %d", sd.Opt)}
+			sd.Resp <- &protocol.Response{Successful: false, Message: fmt.Sprintf("set opt not supported %d", sd.Opt)}
 		}
 	}
 	core.AppLog.Debug().Msgf("running recovery on operator %d", num)

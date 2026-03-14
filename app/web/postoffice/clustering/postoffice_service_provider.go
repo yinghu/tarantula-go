@@ -86,7 +86,7 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 		resp := <-rc
 		stream.Send(resp)
 	default:
-		stream.Send(&protocol.Response{Successful: false, Message: fmt.Sprintf("opt not suuported %d", request.Opt)})
+		stream.Send(&protocol.Response{Successful: false, Message: fmt.Sprintf("request opt not suuported %d", request.Opt)})
 	}
 	return nil
 }
