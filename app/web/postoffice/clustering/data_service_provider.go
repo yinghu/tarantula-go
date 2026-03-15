@@ -468,7 +468,7 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 			})
 			ki := KeyIndex{Header: &protocol.Header{}}
 			core.Import(&ki, k, v, 300)
-			core.AppLog.Debug().Msgf("hash %d", ki.Prefix)
+			core.AppLog.Debug().Msgf("hash %v", ki)
 			if ki.Prefix >= from && ki.Prefix < to {
 				key, _ := ki.lookupDataKey()
 				vitem, err := txn.Get(key)
