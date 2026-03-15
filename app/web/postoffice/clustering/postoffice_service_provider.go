@@ -89,7 +89,7 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 		rc := make(chan *protocol.Response, 3)
 		defer close(rc)
 		core.AppLog.Debug().Msgf("run local pull %v", request)
-		go c.pull(rc)
+		go c.pull(request.Prefix, request.Prefix, rc)
 		for resp := range rc {
 			if !resp.Successful {
 				break

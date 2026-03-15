@@ -138,11 +138,17 @@ func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.Server
 	rq := make(chan []core.Node, 1)
 	c.Mll.rangeRing(core.RingRequest{Token: request.Prefix, Opt: ADD_NODE_OPT, Async: rq})
 	ringRange := <-rq
-	close(rq)
-	core.AppLog.Debug().Msgf("push data from >= %d %d < %d", request.Prefix, ringRange[0].RingToken, ringRange[1].RingToken)
-	stream.Send(&protocol.Response{Successful: true, Message: "to do1"})
-	stream.Send(&protocol.Response{Successful: true, Message: "to do2"})
-	stream.Send(&protocol.Response{Successful: true, Message: "to do3"})
+	defer close(rq)
+	ch := make(chan *protocol.Response, 3)
+	go c.pull(ringRange[0].RingToken, request.Prefix, ch)
+	for resp := range ch {
+		if !resp.Successful {
+			break
+		}
+		if err := stream.Send(resp); err != nil {
+			break
+		}
+	}
 	return nil
 }
 
@@ -443,9 +449,11 @@ func (m *DataServiceProvider) reset(sd SetData) (KeyIndex, error) {
 	return ki, err
 }
 
-func (m *DataServiceProvider) pull(ch chan *protocol.Response) {
+func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) {
 	index := KeyIndex{}
 	pre, _ := index.lookupPrefix(INDEX_PREFIX)
+	core.AppLog.Debug().Msgf("RUN PULL FROM %d to %d", from, to)
+	data := make([]*protocol.Data, 0, 10)
 	m.Local.Db.View(func(txn *badger.Txn) error {
 		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
 		it := txn.NewIterator(op)
@@ -461,18 +469,31 @@ func (m *DataServiceProvider) pull(ch chan *protocol.Response) {
 			ki := KeyIndex{Header: &protocol.Header{}}
 			core.Import(&ki, k, v, 300)
 			core.AppLog.Debug().Msgf("hash %d", ki.Prefix)
-			key, _ := ki.lookupDataKey()
-			vitem, err := txn.Get(key)
-			if err != nil {
-				core.AppLog.Warn().Msgf("should not be a value missing %v", ki)
-				continue
+			if ki.Prefix >= from && ki.Prefix < to {
+				key, _ := ki.lookupDataKey()
+				vitem, err := txn.Get(key)
+				if err != nil {
+					core.AppLog.Warn().Msgf("should not be a value missing %v", ki)
+					continue
+				}
+				vitem.Value(func(val []byte) error {
+					core.AppLog.Debug().Msg("value found!")
+					vdata := protocol.Data{Key: key, Value: append([]byte{}, val...), Header: &protocol.Header{FactoryId: ki.FactoryId(), ClassId: ki.ClassId(), Revision: ki.Revision(), Timestamp: ki.Timestamp()}}
+					data = append(data, &vdata)
+					if len(data) == 10 {
+						resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
+						ch <- &resp
+						data = make([]*protocol.Data, 0, 10)
+					}
+					return nil
+				})
 			}
-			vitem.Value(func(val []byte) error {
-				core.AppLog.Debug().Msg("value found!")
-				return nil
-			})
 		}
 		return nil
 	})
+	if len(data) > 0 {
+		resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
+		ch <- &resp
+	}
 	ch <- &protocol.Response{Successful: false}
 }
