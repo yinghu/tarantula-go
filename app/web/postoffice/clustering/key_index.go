@@ -9,6 +9,13 @@ const (
 	INDEX_PREFIX string = "$___KI___$"
 )
 
+func lookup(p string, bsize int) ([]byte, error) {
+	buff := core.NewBuffer(bsize)
+	buff.WriteString(p)
+	buff.Flip()
+	return buff.Read(0)
+}
+
 type KeyIndex struct {
 	Prefix uint32           `json:"prefix"`
 	Key    []byte           `json:"-"`

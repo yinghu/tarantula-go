@@ -140,10 +140,6 @@ func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.Server
 	ringRange := <-rq
 	close(rq)
 	core.AppLog.Debug().Msgf("push data from >= %d %d < %d", request.Prefix, ringRange[0].RingToken, ringRange[1].RingToken)
-	c.Local.Db.View(func(txn *badger.Txn) error {
-
-		return nil
-	})
 	stream.Send(&protocol.Response{Successful: true, Message: "to do1"})
 	stream.Send(&protocol.Response{Successful: true, Message: "to do2"})
 	stream.Send(&protocol.Response{Successful: true, Message: "to do3"})
@@ -447,6 +443,25 @@ func (m *DataServiceProvider) reset(sd SetData) (KeyIndex, error) {
 	return ki, err
 }
 
-func (m *DataServiceProvider) pull() {
-
+func (m *DataServiceProvider) pull(ch chan *protocol.Response) {
+	pre, _ := lookup(INDEX_PREFIX, 30)
+	m.Local.Db.View(func(txn *badger.Txn) error {
+		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
+		it := txn.NewIterator(op)
+		defer it.Close()
+		for it.Seek(pre); it.ValidForPrefix(pre); it.Next() {
+			item := it.Item()
+			k := append([]byte{}, item.Key()...)
+			var v []byte
+			item.Value(func(val []byte) error {
+				v = append(v, val...)
+				return nil
+			})
+			ki := KeyIndex{}
+			core.Import(&ki, k, v, 300)
+			core.AppLog.Debug().Msgf("hash %d", ki.Prefix)
+		}
+		return nil
+	})
+	ch <- &protocol.Response{Successful: false}
 }

@@ -88,7 +88,8 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 	case core.PULL_DATA_REQUEST:
 		rc := make(chan *protocol.Response, 3)
 		defer close(rc)
-		go c.runPull("", request, rc)
+		core.AppLog.Debug().Msgf("run local pull %v", request)
+		go c.pull(rc)
 		for resp := range rc {
 			if !resp.Successful {
 				break
@@ -325,11 +326,6 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 }
 
 func (c *DataServiceProvider) runPull(target string, set *protocol.Request, ch chan *protocol.Response) {
-	if target == "" {
-		core.AppLog.Debug().Msgf("run local pull %v", set)
-		c.pull()
-		return
-	}
 	core.AppLog.Debug().Msgf("run remote pull %s >> %d", target, set.Prefix)
 	tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
