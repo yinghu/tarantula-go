@@ -65,9 +65,7 @@ start:
 	}
 	core.AppLog.Debug().Msgf("running recovery on operator %d", num)
 	sync := <-m.DPull
-	core.AppLog.Warn().Msgf("pulling data from %s", sync.Remote)
 	for _, h := range sync.Hashs {
-		core.AppLog.Warn().Msgf("recovering data from hash %d", h)
 		req := protocol.Request{Prefix: h}
 		ch := make(chan *protocol.Response, 3)
 		go m.runPull(sync.Remote, &req, ch)

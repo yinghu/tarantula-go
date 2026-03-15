@@ -135,7 +135,12 @@ func (c *DataServiceProvider) Delete(ctx context.Context, in *protocol.Request) 
 }
 
 func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
-	core.AppLog.Debug().Msgf("pull data from %d", request.Prefix)
+	rq := make(chan []core.Node, 1)
+	c.Mll.rangeRing(core.RingRequest{Token: request.Prefix, Opt: ADD_NODE_OPT, Async: rq})
+	ringRange := <-rq
+	close(rq)
+	core.AppLog.Debug().Msgf("push data from %d %d %d", request.Prefix, ringRange[0].RingToken, ringRange[1].RingToken)
+
 	stream.Send(&protocol.Response{Successful: true, Message: "to do1"})
 	stream.Send(&protocol.Response{Successful: true, Message: "to do2"})
 	stream.Send(&protocol.Response{Successful: true, Message: "to do3"})
