@@ -3,6 +3,7 @@ package clustering
 import (
 	"fmt"
 
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 )
@@ -75,7 +76,10 @@ start:
 				break
 			}
 			for _, d := range resp.Data.List {
+				co := bootstrap.ClusterObject{}
+				core.Import(&co, d.Key[12:], d.Value, 300)
 				core.AppLog.Debug().Msgf("header %v", d.Header)
+				core.AppLog.Debug().Msgf("co %v", co)
 			}
 		}
 		close(ch)
