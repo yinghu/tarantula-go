@@ -444,7 +444,8 @@ func (m *DataServiceProvider) reset(sd SetData) (KeyIndex, error) {
 }
 
 func (m *DataServiceProvider) pull(ch chan *protocol.Response) {
-	pre, _ := lookup(INDEX_PREFIX, 30)
+	index := KeyIndex{}
+	pre, _ := index.lookupPrefix(INDEX_PREFIX)
 	m.Local.Db.View(func(txn *badger.Txn) error {
 		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
 		it := txn.NewIterator(op)
@@ -460,6 +461,16 @@ func (m *DataServiceProvider) pull(ch chan *protocol.Response) {
 			ki := KeyIndex{Header: &protocol.Header{}}
 			core.Import(&ki, k, v, 300)
 			core.AppLog.Debug().Msgf("hash %d", ki.Prefix)
+			key, _ := ki.lookupDataKey()
+			vitem, err := txn.Get(key)
+			if err != nil {
+				core.AppLog.Warn().Msgf("should not be a value missing %v", ki)
+				continue
+			}
+			vitem.Value(func(val []byte) error {
+				core.AppLog.Debug().Msg("value found!")
+				return nil
+			})
 		}
 		return nil
 	})

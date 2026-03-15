@@ -9,13 +9,6 @@ const (
 	INDEX_PREFIX string = "$___KI___$"
 )
 
-func lookup(p string, bsize int) ([]byte, error) {
-	buff := core.NewBuffer(bsize)
-	buff.WriteString(p)
-	buff.Flip()
-	return buff.Read(0)
-}
-
 type KeyIndex struct {
 	Prefix uint32           `json:"prefix"`
 	Key    []byte           `json:"-"`
@@ -163,4 +156,23 @@ func (k *KeyIndex) Pair() ([]byte, []byte, error) {
 		return nil, nil, err
 	}
 	return key, value, nil
+}
+
+func (k *KeyIndex) lookupPrefix(p string) ([]byte, error) {
+	buff := core.NewBuffer(COMPOSIT_KEY_MAX)
+	buff.WriteString(p)
+	buff.Flip()
+	return buff.Read(0)
+}
+
+func (k *KeyIndex) lookupDataKey() ([]byte, error) {
+	ksz := len(k.Key)
+	buffer := core.NewBuffer(COMPOSIT_KEY_MAX)
+	buffer.WriteUInt32(k.Header.FactoryId)
+	buffer.WriteUInt32(k.Header.ClassId)
+	buffer.WriteInt32(int32(ksz))
+	buffer.Write(k.Key)
+	buffer.WriteUInt64(k.Header.Revision)
+	buffer.Flip()
+	return buffer.Read(0)
 }
