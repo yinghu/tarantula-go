@@ -3,7 +3,6 @@ package clustering
 import (
 	"fmt"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 )
@@ -71,16 +70,10 @@ start:
 		ch := make(chan *protocol.Response, 3)
 		go m.runPull(sync.Remote, &req, ch)
 		for resp := range ch {
-			core.AppLog.Debug().Msgf("REV %v", resp)
 			if !resp.Successful {
 				break
 			}
-			for _, d := range resp.Data.List {
-				co := bootstrap.ClusterObject{}
-				core.Import(&co, d.Key[12:], d.Value, 300)
-				core.AppLog.Debug().Msgf("header %v", d.Header)
-				core.AppLog.Debug().Msgf("co %v", co)
-			}
+			m.onData(resp)
 		}
 		close(ch)
 	}

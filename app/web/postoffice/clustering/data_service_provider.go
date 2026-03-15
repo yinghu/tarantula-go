@@ -498,3 +498,9 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 	}
 	ch <- &protocol.Response{Successful: false}
 }
+
+func (c *DataServiceProvider) onData(resp *protocol.Response) {
+	for _, d := range resp.Data.List {
+		core.AppLog.Debug().Msgf("Data %v", d.Header)
+	}
+}
