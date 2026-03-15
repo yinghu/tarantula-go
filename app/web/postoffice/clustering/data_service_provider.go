@@ -139,8 +139,11 @@ func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.Server
 	c.Mll.rangeRing(core.RingRequest{Token: request.Prefix, Opt: ADD_NODE_OPT, Async: rq})
 	ringRange := <-rq
 	close(rq)
-	core.AppLog.Debug().Msgf("push data from %d %d %d", request.Prefix, ringRange[0].RingToken, ringRange[1].RingToken)
+	core.AppLog.Debug().Msgf("push data from >= %d %d < %d", request.Prefix, ringRange[0].RingToken, ringRange[1].RingToken)
+	c.Local.Db.View(func(txn *badger.Txn) error {
 
+		return nil
+	})
 	stream.Send(&protocol.Response{Successful: true, Message: "to do1"})
 	stream.Send(&protocol.Response{Successful: true, Message: "to do2"})
 	stream.Send(&protocol.Response{Successful: true, Message: "to do3"})

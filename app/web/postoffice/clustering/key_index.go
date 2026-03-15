@@ -5,6 +5,10 @@ import (
 	"gameclustering.com/internal/protocol"
 )
 
+const (
+	INDEX_PREFIX string = "$___KI___$"
+)
+
 type KeyIndex struct {
 	Prefix uint32           `json:"prefix"`
 	Key    []byte           `json:"-"`
@@ -15,6 +19,9 @@ type KeyIndex struct {
 }
 
 func (k *KeyIndex) WriteKey(buffer core.DataBuffer) error {
+	if err := buffer.WriteString(INDEX_PREFIX); err != nil {
+		return err
+	}
 	if err := buffer.WriteUInt32(k.Prefix); err != nil {
 		return err
 	}
@@ -71,6 +78,10 @@ func (k *KeyIndex) Read(buffer core.DataBuffer) error {
 	return nil
 }
 func (k *KeyIndex) ReadKey(buffer core.DataBuffer) error {
+	_, err := buffer.ReadString()
+	if err != nil {
+		return err
+	}
 	prefix, err := buffer.ReadUInt32()
 	if err != nil {
 		return err
