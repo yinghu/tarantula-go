@@ -477,8 +477,8 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 					continue
 				}
 				vitem.Value(func(val []byte) error {
-					core.AppLog.Debug().Msg("value found!")
 					vdata := protocol.Data{Key: key, Value: append([]byte{}, val...), Header: &protocol.Header{FactoryId: ki.FactoryId(), ClassId: ki.ClassId(), Revision: ki.Revision(), Timestamp: ki.Timestamp()}}
+					core.AppLog.Debug().Msgf("value found %v", vdata.Header)
 					data = append(data, &vdata)
 					if len(data) == 10 {
 						resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
@@ -492,6 +492,7 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 		return nil
 	})
 	if len(data) > 0 {
+
 		resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
 		ch <- &resp
 	}

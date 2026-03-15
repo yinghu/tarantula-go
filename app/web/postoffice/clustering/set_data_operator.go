@@ -74,6 +74,9 @@ start:
 			if !resp.Successful {
 				break
 			}
+			for _, d := range resp.Data.List {
+				core.AppLog.Debug().Msgf("header %v", d.Header)
+			}
 		}
 		close(ch)
 	}
