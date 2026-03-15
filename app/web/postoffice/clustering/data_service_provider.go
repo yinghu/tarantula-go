@@ -457,7 +457,7 @@ func (m *DataServiceProvider) pull(ch chan *protocol.Response) {
 				v = append(v, val...)
 				return nil
 			})
-			ki := KeyIndex{}
+			ki := KeyIndex{Header: &protocol.Header{}}
 			core.Import(&ki, k, v, 300)
 			core.AppLog.Debug().Msgf("hash %d", ki.Prefix)
 		}
