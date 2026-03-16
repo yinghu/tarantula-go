@@ -73,7 +73,7 @@ start:
 			if !resp.Successful {
 				break
 			}
-			m.onData(resp)
+			m.set(resp)
 		}
 		close(ch)
 	}
