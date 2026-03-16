@@ -16,8 +16,8 @@ const (
 	ADD_NODE_OPT     uint32 = 5
 	REMOVE_NODE_OPT  uint32 = 6
 	//UPDATE_NODE_OPT  uint32 = 7
-	SYNC_NODE_OPT    uint32 = 8
-	CLOSE_RING_OPT   uint32 = 99
+	SYNC_NODE_OPT  uint32 = 8
+	CLOSE_RING_OPT uint32 = 99
 
 	NODE_STATE_LIVE     = 0
 	NODE_STATE_DEAD     = 3
@@ -89,8 +89,8 @@ func (m *MemberListListener) Listen() {
 			case REMOVE_NODE_OPT:
 				mr.Async <- m.rangeNodeRemoved(mr.Token)
 			//case UPDATE_NODE_OPT:
-				//m.balancing = mr.Replicas == 0
-				//m.UpdateNode(5 * time.Second)
+			//m.balancing = mr.Replicas == 0
+			//m.UpdateNode(5 * time.Second)
 			case SYNC_NODE_OPT:
 				for _, mbr := range m.Members() {
 					if mbr.Address() == mr.Address {
@@ -118,13 +118,14 @@ func (m *MemberListListener) localNode(node core.Node) bool {
 func (m *MemberListListener) NodeMeta(limit int) []byte {
 	//limit 512
 	//if m.balancing {
-		//return fmt.Append([]byte{}, "pending")
+	//return fmt.Append([]byte{}, "pending")
 	//}
 	return fmt.Appendf([]byte{}, "ready")
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
 	//app message
+	core.AppLog.Debug().Msgf("rev %s", string(msg))
 	m.MSync <- msg
 }
 

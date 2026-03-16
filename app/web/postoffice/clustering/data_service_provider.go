@@ -470,7 +470,8 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 				}
 				vitem.Value(func(val []byte) error {
 					fv := append([]byte{}, val...)
-					vdata := protocol.Data{Key: key, Value: fv, Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Mutable: ki.Header.Mutable}}
+					kz := len(key)
+					vdata := protocol.Data{Key: key[12 : kz-8], Value: fv, Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Mutable: ki.Header.Mutable}}
 					data = append(data, &vdata)
 					if len(data) == 10 {
 						resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
