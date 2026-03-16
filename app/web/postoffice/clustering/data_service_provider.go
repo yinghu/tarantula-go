@@ -363,7 +363,6 @@ func (m *DataServiceProvider) delete(sd SetData) (KeyIndex, error) {
 	return ki, err
 }
 func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
-	core.AppLog.Debug().Msgf("run get %v", gd)
 	data := protocol.Data{Header: &protocol.Header{}}
 	ki := gd.IndexKey()
 	k, err := ki.CompositKey()
