@@ -15,7 +15,7 @@ const (
 	ALL_RING_OPT     uint32 = 3
 	ADD_NODE_OPT     uint32 = 5
 	REMOVE_NODE_OPT  uint32 = 6
-	UPDATE_NODE_OPT  uint32 = 7
+	//UPDATE_NODE_OPT  uint32 = 7
 	SYNC_NODE_OPT    uint32 = 8
 	CLOSE_RING_OPT   uint32 = 99
 
@@ -41,7 +41,7 @@ type MemberListListener struct {
 	*memberlist.Memberlist
 	*MemberHashRing
 	*DataServiceProvider
-	balancing bool
+	//balancing bool
 }
 
 func (m *MemberListListener) toNode(e *memberlist.Node) core.Node {
@@ -88,9 +88,9 @@ func (m *MemberListListener) Listen() {
 				mr.Async <- m.rangeNodeAdded(mr.Token)
 			case REMOVE_NODE_OPT:
 				mr.Async <- m.rangeNodeRemoved(mr.Token)
-			case UPDATE_NODE_OPT:
-				m.balancing = mr.Replicas == 0
-				m.UpdateNode(5 * time.Second)
+			//case UPDATE_NODE_OPT:
+				//m.balancing = mr.Replicas == 0
+				//m.UpdateNode(5 * time.Second)
 			case SYNC_NODE_OPT:
 				for _, mbr := range m.Members() {
 					if mbr.Address() == mr.Address {
@@ -117,9 +117,9 @@ func (m *MemberListListener) localNode(node core.Node) bool {
 // delegate
 func (m *MemberListListener) NodeMeta(limit int) []byte {
 	//limit 512
-	if m.balancing {
-		return fmt.Append([]byte{}, "pending")
-	}
+	//if m.balancing {
+		//return fmt.Append([]byte{}, "pending")
+	//}
 	return fmt.Appendf([]byte{}, "ready")
 }
 
