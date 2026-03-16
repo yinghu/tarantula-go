@@ -13,6 +13,7 @@ const (
 
 func (m *DataServiceProvider) runSetData(num int) {
 start:
+	core.AppLog.Debug().Msgf("waiting set operator %d", num)
 	m.DWait.Wait()
 	core.AppLog.Debug().Msgf("starting set operator %d", num)
 	for sd := range m.DSet {
