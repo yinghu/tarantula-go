@@ -41,7 +41,6 @@ type MemberListListener struct {
 	*memberlist.Memberlist
 	*MemberHashRing
 	*DataServiceProvider
-	//balancing bool
 }
 
 func (m *MemberListListener) toNode(e *memberlist.Node) core.Node {
@@ -125,7 +124,6 @@ func (m *MemberListListener) NodeMeta(limit int) []byte {
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
 	//app message
-	core.AppLog.Debug().Msgf("rev %s", string(msg))
 	m.MSync <- msg
 }
 
