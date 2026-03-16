@@ -190,9 +190,6 @@ func (m *DataServiceProvider) RingUpdated() {
 	for running {
 		select {
 		case nlist := <-m.RNode:
-			//update node to pending
-			m.Mll.MRequest <- core.RingRequest{Opt: UPDATE_NODE_OPT, Replicas: 0}
-			core.AppLog.Debug().Msg("Ring updating")
 			ringReqest := core.RingRequest{Address: nlist[0].IP}
 			for _, n := range nlist {
 				switch n.State {
@@ -227,9 +224,6 @@ func (m *DataServiceProvider) RingUpdated() {
 			if ringReqest.Opt == SYNC_NODE_OPT {
 				m.Mll.MRequest <- ringReqest
 			}
-			m.Mll.MRequest <- core.RingRequest{Opt: UPDATE_NODE_OPT, Replicas: 1}
-			//update node to ready
-			core.AppLog.Debug().Msg("Ring updated")
 		case sync := <-m.RSync:
 			var ds core.RingSync
 			err := json.Unmarshal(sync, &ds)
@@ -452,7 +446,6 @@ func (m *DataServiceProvider) reset(sd SetData) (KeyIndex, error) {
 func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) {
 	index := KeyIndex{}
 	pre, _ := index.lookupPrefix(INDEX_PREFIX)
-	core.AppLog.Debug().Msgf("RUN PULL FROM %d to %d", from, to)
 	data := make([]*protocol.Data, 0, 10)
 	m.Local.Db.View(func(txn *badger.Txn) error {
 		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
@@ -468,7 +461,6 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 			})
 			ki := KeyIndex{Header: &protocol.Header{}}
 			core.Import(&ki, k, v, 300)
-			core.AppLog.Debug().Msgf("hash %v", ki)
 			if ki.Prefix >= from && ki.Prefix < to {
 				key, _ := ki.lookupDataKey()
 				vitem, err := txn.Get(key)
@@ -503,6 +495,7 @@ func (c *DataServiceProvider) set(resp *protocol.Response) {
 
 	c.Local.Db.Update(func(txn *badger.Txn) error {
 		for _, d := range resp.Data.List {
+			core.AppLog.Debug().Msgf("set data %v", d)
 			setdata := SetData{Data: d}
 			ki := setdata.IndexKey()
 			k, v, err := ki.Pair()
