@@ -519,6 +519,7 @@ func (c *DataServiceProvider) set(resp *protocol.Response) {
 			if err != nil { //no data
 				txn.Set(k, v)
 				txn.Set(dkey, setdata.Value)
+				continue
 			}
 			item.Value(func(val []byte) error {
 				eki := KeyIndex{Header: &protocol.Header{}}
