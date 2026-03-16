@@ -197,6 +197,7 @@ func (m *DataServiceProvider) RingUpdated() {
 				case NODE_STATE_SHUTDOWN:
 					running = false
 				case NODE_STATE_LIVE:
+					core.AppLog.Debug().Msgf("node added %v", n)
 					if !m.Mll.localNode(n) { //skip node initial add call
 						rq := make(chan []core.Node, 1)
 						m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: ADD_NODE_OPT, Async: rq})
