@@ -223,6 +223,16 @@ func (m *DataServiceProvider) RingUpdated() {
 					}
 				}
 			}
+			for i, n := range m.Mll.nodes {
+				lz := len(m.Mll.nodes)
+				if i > 0 {
+					n.RangedRing = m.Mll.nodes[i-1].RingToken
+					m.Mll.nodes[i] = n
+				} else {
+					n.RangedRing = m.Mll.nodes[lz-1].RingToken
+					m.Mll.nodes[i] = n
+				}
+			}
 			if ringReqest.Opt == SYNC_NODE_OPT {
 				m.Mll.MRequest <- ringReqest
 			}
