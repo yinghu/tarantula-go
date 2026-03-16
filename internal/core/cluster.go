@@ -22,9 +22,8 @@ type Chunk struct {
 }
 type Node struct {
 	Name         string `json:"name"`
-	LowerRing    uint32 `json:"lowerRing"`
+	RangedRing    uint32 `json:"rangedRing"`
 	RingToken    uint32 `json:"ringToken"`
-	HigherRing   uint32 `json:"higherRing"`
 	Meta         string `json:"meta"`
 	IP           string `json:"address"`
 	State        int    `json:"-"`
