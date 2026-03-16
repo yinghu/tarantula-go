@@ -179,6 +179,7 @@ func (c *DataServiceProvider) Start(dir string) {
 	protocol.RegisterDataServiceServer(rpc, c)
 	protocol.RegisterPostofficeServiceServer(rpc, c)
 	core.AppLog.Printf("local data service provider started on : %s", tcp.Addr().String())
+	c.DWait.Done()
 	err = rpc.Serve(tcp)
 	if err != nil {
 		panic(err)
