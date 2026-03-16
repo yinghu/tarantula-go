@@ -363,6 +363,7 @@ func (m *DataServiceProvider) delete(sd SetData) (KeyIndex, error) {
 	return ki, err
 }
 func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
+	core.AppLog.Debug().Msgf("run get %v", gd)
 	data := protocol.Data{Header: &protocol.Header{}}
 	ki := gd.IndexKey()
 	k, err := ki.CompositKey()
@@ -494,10 +495,8 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 }
 
 func (c *DataServiceProvider) set(resp *protocol.Response) {
-
-	c.Local.Db.Update(func(txn *badger.Txn) error {
+	err := c.Local.Db.Update(func(txn *badger.Txn) error {
 		for _, d := range resp.Data.List {
-			core.AppLog.Debug().Msgf("set data %v", d)
 			setdata := SetData{Data: d}
 			ki := setdata.IndexKey()
 			k, v, err := ki.Pair()
@@ -505,26 +504,35 @@ func (c *DataServiceProvider) set(resp *protocol.Response) {
 				core.AppLog.Warn().Msgf("wrong key index %s", err.Error())
 				continue
 			}
+			dkey, err := setdata.DataKey()
+			if err != nil {
+				core.AppLog.Warn().Msgf("wrong data key %s", err.Error())
+				continue
+			}
 			item, err := txn.Get(k)
 			if err != nil { //no data
 				txn.Set(k, v)
-				txn.Set(setdata.Key, setdata.Value)
-				core.AppLog.Debug().Msgf("set 1 data %v", d)
+				txn.Set(dkey, setdata.Value)
 				continue
 			}
 			item.Value(func(val []byte) error {
 				eki := KeyIndex{Header: &protocol.Header{}}
-				v := append([]byte{}, val...)
-				core.Import(&eki, k, v, COMPOSIT_KEY_MAX)
+				ev := append([]byte{}, val...)
+				err = core.Import(&eki, k, ev, COMPOSIT_KEY_MAX)
+				if err != nil {
+					return err
+				}
 				if eki.Header.Revision < ki.Header.Revision {
 					txn.Set(k, v)
-					txn.Set(setdata.Key, setdata.Value)
-					core.AppLog.Debug().Msgf("set 2 data %v", d)
+					txn.Set(dkey, setdata.Value)
 				}
 				return nil
 			})
 		}
 		return nil
 	})
-
+	if err != nil {
+		core.AppLog.Warn().Msgf("set err %s", err.Error())
+		return
+	}
 }
