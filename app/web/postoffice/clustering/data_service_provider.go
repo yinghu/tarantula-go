@@ -503,15 +503,11 @@ func (c *DataServiceProvider) set(resp *protocol.Response) {
 				core.AppLog.Warn().Msgf("wrong key index %s", err.Error())
 				continue
 			}
-			dkey, err := setdata.DataKey()
-			if err != nil {
-				core.AppLog.Warn().Msgf("wrong data key %s", err.Error())
-				continue
-			}
 			item, err := txn.Get(k)
 			if err != nil { //no data
 				txn.Set(k, v)
-				txn.Set(dkey, setdata.Value)
+				txn.Set(setdata.Key, setdata.Value)
+				core.AppLog.Debug().Msgf("set 1 data %v", d)
 				continue
 			}
 			item.Value(func(val []byte) error {
@@ -520,7 +516,8 @@ func (c *DataServiceProvider) set(resp *protocol.Response) {
 				core.Import(&eki, k, v, COMPOSIT_KEY_MAX)
 				if eki.Header.Revision < ki.Header.Revision {
 					txn.Set(k, v)
-					txn.Set(dkey, setdata.Value)
+					txn.Set(setdata.Key, setdata.Value)
+					core.AppLog.Debug().Msgf("set 2 data %v", d)
 				}
 				return nil
 			})
