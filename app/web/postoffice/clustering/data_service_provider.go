@@ -228,9 +228,11 @@ func (m *DataServiceProvider) RingUpdated() {
 				if i > 0 {
 					n.RangedRing = m.Mll.nodes[i-1].RingToken
 					m.Mll.nodes[i] = n
+					core.AppLog.Debug().Msgf("rangd node %v", n)
 				} else {
 					n.RangedRing = m.Mll.nodes[lz-1].RingToken
 					m.Mll.nodes[i] = n
+					core.AppLog.Debug().Msgf("rangd node %v", n)
 				}
 			}
 			if ringReqest.Opt == SYNC_NODE_OPT {
