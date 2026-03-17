@@ -35,7 +35,7 @@ func (m *MemberlistManager) Start() error {
 	m.MPing = make(chan core.Node, NODE_EVENT_BUFFER_SIZE)
 	m.MConflict = make(chan []core.Node, NODE_EVENT_BUFFER_SIZE)
 	m.MRequest = make(chan core.RingRequest, NODE_EVENT_BUFFER_SIZE)
-	rwNode := make(chan []core.Node, NODE_EVENT_BUFFER_SIZE)
+	rwNode := make(chan RingUpdate, NODE_EVENT_BUFFER_SIZE)
 	rwSync := make(chan []byte, NODE_EVENT_BUFFER_SIZE)
 	m.WNode = rwNode
 	m.MSync = rwSync
@@ -75,8 +75,7 @@ func (m *MemberlistManager) ShutdownHook() {
 	m.Shutdown()
 	core.AppLog.Info().Msg("closing resouces ...")
 	m.MRequest <- core.RingRequest{Opt: CLOSE_RING_OPT}
-	stopNode := []core.Node{{State: NODE_STATE_SHUTDOWN}}
-	m.WNode <- stopNode
+	m.WNode <- RingUpdate{State: NODE_STATE_SHUTDOWN}
 	time.Sleep(3 * time.Second)
 	close(m.MEvent)
 	close(m.MAlive)

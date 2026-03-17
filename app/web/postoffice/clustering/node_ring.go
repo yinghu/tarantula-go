@@ -21,6 +21,8 @@ type NodeRing struct {
 	nodeNum int
 }
 
+
+
 func (m *NodeRing) keyRing(t uint32, relica int) []core.Node {
 	ix := m.indexOf(t)
 	if relica == 0 || m.nodeNum == 1 {

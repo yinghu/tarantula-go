@@ -20,7 +20,7 @@ type DataServiceProvider struct {
 	protocol.UnimplementedDataServiceServer
 	protocol.UnimplementedPostofficeServiceServer
 	Local    *persistence.BadgerLocal
-	RNode    <-chan []core.Node
+	RNode    <-chan RingUpdate
 	RSync    <-chan []byte
 	server   *grpc.Server
 	Mll      *MemberListListener

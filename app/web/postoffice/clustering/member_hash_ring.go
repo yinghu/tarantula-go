@@ -12,7 +12,7 @@ import (
 type MemberHashRing struct {
 	NodeRing
 	weight int
-	WNode chan<- []core.Node
+	WNode  chan<- RingUpdate
 }
 
 func (m *MemberHashRing) vNode(node core.Node, weight int) core.Node {
@@ -31,7 +31,7 @@ func (m *MemberHashRing) OnAdd(node core.Node) {
 	}
 	slices.SortFunc(m.nodes, cmp)
 	m.nodeNum++
-	m.WNode <- added
+	m.WNode <- RingUpdate{State: NODE_STATE_LIVE, Nodes: added}
 }
 
 func (m *MemberHashRing) OnRemove(node core.Node) {
@@ -46,7 +46,7 @@ func (m *MemberHashRing) OnRemove(node core.Node) {
 	})
 	slices.SortFunc(m.nodes, cmp)
 	m.nodeNum--
-	m.WNode <- removed
+	m.WNode <- RingUpdate{State: NODE_STATE_DEAD, Nodes: removed}
 }
 
 func (m *MemberHashRing) OnUpdate(node core.Node) {
@@ -78,8 +78,3 @@ func (m *MemberHashRing) OnConflict(nodes []core.Node) {
 func (m *MemberHashRing) RingToken(key []byte) uint32 {
 	return util.Hash(key)
 }
-
-
-
-
-

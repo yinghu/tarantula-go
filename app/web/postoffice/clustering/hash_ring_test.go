@@ -36,7 +36,7 @@ func TestMurmur3(t *testing.T) {
 
 func TestHashRingScale(t *testing.T) {
 	core.CreateTestLog()
-	rwNode := make(chan []core.Node, NODE_EVENT_BUFFER_SIZE)
+	rwNode := make(chan RingUpdate, NODE_EVENT_BUFFER_SIZE)
 	ring := MemberHashRing{weight: NODE_WEIGHT, WNode: rwNode}
 
 	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
@@ -77,7 +77,7 @@ func TestHashRingScale(t *testing.T) {
 
 func TestHashRingPrefix(t *testing.T) {
 	core.CreateTestLog()
-	rwNode := make(chan []core.Node, NODE_EVENT_BUFFER_SIZE*100)
+	rwNode := make(chan RingUpdate, NODE_EVENT_BUFFER_SIZE*100)
 	ring := MemberHashRing{weight: NODE_WEIGHT, WNode: rwNode}
 	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
 	ring.OnAdd(core.Node{Name: "node-b", IP: "192.168.1.11:6060"})
@@ -242,7 +242,7 @@ func check(t core.Node,rangeRing []core.Node) bool{
 }
 func TestHashRingBalance(t *testing.T) {
 	core.CreateTestLog()
-	rwNode := make(chan []core.Node, NODE_EVENT_BUFFER_SIZE*100)
+	rwNode := make(chan RingUpdate, NODE_EVENT_BUFFER_SIZE*100)
 	defer close(rwNode)
 	ring := MemberHashRing{weight: NODE_WEIGHT, WNode: rwNode}
 	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
