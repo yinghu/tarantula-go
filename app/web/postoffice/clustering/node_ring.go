@@ -21,10 +21,8 @@ type NodeRing struct {
 	nodeNum int
 }
 
-
-
 func (m *NodeRing) keyRing(t uint32, relica int) []core.Node {
-	ix := m.indexOf(t)
+	ix := m.ownerOf(t)
 	if relica == 0 || m.nodeNum == 1 {
 		return []core.Node{m.nodes[ix]}
 	}
@@ -53,6 +51,16 @@ func (m *NodeRing) keyRing(t uint32, relica int) []core.Node {
 	}
 	return syncNodes
 }
+func (m *NodeRing) rangeOfRing(t uint32) []core.Node {
+	ix := m.ownerOf(t)
+	var px int
+	if ix==0{
+		px = len(m.nodes)-1		
+	}else{
+		px = ix-1
+	}
+	return []core.Node{m.nodes[px],m.nodes[ix]}
+}
 
 func (m *NodeRing) rangeNodeAdded(t uint32) []core.Node {
 	target := core.Node{RingToken: t}
@@ -76,7 +84,7 @@ func (m *NodeRing) rangeNodeAdded(t uint32) []core.Node {
 }
 
 func (m *NodeRing) rangeNodeRemoved(t uint32) []core.Node {
-	n := m.indexOf(t)
+	n := m.ownerOf(t)
 	end := len(m.nodes) - 1
 	switch n {
 	case 0:
@@ -88,7 +96,7 @@ func (m *NodeRing) rangeNodeRemoved(t uint32) []core.Node {
 	}
 }
 
-func (m *NodeRing) indexOf(t uint32) int {
+func (m *NodeRing) ownerOf(t uint32) int {
 	l := 0
 	r := len(m.nodes) - 1
 	ix := -1

@@ -13,6 +13,9 @@ type RingUpdate struct {
 
 func (m *DataServiceProvider) balanceOnNodeAdded(added RingUpdate) {
 	ringReqest := core.RingRequest{Address: added.Nodes[0].IP, Opt: SYNC_NODE_OPT}
+	if m.backRing.nodeNum ==0{
+		m.backRing.nodes = append(m.backRing.nodes, added.Nodes...)
+	}
 	for _, n := range added.Nodes {
 		if !m.Mll.localNode(n) { //skip node initial add call
 			rq := make(chan []core.Node, 1)

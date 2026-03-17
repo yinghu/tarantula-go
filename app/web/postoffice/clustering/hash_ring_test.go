@@ -2,37 +2,12 @@ package clustering
 
 import (
 	"fmt"
+	"slices"
 	"testing"
 
 	"gameclustering.com/internal/core"
-	"github.com/spaolacci/murmur3"
+	"gameclustering.com/internal/util"
 )
-
-func TestMurmur3(t *testing.T) {
-	hash := murmur3.New32()
-	dup := make(map[uint32]int)
-	i := 0
-	total := 100000
-	for {
-		if i == total {
-			break
-		}
-		fmt.Fprintf(hash, "node%d", i)
-		h := hash.Sum32()
-		ring := h // % RING_SLOTS >> duplicate ???
-
-		v, e := dup[ring]
-		if !e {
-			dup[ring] = 1
-		} else {
-			dup[ring] = v + 1
-		}
-		i++
-	}
-	if len(dup) != total {
-		t.Errorf("Total should be rings %d insead of %d", total, len(dup))
-	}
-}
 
 func TestHashRingScale(t *testing.T) {
 	core.CreateTestLog()
@@ -49,25 +24,25 @@ func TestHashRingScale(t *testing.T) {
 	}
 	//hash := murmur3.New32()
 	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
-	nodes := ring.keyRing(murmur3.Sum32([]byte("adb")), 3)
+	nodes := ring.keyRing(util.Hash([]byte("adb")), 3)
 	if len(nodes) != 1 {
 		t.Errorf("key ring node should 1 %d", len(nodes))
 	}
 	ring.OnAdd(core.Node{Name: "node-b", IP: "192.168.1.11:6060"})
-	nodes = ring.keyRing(murmur3.Sum32([]byte("adb")), 3)
+	nodes = ring.keyRing(util.Hash([]byte("adb")), 3)
 	if len(nodes) != 2 {
 		t.Errorf("key ring node should 2 %d", len(nodes))
 	}
 
 	ring.OnAdd(core.Node{Name: "node-c", IP: "192.168.1.12:6060"})
-	nodes = ring.keyRing(murmur3.Sum32([]byte("adb")), 3)
+	nodes = ring.keyRing(util.Hash([]byte("adb")), 3)
 	if len(nodes) != 3 {
 		t.Errorf("key ring node should 3 %d", len(nodes))
 	}
 	ring.OnAdd(core.Node{Name: "node-d", IP: "192.168.1.13:6060"})
 	ring.OnAdd(core.Node{Name: "node-e", IP: "192.168.1.14:6060"})
 
-	nodes = ring.keyRing(murmur3.Sum32([]byte("bopaa")), 3)
+	nodes = ring.keyRing(util.Hash([]byte("bopaa")), 3)
 	if len(nodes) != 3 {
 		t.Errorf("key ring node should 3 %d", len(nodes))
 	}
@@ -229,56 +204,46 @@ func TestHashRingPrefix(t *testing.T) {
 
 }
 
-func h32(n string) uint32 {
-	return murmur3.Sum32([]byte(n))
-}
 
-func check(t core.Node,rangeRing []core.Node) bool{
-	a0 := rangeRing[0]
-	a1 := rangeRing[1]
-	core.AppLog.Debug().Msgf("pevious : %d <<%d>> next : %d", a0.RingToken, t.RingToken, a1.RingToken)
-	order := a0.RingToken > t.RingToken && t.RingToken > a0.RingToken
-	return order
-}
 func TestHashRingBalance(t *testing.T) {
 	core.CreateTestLog()
-	rwNode := make(chan RingUpdate, NODE_EVENT_BUFFER_SIZE*100)
-	defer close(rwNode)
-	ring := MemberHashRing{weight: NODE_WEIGHT, WNode: rwNode}
-	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
-	for _, n := range ring.nodes {
-		core.AppLog.Debug().Msgf("one node ring %v", n)
+	ring := NodeRing{nodes: make([]core.Node, 0)}
+	for i := range NODE_WEIGHT {
+		ix := i+100
+		nm := fmt.Sprintf("a%d", i)
+		n := core.Node{Name: nm, RingToken: uint32(ix*i+100), IP: "192.168.1.10"}
+		ring.nodes = append(ring.nodes, n)
 	}
-	for i := range 7 {
-		n0 := core.Node{RingToken: h32(fmt.Sprintf("node-a#%d", i))}
-		check(n0,ring.rangeNodeAdded(n0.RingToken))
-	}
-
-	ring.OnAdd(core.Node{Name: "node-b", IP: "192.168.1.11:6060"})
-
-	for _, n := range ring.nodes {
-		core.AppLog.Debug().Msgf("two node ring %v", n)
-	}
-
-	for i := range 7 {
-		n0 := core.Node{RingToken: h32(fmt.Sprintf("node-a#%d", i))}
-		check(n0,ring.rangeNodeAdded(n0.RingToken))	
-		n1 := core.Node{RingToken: h32(fmt.Sprintf("node-b#%d", i))}
-		check(n1,ring.rangeNodeAdded(n1.RingToken))
-	}
-
-	ring.OnAdd(core.Node{Name: "node-c", IP: "192.168.1.12:6060"})
-	for _, n := range ring.nodes {
-		core.AppLog.Debug().Msgf("three node ring %v", n)
-	}
-	for i := range 7 {
-		n0 := core.Node{RingToken: h32(fmt.Sprintf("node-a#%d", i))}
-		check(n0,ring.rangeNodeAdded(n0.RingToken))	
-		n1 := core.Node{RingToken: h32(fmt.Sprintf("node-b#%d", i))}
-		check(n1,ring.rangeNodeAdded(n1.RingToken))
-		n2 := core.Node{RingToken: h32(fmt.Sprintf("node-c#%d", i))}
-		check(n2,ring.rangeNodeAdded(n2.RingToken))
-	}
+	ring.nodeNum++
+	slices.SortFunc(ring.nodes, cmp)
+	core.AppLog.Debug().Msgf("nodes %v", ring)
 	
+	for i := range 3{
+		nm := fmt.Sprintf("b%d", i)
+		n := core.Node{Name: nm, RingToken: uint32(i+105), IP: "192.168.1.20"}
+		ns := ring.rangeOfRing(n.RingToken)
+		core.AppLog.Debug().Msgf("PUSH DATA RANGE >= %d AND < %d FROM %s[%d]",ns[0].RingToken,n.RingToken,ns[1].IP,ns[1].RingToken)
+		ring.nodes = append(ring.nodes, n)
+		slices.SortFunc(ring.nodes,cmp)
+	}
+
+	for i := range 3{
+		nm := fmt.Sprintf("b%d", i)
+		n := core.Node{Name: nm, RingToken: uint32(i+741), IP: "192.168.1.20"}
+		ns := ring.rangeOfRing(n.RingToken)
+		core.AppLog.Debug().Msgf("PUSH DATA RANGE >= %d AND < %d FROM %s[%d]",ns[0].RingToken,n.RingToken,ns[1].IP,ns[1].RingToken)
+		ring.nodes = append(ring.nodes, n)
+		slices.SortFunc(ring.nodes,cmp)
+	}
+
+	for i := range 3{
+		nm := fmt.Sprintf("b%d", i)
+		n := core.Node{Name: nm, RingToken: uint32(i+441), IP: "192.168.1.20"}
+		ns := ring.rangeOfRing(n.RingToken)
+		core.AppLog.Debug().Msgf("PUSH DATA RANGE >= %d AND < %d FROM %s[%d]",ns[0].RingToken,n.RingToken,ns[1].IP,ns[1].RingToken)
+		ring.nodes = append(ring.nodes, n)
+		slices.SortFunc(ring.nodes,cmp)
+	}
+
 
 }
