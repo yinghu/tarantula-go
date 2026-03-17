@@ -49,6 +49,7 @@ func (m *NodeRing) keyRing(t uint32, relica int) []core.Node {
 	}
 	return syncNodes
 }
+
 func (m *NodeRing) rangeOfRing(t uint32) []core.Node {
 	ix := m.ownerOf(t)
 	var px int
@@ -58,19 +59,6 @@ func (m *NodeRing) rangeOfRing(t uint32) []core.Node {
 		px = ix - 1
 	}
 	return []core.Node{m.nodes[px], m.nodes[ix]}
-}
-
-func (m *NodeRing) rangeNodeRemoved(t uint32) []core.Node {
-	n := m.ownerOf(t)
-	end := len(m.nodes) - 1
-	switch n {
-	case 0:
-		return []core.Node{m.nodes[end], m.nodes[1]}
-	case end:
-		return []core.Node{m.nodes[0], m.nodes[end-1]}
-	default:
-		return []core.Node{m.nodes[n-1], m.nodes[n+1]}
-	}
 }
 
 func (m *NodeRing) ownerOf(t uint32) int {

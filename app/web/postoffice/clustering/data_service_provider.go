@@ -25,6 +25,7 @@ type DataServiceProvider struct {
 	server   *grpc.Server
 	Mll      *MemberListListener
 	backRing NodeRing
+
 	//write worker chan
 	DSet  chan SetData
 	DPull chan core.RingSync
@@ -287,6 +288,7 @@ func (m *DataServiceProvider) delete(sd SetData) (KeyIndex, error) {
 	return ki, err
 }
 func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
+	core.AppLog.Debug().Msgf("getting call %v", gd)
 	data := protocol.Data{Header: &protocol.Header{}}
 	ki := gd.IndexKey()
 	k, err := ki.CompositKey()
@@ -397,6 +399,7 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 					fv := append([]byte{}, val...)
 					kz := len(key)
 					vdata := protocol.Data{Key: key[12 : kz-8], Value: fv, Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Mutable: ki.Header.Mutable}}
+					core.AppLog.Debug().Msgf("key found %s", string(vdata.Key))
 					data = append(data, &vdata)
 					if len(data) == 10 {
 						resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
@@ -418,6 +421,7 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 }
 
 func (c *DataServiceProvider) set(resp *protocol.Response) {
+	core.AppLog.Debug().Msgf("set call %v", resp)
 	err := c.Local.Db.Update(func(txn *badger.Txn) error {
 		for _, d := range resp.Data.List {
 			setdata := SetData{Data: d}
