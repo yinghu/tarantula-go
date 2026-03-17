@@ -43,17 +43,12 @@ func (m *DataServiceProvider) balanceOnNodeAdded(added RingUpdate) {
 
 func (m *DataServiceProvider) balanceOnNodeRemoved(removed RingUpdate) {
 	for _, n := range removed.Nodes {
-		if !m.Mll.localNode(n) { //skip node initial add call
-			rq := make(chan []core.Node, 1)
-			m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: REMOVE_NODE_OPT, Async: rq})
-			ringRange := <-rq
-			close(rq)
-			if !m.Mll.localNode(ringRange[0]) {
-				//pull remote data from >= pre.hash to < added.hash to remote added node
-				core.AppLog.Debug().Msgf("take over data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
-			}
-		}
+		m.backRing.nodes = slices.DeleteFunc(m.backRing.nodes, func(d core.Node) bool {
+			return d.IP == n.IP
+		})
 	}
+	slices.SortFunc(m.backRing.nodes, cmp)
+	m.backRing.nodeNum--
 }
 
 func (m *DataServiceProvider) RingUpdated() {

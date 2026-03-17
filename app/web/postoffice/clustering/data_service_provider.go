@@ -134,10 +134,6 @@ func (c *DataServiceProvider) Delete(ctx context.Context, in *protocol.Request) 
 }
 
 func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
-	//rq := make(chan []core.Node, 1)
-	//c.Mll.rangeRing(core.RingRequest{Token: request.Prefix, Opt: ADD_NODE_OPT, Async: rq})
-	//ringRange := <-rq
-	//defer close(rq)
 	ch := make(chan *protocol.Response, 3)
 	go c.pull(request.Prefix, request.Opt, ch)
 	for resp := range ch {
