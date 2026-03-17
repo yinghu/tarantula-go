@@ -282,10 +282,12 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 	defer close(rq)
 	retry := RetryTrack{Reties: RETRY_MAX}
 	for retry.Reties > 0 {
-		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
+		kh := c.Mll.RingToken(set.Data.Key)
+		core.AppLog.Debug().Msgf("request key hash %d", kh)
+		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: kh, Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		core.AppLog.Debug().Msgf("get %v",ringNode)
+		core.AppLog.Debug().Msgf("get %v", ringNode)
 		tcp, err := grpc.NewClient(ringNode.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			retry.Reties++
