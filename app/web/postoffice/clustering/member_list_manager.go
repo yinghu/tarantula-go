@@ -23,8 +23,8 @@ type MemberlistManager struct {
 }
 
 func (m *MemberlistManager) Start() error {
-	m.MemberHashRing = &MemberHashRing{nodes: make([]core.Node, 0), weight: NODE_WEIGHT}
-	//m.balancing = true
+	m.MemberHashRing = &MemberHashRing{weight: NODE_WEIGHT}
+	m.nodes = make([]core.Node, 0)
 	cfg := memberlist.DefaultLANConfig()
 	cfg.Name = m.Binding
 	ch := make(chan memberlist.NodeEvent, NODE_EVENT_BUFFER_SIZE) //HAVE TO BUFFER
