@@ -13,7 +13,7 @@ import (
 const (
 	REPLICA_RING_OPT uint32 = 1
 	ALL_RING_OPT     uint32 = 3
-	ADD_NODE_OPT     uint32 = 5
+	//ADD_NODE_OPT     uint32 = 5
 	REMOVE_NODE_OPT  uint32 = 6
 	//UPDATE_NODE_OPT  uint32 = 7
 	SYNC_NODE_OPT  uint32 = 8
@@ -83,8 +83,8 @@ func (m *MemberListListener) Listen() {
 					nodes = append(nodes, n)
 				}
 				mr.Async <- nodes
-			case ADD_NODE_OPT:
-				mr.Async <- m.rangeNodeAdded(mr.Token)
+			//case ADD_NODE_OPT:
+				//mr.Async <- m.rangeNodeAdded(mr.Token)
 			case REMOVE_NODE_OPT:
 				mr.Async <- m.rangeNodeRemoved(mr.Token)
 			//case UPDATE_NODE_OPT:

@@ -65,8 +65,8 @@ start:
 	}
 	core.AppLog.Debug().Msgf("running recovery on operator %d", num)
 	sync := <-m.DPull
-	for _, h := range sync.Hashs {
-		req := protocol.Request{Prefix: h}
+	for _, h := range sync.Ranges {
+		req := protocol.Request{Prefix: h.From,Opt: h.To}
 		ch := make(chan *protocol.Response, 3)
 		go m.runPull(sync.Remote, &req, ch)
 		for resp := range ch {

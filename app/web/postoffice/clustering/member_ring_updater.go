@@ -2,6 +2,7 @@ package clustering
 
 import (
 	"encoding/json"
+	"slices"
 
 	"gameclustering.com/internal/core"
 )
@@ -12,24 +13,32 @@ type RingUpdate struct {
 }
 
 func (m *DataServiceProvider) balanceOnNodeAdded(added RingUpdate) {
-	ringReqest := core.RingRequest{Address: added.Nodes[0].IP, Opt: SYNC_NODE_OPT}
-	if m.backRing.nodeNum ==0{
+
+	if m.backRing.nodeNum == 0 {
 		m.backRing.nodes = append(m.backRing.nodes, added.Nodes...)
+		slices.SortFunc(m.backRing.nodes, cmp)
+		m.backRing.nodeNum++
+		return
 	}
+	slices.SortFunc(added.Nodes, cmp)
+	ringSync := core.RingSync{Ranges: make([]core.RingRange, 0)}
 	for _, n := range added.Nodes {
 		if !m.Mll.localNode(n) { //skip node initial add call
-			rq := make(chan []core.Node, 1)
-			m.Mll.rangeRing(core.RingRequest{Token: n.RingToken, Opt: ADD_NODE_OPT, Async: rq})
-			ringRange := <-rq
-			close(rq)
+			ringRange := m.backRing.rangeOfRing(n.RingToken)
 			if m.Mll.localNode(ringRange[1]) {
-				ringReqest.Source.Remote = ringRange[1].RpcEndpoint
-				ringReqest.Source.Hashs = append(ringReqest.Source.Hashs, ringRange[0].RingToken)
+				ringSync.Remote = ringRange[1].RpcEndpoint
+				ringSync.Ranges = append(ringSync.Ranges, core.RingRange{From: ringRange[0].RingToken, To: n.RingToken})
 				core.AppLog.Debug().Msgf("push data key hash >= %d and < %d to remote node %s", ringRange[0].RingToken, n.RingToken, n.IP)
 			}
 		}
+		m.backRing.nodes = append(m.backRing.nodes, n)
+		slices.SortFunc(m.backRing.nodes, cmp)
 	}
-	m.Mll.MRequest <- ringReqest
+	m.backRing.nodeNum++
+	if len(ringSync.Ranges) == 0 {
+		return
+	}
+	m.Mll.MRequest <- core.RingRequest{Source: ringSync, Opt: SYNC_NODE_OPT, Address: added.Nodes[0].IP}
 }
 
 func (m *DataServiceProvider) balanceOnNodeRemoved(removed RingUpdate) {
@@ -72,13 +81,13 @@ func (m *DataServiceProvider) RingUpdated() {
 					m.DSet <- SetData{Opt: core.SET_OPT_RECOVER}
 				}
 				pz := SET_OPERATOR_NUM
-				for _, p := range ds.Hashs {
-					ps := core.RingSync{Remote: ds.Remote, Hashs: []uint32{p}}
+				for _, p := range ds.Ranges {
+					ps := core.RingSync{Remote: ds.Remote, Ranges: []core.RingRange{p}}
 					m.DPull <- ps
 					pz--
 				}
 				for range pz {
-					m.DPull <- core.RingSync{Remote: ds.Remote}
+					m.DPull <- core.RingSync{Remote: ds.Remote, Ranges: []core.RingRange{}}
 				}
 			}
 		}

@@ -47,9 +47,15 @@ type Opt struct {
 	Type     string `json:"Type"`
 }
 
+type RingRange struct {
+	//range >= from and < to
+	From uint32
+	To   uint32
+}
+
 type RingSync struct {
-	Remote string   `json:"remote"`
-	Hashs  []uint32 `json:"hashs"`
+	Remote string      `json:"remote"`
+	Ranges []RingRange `json:"ranges"`
 }
 
 type RingRequest struct {

@@ -1,8 +1,6 @@
 package clustering
 
 import (
-	"slices"
-
 	"gameclustering.com/internal/core"
 )
 
@@ -54,33 +52,12 @@ func (m *NodeRing) keyRing(t uint32, relica int) []core.Node {
 func (m *NodeRing) rangeOfRing(t uint32) []core.Node {
 	ix := m.ownerOf(t)
 	var px int
-	if ix==0{
-		px = len(m.nodes)-1		
-	}else{
-		px = ix-1
+	if ix == 0 {
+		px = len(m.nodes) - 1
+	} else {
+		px = ix - 1
 	}
-	return []core.Node{m.nodes[px],m.nodes[ix]}
-}
-
-func (m *NodeRing) rangeNodeAdded(t uint32) []core.Node {
-	target := core.Node{RingToken: t}
-	n, exist := slices.BinarySearchFunc(m.nodes, target, func(n1, n2 core.Node) int {
-		return cmp(n1, n2)
-	})
-	if exist {
-		end := len(m.nodes) - 1
-		switch n {
-		case 0:
-			return []core.Node{m.nodes[end], m.nodes[1]}
-		case end:
-			return []core.Node{m.nodes[0], m.nodes[end-1]}
-		default:
-			return []core.Node{m.nodes[n-1], m.nodes[n+1]}
-		}
-	}
-	core.AppLog.Warn().Msgf("should be never happening %d %v", n, exist)
-	//should not be happening
-	return []core.Node{}
+	return []core.Node{m.nodes[px], m.nodes[ix]}
 }
 
 func (m *NodeRing) rangeNodeRemoved(t uint32) []core.Node {
