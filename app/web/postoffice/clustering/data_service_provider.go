@@ -205,9 +205,14 @@ func (m *DataServiceProvider) create(sd SetData) (KeyIndex, error) {
 		return ki, err
 	}
 	err = m.Local.Db.Update(func(txn *badger.Txn) error {
-		_, err := txn.Get(k)
+		item, err := txn.Get(k)
 		if err == nil {
-			return fmt.Errorf("key already existed")
+			if item.Value(func(val []byte) error {
+				ev := append([]byte{}, val...)
+				return ki.Val(ev)
+			}) != nil || ki.Header.State != core.DATA_STATE_DELETED {
+				return fmt.Errorf("key already existed")
+			}
 		}
 		if err = txn.Set(k, v); err != nil {
 			return err
