@@ -28,16 +28,17 @@ services:
       - tarantula-service-net      
     volumes:
       - volume_postgres:/var/lib/postgresql/data
-  kafka:
+  broker:
     image: apache/kafka:latest
-    container_name: kafka
-    hostname: kafka
+    container_name: broker
+    hostname: broker
     restart: unless-stopped
     environment:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1  
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1 
+      KAFKA_PROCESS_ROLES: broker,controller 
     ports:
       - 9092:9092
     networks:
