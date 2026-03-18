@@ -388,26 +388,51 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 			})
 			ki := KeyIndex{Header: &protocol.Header{}}
 			core.Import(&ki, k, v, 300)
-			if ki.Prefix >= from && ki.Prefix < to {
-				key, _ := ki.lookupDataKey()
-				vitem, err := txn.Get(key)
-				if err != nil {
-					core.AppLog.Warn().Msgf("should not be a value missing %v", ki)
-					continue
-				}
-				vitem.Value(func(val []byte) error {
-					fv := append([]byte{}, val...)
-					kz := len(key)
-					vdata := protocol.Data{Key: key[12 : kz-8], Value: fv, Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Mutable: ki.Header.Mutable}}
-					core.AppLog.Debug().Msgf("key found %s", string(vdata.Key))
-					data = append(data, &vdata)
-					if len(data) == 10 {
-						resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
-						ch <- &resp
-						data = make([]*protocol.Data, 0, 10)
+			if from > to {
+				if ki.Prefix >= from && ki.Prefix < to {
+					key, _ := ki.lookupDataKey()
+					vitem, err := txn.Get(key)
+					if err != nil {
+						core.AppLog.Warn().Msgf("should not be a value missing %v", ki)
+						continue
 					}
-					return nil
-				})
+					vitem.Value(func(val []byte) error {
+						fv := append([]byte{}, val...)
+						kz := len(key)
+						vdata := protocol.Data{Key: key[12 : kz-8], Value: fv, Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Mutable: ki.Header.Mutable}}
+						core.AppLog.Debug().Msgf("key found %s", string(vdata.Key))
+						data = append(data, &vdata)
+						if len(data) == 10 {
+							resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
+							ch <- &resp
+							data = make([]*protocol.Data, 0, 10)
+						}
+						return nil
+					})
+				}
+			} else {
+				core.AppLog.Debug().Msgf("load from %d to %d", from, to)
+				if ki.Prefix >= from || ki.Prefix < to {
+					key, _ := ki.lookupDataKey()
+					vitem, err := txn.Get(key)
+					if err != nil {
+						core.AppLog.Warn().Msgf("should not be a value missing %v", ki)
+						continue
+					}
+					vitem.Value(func(val []byte) error {
+						fv := append([]byte{}, val...)
+						kz := len(key)
+						vdata := protocol.Data{Key: key[12 : kz-8], Value: fv, Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Mutable: ki.Header.Mutable}}
+						core.AppLog.Debug().Msgf("key found %s", string(vdata.Key))
+						data = append(data, &vdata)
+						if len(data) == 10 {
+							resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
+							ch <- &resp
+							data = make([]*protocol.Data, 0, 10)
+						}
+						return nil
+					})
+				}
 			}
 		}
 		return nil

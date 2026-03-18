@@ -64,6 +64,9 @@ func (m *NodeRing) rangeOfRing(t uint32) []core.Node {
 func (m *NodeRing) ownerOf(t uint32) int {
 	l := 0
 	r := len(m.nodes) - 1
+	if t >= m.nodes[r].RingToken || t < m.nodes[0].RingToken {
+		return 0
+	}
 	ix := -1
 	for l <= r {
 		md := l + (r-l)/2
