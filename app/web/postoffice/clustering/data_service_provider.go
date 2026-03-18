@@ -388,7 +388,7 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 			})
 			ki := KeyIndex{Header: &protocol.Header{}}
 			core.Import(&ki, k, v, 300)
-			if from > to {
+			if from < to {
 				if ki.Prefix >= from && ki.Prefix < to {
 					key, _ := ki.lookupDataKey()
 					vitem, err := txn.Get(key)
