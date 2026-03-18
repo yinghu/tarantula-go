@@ -35,6 +35,7 @@ func (s *PresenceClusterGet) Request(rs core.OnSession, w http.ResponseWriter, r
 	req.Async = aq
 	defer close(aq)
 	s.Cluster().Request(req)
+	rt := core.OnSession{Successful: false}
 	for c := range aq {
 		if !c.Remaining {
 			break
@@ -48,8 +49,15 @@ func (s *PresenceClusterGet) Request(rs core.OnSession, w http.ResponseWriter, r
 				co.Mutable = dt.Header.Mutable
 				co.Rev = dt.Header.Revision
 				co.Tsp = dt.Header.Timestamp
+				rt.Successful = true
+			} else {
+				rt.Message = resp.Message
 			}
 		}
+	}
+	if !rt.Successful {
+		w.Write(util.ToJson(rt))
+		return
 	}
 	w.Write(util.ToJson(co))
 }
