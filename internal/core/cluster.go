@@ -14,6 +14,10 @@ const (
 	QUERY_DATA_REQUEST  uint32 = 15
 
 	PULL_DATA_REQUEST uint32 = 16
+
+	DATA_STATE_READY   uint32 = 0
+	DATA_STATE_PENDING uint32 = 1
+	DATA_STATE_DELETED uint32 = 2
 )
 
 type Chunk struct {
@@ -72,6 +76,7 @@ type DataHeader struct {
 	ClassId   uint32
 	Revision  uint64
 	Mutable   bool
+	State     uint32
 }
 
 type DataRequest struct {

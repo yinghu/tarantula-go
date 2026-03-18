@@ -16,6 +16,10 @@ import (
 	"google.golang.org/grpc"
 )
 
+const (
+	PULL_BATCH_SIZE int = 10
+)
+
 type DataServiceProvider struct {
 	protocol.UnimplementedDataServiceServer
 	protocol.UnimplementedPostofficeServiceServer
@@ -275,7 +279,16 @@ func (m *DataServiceProvider) delete(sd SetData) (KeyIndex, error) {
 		if !ki.Header.Mutable {
 			return fmt.Errorf("cannot delete on immutable %v", ki.Header.Mutable)
 		}
-		if err = txn.Delete(k); err != nil {
+		if ki.Header.State == core.DATA_STATE_DELETED {
+			return fmt.Errorf("already deleted on %d", ki.Header.State)
+		}
+		ki.Header.State = core.DATA_STATE_DELETED
+		ki.Header.Revision++
+		uv, err := ki.Value()
+		if err != nil {
+			return err
+		}
+		if err = txn.Set(k, uv); err != nil {
 			return err
 		}
 		sd.Header.Revision = ki.Header.Revision
@@ -307,6 +320,9 @@ func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
 			return err
 		}
 		//use latest revision
+		if ki.Header.State == core.DATA_STATE_DELETED {
+			return fmt.Errorf("data deleted %d", ki.Header.State)
+		}
 		gd.Data.Header.Revision = ki.Header.Revision
 		dk, err := gd.DataKey()
 		if err != nil {
@@ -372,7 +388,7 @@ func (m *DataServiceProvider) reset(sd SetData) (KeyIndex, error) {
 func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) {
 	index := KeyIndex{}
 	pre, _ := index.lookupPrefix(INDEX_PREFIX)
-	data := make([]*protocol.Data, 0, 10)
+	data := make([]*protocol.Data, 0, PULL_BATCH_SIZE)
 	m.Local.Db.View(func(txn *badger.Txn) error {
 		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
 		it := txn.NewIterator(op)
@@ -386,7 +402,23 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 				return nil
 			})
 			ki := KeyIndex{Header: &protocol.Header{}}
-			core.Import(&ki, k, v, 300)
+			err := core.Import(&ki, k, v, 300)
+			if err != nil {
+				core.AppLog.Warn().Msgf("should not be a error from import data %s", err.Error())
+				continue
+			}
+			if ki.Header.State == core.DATA_STATE_DELETED {
+				key, _ := ki.lookupDataKey()
+				kz := len(key)
+				vdata := protocol.Data{Key: key[12 : kz-8], Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Mutable: ki.Header.Mutable, State: ki.Header.State}}
+				data = append(data, &vdata)
+				if len(data) == PULL_BATCH_SIZE {
+					resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
+					ch <- &resp
+					data = make([]*protocol.Data, 0, PULL_BATCH_SIZE)
+				}
+				continue
+			}
 			if from < to {
 				if ki.Prefix >= from && ki.Prefix < to {
 					key, _ := ki.lookupDataKey()
@@ -398,19 +430,19 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 					vitem.Value(func(val []byte) error {
 						fv := append([]byte{}, val...)
 						kz := len(key)
-						vdata := protocol.Data{Key: key[12 : kz-8], Value: fv, Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Mutable: ki.Header.Mutable}}
-					
+						vdata := protocol.Data{Key: key[12 : kz-8], Value: fv, Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Mutable: ki.Header.Mutable, State: ki.Header.State}}
+
 						data = append(data, &vdata)
-						if len(data) == 10 {
+						if len(data) == PULL_BATCH_SIZE {
 							resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
 							ch <- &resp
-							data = make([]*protocol.Data, 0, 10)
+							data = make([]*protocol.Data, 0, PULL_BATCH_SIZE)
 						}
 						return nil
 					})
 				}
 			} else {
-				
+
 				if ki.Prefix >= from || ki.Prefix < to {
 					key, _ := ki.lookupDataKey()
 					vitem, err := txn.Get(key)
@@ -421,12 +453,12 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 					vitem.Value(func(val []byte) error {
 						fv := append([]byte{}, val...)
 						kz := len(key)
-						vdata := protocol.Data{Key: key[12 : kz-8], Value: fv, Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Mutable: ki.Header.Mutable}}
+						vdata := protocol.Data{Key: key[12 : kz-8], Value: fv, Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Mutable: ki.Header.Mutable, State: ki.Header.State}}
 						data = append(data, &vdata)
-						if len(data) == 10 {
+						if len(data) == PULL_BATCH_SIZE {
 							resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
 							ch <- &resp
-							data = make([]*protocol.Data, 0, 10)
+							data = make([]*protocol.Data, 0, PULL_BATCH_SIZE)
 						}
 						return nil
 					})
@@ -461,7 +493,9 @@ func (c *DataServiceProvider) set(resp *protocol.Response) {
 			item, err := txn.Get(k)
 			if err != nil { //no data
 				txn.Set(k, v)
-				txn.Set(dkey, setdata.Value)
+				if ki.Header.State != core.DATA_STATE_DELETED {
+					txn.Set(dkey, setdata.Value)
+				}
 				continue
 			}
 			item.Value(func(val []byte) error {
@@ -473,7 +507,11 @@ func (c *DataServiceProvider) set(resp *protocol.Response) {
 				}
 				if eki.Header.Revision < ki.Header.Revision {
 					txn.Set(k, v)
-					txn.Set(dkey, setdata.Value)
+					if ki.Header.State == core.DATA_STATE_DELETED {
+						txn.Delete(dkey)
+					} else {
+						txn.Set(dkey, setdata.Value)
+					}
 				}
 				return nil
 			})

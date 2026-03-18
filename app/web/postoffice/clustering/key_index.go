@@ -52,6 +52,9 @@ func (k *KeyIndex) Write(buffer core.DataBuffer) error {
 	if err := buffer.WriteBool(k.Header.Mutable); err != nil {
 		return err
 	}
+	if err := buffer.WriteUInt32(k.Header.State); err != nil {
+		return err
+	}
 	return nil
 }
 func (k *KeyIndex) Read(buffer core.DataBuffer) error {
@@ -75,7 +78,13 @@ func (k *KeyIndex) Read(buffer core.DataBuffer) error {
 		return err
 	}
 	k.Header.Mutable = mtu
+	st, err := buffer.ReadUInt32()
+	if err != nil {
+		return err
+	}
+	k.Header.State = st
 	return nil
+
 }
 func (k *KeyIndex) ReadKey(buffer core.DataBuffer) error {
 	_, err := buffer.ReadString()
