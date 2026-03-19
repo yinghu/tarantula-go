@@ -42,7 +42,7 @@ func (m *DataServiceProvider) balanceOnNodeAdded(added RingUpdate) {
 }
 
 func (m *DataServiceProvider) balanceOnNodeRemoved(removed RingUpdate) {
-	
+
 	for _, n := range removed.Nodes {
 		m.backRing.nodes = slices.DeleteFunc(m.backRing.nodes, func(d core.Node) bool {
 			return d.IP == n.IP
@@ -72,18 +72,22 @@ func (m *DataServiceProvider) RingUpdated() {
 			if err != nil {
 				core.AppLog.Warn().Msgf("cannot parse remote data from %s", string(sync))
 			} else {
-				m.DWait.Add(SET_OPERATOR_NUM)
-				for range SET_OPERATOR_NUM {
-					m.DSet <- SetData{Opt: core.SET_OPT_RECOVER}
-				}
-				pz := SET_OPERATOR_NUM
-				for _, p := range ds.Ranges {
-					ps := core.RingSync{Remote: ds.Remote, Ranges: []core.RingRange{p}}
-					m.DPull <- ps
-					pz--
-				}
-				for range pz {
-					m.DPull <- core.RingSync{Remote: ds.Remote, Ranges: []core.RingRange{}}
+				if len(ds.Ranges) > 0 {
+					m.DWait.Add(SET_OPERATOR_NUM)
+					for range SET_OPERATOR_NUM {
+						m.DSet <- SetData{Opt: core.SET_OPT_RECOVER}
+					}
+					pz := SET_OPERATOR_NUM
+					for _, p := range ds.Ranges {
+						ps := core.RingSync{Remote: ds.Remote, Ranges: []core.RingRange{p}}
+						m.DPull <- ps
+						pz--
+					}
+					for range pz {
+						m.DPull <- core.RingSync{Remote: ds.Remote, Ranges: []core.RingRange{}}
+					}
+				} else {
+					core.AppLog.Debug().Msgf("register subscription %v", ds.Sub)
 				}
 			}
 		}

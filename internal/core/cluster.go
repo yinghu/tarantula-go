@@ -55,13 +55,19 @@ type Opt struct {
 
 type RingRange struct {
 	//range >= from and < to
-	From uint32
-	To   uint32
+	From uint32 `json:"from"`
+	To   uint32 `json:"to"`
+}
+
+type Subscription struct {
+	Topic    string `json:"topic"`
+	Endpoint string `json:"endpoint"`
 }
 
 type RingSync struct {
-	Remote string      `json:"remote"`
-	Ranges []RingRange `json:"ranges"`
+	Remote string       `json:"remote"`
+	Ranges []RingRange  `json:"ranges"`
+	Sub    Subscription `json:"sub"`
 }
 
 type RingRequest struct {
