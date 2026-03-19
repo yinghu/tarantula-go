@@ -14,13 +14,17 @@ const (
 
 type SetData struct {
 	*protocol.Data
-	Opt  uint32
-	Resp chan *protocol.Response
+	Prefix uint32
+	Opt    uint32
+	Resp   chan *protocol.Response
 }
 
 // HELPER METHODS
 func (s *SetData) IndexKey() KeyIndex {
-	ki := KeyIndex{Prefix: util.Hash(s.Key), Header: s.Header, Key: s.Key}
+	if s.Prefix == 0 {
+		s.Prefix = util.Hash(s.Key)
+	}
+	ki := KeyIndex{Prefix: s.Prefix, Header: s.Header, Key: s.Key}
 	return ki
 }
 
