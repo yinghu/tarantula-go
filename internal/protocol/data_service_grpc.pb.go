@@ -26,6 +26,7 @@ const (
 	DataService_Update_FullMethodName    = "/protocol.DataService/update"
 	DataService_Delete_FullMethodName    = "/protocol.DataService/delete"
 	DataService_Subscribe_FullMethodName = "/protocol.DataService/subscribe"
+	DataService_Publish_FullMethodName   = "/protocol.DataService/publish"
 )
 
 // DataServiceClient is the client API for DataService service.
@@ -39,6 +40,7 @@ type DataServiceClient interface {
 	Update(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	Delete(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	Subscribe(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	Publish(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 }
 
 type dataServiceClient struct {
@@ -137,6 +139,16 @@ func (c *dataServiceClient) Subscribe(ctx context.Context, in *Request, opts ...
 	return out, nil
 }
 
+func (c *dataServiceClient) Publish(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, DataService_Publish_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DataServiceServer is the server API for DataService service.
 // All implementations must embed UnimplementedDataServiceServer
 // for forward compatibility.
@@ -148,6 +160,7 @@ type DataServiceServer interface {
 	Update(context.Context, *Request) (*Response, error)
 	Delete(context.Context, *Request) (*Response, error)
 	Subscribe(context.Context, *Request) (*Response, error)
+	Publish(context.Context, *Request) (*Response, error)
 	mustEmbedUnimplementedDataServiceServer()
 }
 
@@ -178,6 +191,9 @@ func (UnimplementedDataServiceServer) Delete(context.Context, *Request) (*Respon
 }
 func (UnimplementedDataServiceServer) Subscribe(context.Context, *Request) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Subscribe not implemented")
+}
+func (UnimplementedDataServiceServer) Publish(context.Context, *Request) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method Publish not implemented")
 }
 func (UnimplementedDataServiceServer) mustEmbedUnimplementedDataServiceServer() {}
 func (UnimplementedDataServiceServer) testEmbeddedByValue()                     {}
@@ -312,6 +328,24 @@ func _DataService_Subscribe_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DataService_Publish_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataServiceServer).Publish(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataService_Publish_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataServiceServer).Publish(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DataService_ServiceDesc is the grpc.ServiceDesc for DataService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -338,6 +372,10 @@ var DataService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "subscribe",
 			Handler:    _DataService_Subscribe_Handler,
+		},
+		{
+			MethodName: "publish",
+			Handler:    _DataService_Publish_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

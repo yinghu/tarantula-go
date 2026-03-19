@@ -148,6 +148,14 @@ func (s *AppManager) Send(e core.Event) error {
 		}
 		core.AppLog.Debug().Msgf("payload %v", c.Data)
 	}
+	req.Opt = core.PUBLISH_REQUEST
+	s.Cluster().Request(req)
+	for c := range aq {
+		if !c.Remaining {
+			break
+		}
+		core.AppLog.Debug().Msgf("payload 2 %v", c.Data)
+	}
 	return nil
 }
 func (s *AppManager) List(query core.Query) {
@@ -157,7 +165,7 @@ func (s *AppManager) List(query core.Query) {
 }
 
 func (s *AppManager) OnEvent(e core.Event) {
-
+	core.AppLog.Debug().Msgf("event %v", e)
 }
 
 func (s *AppManager) OnError(e core.Event, err error) {

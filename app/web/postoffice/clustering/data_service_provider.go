@@ -161,6 +161,15 @@ func (c *DataServiceProvider) Subscribe(ctx context.Context, in *protocol.Reques
 	return &protocol.Response{Successful: true, Message: "topic created"}, nil
 }
 
+func (c *DataServiceProvider) Publish(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
+	//msg := make(chan *protocol.Response, 1)
+	//defer close(msg)
+	//setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
+	//c.DSet <- setData
+	//resp := <-msg
+	return &protocol.Response{Successful: true, Message: "event published"}, nil
+}
+
 func (c *DataServiceProvider) Start(dir string) {
 	c.backRing = NodeRing{nodes: make([]core.Node, 0)}
 	path := fmt.Sprintf("%s/%s", dir, "store")
