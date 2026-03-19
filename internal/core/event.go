@@ -6,11 +6,6 @@ const (
 	EVENT_FACTORY_ID uint32 = 1
 )
 
-type IndexListener interface {
-	LocalStore() DataStore
-	Index(e Event)
-}
-
 type EventListener interface {
 	OnEvent(e Event)
 	OnError(e Event, err error)
@@ -30,7 +25,6 @@ type Event interface {
 	Persistentable
 	OnListener(el EventListener)
 	Listener() EventListener
-	OnIndex(ix IndexListener)
 
 	OnTopic(t string)
 	Topic() string
@@ -98,9 +92,7 @@ func (s *EventObj) OnListener(el EventListener) {
 func (s *EventObj) Listener() EventListener {
 	return s.Callback
 }
-func (s *EventObj) OnIndex(idx IndexListener) {
 
-}
 func (s *EventObj) OnOId(oid int64) {
 	s.EOid = oid
 }

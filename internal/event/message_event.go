@@ -116,7 +116,3 @@ func (s *MessageEvent) Inbound(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *MessageEvent) OnIndex(idx core.IndexListener) {
-	idx.LocalStore().Save(s)
-	idx.Index(s)
-}

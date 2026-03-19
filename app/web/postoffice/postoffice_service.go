@@ -156,7 +156,7 @@ func (s *PostofficeService) inboundEvent(t chan event.SubscriptionEvent) {
 			topics = append(topics, c)
 		case e := <-s.inboundQ:
 			core.AppLog.Printf("Inbound event %v\n", e)
-			e.OnIndex(s)
+			//e.OnIndex(s)
 		case e := <-s.indexQ:
 			for i := range topics {
 				topic := topics[i]
