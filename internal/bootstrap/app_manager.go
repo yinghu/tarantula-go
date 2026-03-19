@@ -155,16 +155,6 @@ func (s *AppManager) List(query core.Query) {
 	req.Async = query.QCc()
 	s.Cluster().Request(req)
 }
-func (s *AppManager) Recover(query core.Query) {
-	for i := range 5 {
-		ret := s.PostJsonSync(fmt.Sprintf("%s/%d", "http://postoffice:8080/postoffice/recover", query.QId()), query)
-		if ret.ErrorCode == 0 {
-			return
-		}
-		time.Sleep(1000 * time.Millisecond)
-		core.AppLog.Printf("Retries: %d %v\n", i, ret)
-	}
-}
 
 func (s AppManager) Load(query core.Query) {
 	e := query.QEvent()

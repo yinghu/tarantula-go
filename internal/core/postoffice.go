@@ -22,6 +22,6 @@ type Query interface {
 type Postoffice interface {
 	Send(e Event) error
 	List(q Query)
-	Recover(q Query)
+	//Recover(q Query)
 	Load(e Query)
 }
