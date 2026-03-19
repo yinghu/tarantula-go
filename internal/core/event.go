@@ -1,5 +1,7 @@
 package core
 
+import "time"
+
 const (
 	EVENT_FACTORY_ID uint32 = 1
 )
@@ -18,7 +20,8 @@ type EventService interface {
 	EventCreator
 	VerifyTicket(ticket string) (OnSession, error)
 	EventListener
-	Postoffice
+	Send(e Event) error
+	List(q Query)
 }
 
 type Event interface {
@@ -49,6 +52,23 @@ type Publisher interface {
 
 type Pusher interface {
 	Push(e Event)
+}
+
+type Query interface {
+	QId() uint32
+	QFactoryId() uint32
+	QClassId() uint32
+	QTag() string
+	QTopic() string
+	QStartTime() time.Time
+	QEndTime() time.Time
+	QLimit() int32
+	QOffset() int32
+	QRead(b DataBuffer) error
+	QWrite(b DataBuffer) error
+	QCc() chan Chunk
+	QEvent() Event
+	QFilter(k, v []byte) bool
 }
 
 type EventObj struct {
