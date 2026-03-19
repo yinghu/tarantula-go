@@ -47,8 +47,7 @@ func (s *AdminService) Start(f core.Env, p core.Pusher) error {
 	http.Handle("/admin/{name}", bootstrap.Logging(&AdminWebIndex{AdminService: s}))
 
 	http.Handle("/admin/cs/message/send", bootstrap.Logging(&CSMessager{AdminService: s}))
-	http.Handle("/admin/cs/message/load", bootstrap.Logging(&CSMessageLoader{AdminService: s}))
-
+	
 	http.Handle("/admin/cs/query/{id}", bootstrap.Logging(&CSQueryer{AdminService: s}))
 	http.Handle("/admin/cs/inventory/grant", bootstrap.Logging(&CSGranter{AdminService: s}))
 	http.Handle("/admin/cs/inventory/load", bootstrap.Logging(&CSInventoryLoader{AdminService: s}))

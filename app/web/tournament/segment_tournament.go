@@ -41,7 +41,7 @@ func (t *SegmentSchedule) Start() error {
 		tq.Tag = event.TOURNAMENT_ETAG
 		tq.Id = event.Q_TOURNAMENT_QID
 		tq.Topic = "tournament"
-		t.Recover(&tq)
+		//t.Recover(&tq)
 	}
 	t.Started = true
 	return nil
