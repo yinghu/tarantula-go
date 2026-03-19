@@ -101,7 +101,7 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 		//defer close(rc)
 		//c.runSubscribe(request, rc)
 		//resp := <-rc
-		c.Mll.MRequest <- core.RingRequest{Source: core.RingSync{Sub: core.Subscription{Topic: string(request.Data.Key),Endpoint:c.rpcEndpoint}}}
+		c.Mll.MRequest <- core.RingRequest{Opt:SYNC_NODE_OPT,Source: core.RingSync{Sub: core.Subscription{Topic: string(request.Data.Key),Endpoint:c.rpcEndpoint}}}
 		stream.Send(&protocol.Response{Successful: true,Message: "topic subscribed"})
 	case core.PUBLISH_REQUEST:
 		rc := make(chan *protocol.Response, 3)

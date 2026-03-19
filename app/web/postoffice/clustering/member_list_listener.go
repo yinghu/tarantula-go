@@ -101,7 +101,7 @@ func (m *MemberListListener) Listen() {
 					}
 				} else {
 					for _, mbr := range m.Members() {
-						core.AppLog.Debug().Msgf("sending sync message to %s", mbr.FullAddress().Name)
+						core.AppLog.Debug().Msgf("sending topic message to %s", mbr.FullAddress().Name)
 						m.SendToAddress(mbr.FullAddress(), util.ToJson(mr.Source))
 					}
 				}
