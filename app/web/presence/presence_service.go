@@ -44,7 +44,7 @@ func (s *PresenceService) Start(env core.Env, p core.Pusher) error {
 		core.AppLog.Printf("Error on load registration %s %s\n", err.Error(), brn.Message)
 	}
 	s.Started = true
-	//s.Subscribe("message",s)
+	s.Subscribe("message", s)
 	core.AppLog.Printf("Presence service started %s\n", env.HttpBinding)
 	http.Handle("/presence/register", bootstrap.Logging(&PresenceRegister{PresenceService: s}))
 	http.Handle("/presence/login", bootstrap.Logging(&PresenceLogin{PresenceService: s}))
