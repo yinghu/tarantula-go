@@ -91,11 +91,18 @@ func (m *MemberListListener) Listen() {
 			//m.balancing = mr.Replicas == 0
 			//m.UpdateNode(5 * time.Second)
 			case SYNC_NODE_OPT:
-				for _, mbr := range m.Members() {
-					if mbr.Address() == mr.Address {
-						core.AppLog.Debug().Msgf("sending sync message to %s", mr.Address)
+				if mr.Address != "" {
+					for _, mbr := range m.Members() {
+						if mbr.Address() == mr.Address {
+							core.AppLog.Debug().Msgf("sending sync message to %s", mr.Address)
+							m.SendToAddress(mbr.FullAddress(), util.ToJson(mr.Source))
+							break
+						}
+					}
+				} else {
+					for _, mbr := range m.Members() {
+						core.AppLog.Debug().Msgf("sending sync message to %s", mbr.FullAddress().Name)
 						m.SendToAddress(mbr.FullAddress(), util.ToJson(mr.Source))
-						break
 					}
 				}
 			case CLOSE_RING_OPT:
