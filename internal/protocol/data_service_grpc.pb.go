@@ -19,12 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	DataService_Get_FullMethodName    = "/protocol.DataService/get"
-	DataService_Reset_FullMethodName  = "/protocol.DataService/reset"
-	DataService_Pull_FullMethodName   = "/protocol.DataService/pull"
-	DataService_Create_FullMethodName = "/protocol.DataService/create"
-	DataService_Update_FullMethodName = "/protocol.DataService/update"
-	DataService_Delete_FullMethodName = "/protocol.DataService/delete"
+	DataService_Get_FullMethodName       = "/protocol.DataService/get"
+	DataService_Reset_FullMethodName     = "/protocol.DataService/reset"
+	DataService_Pull_FullMethodName      = "/protocol.DataService/pull"
+	DataService_Create_FullMethodName    = "/protocol.DataService/create"
+	DataService_Update_FullMethodName    = "/protocol.DataService/update"
+	DataService_Delete_FullMethodName    = "/protocol.DataService/delete"
+	DataService_Subscribe_FullMethodName = "/protocol.DataService/subscribe"
 )
 
 // DataServiceClient is the client API for DataService service.
@@ -37,6 +38,7 @@ type DataServiceClient interface {
 	Create(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	Update(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	Delete(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	Subscribe(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 }
 
 type dataServiceClient struct {
@@ -125,6 +127,16 @@ func (c *dataServiceClient) Delete(ctx context.Context, in *Request, opts ...grp
 	return out, nil
 }
 
+func (c *dataServiceClient) Subscribe(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, DataService_Subscribe_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DataServiceServer is the server API for DataService service.
 // All implementations must embed UnimplementedDataServiceServer
 // for forward compatibility.
@@ -135,6 +147,7 @@ type DataServiceServer interface {
 	Create(context.Context, *Request) (*Response, error)
 	Update(context.Context, *Request) (*Response, error)
 	Delete(context.Context, *Request) (*Response, error)
+	Subscribe(context.Context, *Request) (*Response, error)
 	mustEmbedUnimplementedDataServiceServer()
 }
 
@@ -162,6 +175,9 @@ func (UnimplementedDataServiceServer) Update(context.Context, *Request) (*Respon
 }
 func (UnimplementedDataServiceServer) Delete(context.Context, *Request) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedDataServiceServer) Subscribe(context.Context, *Request) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method Subscribe not implemented")
 }
 func (UnimplementedDataServiceServer) mustEmbedUnimplementedDataServiceServer() {}
 func (UnimplementedDataServiceServer) testEmbeddedByValue()                     {}
@@ -278,6 +294,24 @@ func _DataService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DataService_Subscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataServiceServer).Subscribe(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataService_Subscribe_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataServiceServer).Subscribe(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DataService_ServiceDesc is the grpc.ServiceDesc for DataService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -300,6 +334,10 @@ var DataService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "delete",
 			Handler:    _DataService_Delete_Handler,
+		},
+		{
+			MethodName: "subscribe",
+			Handler:    _DataService_Subscribe_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

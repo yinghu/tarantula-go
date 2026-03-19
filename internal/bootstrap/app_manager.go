@@ -156,13 +156,25 @@ func (s *AppManager) List(query core.Query) {
 	s.Cluster().Request(req)
 }
 
-
 func (s *AppManager) OnEvent(e core.Event) {
 
 }
 
 func (s *AppManager) OnError(e core.Event, err error) {
 
+}
+func (s *AppManager) Subscribe(topic string, listener core.EventListener) {
+	req := core.DataRequest{Key: []byte(topic), Opt: core.SUBSCRIBE_REQUEST}
+	aq := make(chan core.Chunk, 3)
+	req.Async = aq
+	defer close(aq)
+	s.Cluster().Request(req)
+	for c := range aq {
+		if !c.Remaining {
+			break
+		}
+		core.AppLog.Debug().Msgf("payload %v", c.Data)
+	}
 }
 
 func (s *AppManager) Context() string {

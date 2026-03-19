@@ -23,13 +23,13 @@ const (
 type DataServiceProvider struct {
 	protocol.UnimplementedDataServiceServer
 	protocol.UnimplementedPostofficeServiceServer
-	Local    *persistence.BadgerLocal
-	RNode    <-chan RingUpdate
-	RSync    <-chan []byte
-	server   *grpc.Server
-	Mll      *MemberListListener
-	backRing NodeRing
-
+	Local       *persistence.BadgerLocal
+	RNode       <-chan RingUpdate
+	RSync       <-chan []byte
+	server      *grpc.Server
+	Mll         *MemberListListener
+	backRing    NodeRing
+	rpcEndpoint string
 	//write worker chan
 	DSet  chan SetData
 	DPull chan core.RingSync
@@ -150,6 +150,15 @@ func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.Server
 		}
 	}
 	return nil
+}
+
+func (c *DataServiceProvider) Subscribe(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
+	//msg := make(chan *protocol.Response, 1)
+	//defer close(msg)
+	//setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
+	//c.DSet <- setData
+	//resp := <-msg
+	return &protocol.Response{Successful: true, Message: "topic created"}, nil
 }
 
 func (c *DataServiceProvider) Start(dir string) {

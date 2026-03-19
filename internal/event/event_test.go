@@ -38,7 +38,7 @@ func (s *SampleCreator) Send(e core.Event) error {
 func (s *SampleCreator) List(q core.Query)    {}
 func (s *SampleCreator) Recover(q core.Query) {}
 func (s *SampleCreator) Load(e core.Query)    {}
-
+func (s *SampleCreator) Subscribe(topic string, lis core.EventListener)
 func createEvent() core.Event {
 	sub := SubscriptionEvent{}
 	return &sub
@@ -72,7 +72,7 @@ func TestEventJson(t *testing.T) {
 	time.Sleep(10 * time.Second)
 	cpp := TcpPublisher{Remote: "tcp://localhost:5050"}
 	cpp.Connect()
-	go cpp.Subscribe(&SampleCreator{},&SampleCreator{})
+	go cpp.Subscribe(&SampleCreator{}, &SampleCreator{})
 	je := JoinEvent{Ticket: "xticket"}
 	je.OnTopic("tpp")
 	cpp.Join(&je)

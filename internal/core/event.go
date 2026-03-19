@@ -17,6 +17,7 @@ type EventService interface {
 	EventListener
 	Send(e Event) error
 	List(q Query)
+	Subscribe(topic string, listener EventListener)
 }
 
 type Event interface {

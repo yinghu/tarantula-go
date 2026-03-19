@@ -42,6 +42,7 @@ func (m *DataServiceProvider) balanceOnNodeAdded(added RingUpdate) {
 }
 
 func (m *DataServiceProvider) balanceOnNodeRemoved(removed RingUpdate) {
+	
 	for _, n := range removed.Nodes {
 		m.backRing.nodes = slices.DeleteFunc(m.backRing.nodes, func(d core.Node) bool {
 			return d.IP == n.IP
