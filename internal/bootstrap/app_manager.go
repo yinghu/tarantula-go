@@ -355,6 +355,7 @@ func (c *AppManager) receive() {
 	for {
 		resp, err := stream.Recv()
 		if err == io.EOF {
+			core.AppLog.Debug().Msgf("eof %s",err.Error())
 			break
 		}
 		if err != nil {
@@ -363,7 +364,7 @@ func (c *AppManager) receive() {
 			break
 		}
 		core.AppLog.Debug().Msgf("REV %v", resp)
-		c.OnEvent(&event.MessageEvent{})
+		//c.OnEvent(&event.MessageEvent{})
 		//r.Async <- core.Chunk{Remaining: true, Data: resp}
 	}
 	core.AppLog.Warn().Msg("rpc closed from remote")
