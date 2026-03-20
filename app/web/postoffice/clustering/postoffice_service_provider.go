@@ -42,12 +42,17 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 
 func (c *DataServiceProvider) Receive(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
 	go func() {
-		core.AppLog.Debug().Msg("startint publish")
+		core.AppLog.Debug().Msg("starting publish")
 		for {
-			stream.Send(&protocol.Response{Successful: true, Message: "hello"})
+			core.AppLog.Debug().Msg("sending message")
+			err := stream.Send(&protocol.Response{Successful: true, Message: "hello"})
+			if err != nil {
+				core.AppLog.Debug().Msgf("send error %s", err.Error())
+			}
 			time.Sleep(5 * time.Second)
 		}
 	}()
+	core.AppLog.Debug().Msg("stop publish")
 	return nil
 }
 
