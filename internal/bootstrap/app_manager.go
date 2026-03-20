@@ -346,7 +346,7 @@ func (c *AppManager) Request(r core.DataRequest) {
 
 func (c *AppManager) receive() {
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	stream, err := dsp.Receive(context.Background(), &protocol.Request{Opt: 0})
+	stream, err := dsp.Receive(context.Background(), &protocol.Request{Opt: 0, Data: &protocol.Data{Key: []byte(c.Context())}})
 	if err != nil {
 		core.AppLog.Warn().Msgf("rpc connection error %s", err.Error())
 		return

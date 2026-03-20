@@ -44,8 +44,8 @@ func (c *DataServiceProvider) Receive(request *protocol.Request, stream grpc.Ser
 	//go func() {
 	core.AppLog.Debug().Msg("starting publish")
 	for {
-		core.AppLog.Debug().Msg("sending message")
-		err := stream.Send(&protocol.Response{Successful: true, Message: "hello"})
+		core.AppLog.Debug().Msgf("sending message %s", string(request.Data.Key))
+		err := stream.Send(&protocol.Response{Successful: true, Message: string(request.Data.Key)})
 		if err != nil {
 			core.AppLog.Debug().Msgf("send error %s", err.Error())
 			break
