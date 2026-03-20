@@ -105,6 +105,7 @@ func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 		return err
 	}
 	s.rpc = tcp
+	go s.receive()
 	return nil
 }
 
@@ -341,4 +342,31 @@ func (c *AppManager) Request(r core.DataRequest) {
 		r.Async <- core.Chunk{Remaining: true, Data: resp}
 	}
 	r.Async <- crt
+}
+
+func (c *AppManager) receive() {
+	dsp := protocol.NewPostofficeServiceClient(c.rpc)
+	stream, err := dsp.Receive(context.Background(), &protocol.Request{Opt: 0})
+	if err != nil {
+		core.AppLog.Warn().Msgf("rpc connection error %s", err.Error())
+		return
+	}
+	//crt := core.Chunk{Remaining: false}
+	for {
+		resp, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
+			//crt.Data = err
+			break
+		}
+		core.AppLog.Debug().Msgf("REV %v", resp)
+		c.OnEvent(&event.MessageEvent{})
+		//r.Async <- core.Chunk{Remaining: true, Data: resp}
+	}
+	core.AppLog.Warn().Msg("rpc closed from remote")
+	//r.Async <- crt
+
 }

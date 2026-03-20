@@ -24,11 +24,12 @@ var File_postoffice_service_proto protoreflect.FileDescriptor
 
 const file_postoffice_service_proto_rawDesc = "" +
 	"\n" +
-	"\x18postoffice_service.proto\x12\bprotocol\x1a\rrequest.proto\x1a\x0eresponse.proto\x1a\x0fhash_node.proto2\xb6\x01\n" +
+	"\x18postoffice_service.proto\x12\bprotocol\x1a\rrequest.proto\x1a\x0eresponse.proto\x1a\x0fhash_node.proto2\xec\x01\n" +
 	"\x11PostofficeService\x125\n" +
 	"\bhashRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01\x124\n" +
 	"\akeyRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01\x124\n" +
-	"\arequest\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x000\x01BS\n" +
+	"\arequest\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x000\x01\x124\n" +
+	"\areceive\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x000\x01BS\n" +
 	"\x17com.icodesoftware.protoB\x12DataServiceFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var file_postoffice_service_proto_goTypes = []any{
@@ -40,11 +41,13 @@ var file_postoffice_service_proto_depIdxs = []int32{
 	0, // 0: protocol.PostofficeService.hashRing:input_type -> protocol.Request
 	0, // 1: protocol.PostofficeService.keyRing:input_type -> protocol.Request
 	0, // 2: protocol.PostofficeService.request:input_type -> protocol.Request
-	1, // 3: protocol.PostofficeService.hashRing:output_type -> protocol.HashNode
-	1, // 4: protocol.PostofficeService.keyRing:output_type -> protocol.HashNode
-	2, // 5: protocol.PostofficeService.request:output_type -> protocol.Response
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
+	0, // 3: protocol.PostofficeService.receive:input_type -> protocol.Request
+	1, // 4: protocol.PostofficeService.hashRing:output_type -> protocol.HashNode
+	1, // 5: protocol.PostofficeService.keyRing:output_type -> protocol.HashNode
+	2, // 6: protocol.PostofficeService.request:output_type -> protocol.Response
+	2, // 7: protocol.PostofficeService.receive:output_type -> protocol.Response
+	4, // [4:8] is the sub-list for method output_type
+	0, // [0:4] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

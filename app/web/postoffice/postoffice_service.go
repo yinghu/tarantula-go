@@ -78,7 +78,6 @@ func (s *PostofficeService) Start(env core.Env, p core.Pusher) error {
 	http.Handle("/postoffice/query/{id}", bootstrap.Logging(&PostofficeQueryer{PostofficeService: s}))
 	http.Handle("/postoffice/recover/{id}", bootstrap.Logging(&PostofficeRecoverer{PostofficeService: s}))
 	http.Handle("/postoffice/load/{id}", bootstrap.Logging(&PostofficeLoader{PostofficeService: s}))
-	s.Subscribe("message", s)
 	return nil
 }
 

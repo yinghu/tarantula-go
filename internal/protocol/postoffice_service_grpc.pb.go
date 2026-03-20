@@ -22,6 +22,7 @@ const (
 	PostofficeService_HashRing_FullMethodName = "/protocol.PostofficeService/hashRing"
 	PostofficeService_KeyRing_FullMethodName  = "/protocol.PostofficeService/keyRing"
 	PostofficeService_Request_FullMethodName  = "/protocol.PostofficeService/request"
+	PostofficeService_Receive_FullMethodName  = "/protocol.PostofficeService/receive"
 )
 
 // PostofficeServiceClient is the client API for PostofficeService service.
@@ -32,6 +33,7 @@ type PostofficeServiceClient interface {
 	HashRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error)
 	KeyRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error)
 	Request(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error)
+	Receive(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error)
 }
 
 type postofficeServiceClient struct {
@@ -99,6 +101,25 @@ func (c *postofficeServiceClient) Request(ctx context.Context, in *Request, opts
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type PostofficeService_RequestClient = grpc.ServerStreamingClient[Response]
 
+func (c *postofficeServiceClient) Receive(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &PostofficeService_ServiceDesc.Streams[3], PostofficeService_Receive_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[Request, Response]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type PostofficeService_ReceiveClient = grpc.ServerStreamingClient[Response]
+
 // PostofficeServiceServer is the server API for PostofficeService service.
 // All implementations must embed UnimplementedPostofficeServiceServer
 // for forward compatibility.
@@ -107,6 +128,7 @@ type PostofficeServiceServer interface {
 	HashRing(*Request, grpc.ServerStreamingServer[HashNode]) error
 	KeyRing(*Request, grpc.ServerStreamingServer[HashNode]) error
 	Request(*Request, grpc.ServerStreamingServer[Response]) error
+	Receive(*Request, grpc.ServerStreamingServer[Response]) error
 	mustEmbedUnimplementedPostofficeServiceServer()
 }
 
@@ -125,6 +147,9 @@ func (UnimplementedPostofficeServiceServer) KeyRing(*Request, grpc.ServerStreami
 }
 func (UnimplementedPostofficeServiceServer) Request(*Request, grpc.ServerStreamingServer[Response]) error {
 	return status.Error(codes.Unimplemented, "method Request not implemented")
+}
+func (UnimplementedPostofficeServiceServer) Receive(*Request, grpc.ServerStreamingServer[Response]) error {
+	return status.Error(codes.Unimplemented, "method Receive not implemented")
 }
 func (UnimplementedPostofficeServiceServer) mustEmbedUnimplementedPostofficeServiceServer() {}
 func (UnimplementedPostofficeServiceServer) testEmbeddedByValue()                           {}
@@ -180,6 +205,17 @@ func _PostofficeService_Request_Handler(srv interface{}, stream grpc.ServerStrea
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type PostofficeService_RequestServer = grpc.ServerStreamingServer[Response]
 
+func _PostofficeService_Receive_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Request)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(PostofficeServiceServer).Receive(m, &grpc.GenericServerStream[Request, Response]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type PostofficeService_ReceiveServer = grpc.ServerStreamingServer[Response]
+
 // PostofficeService_ServiceDesc is the grpc.ServiceDesc for PostofficeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -201,6 +237,11 @@ var PostofficeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "request",
 			Handler:       _PostofficeService_Request_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "receive",
+			Handler:       _PostofficeService_Receive_Handler,
 			ServerStreams: true,
 		},
 	},
