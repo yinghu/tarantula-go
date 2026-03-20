@@ -105,7 +105,9 @@ func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 		return err
 	}
 	s.rpc = tcp
-	go s.receive()
+	if s.Context() == "presence" {
+		go s.receive()
+	}
 	return nil
 }
 
@@ -355,7 +357,7 @@ func (c *AppManager) receive() {
 	for {
 		resp, err := stream.Recv()
 		if err == io.EOF {
-			core.AppLog.Debug().Msgf("eof %s",err.Error())
+			core.AppLog.Debug().Msgf("eof %s", err.Error())
 			break
 		}
 		if err != nil {
