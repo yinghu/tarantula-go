@@ -105,9 +105,7 @@ func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 		return err
 	}
 	s.rpc = tcp
-	if s.Context() == "presence" {
-		go s.receive()
-	}
+	go s.receive()
 	return nil
 }
 
