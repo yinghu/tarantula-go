@@ -119,7 +119,7 @@ func (s *PostofficeService) OnEvent(e core.Event) {
 func (s *PostofficeService) LocalStore() core.DataStore {
 	return s.Ds
 }
-func (s *PostofficeService) Publish(e core.Event) {
+func (s *PostofficeService) PublishX(e core.Event) {
 	s.outboundQ <- e
 }
 

@@ -15,7 +15,7 @@ type EventService interface {
 	EventCreator
 	VerifyTicket(ticket string) (OnSession, error)
 	EventListener
-	Send(e Event) error
+	Publish(e Event) error
 	List(q Query)
 	Subscribe(topic string, listener EventListener)
 }

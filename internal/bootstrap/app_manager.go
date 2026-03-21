@@ -133,7 +133,7 @@ func (s *AppManager) VerifyTicket(ticket string) (core.OnSession, error) {
 	}
 	return session, nil
 }
-func (s *AppManager) Send(e core.Event) error {
+func (s *AppManager) Publish(e core.Event) error {
 	k, v, err := core.Export(e, 200)
 	if err != nil {
 		return err

@@ -36,5 +36,5 @@ func (s *PostofficePublisher) Request(rs core.OnSession, w http.ResponseWriter, 
 		return
 	}
 	w.Write(util.ToJson(core.OnSession{Successful: true, Message: topic}))
-	s.Publish(me)
+	s.PublishX(me)
 }
