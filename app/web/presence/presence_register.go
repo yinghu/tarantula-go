@@ -49,7 +49,7 @@ func (s *PresenceRegister) Register(login bootstrap.Login) {
 		me.OnOId(id)
 		me.RegisterTime = time.Now()
 		me.OnTopic("login")
-		s.Send(&me)
+		s.Publish(&me)
 		rw := item.OnInventory{SystemId: login.SystemId, ItemId: s.LoginReward.Id, Source: "login"}
 		err = s.ItemService().InventoryManager().Grant(rw)
 		if err != nil {
