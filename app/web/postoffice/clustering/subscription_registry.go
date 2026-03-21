@@ -25,7 +25,7 @@ type SubscriptionRegistry struct {
 	running       bool
 }
 
-func (s SubscriptionRegistry) Start() {
+func (s SubscriptionRegistry) Register() {
 	core.AppLog.Warn().Msg("subscription registry started")
 	s.register = make(chan core.Subscription, NODE_EVENT_BUFFER_SIZE)
 	s.request = make(chan TopicRequest, NODE_EVENT_BUFFER_SIZE)
