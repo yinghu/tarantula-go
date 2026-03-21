@@ -88,11 +88,13 @@ func (m *DataServiceProvider) RingUpdated() {
 					}
 				} else {
 					core.AppLog.Debug().Msgf("register subscription %v", ds.Sub)
+					m.subReg.register <- ds.Sub
 				}
 			}
 		}
 	}
 	//shutdown server
+	m.subReg.running = false
 	for range SET_OPERATOR_NUM {
 		m.DSet <- SetData{Opt: core.SET_OPT_CLOSE}
 	}

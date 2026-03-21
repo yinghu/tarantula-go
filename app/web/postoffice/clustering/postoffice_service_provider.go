@@ -4,7 +4,6 @@ import (
 	context "context"
 	"fmt"
 	"io"
-	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
@@ -42,14 +41,19 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 
 func (c *DataServiceProvider) Receive(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
 	core.AppLog.Debug().Msg("starting publish")
+	aq := make(chan chan *protocol.Response, 2)
+	c.subReg.request <- TopicRequest{Opt: RECEIVER_START, Rev: aq}
+	ch := <-aq
+	close(aq)
 	for c.running {
-		core.AppLog.Debug().Msgf("sending message %s", string(request.Data.Key))
-		err := stream.Send(&protocol.Response{Successful: true, Message: string(request.Data.Key)})
-		if err != nil {
-			core.AppLog.Debug().Msgf("send error %s", err.Error())
-			break
+		for resp := range ch {
+			core.AppLog.Debug().Msgf("sending message %s", resp)
+			err := stream.Send(resp)
+			if err != nil {
+				core.AppLog.Debug().Msgf("send error %s", err.Error())
+				break
+			}
 		}
-		time.Sleep(5 * time.Second)
 	}
 	core.AppLog.Debug().Msg("stop publish")
 	return nil
@@ -60,7 +64,7 @@ func (c *DataServiceProvider) Subscribe(ctx context.Context, in *protocol.Topic)
 	return &protocol.Response{Successful: true, Message: "topic created"}, nil
 }
 func (c *DataServiceProvider) Unsubscribe(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Prefix:in.Prefix,Topic: in.Name, Endpoint: c.rpcEndpoint}}}
+	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Prefix: in.Prefix, Topic: in.Name, Endpoint: c.rpcEndpoint}}}
 	return &protocol.Response{Successful: true, Message: "topic removed"}, nil
 }
 
@@ -132,8 +136,9 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 		if !resp.Successful {
 			stream.Send(resp)
 		} else {
-			c.runPublish(request, rc)
-			resp = <-rc
+			//c.runPublish(request, rc)
+			//resp = <-rc
+			c.subReg.Messager <- resp
 			stream.Send(resp)
 		}
 	default:

@@ -145,13 +145,6 @@ func (s *AppManager) Publish(e core.Event) error {
 	aq := make(chan core.Chunk, 3)
 	req.Async = aq
 	defer close(aq)
-	//s.Cluster().Request(req)
-	//for c := range aq {
-	//if !c.Remaining {
-	//break
-	//}
-	//core.AppLog.Debug().Msgf("payload %v", c.Data)
-	//}
 	s.Cluster().Request(req)
 	for c := range aq {
 		if !c.Remaining {
