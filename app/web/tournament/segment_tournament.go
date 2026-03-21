@@ -96,5 +96,5 @@ func (t *SegmentSchedule) sendEvent(te event.TournamentEvent) {
 	e := event.TournamentEvent{TournamentId: te.TournamentId, InstanceId: te.InstanceId, SystemId: te.SystemId, Score: te.Score, LastUpdated: te.LastUpdated}
 	e.OnOId(id)
 	e.OnTopic("tournament")
-	t.Send(&e)
+	t.Publish(&e)
 }
