@@ -17,15 +17,16 @@ type TopicRequest struct {
 }
 
 type SubscriptionRegistry struct {
-	listeners map[string]chan *protocol.Response
-
-	register chan core.Subscription
-	request  chan TopicRequest
-	Messager  chan *protocol.Response
-	running  bool
+	listeners     map[string]chan *protocol.Response
+	subscriptions map[string][]core.Subscription
+	register      chan core.Subscription
+	request       chan TopicRequest
+	Messager      chan *protocol.Response
+	running       bool
 }
 
 func (s SubscriptionRegistry) Start() {
+	core.AppLog.Warn().Msg("subscription registry started")
 	s.register = make(chan core.Subscription, NODE_EVENT_BUFFER_SIZE)
 	s.request = make(chan TopicRequest, NODE_EVENT_BUFFER_SIZE)
 	s.Messager = make(chan *protocol.Response, NODE_EVENT_BUFFER_SIZE)
@@ -33,6 +34,12 @@ func (s SubscriptionRegistry) Start() {
 		select {
 		case sub := <-s.register:
 			core.AppLog.Debug().Msgf("subscription %v", sub)
+			esb, ok := s.subscriptions[sub.Topic]
+			if !ok {
+				esb = make([]core.Subscription, 0)
+			}
+			esb = append(esb, sub)
+			s.subscriptions[sub.Topic] = esb
 		case req := <-s.request:
 			core.AppLog.Debug().Msgf("request %v", req)
 			switch req.Opt {
@@ -41,6 +48,7 @@ func (s SubscriptionRegistry) Start() {
 				s.listeners[req.Name] = rev
 				req.Rev <- rev
 			case TOPIC_REGISTER:
+
 			}
 		case msg := <-s.Messager:
 			for n, ch := range s.listeners {

@@ -45,6 +45,7 @@ func (c *DataServiceProvider) Receive(request *protocol.Request, stream grpc.Ser
 	c.subReg.request <- TopicRequest{Opt: RECEIVER_START, Rev: aq}
 	ch := <-aq
 	close(aq)
+	core.AppLog.Debug().Msgf("starting publish on [%v]",ch)
 	for c.running {
 		for resp := range ch {
 			core.AppLog.Debug().Msgf("sending message %s", resp)
