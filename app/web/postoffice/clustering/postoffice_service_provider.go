@@ -125,9 +125,6 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 			}
 			stream.Send(resp)
 		}
-	//case core.SUBSCRIBE_REQUEST:
-	//c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Topic: string(request.Data.Key), Endpoint: c.rpcEndpoint}}}
-	//stream.Send(&protocol.Response{Successful: true, Message: fmt.Sprintf("topic [%s] subscription requested", string(request.Data.Key))})
 	case core.PUBLISH_REQUEST:
 		rc := make(chan *protocol.Response, 3)
 		defer close(rc)
@@ -136,9 +133,9 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 		if !resp.Successful {
 			stream.Send(resp)
 		} else {
-			//c.runPublish(request, rc)
-			//resp = <-rc
 			c.subReg.Messager <- resp
+			c.runPublish(request, rc)
+			resp = <-rc
 			stream.Send(resp)
 		}
 	default:
