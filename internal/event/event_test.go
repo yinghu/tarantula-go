@@ -32,7 +32,7 @@ func (s *SampleCreator) OnEvent(e core.Event) {
 	fmt.Printf("On event %v\n", e)
 
 }
-func (s *SampleCreator) Send(e core.Event) error {
+func (s *SampleCreator) Publish(e core.Event) error {
 	return nil
 }
 func (s *SampleCreator) List(q core.Query)    {}
