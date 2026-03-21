@@ -19,10 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PostofficeService_HashRing_FullMethodName = "/protocol.PostofficeService/hashRing"
-	PostofficeService_KeyRing_FullMethodName  = "/protocol.PostofficeService/keyRing"
-	PostofficeService_Request_FullMethodName  = "/protocol.PostofficeService/request"
-	PostofficeService_Receive_FullMethodName  = "/protocol.PostofficeService/receive"
+	PostofficeService_HashRing_FullMethodName    = "/protocol.PostofficeService/hashRing"
+	PostofficeService_KeyRing_FullMethodName     = "/protocol.PostofficeService/keyRing"
+	PostofficeService_Request_FullMethodName     = "/protocol.PostofficeService/request"
+	PostofficeService_Receive_FullMethodName     = "/protocol.PostofficeService/receive"
+	PostofficeService_Subscribe_FullMethodName   = "/protocol.PostofficeService/subscribe"
+	PostofficeService_Unsubscribe_FullMethodName = "/protocol.PostofficeService/unsubscribe"
 )
 
 // PostofficeServiceClient is the client API for PostofficeService service.
@@ -34,6 +36,8 @@ type PostofficeServiceClient interface {
 	KeyRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error)
 	Request(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error)
 	Receive(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error)
+	Subscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
+	Unsubscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
 }
 
 type postofficeServiceClient struct {
@@ -120,6 +124,26 @@ func (c *postofficeServiceClient) Receive(ctx context.Context, in *Request, opts
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type PostofficeService_ReceiveClient = grpc.ServerStreamingClient[Response]
 
+func (c *postofficeServiceClient) Subscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, PostofficeService_Subscribe_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postofficeServiceClient) Unsubscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, PostofficeService_Unsubscribe_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PostofficeServiceServer is the server API for PostofficeService service.
 // All implementations must embed UnimplementedPostofficeServiceServer
 // for forward compatibility.
@@ -129,6 +153,8 @@ type PostofficeServiceServer interface {
 	KeyRing(*Request, grpc.ServerStreamingServer[HashNode]) error
 	Request(*Request, grpc.ServerStreamingServer[Response]) error
 	Receive(*Request, grpc.ServerStreamingServer[Response]) error
+	Subscribe(context.Context, *Topic) (*Response, error)
+	Unsubscribe(context.Context, *Topic) (*Response, error)
 	mustEmbedUnimplementedPostofficeServiceServer()
 }
 
@@ -150,6 +176,12 @@ func (UnimplementedPostofficeServiceServer) Request(*Request, grpc.ServerStreami
 }
 func (UnimplementedPostofficeServiceServer) Receive(*Request, grpc.ServerStreamingServer[Response]) error {
 	return status.Error(codes.Unimplemented, "method Receive not implemented")
+}
+func (UnimplementedPostofficeServiceServer) Subscribe(context.Context, *Topic) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method Subscribe not implemented")
+}
+func (UnimplementedPostofficeServiceServer) Unsubscribe(context.Context, *Topic) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method Unsubscribe not implemented")
 }
 func (UnimplementedPostofficeServiceServer) mustEmbedUnimplementedPostofficeServiceServer() {}
 func (UnimplementedPostofficeServiceServer) testEmbeddedByValue()                           {}
@@ -216,13 +248,58 @@ func _PostofficeService_Receive_Handler(srv interface{}, stream grpc.ServerStrea
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type PostofficeService_ReceiveServer = grpc.ServerStreamingServer[Response]
 
+func _PostofficeService_Subscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Topic)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostofficeServiceServer).Subscribe(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostofficeService_Subscribe_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostofficeServiceServer).Subscribe(ctx, req.(*Topic))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PostofficeService_Unsubscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Topic)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostofficeServiceServer).Unsubscribe(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostofficeService_Unsubscribe_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostofficeServiceServer).Unsubscribe(ctx, req.(*Topic))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PostofficeService_ServiceDesc is the grpc.ServiceDesc for PostofficeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var PostofficeService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "protocol.PostofficeService",
 	HandlerType: (*PostofficeServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "subscribe",
+			Handler:    _PostofficeService_Subscribe_Handler,
+		},
+		{
+			MethodName: "unsubscribe",
+			Handler:    _PostofficeService_Unsubscribe_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "hashRing",

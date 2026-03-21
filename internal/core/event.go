@@ -17,7 +17,7 @@ type EventService interface {
 	EventListener
 	Publish(e Event) error
 	List(q Query)
-	Subscribe(topic string, listener EventListener)
+	Subscribe(topic string, listener EventListener) error
 }
 
 type Event interface {

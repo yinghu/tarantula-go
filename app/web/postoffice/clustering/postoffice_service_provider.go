@@ -51,9 +51,17 @@ func (c *DataServiceProvider) Receive(request *protocol.Request, stream grpc.Ser
 		}
 		time.Sleep(5 * time.Second)
 	}
-	//}()
 	core.AppLog.Debug().Msg("stop publish")
 	return nil
+}
+
+func (c *DataServiceProvider) Subscribe(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
+	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Prefix: in.Prefix, Topic: in.Name, Endpoint: c.rpcEndpoint}}}
+	return &protocol.Response{Successful: true, Message: "topic created"}, nil
+}
+func (c *DataServiceProvider) Unsubscribe(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
+	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Prefix:in.Prefix,Topic: in.Name, Endpoint: c.rpcEndpoint}}}
+	return &protocol.Response{Successful: true, Message: "topic removed"}, nil
 }
 
 func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
@@ -113,15 +121,21 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 			}
 			stream.Send(resp)
 		}
-	case core.SUBSCRIBE_REQUEST:
-		c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Topic: string(request.Data.Key), Endpoint: c.rpcEndpoint}}}
-		stream.Send(&protocol.Response{Successful: true, Message: fmt.Sprintf("topic [%s] subscription requested", string(request.Data.Key))})
+	//case core.SUBSCRIBE_REQUEST:
+	//c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Topic: string(request.Data.Key), Endpoint: c.rpcEndpoint}}}
+	//stream.Send(&protocol.Response{Successful: true, Message: fmt.Sprintf("topic [%s] subscription requested", string(request.Data.Key))})
 	case core.PUBLISH_REQUEST:
 		rc := make(chan *protocol.Response, 3)
 		defer close(rc)
-		c.runPublish(request, rc)
+		c.runCreate(request, rc)
 		resp := <-rc
-		stream.Send(resp)
+		if !resp.Successful {
+			stream.Send(resp)
+		} else {
+			c.runPublish(request, rc)
+			resp = <-rc
+			stream.Send(resp)
+		}
 	default:
 		stream.Send(&protocol.Response{Successful: false, Message: fmt.Sprintf("request opt not suuported %d", request.Opt)})
 	}

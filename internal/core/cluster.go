@@ -14,8 +14,8 @@ const (
 	QUERY_DATA_REQUEST  uint32 = 15
 
 	PULL_DATA_REQUEST uint32 = 16
-	SUBSCRIBE_REQUEST uint32 = 17
-	PUBLISH_REQUEST   uint32 = 18
+	//SUBSCRIBE_REQUEST uint32 = 17
+	PUBLISH_REQUEST uint32 = 18
 
 	DATA_STATE_READY   uint32 = 0
 	DATA_STATE_PENDING uint32 = 1
@@ -60,6 +60,7 @@ type RingRange struct {
 }
 
 type Subscription struct {
+	Prefix   string `json:"prefix"`
 	Topic    string `json:"topic"`
 	Endpoint string `json:"endpoint"`
 }

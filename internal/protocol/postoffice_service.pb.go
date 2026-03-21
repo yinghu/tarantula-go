@@ -24,30 +24,37 @@ var File_postoffice_service_proto protoreflect.FileDescriptor
 
 const file_postoffice_service_proto_rawDesc = "" +
 	"\n" +
-	"\x18postoffice_service.proto\x12\bprotocol\x1a\rrequest.proto\x1a\x0eresponse.proto\x1a\x0fhash_node.proto2\xec\x01\n" +
+	"\x18postoffice_service.proto\x12\bprotocol\x1a\rrequest.proto\x1a\x0eresponse.proto\x1a\x0fhash_node.proto\x1a\vtopic.proto2\xd6\x02\n" +
 	"\x11PostofficeService\x125\n" +
 	"\bhashRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01\x124\n" +
 	"\akeyRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01\x124\n" +
 	"\arequest\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x000\x01\x124\n" +
-	"\areceive\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x000\x01BS\n" +
+	"\areceive\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x000\x01\x122\n" +
+	"\tsubscribe\x12\x0f.protocol.Topic\x1a\x12.protocol.Response\"\x00\x124\n" +
+	"\vunsubscribe\x12\x0f.protocol.Topic\x1a\x12.protocol.Response\"\x00BS\n" +
 	"\x17com.icodesoftware.protoB\x12DataServiceFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var file_postoffice_service_proto_goTypes = []any{
 	(*Request)(nil),  // 0: protocol.Request
-	(*HashNode)(nil), // 1: protocol.HashNode
-	(*Response)(nil), // 2: protocol.Response
+	(*Topic)(nil),    // 1: protocol.Topic
+	(*HashNode)(nil), // 2: protocol.HashNode
+	(*Response)(nil), // 3: protocol.Response
 }
 var file_postoffice_service_proto_depIdxs = []int32{
 	0, // 0: protocol.PostofficeService.hashRing:input_type -> protocol.Request
 	0, // 1: protocol.PostofficeService.keyRing:input_type -> protocol.Request
 	0, // 2: protocol.PostofficeService.request:input_type -> protocol.Request
 	0, // 3: protocol.PostofficeService.receive:input_type -> protocol.Request
-	1, // 4: protocol.PostofficeService.hashRing:output_type -> protocol.HashNode
-	1, // 5: protocol.PostofficeService.keyRing:output_type -> protocol.HashNode
-	2, // 6: protocol.PostofficeService.request:output_type -> protocol.Response
-	2, // 7: protocol.PostofficeService.receive:output_type -> protocol.Response
-	4, // [4:8] is the sub-list for method output_type
-	0, // [0:4] is the sub-list for method input_type
+	1, // 4: protocol.PostofficeService.subscribe:input_type -> protocol.Topic
+	1, // 5: protocol.PostofficeService.unsubscribe:input_type -> protocol.Topic
+	2, // 6: protocol.PostofficeService.hashRing:output_type -> protocol.HashNode
+	2, // 7: protocol.PostofficeService.keyRing:output_type -> protocol.HashNode
+	3, // 8: protocol.PostofficeService.request:output_type -> protocol.Response
+	3, // 9: protocol.PostofficeService.receive:output_type -> protocol.Response
+	3, // 10: protocol.PostofficeService.subscribe:output_type -> protocol.Response
+	3, // 11: protocol.PostofficeService.unsubscribe:output_type -> protocol.Response
+	6, // [6:12] is the sub-list for method output_type
+	0, // [0:6] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -61,6 +68,7 @@ func file_postoffice_service_proto_init() {
 	file_request_proto_init()
 	file_response_proto_init()
 	file_hash_node_proto_init()
+	file_topic_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
