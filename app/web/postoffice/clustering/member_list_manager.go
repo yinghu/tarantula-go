@@ -72,6 +72,7 @@ func (m *MemberlistManager) Start() error {
 
 func (m *MemberlistManager) ShutdownHook() {
 	core.AppLog.Info().Msg("running shut down hook ...")
+	m.running = false
 	m.Leave(3 * time.Second)
 	time.Sleep(3 * time.Second)
 	m.Shutdown()

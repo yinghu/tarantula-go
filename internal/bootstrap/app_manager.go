@@ -29,6 +29,7 @@ type AppManager struct {
 	tcpPusher   core.Pusher
 	ManagedApps []string
 	rpc         *grpc.ClientConn
+	running     bool
 }
 
 func (s *AppManager) ItemService() item.ItemService {
@@ -62,6 +63,7 @@ func (s *AppManager) Name() string {
 }
 func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
+	s.running = true
 	s.ManagedApps = f.ManagedApps
 	s.tcpPusher = p
 	s.F = f
@@ -110,6 +112,7 @@ func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 }
 
 func (s *AppManager) Shutdown() {
+	s.running = false
 	s.rpc.Close()
 	util.GitPush()
 	s.Sql.Close()
@@ -351,8 +354,7 @@ func (c *AppManager) receive() {
 		core.AppLog.Warn().Msgf("rpc connection error %s", err.Error())
 		return
 	}
-	//crt := core.Chunk{Remaining: false}
-	for {
+	for c.running {
 		resp, err := stream.Recv()
 		if err == io.EOF {
 			core.AppLog.Debug().Msgf("eof %s", err.Error())
@@ -368,6 +370,5 @@ func (c *AppManager) receive() {
 		//r.Async <- core.Chunk{Remaining: true, Data: resp}
 	}
 	core.AppLog.Warn().Msg("rpc closed from remote")
-	//r.Async <- crt
 
 }

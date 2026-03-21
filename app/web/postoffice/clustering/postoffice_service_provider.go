@@ -41,9 +41,8 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 }
 
 func (c *DataServiceProvider) Receive(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
-	//go func() {
 	core.AppLog.Debug().Msg("starting publish")
-	for {
+	for c.running {
 		core.AppLog.Debug().Msgf("sending message %s", string(request.Data.Key))
 		err := stream.Send(&protocol.Response{Successful: true, Message: string(request.Data.Key)})
 		if err != nil {
@@ -53,7 +52,7 @@ func (c *DataServiceProvider) Receive(request *protocol.Request, stream grpc.Ser
 		time.Sleep(5 * time.Second)
 	}
 	//}()
-	//core.AppLog.Debug().Msg("stop publish")
+	core.AppLog.Debug().Msg("stop publish")
 	return nil
 }
 

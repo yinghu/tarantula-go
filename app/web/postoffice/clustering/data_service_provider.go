@@ -31,9 +31,10 @@ type DataServiceProvider struct {
 	backRing    NodeRing
 	rpcEndpoint string
 	//write worker chan
-	DSet  chan SetData
-	DPull chan core.RingSync
-	DWait sync.WaitGroup
+	DSet    chan SetData
+	DPull   chan core.RingSync
+	DWait   sync.WaitGroup
+	running bool
 }
 
 func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
@@ -171,6 +172,7 @@ func (c *DataServiceProvider) Publish(ctx context.Context, in *protocol.Request)
 }
 
 func (c *DataServiceProvider) Start(dir string) {
+	c.running = true
 	c.backRing = NodeRing{nodes: make([]core.Node, 0)}
 	path := fmt.Sprintf("%s/%s", dir, "store")
 	core.AppLog.Printf("creating path %s if not existed", path)
