@@ -61,5 +61,5 @@ func (s *InventoryGranter) sendEvent(e core.Event) {
 	oid, _ := s.Sequence().Id()
 	e.OnOId(oid)
 	e.OnTopic("inventory")
-	s.Send(e)
+	s.Publish(e)
 }
