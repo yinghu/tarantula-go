@@ -55,6 +55,7 @@ func (m *MemberlistManager) Start() error {
 	m.Memberlist = list
 	go m.Listen()
 	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode, RSync: rwSync}
+	m.DataServiceProvider.rpcEndpoint = fmt.Sprintf("%s:%d", string(m.LocalNode().Addr.String()), core.RPC_PORT)
 	m.Mll = &m.MemberListListener
 	m.Mll.DWait.Add(1)
 	go m.DataServiceProvider.Start(m.StoreDir)
@@ -65,7 +66,6 @@ func (m *MemberlistManager) Start() error {
 		core.AppLog.Printf("erorr on member join %s", err.Error())
 		return err
 	}
-	m.DataServiceProvider.rpcEndpoint = fmt.Sprintf("%s:%d", string(m.LocalNode().Addr.String()), core.RPC_PORT)
 	core.AppLog.Printf("total nodes have joined %d on local node  %s", joined, m.DataServiceProvider.rpcEndpoint)
 	return nil
 }
