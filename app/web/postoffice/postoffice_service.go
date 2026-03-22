@@ -71,12 +71,6 @@ func (s *PostofficeService) Start(env core.Env, p core.Pusher) error {
 	s.mm = &m
 	s.ready.Done()
 	core.AppLog.Printf("postoffice service started %s %s", env.HttpBinding, env.HomeDir)
-	//http.Handle("/postoffice/subscribe", bootstrap.Logging(&PostofficeSubscriber{PostofficeService: s}))
-	//http.Handle("/postoffice/unsubscribe", bootstrap.Logging(&PostofficeUnSubscriber{PostofficeService: s}))
-	//http.Handle("/postoffice/publish/{topic}/{cid}", bootstrap.Logging(&PostofficePublisher{PostofficeService: s}))
-	//http.Handle("/postoffice/query/{id}", bootstrap.Logging(&PostofficeQueryer{PostofficeService: s}))
-	//http.Handle("/postoffice/recover/{id}", bootstrap.Logging(&PostofficeRecoverer{PostofficeService: s}))
-	//http.Handle("/postoffice/load/{id}", bootstrap.Logging(&PostofficeLoader{PostofficeService: s}))
 	return nil
 }
 
@@ -118,9 +112,7 @@ func (s *PostofficeService) OnEvent(e core.Event) {
 func (s *PostofficeService) LocalStore() core.DataStore {
 	return s.Ds
 }
-func (s *PostofficeService) PublishX(e core.Event) {
-	s.outboundQ <- e
-}
+
 
 func (s *PostofficeService) NodeStarted(n core.Node) {
 	core.AppLog.Printf("node started : %s\n", n.TcpEndpoint)
