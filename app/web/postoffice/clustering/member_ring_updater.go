@@ -13,6 +13,17 @@ type RingUpdate struct {
 	Nodes []core.Node
 }
 
+const (
+	RECEIVER_START uint32 = 1
+	TOPIC_REGISTER uint32 = 2
+)
+
+type TopicRequest struct {
+	Opt  uint32
+	Name string
+	Rev  chan chan *protocol.Response
+}
+
 func (m *DataServiceProvider) balanceOnNodeAdded(added RingUpdate) {
 
 	if m.backRing.nodeNum == 0 {
@@ -99,7 +110,7 @@ func (m *DataServiceProvider) RingUpdated() {
 				}
 			}
 		case req := <-m.DRequest:
-			core.AppLog.Debug().Msgf("request %v", req)
+			core.AppLog.Debug().Msgf("request %s", req.Name)
 			switch req.Opt {
 			case RECEIVER_START:
 				rev := make(chan *protocol.Response, NODE_EVENT_BUFFER_SIZE)

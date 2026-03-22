@@ -127,19 +127,20 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 			stream.Send(resp)
 		}
 	case core.PUBLISH_REQUEST:
-		rc := make(chan *protocol.Response, 3)
-		defer close(rc)
-		c.runCreate(request, rc)
-		resp := <-rc
-		if !resp.Successful {
-			stream.Send(resp)
-		} else {
-			c.DMessager <- resp
-			c.runPublish(request, rc)
-			core.AppLog.Debug().Msgf("messaging out >%v", resp)
-			resp = <-rc
-			stream.Send(resp)
-		}
+		//rc := make(chan *protocol.Response, 3)
+		//defer close(rc)
+		//c.runCreate(request, rc)
+		//resp := <-rc
+		//if !resp.Successful {
+		//	stream.Send(resp)
+		//} else {
+		resp := protocol.Response{Successful: true, Message: "message published"}
+		c.DMessager <- &resp
+		//c.runPublish(request, rc)
+		core.AppLog.Debug().Msgf("messaging out %s", resp.Message)
+		//resp = <-rc
+		stream.Send(&resp)
+		//}
 	default:
 		stream.Send(&protocol.Response{Successful: false, Message: fmt.Sprintf("request opt not suuported %d", request.Opt)})
 	}
