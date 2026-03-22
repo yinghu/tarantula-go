@@ -138,13 +138,13 @@ func (s *AppManager) Publish(e core.Event) error {
 	if err != nil {
 		return err
 	}
-	data := protocol.Data{Key: k,Value: v,Header: &protocol.Header{}}
+	data := protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: e.FactoryId(),ClassId: e.ClassId()}}
 	dsp := protocol.NewPostofficeServiceClient(s.rpc)
-	resp, err := dsp.Publish(context.Background(), &protocol.Topic{Prefix: s.Context(), Name:e.Topic(),Event: &data})
+	resp, err := dsp.Publish(context.Background(), &protocol.Topic{Prefix: s.Context(), Name: e.Topic(), Event: &data})
 	if err != nil {
 		return err
 	}
-	core.AppLog.Debug().Msgf("topic registered %v", resp)
+	core.AppLog.Debug().Msgf("topic publish %v", resp)
 	return nil
 }
 func (s *AppManager) List(query core.Query) {
@@ -161,7 +161,6 @@ func (s *AppManager) OnError(e core.Event, err error) {
 
 }
 func (s *AppManager) Subscribe(topic string, listener core.EventListener) error {
-
 	dsp := protocol.NewPostofficeServiceClient(s.rpc)
 	resp, err := dsp.Subscribe(context.Background(), &protocol.Topic{Prefix: s.Context(), Name: topic})
 	if err != nil {
