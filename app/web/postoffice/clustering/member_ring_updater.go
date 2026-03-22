@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 )
 
 type RingUpdate struct {
@@ -88,13 +89,34 @@ func (m *DataServiceProvider) RingUpdated() {
 					}
 				} else {
 					core.AppLog.Debug().Msgf("register subscription %v", ds.Sub)
-					m.subReg.register <- ds.Sub
+					sub := ds.Sub
+					esb, ok := m.subscriptions[sub.Topic]
+					if !ok {
+						esb = make([]core.Subscription, 0)
+					}
+					esb = append(esb, sub)
+					m.subscriptions[sub.Topic] = esb
 				}
 			}
+		case req := <-m.PRequest:
+			core.AppLog.Debug().Msgf("request %v", req)
+			switch req.Opt {
+			case RECEIVER_START:
+				rev := make(chan *protocol.Response, NODE_EVENT_BUFFER_SIZE)
+				m.listeners[req.Name] = rev
+				req.Rev <- rev
+			case TOPIC_REGISTER:
+
+			}
+		case msg := <-m.PMessager:
+			for n, ch := range m.listeners {
+				core.AppLog.Debug().Msgf("send message to %s", n)
+				ch <- msg
+			}
 		}
+
 	}
 	//shutdown server
-	m.subReg.running = false
 	for range SET_OPERATOR_NUM {
 		m.DSet <- SetData{Opt: core.SET_OPT_CLOSE}
 	}

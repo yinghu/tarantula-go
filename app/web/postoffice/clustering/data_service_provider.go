@@ -35,7 +35,12 @@ type DataServiceProvider struct {
 	DPull   chan core.RingSync
 	DWait   sync.WaitGroup
 	running bool
-	subReg  *SubscriptionRegistry
+
+	//messaging
+	PMessager      chan *protocol.Response
+	subscriptions map[string][]core.Subscription
+	listeners     map[string]chan *protocol.Response
+	PRequest      chan TopicRequest
 }
 
 func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
@@ -182,8 +187,6 @@ func (c *DataServiceProvider) Start(dir string) {
 	for n := range SET_OPERATOR_NUM {
 		go c.runSetData(n)
 	}
-	c.subReg = &SubscriptionRegistry{running: true}
-	go c.subReg.Register()
 	tcp, err := net.Listen("tcp", fmt.Sprintf(":%d", core.RPC_PORT))
 	if err != nil {
 		panic(err)
