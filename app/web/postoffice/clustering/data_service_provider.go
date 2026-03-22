@@ -159,7 +159,7 @@ func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.Server
 	return nil
 }
 
-func (c *DataServiceProvider) Send(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
+func (c *DataServiceProvider) Send(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
 	//msg := make(chan *protocol.Response, 1)
 	//defer close(msg)
 	//setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}

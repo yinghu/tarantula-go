@@ -38,7 +38,7 @@ type DataServiceClient interface {
 	Create(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	Update(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	Delete(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
-	Send(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	Send(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
 }
 
 type dataServiceClient struct {
@@ -127,7 +127,7 @@ func (c *dataServiceClient) Delete(ctx context.Context, in *Request, opts ...grp
 	return out, nil
 }
 
-func (c *dataServiceClient) Send(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+func (c *dataServiceClient) Send(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Response)
 	err := c.cc.Invoke(ctx, DataService_Send_FullMethodName, in, out, cOpts...)
@@ -147,7 +147,7 @@ type DataServiceServer interface {
 	Create(context.Context, *Request) (*Response, error)
 	Update(context.Context, *Request) (*Response, error)
 	Delete(context.Context, *Request) (*Response, error)
-	Send(context.Context, *Request) (*Response, error)
+	Send(context.Context, *Topic) (*Response, error)
 	mustEmbedUnimplementedDataServiceServer()
 }
 
@@ -176,7 +176,7 @@ func (UnimplementedDataServiceServer) Update(context.Context, *Request) (*Respon
 func (UnimplementedDataServiceServer) Delete(context.Context, *Request) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedDataServiceServer) Send(context.Context, *Request) (*Response, error) {
+func (UnimplementedDataServiceServer) Send(context.Context, *Topic) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Send not implemented")
 }
 func (UnimplementedDataServiceServer) mustEmbedUnimplementedDataServiceServer() {}
@@ -295,7 +295,7 @@ func _DataService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 }
 
 func _DataService_Send_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
+	in := new(Topic)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -307,7 +307,7 @@ func _DataService_Send_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: DataService_Send_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DataServiceServer).Send(ctx, req.(*Request))
+		return srv.(DataServiceServer).Send(ctx, req.(*Topic))
 	}
 	return interceptor(ctx, in, info, handler)
 }

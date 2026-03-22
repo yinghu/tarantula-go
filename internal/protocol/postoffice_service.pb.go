@@ -24,14 +24,15 @@ var File_postoffice_service_proto protoreflect.FileDescriptor
 
 const file_postoffice_service_proto_rawDesc = "" +
 	"\n" +
-	"\x18postoffice_service.proto\x12\bprotocol\x1a\rrequest.proto\x1a\x0eresponse.proto\x1a\x0fhash_node.proto\x1a\vtopic.proto2\xd4\x02\n" +
+	"\x18postoffice_service.proto\x12\bprotocol\x1a\rrequest.proto\x1a\x0eresponse.proto\x1a\x0fhash_node.proto\x1a\vtopic.proto2\x86\x03\n" +
 	"\x11PostofficeService\x125\n" +
 	"\bhashRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01\x124\n" +
 	"\akeyRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01\x124\n" +
 	"\arequest\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x000\x01\x122\n" +
 	"\areceive\x12\x0f.protocol.Topic\x1a\x12.protocol.Response\"\x000\x01\x122\n" +
 	"\tsubscribe\x12\x0f.protocol.Topic\x1a\x12.protocol.Response\"\x00\x124\n" +
-	"\vunsubscribe\x12\x0f.protocol.Topic\x1a\x12.protocol.Response\"\x00BS\n" +
+	"\vunsubscribe\x12\x0f.protocol.Topic\x1a\x12.protocol.Response\"\x00\x120\n" +
+	"\apublish\x12\x0f.protocol.Topic\x1a\x12.protocol.Response\"\x00BS\n" +
 	"\x17com.icodesoftware.protoB\x12DataServiceFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var file_postoffice_service_proto_goTypes = []any{
@@ -47,14 +48,16 @@ var file_postoffice_service_proto_depIdxs = []int32{
 	1, // 3: protocol.PostofficeService.receive:input_type -> protocol.Topic
 	1, // 4: protocol.PostofficeService.subscribe:input_type -> protocol.Topic
 	1, // 5: protocol.PostofficeService.unsubscribe:input_type -> protocol.Topic
-	2, // 6: protocol.PostofficeService.hashRing:output_type -> protocol.HashNode
-	2, // 7: protocol.PostofficeService.keyRing:output_type -> protocol.HashNode
-	3, // 8: protocol.PostofficeService.request:output_type -> protocol.Response
-	3, // 9: protocol.PostofficeService.receive:output_type -> protocol.Response
-	3, // 10: protocol.PostofficeService.subscribe:output_type -> protocol.Response
-	3, // 11: protocol.PostofficeService.unsubscribe:output_type -> protocol.Response
-	6, // [6:12] is the sub-list for method output_type
-	0, // [0:6] is the sub-list for method input_type
+	1, // 6: protocol.PostofficeService.publish:input_type -> protocol.Topic
+	2, // 7: protocol.PostofficeService.hashRing:output_type -> protocol.HashNode
+	2, // 8: protocol.PostofficeService.keyRing:output_type -> protocol.HashNode
+	3, // 9: protocol.PostofficeService.request:output_type -> protocol.Response
+	3, // 10: protocol.PostofficeService.receive:output_type -> protocol.Response
+	3, // 11: protocol.PostofficeService.subscribe:output_type -> protocol.Response
+	3, // 12: protocol.PostofficeService.unsubscribe:output_type -> protocol.Response
+	3, // 13: protocol.PostofficeService.publish:output_type -> protocol.Response
+	7, // [7:14] is the sub-list for method output_type
+	0, // [0:7] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

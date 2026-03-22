@@ -25,6 +25,7 @@ type Topic struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Prefix        string                 `protobuf:"bytes,1,opt,name=prefix,proto3" json:"prefix,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Event         *Data                  `protobuf:"bytes,3,opt,name=event,proto3" json:"event,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -73,14 +74,23 @@ func (x *Topic) GetName() string {
 	return ""
 }
 
+func (x *Topic) GetEvent() *Data {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
 var File_topic_proto protoreflect.FileDescriptor
 
 const file_topic_proto_rawDesc = "" +
 	"\n" +
-	"\vtopic.proto\x12\bprotocol\"3\n" +
+	"\vtopic.proto\x12\bprotocol\x1a\n" +
+	"data.proto\"Y\n" +
 	"\x05Topic\x12\x16\n" +
 	"\x06prefix\x18\x01 \x01(\tR\x06prefix\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04nameBM\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12$\n" +
+	"\x05event\x18\x03 \x01(\v2\x0e.protocol.DataR\x05eventBM\n" +
 	"\x17com.icodesoftware.protoB\fTopicFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -98,13 +108,15 @@ func file_topic_proto_rawDescGZIP() []byte {
 var file_topic_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_topic_proto_goTypes = []any{
 	(*Topic)(nil), // 0: protocol.Topic
+	(*Data)(nil),  // 1: protocol.Data
 }
 var file_topic_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: protocol.Topic.event:type_name -> protocol.Data
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_topic_proto_init() }
@@ -112,6 +124,7 @@ func file_topic_proto_init() {
 	if File_topic_proto != nil {
 		return
 	}
+	file_data_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

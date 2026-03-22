@@ -25,6 +25,7 @@ const (
 	PostofficeService_Receive_FullMethodName     = "/protocol.PostofficeService/receive"
 	PostofficeService_Subscribe_FullMethodName   = "/protocol.PostofficeService/subscribe"
 	PostofficeService_Unsubscribe_FullMethodName = "/protocol.PostofficeService/unsubscribe"
+	PostofficeService_Publish_FullMethodName     = "/protocol.PostofficeService/publish"
 )
 
 // PostofficeServiceClient is the client API for PostofficeService service.
@@ -38,6 +39,7 @@ type PostofficeServiceClient interface {
 	Receive(ctx context.Context, in *Topic, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error)
 	Subscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
 	Unsubscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
+	Publish(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
 }
 
 type postofficeServiceClient struct {
@@ -144,6 +146,16 @@ func (c *postofficeServiceClient) Unsubscribe(ctx context.Context, in *Topic, op
 	return out, nil
 }
 
+func (c *postofficeServiceClient) Publish(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, PostofficeService_Publish_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PostofficeServiceServer is the server API for PostofficeService service.
 // All implementations must embed UnimplementedPostofficeServiceServer
 // for forward compatibility.
@@ -155,6 +167,7 @@ type PostofficeServiceServer interface {
 	Receive(*Topic, grpc.ServerStreamingServer[Response]) error
 	Subscribe(context.Context, *Topic) (*Response, error)
 	Unsubscribe(context.Context, *Topic) (*Response, error)
+	Publish(context.Context, *Topic) (*Response, error)
 	mustEmbedUnimplementedPostofficeServiceServer()
 }
 
@@ -182,6 +195,9 @@ func (UnimplementedPostofficeServiceServer) Subscribe(context.Context, *Topic) (
 }
 func (UnimplementedPostofficeServiceServer) Unsubscribe(context.Context, *Topic) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Unsubscribe not implemented")
+}
+func (UnimplementedPostofficeServiceServer) Publish(context.Context, *Topic) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method Publish not implemented")
 }
 func (UnimplementedPostofficeServiceServer) mustEmbedUnimplementedPostofficeServiceServer() {}
 func (UnimplementedPostofficeServiceServer) testEmbeddedByValue()                           {}
@@ -284,6 +300,24 @@ func _PostofficeService_Unsubscribe_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PostofficeService_Publish_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Topic)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostofficeServiceServer).Publish(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostofficeService_Publish_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostofficeServiceServer).Publish(ctx, req.(*Topic))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PostofficeService_ServiceDesc is the grpc.ServiceDesc for PostofficeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -298,6 +332,10 @@ var PostofficeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "unsubscribe",
 			Handler:    _PostofficeService_Unsubscribe_Handler,
+		},
+		{
+			MethodName: "publish",
+			Handler:    _PostofficeService_Publish_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

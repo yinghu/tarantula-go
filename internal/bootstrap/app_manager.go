@@ -138,20 +138,13 @@ func (s *AppManager) Publish(e core.Event) error {
 	if err != nil {
 		return err
 	}
-	req := core.DataRequest{Key: k, Value: v, Opt: core.PUBLISH_REQUEST}
-	req.Prefix = s.Cluster().RingToken([]byte(e.ETag()))
-	req.FactoryId = e.FactoryId()
-	req.ClassId = e.ClassId()
-	aq := make(chan core.Chunk, 3)
-	req.Async = aq
-	defer close(aq)
-	s.Cluster().Request(req)
-	for c := range aq {
-		if !c.Remaining {
-			break
-		}
-		core.AppLog.Debug().Msgf("payload %v", c.Data)
+	data := protocol.Data{Key: k,Value: v,Header: &protocol.Header{}}
+	dsp := protocol.NewPostofficeServiceClient(s.rpc)
+	resp, err := dsp.Publish(context.Background(), &protocol.Topic{Prefix: s.Context(), Name:e.Topic(),Event: &data})
+	if err != nil {
+		return err
 	}
+	core.AppLog.Debug().Msgf("topic registered %v", resp)
 	return nil
 }
 func (s *AppManager) List(query core.Query) {
