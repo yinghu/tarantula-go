@@ -42,10 +42,10 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 func (c *DataServiceProvider) Receive(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
 	core.AppLog.Debug().Msg("starting publish")
 	aq := make(chan chan *protocol.Response, 2)
-	c.DRequest <- TopicRequest{Opt: RECEIVER_START, Rev: aq}
+	c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: string(request.Data.Key), Rev: aq}
 	ch := <-aq
 	close(aq)
-	core.AppLog.Debug().Msgf("starting publish on [%v]", ch)
+	core.AppLog.Debug().Msgf("starting publish on [%s]", string(request.Data.Key))
 	for c.running {
 		for resp := range ch {
 			core.AppLog.Debug().Msgf("sending message %s", resp)
