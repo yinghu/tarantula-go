@@ -167,6 +167,7 @@ func (c *DataServiceProvider) Send(ctx context.Context, in *protocol.Request) (*
 	//resp := <-msg
 
 	c.DMessager <- &protocol.Response{Successful: true, Message: "message sent"}
+	core.AppLog.Debug().Msg("MESSAGE DISTRIBUTED")
 	return &protocol.Response{Successful: true, Message: "event published"}, nil
 }
 

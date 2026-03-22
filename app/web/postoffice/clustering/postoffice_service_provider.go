@@ -416,7 +416,7 @@ func (c *DataServiceProvider) runPublish(set *protocol.Request, ch chan *protoco
 func (m *DataServiceProvider) clientPublish(target *core.Subscription, request *protocol.Request) (*protocol.Response, error) {
 	tcp, err := grpc.NewClient(target.Endpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		return &protocol.Response{}, err
+		return &protocol.Response{Successful: false}, err
 	}
 	defer tcp.Close()
 	dsp := protocol.NewDataServiceClient(tcp)
