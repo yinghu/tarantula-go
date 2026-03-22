@@ -22,6 +22,7 @@ type TopicRequest struct {
 	Opt  uint32
 	Name string
 	Rev  chan chan *protocol.Response
+	Subs chan []core.Subscription
 }
 
 func (m *DataServiceProvider) balanceOnNodeAdded(added RingUpdate) {
@@ -117,7 +118,12 @@ func (m *DataServiceProvider) RingUpdated() {
 				m.listeners[req.Name] = rev
 				req.Rev <- rev
 			case TOPIC_REGISTER:
-
+				subs, ok := m.subscriptions[req.Name]
+				if ok {
+					req.Subs <- subs
+				} else {
+					req.Subs <- []core.Subscription{}
+				}
 			}
 		case msg := <-m.DMessager:
 			for n, ch := range m.listeners {

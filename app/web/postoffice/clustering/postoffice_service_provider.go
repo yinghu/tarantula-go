@@ -132,7 +132,7 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 		c.runPublish(request, rc)
 		resp := <-rc
 		stream.Send(resp)
-		
+
 	default:
 		stream.Send(&protocol.Response{Successful: false, Message: fmt.Sprintf("request opt not suuported %d", request.Opt)})
 	}
@@ -397,38 +397,24 @@ func (c *DataServiceProvider) runPull(target string, set *protocol.Request, ch c
 }
 
 func (c *DataServiceProvider) runPublish(set *protocol.Request, ch chan *protocol.Response) {
-	rq := make(chan []core.Node, 3)
+	rq := make(chan []core.Subscription, 3)
 	defer close(rq)
-	retry := RetryTrack{Reties: RETRY_MAX}
-	for retry.Reties > 0 {
-		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
-		nodes := <-rq
-		ringNode := nodes[0]
-		resp, err := c.clientPublish(&ringNode, set)
-		if err != nil {
-			retry.Err = err
-			retry.Reties--
-			continue
-		}
-		ch <- resp
-		retry.Suc = true
-		if !resp.Successful {
-			break
-		}
-		slaves := nodes[1:]
-		for _, slave := range slaves {
-			c.clientPublish(&slave, set)
-		}
-		break
+	c.DRequest <- TopicRequest{Opt: TOPIC_REGISTER, Subs: rq}
+	subs := <-rq
+	for _, sub := range subs {
+		core.AppLog.Debug().Msgf("send to %v", sub)
+		c.clientPublish(&sub, set)
 	}
-	if retry.Suc {
-		return
-	}
-	core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
-	ch <- &protocol.Response{Successful: false, Message: retry.Err.Error()}
+	//break
+	//}
+	//if retry.Suc {
+	//return
+	//}
+	//core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
+	ch <- &protocol.Response{Successful: true, Message: "published"}
 }
-func (m *DataServiceProvider) clientPublish(target *core.Node, request *protocol.Request) (*protocol.Response, error) {
-	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
+func (m *DataServiceProvider) clientPublish(target *core.Subscription, request *protocol.Request) (*protocol.Response, error) {
+	tcp, err := grpc.NewClient(target.Endpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return &protocol.Response{}, err
 	}
