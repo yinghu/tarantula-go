@@ -48,7 +48,7 @@ func (c *DataServiceProvider) Receive(request *protocol.Request, stream grpc.Ser
 	core.AppLog.Debug().Msgf("starting publish on [%s]", string(request.Data.Key))
 	for c.running {
 		for resp := range ch {
-			core.AppLog.Debug().Msgf("sending message %s", resp)
+			core.AppLog.Debug().Msgf("distributing message %s", resp)
 			err := stream.Send(resp)
 			if err != nil {
 				core.AppLog.Debug().Msgf("send error %s", err.Error())
