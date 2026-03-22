@@ -399,7 +399,7 @@ func (c *DataServiceProvider) runPull(target string, set *protocol.Request, ch c
 func (c *DataServiceProvider) runPublish(set *protocol.Request, ch chan *protocol.Response) {
 	rq := make(chan []core.Subscription, 3)
 	defer close(rq)
-	c.DRequest <- TopicRequest{Opt: TOPIC_REGISTER, Subs: rq}
+	c.DRequest <- TopicRequest{Opt: TOPIC_REGISTER, Subs: rq, Name: "message"}
 	subs := <-rq
 	for _, sub := range subs {
 		core.AppLog.Debug().Msgf("send to %v", sub)
