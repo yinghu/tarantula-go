@@ -24,12 +24,12 @@ var File_postoffice_service_proto protoreflect.FileDescriptor
 
 const file_postoffice_service_proto_rawDesc = "" +
 	"\n" +
-	"\x18postoffice_service.proto\x12\bprotocol\x1a\rrequest.proto\x1a\x0eresponse.proto\x1a\x0fhash_node.proto\x1a\vtopic.proto2\x86\x03\n" +
+	"\x18postoffice_service.proto\x12\bprotocol\x1a\rrequest.proto\x1a\x0eresponse.proto\x1a\x0fhash_node.proto\x1a\vtopic.proto2\x83\x03\n" +
 	"\x11PostofficeService\x125\n" +
 	"\bhashRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01\x124\n" +
 	"\akeyRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01\x124\n" +
-	"\arequest\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x000\x01\x122\n" +
-	"\areceive\x12\x0f.protocol.Topic\x1a\x12.protocol.Response\"\x000\x01\x122\n" +
+	"\arequest\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x000\x01\x12/\n" +
+	"\areceive\x12\x0f.protocol.Topic\x1a\x0f.protocol.Topic\"\x000\x01\x122\n" +
 	"\tsubscribe\x12\x0f.protocol.Topic\x1a\x12.protocol.Response\"\x00\x124\n" +
 	"\vunsubscribe\x12\x0f.protocol.Topic\x1a\x12.protocol.Response\"\x00\x120\n" +
 	"\apublish\x12\x0f.protocol.Topic\x1a\x12.protocol.Response\"\x00BS\n" +
@@ -52,7 +52,7 @@ var file_postoffice_service_proto_depIdxs = []int32{
 	2, // 7: protocol.PostofficeService.hashRing:output_type -> protocol.HashNode
 	2, // 8: protocol.PostofficeService.keyRing:output_type -> protocol.HashNode
 	3, // 9: protocol.PostofficeService.request:output_type -> protocol.Response
-	3, // 10: protocol.PostofficeService.receive:output_type -> protocol.Response
+	1, // 10: protocol.PostofficeService.receive:output_type -> protocol.Topic
 	3, // 11: protocol.PostofficeService.subscribe:output_type -> protocol.Response
 	3, // 12: protocol.PostofficeService.unsubscribe:output_type -> protocol.Response
 	3, // 13: protocol.PostofficeService.publish:output_type -> protocol.Response

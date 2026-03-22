@@ -39,9 +39,9 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 	return nil
 }
 
-func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerStreamingServer[protocol.Response]) error {
+func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerStreamingServer[protocol.Topic]) error {
 	core.AppLog.Debug().Msg("starting publish")
-	aq := make(chan chan *protocol.Response, 2)
+	aq := make(chan chan *protocol.Topic, 2)
 	c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: topic.Prefix, Rev: aq}
 	ch := <-aq
 	close(aq)

@@ -37,9 +37,9 @@ type DataServiceProvider struct {
 	running bool
 
 	//messaging
-	DMessager     chan *protocol.Response
+	DMessager     chan *protocol.Topic
 	subscriptions map[string][]core.Subscription
-	listeners     map[string]chan *protocol.Response
+	listeners     map[string]chan *protocol.Topic
 	DRequest      chan TopicRequest
 }
 
@@ -166,7 +166,7 @@ func (c *DataServiceProvider) Send(ctx context.Context, in *protocol.Topic) (*pr
 	//c.DSet <- setData
 	//resp := <-msg
 
-	c.DMessager <- &protocol.Response{Successful: true, Message: "message sent"}
+	c.DMessager <- in
 	core.AppLog.Debug().Msg("MESSAGE DISTRIBUTED")
 	return &protocol.Response{Successful: true, Message: "event published"}, nil
 }
@@ -185,9 +185,9 @@ func (c *DataServiceProvider) Start(dir string) {
 	if err != nil {
 		panic(err)
 	}
-	c.DMessager = make(chan *protocol.Response, NODE_EVENT_BUFFER_SIZE)
+	c.DMessager = make(chan *protocol.Topic, NODE_EVENT_BUFFER_SIZE)
 	c.DRequest = make(chan TopicRequest, NODE_EVENT_BUFFER_SIZE)
-	c.listeners = make(map[string]chan *protocol.Response)
+	c.listeners = make(map[string]chan *protocol.Topic)
 	c.subscriptions = make(map[string][]core.Subscription)
 
 	c.DSet = make(chan SetData, NODE_EVENT_BUFFER_SIZE)

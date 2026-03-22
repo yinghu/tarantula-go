@@ -21,7 +21,7 @@ const (
 type TopicRequest struct {
 	Opt  uint32
 	Name string
-	Rev  chan chan *protocol.Response
+	Rev  chan chan *protocol.Topic
 	Subs chan []core.Subscription
 }
 
@@ -114,7 +114,7 @@ func (m *DataServiceProvider) RingUpdated() {
 			core.AppLog.Debug().Msgf("request %s", req.Name)
 			switch req.Opt {
 			case RECEIVER_START:
-				rev := make(chan *protocol.Response, NODE_EVENT_BUFFER_SIZE)
+				rev := make(chan *protocol.Topic, NODE_EVENT_BUFFER_SIZE)
 				m.listeners[req.Name] = rev
 				req.Rev <- rev
 			case TOPIC_REGISTER:
