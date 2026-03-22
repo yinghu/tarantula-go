@@ -37,10 +37,10 @@ type DataServiceProvider struct {
 	running bool
 
 	//messaging
-	PMessager      chan *protocol.Response
+	DMessager     chan *protocol.Response
 	subscriptions map[string][]core.Subscription
 	listeners     map[string]chan *protocol.Response
-	PRequest      chan TopicRequest
+	DRequest      chan TopicRequest
 }
 
 func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
@@ -182,6 +182,11 @@ func (c *DataServiceProvider) Start(dir string) {
 	if err != nil {
 		panic(err)
 	}
+	c.DMessager = make(chan *protocol.Response, NODE_EVENT_BUFFER_SIZE)
+	c.DRequest = make(chan TopicRequest, NODE_EVENT_BUFFER_SIZE)
+	c.listeners = make(map[string]chan *protocol.Response)
+	c.subscriptions = make(map[string][]core.Subscription)
+	
 	c.DSet = make(chan SetData, NODE_EVENT_BUFFER_SIZE)
 	c.DPull = make(chan core.RingSync, NODE_EVENT_BUFFER_SIZE)
 	for n := range SET_OPERATOR_NUM {

@@ -98,7 +98,7 @@ func (m *DataServiceProvider) RingUpdated() {
 					m.subscriptions[sub.Topic] = esb
 				}
 			}
-		case req := <-m.PRequest:
+		case req := <-m.DRequest:
 			core.AppLog.Debug().Msgf("request %v", req)
 			switch req.Opt {
 			case RECEIVER_START:
@@ -108,7 +108,7 @@ func (m *DataServiceProvider) RingUpdated() {
 			case TOPIC_REGISTER:
 
 			}
-		case msg := <-m.PMessager:
+		case msg := <-m.DMessager:
 			for n, ch := range m.listeners {
 				core.AppLog.Debug().Msgf("send message to %s", n)
 				ch <- msg
