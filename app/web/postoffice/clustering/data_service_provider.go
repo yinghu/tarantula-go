@@ -159,12 +159,14 @@ func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.Server
 	return nil
 }
 
-func (c *DataServiceProvider) Publish(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
+func (c *DataServiceProvider) Send(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
 	//msg := make(chan *protocol.Response, 1)
 	//defer close(msg)
 	//setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
 	//c.DSet <- setData
 	//resp := <-msg
+
+	c.DMessager <- &protocol.Response{Successful: true, Message: "message sent"}
 	return &protocol.Response{Successful: true, Message: "event published"}, nil
 }
 
@@ -186,7 +188,7 @@ func (c *DataServiceProvider) Start(dir string) {
 	c.DRequest = make(chan TopicRequest, NODE_EVENT_BUFFER_SIZE)
 	c.listeners = make(map[string]chan *protocol.Response)
 	c.subscriptions = make(map[string][]core.Subscription)
-	
+
 	c.DSet = make(chan SetData, NODE_EVENT_BUFFER_SIZE)
 	c.DPull = make(chan core.RingSync, NODE_EVENT_BUFFER_SIZE)
 	for n := range SET_OPERATOR_NUM {
