@@ -39,11 +39,6 @@ type EventCreator interface {
 	Create(classId uint32, topic string) (Event, error)
 }
 
-type Publisher interface {
-	Publish(e Event, ticket string) error
-	Connect() error
-	Close() error
-}
 
 type Pusher interface {
 	Push(e Event)

@@ -36,9 +36,12 @@ func (s *SampleCreator) Publish(e core.Event) error {
 	return nil
 }
 func (s *SampleCreator) List(q core.Query)    {}
-func (s *SampleCreator) Recover(q core.Query) {}
+//func (s *SampleCreator) Recover(q core.Query) {}
 func (s *SampleCreator) Load(e core.Query)    {}
-func (s *SampleCreator) Subscribe(topic string, lis core.EventListener)
+func (s *SampleCreator) Subscribe(topic string, lis core.EventListener) error {
+	return nil
+}
+
 func createEvent() core.Event {
 	sub := SubscriptionEvent{}
 	return &sub
