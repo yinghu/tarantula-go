@@ -129,6 +129,7 @@ func (m *DataServiceProvider) RingUpdated() {
 				}
 			}
 		case msg := <-m.DMessager:
+			core.AppLog.Debug().Msgf("dispatching event %v", msg)
 			target, ok := m.listeners[msg.Tag]
 			if ok {
 				target <- msg
