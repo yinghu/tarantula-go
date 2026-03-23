@@ -138,7 +138,7 @@ func (s *AppManager) Publish(e core.Event) error {
 	if err != nil {
 		return err
 	}
-	data := protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: e.FactoryId(),ClassId: e.ClassId()}}
+	data := protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: e.FactoryId(), ClassId: e.ClassId()}}
 	dsp := protocol.NewPostofficeServiceClient(s.rpc)
 	resp, err := dsp.Publish(context.Background(), &protocol.Topic{Prefix: s.Context(), Name: e.Topic(), Event: &data})
 	if err != nil {
@@ -167,6 +167,16 @@ func (s *AppManager) Subscribe(topic string, listener core.EventListener) error 
 		return err
 	}
 	core.AppLog.Debug().Msgf("topic registered %v", resp)
+	return nil
+}
+
+func (s *AppManager) Unsubscribe(topic string) error {
+	dsp := protocol.NewPostofficeServiceClient(s.rpc)
+	resp, err := dsp.Unsubscribe(context.Background(), &protocol.Topic{Prefix: s.Context(), Name: topic})
+	if err != nil {
+		return err
+	}
+	core.AppLog.Debug().Msgf("topic unregistered %v", resp)
 	return nil
 }
 

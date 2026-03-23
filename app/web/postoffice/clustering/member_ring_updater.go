@@ -102,12 +102,16 @@ func (m *DataServiceProvider) RingUpdated() {
 				} else {
 					core.AppLog.Debug().Msgf("register subscription %v", ds.Sub)
 					sub := ds.Sub
-					esb, ok := m.subscriptions[sub.Topic]
-					if !ok {
-						esb = make([]core.Subscription, 0)
+					if ds.Sub.Deleting {
+						delete(m.subscriptions,sub.Topic)
+					} else {
+						esb, ok := m.subscriptions[sub.Topic]
+						if !ok {
+							esb = make([]core.Subscription, 0)
+						}
+						esb = append(esb, sub)
+						m.subscriptions[sub.Topic] = esb
 					}
-					esb = append(esb, sub)
-					m.subscriptions[sub.Topic] = esb
 				}
 			}
 		case req := <-m.DRequest:

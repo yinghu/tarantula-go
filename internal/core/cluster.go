@@ -14,7 +14,7 @@ const (
 	QUERY_DATA_REQUEST  uint32 = 15
 
 	PULL_DATA_REQUEST uint32 = 16
-	
+
 	DATA_STATE_READY   uint32 = 0
 	DATA_STATE_PENDING uint32 = 1
 	DATA_STATE_DELETED uint32 = 2
@@ -61,6 +61,7 @@ type Subscription struct {
 	Prefix   string `json:"prefix"`
 	Topic    string `json:"topic"`
 	Endpoint string `json:"endpoint"`
+	Deleting bool   `json:"deleting"`
 }
 
 type RingSync struct {

@@ -40,15 +40,14 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 }
 
 func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerStreamingServer[protocol.Topic]) error {
-	core.AppLog.Debug().Msg("starting publish")
 	aq := make(chan chan *protocol.Topic, 2)
 	c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: topic.Prefix, Rev: aq}
 	ch := <-aq
 	close(aq)
-	core.AppLog.Debug().Msgf("starting publish on [%s]", topic.Prefix)
+	core.AppLog.Debug().Msgf("start event receiver on [%s]", topic.Prefix)
+	defer close(ch)
 	for c.running {
 		for resp := range ch {
-			core.AppLog.Debug().Msgf("distributing message %s", resp)
 			err := stream.Send(resp)
 			if err != nil {
 				core.AppLog.Debug().Msgf("send error %s", err.Error())
@@ -56,16 +55,13 @@ func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerS
 			}
 		}
 	}
-	core.AppLog.Debug().Msg("stop publish")
+	core.AppLog.Debug().Msgf("stop evnt receiver from on [%s]", topic.Prefix)
 	return nil
 }
 
 func (c *DataServiceProvider) Publish(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	//c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Prefix: in.Prefix, Topic: in.Name, Endpoint: c.rpcEndpoint}}}
-	aq := make(chan *protocol.Response, 2)
-	c.runPublish(in, aq)
-	<-aq
-	return &protocol.Response{Successful: true, Message: "topic created"}, nil
+	go c.runPublish(in)
+	return &protocol.Response{Successful: true, Message: "topic event dispatched"}, nil
 }
 
 func (c *DataServiceProvider) Subscribe(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
@@ -73,7 +69,7 @@ func (c *DataServiceProvider) Subscribe(ctx context.Context, in *protocol.Topic)
 	return &protocol.Response{Successful: true, Message: "topic created"}, nil
 }
 func (c *DataServiceProvider) Unsubscribe(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Prefix: in.Prefix, Topic: in.Name, Endpoint: c.rpcEndpoint}}}
+	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Prefix: in.Prefix, Topic: in.Name, Endpoint: c.rpcEndpoint, Deleting: true}}}
 	return &protocol.Response{Successful: true, Message: "topic removed"}, nil
 }
 
@@ -134,13 +130,6 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 			}
 			stream.Send(resp)
 		}
-	//case core.PUBLISH_REQUEST:
-	//rc := make(chan *protocol.Response, 3)
-	//defer close(rc)
-	//c.runPublish(request, rc)
-	//resp := <-rc
-	//stream.Send(resp)
-
 	default:
 		stream.Send(&protocol.Response{Successful: false, Message: fmt.Sprintf("request opt not suuported %d", request.Opt)})
 	}
@@ -404,22 +393,14 @@ func (c *DataServiceProvider) runPull(target string, set *protocol.Request, ch c
 	ch <- &crt
 }
 
-func (c *DataServiceProvider) runPublish(set *protocol.Topic, ch chan *protocol.Response) {
+func (c *DataServiceProvider) runPublish(topic *protocol.Topic) {
 	rq := make(chan []core.Subscription, 3)
 	defer close(rq)
-	c.DRequest <- TopicRequest{Opt: TOPIC_REGISTER, Subs: rq, Name: set.Name}
+	c.DRequest <- TopicRequest{Opt: TOPIC_REGISTER, Subs: rq, Name: topic.Name}
 	subs := <-rq
 	for _, sub := range subs {
-		core.AppLog.Debug().Msgf("send to %v", sub)
-		c.clientPublish(&sub, set)
+		c.clientPublish(&sub, topic)
 	}
-	//break
-	//}
-	//if retry.Suc {
-	//return
-	//}
-	//core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
-	ch <- &protocol.Response{Successful: true, Message: "published"}
 }
 func (m *DataServiceProvider) clientPublish(target *core.Subscription, request *protocol.Topic) (*protocol.Response, error) {
 	tcp, err := grpc.NewClient(target.Endpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))

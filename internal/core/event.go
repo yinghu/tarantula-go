@@ -18,6 +18,7 @@ type EventService interface {
 	Publish(e Event) error
 	List(q Query)
 	Subscribe(topic string, listener EventListener) error
+	Unsubscribe(topic string) error
 }
 
 type Event interface {
@@ -38,7 +39,6 @@ type Event interface {
 type EventCreator interface {
 	Create(classId uint32, topic string) (Event, error)
 }
-
 
 type Pusher interface {
 	Push(e Event)
