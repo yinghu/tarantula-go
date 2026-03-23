@@ -46,15 +46,15 @@ func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerS
 	close(aq)
 	core.AppLog.Debug().Msgf("start event receiver on [%s]", topic.Tag)
 	defer close(ch)
-	for c.running {
-		for resp := range ch {
-			err := stream.Send(resp)
-			if err != nil {
-				core.AppLog.Debug().Msgf("send error %s", err.Error())
-				break
-			}
+	//for c.running {
+	for resp := range ch {
+		err := stream.Send(resp)
+		if err != nil {
+			core.AppLog.Debug().Msgf("send error %s", err.Error())
+			break
 		}
 	}
+	//}
 	core.AppLog.Debug().Msgf("stop evnt receiver from on [%s]", topic.Tag)
 	return nil
 }
