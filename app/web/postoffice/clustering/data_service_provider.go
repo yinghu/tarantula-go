@@ -160,14 +160,7 @@ func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.Server
 }
 
 func (c *DataServiceProvider) Send(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	//msg := make(chan *protocol.Response, 1)
-	//defer close(msg)
-	//setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
-	//c.DSet <- setData
-	//resp := <-msg
-
 	c.DMessager <- in
-	core.AppLog.Debug().Msg("MESSAGE DISTRIBUTED")
 	return &protocol.Response{Successful: true, Message: "event published"}, nil
 }
 

@@ -127,7 +127,7 @@ func (m *DataServiceProvider) RingUpdated() {
 			}
 		case msg := <-m.DMessager:
 			for n, ch := range m.listeners {
-				core.AppLog.Debug().Msgf("send message to %s", n)
+				core.AppLog.Debug().Msgf("send message to %s %s %s", n, msg.Prefix, msg.Name)
 				ch <- msg
 			}
 		}
