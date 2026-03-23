@@ -353,12 +353,17 @@ func (c *AppManager) receive() {
 		}
 		if err != nil {
 			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
-			//crt.Data = err
 			break
 		}
 		core.AppLog.Debug().Msgf("REV %v", resp)
-		//c.OnEvent(&event.MessageEvent{})
-		//r.Async <- core.Chunk{Remaining: true, Data: resp}
+		data := resp.Event
+		e := event.CreateEvent(data.Header.ClassId)
+		err = core.Import(e,data.Key,data.Value,200)
+		if err!=nil{
+			core.AppLog.Debug().Msgf("event parse error %s",err.Error())
+		}else{
+			c.OnEvent(e)
+		}
 	}
 	core.AppLog.Warn().Msg("rpc closed from remote")
 

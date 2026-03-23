@@ -41,6 +41,9 @@ func (s *SampleCreator) Load(e core.Query)    {}
 func (s *SampleCreator) Subscribe(topic string, lis core.EventListener) error {
 	return nil
 }
+func (s *SampleCreator) Unsubscribe(topic string) error {
+	return nil
+}
 
 func createEvent() core.Event {
 	sub := SubscriptionEvent{}
