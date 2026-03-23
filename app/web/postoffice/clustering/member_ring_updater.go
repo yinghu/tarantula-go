@@ -16,6 +16,7 @@ type RingUpdate struct {
 const (
 	RECEIVER_START uint32 = 1
 	TOPIC_REGISTER uint32 = 2
+	RECEIVER_END   uint32 = 3
 )
 
 type TopicRequest struct {
@@ -120,6 +121,9 @@ func (m *DataServiceProvider) RingUpdated() {
 				rev := make(chan *protocol.Topic, NODE_EVENT_BUFFER_SIZE)
 				m.listeners[req.Name] = rev
 				req.Rev <- rev
+			case RECEIVER_END:
+				delete(m.listeners, req.Name)
+				core.AppLog.Debug().Msgf("listener removed %s", req.Name)
 			case TOPIC_REGISTER:
 				subs, ok := m.subscriptions[req.Name]
 				if ok {
