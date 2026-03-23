@@ -60,7 +60,7 @@ func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerS
 }
 
 func (c *DataServiceProvider) Publish(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	go c.runPublish(in)
+	c.runPublish(in)
 	return &protocol.Response{Successful: true, Message: "topic event dispatched"}, nil
 }
 

@@ -140,7 +140,7 @@ func (s *AppManager) Publish(e core.Event) error {
 	}
 	data := protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: e.FactoryId(), ClassId: e.ClassId()}}
 	dsp := protocol.NewPostofficeServiceClient(s.rpc)
-	resp, err := dsp.Publish(context.Background(), &protocol.Topic{Tag: s.Context(), Name: e.Topic(), Event: &data})
+	resp, err := dsp.Publish(context.Background(), &protocol.Topic{Tag: e.ETag(), Name: e.Topic(), Event: &data})
 	if err != nil {
 		return err
 	}
@@ -357,10 +357,10 @@ func (c *AppManager) receive() {
 		}
 		data := resp.Event
 		e := event.CreateEvent(data.Header.ClassId)
-		err = core.Import(e,data.Key,data.Value,200)
-		if err!=nil{
-			core.AppLog.Debug().Msgf("event parse error %s",err.Error())
-		}else{
+		err = core.Import(e, data.Key, data.Value, 200)
+		if err != nil {
+			core.AppLog.Debug().Msgf("event parse error %s", err.Error())
+		} else {
 			c.OnEvent(e)
 		}
 	}

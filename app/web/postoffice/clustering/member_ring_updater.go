@@ -103,7 +103,7 @@ func (m *DataServiceProvider) RingUpdated() {
 					core.AppLog.Debug().Msgf("register subscription %v", ds.Sub)
 					sub := ds.Sub
 					if ds.Sub.Deleting {
-						delete(m.subscriptions,sub.Topic)
+						delete(m.subscriptions, sub.Topic)
 					} else {
 						esb, ok := m.subscriptions[sub.Topic]
 						if !ok {
@@ -115,7 +115,6 @@ func (m *DataServiceProvider) RingUpdated() {
 				}
 			}
 		case req := <-m.DRequest:
-			core.AppLog.Debug().Msgf("request %s", req.Name)
 			switch req.Opt {
 			case RECEIVER_START:
 				rev := make(chan *protocol.Topic, NODE_EVENT_BUFFER_SIZE)
@@ -130,9 +129,13 @@ func (m *DataServiceProvider) RingUpdated() {
 				}
 			}
 		case msg := <-m.DMessager:
-			for n, ch := range m.listeners {
-				core.AppLog.Debug().Msgf("send message to %s %s %s", n, msg.Tag, msg.Name)
-				ch <- msg
+			target, ok := m.listeners[msg.Tag]
+			if ok {
+				target <- msg
+			} else {
+				for _, ch := range m.listeners {
+					ch <- msg
+				}
 			}
 		}
 
