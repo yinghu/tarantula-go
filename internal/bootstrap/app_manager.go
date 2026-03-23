@@ -140,7 +140,7 @@ func (s *AppManager) Publish(e core.Event) error {
 	}
 	data := protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: e.FactoryId(), ClassId: e.ClassId()}}
 	dsp := protocol.NewPostofficeServiceClient(s.rpc)
-	resp, err := dsp.Publish(context.Background(), &protocol.Topic{Prefix: s.Context(), Name: e.Topic(), Event: &data})
+	resp, err := dsp.Publish(context.Background(), &protocol.Topic{Tag: s.Context(), Name: e.Topic(), Event: &data})
 	if err != nil {
 		return err
 	}
@@ -162,7 +162,7 @@ func (s *AppManager) OnError(e core.Event, err error) {
 }
 func (s *AppManager) Subscribe(topic string, listener core.EventListener) error {
 	dsp := protocol.NewPostofficeServiceClient(s.rpc)
-	resp, err := dsp.Subscribe(context.Background(), &protocol.Topic{Prefix: s.Context(), Name: topic})
+	resp, err := dsp.Subscribe(context.Background(), &protocol.Topic{Tag: s.Context(), Name: topic})
 	if err != nil {
 		return err
 	}
@@ -172,7 +172,7 @@ func (s *AppManager) Subscribe(topic string, listener core.EventListener) error 
 
 func (s *AppManager) Unsubscribe(topic string) error {
 	dsp := protocol.NewPostofficeServiceClient(s.rpc)
-	resp, err := dsp.Unsubscribe(context.Background(), &protocol.Topic{Prefix: s.Context(), Name: topic})
+	resp, err := dsp.Unsubscribe(context.Background(), &protocol.Topic{Tag: s.Context(), Name: topic})
 	if err != nil {
 		return err
 	}
@@ -340,7 +340,7 @@ func (c *AppManager) Request(r core.DataRequest) {
 
 func (c *AppManager) receive() {
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	stream, err := dsp.Receive(context.Background(), &protocol.Topic{Prefix: c.Context()})
+	stream, err := dsp.Receive(context.Background(), &protocol.Topic{Tag: c.Context()})
 	if err != nil {
 		core.AppLog.Warn().Msgf("rpc connection error %s", err.Error())
 		return
@@ -355,7 +355,6 @@ func (c *AppManager) receive() {
 			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
 			break
 		}
-		core.AppLog.Debug().Msgf("REV %v", resp)
 		data := resp.Event
 		e := event.CreateEvent(data.Header.ClassId)
 		err = core.Import(e,data.Key,data.Value,200)
@@ -366,5 +365,4 @@ func (c *AppManager) receive() {
 		}
 	}
 	core.AppLog.Warn().Msg("rpc closed from remote")
-
 }

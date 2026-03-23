@@ -41,10 +41,10 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 
 func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerStreamingServer[protocol.Topic]) error {
 	aq := make(chan chan *protocol.Topic, 2)
-	c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: topic.Prefix, Rev: aq}
+	c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: topic.Tag, Rev: aq}
 	ch := <-aq
 	close(aq)
-	core.AppLog.Debug().Msgf("start event receiver on [%s]", topic.Prefix)
+	core.AppLog.Debug().Msgf("start event receiver on [%s]", topic.Tag)
 	defer close(ch)
 	for c.running {
 		for resp := range ch {
@@ -55,7 +55,7 @@ func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerS
 			}
 		}
 	}
-	core.AppLog.Debug().Msgf("stop evnt receiver from on [%s]", topic.Prefix)
+	core.AppLog.Debug().Msgf("stop evnt receiver from on [%s]", topic.Tag)
 	return nil
 }
 
@@ -65,11 +65,11 @@ func (c *DataServiceProvider) Publish(ctx context.Context, in *protocol.Topic) (
 }
 
 func (c *DataServiceProvider) Subscribe(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Prefix: in.Prefix, Topic: in.Name, Endpoint: c.rpcEndpoint}}}
+	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Prefix: in.Tag, Topic: in.Name, Endpoint: c.rpcEndpoint}}}
 	return &protocol.Response{Successful: true, Message: "topic created"}, nil
 }
 func (c *DataServiceProvider) Unsubscribe(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Prefix: in.Prefix, Topic: in.Name, Endpoint: c.rpcEndpoint, Deleting: true}}}
+	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Prefix: in.Tag, Topic: in.Name, Endpoint: c.rpcEndpoint, Deleting: true}}}
 	return &protocol.Response{Successful: true, Message: "topic removed"}, nil
 }
 

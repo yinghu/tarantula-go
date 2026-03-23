@@ -23,7 +23,7 @@ const (
 
 type Topic struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Prefix        string                 `protobuf:"bytes,1,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	Tag           string                 `protobuf:"bytes,1,opt,name=tag,proto3" json:"tag,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Event         *Data                  `protobuf:"bytes,3,opt,name=event,proto3" json:"event,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -60,9 +60,9 @@ func (*Topic) Descriptor() ([]byte, []int) {
 	return file_topic_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Topic) GetPrefix() string {
+func (x *Topic) GetTag() string {
 	if x != nil {
-		return x.Prefix
+		return x.Tag
 	}
 	return ""
 }
@@ -86,9 +86,9 @@ var File_topic_proto protoreflect.FileDescriptor
 const file_topic_proto_rawDesc = "" +
 	"\n" +
 	"\vtopic.proto\x12\bprotocol\x1a\n" +
-	"data.proto\"Y\n" +
-	"\x05Topic\x12\x16\n" +
-	"\x06prefix\x18\x01 \x01(\tR\x06prefix\x12\x12\n" +
+	"data.proto\"S\n" +
+	"\x05Topic\x12\x10\n" +
+	"\x03tag\x18\x01 \x01(\tR\x03tag\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12$\n" +
 	"\x05event\x18\x03 \x01(\v2\x0e.protocol.DataR\x05eventBM\n" +
 	"\x17com.icodesoftware.protoB\fTopicFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
