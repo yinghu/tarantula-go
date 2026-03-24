@@ -53,11 +53,17 @@ func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerS
 			break
 		}
 	}
-	c.DRequest <- TopicRequest{Opt: RECEIVER_END, Name: topic.Tag}
+	c.DRequest <- TopicRequest{Opt: RECEIVER_REMOVE, Name: topic.Tag}
 	core.AppLog.Debug().Msgf("stop evnt receiver from on [%s]", topic.Tag)
 	return nil
 }
-
+func (c *DataServiceProvider) Disconnect(ctx context.Context, topic *protocol.Topic) (*protocol.Response, error) {
+	//aq := make(chan chan *protocol.Topic, 2)
+	//c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: topic.Tag, Rev: aq}
+	//ch := <-aq
+	core.AppLog.Debug().Msgf("receiver disconnected %s", topic.Tag)
+	return &protocol.Response{Successful: true, Message: "disconnected"}, nil
+}
 func (c *DataServiceProvider) Publish(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
 	c.runPublish(in)
 	return &protocol.Response{Successful: true, Message: "topic event dispatched"}, nil

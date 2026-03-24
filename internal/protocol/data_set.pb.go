@@ -81,8 +81,8 @@ const file_data_set_proto_rawDesc = "" +
 	"data.proto\"A\n" +
 	"\aDataSet\x12\x12\n" +
 	"\x04size\x18\x01 \x01(\aR\x04size\x12\"\n" +
-	"\x04list\x18\x02 \x03(\v2\x0e.protocol.DataR\x04listBQ\n" +
-	"\x17com.icodesoftware.protoB\x10DataBatchFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
+	"\x04list\x18\x02 \x03(\v2\x0e.protocol.DataR\x04listBO\n" +
+	"\x17com.icodesoftware.protoB\x0eDataSetFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
 	file_data_set_proto_rawDescOnce sync.Once
