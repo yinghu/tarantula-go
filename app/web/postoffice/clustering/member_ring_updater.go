@@ -14,9 +14,9 @@ type RingUpdate struct {
 }
 
 const (
-	RECEIVER_START uint32 = 1
-	TOPIC_REGISTER uint32 = 2
-	RECEIVER_REMOVE   uint32 = 3
+	RECEIVER_START  uint32 = 1
+	TOPIC_REGISTER  uint32 = 2
+	RECEIVER_REMOVE uint32 = 3
 )
 
 type TopicRequest struct {
@@ -112,6 +112,7 @@ func (m *DataServiceProvider) RingUpdated() {
 						}
 						esb = append(esb, sub)
 						m.subscriptions[sub.Topic] = esb
+						core.AppLog.Debug().Msgf("subs %v", esb)
 					}
 				}
 			}

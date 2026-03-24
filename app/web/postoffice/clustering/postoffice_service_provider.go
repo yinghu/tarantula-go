@@ -58,9 +58,6 @@ func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerS
 	return nil
 }
 func (c *DataServiceProvider) Disconnect(ctx context.Context, topic *protocol.Topic) (*protocol.Response, error) {
-	//aq := make(chan chan *protocol.Topic, 2)
-	//c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: topic.Tag, Rev: aq}
-	//ch := <-aq
 	c.DMessager <- topic
 	core.AppLog.Debug().Msgf("receiver disconnected %s", topic.Tag)
 	return &protocol.Response{Successful: true, Message: "disconnected"}, nil
