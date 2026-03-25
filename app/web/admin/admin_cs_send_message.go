@@ -33,7 +33,7 @@ func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 	me.OnOId(id)
 	me.Source = s.Context()
 	me.DateTime = time.Now()
-	me.OnTopic("message")
+	//me.OnTopic("message")
 	err = s.Publish(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
