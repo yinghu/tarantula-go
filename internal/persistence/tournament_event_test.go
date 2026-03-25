@@ -33,13 +33,13 @@ func TestTournamentEvent(t *testing.T) {
 		t.Errorf("Local store error %s", err.Error())
 	}
 	defer local.Close()
-	index := SampleIndexListener{BadgerLocal: local}
+	//index := SampleIndexListener{BadgerLocal: local}
 	endTime := time.Now().Add(1 * time.Hour).UnixMilli()
 	for i := range 10 {
 		sid := 1000 + i
 		tmnt := event.TournamentEvent{TournamentId: TID, InstanceId: IID, SystemId: int64(sid), Score:10, LastUpdated: endTime - time.Now().UnixMilli()}
 		tmnt.LastUpdated = endTime - time.Now().UnixMilli()
-		tmnt.OnIndex(&index)
+		//tmnt.OnIndex(&index)
 	}
 	tq := event.QScore{TournamentId: TID,InstanceId: IID}
 	prx := core.NewBuffer(100)

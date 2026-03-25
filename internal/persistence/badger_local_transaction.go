@@ -121,7 +121,7 @@ func (t *BadgerLocalTransaction) Set(p core.Persistentable) error {
 	if rev > 0 {
 		return nil
 	}
-	se := event.StatEvent{Tag: p.ETag(), Name: event.STAT_TOTAL}
+	se := event.StatEvent{ Name: event.STAT_TOTAL}
 	t.key.Clear()
 	t.value.Clear()
 	se.WriteKey(t.key)

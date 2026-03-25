@@ -213,7 +213,7 @@ func TestDatatBuffer(t *testing.T) {
 	if ct != 4 {
 		t.Errorf("should be 3 items %d", ct)
 	}
-	se := event.StatEvent{Tag: sample1.ETag(), Name: "total"}
+	se := event.StatEvent{ Name: "total"}
 	err = local.Load(&se)
 	if err != nil {
 		fmt.Printf("se load err %s\n", err.Error())

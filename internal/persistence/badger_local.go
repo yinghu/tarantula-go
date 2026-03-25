@@ -207,7 +207,7 @@ func (s *BadgerLocal) set(key *core.BufferProxy, value *core.BufferProxy, t core
 			return nil
 		}
 		//update stat total
-		se := event.StatEvent{Tag: t.ETag(), Name: event.STAT_TOTAL}
+		se := event.StatEvent{ Name: event.STAT_TOTAL}
 		key.Clear()
 		se.WriteKey(key)
 		key.Flip()

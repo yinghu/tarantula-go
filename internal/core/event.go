@@ -28,8 +28,15 @@ type Event interface {
 	OnListener(el EventListener)
 	Listener() EventListener
 
+	OnNodeId(t string)
+	NodeId() string
+
+	OnTag(t string)
+	Tag() string
+
 	OnTopic(t string)
 	Topic() string
+
 	OId() int64
 	OnOId(id int64)
 	OnRecipientId(id int64)
@@ -64,8 +71,26 @@ type Query interface {
 type EventObj struct {
 	Callback EventListener `json:"-"`
 	PersistentableObj
-	ETopic string `json:"Topic"`
-	EOid   int64  `json:"Oid,string"`
+	ENodeId string `json:"nodeId"`
+	ETag    string `json:"tag"`
+	ETopic  string `json:"topic"`
+	EOid    int64  `json:"oid,string"`
+}
+
+func (s *EventObj) OnNodeId(t string) {
+	s.ENodeId = t
+}
+
+func (s *EventObj) NodeId() string {
+	return s.ENodeId
+}
+
+func (s *EventObj) OnTag(t string) {
+	s.ETag = t
+}
+
+func (s *EventObj) Tag() string {
+	return s.ETag
 }
 
 func (s *EventObj) OnTopic(t string) {

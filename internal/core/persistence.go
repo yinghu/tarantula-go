@@ -56,7 +56,7 @@ type Persistentable interface {
 	Timestamp() uint64
 	OnTimestamp(tsp uint64)
 	OnRevision(rev uint64)
-	ETag() string
+	//ETag() string
 }
 
 type PersistentableObj struct {

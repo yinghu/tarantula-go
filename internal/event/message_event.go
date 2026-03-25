@@ -7,7 +7,7 @@ import (
 )
 
 type MessageEvent struct {
-	Tag      string    `json:"tag"`
+	
 	Title    string    `json:"title"`
 	Message  string    `json:"message"`
 	DateTime time.Time `json:"dataTime"`
@@ -19,14 +19,8 @@ func (s *MessageEvent) ClassId() uint32 {
 	return MESSAGE_CID
 }
 
-func (s *MessageEvent) ETag() string {
-	return s.Tag
-}
-
 func (s *MessageEvent) WriteKey(buff core.DataBuffer) error {
-	if err := buff.WriteString(s.ETag()); err != nil {
-		return err
-	}
+	
 	if err := buff.WriteInt64(s.OId()); err != nil {
 		return err
 	}
@@ -34,11 +28,6 @@ func (s *MessageEvent) WriteKey(buff core.DataBuffer) error {
 }
 
 func (s *MessageEvent) ReadKey(buff core.DataBuffer) error {
-	tag, err := buff.ReadString()
-	if err != nil {
-		return err
-	}
-	s.Tag = tag
 	id, err := buff.ReadInt64()
 	if err != nil {
 		return err
