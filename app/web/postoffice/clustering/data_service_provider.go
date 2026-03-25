@@ -38,8 +38,8 @@ type DataServiceProvider struct {
 
 	//messaging
 	DMessager     chan *protocol.Topic
-	index         map[string]core.Subscription
-	subscriptions map[string][]core.Subscription
+	//index         map[string]core.Subscription
+	subscriptions map[string]*SubscriptionRegistry
 	listeners     map[string]chan *protocol.Topic
 	DRequest      chan TopicRequest
 }
@@ -182,8 +182,8 @@ func (c *DataServiceProvider) Start(dir string) {
 	c.DMessager = make(chan *protocol.Topic, NODE_EVENT_BUFFER_SIZE)
 	c.DRequest = make(chan TopicRequest, NODE_EVENT_BUFFER_SIZE)
 	c.listeners = make(map[string]chan *protocol.Topic)
-	c.subscriptions = make(map[string][]core.Subscription)
-	c.index = make(map[string]core.Subscription)
+	c.subscriptions = make(map[string]*SubscriptionRegistry)
+	
 	c.DSet = make(chan SetData, NODE_EVENT_BUFFER_SIZE)
 	c.DPull = make(chan core.RingSync, NODE_EVENT_BUFFER_SIZE)
 	for n := range SET_OPERATOR_NUM {

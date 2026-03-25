@@ -401,7 +401,7 @@ func (c *DataServiceProvider) runPull(target string, set *protocol.Request, ch c
 func (c *DataServiceProvider) runPublish(topic *protocol.Topic) {
 	rq := make(chan []core.Subscription, 3)
 	defer close(rq)
-	c.DRequest <- TopicRequest{Opt: TOPIC_REGISTER, Subs: rq, Name: topic.Name}
+	c.DRequest <- TopicRequest{Opt: TOPIC_REGISTER, Subs: rq, NodeId: topic.NodeId, Tag: topic.Tag, Name: topic.Name}
 	subs := <-rq
 	for _, sub := range subs {
 		c.clientPublish(&sub, topic)

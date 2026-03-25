@@ -68,7 +68,7 @@ type Subscription struct {
 }
 
 func (s *Subscription) Key() string {
-	return fmt.Sprintf("%s:%s", s.NodeId, s.Tag)
+	return fmt.Sprintf("%s:%s:%s", s.NodeId, s.Tag, s.Topic)
 }
 
 type RingSync struct {
