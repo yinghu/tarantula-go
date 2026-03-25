@@ -55,7 +55,7 @@ func (s *AppManager) List(query core.Query) {
 
 func (s *AppManager) Subscribe(topic string, listener core.EventListener) error {
 	dsp := protocol.NewPostofficeServiceClient(s.rpc)
-	resp, err := dsp.Subscribe(context.Background(), &protocol.Topic{Tag: s.Context(), Name: topic})
+	resp, err := dsp.Subscribe(context.Background(), &protocol.Topic{NodeId: s.NodeId(), Tag: s.Context(), Name: topic})
 	if err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func (s *AppManager) Unsubscribe(topic string) error {
 
 func (c *AppManager) receive() {
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	stream, err := dsp.Receive(context.Background(), &protocol.Topic{NodeId:c.NodeId(),Tag: c.Context()})
+	stream, err := dsp.Receive(context.Background(), &protocol.Topic{NodeId: c.NodeId(), Tag: c.Context()})
 	if err != nil {
 		core.AppLog.Warn().Msgf("rpc connection error %s", err.Error())
 		return
