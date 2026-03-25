@@ -38,6 +38,7 @@ type DataServiceProvider struct {
 
 	//messaging
 	DMessager     chan *protocol.Topic
+	index         map[string]core.Subscription
 	subscriptions map[string][]core.Subscription
 	listeners     map[string]chan *protocol.Topic
 	DRequest      chan TopicRequest

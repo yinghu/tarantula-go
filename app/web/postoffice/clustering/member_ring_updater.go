@@ -104,15 +104,31 @@ func (m *DataServiceProvider) RingUpdated() {
 					core.AppLog.Debug().Msgf("register subscription %v", ds.Sub)
 					sub := ds.Sub
 					if ds.Sub.Deleting {
-						delete(m.subscriptions, sub.Topic)
-					} else {
-						esb, ok := m.subscriptions[sub.Topic]
-						if !ok {
-							esb = make([]core.Subscription, 0)
+						if sub.Tag != "" {
+							_, exsits := m.index[sub.Key()]
+							if exsits {
+								delete(m.index, sub.Key())
+								subs := m.subscriptions[sub.Topic]
+								subs = slices.DeleteFunc(subs, func(d core.Subscription) bool {
+									return d.Key() == sub.Key()
+								})
+								m.subscriptions[sub.Topic] = subs
+							}
+						} else {
+							core.AppLog.Debug().Msgf("clear all subs from %s", sub.NodeId)
 						}
-						esb = append(esb, sub)
-						m.subscriptions[sub.Topic] = esb
-						core.AppLog.Debug().Msgf("subs %v", esb)
+					} else {
+						_, exsits := m.index[sub.Key()]
+						if !exsits {
+							m.index[sub.Key()] = sub
+							esb, ok := m.subscriptions[sub.Topic]
+							if !ok {
+								esb = make([]core.Subscription, 0)
+							}
+							esb = append(esb, sub)
+							m.subscriptions[sub.Topic] = esb
+							core.AppLog.Debug().Msgf("subs %v", esb)
+						}
 					}
 				}
 			}
