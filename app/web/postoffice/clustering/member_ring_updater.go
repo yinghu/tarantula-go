@@ -83,7 +83,7 @@ func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
 			core.AppLog.Debug().Msgf("clear all subs from %s", sub.NodeId)
 		}
 	} else {
-		_, exsits := m.index[sub.Key()]
+		_, exsits := m.index[sub.Key()] //nodeId:tag
 		if !exsits {
 			m.index[sub.Key()] = sub
 			esb, ok := m.subscriptions[sub.Topic]

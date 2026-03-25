@@ -40,7 +40,7 @@ func (s *AppManager) Publish(e core.Event) error {
 	}
 	data := protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: e.FactoryId(), ClassId: e.ClassId()}}
 	dsp := protocol.NewPostofficeServiceClient(s.rpc)
-	resp, err := dsp.Publish(context.Background(), &protocol.Topic{Tag: "", Name: e.Topic(), Event: &data})
+	resp, err := dsp.Publish(context.Background(), &protocol.Topic{NodeId: e.NodeId(), Tag: e.Tag(), Name: e.Topic(), Event: &data})
 	if err != nil {
 		return err
 	}
