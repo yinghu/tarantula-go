@@ -41,11 +41,11 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 
 func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerStreamingServer[protocol.Topic]) error {
 	aq := make(chan chan *protocol.Topic, 2)
-	revKey := fmt.Sprintf("%s:%s", topic.NodeId, topic.Tag)
-	c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: revKey, Rev: aq}
+
+	c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: topic.NodeId, Rev: aq}
 	ch := <-aq
 	close(aq)
-	core.AppLog.Debug().Msgf("start event receiver on [%s]", revKey)
+	core.AppLog.Debug().Msgf("start event receiver on [%s]", topic.NodeId)
 	defer close(ch)
 	for resp := range ch {
 		err := stream.Send(resp)
@@ -54,8 +54,8 @@ func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerS
 			break
 		}
 	}
-	c.DRequest <- TopicRequest{Opt: RECEIVER_REMOVE, Name: revKey}
-	core.AppLog.Debug().Msgf("stop evnt receiver from on [%s]", revKey)
+	c.DRequest <- TopicRequest{Opt: RECEIVER_REMOVE, Name: topic.NodeId}
+	core.AppLog.Debug().Msgf("stop evnt receiver from on [%s]", topic.NodeId)
 	return nil
 }
 func (c *DataServiceProvider) Disconnect(ctx context.Context, topic *protocol.Topic) (*protocol.Response, error) {
