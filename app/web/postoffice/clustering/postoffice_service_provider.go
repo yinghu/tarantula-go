@@ -41,10 +41,11 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 
 func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerStreamingServer[protocol.Topic]) error {
 	aq := make(chan chan *protocol.Topic, 2)
-	c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: topic.Tag, Rev: aq}
+	revKey := fmt.Sprintf("%s:%s", topic.NodeId, topic.Tag)
+	c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: revKey, Rev: aq}
 	ch := <-aq
 	close(aq)
-	core.AppLog.Debug().Msgf("start event receiver on [%s]", topic.Tag)
+	core.AppLog.Debug().Msgf("start event receiver on [%s]", revKey)
 	defer close(ch)
 	for resp := range ch {
 		err := stream.Send(resp)
@@ -53,8 +54,8 @@ func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerS
 			break
 		}
 	}
-	c.DRequest <- TopicRequest{Opt: RECEIVER_REMOVE, Name: topic.Tag}
-	core.AppLog.Debug().Msgf("stop evnt receiver from on [%s]", topic.Tag)
+	c.DRequest <- TopicRequest{Opt: RECEIVER_REMOVE, Name: revKey}
+	core.AppLog.Debug().Msgf("stop evnt receiver from on [%s]", revKey)
 	return nil
 }
 func (c *DataServiceProvider) Disconnect(ctx context.Context, topic *protocol.Topic) (*protocol.Response, error) {
@@ -68,11 +69,11 @@ func (c *DataServiceProvider) Publish(ctx context.Context, in *protocol.Topic) (
 }
 
 func (c *DataServiceProvider) Subscribe(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Prefix: in.Tag, Topic: in.Name, Endpoint: c.rpcEndpoint}}}
+	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{NodeId: in.NodeId, Tag: in.Tag, Topic: in.Name, Endpoint: c.rpcEndpoint}}}
 	return &protocol.Response{Successful: true, Message: "topic created"}, nil
 }
 func (c *DataServiceProvider) Unsubscribe(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{Prefix: in.Tag, Topic: in.Name, Endpoint: c.rpcEndpoint, Deleting: true}}}
+	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{NodeId: in.NodeId, Tag: in.Tag, Topic: in.Name, Endpoint: c.rpcEndpoint, Deleting: true}}}
 	return &protocol.Response{Successful: true, Message: "topic removed"}, nil
 }
 

@@ -50,7 +50,7 @@ type TarantulaService interface {
 type TarantulaApp interface {
 	TarantulaService
 	AccessControl() int32
-	Name() string
+	NodeId() string
 	Request(sesion core.OnSession, w http.ResponseWriter, r *http.Request)
 }
 

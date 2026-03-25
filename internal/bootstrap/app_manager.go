@@ -58,8 +58,8 @@ func (c *AppManager) Cluster() core.ClusterService {
 	return c
 }
 
-func (s *AppManager) Name() string {
-	return s.F.GroupName
+func (s *AppManager) NodeId() string {
+	return s.F.NodeName
 }
 func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
@@ -118,8 +118,6 @@ func (s *AppManager) Shutdown() {
 	s.Sql.Close()
 	core.AppLog.Println("app manager shutting down ...")
 }
-
-
 
 func (s *AppManager) Context() string {
 	return s.F.GroupName

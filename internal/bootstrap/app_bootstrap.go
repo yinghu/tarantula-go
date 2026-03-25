@@ -100,7 +100,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 		var code int32 = 0
 		defer func() {
 			dur := time.Since(start)
-			ms := core.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.Name(), ReqId: stub, ReqCode: code}
+			ms := core.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.NodeId(), ReqId: stub, ReqCode: code}
 			s.Metrics().WebRequest(ms)
 			metrics.HTTP_REQUEST_METRICS.WithLabelValues(r.URL.Path).Observe(dur.Seconds())
 

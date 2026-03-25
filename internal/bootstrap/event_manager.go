@@ -75,7 +75,7 @@ func (s *AppManager) Unsubscribe(topic string) error {
 
 func (c *AppManager) receive() {
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	stream, err := dsp.Receive(context.Background(), &protocol.Topic{Tag: c.Context()})
+	stream, err := dsp.Receive(context.Background(), &protocol.Topic{NodeId:c.NodeId(),Tag: c.Context()})
 	if err != nil {
 		core.AppLog.Warn().Msgf("rpc connection error %s", err.Error())
 		return

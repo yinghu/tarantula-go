@@ -1,5 +1,7 @@
 package core
 
+import "fmt"
+
 const (
 	RPC_PORT int = 7001
 
@@ -58,10 +60,15 @@ type RingRange struct {
 }
 
 type Subscription struct {
-	Prefix   string `json:"prefix"`
+	NodeId   string `json:"nodeId"`
+	Tag      string `json:"tag"`
 	Topic    string `json:"topic"`
 	Endpoint string `json:"endpoint"`
 	Deleting bool   `json:"deleting"`
+}
+
+func (s *Subscription) Key() string {
+	return fmt.Sprintf("%s:%s", s.NodeId, s.Tag)
 }
 
 type RingSync struct {
