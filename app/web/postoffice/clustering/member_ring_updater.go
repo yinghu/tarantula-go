@@ -66,6 +66,37 @@ func (m *DataServiceProvider) balanceOnNodeRemoved(removed RingUpdate) {
 	m.backRing.nodeNum--
 }
 
+func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
+	core.AppLog.Debug().Msgf("register subscription %v", sub)
+	if sub.Deleting {
+		if sub.Tag != "" {
+			_, exsits := m.index[sub.Key()]
+			if exsits {
+				delete(m.index, sub.Key())
+				subs := m.subscriptions[sub.Topic]
+				subs = slices.DeleteFunc(subs, func(d core.Subscription) bool {
+					return d.Key() == sub.Key()
+				})
+				m.subscriptions[sub.Topic] = subs
+			}
+		} else {
+			core.AppLog.Debug().Msgf("clear all subs from %s", sub.NodeId)
+		}
+	} else {
+		_, exsits := m.index[sub.Key()]
+		if !exsits {
+			m.index[sub.Key()] = sub
+			esb, ok := m.subscriptions[sub.Topic]
+			if !ok {
+				esb = make([]core.Subscription, 0)
+			}
+			esb = append(esb, sub)
+			m.subscriptions[sub.Topic] = esb
+			core.AppLog.Debug().Msgf("subs %v", esb)
+		}
+	}
+}
+
 func (m *DataServiceProvider) RingUpdated() {
 	running := true
 	for running {
@@ -101,35 +132,7 @@ func (m *DataServiceProvider) RingUpdated() {
 						m.DPull <- core.RingSync{Remote: ds.Remote, Ranges: []core.RingRange{}}
 					}
 				} else {
-					core.AppLog.Debug().Msgf("register subscription %v", ds.Sub)
-					sub := ds.Sub
-					if ds.Sub.Deleting {
-						if sub.Tag != "" {
-							_, exsits := m.index[sub.Key()]
-							if exsits {
-								delete(m.index, sub.Key())
-								subs := m.subscriptions[sub.Topic]
-								subs = slices.DeleteFunc(subs, func(d core.Subscription) bool {
-									return d.Key() == sub.Key()
-								})
-								m.subscriptions[sub.Topic] = subs
-							}
-						} else {
-							core.AppLog.Debug().Msgf("clear all subs from %s", sub.NodeId)
-						}
-					} else {
-						_, exsits := m.index[sub.Key()]
-						if !exsits {
-							m.index[sub.Key()] = sub
-							esb, ok := m.subscriptions[sub.Topic]
-							if !ok {
-								esb = make([]core.Subscription, 0)
-							}
-							esb = append(esb, sub)
-							m.subscriptions[sub.Topic] = esb
-							core.AppLog.Debug().Msgf("subs %v", esb)
-						}
-					}
+					m.registerSubscription(ds.Sub)
 				}
 			}
 		case req := <-m.DRequest:
