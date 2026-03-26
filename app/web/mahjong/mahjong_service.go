@@ -26,6 +26,7 @@ func (s *MahjongService) Start(f core.Env, p core.Pusher) error {
 	s.TableIndex = make(map[int64]*MahjongTable)
 	s.Dispatcher = make(chan MahjongPlayToken, 10)
 	go s.dispatch()
+	s.Subscribe("purchase", s)
 	http.Handle("/mahjong/table/{lobbyId}/{systemId}", bootstrap.Logging(&MahjongTableSelector{MahjongService: s}))
 	return nil
 }

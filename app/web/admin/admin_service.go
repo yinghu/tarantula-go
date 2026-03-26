@@ -41,13 +41,14 @@ func (s *AdminService) Start(f core.Env, p core.Pusher) error {
 	if err != nil {
 		core.AppLog.Printf("Root already existed %s\n", err.Error())
 	}
+	s.Subscribe("login", s)
 	http.Handle("/admin/webprotected/{name}", bootstrap.Logging(&AdminWebProtected{AdminService: s}))
 	http.Handle("/admin/web/{name}", bootstrap.Logging(&AdminWebIndex{AdminService: s}))
 	//handle / context from nginx proxy
 	http.Handle("/admin/{name}", bootstrap.Logging(&AdminWebIndex{AdminService: s}))
 
 	http.Handle("/admin/cs/message/send", bootstrap.Logging(&CSMessager{AdminService: s}))
-	
+
 	http.Handle("/admin/cs/query/{id}", bootstrap.Logging(&CSQueryer{AdminService: s}))
 	http.Handle("/admin/cs/inventory/grant", bootstrap.Logging(&CSGranter{AdminService: s}))
 	http.Handle("/admin/cs/inventory/load", bootstrap.Logging(&CSInventoryLoader{AdminService: s}))
