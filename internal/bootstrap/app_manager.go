@@ -101,12 +101,22 @@ func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 		return err
 	}
 	s.imse = &is
-	tcp, err := grpc.NewClient(fmt.Sprintf("%s:%d", f.Host, core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		core.AppLog.Warn().Msgf("grpc connect failed %s", err.Error())
-		return err
+	retries := 3
+	for {
+		tcp, err := grpc.NewClient(fmt.Sprintf("%s:%d", f.Host, core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if err != nil {
+			core.AppLog.Warn().Msgf("grpc connect failed %s", err.Error())
+			//return err
+			retries--
+			if retries > 0 {
+				time.Sleep(3 * time.Second)
+				continue
+			}
+			return err
+		}
+		s.rpc = tcp
+		break
 	}
-	s.rpc = tcp
 	go s.receive()
 	return nil
 }
