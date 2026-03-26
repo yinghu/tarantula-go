@@ -59,6 +59,11 @@ type RingRange struct {
 	To   uint32 `json:"to"`
 }
 
+type TopicKey struct {
+	Topic    string
+	Endpoint string
+}
+
 type Subscription struct {
 	NodeId   string `json:"nodeId"`
 	Tag      string `json:"tag"`
@@ -69,6 +74,9 @@ type Subscription struct {
 
 func (s *Subscription) Key() string {
 	return fmt.Sprintf("%s:%s:%s", s.NodeId, s.Tag, s.Topic)
+}
+func (s *Subscription) TopicKey() TopicKey {
+	return TopicKey{Topic:s.Topic,Endpoint: s.Endpoint}
 }
 
 type RingSync struct {

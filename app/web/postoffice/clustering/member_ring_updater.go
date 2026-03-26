@@ -28,11 +28,6 @@ type TopicRequest struct {
 	Subs   chan []core.Subscription
 }
 
-type SubscriptionRegistry struct {
-	Index string //nodeId | tag | topic | (nodeId:tag:topic)
-	Subs  []*core.Subscription
-}
-
 func (m *DataServiceProvider) balanceOnNodeAdded(added RingUpdate) {
 
 	if m.backRing.nodeNum == 0 {
@@ -76,48 +71,9 @@ func (m *DataServiceProvider) balanceOnNodeRemoved(removed RingUpdate) {
 func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
 	core.AppLog.Debug().Msgf("register subscription %v", sub)
 	if sub.Deleting {
-		if sub.Tag != "" {
-			//_, exsits := m.index[sub.Key()]
-			//if exsits {
-			//delete(m.index, sub.Key())
-			//subs := m.subscriptions[sub.Topic]
-			//subs = slices.DeleteFunc(subs, func(d core.Subscription) bool {
-			//return d.Key() == sub.Key()
-			//})
-			//m.subscriptions[sub.Topic] = subs
-			//}
-		} else {
-			core.AppLog.Debug().Msgf("clear all subs from %s", sub.NodeId)
-		}
+		m.subscriptions.del(sub)
 	} else {
-		_, exsits := m.subscriptions[sub.Key()] //nodeId:tag:topic index
-		if !exsits {
-			m.subscriptions[sub.Key()] = &SubscriptionRegistry{Subs: []*core.Subscription{&sub}}
-			//nodeId index
-			nsb, ok := m.subscriptions[sub.NodeId]
-			if !ok {
-				nsb = &SubscriptionRegistry{Subs: make([]*core.Subscription, 0)}
-				m.subscriptions[sub.NodeId] = nsb
-			}
-			nsb.Subs = append(nsb.Subs, &sub)
-			//tag index
-			tsb, ok := m.subscriptions[sub.Tag]
-			if !ok {
-				tsb = &SubscriptionRegistry{Subs: make([]*core.Subscription, 0)}
-				m.subscriptions[sub.Tag] = tsb
-			}
-			tsb.Subs = append(tsb.Subs, &sub)
-			//topic index
-			psb, ok := m.subscriptions[sub.Topic]
-			if !ok {
-				psb = &SubscriptionRegistry{Subs: make([]*core.Subscription, 0)}
-				m.subscriptions[sub.Topic] = psb
-			}
-			psb.Subs = append(psb.Subs, &sub)
-
-		} else {
-			core.AppLog.Warn().Msgf("subscription alread existed %s", sub.Key())
-		}
+		m.subscriptions.add(sub)
 	}
 }
 
@@ -169,16 +125,7 @@ func (m *DataServiceProvider) RingUpdated() {
 				delete(m.listeners, req.Name)
 				core.AppLog.Debug().Msgf("listener removed %s", req.Name)
 			case TOPIC_REGISTER:
-				reg, ok := m.subscriptions[req.Name]
-				if ok {
-					out := make([]core.Subscription, 0)
-					for _, sub := range reg.Subs {
-						out = append(out, core.Subscription{Endpoint: sub.Endpoint})
-					}
-					req.Subs <- out //subs.Subs
-				} else {
-					req.Subs <- []core.Subscription{}
-				}
+				req.Subs <- m.subscriptions.topic()
 			}
 		case msg := <-m.DMessager:
 			core.AppLog.Debug().Msgf("dispatching event %v", msg)
