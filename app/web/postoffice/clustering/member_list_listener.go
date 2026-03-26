@@ -13,10 +13,10 @@ import (
 const (
 	REPLICA_RING_OPT uint32 = 1
 	ALL_RING_OPT     uint32 = 3
-	//ADD_NODE_OPT     uint32 = 5
-	//REMOVE_NODE_OPT  uint32 = 6
-	//UPDATE_NODE_OPT  uint32 = 7
-	SYNC_NODE_OPT  uint32 = 8
+
+	SYNC_NODE_OPT uint32 = 8
+	SYNC_SUB_OPT  uint32 = 9
+
 	CLOSE_RING_OPT uint32 = 99
 
 	NODE_STATE_LIVE     = 0
@@ -91,19 +91,18 @@ func (m *MemberListListener) Listen() {
 			//m.balancing = mr.Replicas == 0
 			//m.UpdateNode(5 * time.Second)
 			case SYNC_NODE_OPT:
-				if mr.Address != "" {
-					for _, mbr := range m.Members() {
-						if mbr.Address() == mr.Address {
-							core.AppLog.Debug().Msgf("sending sync message to %s", mr.Address)
-							m.SendToAddress(mbr.FullAddress(), util.ToJson(mr.Source))
-							break
-						}
-					}
-				} else {
-					for _, mbr := range m.Members() {
-						core.AppLog.Debug().Msgf("sending topic message to %s", mbr.FullAddress().Name)
+				for _, mbr := range m.Members() {
+					if mbr.Address() == mr.Address {
+						core.AppLog.Debug().Msgf("sending sync message to %s", mr.Address)
 						m.SendToAddress(mbr.FullAddress(), util.ToJson(mr.Source))
+						break
 					}
+				}
+
+			case SYNC_SUB_OPT:
+				for _, mbr := range m.Members() {
+					core.AppLog.Debug().Msgf("sending topic message to %s", mbr.FullAddress().Name)
+					m.SendToAddress(mbr.FullAddress(), util.ToJson(mr.Source))
 				}
 			case CLOSE_RING_OPT:
 				running = false
