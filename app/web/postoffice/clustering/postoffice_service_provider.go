@@ -74,7 +74,7 @@ func (c *DataServiceProvider) Subscribe(ctx context.Context, in *protocol.Topic)
 	return &protocol.Response{Successful: true, Message: "topic created"}, nil
 }
 func (c *DataServiceProvider) Unsubscribe(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_NODE_OPT, Source: core.RingSync{Sub: core.Subscription{NodeId: in.NodeId, Tag: in.Tag, Topic: in.Name, Endpoint: c.rpcEndpoint, Deleting: true}}}
+	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_SUB_OPT, Source: core.RingSync{Sub: core.Subscription{NodeId: in.NodeId, Tag: in.Tag, Topic: in.Name, Endpoint: c.rpcEndpoint, Deleting: true}}}
 	return &protocol.Response{Successful: true, Message: "topic removed"}, nil
 }
 
