@@ -69,7 +69,6 @@ func (m *DataServiceProvider) balanceOnNodeRemoved(removed RingUpdate) {
 }
 
 func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
-	core.AppLog.Debug().Msgf("register subscription %v", sub)
 	if sub.Deleting {
 		m.subscriptions.del(sub)
 	} else {
@@ -128,15 +127,11 @@ func (m *DataServiceProvider) RingUpdated() {
 				req.Subs <- m.subscriptions.topic(req.Name)
 			}
 		case msg := <-m.DMessager:
-			core.AppLog.Debug().Msgf("dispatching event %v", msg)
-			target, ok := m.listeners[msg.Tag]
-			if ok {
-				target <- msg
-			} else {
-				for _, ch := range m.listeners {
-					ch <- msg
-				}
+
+			for _, ch := range m.listeners {
+				ch <- msg
 			}
+
 		}
 
 	}

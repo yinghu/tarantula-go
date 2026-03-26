@@ -5,17 +5,15 @@ import (
 )
 
 type SubscriptionRegistry struct {
-	Index string //nodeId | tag | topic | (nodeId:tag:topic)
-	Subs  map[string]core.Subscription
-
-	Ends map[core.TopicKey]map[string]core.Subscription
+	
+	topicEnds map[core.TopicKey]map[string]core.Subscription
 }
 
 func (s *SubscriptionRegistry) add(sub core.Subscription) {
-	subs, exists := s.Ends[sub.TopicKey()]
+	subs, exists := s.topicEnds[sub.TopicKey()]
 	if !exists {
 		subs = make(map[string]core.Subscription)
-		s.Ends[sub.TopicKey()] = subs
+		s.topicEnds[sub.TopicKey()] = subs
 	}
 	_, exists = subs[sub.Key()]
 	if exists {
@@ -25,7 +23,7 @@ func (s *SubscriptionRegistry) add(sub core.Subscription) {
 }
 
 func (s *SubscriptionRegistry) del(sub core.Subscription) {
-	subs, exists := s.Ends[sub.TopicKey()]
+	subs, exists := s.topicEnds[sub.TopicKey()]
 	if !exists {
 		return
 	}
@@ -33,16 +31,16 @@ func (s *SubscriptionRegistry) del(sub core.Subscription) {
 	if len(subs) > 0 {
 		return
 	}
-	delete(s.Ends, sub.TopicKey())
+	delete(s.topicEnds, sub.TopicKey())
 }
 
 func (s *SubscriptionRegistry) size() int {
-	return len(s.Ends)
+	return len(s.topicEnds)
 }
 
 func (s *SubscriptionRegistry) topic(name string) []core.Subscription {
 	sub := make([]core.Subscription, 0)
-	for k := range s.Ends {
+	for k := range s.topicEnds {
 		if name == k.Topic {
 			sub = append(sub, core.Subscription{Topic: k.Topic, Endpoint: k.Endpoint})
 		}
