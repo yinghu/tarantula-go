@@ -125,7 +125,7 @@ func (m *DataServiceProvider) RingUpdated() {
 				delete(m.listeners, req.Name)
 				core.AppLog.Debug().Msgf("listener removed %s", req.Name)
 			case TOPIC_REGISTER:
-				req.Subs <- m.subscriptions.topic()
+				req.Subs <- m.subscriptions.topic(req.Name)
 			}
 		case msg := <-m.DMessager:
 			core.AppLog.Debug().Msgf("dispatching event %v", msg)

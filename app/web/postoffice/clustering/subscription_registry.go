@@ -40,10 +40,12 @@ func (s *SubscriptionRegistry) size() int {
 	return len(s.Ends)
 }
 
-func (s *SubscriptionRegistry) topic() []core.Subscription {
+func (s *SubscriptionRegistry) topic(name string) []core.Subscription {
 	sub := make([]core.Subscription, 0)
 	for k := range s.Ends {
-		sub = append(sub, core.Subscription{Topic: k.Topic, Endpoint: k.Endpoint})
+		if name == k.Topic {
+			sub = append(sub, core.Subscription{Topic: k.Topic, Endpoint: k.Endpoint})
+		}
 	}
 	return sub
 }
