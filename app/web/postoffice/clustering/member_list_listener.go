@@ -83,13 +83,6 @@ func (m *MemberListListener) Listen() {
 					nodes = append(nodes, n)
 				}
 				mr.Async <- nodes
-			//case ADD_NODE_OPT:
-			//mr.Async <- m.rangeNodeAdded(mr.Token)
-			//case REMOVE_NODE_OPT:
-			//mr.Async <- m.rangeNodeRemoved(mr.Token)
-			//case UPDATE_NODE_OPT:
-			//m.balancing = mr.Replicas == 0
-			//m.UpdateNode(5 * time.Second)
 			case SYNC_NODE_OPT:
 				for _, mbr := range m.Members() {
 					if mbr.Address() == mr.Address {
@@ -98,7 +91,6 @@ func (m *MemberListListener) Listen() {
 						break
 					}
 				}
-
 			case SYNC_SUB_OPT:
 				for _, mbr := range m.Members() {
 					core.AppLog.Debug().Msgf("sending topic message to %s", mbr.FullAddress().Name)

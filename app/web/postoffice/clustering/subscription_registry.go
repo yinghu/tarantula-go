@@ -4,8 +4,9 @@ import (
 	"gameclustering.com/internal/core"
 )
 
+type sub func(sub core.Subscription)
+
 type SubscriptionRegistry struct {
-	
 	topicEnds map[core.TopicKey]map[string]core.Subscription
 }
 
@@ -46,4 +47,12 @@ func (s *SubscriptionRegistry) topic(req TopicRequest) []core.Subscription {
 		}
 	}
 	return sub
+}
+
+func (s *SubscriptionRegistry) lookup(sub sub) {
+	for _, v := range s.topicEnds {
+		for _, b := range v {
+			sub(b)
+		}
+	}
 }

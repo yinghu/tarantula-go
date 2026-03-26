@@ -55,6 +55,9 @@ func (m *DataServiceProvider) balanceOnNodeAdded(added RingUpdate) {
 		return
 	}
 	m.Mll.MRequest <- core.RingRequest{Source: ringSync, Opt: SYNC_NODE_OPT, Address: added.Nodes[0].IP}
+	m.subscriptions.lookup(func(sub core.Subscription) {
+		core.AppLog.Debug().Msgf("sub %v", sub)
+	})
 }
 
 func (m *DataServiceProvider) balanceOnNodeRemoved(removed RingUpdate) {
