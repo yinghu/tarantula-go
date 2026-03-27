@@ -19,12 +19,18 @@ const (
 	RECEIVER_REMOVE uint32 = 3
 )
 
+type ReceiverAsync struct {
+	Rev chan *protocol.Topic
+	Q   chan string
+}
+
 type TopicRequest struct {
 	Opt    uint32
 	NodeId string
 	Tag    string
 	Name   string
-	Rev    chan chan *protocol.Topic
+	//Rev    chan chan *protocol.Topic
+	Async  chan ReceiverAsync
 	Subs   chan []core.Subscription
 }
 
@@ -124,9 +130,12 @@ func (m *DataServiceProvider) RingUpdated() {
 		case req := <-m.DRequest:
 			switch req.Opt {
 			case RECEIVER_START:
-				rev := make(chan *protocol.Topic, NODE_EVENT_BUFFER_SIZE)
-				m.listeners[req.Name] = rev
-				req.Rev <- rev
+				rev, ok := m.listeners[req.Name]
+				if !ok {
+					rev = ReceiverAsync{Rev: make(chan *protocol.Topic, NODE_EVENT_BUFFER_SIZE),Q: make(chan string,2)}
+					m.listeners[req.Name] = rev
+				}
+				req.Async <- rev
 			case RECEIVER_REMOVE:
 				delete(m.listeners, req.Name)
 				core.AppLog.Debug().Msgf("listener removed %s", req.Name)
@@ -136,7 +145,7 @@ func (m *DataServiceProvider) RingUpdated() {
 		case msg := <-m.DMessager:
 
 			for _, ch := range m.listeners {
-				ch <- msg
+				ch.Rev <- msg
 			}
 
 		}

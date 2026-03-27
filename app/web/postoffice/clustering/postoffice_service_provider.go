@@ -40,13 +40,14 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 }
 
 func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerStreamingServer[protocol.Topic]) error {
-	aq := make(chan chan *protocol.Topic, 2)
-	c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: topic.NodeId, Rev: aq}
+	aq := make(chan ReceiverAsync, 2)
+	c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: topic.NodeId, Async: aq}
 	ch := <-aq
 	close(aq)
 	core.AppLog.Debug().Msgf("start event receiver on [%s]", topic.NodeId)
-	defer close(ch)
-	for resp := range ch {
+	defer close(ch.Rev)
+	defer close(ch.Q)
+	for resp := range ch.Rev {
 		err := stream.Send(resp)
 		if err != nil {
 			core.AppLog.Debug().Msgf("send error %s", err.Error())
@@ -59,7 +60,7 @@ func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerS
 	return nil
 }
 func (c *DataServiceProvider) Disconnect(ctx context.Context, topic *protocol.Topic) (*protocol.Response, error) {
-	core.AppLog.Debug().Msgf("receiver disconnected %s", topic.Tag)
+	core.AppLog.Debug().Msgf("receiver disconnected %s", topic.NodeId)
 	return &protocol.Response{Successful: true, Message: "disconnected"}, nil
 }
 func (c *DataServiceProvider) Publish(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
