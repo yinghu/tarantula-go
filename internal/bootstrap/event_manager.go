@@ -73,6 +73,16 @@ func (s *AppManager) Unsubscribe(topic string) error {
 	return nil
 }
 
+func (s *AppManager) disconnect() error {
+	dsp := protocol.NewPostofficeServiceClient(s.rpc)
+	resp, err := dsp.Disconnect(context.Background(), &protocol.Topic{Tag: s.Context(), Name: s.NodeId()})
+	if err != nil {
+		return err
+	}
+	core.AppLog.Debug().Msgf("disconnecting topic %v", resp)
+	return nil
+}
+
 func (c *AppManager) receive() {
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	stream, err := dsp.Receive(context.Background(), &protocol.Topic{NodeId: c.NodeId(), Tag: c.Context()})

@@ -123,6 +123,7 @@ func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 
 func (s *AppManager) Shutdown() {
 	s.running = false
+	s.disconnect()
 	s.rpc.Close()
 	util.GitPush()
 	s.Sql.Close()
