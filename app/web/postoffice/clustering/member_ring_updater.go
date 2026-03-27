@@ -17,6 +17,7 @@ const (
 	RECEIVER_START  uint32 = 1
 	TOPIC_REGISTER  uint32 = 2
 	RECEIVER_REMOVE uint32 = 3
+	RECEIVER_END    uint32 = 4
 )
 
 type ReceiverAsync struct {
@@ -30,8 +31,8 @@ type TopicRequest struct {
 	Tag    string
 	Name   string
 	//Rev    chan chan *protocol.Topic
-	Async  chan ReceiverAsync
-	Subs   chan []core.Subscription
+	Async chan ReceiverAsync
+	Subs  chan []core.Subscription
 }
 
 func (m *DataServiceProvider) balanceOnNodeAdded(added RingUpdate) {
@@ -132,7 +133,7 @@ func (m *DataServiceProvider) RingUpdated() {
 			case RECEIVER_START:
 				rev, ok := m.listeners[req.Name]
 				if !ok {
-					rev = ReceiverAsync{Rev: make(chan *protocol.Topic, NODE_EVENT_BUFFER_SIZE),Q: make(chan string,2)}
+					rev = ReceiverAsync{Rev: make(chan *protocol.Topic, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2)}
 					m.listeners[req.Name] = rev
 				}
 				req.Async <- rev
@@ -141,6 +142,11 @@ func (m *DataServiceProvider) RingUpdated() {
 				core.AppLog.Debug().Msgf("listener removed %s", req.Name)
 			case TOPIC_REGISTER:
 				req.Subs <- m.subscriptions.topic(req)
+			case RECEIVER_END:
+				rev, ok := m.listeners[req.Name]
+				if ok {
+					rev.Q <- req.Name
+				}
 			}
 		case msg := <-m.DMessager:
 

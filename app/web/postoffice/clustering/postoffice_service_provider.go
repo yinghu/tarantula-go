@@ -47,11 +47,17 @@ func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerS
 	core.AppLog.Debug().Msgf("start event receiver on [%s]", topic.NodeId)
 	defer close(ch.Rev)
 	defer close(ch.Q)
-	for resp := range ch.Rev {
-		err := stream.Send(resp)
-		if err != nil {
-			core.AppLog.Debug().Msgf("send error %s", err.Error())
-			break
+	receiving := true
+	for receiving {
+		select {
+		case <-ch.Q:
+			receiving = false
+		case resp := <-ch.Rev:
+			err := stream.Send(resp)
+			if err != nil {
+				core.AppLog.Debug().Msgf("send error %s", err.Error())
+				receiving = false
+			}
 		}
 	}
 	c.DRequest <- TopicRequest{Opt: RECEIVER_REMOVE, Name: topic.NodeId}
@@ -61,6 +67,7 @@ func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerS
 }
 func (c *DataServiceProvider) Disconnect(ctx context.Context, topic *protocol.Topic) (*protocol.Response, error) {
 	core.AppLog.Debug().Msgf("receiver disconnected %s", topic.NodeId)
+	c.DRequest <- TopicRequest{Opt: RECEIVER_END, Name: topic.NodeId}
 	return &protocol.Response{Successful: true, Message: "disconnected"}, nil
 }
 func (c *DataServiceProvider) Publish(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
