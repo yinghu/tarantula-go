@@ -57,7 +57,9 @@ func (m *DataServiceProvider) balanceOnNodeAdded(added RingUpdate) {
 	m.Mll.MRequest <- core.RingRequest{Source: ringSync, Opt: SYNC_NODE_OPT, Address: added.Nodes[0].IP}
 	m.subscriptions.lookup(func(sub core.Subscription) {
 		core.AppLog.Debug().Msgf("sub %v > %s", sub, m.rpcEndpoint)
-		m.Mll.MRequest <- core.RingRequest{Opt: SYNC_SUB_OPT, Source: core.RingSync{Sub: sub}}
+		if sub.Endpoint == m.rpcEndpoint {
+			m.Mll.MRequest <- core.RingRequest{Opt: SYNC_SUB_OPT, Address: added.Nodes[0].IP, Source: core.RingSync{Sub: sub}}
+		}
 	})
 }
 
@@ -73,6 +75,7 @@ func (m *DataServiceProvider) balanceOnNodeRemoved(removed RingUpdate) {
 }
 
 func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
+	core.AppLog.Debug().Msgf("subscription %v", sub)
 	if sub.Deleting {
 		m.subscriptions.del(sub)
 	} else {

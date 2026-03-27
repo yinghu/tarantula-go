@@ -92,9 +92,19 @@ func (m *MemberListListener) Listen() {
 					}
 				}
 			case SYNC_SUB_OPT:
-				for _, mbr := range m.Members() {
-					core.AppLog.Debug().Msgf("sending topic message to %s", mbr.FullAddress().Name)
-					m.SendToAddress(mbr.FullAddress(), util.ToJson(mr.Source))
+				if mr.Address != "" {
+					for _, mbr := range m.Members() {
+						if mbr.Address() == mr.Address {
+							core.AppLog.Debug().Msgf("sending topic message to %s", mbr.FullAddress().Name)
+							m.SendToAddress(mbr.FullAddress(), util.ToJson(mr.Source))
+							break
+						}
+					}
+				} else {
+					for _, mbr := range m.Members() {
+						core.AppLog.Debug().Msgf("sending topic message to %s", mbr.FullAddress().Name)
+						m.SendToAddress(mbr.FullAddress(), util.ToJson(mr.Source))
+					}
 				}
 			case CLOSE_RING_OPT:
 				running = false
