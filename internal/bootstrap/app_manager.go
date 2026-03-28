@@ -3,14 +3,11 @@ package bootstrap
 import (
 	"context"
 	"fmt"
-	"io"
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
-	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/concurrency"
@@ -28,6 +25,7 @@ type AppManager struct {
 	ItemUpdater item.ItemListener
 	tcpPusher   core.Pusher
 	ManagedApps []string
+	cluster     ClusterManager
 	rpc         *grpc.ClientConn
 	running     bool
 }
@@ -55,7 +53,7 @@ func (s *AppManager) ItemListener() item.ItemListener {
 }
 
 func (c *AppManager) Cluster() core.ClusterService {
-	return c
+	return c.Cluster()
 }
 
 func (s *AppManager) NodeId() string {
@@ -63,6 +61,7 @@ func (s *AppManager) NodeId() string {
 }
 func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
+	s.cluster = ClusterManager{App: s}
 	s.running = true
 	s.ManagedApps = f.ManagedApps
 	s.tcpPusher = p
@@ -117,13 +116,13 @@ func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 		s.rpc = tcp
 		break
 	}
-	go s.receive()
+	go s.cluster.receive()
 	return nil
 }
 
 func (s *AppManager) Shutdown() {
 	s.running = false
-	s.disconnect()
+	s.cluster.disconnect()
 	s.rpc.Close()
 	util.GitPush()
 	s.Sql.Close()
@@ -137,7 +136,28 @@ func (s *AppManager) Context() string {
 func (s *AppManager) Service() TarantulaService {
 	return s
 }
+func (s *AppManager) Create(classId uint32, topic string) (core.Event, error) {
+	return nil, nil
+}
 
+func (s *AppManager) VerifyTicket(ticket string) (core.OnSession, error) {
+	session, err := s.auth.ValidateTicket(ticket)
+	if err != nil {
+		return session, err
+	}
+	if session.AccessControl < core.ADMIN_ACCESS_CONTROL {
+		return session, fmt.Errorf("admin access control required %d", session.AccessControl)
+	}
+	return session, nil
+}
+
+func (s *AppManager) OnEvent(e core.Event) {
+	core.AppLog.Debug().Msgf("event %v", e)
+}
+
+func (s *AppManager) OnError(e core.Event, err error) {
+
+}
 func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
 	tkn := util.JwtHMac{Alg: core.JWT_ALG, Ksz: core.JWT_KEY_SIZE}
 	ci := util.Aes{Ksz: core.CIPHER_KEY_SIZE}
@@ -204,86 +224,4 @@ func (c *AppManager) Atomic(prefix string, t core.Exec) error {
 	mutex.Lock(ctx)
 	defer mutex.Unlock(ctx)
 	return t(&core.EtcdClient{Cli: cli, Prefix: prefix})
-}
-
-// ClusterService api
-func (c *AppManager) HashRing(r core.RingRequest) {
-
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	stream, err := dsp.HashRing(context.Background(), &protocol.Request{Prefix: 0})
-	if err != nil {
-		return
-	}
-	ring := make([]core.Node, 0)
-	for {
-		data, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
-			break
-		}
-		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
-	}
-	r.Async <- ring
-}
-
-func (c *AppManager) KeyRing(r core.RingRequest) {
-
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	stream, err := dsp.KeyRing(context.Background(), &protocol.Request{Prefix: r.Token})
-	if err != nil {
-		return
-	}
-	ring := make([]core.Node, 0)
-	for {
-		data, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
-			break
-		}
-		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
-	}
-	r.Async <- ring
-}
-
-func (c *AppManager) RingToken(key []byte) uint32 {
-	return util.Hash(key)
-}
-
-func (c *AppManager) Request(r core.DataRequest) {
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
-	if r.Opt == core.QUERY_DATA_REQUEST || r.Opt == core.PULL_DATA_REQUEST {
-		dt, err := event.Export(r.Criteria, 100)
-		if err != nil {
-			r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: err.Error()}}
-			return
-		}
-		q := protocol.Query{Id: r.Criteria.QId(), Criteria: dt}
-		req.Query = &q
-	}
-	stream, err := dsp.Request(context.Background(), &req)
-	if err != nil {
-		r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: err.Error()}}
-		return
-	}
-	crt := core.Chunk{Remaining: false}
-	for {
-		resp, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
-			crt.Data = err
-			break
-		}
-		r.Async <- core.Chunk{Remaining: true, Data: resp}
-	}
-	r.Async <- crt
 }

@@ -39,7 +39,7 @@ func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	err = s.Publish(tp)
+	err = s.Cluster().Publish(tp)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return

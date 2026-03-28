@@ -36,7 +36,7 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	defer close(me.QCc())
-	go s.List(me)
+	go s.Cluster().List(me)
 	ms := make([]event.MessageEvent, 0)
 	for c := range me.QCc() {
 		if !c.Remaining {
