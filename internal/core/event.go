@@ -1,6 +1,10 @@
 package core
 
-import "time"
+import (
+	"time"
+
+	"gameclustering.com/internal/protocol"
+)
 
 const (
 	EVENT_FACTORY_ID uint32 = 1
@@ -16,6 +20,8 @@ type EventService interface {
 	VerifyTicket(ticket string) (OnSession, error)
 	EventListener
 	Publish(e Event) error
+	PublishX(e *protocol.Event) error
+
 	List(q Query)
 	Subscribe(topic string, listener EventListener) error
 	Unsubscribe(topic string) error

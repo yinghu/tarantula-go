@@ -6,7 +6,6 @@ import (
 	"io"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
 )
 
@@ -34,17 +33,21 @@ func (s *AppManager) OnError(e core.Event, err error) {
 }
 
 func (s *AppManager) Publish(e core.Event) error {
-	k, v, err := core.Export(e, 200)
-	if err != nil {
-		return err
-	}
-	data := protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: e.FactoryId(), ClassId: e.ClassId()}}
+	//k, v, err := core.Export(e, 200)
+	//if err != nil {
+	//return err
+	//}
+	data := protocol.Event{Header: &protocol.Header{FactoryId: e.FactoryId(), ClassId: e.ClassId()}}
 	dsp := protocol.NewPostofficeServiceClient(s.rpc)
 	resp, err := dsp.Publish(context.Background(), &protocol.Topic{NodeId: e.NodeId(), Tag: e.Tag(), Name: e.Topic(), Event: &data})
 	if err != nil {
 		return err
 	}
 	core.AppLog.Debug().Msgf("topic publish %v", resp)
+	return nil
+}
+
+func (s *AppManager) PublishX(e *protocol.Event) error {
 	return nil
 }
 func (s *AppManager) List(query core.Query) {
@@ -100,14 +103,15 @@ func (c *AppManager) receive() {
 			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
 			break
 		}
-		data := resp.Event
-		e := event.CreateEvent(data.Header.ClassId)
-		err = core.Import(e, data.Key, data.Value, 200)
-		if err != nil {
-			core.AppLog.Debug().Msgf("event parse error %s", err.Error())
-		} else {
-			c.OnEvent(e)
-		}
+		core.AppLog.Debug().Msgf("topic %v", resp)
+		//data := resp.Event
+		//e := event.CreateEvent(data.Header.ClassId)
+		//err = core.Import(e, data.Key, data.Value, 200)
+		//if err != nil {
+		//core.AppLog.Debug().Msgf("event parse error %s", err.Error())
+		//} else {
+		//c.OnEvent(e)
+		//}
 	}
 	core.AppLog.Warn().Msg("rpc closed from remote")
 }

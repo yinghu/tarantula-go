@@ -25,7 +25,8 @@ const (
 type Event struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Header        *Header                `protobuf:"bytes,1,opt,name=header,proto3" json:"header,omitempty"`
-	Message       *anypb.Any             `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Id            uint64                 `protobuf:"fixed64,2,opt,name=id,proto3" json:"id,omitempty"`
+	Message       *anypb.Any             `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -67,6 +68,13 @@ func (x *Event) GetHeader() *Header {
 	return nil
 }
 
+func (x *Event) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 func (x *Event) GetMessage() *anypb.Any {
 	if x != nil {
 		return x.Message
@@ -78,10 +86,11 @@ var File_event_proto protoreflect.FileDescriptor
 
 const file_event_proto_rawDesc = "" +
 	"\n" +
-	"\vevent.proto\x12\bprotocol\x1a\x19google/protobuf/any.proto\x1a\fheader.proto\"a\n" +
+	"\vevent.proto\x12\bprotocol\x1a\x19google/protobuf/any.proto\x1a\fheader.proto\"q\n" +
 	"\x05Event\x12(\n" +
-	"\x06header\x18\x01 \x01(\v2\x10.protocol.HeaderR\x06header\x12.\n" +
-	"\amessage\x18\x02 \x01(\v2\x14.google.protobuf.AnyR\amessageBM\n" +
+	"\x06header\x18\x01 \x01(\v2\x10.protocol.HeaderR\x06header\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\x06R\x02id\x12.\n" +
+	"\amessage\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\amessageBM\n" +
 	"\x17com.icodesoftware.protoB\fEventFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (

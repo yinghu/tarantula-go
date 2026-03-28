@@ -26,7 +26,7 @@ type Topic struct {
 	NodeId        string                 `protobuf:"bytes,1,opt,name=nodeId,proto3" json:"nodeId,omitempty"`
 	Tag           string                 `protobuf:"bytes,2,opt,name=tag,proto3" json:"tag,omitempty"`
 	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Event         *Data                  `protobuf:"bytes,4,opt,name=event,proto3" json:"event,omitempty"`
+	Event         *Event                 `protobuf:"bytes,4,opt,name=event,proto3" json:"event,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -82,7 +82,7 @@ func (x *Topic) GetName() string {
 	return ""
 }
 
-func (x *Topic) GetEvent() *Data {
+func (x *Topic) GetEvent() *Event {
 	if x != nil {
 		return x.Event
 	}
@@ -93,13 +93,12 @@ var File_topic_proto protoreflect.FileDescriptor
 
 const file_topic_proto_rawDesc = "" +
 	"\n" +
-	"\vtopic.proto\x12\bprotocol\x1a\n" +
-	"data.proto\"k\n" +
+	"\vtopic.proto\x12\bprotocol\x1a\vevent.proto\"l\n" +
 	"\x05Topic\x12\x16\n" +
 	"\x06nodeId\x18\x01 \x01(\tR\x06nodeId\x12\x10\n" +
 	"\x03tag\x18\x02 \x01(\tR\x03tag\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x12$\n" +
-	"\x05event\x18\x04 \x01(\v2\x0e.protocol.DataR\x05eventBM\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12%\n" +
+	"\x05event\x18\x04 \x01(\v2\x0f.protocol.EventR\x05eventBM\n" +
 	"\x17com.icodesoftware.protoB\fTopicFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -117,10 +116,10 @@ func file_topic_proto_rawDescGZIP() []byte {
 var file_topic_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_topic_proto_goTypes = []any{
 	(*Topic)(nil), // 0: protocol.Topic
-	(*Data)(nil),  // 1: protocol.Data
+	(*Event)(nil), // 1: protocol.Event
 }
 var file_topic_proto_depIdxs = []int32{
-	1, // 0: protocol.Topic.event:type_name -> protocol.Data
+	1, // 0: protocol.Topic.event:type_name -> protocol.Event
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -133,7 +132,7 @@ func file_topic_proto_init() {
 	if File_topic_proto != nil {
 		return
 	}
-	file_data_proto_init()
+	file_event_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
