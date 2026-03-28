@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -47,9 +46,9 @@ func (s *PresenceRegister) Register(login bootstrap.Login) {
 		}
 		me := event.RegisterEvent{SystemId: login.SystemId, Name: login.Name}
 		me.OnOId(id)
-		me.RegisterTime = time.Now()
+		//me.RegisterTime = time.Now()
 		me.OnTopic("login")
-		s.Publish(&me)
+		//s.Publish(&me)
 		rw := item.OnInventory{SystemId: login.SystemId, ItemId: s.LoginReward.Id, Source: "login"}
 		err = s.ItemService().InventoryManager().Grant(rw)
 		if err != nil {

@@ -50,7 +50,7 @@ func (s *PresenceLogin) Login(login bootstrap.Login) {
 		me.OnOId(id)
 		me.LoginTime = time.Now()
 		me.OnTopic("login")
-		s.Publish(&me)
+		//s.Publish(&me)
 		rw := item.OnInventory{SystemId: login.SystemId, ItemId: s.LoginReward.Id, Source: "login"}
 		err = s.ItemService().InventoryManager().Grant(rw)
 		if err != nil {
