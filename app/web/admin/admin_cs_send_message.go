@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
@@ -33,7 +34,12 @@ func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 	me.OnOId(id)
 	me.Source = s.Context()
 	me.DateTime = time.Now()
-	err = s.Publish(&me)
+	tp, err := bootstrap.FromMessageEvent(me)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	err = s.Publish(tp)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return

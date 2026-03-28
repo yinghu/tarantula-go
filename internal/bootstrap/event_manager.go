@@ -32,7 +32,7 @@ func (s *AppManager) OnError(e core.Event, err error) {
 
 }
 
-func (s *AppManager) Publish(e core.Event) error {
+func (s *AppManager) PublishX(e core.Event) error {
 	//k, v, err := core.Export(e, 200)
 	//if err != nil {
 	//return err
@@ -47,7 +47,13 @@ func (s *AppManager) Publish(e core.Event) error {
 	return nil
 }
 
-func (s *AppManager) PublishX(e *protocol.Event) error {
+func (s *AppManager) Publish(e *protocol.Topic) error {
+	dsp := protocol.NewPostofficeServiceClient(s.rpc)
+	resp, err := dsp.Publish(context.Background(), e)
+	if err != nil {
+		return err
+	}
+	core.AppLog.Debug().Msgf("topic publish %v", resp)
 	return nil
 }
 func (s *AppManager) List(query core.Query) {
