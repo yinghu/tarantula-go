@@ -32,21 +32,6 @@ func (s *AppManager) OnError(e core.Event, err error) {
 
 }
 
-func (s *AppManager) PublishX(e core.Event) error {
-	//k, v, err := core.Export(e, 200)
-	//if err != nil {
-	//return err
-	//}
-	data := protocol.Event{Header: &protocol.Header{FactoryId: e.FactoryId(), ClassId: e.ClassId()}}
-	dsp := protocol.NewPostofficeServiceClient(s.rpc)
-	resp, err := dsp.Publish(context.Background(), &protocol.Topic{NodeId: e.NodeId(), Tag: e.Tag(), Name: e.Topic(), Event: &data})
-	if err != nil {
-		return err
-	}
-	core.AppLog.Debug().Msgf("topic publish %v", resp)
-	return nil
-}
-
 func (s *AppManager) Publish(e *protocol.Topic) error {
 	dsp := protocol.NewPostofficeServiceClient(s.rpc)
 	resp, err := dsp.Publish(context.Background(), e)

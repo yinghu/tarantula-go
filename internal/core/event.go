@@ -2,8 +2,6 @@ package core
 
 import (
 	"time"
-
-	"gameclustering.com/internal/protocol"
 )
 
 const (
@@ -19,12 +17,10 @@ type EventService interface {
 	EventCreator
 	VerifyTicket(ticket string) (OnSession, error)
 	EventListener
-	//Publish(e Event) error
-	Publish(e *protocol.Topic) error
-
-	List(q Query)
-	Subscribe(topic string, listener EventListener) error
-	Unsubscribe(topic string) error
+	//Publish(e *protocol.Topic) error
+	//List(q Query)
+	//Subscribe(topic string, listener EventListener) error
+	//Unsubscribe(topic string) error
 }
 
 type Event interface {

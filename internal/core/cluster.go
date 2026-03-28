@@ -1,6 +1,10 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+
+	"gameclustering.com/internal/protocol"
+)
 
 const (
 	RPC_PORT int = 7001
@@ -76,7 +80,7 @@ func (s *Subscription) Key() string {
 	return fmt.Sprintf("%s:%s:%s", s.NodeId, s.Tag, s.Topic)
 }
 func (s *Subscription) TopicKey() TopicKey {
-	return TopicKey{Topic:s.Topic,Endpoint: s.Endpoint}
+	return TopicKey{Topic: s.Topic, Endpoint: s.Endpoint}
 }
 
 type RingSync struct {
@@ -117,4 +121,9 @@ type ClusterService interface {
 	KeyRing(r RingRequest)
 	RingToken(key []byte) uint32
 	Request(r DataRequest)
+
+	Publish(e *protocol.Topic) error
+	List(q Query)
+	Subscribe(topic string, listener EventListener) error
+	Unsubscribe(topic string) error
 }

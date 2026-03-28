@@ -63,6 +63,8 @@ func (s *MahjongService) OnError(e core.Event, err error) {
 	core.AppLog.Printf("On event error %s\n", err.Error())
 }
 
+
+
 func (s *MahjongService) OnEvent(e core.Event) {
 	switch e.ClassId() {
 	case event.MESSAGE_CID:
