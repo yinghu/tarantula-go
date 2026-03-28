@@ -11,7 +11,8 @@ import (
 )
 
 type ClusterManager struct {
-	App *AppManager
+	App     *AppManager
+	running bool
 }
 
 func (c *ClusterManager) HashRing(r core.RingRequest) {
@@ -147,7 +148,7 @@ func (c *ClusterManager) receive() {
 		core.AppLog.Warn().Msgf("rpc connection error %s", err.Error())
 		return
 	}
-	for c.App.running {
+	for c.running {
 		resp, err := stream.Recv()
 		if err == io.EOF {
 			core.AppLog.Debug().Msgf("eof %s", err.Error())

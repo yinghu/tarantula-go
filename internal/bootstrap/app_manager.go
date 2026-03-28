@@ -27,7 +27,6 @@ type AppManager struct {
 	ManagedApps []string
 	cluster     *ClusterManager
 	rpc         *grpc.ClientConn
-	running     bool
 }
 
 func (s *AppManager) ItemService() item.ItemService {
@@ -53,7 +52,7 @@ func (s *AppManager) ItemListener() item.ItemListener {
 }
 
 func (c *AppManager) Cluster() core.ClusterService {
-	return c.Cluster()
+	return c.cluster
 }
 
 func (s *AppManager) NodeId() string {
@@ -61,8 +60,7 @@ func (s *AppManager) NodeId() string {
 }
 func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
-	s.cluster = &ClusterManager{App: s}
-	s.running = true
+	s.cluster = &ClusterManager{App: s, running: true}
 	s.ManagedApps = f.ManagedApps
 	s.tcpPusher = p
 	s.F = f
@@ -121,7 +119,7 @@ func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 }
 
 func (s *AppManager) Shutdown() {
-	s.running = false
+	s.cluster.running = false
 	s.cluster.disconnect()
 	s.rpc.Close()
 	util.GitPush()
