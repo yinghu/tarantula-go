@@ -45,8 +45,9 @@ func (s *PresenceService) Start(env core.Env, p core.Pusher) error {
 		core.AppLog.Printf("Error on load registration %s %s\n", err.Error(), brn.Message)
 	}
 	s.Started = true
-	s.Cluster().Subscribe("message", &protocol.MessageEventListener{Callback: func(e *protocol.MessageEvent) {
-		core.AppLog.Debug().Msgf("event %v", e)
+	s.Cluster().Subscribe("message", &protocol.MessageEventListener{Callback: func(e *protocol.MessageEvent) error {
+		core.AppLog.Debug().Msgf("event time %v", e.DateTime.AsTime())
+		return nil
 	}})
 	core.AppLog.Printf("Presence service started %s\n", env.HttpBinding)
 	http.Handle("/presence/register", bootstrap.Logging(&PresenceRegister{PresenceService: s}))

@@ -1,6 +1,6 @@
 package protocol
 
-type Handler func(e *MessageEvent)
+type Handler func(e *MessageEvent) error
 
 type MessageEventListener struct {
 	Callback Handler
@@ -12,6 +12,5 @@ func (m *MessageEventListener) OnTopic(topic *Topic) error {
 	if err != nil {
 		return err
 	}
-	m.Callback(&me)
-	return nil
+	return m.Callback(&me)
 }

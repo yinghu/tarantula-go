@@ -162,14 +162,6 @@ func (c *ClusterManager) receive() {
 		}
 		core.AppLog.Debug().Msgf("topic %v", resp)
 		c.tpl.OnTopic(resp)
-		//data := resp.Event
-		//e := event.CreateEvent(data.Header.ClassId)
-		//err = core.Import(e, data.Key, data.Value, 200)
-		//if err != nil {
-		//core.AppLog.Debug().Msgf("event parse error %s", err.Error())
-		//} else {
-		//c.OnEvent(e)
-		//}
 	}
 	core.AppLog.Warn().Msg("rpc closed from remote")
 }
