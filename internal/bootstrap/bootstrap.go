@@ -32,7 +32,6 @@ type TarantulaContext interface {
 	Config() string
 	Start(f core.Env, p core.Pusher) error
 	Shutdown()
-	//core.EventService
 	Context() string
 	Service() TarantulaService
 }
