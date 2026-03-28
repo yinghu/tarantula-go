@@ -36,4 +36,20 @@ func TestEvent(t *testing.T) {
 		return
 	}
 	fmt.Printf("data %v\n", &me)
+
+	tp := Topic{NodeId: "pd.1", Tag: "presence", Name: "message", Event: &e}
+	tdd, err := proto.Marshal(&tp)
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+		return
+	}
+	fmt.Printf("size of topic %d\n", len(tdd))
+
+	var tpx Topic
+	err = proto.Unmarshal(tdd, &tpx)
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+		return
+	}
+	fmt.Printf("topic %v\n", &tpx)
 }

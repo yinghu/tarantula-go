@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 )
 
 type SampleCreator struct {
@@ -33,6 +34,9 @@ func (s *SampleCreator) OnEvent(e core.Event) {
 
 }
 func (s *SampleCreator) Publish(e core.Event) error {
+	return nil
+}
+func (s *SampleCreator) PublishX(e *protocol.Event) error {
 	return nil
 }
 func (s *SampleCreator) List(q core.Query)    {}
