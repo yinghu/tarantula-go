@@ -78,10 +78,10 @@ func (s *MahjongService) OnEvent(e core.Event) {
 		id, _ := s.Sequence().Id()
 		e.OnOId(id)
 		e.OnTopic("mahjong")
-		err := s.Publish(e)
-		if err != nil {
-			core.AppLog.Printf("failed to send event %s\n", err.Error())
-		}
+		//err := s.Publish(e)
+		//if err != nil {
+			//core.AppLog.Printf("failed to send event %s\n", err.Error())
+		//}
 	default:
 	}
 }
