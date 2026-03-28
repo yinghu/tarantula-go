@@ -25,7 +25,7 @@ type AppManager struct {
 	ItemUpdater item.ItemListener
 	tcpPusher   core.Pusher
 	ManagedApps []string
-	cluster     ClusterManager
+	cluster     *ClusterManager
 	rpc         *grpc.ClientConn
 	running     bool
 }
@@ -61,7 +61,7 @@ func (s *AppManager) NodeId() string {
 }
 func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
-	s.cluster = ClusterManager{App: s}
+	s.cluster = &ClusterManager{App: s}
 	s.running = true
 	s.ManagedApps = f.ManagedApps
 	s.tcpPusher = p
