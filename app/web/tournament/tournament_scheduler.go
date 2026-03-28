@@ -54,7 +54,7 @@ func (a *TournamentService) scheduleInstance(conf item.Configuration) {
 	id, _ := a.Sequence().Id()
 	info.OnOId(id)
 	info.OnTopic("message")
-	a.Publish(&info)
+	//a.Publish(&info)
 }
 
 func (a *TournamentService) scheduleSegment(conf item.Configuration) {
