@@ -32,7 +32,7 @@ type TarantulaContext interface {
 	Config() string
 	Start(f core.Env, p core.Pusher) error
 	Shutdown()
-	core.EventService
+	//core.EventService
 	Context() string
 	Service() TarantulaService
 }
@@ -45,6 +45,7 @@ type TarantulaService interface {
 	ItemListener() item.ItemListener
 	Pusher() core.Pusher
 	Cluster() core.ClusterService
+	Event() core.EventService
 }
 
 type TarantulaApp interface {
@@ -63,5 +64,3 @@ type Login struct {
 	AccessControl int32           `json:"accessControl,string"`
 	Cc            chan core.Chunk `json:"-"`
 }
-
-

@@ -37,7 +37,7 @@ func (s *TournamentService) Start(f core.Env, p core.Pusher) error {
 			}
 		}
 	}
-	s.Cluster().Subscribe("tournament", s)
+	s.Cluster().Subscribe("tournament", s.Event())
 	http.Handle("/tournament/list", bootstrap.Logging(&TournamentList{TournamentService: s}))
 	http.Handle("/tournament/join", bootstrap.Logging(&TournamentJoin{TournamentService: s}))
 	http.Handle("/tournament/score", bootstrap.Logging(&TournamentScore{TournamentService: s}))

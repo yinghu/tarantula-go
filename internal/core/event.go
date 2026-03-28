@@ -17,10 +17,6 @@ type EventService interface {
 	EventCreator
 	VerifyTicket(ticket string) (OnSession, error)
 	EventListener
-	//Publish(e *protocol.Topic) error
-	//List(q Query)
-	//Subscribe(topic string, listener EventListener) error
-	//Unsubscribe(topic string) error
 }
 
 type Event interface {

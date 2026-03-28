@@ -41,7 +41,7 @@ func (s *AdminService) Start(f core.Env, p core.Pusher) error {
 	if err != nil {
 		core.AppLog.Printf("Root already existed %s\n", err.Error())
 	}
-	s.Cluster().Subscribe("login", s)
+	s.Cluster().Subscribe("login", s.Event())
 	http.Handle("/admin/webprotected/{name}", bootstrap.Logging(&AdminWebProtected{AdminService: s}))
 	http.Handle("/admin/web/{name}", bootstrap.Logging(&AdminWebIndex{AdminService: s}))
 	//handle / context from nginx proxy

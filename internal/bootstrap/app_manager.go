@@ -26,6 +26,7 @@ type AppManager struct {
 	tcpPusher   core.Pusher
 	ManagedApps []string
 	cluster     *ClusterManager
+	event       *EventManager
 	rpc         *grpc.ClientConn
 }
 
@@ -54,6 +55,9 @@ func (s *AppManager) ItemListener() item.ItemListener {
 func (c *AppManager) Cluster() core.ClusterService {
 	return c.cluster
 }
+func (c *AppManager) Event() core.EventService {
+	return c.event
+}
 
 func (s *AppManager) NodeId() string {
 	return s.F.NodeName
@@ -61,6 +65,7 @@ func (s *AppManager) NodeId() string {
 func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
 	s.cluster = &ClusterManager{App: s, running: true}
+	s.event = &EventManager{App: s}
 	s.ManagedApps = f.ManagedApps
 	s.tcpPusher = p
 	s.F = f
@@ -134,28 +139,7 @@ func (s *AppManager) Context() string {
 func (s *AppManager) Service() TarantulaService {
 	return s
 }
-func (s *AppManager) Create(classId uint32, topic string) (core.Event, error) {
-	return nil, nil
-}
 
-func (s *AppManager) VerifyTicket(ticket string) (core.OnSession, error) {
-	session, err := s.auth.ValidateTicket(ticket)
-	if err != nil {
-		return session, err
-	}
-	if session.AccessControl < core.ADMIN_ACCESS_CONTROL {
-		return session, fmt.Errorf("admin access control required %d", session.AccessControl)
-	}
-	return session, nil
-}
-
-func (s *AppManager) OnEvent(e core.Event) {
-	core.AppLog.Debug().Msgf("event %v", e)
-}
-
-func (s *AppManager) OnError(e core.Event, err error) {
-
-}
 func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
 	tkn := util.JwtHMac{Alg: core.JWT_ALG, Ksz: core.JWT_KEY_SIZE}
 	ci := util.Aes{Ksz: core.CIPHER_KEY_SIZE}

@@ -7,7 +7,7 @@ type LocalPublisher struct {
 }
 
 func (s *LocalPublisher) Publish(e core.Event, ticket string) error {
-	s.OnEvent(e)
+	s.Event().OnEvent(e)
 	return nil
 }
 
