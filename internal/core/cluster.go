@@ -116,6 +116,10 @@ type DataRequest struct {
 	Async    chan Chunk
 }
 
+type TopicListener interface {
+	OnTopic(topic *protocol.Topic) error
+}
+
 type ClusterService interface {
 	HashRing(r RingRequest)
 	KeyRing(r RingRequest)
@@ -124,6 +128,6 @@ type ClusterService interface {
 
 	Publish(e *protocol.Topic) error
 	List(q Query)
-	Subscribe(topic string, listener EventListener) error
+	Subscribe(topic string, listener TopicListener) error
 	Unsubscribe(topic string) error
 }

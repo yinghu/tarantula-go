@@ -6,6 +6,7 @@ import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -44,7 +45,9 @@ func (s *PresenceService) Start(env core.Env, p core.Pusher) error {
 		core.AppLog.Printf("Error on load registration %s %s\n", err.Error(), brn.Message)
 	}
 	s.Started = true
-	s.Cluster().Subscribe("message", s.Event())
+	s.Cluster().Subscribe("message", &protocol.MessageEventListener{Callback: func(e *protocol.MessageEvent) {
+		core.AppLog.Debug().Msgf("event %v", e)
+	}})
 	core.AppLog.Printf("Presence service started %s\n", env.HttpBinding)
 	http.Handle("/presence/register", bootstrap.Logging(&PresenceRegister{PresenceService: s}))
 	http.Handle("/presence/login", bootstrap.Logging(&PresenceLogin{PresenceService: s}))

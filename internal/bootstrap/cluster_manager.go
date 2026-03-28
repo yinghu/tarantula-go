@@ -13,6 +13,7 @@ import (
 type ClusterManager struct {
 	App     *AppManager
 	running bool
+	tpl     core.TopicListener
 }
 
 func (c *ClusterManager) HashRing(r core.RingRequest) {
@@ -111,12 +112,13 @@ func (s *ClusterManager) List(query core.Query) {
 	s.Request(req)
 }
 
-func (s *ClusterManager) Subscribe(topic string, listener core.EventListener) error {
+func (s *ClusterManager) Subscribe(topic string, listener core.TopicListener) error {
 	dsp := protocol.NewPostofficeServiceClient(s.App.rpc)
 	resp, err := dsp.Subscribe(context.Background(), &protocol.Topic{NodeId: s.App.NodeId(), Tag: s.App.Context(), Name: topic})
 	if err != nil {
 		return err
 	}
+	s.tpl = listener
 	core.AppLog.Debug().Msgf("topic registered %v", resp)
 	return nil
 }
@@ -159,6 +161,7 @@ func (c *ClusterManager) receive() {
 			break
 		}
 		core.AppLog.Debug().Msgf("topic %v", resp)
+		c.tpl.OnTopic(resp)
 		//data := resp.Event
 		//e := event.CreateEvent(data.Header.ClassId)
 		//err = core.Import(e, data.Key, data.Value, 200)
