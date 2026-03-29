@@ -208,6 +208,7 @@ func (c *ClusterManager) connect(host string) error {
 		c.rpc = tcp
 		break
 	}
+	c.subscriptions = make(map[string]core.TopicListener)
 	c.cSub = make(chan Sub, SUB_CHAN_SIZE)
 	c.cInbound = make(chan *protocol.Topic, TOPIC_CHAN_SIZE)
 	c.running = true
