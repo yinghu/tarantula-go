@@ -16,7 +16,19 @@ import (
 
 const (
 	RPC_CONNECT_RETRIES int = 3
+
+	SUB_CHAN_SIZE   int = 3
+	TOPIC_CHAN_SIZE int = 12
+
+	OPT_SUB   int = 100
+	OPT_UNSUB int = 200
 )
+
+type Sub struct {
+	opt      int
+	name     string
+	listener core.TopicListener
+}
 
 type ClusterManager struct {
 	App     *AppManager
@@ -25,7 +37,8 @@ type ClusterManager struct {
 
 	subscriptions map[string]core.TopicListener
 
-	CRequest chan core.TopicListener
+	cSub     chan Sub
+	cInbound chan *protocol.Topic
 }
 
 func (c *ClusterManager) HashRing(r core.RingRequest) {
@@ -146,6 +159,7 @@ func (c *ClusterManager) Subscribe(topic string, listener core.TopicListener) er
 	if err != nil {
 		return err
 	}
+	c.cSub <- Sub{opt: OPT_SUB, name: topic, listener: listener}
 	core.AppLog.Debug().Msgf("topic registered %v", resp)
 	return nil
 }
@@ -159,6 +173,7 @@ func (c *ClusterManager) Unsubscribe(topic string) error {
 	if err != nil {
 		return err
 	}
+	c.cSub <- Sub{opt: OPT_UNSUB, name: topic}
 	core.AppLog.Debug().Msgf("topic unregistered %v", resp)
 	return nil
 }
@@ -177,7 +192,7 @@ func (c *ClusterManager) disconnect() error {
 	return c.rpc.Close()
 }
 
-func (s *ClusterManager) connect(host string) error {
+func (c *ClusterManager) connect(host string) error {
 	retries := RPC_CONNECT_RETRIES
 	for {
 		tcp, err := grpc.NewClient(fmt.Sprintf("%s:%d", host, core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -190,11 +205,14 @@ func (s *ClusterManager) connect(host string) error {
 			}
 			return err
 		}
-		s.rpc = tcp
+		c.rpc = tcp
 		break
 	}
-	s.running = true
-	go s.receive()
+	c.cSub = make(chan Sub, SUB_CHAN_SIZE)
+	c.cInbound = make(chan *protocol.Topic, TOPIC_CHAN_SIZE)
+	c.running = true
+	go c.async()
+	go c.receive()
 	return nil
 }
 
@@ -216,7 +234,31 @@ func (c *ClusterManager) receive() {
 			break
 		}
 		core.AppLog.Debug().Msgf("topic %v", resp)
-		//c.tpl.OnTopic(resp)
+		c.cInbound <- resp
 	}
 	core.AppLog.Warn().Msg("rpc closed from remote")
+}
+
+func (c *ClusterManager) async() {
+	for c.running {
+		select {
+		case sub := <-c.cSub:
+			switch sub.opt {
+			case OPT_SUB:
+				c.subscriptions[sub.name] = sub.listener
+			case OPT_UNSUB:
+				delete(c.subscriptions, sub.name)
+			}
+		case topic := <-c.cInbound:
+			tl, ok := c.subscriptions[topic.Name]
+			if ok {
+				tl.OnTopic(topic)
+			} else {
+				core.AppLog.Debug().Msgf("dead topic %v", topic)
+			}
+		}
+	}
+	clear(c.subscriptions)
+	close(c.cInbound)
+	close(c.cSub)
 }
