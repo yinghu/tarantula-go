@@ -242,22 +242,14 @@ ro:
 			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
 			break
 		}
-		//core.AppLog.Debug().Msgf("topic %v", resp)
 		c.cInbound <- resp
 	}
-	core.AppLog.Warn().Msg("rpc closed from remote")
+	core.AppLog.Warn().Msgf("cluster manager receiver closed from remote %v", c.running)
 }
 
 func (c *ClusterManager) async() {
 	for c.running {
 		select {
-		case sub := <-c.cSub:
-			switch sub.opt {
-			case OPT_SUB:
-				c.subscriptions[sub.name] = sub.listener
-			case OPT_UNSUB:
-				delete(c.subscriptions, sub.name)
-			}
 		case topic := <-c.cInbound:
 			tl, ok := c.subscriptions[topic.Name]
 			if ok {
@@ -265,8 +257,17 @@ func (c *ClusterManager) async() {
 			} else {
 				core.AppLog.Debug().Msgf("dead topic %v", topic)
 			}
+		case sub := <-c.cSub:
+			switch sub.opt {
+			case OPT_SUB:
+				c.subscriptions[sub.name] = sub.listener
+			case OPT_UNSUB:
+				delete(c.subscriptions, sub.name)
+			}
+
 		}
 	}
+	core.AppLog.Warn().Msgf("cluster manager async task closed from remote %v", c.running)
 	clear(c.subscriptions)
 	close(c.cInbound)
 	close(c.cSub)
