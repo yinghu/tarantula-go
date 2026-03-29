@@ -19,16 +19,20 @@ const (
 )
 
 type ClusterManager struct {
-	App           *AppManager
-	rpc           *grpc.ClientConn
-	running       bool
-	
+	App     *AppManager
+	rpc     *grpc.ClientConn
+	running bool
+
 	subscriptions map[string]core.TopicListener
-	
+
+	CRequest chan core.TopicListener
 }
 
 func (c *ClusterManager) HashRing(r core.RingRequest) {
-
+	if !c.running {
+		r.Async <- []core.Node{}
+		return
+	}
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	stream, err := dsp.HashRing(context.Background(), &protocol.Request{Prefix: 0})
 	if err != nil {
@@ -50,7 +54,10 @@ func (c *ClusterManager) HashRing(r core.RingRequest) {
 }
 
 func (c *ClusterManager) KeyRing(r core.RingRequest) {
-
+	if !c.running {
+		r.Async <- []core.Node{}
+		return
+	}
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	stream, err := dsp.KeyRing(context.Background(), &protocol.Request{Prefix: r.Token})
 	if err != nil {
@@ -76,6 +83,10 @@ func (c *ClusterManager) RingToken(key []byte) uint32 {
 }
 
 func (c *ClusterManager) Request(r core.DataRequest) {
+	if !c.running {
+		r.Async <- core.Chunk{Remaining: false}
+		return
+	}
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
 	if r.Opt == core.QUERY_DATA_REQUEST || r.Opt == core.PULL_DATA_REQUEST {
@@ -108,8 +119,11 @@ func (c *ClusterManager) Request(r core.DataRequest) {
 	r.Async <- crt
 }
 
-func (s *ClusterManager) Publish(e *protocol.Topic) error {
-	dsp := protocol.NewPostofficeServiceClient(s.rpc)
+func (c *ClusterManager) Publish(e *protocol.Topic) error {
+	if !c.running {
+		return fmt.Errorf("not started")
+	}
+	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	resp, err := dsp.Publish(context.Background(), e)
 	if err != nil {
 		return err
@@ -117,15 +131,18 @@ func (s *ClusterManager) Publish(e *protocol.Topic) error {
 	core.AppLog.Debug().Msgf("topic publish %v", resp)
 	return nil
 }
-func (s *ClusterManager) List(query core.Query) {
+func (c *ClusterManager) List(query core.Query) {
 	req := core.DataRequest{Opt: core.QUERY_DATA_REQUEST, Criteria: query}
 	req.Async = query.QCc()
-	s.Request(req)
+	c.Request(req)
 }
 
-func (s *ClusterManager) Subscribe(topic string, listener core.TopicListener) error {
-	dsp := protocol.NewPostofficeServiceClient(s.rpc)
-	resp, err := dsp.Subscribe(context.Background(), &protocol.Topic{NodeId: s.App.NodeId(), Tag: s.App.Context(), Name: topic})
+func (c *ClusterManager) Subscribe(topic string, listener core.TopicListener) error {
+	if !c.running {
+		return fmt.Errorf("not started")
+	}
+	dsp := protocol.NewPostofficeServiceClient(c.rpc)
+	resp, err := dsp.Subscribe(context.Background(), &protocol.Topic{NodeId: c.App.NodeId(), Tag: c.App.Context(), Name: topic})
 	if err != nil {
 		return err
 	}
@@ -133,9 +150,12 @@ func (s *ClusterManager) Subscribe(topic string, listener core.TopicListener) er
 	return nil
 }
 
-func (s *ClusterManager) Unsubscribe(topic string) error {
-	dsp := protocol.NewPostofficeServiceClient(s.rpc)
-	resp, err := dsp.Unsubscribe(context.Background(), &protocol.Topic{Tag: s.App.Context(), Name: topic})
+func (c *ClusterManager) Unsubscribe(topic string) error {
+	if !c.running {
+		return fmt.Errorf("not started")
+	}
+	dsp := protocol.NewPostofficeServiceClient(c.rpc)
+	resp, err := dsp.Unsubscribe(context.Background(), &protocol.Topic{Tag: c.App.Context(), Name: topic})
 	if err != nil {
 		return err
 	}
@@ -143,15 +163,18 @@ func (s *ClusterManager) Unsubscribe(topic string) error {
 	return nil
 }
 
-func (s *ClusterManager) disconnect() error {
-	s.running = false
-	dsp := protocol.NewPostofficeServiceClient(s.rpc)
-	resp, err := dsp.Disconnect(context.Background(), &protocol.Topic{Tag: s.App.Context(), NodeId: s.App.NodeId()})
+func (c *ClusterManager) disconnect() error {
+	if !c.running {
+		return fmt.Errorf("not started")
+	}
+	c.running = false
+	dsp := protocol.NewPostofficeServiceClient(c.rpc)
+	resp, err := dsp.Disconnect(context.Background(), &protocol.Topic{Tag: c.App.Context(), NodeId: c.App.NodeId()})
 	if err != nil {
 		return err
 	}
 	core.AppLog.Debug().Msgf("disconnecting topic %v", resp)
-	return s.rpc.Close()
+	return c.rpc.Close()
 }
 
 func (s *ClusterManager) connect(host string) error {
