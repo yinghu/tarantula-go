@@ -2,23 +2,31 @@ package bootstrap
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+)
+
+const (
+	RPC_CONNECT_RETRIES int = 3
 )
 
 type ClusterManager struct {
 	App     *AppManager
+	rpc     *grpc.ClientConn
 	running bool
-	tpl     core.TopicListener
 }
 
 func (c *ClusterManager) HashRing(r core.RingRequest) {
 
-	dsp := protocol.NewPostofficeServiceClient(c.App.rpc)
+	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	stream, err := dsp.HashRing(context.Background(), &protocol.Request{Prefix: 0})
 	if err != nil {
 		return
@@ -40,7 +48,7 @@ func (c *ClusterManager) HashRing(r core.RingRequest) {
 
 func (c *ClusterManager) KeyRing(r core.RingRequest) {
 
-	dsp := protocol.NewPostofficeServiceClient(c.App.rpc)
+	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	stream, err := dsp.KeyRing(context.Background(), &protocol.Request{Prefix: r.Token})
 	if err != nil {
 		return
@@ -65,7 +73,7 @@ func (c *ClusterManager) RingToken(key []byte) uint32 {
 }
 
 func (c *ClusterManager) Request(r core.DataRequest) {
-	dsp := protocol.NewPostofficeServiceClient(c.App.rpc)
+	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
 	if r.Opt == core.QUERY_DATA_REQUEST || r.Opt == core.PULL_DATA_REQUEST {
 		dt, err := event.Export(r.Criteria, 100)
@@ -98,7 +106,7 @@ func (c *ClusterManager) Request(r core.DataRequest) {
 }
 
 func (s *ClusterManager) Publish(e *protocol.Topic) error {
-	dsp := protocol.NewPostofficeServiceClient(s.App.rpc)
+	dsp := protocol.NewPostofficeServiceClient(s.rpc)
 	resp, err := dsp.Publish(context.Background(), e)
 	if err != nil {
 		return err
@@ -113,18 +121,17 @@ func (s *ClusterManager) List(query core.Query) {
 }
 
 func (s *ClusterManager) Subscribe(topic string, listener core.TopicListener) error {
-	dsp := protocol.NewPostofficeServiceClient(s.App.rpc)
+	dsp := protocol.NewPostofficeServiceClient(s.rpc)
 	resp, err := dsp.Subscribe(context.Background(), &protocol.Topic{NodeId: s.App.NodeId(), Tag: s.App.Context(), Name: topic})
 	if err != nil {
 		return err
 	}
-	s.tpl = listener
 	core.AppLog.Debug().Msgf("topic registered %v", resp)
 	return nil
 }
 
 func (s *ClusterManager) Unsubscribe(topic string) error {
-	dsp := protocol.NewPostofficeServiceClient(s.App.rpc)
+	dsp := protocol.NewPostofficeServiceClient(s.rpc)
 	resp, err := dsp.Unsubscribe(context.Background(), &protocol.Topic{Tag: s.App.Context(), Name: topic})
 	if err != nil {
 		return err
@@ -134,17 +141,39 @@ func (s *ClusterManager) Unsubscribe(topic string) error {
 }
 
 func (s *ClusterManager) disconnect() error {
-	dsp := protocol.NewPostofficeServiceClient(s.App.rpc)
+	s.running = false
+	dsp := protocol.NewPostofficeServiceClient(s.rpc)
 	resp, err := dsp.Disconnect(context.Background(), &protocol.Topic{Tag: s.App.Context(), NodeId: s.App.NodeId()})
 	if err != nil {
 		return err
 	}
 	core.AppLog.Debug().Msgf("disconnecting topic %v", resp)
+	return s.rpc.Close()
+}
+
+func (s *ClusterManager) connect(host string) error {
+	retries := RPC_CONNECT_RETRIES
+	for {
+		tcp, err := grpc.NewClient(fmt.Sprintf("%s:%d", host, core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if err != nil {
+			retries--
+			if retries > 0 {
+				core.AppLog.Warn().Msgf("retrying to connect gprc %s with retried times %d", err.Error(), retries)
+				time.Sleep(3 * time.Second)
+				continue
+			}
+			return err
+		}
+		s.rpc = tcp
+		break
+	}
+	s.running = true
+	go s.receive()
 	return nil
 }
 
 func (c *ClusterManager) receive() {
-	dsp := protocol.NewPostofficeServiceClient(c.App.rpc)
+	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	stream, err := dsp.Receive(context.Background(), &protocol.Topic{NodeId: c.App.NodeId(), Tag: c.App.Context()})
 	if err != nil {
 		core.AppLog.Warn().Msgf("rpc connection error %s", err.Error())
@@ -161,7 +190,7 @@ func (c *ClusterManager) receive() {
 			break
 		}
 		core.AppLog.Debug().Msgf("topic %v", resp)
-		c.tpl.OnTopic(resp)
+		//c.tpl.OnTopic(resp)
 	}
 	core.AppLog.Warn().Msg("rpc closed from remote")
 }

@@ -11,8 +11,6 @@ import (
 	"gameclustering.com/internal/util"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/concurrency"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type AppManager struct {
@@ -27,7 +25,6 @@ type AppManager struct {
 	ManagedApps []string
 	cluster     *ClusterManager
 	event       *EventManager
-	rpc         *grpc.ClientConn
 }
 
 func (s *AppManager) ItemService() item.ItemService {
@@ -64,7 +61,7 @@ func (s *AppManager) NodeId() string {
 }
 func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
-	s.cluster = &ClusterManager{App: s, running: true}
+	s.cluster = &ClusterManager{App: s}
 	s.event = &EventManager{App: s}
 	s.ManagedApps = f.ManagedApps
 	s.tcpPusher = p
@@ -103,30 +100,11 @@ func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 		return err
 	}
 	s.imse = &is
-	retries := 3
-	for {
-		tcp, err := grpc.NewClient(fmt.Sprintf("%s:%d", f.Host, core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
-		if err != nil {
-			core.AppLog.Warn().Msgf("grpc connect failed %s", err.Error())
-			//return err
-			retries--
-			if retries > 0 {
-				time.Sleep(3 * time.Second)
-				continue
-			}
-			return err
-		}
-		s.rpc = tcp
-		break
-	}
-	go s.cluster.receive()
-	return nil
+	return s.cluster.connect(f.Host)
 }
 
 func (s *AppManager) Shutdown() {
-	s.cluster.running = false
 	s.cluster.disconnect()
-	s.rpc.Close()
 	util.GitPush()
 	s.Sql.Close()
 	core.AppLog.Println("app manager shutting down ...")
