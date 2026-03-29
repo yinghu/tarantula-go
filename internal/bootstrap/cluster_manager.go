@@ -218,10 +218,18 @@ func (c *ClusterManager) connect(host string) error {
 }
 
 func (c *ClusterManager) receive() {
+	retries := RPC_CONNECT_RETRIES
+ro:
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	stream, err := dsp.Receive(context.Background(), &protocol.Topic{NodeId: c.App.NodeId(), Tag: c.App.Context()})
 	if err != nil {
-		core.AppLog.Warn().Msgf("rpc connection error %s", err.Error())
+		retries--
+		if retries > 0 {
+			core.AppLog.Warn().Msgf("rpc connection retry with %s %d", err.Error(), retries)
+			time.Sleep(3 * time.Second)
+			goto ro
+		}
+		core.AppLog.Warn().Msgf("rpc connection error after retried %s", err.Error())
 		return
 	}
 	for c.running {
