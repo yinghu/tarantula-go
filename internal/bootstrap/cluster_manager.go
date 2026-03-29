@@ -234,7 +234,7 @@ func (c *ClusterManager) receive() {
 			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
 			break
 		}
-		core.AppLog.Debug().Msgf("topic %v", resp)
+		//core.AppLog.Debug().Msgf("topic %v", resp)
 		c.cInbound <- resp
 	}
 	core.AppLog.Warn().Msg("rpc closed from remote")
