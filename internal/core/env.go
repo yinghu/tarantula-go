@@ -21,21 +21,22 @@ type EventEndpoint struct {
 }
 
 type Env struct {
-	Prefix        string        `json:"Prefix"`
-	Standalone    bool          `json:"Standalone"`
-	GroupName     string        `json:"GroupName"`
-	NodeName      string        `json:"NodeName"`
-	NodeId        int64         `json:"NodeId"`
-	Host          string        `json:"Host"`
-	HttpBinding   string        `json:"HttpBinding"`
-	HttpEndpoint  string        `json:"HttpEndpoint"`
-	Evp           EventEndpoint `json:"EventEndpoint"`
-	EtcdEndpoints []string      `json:"EtcdEndpoints"`
-	ManagedApps   []string      `json:"ManagedApps"`
-	Pgs           Sql           `json:"Sql"`
-	HomeDir       string        `json:"HomeDir"`
-	LogTruncated  bool          `json:"LogTruncated"`
-	AuthLevel     int32         `json:"AuthLevel"`
+	Prefix          string        `json:"Prefix"`
+	Standalone      bool          `json:"Standalone"`
+	GroupName       string        `json:"GroupName"`
+	NodeName        string        `json:"NodeName"`
+	NodeId          int64         `json:"NodeId"`
+	Host            string        `json:"Host"`
+	HttpBinding     string        `json:"HttpBinding"`
+	HttpEndpoint    string        `json:"HttpEndpoint"`
+	Evp             EventEndpoint `json:"EventEndpoint"`
+	EtcdEndpoints   []string      `json:"EtcdEndpoints"`
+	ManagedApps     []string      `json:"ManagedApps"`
+	Pgs             Sql           `json:"Sql"`
+	HomeDir         string        `json:"HomeDir"`
+	LogTruncated    bool          `json:"LogTruncated"`
+	AuthLevel       int32         `json:"AuthLevel"`
+	IsClusterMember bool          `json:"IsClusterMember"`
 }
 
 func (f *Env) PresenceCtx() string {

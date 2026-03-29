@@ -61,7 +61,7 @@ func (s *AppManager) NodeId() string {
 }
 func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
-	s.cluster = &ClusterManager{App: s}
+
 	s.event = &EventManager{App: s}
 	s.ManagedApps = f.ManagedApps
 	s.tcpPusher = p
@@ -100,6 +100,11 @@ func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 		return err
 	}
 	s.imse = &is
+	if f.IsClusterMember {
+		return nil
+	}
+	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.Host)
+	s.cluster = &ClusterManager{App: s}
 	return s.cluster.connect(f.Host)
 }
 

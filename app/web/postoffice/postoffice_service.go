@@ -19,6 +19,7 @@ func (s *PostofficeService) Config() string {
 
 func (s *PostofficeService) Start(env core.Env, p core.Pusher) error {
 	env.AuthLevel = core.ADMIN_ACCESS_CONTROL
+	env.IsClusterMember = true
 	s.AppManager.Start(env, p)
 
 	s.createSchema()

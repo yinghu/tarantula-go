@@ -19,9 +19,12 @@ const (
 )
 
 type ClusterManager struct {
-	App     *AppManager
-	rpc     *grpc.ClientConn
-	running bool
+	App           *AppManager
+	rpc           *grpc.ClientConn
+	running       bool
+	
+	subscriptions map[string]core.TopicListener
+	
 }
 
 func (c *ClusterManager) HashRing(r core.RingRequest) {
