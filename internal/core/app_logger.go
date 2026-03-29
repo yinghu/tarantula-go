@@ -11,7 +11,7 @@ var (
 )
 
 func CreateAppLog(dir string, truncated bool, standAlone bool) {
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	if standAlone {
 		CreateTestLog()
