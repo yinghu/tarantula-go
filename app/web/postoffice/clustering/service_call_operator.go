@@ -47,8 +47,10 @@ func (s *ServiceCallOperator) RunTask() {
 			continue
 		}
 		for r := range RETRY_MAX {
+			core.AppLog.Debug().Msgf("connecting to %s", task.target)
 			c, err := grpc.NewClient(task.target, grpc.WithTransportCredentials(insecure.NewCredentials()))
 			if err == nil {
+				core.AppLog.Debug().Msgf("connected to %s", task.target)
 				s.localConns[task.target] = c
 				break
 			}
