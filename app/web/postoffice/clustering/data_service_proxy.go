@@ -32,7 +32,7 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request) (*protocol.Respon
 		c.clientCreate(&ringNode, set, ch)
 		resp := <-ch
 		if !resp.Successful {
-			retry.Err = fmt.Errorf(resp.Message)
+			retry.Err = resp.Message
 			retry.Reties--
 			continue
 		}
@@ -47,8 +47,8 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request) (*protocol.Respon
 		}
 		break
 	}
-	core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
-	return &protocol.Response{Successful: retry.Suc, Message: retry.Err.Error()}, nil
+	core.AppLog.Printf("retry %s, %d", retry.Err, retry.Reties)
+	return &protocol.Response{Successful: retry.Suc, Message: retry.Err}, nil
 }
 
 func (m *DataServiceProvider) clientCreate(target *core.Node, request *protocol.Request, ch chan *protocol.Response) {
@@ -71,7 +71,7 @@ func (c *DataServiceProvider) runUpdate(set *protocol.Request, ch chan *protocol
 		ringNode := nodes[0]
 		resp, err := c.clientUpdate(&ringNode, set)
 		if err != nil {
-			retry.Err = err
+			retry.Err = err.Error()
 			retry.Reties--
 			continue
 		}
@@ -89,8 +89,8 @@ func (c *DataServiceProvider) runUpdate(set *protocol.Request, ch chan *protocol
 	if retry.Suc {
 		return
 	}
-	core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
-	ch <- &protocol.Response{Successful: false, Message: retry.Err.Error()}
+	core.AppLog.Printf("retry %s, %d", retry.Err, retry.Reties)
+	ch <- &protocol.Response{Successful: false, Message: retry.Err}
 }
 
 func (m *DataServiceProvider) clientUpdate(target *core.Node, request *protocol.Request) (*protocol.Response, error) {
@@ -113,7 +113,7 @@ func (c *DataServiceProvider) runDelete(set *protocol.Request, ch chan *protocol
 		ringNode := nodes[0]
 		resp, err := c.clientDelete(&ringNode, set)
 		if err != nil {
-			retry.Err = err
+			retry.Err = err.Error()
 			retry.Reties--
 			continue
 		}
@@ -131,8 +131,8 @@ func (c *DataServiceProvider) runDelete(set *protocol.Request, ch chan *protocol
 	if retry.Suc {
 		return
 	}
-	core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
-	ch <- &protocol.Response{Successful: false, Message: retry.Err.Error()}
+	core.AppLog.Printf("retry %s, %d", retry.Err, retry.Reties)
+	ch <- &protocol.Response{Successful: false, Message: retry.Err}
 }
 
 func (m *DataServiceProvider) clientDelete(target *core.Node, request *protocol.Request) (*protocol.Response, error) {
@@ -155,7 +155,7 @@ func (c *DataServiceProvider) runReset(set *protocol.Request, ch chan *protocol.
 		ringNode := nodes[0]
 		resp, err := c.clientReset(&ringNode, set)
 		if err != nil {
-			retry.Err = err
+			retry.Err = err.Error()
 			retry.Reties--
 			continue
 		}
@@ -173,8 +173,8 @@ func (c *DataServiceProvider) runReset(set *protocol.Request, ch chan *protocol.
 	if retry.Suc {
 		return
 	}
-	core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
-	ch <- &protocol.Response{Successful: false, Message: retry.Err.Error()}
+	core.AppLog.Printf("retry %s, %d", retry.Err, retry.Reties)
+	ch <- &protocol.Response{Successful: false, Message: retry.Err}
 }
 
 func (m *DataServiceProvider) clientReset(target *core.Node, request *protocol.Request) (*protocol.Response, error) {
@@ -232,8 +232,8 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 	if retry.Suc {
 		return
 	}
-	core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
-	ch <- &protocol.Response{Successful: false, Message: retry.Err.Error()}
+	core.AppLog.Printf("retry %s, %d", retry.Err, retry.Reties)
+	ch <- &protocol.Response{Successful: false, Message: retry.Err}
 }
 
 func (c *DataServiceProvider) runPull(target string, set *protocol.Request, ch chan *protocol.Response) {
