@@ -41,6 +41,9 @@ type DataServiceProvider struct {
 	subscriptions SubscriptionRegistry
 	listeners     map[string]ReceiverAsync //chan *protocol.Topic
 	DRequest      chan TopicRequest
+
+	//service task caller
+	WTask chan<- Task
 }
 
 func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
@@ -180,7 +183,7 @@ func (c *DataServiceProvider) Start(dir string) {
 	}
 	c.DMessager = make(chan *protocol.Topic, NODE_EVENT_BUFFER_SIZE)
 	c.DRequest = make(chan TopicRequest, NODE_EVENT_BUFFER_SIZE)
-	c.listeners = make(map[string]ReceiverAsync)//chan *protocol.Topic)
+	c.listeners = make(map[string]ReceiverAsync) //chan *protocol.Topic)
 	c.subscriptions = SubscriptionRegistry{topicEnds: make(map[core.TopicKey]map[string]core.Subscription)}
 
 	c.DSet = make(chan SetData, NODE_EVENT_BUFFER_SIZE)
