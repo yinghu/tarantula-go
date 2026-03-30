@@ -25,7 +25,7 @@ const (
 )
 
 type RetryTrack struct {
-	Err    error
+	Err    string
 	Reties int
 	Suc    bool
 }
