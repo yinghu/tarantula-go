@@ -46,25 +46,26 @@ func (s *ServiceCallOperator) RunTask() {
 			}
 			continue
 		}
+		opt := NO_TCP_CONNECT
 		for r := range RETRY_MAX {
-			core.AppLog.Debug().Msgf("connecting to %s", task.target)
 			c, err := grpc.NewClient(task.target, grpc.WithTransportCredentials(insecure.NewCredentials()))
 			if err == nil {
-				core.AppLog.Debug().Msgf("connected to %s", task.target)
 				s.localConns[task.target] = c
+				opt = TASK_OPT_REQUEST
 				break
 			}
 			time.Sleep(1 * time.Second)
 			core.AppLog.Warn().Msgf("retry to connect to %s retries : %d", task.target, r)
 		}
-		if c != nil {
+		if opt == TASK_OPT_REQUEST {
 			if err := task.execute(c, SUCCESS); err != nil {
 				core.AppLog.Warn().Msgf("remove connecting from error %s", err.Error())
 				delete(s.localConns, task.target)
 			}
-		} else {
-			core.AppLog.Warn().Msgf("no connection from remote %s", task.target)
-			task.execute(c, NO_TCP_CONNECT)
+			continue
 		}
+		core.AppLog.Warn().Msgf("no connection from remote %s", task.target)
+		task.execute(c, NO_TCP_CONNECT)
+
 	}
 }
