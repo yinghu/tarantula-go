@@ -48,6 +48,7 @@ func (s *ServiceCallOperator) RunTask() {
 		}
 		opt := NO_TCP_CONNECT
 		for r := range RETRY_MAX {
+			core.AppLog.Debug().Msgf("connecting to %s", task.target)
 			cx, err := grpc.NewClient(task.target, grpc.WithTransportCredentials(insecure.NewCredentials()))
 			if err == nil {
 				s.localConns[task.target] = cx
