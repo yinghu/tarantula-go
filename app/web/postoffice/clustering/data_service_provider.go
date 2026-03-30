@@ -190,6 +190,10 @@ func (c *DataServiceProvider) Start(dir string) {
 	for n := range SET_OPERATOR_NUM {
 		go c.runSetData(n)
 	}
+	tak := make(chan Task, NODE_EVENT_BUFFER_SIZE)
+	c.WTask = tak
+	sc := ServiceCallOperator{RTask: tak, localConns: make(map[string]*grpc.ClientConn)}
+	go sc.RunTask()
 	tcp, err := net.Listen("tcp", fmt.Sprintf(":%d", core.RPC_PORT))
 	if err != nil {
 		panic(err)

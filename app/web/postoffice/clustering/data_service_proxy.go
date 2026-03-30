@@ -289,15 +289,17 @@ func (c *DataServiceProvider) runPublish(topic *protocol.Topic) {
 	c.DRequest <- TopicRequest{Opt: TOPIC_REGISTER, Subs: rq, NodeId: topic.NodeId, Tag: topic.Tag, Name: topic.Name}
 	subs := <-rq
 	for _, sub := range subs {
-		c.clientPublish(&sub, topic)
+		c.clientPublish(&sub, topic, rc)
+		resp = <-rc
+		core.AppLog.Debug().Msgf("publish %v", resp)
 	}
 }
-func (m *DataServiceProvider) clientPublish(target *core.Subscription, request *protocol.Topic) (*protocol.Response, error) {
-	tcp, err := grpc.NewClient(target.Endpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return &protocol.Response{Successful: false}, err
-	}
-	defer tcp.Close()
-	dsp := protocol.NewDataServiceClient(tcp)
-	return dsp.Send(context.Background(), request)
+func (m *DataServiceProvider) clientPublish(target *core.Subscription, request *protocol.Topic, async chan *protocol.Response) {
+	task := Task{target: target.Endpoint, execute: func(tcp *grpc.ClientConn, opt int) error {
+		dsp := protocol.NewDataServiceClient(tcp)
+		resp, err := dsp.Send(context.Background(), request)
+		async <- resp
+		return err
+	}}
+	m.WTask <- task
 }
