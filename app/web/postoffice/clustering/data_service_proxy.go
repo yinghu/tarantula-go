@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func (c *DataServiceProvider) runCreate(set *protocol.Request, ch chan *protocol.Response) {
+func (c *DataServiceProvider) runCreate(set *protocol.Request) (*protocol.Response, error) {
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
 	retry := RetryTrack{Reties: RETRY_MAX}
@@ -23,42 +23,42 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request, ch chan *protocol
 	} else {
 		rt = c.Mll.RingToken(set.Data.Key)
 	}
+	ch := make(chan *protocol.Response, 3)
+	defer close(ch)
 	for retry.Reties > 0 {
 		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: rt, Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		resp, err := c.clientCreate(&ringNode, set)
-		if err != nil {
-			retry.Err = err
+		c.clientCreate(&ringNode, set, ch)
+		resp := <-ch
+		if !resp.Successful {
+			retry.Err = fmt.Errorf(resp.Message)
 			retry.Reties--
 			continue
 		}
-		ch <- resp
 		retry.Suc = true
-		if !resp.Successful {
-			break
-		}
 		slaves := nodes[1:]
 		for _, slave := range slaves {
-			c.clientCreate(&slave, set)
+			c.clientCreate(&slave, set, ch)
+			resp = <-ch
+			if !resp.Successful {
+				core.AppLog.Debug().Msgf("error on slave %s", resp.Message)
+			}
 		}
 		break
 	}
-	if retry.Suc {
-		return
-	}
 	core.AppLog.Printf("retry %s, %d", retry.Err.Error(), retry.Reties)
-	ch <- &protocol.Response{Successful: false, Message: retry.Err.Error()}
+	return &protocol.Response{Successful: retry.Suc, Message: retry.Err.Error()}, nil
 }
 
-func (m *DataServiceProvider) clientCreate(target *core.Node, request *protocol.Request) (*protocol.Response, error) {
-	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return &protocol.Response{}, err
-	}
-	defer tcp.Close()
-	dsp := protocol.NewDataServiceClient(tcp)
-	return dsp.Create(context.Background(), request)
+func (m *DataServiceProvider) clientCreate(target *core.Node, request *protocol.Request, ch chan *protocol.Response) {
+	task := Task{target: target.RpcEndpoint, execute: func(tcp *grpc.ClientConn, opt int) error {
+		dsp := protocol.NewDataServiceClient(tcp)
+		resp, _ := dsp.Create(context.Background(), request)
+		ch <- resp
+		return nil
+	}}
+	m.WTask <- task
 }
 
 func (c *DataServiceProvider) runUpdate(set *protocol.Request, ch chan *protocol.Response) {
@@ -272,15 +272,13 @@ func (c *DataServiceProvider) runPull(target string, set *protocol.Request, ch c
 func (c *DataServiceProvider) runPublish(topic *protocol.Topic) (*protocol.Response, error) {
 	rc := make(chan *protocol.Response, 1)
 	defer close(rc)
-	go func() {
-		tpf := bootstrap.ProtoTopicFactory{}
-		req, err := tpf.ToRequest(topic)
-		if err != nil {
-			rc <- &protocol.Response{Successful: false}
-		}
-		c.runCreate(req, rc)
-	}()
-	resp := <-rc
+
+	tpf := bootstrap.ProtoTopicFactory{}
+	req, err := tpf.ToRequest(topic)
+	if err != nil {
+		rc <- &protocol.Response{Successful: false}
+	}
+	resp, err := c.runCreate(req)
 	if !resp.Successful {
 		core.AppLog.Warn().Msgf("cannot save topic %v", resp)
 		return resp, fmt.Errorf("cannot save topic")

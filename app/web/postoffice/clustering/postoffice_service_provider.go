@@ -84,10 +84,7 @@ func (c *DataServiceProvider) Unsubscribe(ctx context.Context, in *protocol.Topi
 func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
 	switch request.Opt {
 	case core.CREATE_DATA_REQUEST:
-		rc := make(chan *protocol.Response, 3)
-		defer close(rc)
-		c.runCreate(request, rc)
-		resp := <-rc
+		resp, _ := c.runCreate(request)
 		stream.Send(resp)
 	case core.GET_DATA_REQUEST:
 		rc := make(chan *protocol.Response, 3)
