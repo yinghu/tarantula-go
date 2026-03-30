@@ -69,8 +69,7 @@ func (c *DataServiceProvider) Disconnect(ctx context.Context, topic *protocol.To
 	return &protocol.Response{Successful: true, Message: "disconnected"}, nil
 }
 func (c *DataServiceProvider) Publish(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	c.runPublish(in)
-	return &protocol.Response{Successful: true, Message: "topic event dispatched"}, nil
+	return c.runPublish(in)
 }
 
 func (c *DataServiceProvider) Subscribe(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {

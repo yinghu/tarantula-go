@@ -21,6 +21,7 @@ type MemberlistManager struct {
 
 	StoreDir string
 	Binding  string
+	Seq      core.Sequence
 }
 
 func (m *MemberlistManager) Start() error {

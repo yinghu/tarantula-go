@@ -269,7 +269,7 @@ func (c *DataServiceProvider) runPull(target string, set *protocol.Request, ch c
 	ch <- &crt
 }
 
-func (c *DataServiceProvider) runPublish(topic *protocol.Topic) {
+func (c *DataServiceProvider) runPublish(topic *protocol.Topic) (*protocol.Response, error) {
 	rc := make(chan *protocol.Response, 1)
 	defer close(rc)
 	go func() {
@@ -283,7 +283,7 @@ func (c *DataServiceProvider) runPublish(topic *protocol.Topic) {
 	resp := <-rc
 	if !resp.Successful {
 		core.AppLog.Warn().Msgf("cannot save topic %v", resp)
-		return
+		return resp, fmt.Errorf("cannot save topic")
 	}
 	rq := make(chan []core.Subscription, 3)
 	defer close(rq)
@@ -294,12 +294,13 @@ func (c *DataServiceProvider) runPublish(topic *protocol.Topic) {
 		resp = <-rc
 		core.AppLog.Debug().Msgf("publish %v", resp)
 	}
+	return &protocol.Response{Successful: true, Message: "topic delivered"}, nil
 }
 func (m *DataServiceProvider) clientPublish(target *core.Subscription, request *protocol.Topic, async chan *protocol.Response) {
 	task := Task{target: target.Endpoint, execute: func(tcp *grpc.ClientConn, opt int) error {
-		if opt == NO_TCP_CONNECT{
-			async <- &protocol.Response{Successful: false,Message: "no tcp"}
-			return fmt.Errorf("no tcp from %s",target.Endpoint)
+		if opt == NO_TCP_CONNECT {
+			async <- &protocol.Response{Successful: false, Message: "no tcp"}
+			return fmt.Errorf("no tcp from %s", target.Endpoint)
 		}
 		dsp := protocol.NewDataServiceClient(tcp)
 		resp, err := dsp.Send(context.Background(), request)
