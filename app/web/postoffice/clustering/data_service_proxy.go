@@ -299,6 +299,7 @@ func (m *DataServiceProvider) clientPublish(target *core.Subscription, request *
 		dsp := protocol.NewDataServiceClient(tcp)
 		resp, err := dsp.Send(context.Background(), request)
 		async <- resp
+		core.AppLog.Debug().Msgf("SEND : %v", resp)
 		return err
 	}}
 	m.WTask <- task
