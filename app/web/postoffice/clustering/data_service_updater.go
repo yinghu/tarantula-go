@@ -161,6 +161,7 @@ func (m *DataServiceProvider) RingUpdated() {
 	for range SET_OPERATOR_NUM {
 		m.DSet <- SetData{Opt: core.SET_OPT_CLOSE}
 	}
+	m.WTask <- Task{opt: TASK_OPT_CLOSE}
 	close(m.DSet)
 	close(m.DPull)
 	m.server.Stop()

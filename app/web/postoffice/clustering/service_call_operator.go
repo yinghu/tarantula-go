@@ -12,7 +12,8 @@ const (
 	SUCCESS        int = 0
 	NO_TCP_CONNECT int = 1
 
-	TASK_OPT_CLOSE int = 2
+	TASK_OPT_REQUEST int = 0
+	TASK_OPT_CLOSE   int = 2
 )
 
 type Execute func(tcp *grpc.ClientConn, opt int) error
