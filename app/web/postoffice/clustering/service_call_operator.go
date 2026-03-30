@@ -61,6 +61,7 @@ func (s *ServiceCallOperator) RunTask() {
 				delete(s.localConns, task.target)
 			}
 		} else {
+			core.AppLog.Warn().Msgf("no connection from remote %s", task.target)
 			task.execute(c, NO_TCP_CONNECT)
 		}
 	}

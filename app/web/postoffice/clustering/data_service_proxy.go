@@ -2,6 +2,7 @@ package clustering
 
 import (
 	context "context"
+	"fmt"
 	"io"
 
 	"gameclustering.com/internal/bootstrap"
@@ -296,6 +297,10 @@ func (c *DataServiceProvider) runPublish(topic *protocol.Topic) {
 }
 func (m *DataServiceProvider) clientPublish(target *core.Subscription, request *protocol.Topic, async chan *protocol.Response) {
 	task := Task{target: target.Endpoint, execute: func(tcp *grpc.ClientConn, opt int) error {
+		if opt == NO_TCP_CONNECT{
+			async <- &protocol.Response{Successful: false,Message: "no tcp"}
+			return fmt.Errorf("no tcp from %s",target.Endpoint)
+		}
 		dsp := protocol.NewDataServiceClient(tcp)
 		resp, err := dsp.Send(context.Background(), request)
 		async <- resp
