@@ -13,7 +13,10 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func FromMessageEvent(e event.MessageEvent) (*protocol.Topic, error) {
+type ProtoTopicFactory struct {
+}
+
+func (p *ProtoTopicFactory) FromMessageEvent(e event.MessageEvent) (*protocol.Topic, error) {
 	tpx := protocol.Topic{NodeId: e.NodeId(), Tag: e.Tag(), Name: e.Topic()}
 	msg := protocol.Event{Header: &protocol.Header{FactoryId: e.FactoryId(), ClassId: e.ClassId()}, Id: uint64(e.OId())}
 	obj, err := anypb.New(&protocol.MessageEvent{Title: e.Title, Message: e.Message, Source: e.Source, DateTime: timestamppb.New(e.DateTime)})
@@ -25,7 +28,7 @@ func FromMessageEvent(e event.MessageEvent) (*protocol.Topic, error) {
 	return &tpx, nil
 }
 
-func ToRequest(topic *protocol.Topic) (*protocol.Request, error) {
+func (p *ProtoTopicFactory) ToRequest(topic *protocol.Topic) (*protocol.Request, error) {
 	req := protocol.Request{Opt: core.CREATE_DATA_REQUEST, Prefix: util.Hash([]byte(topic.Name))}
 	if topic.Event.Id <= 0 {
 		return &req, fmt.Errorf("id cannot be less than 0")
@@ -46,4 +49,10 @@ func ToRequest(topic *protocol.Topic) (*protocol.Request, error) {
 	data := protocol.Data{Header: topic.Event.Header, Key: key, Value: value}
 	req.Data = &data
 	return &req, nil
+}
+
+func (p *ProtoTopicFactory) FromData(data []byte) (*protocol.Topic, error) {
+	tp := protocol.Topic{}
+	err := proto.Unmarshal(data, &tp)
+	return &tp, err
 }
