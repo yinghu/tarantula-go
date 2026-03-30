@@ -24,7 +24,7 @@ func (s *PostofficeService) Start(env core.Env, p core.Pusher) error {
 
 	s.createSchema()
 
-	m := clustering.MemberlistManager{StoreDir: fmt.Sprintf("%s/%s", env.HomeDir, env.GroupName), Seq: s.mm.Seq}
+	m := clustering.MemberlistManager{StoreDir: fmt.Sprintf("%s/%s", env.HomeDir, env.GroupName), Seq: s.Sequence()}
 	m.Seed = []string{"192.168.1.11", "192.168.1.6"}
 	m.Binding = env.NodeName
 	err := m.Start()
