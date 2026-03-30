@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/grpc"
@@ -405,6 +406,21 @@ func (c *DataServiceProvider) runPull(target string, set *protocol.Request, ch c
 }
 
 func (c *DataServiceProvider) runPublish(topic *protocol.Topic) {
+	rc := make(chan *protocol.Response, 1)
+	defer close(rc)
+	go func() {
+		tpf := bootstrap.ProtoTopicFactory{}
+		req, err := tpf.ToRequest(topic)
+		if err != nil {
+			rc <- &protocol.Response{Successful: false}
+		}
+		c.runCreate(req, rc)
+	}()
+	resp := <-rc
+	if !resp.Successful {
+		core.AppLog.Warn().Msgf("cannot save topic %v", resp)
+		return
+	}
 	rq := make(chan []core.Subscription, 3)
 	defer close(rq)
 	c.DRequest <- TopicRequest{Opt: TOPIC_REGISTER, Subs: rq, NodeId: topic.NodeId, Tag: topic.Tag, Name: topic.Name}
