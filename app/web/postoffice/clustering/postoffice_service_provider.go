@@ -86,40 +86,30 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 	case core.CREATE_DATA_REQUEST:
 		resp, _ := c.runCreate(request)
 		stream.Send(resp)
+
 	case core.GET_DATA_REQUEST:
-		//rc := make(chan *protocol.Response, 3)
-		//defer close(rc)
 		c.runGet(request, stream)
-		//for resp := range rc {
-		//stream.Send(resp)
-		//if !resp.Successful {
-		//break
-		//}
-		//}
+
 	case core.QUERY_DATA_REQUEST:
-		//rc := make(chan *protocol.Response, 3)
-		//defer close(rc)
 		c.runGet(request, stream)
-		//for resp := range rc {
-		//if !resp.Successful {
-		//break
-		//}
-		//stream.Send(resp)
-		//}
+
 	case core.UPDATE_DATA_REQUEST:
 		resp, _ := c.runUpdate(request)
 		stream.Send(resp)
+
 	case core.DELETE_DATA_REQUEST:
 		resp, _ := c.runDelete(request)
 		stream.Send(resp)
+
 	case core.RESET_DATA_REQUEST:
 		resp, _ := c.runReset(request)
 		stream.Send(resp)
+
 	case core.PULL_DATA_REQUEST:
 		rc := make(chan *protocol.Response, 3)
 		defer close(rc)
 		core.AppLog.Debug().Msgf("run local pull %v", request)
-		go c.pull(request.Prefix, request.Prefix, rc)
+		c.pull(request.Prefix, request.Prefix, rc)
 		for resp := range rc {
 			if !resp.Successful {
 				break
