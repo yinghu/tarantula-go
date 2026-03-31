@@ -107,22 +107,13 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 			stream.Send(resp)
 		}
 	case core.UPDATE_DATA_REQUEST:
-		rc := make(chan *protocol.Response, 3)
-		defer close(rc)
-		c.runUpdate(request, rc)
-		resp := <-rc
+		resp, _ := c.runUpdate(request)
 		stream.Send(resp)
 	case core.DELETE_DATA_REQUEST:
-		rc := make(chan *protocol.Response, 3)
-		defer close(rc)
-		c.runDelete(request, rc)
-		resp := <-rc
+		resp, _ := c.runDelete(request)
 		stream.Send(resp)
 	case core.RESET_DATA_REQUEST:
-		rc := make(chan *protocol.Response, 3)
-		defer close(rc)
-		c.runReset(request, rc)
-		resp := <-rc
+		resp, _ := c.runReset(request)
 		stream.Send(resp)
 	case core.PULL_DATA_REQUEST:
 		rc := make(chan *protocol.Response, 3)

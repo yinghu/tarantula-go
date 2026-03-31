@@ -61,130 +61,118 @@ func (m *DataServiceProvider) clientCreate(target *core.Node, request *protocol.
 	m.WTask <- task
 }
 
-func (c *DataServiceProvider) runUpdate(set *protocol.Request, ch chan *protocol.Response) {
+func (c *DataServiceProvider) runUpdate(set *protocol.Request) (*protocol.Response, error) {
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
 	retry := RetryTrack{Reties: RETRY_MAX}
+	ch := make(chan *protocol.Response, 3)
+	defer close(ch)
 	for retry.Reties > 0 {
 		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		resp, err := c.clientUpdate(&ringNode, set)
-		if err != nil {
-			retry.Err = err.Error()
+		c.clientUpdate(&ringNode, set, ch)
+		resp := <-ch
+		if !resp.Successful {
+			retry.Err = resp.Message
 			retry.Reties--
 			continue
 		}
-		ch <- resp
 		retry.Suc = true
-		if !resp.Successful {
-			break
-		}
 		slaves := nodes[1:]
 		for _, slave := range slaves {
-			c.clientUpdate(&slave, set)
+			c.clientUpdate(&slave, set, ch)
 		}
 		break
 	}
-	if retry.Suc {
-		return
-	}
-	core.AppLog.Printf("retry %s, %d", retry.Err, retry.Reties)
-	ch <- &protocol.Response{Successful: false, Message: retry.Err}
+	core.AppLog.Printf("retry %s, %d ,%v", retry.Err, retry.Reties, retry.Suc)
+	return &protocol.Response{Successful: retry.Suc, Message: retry.Err}, nil
 }
 
-func (m *DataServiceProvider) clientUpdate(target *core.Node, request *protocol.Request) (*protocol.Response, error) {
-	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return &protocol.Response{}, err
-	}
-	defer tcp.Close()
-	dsp := protocol.NewDataServiceClient(tcp)
-	return dsp.Update(context.Background(), request)
+func (m *DataServiceProvider) clientUpdate(target *core.Node, request *protocol.Request, ch chan *protocol.Response) {
+	task := Task{target: target.RpcEndpoint, execute: func(tcp *grpc.ClientConn, opt int) error {
+		dsp := protocol.NewDataServiceClient(tcp)
+		resp, _ := dsp.Update(context.Background(), request)
+		ch <- resp
+		return nil
+	}}
+	m.WTask <- task
 }
 
-func (c *DataServiceProvider) runDelete(set *protocol.Request, ch chan *protocol.Response) {
+func (c *DataServiceProvider) runDelete(set *protocol.Request) (*protocol.Response, error) {
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
 	retry := RetryTrack{Reties: RETRY_MAX}
+	ch := make(chan *protocol.Response, 3)
+	defer close(ch)
 	for retry.Reties > 0 {
 		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		resp, err := c.clientDelete(&ringNode, set)
-		if err != nil {
-			retry.Err = err.Error()
+		c.clientDelete(&ringNode, set, ch)
+		resp := <-ch
+		if !resp.Successful {
+			retry.Err = resp.Message
 			retry.Reties--
 			continue
 		}
-		ch <- resp
 		retry.Suc = true
-		if !resp.Successful {
-			break
-		}
 		slaves := nodes[1:]
 		for _, slave := range slaves {
-			c.clientDelete(&slave, set)
+			c.clientDelete(&slave, set, ch)
 		}
 		break
 	}
-	if retry.Suc {
-		return
-	}
-	core.AppLog.Printf("retry %s, %d", retry.Err, retry.Reties)
-	ch <- &protocol.Response{Successful: false, Message: retry.Err}
+	core.AppLog.Printf("retry %s, %d , %v", retry.Err, retry.Reties, retry.Suc)
+	return &protocol.Response{Successful: retry.Suc, Message: retry.Err}, nil
 }
 
-func (m *DataServiceProvider) clientDelete(target *core.Node, request *protocol.Request) (*protocol.Response, error) {
-	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return &protocol.Response{}, err
-	}
-	defer tcp.Close()
-	dsp := protocol.NewDataServiceClient(tcp)
-	return dsp.Delete(context.Background(), request)
+func (m *DataServiceProvider) clientDelete(target *core.Node, request *protocol.Request, ch chan *protocol.Response) {
+	task := Task{target: target.RpcEndpoint, execute: func(tcp *grpc.ClientConn, opt int) error {
+		dsp := protocol.NewDataServiceClient(tcp)
+		resp, _ := dsp.Delete(context.Background(), request)
+		ch <- resp
+		return nil
+	}}
+	m.WTask <- task
 }
 
-func (c *DataServiceProvider) runReset(set *protocol.Request, ch chan *protocol.Response) {
+func (c *DataServiceProvider) runReset(set *protocol.Request) (*protocol.Response, error) {
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
 	retry := RetryTrack{Reties: RETRY_MAX}
+	ch := make(chan *protocol.Response, 3)
+	defer close(ch)
 	for retry.Reties > 0 {
 		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		resp, err := c.clientReset(&ringNode, set)
-		if err != nil {
-			retry.Err = err.Error()
+		c.clientReset(&ringNode, set, ch)
+
+		resp := <-ch
+		if !resp.Successful {
+			retry.Err = resp.Message
 			retry.Reties--
 			continue
 		}
-		ch <- resp
 		retry.Suc = true
-		if !resp.Successful {
-			break
-		}
 		slaves := nodes[1:]
 		for _, slave := range slaves {
-			c.clientReset(&slave, set)
+			c.clientReset(&slave, set, ch)
 		}
 		break
 	}
-	if retry.Suc {
-		return
-	}
-	core.AppLog.Printf("retry %s, %d", retry.Err, retry.Reties)
-	ch <- &protocol.Response{Successful: false, Message: retry.Err}
+	core.AppLog.Printf("retry %s, %d , %v", retry.Err, retry.Reties, retry.Suc)
+	return &protocol.Response{Successful: retry.Suc, Message: retry.Err}, nil
 }
 
-func (m *DataServiceProvider) clientReset(target *core.Node, request *protocol.Request) (*protocol.Response, error) {
-	tcp, err := grpc.NewClient(target.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return &protocol.Response{}, err
-	}
-	defer tcp.Close()
-	dsp := protocol.NewDataServiceClient(tcp)
-	return dsp.Reset(context.Background(), request)
+func (m *DataServiceProvider) clientReset(target *core.Node, request *protocol.Request, ch chan *protocol.Response) {
+	m.WTask <- Task{target: target.RpcEndpoint, execute: func(tcp *grpc.ClientConn, opt int) error {
+		dsp := protocol.NewDataServiceClient(tcp)
+		resp, _ := dsp.Reset(context.Background(), request)
+		ch <- resp
+		return nil
+	}}
 }
 
 func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Response) {
