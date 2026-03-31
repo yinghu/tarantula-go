@@ -14,7 +14,8 @@ func TestProtoFactory(t *testing.T) {
 	me.OnTag("presence")
 	me.OnTopic("message")
 	me.OnOId(100)
-	ptf := ProtoTopicFactory{}
+	ptf := MessageEventFactory{}
+	ptf.Cluster = &ClusterManager{}
 	tp, err := ptf.FromMessageEvent(me)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
