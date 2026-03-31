@@ -211,6 +211,9 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, responser grpc.Serve
 	}}
 	for resp := range ch {
 		responser.Send(resp)
+		if !resp.Successful {
+			break
+		}
 	}
 
 }
