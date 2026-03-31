@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
@@ -24,10 +23,9 @@ func (s *TournamentService) Config() string {
 	return "/etc/tarantula/tournament-conf.json"
 }
 
-func (s *TournamentService) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
+func (s *TournamentService) Start(f core.Env, p core.Pusher) error {
 	s.ItemUpdater = s
-	s.Bsl = s
-	s.AppManager.Start(f, c, p)
+	s.AppManager.Start(f, p)
 	s.createSchema()
 	s.tournaments = make(map[int64]Tournament)
 	ids, err := s.loadSchedule()
@@ -39,6 +37,7 @@ func (s *TournamentService) Start(f conf.Env, c core.Cluster, p event.Pusher) er
 			}
 		}
 	}
+	//s.Cluster().Subscribe("tournament", s.Event())
 	http.Handle("/tournament/list", bootstrap.Logging(&TournamentList{TournamentService: s}))
 	http.Handle("/tournament/join", bootstrap.Logging(&TournamentJoin{TournamentService: s}))
 	http.Handle("/tournament/score", bootstrap.Logging(&TournamentScore{TournamentService: s}))
@@ -46,7 +45,7 @@ func (s *TournamentService) Start(f conf.Env, c core.Cluster, p event.Pusher) er
 	return nil
 }
 
-func (s *TournamentService) OnEvent(e event.Event) {
+func (s *TournamentService) OnEvent(e core.Event) {
 	te, isTe := e.(*event.TournamentEvent)
 	if isTe {
 		tmnt := s.tournaments[te.TournamentId]
@@ -60,7 +59,7 @@ func (s *TournamentService) OnEvent(e event.Event) {
 }
 
 func (s *TournamentService) NodeStarted(n core.Node) {
-	core.AppLog.Printf("Node started %s %s\n", n.Name, s.Cluster().Local().Name)
+	//core.AppLog.Printf("Node started %s %s\n", n.Name, s.Cluster().Local().Name)
 	for _, t := range s.tournaments {
 		t.Start()
 	}

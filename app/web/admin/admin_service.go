@@ -6,9 +6,7 @@ import (
 	"os"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 )
 
 type AdminService struct {
@@ -23,13 +21,14 @@ func (s *AdminService) Config() string {
 	return "/etc/tarantula/admin-conf.json"
 }
 
-func (s *AdminService) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
-	s.AppManager.Start(f, c, p)
+func (s *AdminService) Start(f core.Env, p core.Pusher) error {
+	f.AuthLevel = core.ADMIN_ACCESS_CONTROL
+	s.AppManager.Start(f, p)
 	s.managedApps = f.ManagedApps
-	s.contentDir = f.Bin
-	s.assetDir = f.LocalDir + "/asset"
+	s.contentDir = fmt.Sprintf("%s/%s", f.HomeDir, "bin")
+	s.assetDir = fmt.Sprintf("%s/%s/%s", f.HomeDir, f.GroupName, "asset")
 	os.MkdirAll(s.assetDir, 0755)
-	s.publishDir = f.Bin + "/tarantula"
+	s.publishDir = s.contentDir + "/tarantula"
 	err := s.createSchema()
 	if err != nil {
 		return err
@@ -38,17 +37,17 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 	if err != nil {
 		return err
 	}
-	err = s.SaveLogin(&bootstrap.Login{Name: "root", Hash: hash, AccessControl: bootstrap.SUDO_ACCESS_CONTROL})
+	err = s.SaveLogin(&bootstrap.Login{Name: "root", Hash: hash, AccessControl: core.SUDO_ACCESS_CONTROL})
 	if err != nil {
 		core.AppLog.Printf("Root already existed %s\n", err.Error())
 	}
+	//s.Cluster().Subscribe("login", s.Event())
 	http.Handle("/admin/webprotected/{name}", bootstrap.Logging(&AdminWebProtected{AdminService: s}))
 	http.Handle("/admin/web/{name}", bootstrap.Logging(&AdminWebIndex{AdminService: s}))
 	//handle / context from nginx proxy
 	http.Handle("/admin/{name}", bootstrap.Logging(&AdminWebIndex{AdminService: s}))
 
 	http.Handle("/admin/cs/message/send", bootstrap.Logging(&CSMessager{AdminService: s}))
-	http.Handle("/admin/cs/message/load", bootstrap.Logging(&CSMessageLoader{AdminService: s}))
 
 	http.Handle("/admin/cs/query/{id}", bootstrap.Logging(&CSQueryer{AdminService: s}))
 	http.Handle("/admin/cs/inventory/grant", bootstrap.Logging(&CSGranter{AdminService: s}))
@@ -74,6 +73,14 @@ func (s *AdminService) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
 	http.Handle("/admin/password", bootstrap.Logging(&AdminChangePwd{AdminService: s}))
 	http.Handle("/admin/accesskey", bootstrap.Logging(&AdminCreateAccessKey{AdminService: s}))
 	http.Handle("/admin/login", bootstrap.Logging(&AdminLogin{AdminService: s}))
+
+	http.Handle("/admin/presence/hashring", bootstrap.Logging(&AdminHashRingEndpoint{AdminService: s}))
+	http.Handle("/admin/presence/keyring/{key}", bootstrap.Logging(&AdminKeyRingEndpoint{AdminService: s}))
+
+	http.Handle("/admin/cluster/delete/{key}", bootstrap.Logging(&AdminClusterDelete{AdminService: s}))
+	http.Handle("/admin/cluster/reset", bootstrap.Logging(&AdminClusterReset{AdminService: s}))
+	http.Handle("/admin/cluster/pull/{ringToken}/{limit}", bootstrap.Logging(&AdminClusterPull{AdminService: s}))
+
 	fmt.Printf("Admin service started %s\n", f.HttpBinding)
 	return nil
 }

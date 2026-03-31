@@ -3,109 +3,102 @@
         {
             "Name":"Asset","ScopeSequence":1,"Icon":"videogame_asset",    
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
-                {"Name":"Edit","Callback":"edit_category"}           
+                {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}         
             ]
         },
         {
             "Name":"Component","ScopeSequence":2,"Icon":"component_exchange",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
-                {"Name":"Edit","Callback":"edit_category"}           
+                {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}          
             ]    
         },
         {
             "Name":"Commodity","ScopeSequence":3,"Icon":"inventory_2",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
-                {"Name":"Edit","Callback":"edit_category"}           
+                {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}        
             ]        
         },
         {
             "Name":"Item","ScopeSequence":4,"Icon":"package_2",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
-                {"Name":"Edit","Callback":"edit_category"}            
+               {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}           
             ]        
         },
         {
             "Name":"Store","ScopeSequence":5,"Icon":"shopping_cart",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
-                {"Name":"Edit","Callback":"edit_category"}            
+                {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}          
             ]        
         },
         {
             "Name":"Tournament","ScopeSequence":5,"Icon":"trophy",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
-                {"Name":"Edit","Callback":"edit_category"}           
+                {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}           
             ]        
         },
         {
             "Name":"Resource","ScopeSequence":5,"Icon":"extension",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
-                {"Name":"Edit","Callback":"edit_category"}            
+                {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3},
+                {"Name":"List Product","Type":5},{"Name":"Save Product","Type":5}          
             ]        
         },
         {
             "Name":"Achievement","ScopeSequence":5,"Icon":"award_star",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
-                {"Name":"Edit","Callback":"edit_category"}           
+                {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}             
             ]        
         },
         {
             "Name":"DailyLogin","ScopeSequence":5,"Icon":"commute",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
-                {"Name":"Edit","Callback":"edit_category"}           
+               {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}         
             ]        
         },
         {
             "Name":"Cloud","ScopeSequence":5,"Icon":"cloud",
             "Jobs":[
-                {"Name":"New Enum","Callback":"create_new_enum"},{"Name":"New Category","Callback":"create_new_category"},
-                {"Name":"Edit","Callback":"edit_category"},{"Name":"TokenRing","Callback":"list_token_ring"},
-                {"Name":"Get","Callback":"get_value"},{"Name":"Set","Callback":"set_value"}           
+                {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}
+                ,{"Name":"TokenRing","Type":6},{"Name":"KeyRing","Type":11},
+                {"Name":"Get","Type":101},{"Name":"Reset","Type":103}, {"Name":"Create","Type":100},
+                {"Name":"Update","Type":102}, {"Name":"Delete","Type":104},{"Name":"Pull","Type":105}                  
             ]        
         },
         {
             "Name":"AdminTool","ScopeSequence":0,"Icon":"admin_panel_settings",
             "Jobs":[
-                {"Name":"ChangePassword","Callback":"on_post","Form":"/admin/webprotected/change.password.json","Path":"/admin/password"},
-                {"Name":"AddLogin","Callback":"on_post","Form":"/admin/webprotected/add.login.json","Path":"/admin/login/add"},
-                {"Name":"ParseSnowFlakeId","Callback":"on_post","Form":"/admin/webprotected/parse.snow.flake.id.json","Path":"/admin/snowflake/parse"},
-                {"Name":"SyncRepo","Callback":"on_post","Form":"/admin/webprotected/sync.repository.json","Path":"/admin/repo/sync"},
-                {"Name":"AddTopic","Callback":"on_post","Form":"/admin/webprotected/admin.add.topic.json","Path":"/admin/topic/subscribe"},
-                {"Name":"CreateKey","Callback":"on_post","Form":"/admin/webprotected/admin.create.access.key.json","Path":"/admin/accesskey"}
+                {"Name":"ChangePassword","Form":"/admin/webprotected/change.password.json","Path":"/admin/password","Type":5},
+                {"Name":"AddLogin","Form":"/admin/webprotected/add.login.json","Path":"/admin/login/add","Type":5},
+                {"Name":"ParseSnowFlakeId","Form":"/admin/webprotected/parse.snow.flake.id.json","Path":"/admin/snowflake/parse","Type":5},
+                {"Name":"SyncRepo","Form":"/admin/webprotected/sync.repository.json","Path":"/admin/repo/sync","Type":5},
+                {"Name":"AddTopic","Form":"/admin/webprotected/admin.add.topic.json","Path":"/admin/topic/subscribe","Type":5},
+                {"Name":"CreateAccessKey","Form":"/admin/webprotected/admin.create.access.key.json","Path":"/admin/accesskey","Type":12}
             ]        
         },
         {
             "Name":"CSTool","ScopeSequence":0,"Icon":"support",
             "Jobs":[
-                {"Name":"SendMessage","Callback":"on_post","Form":"/admin/webprotected/cs.send.message.json","Path":"/admin/cs/message/send"},
-                {"Name":"LoadMessage","Callback":"on_post","Form":"/admin/webprotected/cs.load.message.json","Path":"/admin/cs/message/load"},
-                {"Name":"QueryEvent","Callback":"on_post","Form":"/admin/webprotected/cs.query.event.json","Path":"/admin/cs/query","Query":["Id"]},
-                {"Name":"QueryTournament","Callback":"on_post","Form":"/admin/webprotected/cs.query.tournament.json","Path":"/admin/cs/query","Query":["Id"]},
-                {"Name":"QueryTournamentJoin","Callback":"on_post","Form":"/admin/webprotected/cs.query.tournament.join.json","Path":"/admin/cs/query","Query":["Id"]},
-                {"Name":"InventroyGrant","Callback":"on_post","Form":"/admin/webprotected/cs.inventory.grant.json","Path":"/admin/cs/inventory/grant"},
-                {"Name":"InventroyLoad","Callback":"on_post","Form":"/admin/webprotected/cs.inventory.load.json","Path":"/admin/cs/inventory/load"}
+                {"Name":"SendMessage","Type":13},
+                {"Name":"LoadMessage","Type":14},
+                {"Name":"QueryEvent","Type":15},
+                {"Name":"QueryTournament","Form":"/admin/webprotected/cs.query.tournament.json","Path":"/admin/cs/query","Query":["Id"],"Type":5},
+                {"Name":"QueryTournamentJoin","Form":"/admin/webprotected/cs.query.tournament.join.json","Path":"/admin/cs/query","Query":["Id"],"Type":5},
+                {"Name":"InventroyGrant","Form":"/admin/webprotected/cs.inventory.grant.json","Path":"/admin/cs/inventory/grant","Type":5},
+                {"Name":"InventroyLoad","Form":"/admin/webprotected/cs.inventory.load.json","Path":"/admin/cs/inventory/load","Type":5}
             ]        
         },
         {
             "Name":"APITool","ScopeSequence":0,"Icon":"api","Callback":"on_player_login",
             "Jobs":[
-                {"Name":"Register","Callback":"on_player_post","Form":"/admin/register.json","Path":"/presence/register"},
-                {"Name":"Login","Callback":"on_player_post","Form":"/admin/login.json","Path":"/presence/login"},
-                {"Name":"ViewItem","Callback":"on_player_post","Form":"/admin/webprotected/view.item.json","Path":"/presence/login"},
-                {"Name":"TournamentList","Callback":"on_player_get","Path":"/tournament/list"},
-                {"Name":"TournamentJoin","Callback":"on_player_post","Form":"/admin/webprotected/tournament.join.json","Path":"/tournament/join"},
-                {"Name":"TournamentScore","Callback":"on_player_post","Form":"/admin/webprotected/tournament.score.json","Path":"/tournament/score","Payload":"TournamentJoin"},
-                {"Name":"TournamentRaceBoard","Callback":"on_player_post","Path":"/tournament/raceboard","Payload":"TournamentJoin"},
-                {"Name":"InventroyLoad","Callback":"on_player_post","Form":"/admin/webprotected/cs.inventory.load.json","Path":"/inventory/load"},
-                {"Name":"MahjongTable","Callback":"on_player_get","Path":"/mahjong/table"}
+                {"Name":"Register","Type":16},
+                {"Name":"Login","Form":"/admin/login.json","Path":"/presence/login","Type":5},
+                {"Name":"ViewItem","Form":"/admin/webprotected/view.item.json","Path":"/presence/login","Type":5},
+                {"Name":"TournamentList","Path":"/tournament/list","Type":5},
+                {"Name":"TournamentJoin","Form":"/admin/webprotected/tournament.join.json","Path":"/tournament/join","Type":5},
+                {"Name":"TournamentScore","Form":"/admin/webprotected/tournament.score.json","Path":"/tournament/score","Payload":"TournamentJoin","Type":5},
+                {"Name":"TournamentRaceBoard","Path":"/tournament/raceboard","Payload":"TournamentJoin","Type":5},
+                {"Name":"InventroyLoad","Form":"/admin/webprotected/cs.inventory.load.json","Path":"/inventory/load","Type":5},
+                {"Name":"MahjongTable","Path":"/mahjong/table","Type":5}
             ]        
         }
         

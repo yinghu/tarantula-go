@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 )
 
 type MahjongTimeout interface {
@@ -15,7 +14,7 @@ type MahjongTimeout interface {
 }
 
 type MahjongEventObj struct {
-	event.EventObj
+	core.EventObj
 	SystemId int64
 	TableId  int64
 }
@@ -35,7 +34,7 @@ type MahjongTimeoutObj struct {
 	MahjongEventObj
 	N       MahjongPlayTurn
 	T       OnTimer //triger on timer
-	P       OnStop //call on stop
+	P       OnStop  //call on stop
 	K       *time.Timer
 	Lock    *sync.Mutex
 	Stopped bool

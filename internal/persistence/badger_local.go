@@ -15,6 +15,7 @@ import (
 const (
 	BDG_KEY_SIZE   int = 200
 	BDG_VALUE_SIZE int = 4096
+	BDG_GC_TICK    int = 10
 )
 
 type BadgerLocal struct {
@@ -23,7 +24,8 @@ type BadgerLocal struct {
 	Db          *badger.DB
 	LogDisabled bool
 	GcEnabled   bool
-	gcTick      time.Ticker
+	GcInterval  int
+	gcTick      *time.Ticker
 }
 
 func (s *BadgerLocal) Save(t core.Persistentable) error {
@@ -65,11 +67,11 @@ func (s *BadgerLocal) Load(t core.Persistentable) error {
 	if cid != int32(t.ClassId()) {
 		return fmt.Errorf("class id not matched %d , %d", cid, t.ClassId())
 	}
-	rv, err := value.ReadInt64()
+	rv, err := value.ReadUInt64()
 	if err != nil {
 		return err
 	}
-	tm, err := value.ReadInt64()
+	tm, err := value.ReadUInt64()
 	if err != nil {
 		return err
 	}
@@ -177,7 +179,7 @@ func (s *BadgerLocal) set(key *core.BufferProxy, value *core.BufferProxy, t core
 	return s.Db.Update(func(txn *badger.Txn) error {
 		k, _ := key.Read(0)
 		v, _ := value.Read(0)
-		var riv int64 = 0
+		var riv uint64 = 0
 		updating := true
 		item, err := txn.Get(k)
 		if err == nil {
@@ -186,7 +188,7 @@ func (s *BadgerLocal) set(key *core.BufferProxy, value *core.BufferProxy, t core
 				value.Write(val)
 				value.Flip()
 				value.ReadInt32()
-				v, err := value.ReadInt64()
+				v, err := value.ReadUInt64()
 				if err != nil {
 					riv = v
 				}
@@ -205,7 +207,7 @@ func (s *BadgerLocal) set(key *core.BufferProxy, value *core.BufferProxy, t core
 			return nil
 		}
 		//update stat total
-		se := event.StatEvent{Tag: t.ETag(), Name: event.STAT_TOTAL}
+		se := event.StatEvent{ Name: event.STAT_TOTAL}
 		key.Clear()
 		se.WriteKey(key)
 		key.Flip()
@@ -230,7 +232,7 @@ func (s *BadgerLocal) set(key *core.BufferProxy, value *core.BufferProxy, t core
 		}
 		value.Clear()
 		value.WriteInt32(int32(se.ClassId()))
-		value.WriteInt64(se.Revision())
+		value.WriteUInt64(se.Revision())
 		value.WriteInt64(time.Now().UnixMilli())
 		se.Write(value)
 		value.Flip()
@@ -303,11 +305,14 @@ func (s *BadgerLocal) Open() error {
 	if !s.GcEnabled {
 		return nil
 	}
-	s.gcTick = *time.NewTicker(10 * time.Minute)
+	if s.GcInterval == 0 {
+		s.GcInterval = BDG_GC_TICK
+	}
+	s.gcTick = time.NewTicker(time.Duration(s.GcInterval) * time.Minute)
 	go func() {
 		for range s.gcTick.C {
 		gc:
-			core.AppLog.Printf("running gc at %v\n", time.Now())
+			core.AppLog.Printf("running gc at %v", time.Now())
 			err := s.Db.RunValueLogGC(0.7)
 			if err == nil {
 				goto gc
@@ -337,6 +342,6 @@ func (s *BadgerLocal) Tx() core.Transaction {
 	k.NewProxy(BDG_KEY_SIZE)
 	v := core.BufferProxy{}
 	v.NewProxy(BDG_VALUE_SIZE)
-	tx := BadgerLocalTransaction{ctx: s.Db.NewTransaction(true),key: &k,value: &v}
+	tx := BadgerLocalTransaction{ctx: s.Db.NewTransaction(true), key: &k, value: &v}
 	return &tx
 }

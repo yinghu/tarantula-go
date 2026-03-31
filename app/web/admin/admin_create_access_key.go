@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 )
@@ -21,7 +20,7 @@ type KeyExpiration struct {
 }
 
 func (s *AdminCreateAccessKey) AccessControl() int32 {
-	return bootstrap.ADMIN_ACCESS_CONTROL
+	return core.ADMIN_ACCESS_CONTROL
 }
 func (s *AdminCreateAccessKey) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
@@ -36,11 +35,12 @@ func (s *AdminCreateAccessKey) Request(rs core.OnSession, w http.ResponseWriter,
 		return
 	}
 	dur := int(time.Until(cp.ExpiryTime).Seconds())
-	key, err := s.AppAuth.CreateTicket(rs.SystemId, rs.Stub, rs.AccessControl, dur)
+	key, err := s.Authenticator().CreateTicket(rs.SystemId, rs.Stub, rs.AccessControl, dur)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
 	cp.Key = key
 	w.Write(util.ToJson(cp))
+
 }

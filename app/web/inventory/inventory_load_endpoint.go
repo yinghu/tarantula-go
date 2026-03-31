@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
@@ -16,7 +15,7 @@ type InventoryLoader struct {
 }
 
 func (s *InventoryLoader) AccessControl() int32 {
-	return bootstrap.PROTECTED_ACCESS_CONTROL
+	return core.PROTECTED_ACCESS_CONTROL
 }
 
 func (s *InventoryLoader) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {

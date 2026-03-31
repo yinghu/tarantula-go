@@ -1,17 +1,44 @@
 package core
 
-const (
-	CLUSTER_PARTITION_NUM int = 271
+import (
+	"fmt"
+
+	"gameclustering.com/internal/protocol"
 )
 
+const (
+	RPC_PORT int = 7001
+
+	SET_OPT_RECOVER uint32 = 1
+	SET_OPT_CLOSE   uint32 = 2
+
+	GET_DATA_REQUEST    uint32 = 10
+	CREATE_DATA_REQUEST uint32 = 11
+	UPDATE_DATA_REQUEST uint32 = 12
+	DELETE_DATA_REQUEST uint32 = 13
+	RESET_DATA_REQUEST  uint32 = 14
+	QUERY_DATA_REQUEST  uint32 = 15
+
+	PULL_DATA_REQUEST uint32 = 16
+
+	DATA_STATE_READY   uint32 = 0
+	DATA_STATE_PENDING uint32 = 1
+	DATA_STATE_DELETED uint32 = 2
+)
+
+type Chunk struct {
+	Remaining bool
+	Data      any
+}
 type Node struct {
 	Name         string `json:"name"`
 	RingToken    uint32 `json:"ringToken"`
 	Meta         string `json:"meta"`
 	IP           string `json:"address"`
-	State        int    `json:"state"`
-	HttpEndpoint string `json:"http"`
-	TcpEndpoint  string `json:"tcp"`
+	State        int    `json:"-"`
+	RpcEndpoint  string `json:"rpc,omitempty"`
+	HttpEndpoint string `json:"http,omitempty"`
+	TcpEndpoint  string `json:"tcp,omitempty"`
 }
 type KVLoad func(k, v string) bool
 
@@ -24,57 +51,83 @@ type Ctx interface {
 
 type Exec func(ctx Ctx) error
 
-type Cluster interface {
-	Group() string
-	Local() Node
-	View() []Node
-	Partition(key []byte) Node
-	Atomic(prefix string, t Exec) error
-	Join() error
-	Wait()
-	Quit()
-	Started()
-
-	OnJoin(join Node)
-	OnLeave(leave Node)
-	Listener() ClusterListener
-}
-
 type Opt struct {
 	IsCreate bool   `json:"IsCreate"`
 	IsModify bool   `json:"IsModify"`
 	Type     string `json:"Type"`
 }
 
-type ClusterListener interface {
-	KVUpdated(key string, value string, opt Opt)
-	MemberJoined(joined Node)
-	MemberLeft(left Node)
+type RingRange struct {
+	//range >= from and < to
+	From uint32 `json:"from"`
+	To   uint32 `json:"to"`
+}
+
+type TopicKey struct {
+	Topic    string
+	Endpoint string
+}
+
+type Subscription struct {
+	NodeId   string `json:"nodeId"`
+	Tag      string `json:"tag"`
+	Topic    string `json:"topic"`
+	Endpoint string `json:"endpoint"`
+	Deleting bool   `json:"deleting"`
+}
+
+func (s *Subscription) Key() string {
+	return fmt.Sprintf("%s:%s:%s", s.NodeId, s.Tag, s.Topic)
+}
+func (s *Subscription) TopicKey() TopicKey {
+	return TopicKey{Topic: s.Topic, Endpoint: s.Endpoint}
+}
+
+type RingSync struct {
+	Remote string       `json:"remote"`
+	Ranges []RingRange  `json:"ranges"`
+	Sub    Subscription `json:"sub"`
 }
 
 type RingRequest struct {
+	Opt      uint32
+	Address  string
+	Source   RingSync
 	Token    uint32
 	Replicas int
 	Async    chan []Node
 }
 
-type GetRequest struct {
-	Database string
-	Key      []byte
-	Async    chan Chunk
+type DataHeader struct {
+	FactoryId uint32
+	ClassId   uint32
+	Revision  uint64
+	Mutable   bool
+	State     uint32
 }
-type SetRequest struct {
-	Database string
+
+type DataRequest struct {
+	DataHeader
+	Prefix   uint32
 	Key      []byte
 	Value    []byte
+	Opt      uint32
+	Criteria Query
 	Async    chan Chunk
 }
 
+type TopicListener interface {
+	OnTopic(topic *protocol.Topic) error
+}
+
 type ClusterService interface {
-	Sequence
 	HashRing(r RingRequest)
 	KeyRing(r RingRequest)
 	RingToken(key []byte) uint32
-	Get(get GetRequest)
-	Set(get SetRequest)
+	Request(r DataRequest)
+
+	Publish(e *protocol.Topic) error
+	List(q Query)
+	Subscribe(topic string, listener TopicListener) error
+	Unsubscribe(topic string) error
 }

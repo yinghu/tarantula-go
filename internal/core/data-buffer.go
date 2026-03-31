@@ -14,8 +14,10 @@ type DataBuffer interface {
 	WriteFloat32(data float32) error
 
 	WriteInt64(data int64) error
-
+	WriteUInt64(data uint64) error
 	WriteInt32(data int32) error
+
+	WriteUInt32(data uint32) error
 
 	WriteInt16(data int16) error
 
@@ -26,9 +28,10 @@ type DataBuffer interface {
 	Write(data []byte) error
 
 	ReadInt32() (int32, error)
+	ReadUInt32() (uint32, error)
 
 	ReadInt64() (int64, error)
-
+	ReadUInt64() (uint64, error)
 	ReadFloat32() (float32, error)
 
 	ReadFloat64() (float64, error)
@@ -81,6 +84,9 @@ func (s *DataBufferHook) WriteFloat32(data float32) error {
 func (s *DataBufferHook) WriteInt64(data int64) error {
 	return nil
 }
+func (s *DataBufferHook) WriteUInt64(data uint64) error {
+	return nil
+}
 func (s *DataBufferHook) WriteInt32(data int32) error {
 	return nil
 }
@@ -110,6 +116,9 @@ func (s *DataBufferHook) ReadInt32() (int32, error) {
 }
 
 func (s *DataBufferHook) ReadInt64() (int64, error) {
+	return 0, nil
+}
+func (s *DataBufferHook) ReadUInt64() (uint64, error) {
 	return 0, nil
 }
 

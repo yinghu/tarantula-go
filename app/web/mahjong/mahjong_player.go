@@ -5,7 +5,6 @@ import (
 	"slices"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
 
@@ -43,7 +42,7 @@ type MahjongPlayer struct {
 	W              []mj.Tile `json:"-"` //white
 	PendingKongs   []KongType
 	PendingFlowers []KongType
-	Pusher         event.Pusher
+	Pusher         core.Pusher
 	TN             bool   //false draw true discharge
 	TC             [4]int //
 	Checker        HandSegmenet
@@ -55,7 +54,7 @@ func (mp *MahjongPlayer) OnError(mt *MahjongTable, err error) {
 		mr := NewMahjongErrorEvent(mp.SystemId, mt.Id, 100, err.Error())
 		mt.Update(&mr)
 	}
-	
+
 	core.AppLog.Printf("play error %s on %d\n", err.Error(), mp.Seat)
 }
 
@@ -567,7 +566,7 @@ func (mp *MahjongPlayer) validateKong(kong int) (KongType, error) {
 	return deleted, nil
 }
 
-func NewPlayer(seat int, sorting bool, pusher event.Pusher) *MahjongPlayer {
+func NewPlayer(seat int, sorting bool, pusher core.Pusher) *MahjongPlayer {
 	mp := MahjongPlayer{Seat: seat, Auto: true, Pusher: pusher}
 	mp.Hand = mj.Hand{Listener: &mp, Sorting: sorting}
 	mp.Hand.New()

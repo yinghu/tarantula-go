@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/util"
@@ -16,7 +15,7 @@ type TournamentJoin struct {
 }
 
 func (s *TournamentJoin) AccessControl() int32 {
-	return bootstrap.PROTECTED_ACCESS_CONTROL
+	return core.PROTECTED_ACCESS_CONTROL
 }
 
 func (s *TournamentJoin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {

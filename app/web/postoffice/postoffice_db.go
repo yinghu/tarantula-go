@@ -38,14 +38,3 @@ func (db *PostofficeService) createTopic(t event.SubscriptionEvent) (int32, erro
 	return id, nil
 }
 
-func (db *PostofficeService) loadTopics() {
-	db.Sql.Query(func(row pgx.Rows) error {
-		var tp event.SubscriptionEvent
-		err := row.Scan(&tp.Id, &tp.Name, &tp.App)
-		if err != nil {
-			return err
-		}
-		db.topics[tp.Id] = tp
-		return nil
-	}, SELECT_TOPICS)
-}

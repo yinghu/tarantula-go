@@ -1,3 +1,4 @@
+
 package event
 
 import "gameclustering.com/internal/core"
@@ -9,7 +10,7 @@ type QTournament struct {
 	QWithTag
 }
 
-func (q *QTournament) QCriteria(buff core.DataBuffer) error {
+func (q *QTournament) QWrite(buff core.DataBuffer) error {
 	buff.WriteString(TOURNAMENT_ETAG)
 	if q.TournamentId > 0 {
 		buff.WriteInt64(q.TournamentId)
@@ -29,7 +30,7 @@ type QScore struct{
 	QWithTag
 }
 
-func (q *QScore) QCriteria(buff core.DataBuffer) error {
+func (q *QScore) QWrite(buff core.DataBuffer) error {
 	buff.WriteString(TOURNAMENT_ETAG)
 	buff.WriteString(T_SCORE_TAG)
 	if q.TournamentId > 0 {

@@ -1,9 +1,11 @@
 package event
 
+import "gameclustering.com/internal/core"
+
 type CloseEvent struct {
-	EventObj `json:"-"`
+	core.EventObj `json:"-"`
 }
 
-func (s *CloseEvent) ClassId() int {
+func (s *CloseEvent) ClassId() uint32 {
 	return CLOSE_CID
 }

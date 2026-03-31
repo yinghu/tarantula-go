@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 )
@@ -21,7 +20,7 @@ type SnowFlakeResp struct {
 }
 
 func (s *AdminParseSnowFlakeId) AccessControl() int32 {
-	return bootstrap.SUDO_ACCESS_CONTROL
+	return core.SUDO_ACCESS_CONTROL
 }
 func (s *AdminParseSnowFlakeId) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()

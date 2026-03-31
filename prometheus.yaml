@@ -9,12 +9,6 @@
       - job_name: 'tarantula.node'
         static_configs:
           - targets: ['node:9100']     
-      
-      - job_name: 'tarantula.postoffice'
-        metrics_path: /postoffice/metrics
-        static_configs:
-          - targets: ['postoffice:8080']
-        bearer_token_file: '/etc/prometheus/token.txt'
 
       - job_name: 'tarantula.presence'
         metrics_path: /presence/metrics

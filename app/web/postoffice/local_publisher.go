@@ -1,13 +1,13 @@
 package main
 
-import "gameclustering.com/internal/event"
+import "gameclustering.com/internal/core"
 
 type LocalPublisher struct {
 	*PostofficeService
 }
 
-func (s *LocalPublisher) Publish(e event.Event, ticket string) error {
-	s.OnEvent(e)
+func (s *LocalPublisher) Publish(e core.Event, ticket string) error {
+	s.Event().OnEvent(e)
 	return nil
 }
 

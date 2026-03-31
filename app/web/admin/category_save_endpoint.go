@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
@@ -15,7 +14,7 @@ type CategorySaver struct {
 }
 
 func (s *CategorySaver) AccessControl() int32 {
-	return bootstrap.ADMIN_ACCESS_CONTROL
+	return core.ADMIN_ACCESS_CONTROL
 }
 func (s *CategorySaver) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
@@ -39,6 +38,6 @@ func (s *CategorySaver) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 		w.Write(util.ToJson(session))
 		return
 	}
-	w.Write(util.ToJson(core.OnSession{Successful: true,Message: "saved"}))
+	w.Write(util.ToJson(core.OnSession{Successful: true, Message: "saved"}))
 
 }

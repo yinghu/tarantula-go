@@ -74,7 +74,26 @@ func (s *BufferProxy) WriteInt64(data int64) error {
 	return s.data.PutBytes(buf.Bytes(), 0, buf.Len())
 }
 
+func (s *BufferProxy) WriteUInt64(data uint64) error {
+	buf := new(bytes.Buffer)
+	err := binary.Write(buf, binary.BigEndian, data)
+	if err != nil {
+		return err
+	}
+	return s.data.PutBytes(buf.Bytes(), 0, buf.Len())
+}
+
 func (s *BufferProxy) WriteInt32(data int32) error {
+	buf := new(bytes.Buffer)
+	err := binary.Write(buf, binary.BigEndian, data)
+	if err != nil {
+		return err
+	}
+	return s.data.PutBytes(buf.Bytes(), 0, buf.Len())
+
+}
+
+func (s *BufferProxy) WriteUInt32(data uint32) error {
 	buf := new(bytes.Buffer)
 	err := binary.Write(buf, binary.BigEndian, data)
 	if err != nil {
@@ -127,6 +146,20 @@ func (s *BufferProxy) ReadInt32() (int32, error) {
 	return v, nil
 }
 
+func (s *BufferProxy) ReadUInt32() (uint32, error) {
+	buf := make([]byte, 4)
+	err := s.data.GetBytes(buf, 0, 4)
+	if err != nil {
+		return 0, err
+	}
+	var v uint32
+	err = binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
+	if err != nil {
+		return 0, err
+	}
+	return v, nil
+}
+
 func (s *BufferProxy) ReadInt64() (int64, error) {
 	buf := make([]byte, 8)
 	err := s.data.GetBytes(buf, 0, 8)
@@ -141,6 +174,19 @@ func (s *BufferProxy) ReadInt64() (int64, error) {
 	return v, nil
 }
 
+func (s *BufferProxy) ReadUInt64() (uint64, error) {
+	buf := make([]byte, 8)
+	err := s.data.GetBytes(buf, 0, 8)
+	if err != nil {
+		return 0, err
+	}
+	var v uint64
+	err = binary.Read(bytes.NewBuffer(buf), binary.BigEndian, &v)
+	if err != nil {
+		return 0, err
+	}
+	return v, nil
+}
 func (s *BufferProxy) ReadFloat32() (float32, error) {
 	buf := make([]byte, 4)
 	err := s.data.GetBytes(buf, 0, 4)

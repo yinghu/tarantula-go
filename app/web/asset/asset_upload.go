@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 
@@ -20,7 +19,7 @@ type AssetUpload struct {
 }
 
 func (s *AssetUpload) AccessControl() int32 {
-	return bootstrap.PROTECTED_ACCESS_CONTROL
+	return core.PROTECTED_ACCESS_CONTROL
 }
 
 func (s *AssetUpload) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
@@ -30,7 +29,7 @@ func (s *AssetUpload) Request(rs core.OnSession, w http.ResponseWriter, r *http.
 	pdir := s.assetDir + "/" + strconv.Itoa(int(rs.SystemId))
 	os.MkdirAll(pdir, 0755)
 	fid := uuid.New()
-	fn := fid.String()+"."+strings.Split(ctype, "/")[1]
+	fn := fid.String() + "." + strings.Split(ctype, "/")[1]
 	dest, err := os.OpenFile(pdir+"/"+fn, os.O_CREATE|os.O_WRONLY, 0644)
 	w.WriteHeader(http.StatusOK)
 	if err != nil {

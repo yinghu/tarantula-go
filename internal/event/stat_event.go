@@ -7,25 +7,20 @@ import (
 )
 
 type StatEvent struct {
-	Tag      string `json:"Tag"`
 	Name     string `json:"Name"`
 	Count    uint32 `json:"Count"`
-	EventObj `json:"-"`
+	core.EventObj `json:"-"`
 }
 
-func (s *StatEvent) ClassId() int {
+func (s *StatEvent) ClassId() uint32 {
 	return STAT_CID
 }
 
-func (s *StatEvent) ETag() string {
-	return STAT_ETAG
-}
+
 
 func (s *StatEvent) WriteKey(buff core.DataBuffer) error {
-	if err := buff.WriteString(s.ETag()); err != nil {
-		return err
-	}
-	if err := buff.WriteString(s.Tag); err != nil {
+	
+	if err := buff.WriteString(s.ETag); err != nil {
 		return err
 	}
 	if err := buff.WriteString(s.Name); err != nil {
@@ -39,14 +34,14 @@ func (s *StatEvent) ReadKey(buff core.DataBuffer) error {
 	if err != nil {
 		return err
 	}
-	if tg != s.ETag() {
+	if tg != s.Tag() {
 		return errors.New("etag not match")
 	}
 	tag, err := buff.ReadString()
 	if err != nil {
 		return err
 	}
-	s.Tag = tag
+	s.ETag = tag
 	name, err := buff.ReadString()
 	if err != nil {
 		return err

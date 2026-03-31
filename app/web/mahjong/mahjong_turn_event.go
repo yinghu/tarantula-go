@@ -8,7 +8,7 @@ type MahjongTurnEvent struct {
 	MahjongTimeoutObj
 }
 
-func (s *MahjongTurnEvent) ClassId() int {
+func (s *MahjongTurnEvent) ClassId() uint32 {
 	return M_TURN_CID
 }
 

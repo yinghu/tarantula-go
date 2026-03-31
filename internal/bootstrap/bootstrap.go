@@ -3,17 +3,8 @@ package bootstrap
 import (
 	"net/http"
 
-	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
-)
-
-const (
-	PUBLIC_ACCESS_CONTROL    int32 = 0
-	PROTECTED_ACCESS_CONTROL int32 = 1
-	ADMIN_ACCESS_CONTROL     int32 = 30
-	SUDO_ACCESS_CONTROL      int32 = 100
 )
 
 const (
@@ -39,10 +30,8 @@ const (
 
 type TarantulaContext interface {
 	Config() string
-	Start(f conf.Env, c core.Cluster, p event.Pusher) error
+	Start(f core.Env, p core.Pusher) error
 	Shutdown()
-	event.EventService
-	core.ClusterListener
 	Context() string
 	Service() TarantulaService
 }
@@ -50,23 +39,19 @@ type TarantulaContext interface {
 type TarantulaService interface {
 	ItemService() item.ItemService
 	Metrics() core.MetricsService
-	Cluster() core.Cluster
 	Authenticator() core.Authenticator
 	Sequence() core.Sequence
 	ItemListener() item.ItemListener
-	BootstrapListener() BootstrapListener
-	Pusher() event.Pusher
+	Pusher() core.Pusher
+	Cluster() core.ClusterService
+	Event() core.EventService
 }
 
 type TarantulaApp interface {
 	TarantulaService
 	AccessControl() int32
+	NodeId() string
 	Request(sesion core.OnSession, w http.ResponseWriter, r *http.Request)
-}
-
-type BootstrapListener interface {
-	NodeStarted(n core.Node)
-	NodeStopped(n core.Node)
 }
 
 type Login struct {

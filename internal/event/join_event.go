@@ -11,10 +11,10 @@ type JoinEvent struct {
 	Client   net.Conn
 	SystemId int64
 	Flag     int64
-	EventObj
+	core.EventObj
 }
 
-func (s *JoinEvent) ClassId() int {
+func (s *JoinEvent) ClassId() uint32 {
 	return JOIN_CID
 }
 

@@ -4,10 +4,9 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -21,9 +20,9 @@ func (s *PresenceService) Config() string {
 	return "/etc/tarantula/presence-conf.json"
 }
 
-func (s *PresenceService) Start(env conf.Env, c core.Cluster, p event.Pusher) error {
+func (s *PresenceService) Start(env core.Env, p core.Pusher) error {
 	s.ItemUpdater = s
-	err := s.AppManager.Start(env, c, p)
+	err := s.AppManager.Start(env, p)
 	if err != nil {
 		return err
 	}
@@ -46,10 +45,15 @@ func (s *PresenceService) Start(env conf.Env, c core.Cluster, p event.Pusher) er
 		core.AppLog.Printf("Error on load registration %s %s\n", err.Error(), brn.Message)
 	}
 	s.Started = true
+	s.Cluster().Subscribe("message", &protocol.MessageEventListener{Callback: func(e *protocol.MessageEvent) error {
+		core.AppLog.Debug().Msgf("event time %v", e.DateTime.AsTime())
+		return nil
+	}})
 	core.AppLog.Printf("Presence service started %s\n", env.HttpBinding)
 	http.Handle("/presence/register", bootstrap.Logging(&PresenceRegister{PresenceService: s}))
 	http.Handle("/presence/login", bootstrap.Logging(&PresenceLogin{PresenceService: s}))
 	http.Handle("/presence/password", bootstrap.Logging(&PresenceChangePwd{PresenceService: s}))
+	http.Handle("/presence/cluster/get/{key}", bootstrap.Logging(&PresenceClusterGet{PresenceService: s}))
 	return nil
 }
 func (s *PresenceService) Shutdown() {
@@ -57,6 +61,6 @@ func (s *PresenceService) Shutdown() {
 	core.AppLog.Printf("Presence service shut down\n")
 }
 
-func (s *PresenceService) OnEvent(e event.Event) {
+func (s *PresenceService) OnEvent(e core.Event) {
 	core.AppLog.Printf("%v\n", e)
 }

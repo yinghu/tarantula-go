@@ -41,7 +41,7 @@ func (t *SegmentSchedule) Start() error {
 		tq.Tag = event.TOURNAMENT_ETAG
 		tq.Id = event.Q_TOURNAMENT_QID
 		tq.Topic = "tournament"
-		t.Recover(&tq)
+		//t.Recover(&tq)
 	}
 	t.Started = true
 	return nil
@@ -96,5 +96,5 @@ func (t *SegmentSchedule) sendEvent(te event.TournamentEvent) {
 	e := event.TournamentEvent{TournamentId: te.TournamentId, InstanceId: te.InstanceId, SystemId: te.SystemId, Score: te.Score, LastUpdated: te.LastUpdated}
 	e.OnOId(id)
 	e.OnTopic("tournament")
-	t.Send(&e)
+	//t.Publish(&e)
 }

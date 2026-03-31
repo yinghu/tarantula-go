@@ -20,7 +20,7 @@ type ChangePassword struct {
 }
 
 func (s *AdminChangePwd) AccessControl() int32 {
-	return bootstrap.PROTECTED_ACCESS_CONTROL
+	return core.ADMIN_ACCESS_CONTROL
 }
 func (s *AdminChangePwd) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()

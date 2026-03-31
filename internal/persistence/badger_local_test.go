@@ -485,7 +485,7 @@ func TestLocalTransactionGet(t *testing.T) {
 	if mex.Revision() != 1{
 		t.Errorf("should be 1 %d",mex.Revision())
 	}
-	se := event.StatEvent{Tag:me.ETag(),Name: event.STAT_TOTAL}
+	se := event.StatEvent{Name: event.STAT_TOTAL}
 	err = tr.Get(&se)
 	if err != nil{
 		t.Errorf("should not be error %s",err.Error())

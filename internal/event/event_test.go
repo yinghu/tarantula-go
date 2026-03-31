@@ -8,12 +8,13 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 )
 
 type SampleCreator struct {
 }
 
-func (s *SampleCreator) Create(cid int, topic string) (Event, error) {
+func (s *SampleCreator) Create(cid uint32, topic string) (core.Event, error) {
 	e := CreateEvent(cid)
 	e.OnTopic(topic)
 	e.OnListener(s)
@@ -24,22 +25,32 @@ func (s *SampleCreator) VerifyTicket(ticket string) (core.OnSession, error) {
 	sess := core.OnSession{Successful: true, SystemId: 100}
 	return sess, nil
 }
-func (s *SampleCreator) OnError(e Event, err error) {
+func (s *SampleCreator) OnError(e core.Event, err error) {
 	fmt.Printf("On event error %v %s\n", e, err.Error())
 }
 
-func (s *SampleCreator) OnEvent(e Event) {
+func (s *SampleCreator) OnEvent(e core.Event) {
 	fmt.Printf("On event %v\n", e)
 
 }
-func (s *SampleCreator) Send(e Event) error {
+func (s *SampleCreator) PublishX(e core.Event) error {
 	return nil
 }
-func (s *SampleCreator) List(q Query)    {}
-func (s *SampleCreator) Recover(q Query) {}
-func (s *SampleCreator) Load(e Query)    {}
+func (s *SampleCreator) Publish(e *protocol.Topic) error {
+	return nil
+}
+func (s *SampleCreator) List(q core.Query) {}
 
-func createEvent() Event {
+// func (s *SampleCreator) Recover(q core.Query) {}
+func (s *SampleCreator) Load(e core.Query) {}
+func (s *SampleCreator) Subscribe(topic string, lis core.EventListener) error {
+	return nil
+}
+func (s *SampleCreator) Unsubscribe(topic string) error {
+	return nil
+}
+
+func createEvent() core.Event {
 	sub := SubscriptionEvent{}
 	return &sub
 }
@@ -72,7 +83,7 @@ func TestEventJson(t *testing.T) {
 	time.Sleep(10 * time.Second)
 	cpp := TcpPublisher{Remote: "tcp://localhost:5050"}
 	cpp.Connect()
-	go cpp.Subscribe(&SampleCreator{},&SampleCreator{})
+	go cpp.Subscribe(&SampleCreator{}, &SampleCreator{})
 	je := JoinEvent{Ticket: "xticket"}
 	je.OnTopic("tpp")
 	cpp.Join(&je)

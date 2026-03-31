@@ -1,12 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/conf"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 )
 
 type AssetService struct {
@@ -18,16 +17,19 @@ func (s *AssetService) Config() string {
 	return "/etc/tarantula/asset-conf.json"
 }
 
-func (s *AssetService) Start(f conf.Env, c core.Cluster, p event.Pusher) error {
+func (s *AssetService) Start(f core.Env, p core.Pusher) error {
 	s.ItemUpdater = s
-	s.AppManager.Start(f, c, p)
-	s.assetDir = f.LocalDir
+	s.AppManager.Start(f, p)
+	s.assetDir = fmt.Sprintf("%s/%s", f.HomeDir, f.GroupName)
 	err := s.createSchema()
 	if err != nil {
 		return nil
 	}
-	core.AppLog.Printf("Asset service started %s %s\n", f.HttpBinding, f.LocalDir)
+	//s.Cluster().Subscribe("ban", s.Event())
+	core.AppLog.Printf("Asset service started %s %s\n", f.HttpBinding, s.assetDir)
 	http.Handle("/asset/upload/{name}", bootstrap.Logging(&AssetUpload{AssetService: s}))
 	http.Handle("/asset/download/{name}", bootstrap.Logging(&AssetDownload{AssetService: s}))
+	http.Handle("/asset/cluster/create", bootstrap.Logging(&AssetClusterCreate{AssetService: s}))
+
 	return nil
 }

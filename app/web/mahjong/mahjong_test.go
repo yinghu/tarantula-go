@@ -4,22 +4,21 @@ import (
 	"testing"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/mj"
 )
 
 type SampleCallback struct {
 }
 
-func (s *SampleCallback) OnError(e event.Event, err error) {
+func (s *SampleCallback) OnError(e core.Event, err error) {
 	//fmt.Printf("On event error %v %s\n", e, err.Error())
 }
 
-func (s *SampleCallback) OnEvent(e event.Event) {
+func (s *SampleCallback) OnEvent(e core.Event) {
 	//fmt.Printf("On event %v\n", e)
 }
 
-func (s *SampleCallback) Push(e event.Event) {
+func (s *SampleCallback) Push(e core.Event) {
 
 }
 

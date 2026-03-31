@@ -1,17 +1,19 @@
 package event
 
+import "gameclustering.com/internal/core"
+
 const (
-	CLOSE_CID           int = 0
-	STAT_CID            int = 1
-	LOGIN_CID           int = 2
-	MESSAGE_CID         int = 3
-	TOURNAMENT_CID      int = 4
-	SUBSCRIPTION_CID    int = 5
-	TOURNAMENT_SCORE_CID int = 6
-	INVENTORY_CID       int = 7
-	JOIN_CID            int = 8
-	KICKOFF_CID         int = 9
-	REGISTER_CID        int = 10
+	CLOSE_CID            uint32 = 0
+	STAT_CID             uint32 = 1
+	LOGIN_CID            uint32 = 2
+	MESSAGE_CID          uint32 = 3
+	TOURNAMENT_CID       uint32 = 4
+	SUBSCRIPTION_CID     uint32 = 5
+	TOURNAMENT_SCORE_CID uint32 = 6
+	INVENTORY_CID        uint32 = 7
+	JOIN_CID             uint32 = 8
+	KICKOFF_CID          uint32 = 9
+	REGISTER_CID         uint32 = 10
 
 	LOGIN_ETAG        string = "lgn"
 	MESSAGE_ETAG      string = "msg"
@@ -25,9 +27,10 @@ const (
 	STAT_ETAG string = "stat"
 
 	STAT_TOTAL string = "total"
+
 )
 
-func CreateEvent(cid int) Event {
+func CreateEvent(cid uint32) core.Event {
 	switch cid {
 	case STAT_CID:
 		return &StatEvent{}

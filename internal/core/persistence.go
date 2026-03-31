@@ -1,21 +1,67 @@
 package core
 
+func Export(obj Persistentable, buffSize int) ([]byte, []byte, error) {
+	buff := NewBuffer(buffSize)
+	var k []byte
+	var v []byte
+	if err := obj.WriteKey(buff); err != nil {
+		return k, v, err
+	}
+	buff.Flip()
+	k, err := buff.Read(0)
+	if err != nil {
+		return k, v, err
+	}
+	buff.Clear()
+	if err := obj.Write(buff); err != nil {
+		return k, v, err
+	}
+	buff.Flip()
+	v, err = buff.Read(0)
+	if err != nil {
+		return k, v, err
+	}
+	return k, v, nil
+}
+
+func Import(obj Persistentable, k, v []byte, buffSize int) error {
+	buff := NewBuffer(buffSize)
+	if err := buff.Write(k); err != nil {
+		return err
+	}
+	buff.Flip()
+	if err := obj.ReadKey(buff); err != nil {
+		return err
+	}
+	buff.Clear()
+	if err := buff.Write(v); err != nil {
+		return err
+	}
+	buff.Flip()
+	if err := obj.Read(buff); err != nil {
+		return err
+	}
+	return nil
+}
+
 type Persistentable interface {
 	Write(value DataBuffer) error
 	WriteKey(key DataBuffer) error
 	Read(value DataBuffer) error
 	ReadKey(key DataBuffer) error
-	ClassId() int
-	Revision() int64
-	Timestamp() int64
-	OnTimestamp(tsp int64)
-	OnRevision(rev int64)
-	ETag() string
+	FactoryId() uint32
+	ClassId() uint32
+
+	Revision() uint64
+	Timestamp() uint64
+	OnTimestamp(tsp uint64)
+	OnRevision(rev uint64)
+	//ETag() string
 }
 
 type PersistentableObj struct {
-	Rev int64 `json:"rev,string"`
-	Tsp int64 `json:"timestamp,string"`
+	Rev uint64 `json:"rev,string"`
+	Tsp uint64 `json:"timestamp,string"`
 }
 
 type Stream func(k, v DataBuffer) bool
@@ -36,21 +82,25 @@ func (s *PersistentableObj) ReadKey(value DataBuffer) error {
 	return nil
 }
 
-func (s *PersistentableObj) ClassId() int {
+func (s *PersistentableObj) FactoryId() uint32 {
 	return 0
 }
 
-func (s *PersistentableObj) Revision() int64 {
+func (s *PersistentableObj) ClassId() uint32 {
+	return 0
+}
+
+func (s *PersistentableObj) Revision() uint64 {
 	return s.Rev
 }
-func (s *PersistentableObj) Timestamp() int64 {
+func (s *PersistentableObj) Timestamp() uint64 {
 	return s.Tsp
 }
-func (s *PersistentableObj) OnTimestamp(tsp int64) {
+func (s *PersistentableObj) OnTimestamp(tsp uint64) {
 	s.Tsp = tsp
 }
 
-func (s *PersistentableObj) OnRevision(rev int64) {
+func (s *PersistentableObj) OnRevision(rev uint64) {
 	s.Rev = rev
 }
 
@@ -70,7 +120,7 @@ type ListingOpt struct {
 type Transaction interface {
 	Get(p Persistentable) error
 	Set(p Persistentable) error
-	Del(p Persistentable) error	
+	Del(p Persistentable) error
 	Commit() error
 	Rollback()
 }

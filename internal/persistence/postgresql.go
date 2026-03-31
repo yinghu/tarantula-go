@@ -47,6 +47,20 @@ func (p *Postgresql) pconfig() (*pgxpool.Config, error) {
 	return cfg, nil
 }
 
+// one time connection
+func (p *Postgresql) CreateDatabase(ddl string) error {
+	conn, err := pgx.Connect(context.Background(), p.Url)
+	if err != nil {
+		return err
+	}
+	defer conn.Close(context.Background())
+	_, err = conn.Exec(context.Background(), ddl)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (p *Postgresql) Create() error {
 	cfg, err := p.pconfig()
 	if err != nil {

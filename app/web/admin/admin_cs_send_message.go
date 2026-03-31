@@ -16,7 +16,7 @@ type CSMessager struct {
 }
 
 func (s *CSMessager) AccessControl() int32 {
-	return bootstrap.ADMIN_ACCESS_CONTROL
+	return core.ADMIN_ACCESS_CONTROL
 }
 func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
@@ -34,8 +34,14 @@ func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 	me.OnOId(id)
 	me.Source = s.Context()
 	me.DateTime = time.Now()
-	me.OnTopic("message")
-	err = s.Send(&me)
+	tf := bootstrap.MessageEventFactory{}
+	tf.Cluster = s.Cluster()
+	tp, err := tf.FromMessageEvent(me)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	err = s.Cluster().Publish(tp)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return

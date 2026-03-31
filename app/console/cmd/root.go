@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"gameclustering.com/cmd/admin"
 	"gameclustering.com/cmd/player"
 	"github.com/spf13/cobra"
 )
@@ -20,5 +19,4 @@ func Execute() error {
 
 func init() {
 	rootCmd.AddCommand(player.PlayerCmd)
-	rootCmd.AddCommand(admin.AdminCmd)
 }

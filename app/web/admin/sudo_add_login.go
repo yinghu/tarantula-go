@@ -14,7 +14,7 @@ type SudoAddLogin struct {
 }
 
 func (s *SudoAddLogin) AccessControl() int32 {
-	return bootstrap.SUDO_ACCESS_CONTROL
+	return core.SUDO_ACCESS_CONTROL
 }
 func (s *SudoAddLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
@@ -26,7 +26,7 @@ func (s *SudoAddLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http
 		return
 	}
 	if login.AccessControl <= 0 {
-		login.AccessControl = bootstrap.PROTECTED_ACCESS_CONTROL
+		login.AccessControl = core.PROTECTED_ACCESS_CONTROL
 	}
 	hash, err := s.Authenticator().HashPassword(login.Hash)
 	if err != nil {

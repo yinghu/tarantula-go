@@ -14,7 +14,7 @@ type AdminLogin struct {
 }
 
 func (s *AdminLogin) AccessControl() int32 {
-	return bootstrap.PUBLIC_ACCESS_CONTROL
+	return core.PUBLIC_ACCESS_CONTROL
 }
 func (s *AdminLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
@@ -45,6 +45,6 @@ func (s *AdminLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 		w.Write(util.ToJson(session))
 		return
 	}
-	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: s.Cluster().Local().HttpEndpoint}
+	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: ""}
 	w.Write(util.ToJson(session))
 }

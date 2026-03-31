@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 )
@@ -16,7 +15,7 @@ type AdminWebIndex struct {
 }
 
 func (s *AdminWebIndex) AccessControl() int32 {
-	return bootstrap.PUBLIC_ACCESS_CONTROL
+	return core.PUBLIC_ACCESS_CONTROL
 }
 func (s *AdminWebIndex) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()

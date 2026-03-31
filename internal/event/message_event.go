@@ -7,25 +7,20 @@ import (
 )
 
 type MessageEvent struct {
+	
 	Title    string    `json:"title"`
 	Message  string    `json:"message"`
 	DateTime time.Time `json:"dataTime"`
 	Source   string    `json:"source"`
-	EventObj
+	core.EventObj
 }
 
-func (s *MessageEvent) ClassId() int {
+func (s *MessageEvent) ClassId() uint32 {
 	return MESSAGE_CID
 }
 
-func (s *MessageEvent) ETag() string {
-	return MESSAGE_ETAG
-}
-
 func (s *MessageEvent) WriteKey(buff core.DataBuffer) error {
-	if err := buff.WriteString(s.ETag()); err != nil {
-		return err
-	}
+	
 	if err := buff.WriteInt64(s.OId()); err != nil {
 		return err
 	}
@@ -33,10 +28,6 @@ func (s *MessageEvent) WriteKey(buff core.DataBuffer) error {
 }
 
 func (s *MessageEvent) ReadKey(buff core.DataBuffer) error {
-	_, err := buff.ReadString()
-	if err != nil {
-		return err
-	}
 	id, err := buff.ReadInt64()
 	if err != nil {
 		return err
@@ -114,7 +105,3 @@ func (s *MessageEvent) Inbound(buff core.DataBuffer) error {
 	return nil
 }
 
-func (s *MessageEvent) OnIndex(idx IndexListener) {
-	idx.LocalStore().Save(s)
-	idx.Index(s)
-}

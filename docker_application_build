@@ -1,6 +1,5 @@
 # Build
 FROM golang:1.24.2-alpine AS builder
-RUN apk add gcc musl-dev
 ARG app
 WORKDIR /build
 COPY . .
@@ -34,9 +33,6 @@ RUN chmod 700 id_ed25519
 
 # Application Install
 WORKDIR /home/tarantula/bin
-ARG h
-ARG n
-ARG s
 ARG g
 RUN mkdir site
 COPY --from=builder /build/app/web/${app}/main .
@@ -44,11 +40,5 @@ COPY --from=builder /build/site/* site
 RUN git clone git@github.com:yinghu/tarantula.git
 WORKDIR /home/tarantula/bin/tarantula
 RUN git pull
-RUN git checkout ${g}
 WORKDIR /home/tarantula/bin
-RUN echo ${h} ${n} ${s} ${g}
-ENV TN_HOST=${h}
-ENV TN_NAME=${n}
-ENV TN_ID=${s}
-ENV TN_GROUP=${g}
 ENTRYPOINT ["./main"]

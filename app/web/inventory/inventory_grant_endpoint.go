@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
@@ -17,7 +16,7 @@ type InventoryGranter struct {
 }
 
 func (s *InventoryGranter) AccessControl() int32 {
-	return bootstrap.PROTECTED_ACCESS_CONTROL
+	return core.PROTECTED_ACCESS_CONTROL
 }
 
 func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
@@ -58,9 +57,9 @@ func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *
 	}
 	w.Write(util.ToJson(core.OnSession{Successful: true, Message: "granted"}))
 }
-func (s *InventoryGranter) sendEvent(e event.Event) {
+func (s *InventoryGranter) sendEvent(e core.Event) {
 	oid, _ := s.Sequence().Id()
 	e.OnOId(oid)
 	e.OnTopic("inventory")
-	s.Send(e)
+	//s.Publish(e)
 }

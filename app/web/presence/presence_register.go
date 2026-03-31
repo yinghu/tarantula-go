@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -17,13 +16,13 @@ type PresenceRegister struct {
 }
 
 func (s *PresenceRegister) AccessControl() int32 {
-	return bootstrap.PUBLIC_ACCESS_CONTROL
+	return core.PUBLIC_ACCESS_CONTROL
 }
 
 func (s *PresenceRegister) Register(login bootstrap.Login) {
 	id, _ := s.Sequence().Id()
 	login.SystemId = id
-	login.AccessControl = bootstrap.PROTECTED_ACCESS_CONTROL
+	login.AccessControl = core.PROTECTED_ACCESS_CONTROL
 	hash, _ := s.Authenticator().HashPassword(login.Hash)
 	login.Hash = hash
 	err := s.SaveLogin(&login)
@@ -36,8 +35,8 @@ func (s *PresenceRegister) Register(login bootstrap.Login) {
 		login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.INVALID_TOKEN_CODE)}
 		return
 	}
-	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: s.Cluster().Local().HttpEndpoint}
-	ticket, _ := s.AppAuth.CreateTicket(login.SystemId, login.Id, login.AccessControl,bootstrap.TICKET_TIME_OUT_MINUTES)
+	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: s.F.Host}
+	ticket, _ := s.Authenticator().CreateTicket(login.SystemId, login.Id, login.AccessControl, bootstrap.TICKET_TIME_OUT_MINUTES)
 	session.Ticket = ticket
 	login.Cc <- core.Chunk{Remaining: false, Data: util.ToJson(session)}
 	go func() {
@@ -47,9 +46,9 @@ func (s *PresenceRegister) Register(login bootstrap.Login) {
 		}
 		me := event.RegisterEvent{SystemId: login.SystemId, Name: login.Name}
 		me.OnOId(id)
-		me.RegisterTime = time.Now()
+		//me.RegisterTime = time.Now()
 		me.OnTopic("login")
-		s.Send(&me)
+		//s.Publish(&me)
 		rw := item.OnInventory{SystemId: login.SystemId, ItemId: s.LoginReward.Id, Source: "login"}
 		err = s.ItemService().InventoryManager().Grant(rw)
 		if err != nil {
@@ -70,7 +69,8 @@ func (s *PresenceRegister) Request(rs core.OnSession, w http.ResponseWriter, r *
 	login.Cc = listener
 	go s.Register(login)
 	for c := range listener {
-		w.Write(c.Data)
+		cv, _ := c.Data.([]byte)
+		w.Write(cv)
 		if !c.Remaining {
 			break
 		}

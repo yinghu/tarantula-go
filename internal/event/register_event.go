@@ -10,10 +10,10 @@ type RegisterEvent struct {
 	Name      string    `json:"login"`
 	SystemId  int64     `json:"systemId,string"`
 	RegisterTime time.Time `json:"registerTime"`
-	EventObj
+	core.EventObj
 }
 
-func (s *RegisterEvent) ClassId() int {
+func (s *RegisterEvent) ClassId() uint32 {
 	return REGISTER_CID
 }
 

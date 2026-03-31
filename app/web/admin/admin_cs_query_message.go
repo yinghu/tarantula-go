@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -16,7 +16,7 @@ type CSQueryer struct {
 }
 
 func (s *CSQueryer) AccessControl() int32 {
-	return bootstrap.ADMIN_ACCESS_CONTROL
+	return core.ADMIN_ACCESS_CONTROL
 }
 
 func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
@@ -27,7 +27,7 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 		w.Write(util.ToJson(session))
 		return
 	}
-	me := event.CreateQuery(int32(qid))
+	me := event.CreateQuery(uint32(qid))
 	err = json.NewDecoder(r.Body).Decode(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
@@ -36,13 +36,21 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	defer close(me.QCc())
-	go s.List(me)
+	go s.Cluster().List(me)
+	ms := make([]event.MessageEvent, 0)
 	for c := range me.QCc() {
-		if len(c.Data) > 0 {
-			w.Write(c.Data)
-		}
 		if !c.Remaining {
 			break
 		}
+		resp, ok := c.Data.(*protocol.Response)
+		if ok {
+			for _, data := range resp.Data.List {
+				me := event.MessageEvent{}
+				core.Import(&me, data.Key, data.Value, 200)
+				core.AppLog.Debug().Msgf("Data : %v", me)
+				ms = append(ms, me)
+			}
+		}
 	}
+	w.Write(util.ToJson(ms))
 }

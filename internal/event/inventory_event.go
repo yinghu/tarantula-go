@@ -13,10 +13,10 @@ type InventoryEvent struct {
 	Source      string    `json:"Source"`
 	GrantTime   time.Time `json:"GrantTime"`
 	Description string    `json:"Description"`
-	EventObj    `json:"-"`
+	core.EventObj    `json:"-"`
 }
 
-func (s *InventoryEvent) ClassId() int {
+func (s *InventoryEvent) ClassId() uint32 {
 	return INVENTORY_CID
 }
 

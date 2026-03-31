@@ -12,11 +12,11 @@ import (
 )
 
 func (s *AppManager) PostJsonAsync(url string, payload any, ch chan core.Chunk) {
-	if s.standalone {
+	if s.F.Standalone {
 		ch <- core.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: STANDALONE_APP, Message: STANDALONE_APP_MSG})}
 		return
 	}
-	tick, err := s.AppAuth.CreateToken(1, 1, ADMIN_ACCESS_CONTROL)
+	tick, err := s.auth.CreateToken(1, 1, core.ADMIN_ACCESS_CONTROL)
 	if err != nil {
 		ch <- core.Chunk{Remaining: false, Data: util.ToJson(core.OnSession{ErrorCode: INVALID_TICKET_CODE, Message: err.Error()})}
 		return
@@ -72,10 +72,10 @@ func (s *AppManager) PostJsonAsync(url string, payload any, ch chan core.Chunk) 
 }
 
 func (s *AppManager) PostJsonSync(url string, payload any) core.OnSession {
-	if s.standalone {
+	if s.F.Standalone {
 		return core.OnSession{ErrorCode: STANDALONE_APP, Message: STANDALONE_APP_MSG}
 	}
-	tick, err := s.AppAuth.CreateToken(1, 1, SUDO_ACCESS_CONTROL)
+	tick, err := s.auth.CreateToken(1, 1, core.SUDO_ACCESS_CONTROL)
 	if err != nil {
 		return core.OnSession{ErrorCode: INVALID_TICKET_CODE, Message: err.Error()}
 	}

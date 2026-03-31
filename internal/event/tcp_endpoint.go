@@ -15,20 +15,20 @@ const (
 
 type TcpEndpoint struct {
 	Endpoint string
-	Service  EventService
+	Service  core.EventService
 	listener net.Listener
 
 	OutboundEnabled bool
 
 	outboundCQ    chan net.Conn
-	outboundEQ    chan Event
+	outboundEQ    chan core.Event
 	outboundIndex map[int64]*OutboundSocket
 }
 
 func (s *TcpEndpoint) Open() error {
 	s.outboundIndex = make(map[int64]*OutboundSocket)
 	if s.OutboundEnabled {
-		s.outboundEQ = make(chan Event, 10)
+		s.outboundEQ = make(chan core.Event, 10)
 		s.outboundCQ = make(chan net.Conn, 10)
 		go s.outbound()
 	}
@@ -89,7 +89,7 @@ func (s *TcpEndpoint) inbound(client net.Conn, systemId int64) {
 			continue
 		}
 		buff.Flip()
-		cid, err := buff.ReadInt32()
+		cid, err := buff.ReadUInt32()
 		if err != nil {
 			core.AppLog.Printf("read class id error %s\n", err.Error())
 			buff.Clear()
@@ -113,7 +113,7 @@ func (s *TcpEndpoint) inbound(client net.Conn, systemId int64) {
 			buff.Clear()
 			continue
 		}
-		e, err := s.Service.Create(int(cid), topic)
+		e, err := s.Service.Create(cid, topic)
 		if err != nil {
 			core.AppLog.Printf("invalid class id error %s\n", err.Error())
 			buff.Clear()
@@ -154,7 +154,7 @@ func (s *TcpEndpoint) outbound() {
 			if e.ClassId() == JOIN_CID {
 				metrics.SOCKET_CONCURRENCY_METRICS.Inc()
 				join, _ := e.(*JoinEvent)
-				cout := OutboundSocket{C: join.Client, Pending: make(chan Event, 10), B: core.NewBuffer(TCP_READ_BUFFER_SIZE), Flag: join.Flag}
+				cout := OutboundSocket{C: join.Client, Pending: make(chan core.Event, 10), B: core.NewBuffer(TCP_READ_BUFFER_SIZE), Flag: join.Flag}
 				go cout.Subscribe()
 				s.outboundIndex[join.SystemId] = &cout
 				go s.inbound(join.Client, join.SystemId)
@@ -166,7 +166,7 @@ func (s *TcpEndpoint) outbound() {
 	}
 	core.AppLog.Printf("outbound event closed")
 }
-func (s *TcpEndpoint) Push(e Event) {
+func (s *TcpEndpoint) Push(e core.Event) {
 	s.outboundEQ <- e
 }
 func (s *TcpEndpoint) join(client net.Conn) {
@@ -204,7 +204,7 @@ func (s *TcpEndpoint) join(client net.Conn) {
 	s.outboundEQ <- &e
 }
 
-func (s *TcpEndpoint) dispatch(e Event) {
+func (s *TcpEndpoint) dispatch(e core.Event) {
 	if e.RecipientId() > 0 {
 		soc, exists := s.outboundIndex[e.RecipientId()]
 		if exists {
