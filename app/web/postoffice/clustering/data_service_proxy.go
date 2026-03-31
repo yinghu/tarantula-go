@@ -175,37 +175,31 @@ func (m *DataServiceProvider) clientReset(target *core.Node, request *protocol.R
 	}}
 }
 
-func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Response) {
+func (c *DataServiceProvider) runGet(set *protocol.Request, responser grpc.ServerStreamingServer[protocol.Response]) {
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
-	retry := RetryTrack{Reties: RETRY_MAX}
-	for retry.Reties > 0 {
-		kh := c.Mll.RingToken(set.Data.Key)
-		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: kh, Replicas: REPLICA_MAX, Async: rq}
-		nodes := <-rq
-		ringNode := nodes[0]
-		tcp, err := grpc.NewClient(ringNode.RpcEndpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
-		if err != nil {
-			retry.Reties++
-			continue
-		}
-		defer tcp.Close()
+	ch := make(chan *protocol.Response, 3)
+	defer close(ch)
+	kh := c.Mll.RingToken(set.Data.Key)
+	c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: kh, Replicas: REPLICA_MAX, Async: rq}
+	nodes := <-rq
+	ringNode := nodes[0]
+	c.WTask <- Task{target: ringNode.RpcEndpoint, execute: func(tcp *grpc.ClientConn, opt int) error {
 		dsp := protocol.NewDataServiceClient(tcp)
 		stream, err := dsp.Get(context.Background(), set)
 		if err != nil {
-			retry.Reties++
-			continue
+			ch <- &protocol.Response{Successful: false, Message: err.Error(), Code: 500000}
+			return nil
 		}
-		crt := protocol.Response{Successful: false}
 		for {
 			data, err := stream.Recv()
 			if err == io.EOF {
+				ch <- &protocol.Response{Successful: false, Message: err.Error(), Code: 500000}
 				break
 			}
 			if err != nil {
 				core.AppLog.Debug().Msgf("run get streaming error %s", err.Error())
-				crt.Code = 400001
-				crt.Message = err.Error()
+				ch <- &protocol.Response{Successful: false, Message: err.Error(), Code: 500000}
 				break
 			}
 			ch <- data
@@ -213,15 +207,12 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, ch chan *protocol.Re
 				break
 			}
 		}
-		ch <- &crt
-		retry.Suc = true
-		break
+		return nil
+	}}
+	for resp := range ch {
+		responser.Send(resp)
 	}
-	if retry.Suc {
-		return
-	}
-	core.AppLog.Printf("retry %s, %d", retry.Err, retry.Reties)
-	ch <- &protocol.Response{Successful: false, Message: retry.Err}
+
 }
 
 func (c *DataServiceProvider) runPull(target string, set *protocol.Request, ch chan *protocol.Response) {
