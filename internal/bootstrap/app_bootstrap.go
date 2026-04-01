@@ -16,7 +16,14 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+var TopicFactoryRegistry = make(map[string]func() core.ProtoTopicFactory)
+
+func Register(name string, fac func() core.ProtoTopicFactory) {
+	TopicFactoryRegistry[name] = fac
+}
+
 func AppBootstrap(tcx TarantulaContext) {
+
 	f := core.Env{}
 	err := f.Load(tcx.Config())
 	if err != nil {

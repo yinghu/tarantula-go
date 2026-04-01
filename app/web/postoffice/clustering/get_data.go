@@ -13,17 +13,17 @@ type GetData struct {
 }
 
 func (s *GetData) IndexKey() KeyIndex {
-	data := s.Data;
+	data := s.Data
 	ki := KeyIndex{Prefix: hash.Sum32(data.Key), Header: data.Header, Key: data.Key}
 	return ki
 }
 func (s *GetData) DataKey() ([]byte, error) {
 	data := s.Data
 	ksz := len(data.Key)
-	if ksz+20 > COMPOSIT_KEY_MAX {
+	if ksz+20 > core.COMPOSIT_KEY_MAX {
 		return []byte{}, fmt.Errorf("Key size overflow %d", ksz)
 	}
-	buffer := core.NewBuffer(COMPOSIT_KEY_MAX)
+	buffer := core.NewBuffer(core.COMPOSIT_KEY_MAX)
 	buffer.WriteUInt32(data.Header.FactoryId)
 	buffer.WriteUInt32(data.Header.ClassId)
 	buffer.WriteInt32(int32(ksz))

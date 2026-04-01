@@ -8,10 +8,6 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-const (
-	COMPOSIT_KEY_MAX int = 500
-)
-
 type SetData struct {
 	*protocol.Data
 	Prefix uint32
@@ -30,10 +26,10 @@ func (s *SetData) IndexKey() KeyIndex {
 
 func (s *SetData) DataKey() ([]byte, error) {
 	ksz := len(s.Key)
-	if ksz+20 > COMPOSIT_KEY_MAX {
+	if ksz+20 > core.COMPOSIT_KEY_MAX {
 		return []byte{}, fmt.Errorf("Key size overflow %d", ksz)
 	}
-	buffer := core.NewBuffer(COMPOSIT_KEY_MAX)
+	buffer := core.NewBuffer(core.COMPOSIT_KEY_MAX)
 	buffer.WriteUInt32(s.Header.FactoryId)
 	buffer.WriteUInt32(s.Header.ClassId)
 	buffer.WriteUInt32(uint32(ksz))

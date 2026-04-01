@@ -44,11 +44,17 @@ func Import(obj Persistentable, k, v []byte, buffSize int) error {
 	return nil
 }
 
-type Persistentable interface {
-	Write(value DataBuffer) error
+type CompositeKey interface {
 	WriteKey(key DataBuffer) error
-	Read(value DataBuffer) error
 	ReadKey(key DataBuffer) error
+}
+
+type Persistentable interface {
+	CompositeKey
+	Write(value DataBuffer) error
+	//WriteKey(key DataBuffer) error
+	Read(value DataBuffer) error
+	//ReadKey(key DataBuffer) error
 	FactoryId() uint32
 	ClassId() uint32
 

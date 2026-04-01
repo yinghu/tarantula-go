@@ -328,7 +328,7 @@ func (c *DataServiceProvider) set(resp *protocol.Response) {
 			item.Value(func(val []byte) error {
 				eki := KeyIndex{Header: &protocol.Header{}}
 				ev := append([]byte{}, val...)
-				err = core.Import(&eki, k, ev, COMPOSIT_KEY_MAX)
+				err = core.Import(&eki, k, ev, core.COMPOSIT_KEY_MAX)
 				if err != nil {
 					return err
 				}

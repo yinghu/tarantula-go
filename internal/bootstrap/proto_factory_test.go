@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
 
@@ -15,21 +16,23 @@ func TestProtoFactory(t *testing.T) {
 	me.OnTopic("message")
 	me.OnOId(100)
 	ptf := MessageEventFactory{}
-	ptf.Cluster = &ClusterManager{}
 	tp, err := ptf.FromMessageEvent(me)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
-	req, err := ptf.ToRequest(tp)
+	req, err := ptf.Request(tp)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
-	fmt.Printf("req %v\n", req)
-	tpx, err := ptf.FromData(req.Data.Value)
+	fmt.Printf("req %v\n", req.Data.Value)
+	tpc, err := ptf.Topic(req.Data.Value)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
 	fmt.Printf("tp %v\n", tp)
-	fmt.Printf("tpx %v\n", tpx)
+	fmt.Printf("tpx %v\n", tpc)
+}
 
+func TestMessageEventFactory(t *testing.T) {
+	Register("me", func() core.ProtoTopicFactory { return &MessageEventFactory{} })
 }

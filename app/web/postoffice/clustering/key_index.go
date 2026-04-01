@@ -121,7 +121,7 @@ func (k *KeyIndex) ReadKey(buffer core.DataBuffer) error {
 //HELP METHODS
 
 func (k *KeyIndex) Val(val []byte) error {
-	kBuff := core.NewBuffer(COMPOSIT_KEY_MAX)
+	kBuff := core.NewBuffer(core.COMPOSIT_KEY_MAX)
 	if err := kBuff.Write(val); err != nil {
 		return err
 	}
@@ -130,7 +130,7 @@ func (k *KeyIndex) Val(val []byte) error {
 }
 
 func (k *KeyIndex) CompositKey() ([]byte, error) {
-	kBuff := core.NewBuffer(COMPOSIT_KEY_MAX)
+	kBuff := core.NewBuffer(core.COMPOSIT_KEY_MAX)
 	if err := k.WriteKey(kBuff); err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func (k *KeyIndex) CompositKey() ([]byte, error) {
 	return kBuff.Read(0)
 }
 func (k *KeyIndex) Value() ([]byte, error) {
-	kBuff := core.NewBuffer(COMPOSIT_KEY_MAX)
+	kBuff := core.NewBuffer(core.COMPOSIT_KEY_MAX)
 	if err := k.Write(kBuff); err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ func (k *KeyIndex) Value() ([]byte, error) {
 	return kBuff.Read(0)
 }
 func (k *KeyIndex) Pair() ([]byte, []byte, error) {
-	kBuff := core.NewBuffer(COMPOSIT_KEY_MAX)
+	kBuff := core.NewBuffer(core.COMPOSIT_KEY_MAX)
 	if err := k.WriteKey(kBuff); err != nil {
 		return nil, nil, err
 	}
@@ -168,7 +168,7 @@ func (k *KeyIndex) Pair() ([]byte, []byte, error) {
 }
 
 func (k *KeyIndex) lookupPrefix(p string) ([]byte, error) {
-	buff := core.NewBuffer(COMPOSIT_KEY_MAX)
+	buff := core.NewBuffer(core.COMPOSIT_KEY_MAX)
 	buff.WriteString(p)
 	buff.Flip()
 	return buff.Read(0)
@@ -176,7 +176,7 @@ func (k *KeyIndex) lookupPrefix(p string) ([]byte, error) {
 
 func (k *KeyIndex) lookupDataKey() ([]byte, error) {
 	ksz := len(k.Key)
-	buffer := core.NewBuffer(COMPOSIT_KEY_MAX)
+	buffer := core.NewBuffer(core.COMPOSIT_KEY_MAX)
 	buffer.WriteUInt32(k.Header.FactoryId)
 	buffer.WriteUInt32(k.Header.ClassId)
 	buffer.WriteInt32(int32(ksz))

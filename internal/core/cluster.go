@@ -24,6 +24,8 @@ const (
 	DATA_STATE_READY   uint32 = 0
 	DATA_STATE_PENDING uint32 = 1
 	DATA_STATE_DELETED uint32 = 2
+
+	COMPOSIT_KEY_MAX int = 500
 )
 
 type Chunk struct {

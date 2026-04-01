@@ -14,8 +14,8 @@ func (c *DataServiceProvider) runPublish(topic *protocol.Topic) (*protocol.Respo
 	rc := make(chan *protocol.Response, 1)
 	defer close(rc)
 
-	tpf := bootstrap.ProtoTopicFactory{}
-	req, err := tpf.ToRequest(topic)
+	tpf := bootstrap.MessageEventFactory{}
+	req, err := tpf.Request(topic)
 	if err != nil {
 		rc <- &protocol.Response{Successful: false}
 	}
