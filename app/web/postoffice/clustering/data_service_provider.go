@@ -76,7 +76,7 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 		p := px
 		rc := make(chan *protocol.Response, 3)
 		dset := make([]*protocol.Data, 0)
-		core.AppLog.Debug().Msgf("query : %d %d %d %d", q.QLimit(), q.QOffset(), q.QFactoryId(), q.QEvent().ClassId())
+		core.AppLog.Debug().Msgf("query : %d %d %d %d", q.QLimit(), q.QOffset(), q.QFactoryId(), q.QClassId())
 		go func() {
 			limit := q.QLimit()
 			offset := q.QOffset()
