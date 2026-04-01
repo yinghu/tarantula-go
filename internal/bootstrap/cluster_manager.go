@@ -103,12 +103,12 @@ func (c *ClusterManager) Request(r core.DataRequest) {
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
 	if r.Opt == core.QUERY_DATA_REQUEST || r.Opt == core.PULL_DATA_REQUEST {
-		dt, err := event.Export(r.Criteria, 100)
+		dt, err := event.Export(r.Criteria, core.COMPOSIT_KEY_MAX)
 		if err != nil {
 			r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: err.Error()}}
 			return
 		}
-		q := protocol.Query{Id: r.Criteria.QId(), Criteria: dt}
+		q := protocol.Query{Id: r.Criteria.QTopic(), Criteria: dt}
 		req.Query = &q
 	}
 	stream, err := dsp.Request(context.Background(), &req)

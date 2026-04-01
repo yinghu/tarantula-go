@@ -9,6 +9,7 @@ type ProtoTopicFactory interface {
 	CompositeKey
 	Request(topic *protocol.Topic) (*protocol.Request, error)
 	Topic(data []byte) (*protocol.Topic, error)
+	Query(criteria []byte) (Query, error)
 }
 
 type ProtoTopicFactoryObj struct {
@@ -18,6 +19,7 @@ type ProtoTopicFactoryObj struct {
 func (p *ProtoTopicFactoryObj) WriteKey(key DataBuffer) error {
 	return nil
 }
+
 func (p *ProtoTopicFactoryObj) ReadKey(key DataBuffer) error {
 	return nil
 }

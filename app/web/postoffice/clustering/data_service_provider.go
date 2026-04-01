@@ -7,8 +7,8 @@ import (
 	"os"
 	"sync"
 
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	badger "github.com/dgraph-io/badger/v4"
@@ -56,8 +56,8 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 		return stream.Send(&resp)
 	}
 	if request.Opt == core.QUERY_DATA_REQUEST {
-		q := event.CreateQuery(request.Query.Id)
-		err := event.Import(q, request.Query.Criteria, 100)
+		tf, _ := bootstrap.TopicFactoryRegistry[request.Query.Id]
+		q, err := tf().Query(request.Query.Criteria)
 		if err != nil {
 			return err
 		}

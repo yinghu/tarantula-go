@@ -23,7 +23,7 @@ const (
 
 type Query struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint32                 `protobuf:"fixed32,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Criteria      []byte                 `protobuf:"bytes,2,opt,name=criteria,proto3" json:"criteria,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -59,11 +59,11 @@ func (*Query) Descriptor() ([]byte, []int) {
 	return file_query_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Query) GetId() uint32 {
+func (x *Query) GetId() string {
 	if x != nil {
 		return x.Id
 	}
-	return 0
+	return ""
 }
 
 func (x *Query) GetCriteria() []byte {
@@ -79,7 +79,7 @@ const file_query_proto_rawDesc = "" +
 	"\n" +
 	"\vquery.proto\x12\bprotocol\"3\n" +
 	"\x05Query\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\aR\x02id\x12\x1a\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\bcriteria\x18\x02 \x01(\fR\bcriteriaBM\n" +
 	"\x17com.icodesoftware.protoB\fQueryFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 

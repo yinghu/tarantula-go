@@ -42,9 +42,6 @@ func (p *MessageEventFactory) Request(topic *protocol.Topic) (*protocol.Request,
 	if err != nil {
 		return &req, err
 	}
-	//topic.Event.Header.NodeId = topic.NodeId
-	//topic.Event.Header.Tag = topic.Tag
-	//topic.Event.Header.Topic = topic.Name
 	req.Prefix = util.Hash(key)
 	value, err := proto.Marshal(topic)
 	if err != nil {
@@ -62,4 +59,13 @@ func (p *MessageEventFactory) WriteKey(key core.DataBuffer) error {
 		return err
 	}
 	return key.WriteUInt64(p.Target.Event.Id)
+}
+
+func (p *MessageEventFactory) Query(criteria []byte) (core.Query, error) {
+	q := MessageEventQuery{}
+	err := event.Import(&q, criteria, core.COMPOSIT_KEY_MAX)
+	if err != nil {
+		return &q, err
+	}
+	return &q, nil
 }
