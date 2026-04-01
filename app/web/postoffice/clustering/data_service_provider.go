@@ -57,7 +57,10 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 	}
 	if request.Opt == core.QUERY_DATA_REQUEST {
 		core.AppLog.Debug().Msgf("query id %s", request.Query.Id)
-		tf, _ := bootstrap.TopicFactoryRegistry["MessageEventFactory"]
+		tf, existed := bootstrap.TopicFactoryRegistry["MessageEventFactory"]
+		if !existed {
+			return fmt.Errorf("event factory not registered %s", request.Query.Id)
+		}
 		q, err := tf().Query(request.Query.Criteria)
 		if err != nil {
 			return err
