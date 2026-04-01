@@ -66,8 +66,8 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 			return err
 		}
 		buff := core.NewBuffer(16)
-		buff.WriteUInt32(q.QFactoryId())
-		buff.WriteUInt32(q.QClassId())
+		buff.WriteUInt32(1)
+		buff.WriteUInt32(3)
 		buff.Flip()
 		px, err := buff.Read(0)
 		if err != nil {
