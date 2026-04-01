@@ -20,6 +20,7 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request) (*protocol.Respon
 	} else {
 		rt = c.Mll.RingToken(set.Data.Key)
 	}
+	core.AppLog.Debug().Msgf("data header %v", set.Data.Header)
 	ch := make(chan *protocol.Response, 3)
 	defer close(ch)
 	for retry.Reties > 0 {
