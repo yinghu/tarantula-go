@@ -2,11 +2,10 @@ package bootstrap
 
 import (
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 )
 
 type MessageEventQuery struct {
-	event.QWithTag
+	core.QueryObj
 }
 
 func (q *MessageEventQuery) QFilter(k, v []byte) bool {
