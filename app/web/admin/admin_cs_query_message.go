@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
@@ -27,7 +28,12 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 		w.Write(util.ToJson(session))
 		return
 	}
-	me := event.CreateQuery(uint32(qid))
+	me := bootstrap.MessageEventQuery{}
+	me.Id = uint32(qid)
+	me.ClassId = 3
+	me.FactoryId = 1
+	me.Topic = "message"
+	me.Cc = make(chan core.Chunk, 3)
 	err = json.NewDecoder(r.Body).Decode(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
@@ -36,7 +42,7 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	defer close(me.QCc())
-	go s.Cluster().List(me)
+	go s.Cluster().List(&me)
 	ms := make([]event.MessageEvent, 0)
 	for c := range me.QCc() {
 		if !c.Remaining {
