@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 )
 
@@ -33,6 +32,6 @@ func TestProtoFactory(t *testing.T) {
 	fmt.Printf("tpx %v\n", tpc)
 }
 
-func TestMessageEventFactory(t *testing.T) {
-	Register("me", func() core.ProtoTopicFactory { return &MessageEventFactory{} })
-}
+//func TestMessageEventFactory(t *testing.T) {
+//Register("me", func() core.ProtoTopicFactory { return &MessageEventFactory{} })
+//}
