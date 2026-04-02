@@ -8,7 +8,7 @@ import (
 	"gameclustering.com/internal/event"
 )
 
-func TestProtoFactory(t *testing.T) {
+func TestMessageEventFactory(t *testing.T) {
 	me := event.MessageEvent{Title: "tile", Message: "msg", DateTime: time.Now(), Source: "admin"}
 	me.OnNodeId("nid")
 	me.OnTag("presence")
@@ -30,8 +30,13 @@ func TestProtoFactory(t *testing.T) {
 	}
 	fmt.Printf("tp %v\n", tp)
 	fmt.Printf("tpx %v\n", tpc)
-}
 
-//func TestMessageEventFactory(t *testing.T) {
-//Register("me", func() core.ProtoTopicFactory { return &MessageEventFactory{} })
-//}
+	mq := MessageEventQuery{}
+	mq.ClassId = 3
+	mq.FactoryId = 1
+	mq.Topic = "message"
+
+	qt, _ := ptf.Export(&mq)
+	q, _ := ptf.Import(qt)
+	fmt.Printf("q %d %d %s\n", q.QFactoryId(), q.QClassId(), mq.QTopic())
+}

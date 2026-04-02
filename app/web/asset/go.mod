@@ -21,7 +21,6 @@ replace gameclustering.com/internal/protocol => ../../../internal/protocol
 require (
 	gameclustering.com/internal/bootstrap v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
-	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
 	github.com/google/uuid v1.6.0
@@ -29,6 +28,7 @@ require (
 )
 
 require (
+	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/protocol v0.0.0-00010101000000-000000000000 // indirect

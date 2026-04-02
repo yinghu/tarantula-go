@@ -1,12 +1,9 @@
 package bootstrap
 
 import (
-	"fmt"
-
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
-	"gameclustering.com/internal/util"
 	"google.golang.org/protobuf/proto"
 
 	"google.golang.org/protobuf/types/known/anypb"
@@ -14,7 +11,7 @@ import (
 )
 
 type MessageEventFactory struct {
-	core.ProtoTopicFactoryObj
+	event.ProtoTopicFactoryObj
 }
 
 func (p *MessageEventFactory) FromMessageEvent(e event.MessageEvent) (*protocol.Topic, error) {
@@ -29,29 +26,6 @@ func (p *MessageEventFactory) FromMessageEvent(e event.MessageEvent) (*protocol.
 	return &tpx, nil
 }
 
-func (p *MessageEventFactory) Request(topic *protocol.Topic) (*protocol.Request, error) {
-	p.Target = topic
-	req := protocol.Request{Opt: core.CREATE_DATA_REQUEST}
-	if topic.Event.Id <= 0 {
-		return &req, fmt.Errorf("id cannot be less than 0")
-	}
-	buff := core.NewBuffer(core.COMPOSIT_KEY_MAX)
-	p.WriteKey(buff)
-	buff.Flip()
-	key, err := buff.Read(0)
-	if err != nil {
-		return &req, err
-	}
-	req.Prefix = util.Hash(key)
-	value, err := proto.Marshal(topic)
-	if err != nil {
-		return &req, err
-	}
-	data := protocol.Data{Header: topic.Event.Header, Key: key, Value: value}
-	req.Data = &data
-	return &req, nil
-}
-
 func (p *MessageEventFactory) WriteKey(key core.DataBuffer) error {
 	me := protocol.MessageEvent{}
 	err := anypb.UnmarshalTo(p.Target.Event.Message, &me, proto.UnmarshalOptions{})
@@ -61,7 +35,7 @@ func (p *MessageEventFactory) WriteKey(key core.DataBuffer) error {
 	return key.WriteUInt64(p.Target.Event.Id)
 }
 
-func (p *MessageEventFactory) Query(criteria []byte) (core.Query, error) {
+func (p *MessageEventFactory) Import(criteria []byte) (core.Query, error) {
 	q := MessageEventQuery{}
 	err := event.Import(&q, criteria, core.COMPOSIT_KEY_MAX)
 	if err != nil {

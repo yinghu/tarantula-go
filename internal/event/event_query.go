@@ -151,6 +151,9 @@ func (q *QWithTag) QFactoryId() uint32 {
 func (q *QWithTag) QClassId() uint32 {
 	return q.ClassId
 }
+func (q *QWithTag) QNodeId() string {
+	return q.Tag
+}
 func (q *QWithTag) QTag() string {
 	return q.Tag
 }

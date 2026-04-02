@@ -42,24 +42,24 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 	//w.WriteHeader(http.StatusOK)
 	defer close(me.QCc())
 	go s.Cluster().List(&me)
-	//ms := make([]event.MessageEvent, 0)
+	ms := make([]*protocol.Topic, 0)
+	mf := bootstrap.MessageEventFactory{}
 	for c := range me.QCc() {
-		core.AppLog.Debug().Msgf("inbound %v > %v", c.Remaining, c)
 		if !c.Remaining {
 			break
 		}
 		resp, ok := c.Data.(*protocol.Response)
-		core.AppLog.Debug().Msgf("inbound 2 %v > %v", resp.Successful, resp)
+
 		if ok && resp.Successful {
 			for _, data := range resp.Data.List {
-				//me := event.MessageEvent{}
-				//core.Import(&me, data.Key, data.Value, 200)
-				core.AppLog.Debug().Msgf("Data : %v", data)
-				//ms = append(ms, me)
+				me, err := mf.Topic(data.Value)
+				if err != nil {
+					continue
+				}
+				core.AppLog.Debug().Msgf("topic : %v", me)
+				ms = append(ms, me)
 			}
 		}
 	}
-	core.AppLog.Debug().Msg("DONE1!!!!")
-	w.Write(util.ToJson(core.OnSession{Successful: true}))
-	core.AppLog.Debug().Msg("DONE2!!!!")
+	w.Write(util.ToJson(ms))
 }

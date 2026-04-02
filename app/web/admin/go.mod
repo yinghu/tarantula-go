@@ -23,6 +23,7 @@ require (
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/protocol v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.4
@@ -31,7 +32,6 @@ require (
 require (
 	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000 // indirect
-	gameclustering.com/internal/protocol v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect

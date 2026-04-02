@@ -61,7 +61,7 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 		if !existed {
 			return fmt.Errorf("event factory not registered %s", request.Query.Id)
 		}
-		q, err := tf().Query(request.Query.Criteria)
+		q, err := tf().Import(request.Query.Criteria)
 		if err != nil {
 			return err
 		}
