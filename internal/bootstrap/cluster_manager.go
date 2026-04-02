@@ -147,12 +147,6 @@ func (c *ClusterManager) Publish(e *protocol.Topic) error {
 	return nil
 }
 
-//func (c *ClusterManager) List(query core.Query) {
-//req := core.DataRequest{Opt: core.QUERY_DATA_REQUEST, Criteria: query}
-//req.Async = query.QCc()
-//c.Request(req)
-//}
-
 func (c *ClusterManager) Subscribe(topic string, listener core.TopicListener) error {
 	if !c.running {
 		return fmt.Errorf("not started")
