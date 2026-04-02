@@ -129,7 +129,7 @@ type ClusterService interface {
 	Request(r DataRequest)
 
 	Publish(e *protocol.Topic) error
-	List(q Query)
+	//List(q Query)
 	Subscribe(topic string, listener TopicListener) error
 	Unsubscribe(topic string) error
 }
