@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
-	"strconv"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -21,29 +21,23 @@ func (s *CSQueryer) AccessControl() int32 {
 
 func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	qid, err := strconv.ParseInt(r.PathValue("id"), 10, 32)
-	if err != nil {
-		session := core.OnSession{Successful: false, Message: err.Error()}
-		w.Write(util.ToJson(session))
+	topic := r.PathValue("topic")
+	mc, existed := bootstrap.TopicFactoryRegistry[topic]
+	if !existed {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: fmt.Sprintf("topic %s not existed", topic)}))
 		return
 	}
-	me := bootstrap.MessageEventQuery{}
-	me.Id = uint32(qid)
-	me.ClassId = 3
-	me.FactoryId = 1
-	me.Topic = "message"
-	me.Cc = make(chan core.Chunk, 3)
-	err = json.NewDecoder(r.Body).Decode(&me)
+	mf := mc()
+	me := mf.Query()
+	err := json.NewDecoder(r.Body).Decode(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	//w.Header().Set("Content-Type", "application/json")
-	//w.WriteHeader(http.StatusOK)
 	defer close(me.QCc())
-	go s.Cluster().List(&me)
+
+	go s.Cluster().List(me)
 	ms := make([]*protocol.Topic, 0)
-	mf := bootstrap.MessageEventFactory{}
 	for c := range me.QCc() {
 		if !c.Remaining {
 			break

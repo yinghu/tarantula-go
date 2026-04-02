@@ -26,13 +26,13 @@ func (p *MessageEventFactory) FromMessageEvent(e event.MessageEvent) (*protocol.
 	return &tpx, nil
 }
 
-func (p *MessageEventFactory) WriteKey(key core.DataBuffer) error {
+func (p *MessageEventFactory) Message(topic *protocol.Topic) (any, error) {
 	me := protocol.MessageEvent{}
-	err := anypb.UnmarshalTo(p.Target.Event.Message, &me, proto.UnmarshalOptions{})
+	err := anypb.UnmarshalTo(topic.Event.Message, &me, proto.UnmarshalOptions{})
 	if err != nil {
-		return err
+		return &me, err
 	}
-	return key.WriteUInt64(p.Target.Event.Id)
+	return &me, nil
 }
 
 func (p *MessageEventFactory) Import(criteria []byte) (core.Query, error) {
@@ -42,4 +42,13 @@ func (p *MessageEventFactory) Import(criteria []byte) (core.Query, error) {
 		return &q, err
 	}
 	return &q, nil
+}
+
+func (p *MessageEventFactory) Query() core.Query {
+	q := MessageEventQuery{}
+	q.ClassId = 3
+	q.FactoryId = 1
+	q.Topic = "message"
+	q.Cc = make(chan core.Chunk, 3)
+	return &q
 }

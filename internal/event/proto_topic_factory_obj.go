@@ -37,7 +37,7 @@ func (p *ProtoTopicFactoryObj) Request(topic *protocol.Topic) (*protocol.Request
 }
 
 func (p *ProtoTopicFactoryObj) WriteKey(key core.DataBuffer) error {
-	return nil
+	return key.WriteUInt64(p.Target.Event.Id)
 }
 
 func (p *ProtoTopicFactoryObj) ReadKey(key core.DataBuffer) error {

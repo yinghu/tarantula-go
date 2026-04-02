@@ -56,8 +56,7 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 		return stream.Send(&resp)
 	}
 	if request.Opt == core.QUERY_DATA_REQUEST {
-		core.AppLog.Debug().Msgf("query id %s", request.Query.Id)
-		tf, existed := bootstrap.TopicFactoryRegistry["MessageEventFactory"]
+		tf, existed := bootstrap.TopicFactoryRegistry["message"]
 		if !existed {
 			return fmt.Errorf("event factory not registered %s", request.Query.Id)
 		}
@@ -65,9 +64,10 @@ func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerS
 		if err != nil {
 			return err
 		}
+		core.AppLog.Debug().Msgf("query %v", q)
 		buff := core.NewBuffer(16)
-		buff.WriteUInt32(1)
-		buff.WriteUInt32(3)
+		buff.WriteUInt32(q.QFactoryId())
+		buff.WriteUInt32(q.QClassId())
 		buff.Flip()
 		px, err := buff.Read(0)
 		if err != nil {
