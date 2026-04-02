@@ -39,8 +39,8 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	//w.Header().Set("Content-Type", "application/json")
+	//w.WriteHeader(http.StatusOK)
 	defer close(me.QCc())
 	go s.Cluster().List(&me)
 	ms := make([]event.MessageEvent, 0)
@@ -51,10 +51,10 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 		resp, ok := c.Data.(*protocol.Response)
 		if ok {
 			for _, data := range resp.Data.List {
-				//me := event.MessageEvent{}
+				me := event.MessageEvent{}
 				//core.Import(&me, data.Key, data.Value, 200)
 				core.AppLog.Debug().Msgf("Data : %v", data)
-				//ms = append(ms, me)
+				ms = append(ms, me)
 			}
 		}
 	}
