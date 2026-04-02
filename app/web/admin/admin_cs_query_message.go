@@ -46,6 +46,7 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 	ms := make([]event.MessageEvent, 0)
 	for c := range me.QCc() {
 		if !c.Remaining {
+			core.AppLog.Debug().Msg("break")
 			break
 		}
 		resp, ok := c.Data.(*protocol.Response)
