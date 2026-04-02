@@ -51,10 +51,10 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 		resp, ok := c.Data.(*protocol.Response)
 		if ok {
 			for _, data := range resp.Data.List {
-				me := event.MessageEvent{}
-				core.Import(&me, data.Key, data.Value, 200)
-				core.AppLog.Debug().Msgf("Data : %v", me)
-				ms = append(ms, me)
+				//me := event.MessageEvent{}
+				//core.Import(&me, data.Key, data.Value, 200)
+				core.AppLog.Debug().Msgf("Data : %v", data)
+				//ms = append(ms, me)
 			}
 		}
 	}
