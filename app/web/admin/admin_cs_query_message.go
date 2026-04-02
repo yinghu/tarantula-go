@@ -59,6 +59,7 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 			}
 		}
 	}
+	core.AppLog.Debug().Msg("DONE1!!!!")
 	w.Write(util.ToJson(core.OnSession{Successful: true}))
 	core.AppLog.Debug().Msg("DONE2!!!!")
 }
