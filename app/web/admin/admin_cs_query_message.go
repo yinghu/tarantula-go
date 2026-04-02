@@ -7,6 +7,7 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -31,7 +32,7 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 	me.ClassId = 3
 	me.FactoryId = 1
 	me.Topic = "message"
-	//me.Cc = make(chan core.Chunk, 3)
+	me.Cc = make(chan core.Chunk, 3)
 	err = json.NewDecoder(r.Body).Decode(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
@@ -39,24 +40,24 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 	}
 	//w.Header().Set("Content-Type", "application/json")
 	//w.WriteHeader(http.StatusOK)
-	//defer close(me.QCc())
-	//go s.Cluster().List(&me)
+	defer close(me.QCc())
+	go s.Cluster().List(&me)
 	//ms := make([]event.MessageEvent, 0)
-	//for c := range me.QCc() {
-	//	if !c.Remaining {
-	//		core.AppLog.Debug().Msg("break")
-	//		break
-	//	}
-	//	resp, ok := c.Data.(*protocol.Response)
-	//	if ok {
-	//		for _, data := range resp.Data.List {
-	//			me := event.MessageEvent{}
-	//			//core.Import(&me, data.Key, data.Value, 200)
-	//			core.AppLog.Debug().Msgf("Data : %v", data)
-	//			ms = append(ms, me)
-	//		}
-	//	}
-	//}
+	for c := range me.QCc() {
+		core.AppLog.Debug().Msgf("inbound %v", c)
+		if !c.Remaining {
+			break
+		}
+		resp, ok := c.Data.(*protocol.Response)
+		if ok {
+			for _, data := range resp.Data.List {
+				//me := event.MessageEvent{}
+				//core.Import(&me, data.Key, data.Value, 200)
+				core.AppLog.Debug().Msgf("Data : %v", data)
+				//ms = append(ms, me)
+			}
+		}
+	}
 	core.AppLog.Debug().Msg("DONE1!!!!")
 	w.Write(util.ToJson(core.OnSession{Successful: true}))
 	core.AppLog.Debug().Msg("DONE2!!!!")
