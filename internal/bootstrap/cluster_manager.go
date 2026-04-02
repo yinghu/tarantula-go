@@ -119,6 +119,7 @@ func (c *ClusterManager) Request(r core.DataRequest) {
 	crt := core.Chunk{Remaining: false}
 	for {
 		resp, err := stream.Recv()
+		core.AppLog.Debug().Msgf("RPC : %v", resp)
 		if err == io.EOF {
 			break
 		}
