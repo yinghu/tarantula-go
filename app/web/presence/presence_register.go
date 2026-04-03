@@ -6,7 +6,9 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -39,15 +41,26 @@ func (s *PresenceRegister) Register(login bootstrap.Login) {
 	session.Ticket = ticket
 	login.Cc <- core.Chunk{Remaining: false, Data: util.ToJson(session)}
 	go func() {
-		//id, err := s.Sequence().Id()
-		//if err != nil {
-		//return
-		//}
-		//me := event.RegisterEvent{SystemId: login.SystemId, Name: login.Name}
-		//me.OnOId(id)
-		//me.RegisterTime = time.Now()
-		//me.OnTopic("login")
-		//s.Publish(&me)
+		id, err := s.Sequence().Id()
+		if err != nil {
+			core.AppLog.Warn().Msgf("failed to create seq %s", err.Error())
+			return
+		}
+		rf := event.RegisterEventFactory{}
+		me := protocol.RegisterEvent{SystemId: uint64(login.SystemId), Name: login.Name, Source: "web"}
+		tp, err := rf.FromRegisterEvent(&me)
+		if err != nil {
+			core.AppLog.Warn().Msgf("failed to create topic %s", err.Error())
+			return
+		}
+		tp.Event.Id = uint64(id)
+		tp.NodeId = s.NodeId()
+		tp.Tag = s.Context()
+		err = s.Cluster().Publish(tp)
+		if err != nil {
+			core.AppLog.Warn().Msgf("failed to publish topic %s", err.Error())
+			return
+		}
 		rw := item.OnInventory{SystemId: login.SystemId, ItemId: s.LoginReward.Id, Source: "login"}
 		err = s.ItemService().InventoryManager().Grant(rw)
 		if err != nil {
