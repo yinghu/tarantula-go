@@ -39,8 +39,8 @@ func (c *DataServiceProvider) runPublish(topic *protocol.Topic) (*protocol.Respo
 	return &protocol.Response{Successful: true, Message: "topic delivered"}, nil
 }
 func (m *DataServiceProvider) clientPublish(target *core.Subscription, request *protocol.Topic, async chan *protocol.Response) {
-	task := Task{target: target.Endpoint, execute: func(tcp *grpc.ClientConn, opt int) error {
-		if opt == NO_TCP_CONNECT {
+	task := core.Task{Target: target.Endpoint, Execute: func(tcp *grpc.ClientConn, opt int) error {
+		if opt == core.NO_TCP_CONNECT {
 			async <- &protocol.Response{Successful: false, Message: "no tcp"}
 			return fmt.Errorf("no tcp from %s", target.Endpoint)
 		}

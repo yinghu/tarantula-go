@@ -37,7 +37,7 @@ func (c *DataServiceProvider) runDelete(set *protocol.Request) (*protocol.Respon
 }
 
 func (m *DataServiceProvider) clientDelete(target *core.Node, request *protocol.Request, ch chan *protocol.Response) {
-	task := Task{target: target.RpcEndpoint, execute: func(tcp *grpc.ClientConn, opt int) error {
+	task := core.Task{Target: target.RpcEndpoint, Execute: func(tcp *grpc.ClientConn, opt int) error {
 		dsp := protocol.NewDataServiceClient(tcp)
 		resp, _ := dsp.Delete(context.Background(), request)
 		ch <- resp

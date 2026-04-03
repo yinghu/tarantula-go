@@ -38,7 +38,7 @@ func (c *DataServiceProvider) runReset(set *protocol.Request) (*protocol.Respons
 }
 
 func (m *DataServiceProvider) clientReset(target *core.Node, request *protocol.Request, ch chan *protocol.Response) {
-	m.WTask <- Task{target: target.RpcEndpoint, execute: func(tcp *grpc.ClientConn, opt int) error {
+	m.WTask <- core.Task{Target: target.RpcEndpoint, Execute: func(tcp *grpc.ClientConn, opt int) error {
 		dsp := protocol.NewDataServiceClient(tcp)
 		resp, _ := dsp.Reset(context.Background(), request)
 		ch <- resp

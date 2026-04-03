@@ -50,8 +50,8 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request) (*protocol.Respon
 }
 
 func (m *DataServiceProvider) clientCreate(target *core.Node, request *protocol.Request, ch chan *protocol.Response) {
-	task := Task{target: target.RpcEndpoint, execute: func(tcp *grpc.ClientConn, opt int) error {
-		if opt == NO_TCP_CONNECT {
+	task := core.Task{Target: target.RpcEndpoint, Execute: func(tcp *grpc.ClientConn, opt int) error {
+		if opt == core.NO_TCP_CONNECT {
 			ch <- &protocol.Response{Successful: false, Message: "no tcp connect"}
 			return fmt.Errorf("no tcp connect")
 		}

@@ -18,7 +18,7 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, responser grpc.Serve
 	c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: kh, Replicas: REPLICA_MAX, Async: rq}
 	nodes := <-rq
 	ringNode := nodes[0]
-	c.WTask <- Task{target: ringNode.RpcEndpoint, execute: func(tcp *grpc.ClientConn, opt int) error {
+	c.WTask <- core.Task{Target: ringNode.RpcEndpoint, Execute: func(tcp *grpc.ClientConn, opt int) error {
 		dsp := protocol.NewDataServiceClient(tcp)
 		stream, err := dsp.Get(context.Background(), set)
 		if err != nil {
@@ -54,7 +54,7 @@ func (c *DataServiceProvider) runGet(set *protocol.Request, responser grpc.Serve
 
 func (c *DataServiceProvider) runPull(target string, set *protocol.Request, ch chan *protocol.Response) {
 	core.AppLog.Debug().Msgf("run remote pull %s >= %d < %d", target, set.Prefix, set.Opt)
-	c.WTask <- Task{target: target, execute: func(tcp *grpc.ClientConn, opt int) error {
+	c.WTask <- core.Task{Target: target, Execute: func(tcp *grpc.ClientConn, opt int) error {
 		dsp := protocol.NewDataServiceClient(tcp)
 		stream, err := dsp.Pull(context.Background(), set)
 		if err != nil {
