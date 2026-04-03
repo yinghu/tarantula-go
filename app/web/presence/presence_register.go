@@ -6,7 +6,6 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
 )
@@ -40,14 +39,14 @@ func (s *PresenceRegister) Register(login bootstrap.Login) {
 	session.Ticket = ticket
 	login.Cc <- core.Chunk{Remaining: false, Data: util.ToJson(session)}
 	go func() {
-		id, err := s.Sequence().Id()
-		if err != nil {
-			return
-		}
-		me := event.RegisterEvent{SystemId: login.SystemId, Name: login.Name}
-		me.OnOId(id)
+		//id, err := s.Sequence().Id()
+		//if err != nil {
+		//return
+		//}
+		//me := event.RegisterEvent{SystemId: login.SystemId, Name: login.Name}
+		//me.OnOId(id)
 		//me.RegisterTime = time.Now()
-		me.OnTopic("login")
+		//me.OnTopic("login")
 		//s.Publish(&me)
 		rw := item.OnInventory{SystemId: login.SystemId, ItemId: s.LoginReward.Id, Source: "login"}
 		err = s.ItemService().InventoryManager().Grant(rw)
