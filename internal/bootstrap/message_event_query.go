@@ -9,6 +9,7 @@ type MessageEventQuery struct {
 }
 
 func (q *MessageEventQuery) QFilter(k, v []byte) bool {
+
 	core.AppLog.Debug().Msgf("filter here")
 	return true
 }
