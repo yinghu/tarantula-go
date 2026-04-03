@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	"google.golang.org/grpc"
@@ -103,7 +102,12 @@ func (c *ClusterManager) Request(r core.DataRequest) {
 	dsp := protocol.NewPostofficeServiceClient(c.rpc)
 	req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
 	if r.Opt == core.QUERY_DATA_REQUEST || r.Opt == core.PULL_DATA_REQUEST {
-		dt, err := event.Export(r.Criteria, core.COMPOSIT_KEY_MAX)
+		mf, existed := TopicFactoryRegistry[r.Criteria.QTopic()]
+		if !existed {
+			r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: "query topic not existed"}}
+			return
+		}
+		dt, err := mf().Export(r.Criteria)
 		if err != nil {
 			r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: err.Error()}}
 			return
