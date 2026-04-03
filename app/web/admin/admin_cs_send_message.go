@@ -7,10 +7,10 @@ import (
 
 	"google.golang.org/protobuf/encoding/protojson"
 
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
-	"google.golang.org/protobuf/types/known/anypb"
 )
 
 type CSMessager struct {
@@ -22,6 +22,7 @@ func (s *CSMessager) AccessControl() int32 {
 }
 func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+	mf := bootstrap.MessageEventFactory{}
 	var me protocol.MessageEvent
 	var buf bytes.Buffer
 	_, err := io.Copy(&buf, r.Body)
@@ -40,24 +41,15 @@ func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	//obj, err := anypb.New(&protocol.MessageEvent{Title: e.Title, Message: e.Message, Source: e.Source, DateTime: timestamppb.New(e.DateTime)})
-	obj, err := anypb.New(&me)
+	tp, err := mf.FromMessageEvent(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	e := protocol.Event{Id: uint64(id), Header: &protocol.Header{FactoryId: 1, ClassId: 3}, Message: obj}
-	t := protocol.Topic{Event: &e, NodeId: s.NodeId(), Tag: s.Context(), Name: "message"}
-	//me.OnOId(id)
-	//me.Source = s.Context()
-	//me.DateTime = time.Now()
-	//tf := bootstrap.MessageEventFactory{}
-	//tp, err := tf.FromMessageEvent(me)
-	//if err != nil {
-	//w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
-	//return
-	//}
-	err = s.Cluster().Publish(&t)
+	tp.Event.Id = uint64(id)
+	tp.NodeId = s.NodeId()
+	tp.Tag = s.Context()
+	err = s.Cluster().Publish(tp)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return

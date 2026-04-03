@@ -7,17 +7,21 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"google.golang.org/protobuf/types/known/anypb"
-	"google.golang.org/protobuf/types/known/timestamppb"
+)
+
+const (
+	MESSAGE_EVENT_CID  uint32 = 3
+	MESSAGE_TOPIC_NAME string = "message"
 )
 
 type MessageEventFactory struct {
 	event.ProtoTopicFactoryObj
 }
 
-func (p *MessageEventFactory) FromMessageEvent(e event.MessageEvent) (*protocol.Topic, error) {
-	tpx := protocol.Topic{NodeId: e.NodeId(), Tag: e.Tag(), Name: e.Topic()}
-	msg := protocol.Event{Header: &protocol.Header{FactoryId: e.FactoryId(), ClassId: e.ClassId()}, Id: uint64(e.OId())}
-	obj, err := anypb.New(&protocol.MessageEvent{Title: e.Title, Message: e.Message, Source: e.Source, DateTime: timestamppb.New(e.DateTime)})
+func (p *MessageEventFactory) FromMessageEvent(e *protocol.MessageEvent) (*protocol.Topic, error) {
+	tpx := protocol.Topic{Name: MESSAGE_TOPIC_NAME}
+	msg := protocol.Event{Header: &protocol.Header{FactoryId: core.EVENT_FACTORY_ID, ClassId: MESSAGE_EVENT_CID}}
+	obj, err := anypb.New(e)
 	if err != nil {
 		return &tpx, err
 	}
@@ -46,9 +50,9 @@ func (p *MessageEventFactory) Import(criteria []byte) (core.Query, error) {
 
 func (p *MessageEventFactory) Query() core.Query {
 	q := MessageEventQuery{}
-	q.ClassId = 3
-	q.FactoryId = 1
-	q.Topic = "message"
+	q.ClassId = MESSAGE_EVENT_CID
+	q.FactoryId = core.EVENT_FACTORY_ID
+	q.Topic = MESSAGE_TOPIC_NAME
 	q.Cc = make(chan core.Chunk, 3)
 	return &q
 }
