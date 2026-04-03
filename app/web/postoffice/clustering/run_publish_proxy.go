@@ -14,7 +14,7 @@ func (c *DataServiceProvider) runPublish(topic *protocol.Topic) (*protocol.Respo
 	rc := make(chan *protocol.Response, 1)
 	defer close(rc)
 
-	tpf, registered := bootstrap.TopicFactoryRegistry["MessageEventFactory"]
+	tpf, registered := bootstrap.TopicFactoryRegistry[topic.Name]
 	if !registered {
 		return &protocol.Response{Successful: false}, fmt.Errorf("event factory not registered")
 	}
