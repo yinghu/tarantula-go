@@ -9,7 +9,12 @@ type MessageEventQuery struct {
 }
 
 func (q *MessageEventQuery) QFilter(k, v []byte) bool {
-
-	core.AppLog.Debug().Msgf("filter here")
+	mf := MessageEventFactory{}
+	t, err := mf.Topic(v)
+	if err != nil {
+		core.AppLog.Warn().Msgf("wrong decode format %s", err)
+		return false
+	}
+	core.AppLog.Debug().Msgf("filter here %v", t)
 	return true
 }
