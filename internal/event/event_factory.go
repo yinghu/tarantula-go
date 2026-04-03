@@ -27,7 +27,6 @@ const (
 	STAT_ETAG string = "stat"
 
 	STAT_TOTAL string = "total"
-
 )
 
 func CreateEvent(cid uint32) core.Event {
@@ -36,8 +35,6 @@ func CreateEvent(cid uint32) core.Event {
 		return &StatEvent{}
 	case LOGIN_CID:
 		return &LoginEvent{}
-	case MESSAGE_CID:
-		return &MessageEvent{}
 	case TOURNAMENT_CID:
 		return &TournamentEvent{}
 	case SUBSCRIPTION_CID:
