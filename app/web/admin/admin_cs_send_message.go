@@ -1,8 +1,11 @@
 package main
 
 import (
-	"encoding/json"
+	"bytes"
+	"io"
 	"net/http"
+
+	"google.golang.org/protobuf/encoding/protojson"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
@@ -20,7 +23,13 @@ func (s *CSMessager) AccessControl() int32 {
 func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var me protocol.MessageEvent
-	err := json.NewDecoder(r.Body).Decode(&me)
+	var buf bytes.Buffer
+	_, err := io.Copy(&buf, r.Body)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	err = protojson.Unmarshal(buf.Bytes(), &me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
