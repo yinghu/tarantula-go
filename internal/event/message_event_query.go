@@ -1,4 +1,4 @@
-package bootstrap
+package event
 
 import (
 	"gameclustering.com/internal/core"

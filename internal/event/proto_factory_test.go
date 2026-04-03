@@ -1,4 +1,4 @@
-package bootstrap
+package event
 
 import (
 	"fmt"

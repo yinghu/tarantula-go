@@ -1,8 +1,7 @@
-package bootstrap
+package event
 
 import (
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/protobuf/proto"
 
@@ -15,7 +14,7 @@ const (
 )
 
 type MessageEventFactory struct {
-	event.ProtoTopicFactoryObj
+	ProtoTopicFactoryObj
 }
 
 func (p *MessageEventFactory) FromMessageEvent(e *protocol.MessageEvent) (*protocol.Topic, error) {
@@ -41,7 +40,7 @@ func (p *MessageEventFactory) Message(topic *protocol.Topic) (any, error) {
 
 func (p *MessageEventFactory) Import(criteria []byte) (core.Query, error) {
 	q := MessageEventQuery{}
-	err := event.Import(&q, criteria, core.COMPOSIT_KEY_MAX)
+	err := Import(&q, criteria, core.COMPOSIT_KEY_MAX)
 	if err != nil {
 		return &q, err
 	}

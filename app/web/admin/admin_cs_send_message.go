@@ -7,8 +7,8 @@ import (
 
 	"google.golang.org/protobuf/encoding/protojson"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
@@ -22,7 +22,7 @@ func (s *CSMessager) AccessControl() int32 {
 }
 func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	mf := bootstrap.MessageEventFactory{}
+	mf := event.MessageEventFactory{}
 	var me protocol.MessageEvent
 	var buf bytes.Buffer
 	_, err := io.Copy(&buf, r.Body)
