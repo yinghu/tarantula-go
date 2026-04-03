@@ -38,7 +38,7 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 	req := core.DataRequest{Opt: core.QUERY_DATA_REQUEST, Criteria: me}
 	req.Async = me.QCc()
 	go s.Cluster().Request(req)
-	ms := make([]*protocol.Topic, 0)
+	ms := make([]any, 0)
 	for c := range me.QCc() {
 		if !c.Remaining {
 			break
@@ -52,7 +52,11 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 					continue
 				}
 				core.AppLog.Debug().Msgf("topic : %v", me)
-				ms = append(ms, me)
+				e, err := mf.Message(me)
+				if err != nil {
+					continue
+				}
+				ms = append(ms, e)
 			}
 		}
 	}
