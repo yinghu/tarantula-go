@@ -200,5 +200,5 @@ func (c *AppManager) Atomic(prefix string, t core.Exec) error {
 }
 
 func (c *AppManager) Run(e *zerolog.Event, level zerolog.Level, msg string) {
-	fmt.Printf("log hook call %s\n", msg)
+	fmt.Printf("log hook call %s %v\n", msg, level.String())
 }
