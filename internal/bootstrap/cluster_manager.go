@@ -38,6 +38,8 @@ type ClusterManager struct {
 
 	cSub     chan Sub
 	cInbound chan *protocol.Topic
+	cHost    string
+	wTask    chan<- core.Task
 }
 
 func (c *ClusterManager) HashRing(r core.RingRequest) {
@@ -45,24 +47,28 @@ func (c *ClusterManager) HashRing(r core.RingRequest) {
 		r.Async <- []core.Node{}
 		return
 	}
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	stream, err := dsp.HashRing(context.Background(), &protocol.Request{Prefix: 0})
-	if err != nil {
-		return
-	}
-	ring := make([]core.Node, 0)
-	for {
-		data, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
+	c.wTask <- core.Task{Target: c.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
+		dsp := protocol.NewPostofficeServiceClient(tcp)
+		stream, err := dsp.HashRing(context.Background(), &protocol.Request{Prefix: 0})
 		if err != nil {
-			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
-			break
+			r.Async <- []core.Node{}
+			return err
 		}
-		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
-	}
-	r.Async <- ring
+		ring := make([]core.Node, 0)
+		for {
+			data, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				core.AppLog.Debug().Msgf("streaming error %s", err.Error())
+				break
+			}
+			ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
+		}
+		r.Async <- ring
+		return nil
+	}}
 }
 
 func (c *ClusterManager) KeyRing(r core.RingRequest) {
@@ -194,6 +200,7 @@ func (c *ClusterManager) disconnect() error {
 }
 
 func (c *ClusterManager) connect(host string) error {
+	c.cHost = host
 	retries := RPC_CONNECT_RETRIES
 	for {
 		tcp, err := grpc.NewClient(fmt.Sprintf("%s:%d", host, core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -269,6 +276,7 @@ func (c *ClusterManager) async() {
 		}
 	}
 	core.AppLog.Warn().Msgf("cluster manager async task closed from remote %v", c.running)
+	c.wTask <- core.Task{Opt: core.TASK_OPT_CLOSE}
 	clear(c.subscriptions)
 	close(c.cInbound)
 	close(c.cSub)

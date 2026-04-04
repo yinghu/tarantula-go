@@ -11,6 +11,7 @@ import (
 	"gameclustering.com/internal/util"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/concurrency"
+	"google.golang.org/grpc"
 )
 
 type AppManager struct {
@@ -105,6 +106,10 @@ func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 	}
 	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.Host)
 	s.cluster = &ClusterManager{App: s}
+	task := make(chan core.Task, 10)
+	s.cluster.wTask = task
+	tex := core.ServiceCallOperator{RTask: task, LocalConns: make(map[string]*grpc.ClientConn)}
+	go tex.RunTask()
 	return s.cluster.connect(f.Host)
 }
 

@@ -27,7 +27,6 @@ require (
 	github.com/prometheus/client_golang v1.23.2
 	go.etcd.io/etcd/client/v3 v3.6.5
 	google.golang.org/grpc v1.79.1
-	google.golang.org/protobuf v1.36.11
 )
 
 require (
@@ -74,4 +73,5 @@ require (
 	golang.org/x/text v0.32.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
 )
