@@ -17,9 +17,9 @@ func (s *AssetService) Config() string {
 	return "/etc/tarantula/asset-conf.json"
 }
 
-func (s *AssetService) Start(f core.Env, p core.Pusher) error {
+func (s *AssetService) Start(f core.Env) error {
 	s.ItemUpdater = s
-	s.AppManager.Start(f, p)
+	s.AppManager.Start(f)
 	s.assetDir = fmt.Sprintf("%s/%s", f.HomeDir, f.GroupName)
 	err := s.createSchema()
 	if err != nil {

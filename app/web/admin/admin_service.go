@@ -21,9 +21,9 @@ func (s *AdminService) Config() string {
 	return "/etc/tarantula/admin-conf.json"
 }
 
-func (s *AdminService) Start(f core.Env, p core.Pusher) error {
+func (s *AdminService) Start(f core.Env) error {
 	f.AuthLevel = core.ADMIN_ACCESS_CONTROL
-	s.AppManager.Start(f, p)
+	s.AppManager.Start(f)
 	s.managedApps = f.ManagedApps
 	s.contentDir = fmt.Sprintf("%s/%s", f.HomeDir, "bin")
 	s.assetDir = fmt.Sprintf("%s/%s/%s", f.HomeDir, f.GroupName, "asset")

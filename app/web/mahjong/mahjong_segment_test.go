@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"testing"
 
-	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/mj"
 )
 
 func TestMahjongSegment(t *testing.T) {
-	core.CreateTestLog()
+	bootstrap.CreateTestLog()
 	tiles := make([]mj.Tile, 0)
 	tiles = append(tiles, mj.FromS(mj.BAMBOO1))
 	tiles = append(tiles, mj.FromS(mj.BAMBOO2))

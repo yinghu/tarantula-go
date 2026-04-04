@@ -60,12 +60,12 @@ func (c *AppManager) Event() core.EventService {
 func (s *AppManager) NodeId() string {
 	return s.F.NodeName
 }
-func (s *AppManager) Start(f core.Env, p core.Pusher) error {
+func (s *AppManager) Start(f core.Env) error {
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
 
 	s.event = &EventManager{App: s}
 	s.ManagedApps = f.ManagedApps
-	s.tcpPusher = p
+	//s.tcpPusher = p
 	s.F = f
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/mj"
 )
 
@@ -150,7 +150,7 @@ func TestTableSetup(t *testing.T) {
 }
 
 func TestTablePlayDrawDiscard(t *testing.T) {
-	core.CreateTestLog()
+	bootstrap.CreateTestLog()
 	mt := MahjongTable{}
 	mt.New()
 	mt.Sit(100)
@@ -207,7 +207,7 @@ func TestTablePlayDrawDiscard(t *testing.T) {
 }
 
 func TestTablePlayChow(t *testing.T) {
-	core.CreateTestLog()
+	bootstrap.CreateTestLog()
 	mt := MahjongTable{}
 	mt.New()
 	mt.Sit(100)
@@ -283,7 +283,7 @@ func TestTablePlayChow(t *testing.T) {
 }
 
 func TestTablePlayPung(t *testing.T) {
-	core.CreateTestLog()
+	bootstrap.CreateTestLog()
 	mt := MahjongTable{}
 	mt.New()
 	mt.Sit(100)
@@ -363,7 +363,7 @@ func TestTablePlayPung(t *testing.T) {
 }
 
 func TestTablePlayKong(t *testing.T) {
-	core.CreateTestLog()
+	bootstrap.CreateTestLog()
 	mt := MahjongTable{}
 	mt.New()
 	mt.Sit(100)
@@ -415,7 +415,7 @@ func TestTablePlayKong(t *testing.T) {
 		t.Errorf("discard allowed from %v", mt.Players[dealer].TN)
 	}
 
-	pds := mt.Players[dealer].CheckDiscard( mj.FromS(mj.CHARACTER1), false)
+	pds := mt.Players[dealer].CheckDiscard(mj.FromS(mj.CHARACTER1), false)
 	for i := range pds {
 		fmt.Printf("meld %s\n", pds[i].Name())
 	}
@@ -430,7 +430,7 @@ func TestTablePlayKong(t *testing.T) {
 	x := dealer + 1000
 
 	for i := range 10 {
-		fmt.Printf("Seat %d %d %d\n",dealer, i, x%4)
+		fmt.Printf("Seat %d %d %d\n", dealer, i, x%4)
 		x++
 	}
 

@@ -38,14 +38,14 @@ func AppBootstrap(tcx TarantulaContext) {
 		return
 	}
 	CreateAppLog(mountDir, f.LogTruncated, f.Standalone)
-	e := event.TcpEndpoint{Endpoint: f.Evp.TcpEndpoint, Service: tcx.Service().Event(), OutboundEnabled: f.Evp.OutboundEnabled}
-	if f.Evp.Enabled {
-		go func() {
-			e.Open()
-		}()
-	}
+	//e := event.TcpEndpoint{Endpoint: f.Evp.TcpEndpoint, Service: tcx.Service().Event(), OutboundEnabled: f.Evp.OutboundEnabled}
+	//if f.Evp.Enabled {
+	//go func() {
+	//e.Open()
+	//}()
+	//}
 	go func() {
-		err := tcx.Start(f, &e)
+		err := tcx.Start(f)
 		if err != nil {
 			core.AppLog.Printf("Error %s\n", err.Error())
 		}
@@ -60,9 +60,9 @@ func AppBootstrap(tcx TarantulaContext) {
 	<-sigs
 	core.AppLog.Println("Signal to exit")
 	tcx.Shutdown()
-	if f.Evp.Enabled {
-		e.Close()
-	}
+	//if f.Evp.Enabled {
+	//e.Close()
+	//}
 	signal.Stop(sigs)
 	close(sigs)
 }

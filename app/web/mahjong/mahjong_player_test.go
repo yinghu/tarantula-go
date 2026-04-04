@@ -3,6 +3,7 @@ package main
 import (
 	"testing"
 
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/mj"
 )
@@ -15,7 +16,7 @@ func (p *SamplePusher) Push(e core.Event) {
 }
 
 func TestPlayerSetup(t *testing.T) {
-	core.CreateTestLog()
+	bootstrap.CreateTestLog()
 	mp := NewPlayer(1, true, &SampleCallback{})
 	if !mp.Auto {
 		t.Errorf("default should be auto %v", mp.Auto)
@@ -101,7 +102,7 @@ func TestPlayerSetup(t *testing.T) {
 	}
 }
 func TestPlayerChow(t *testing.T) {
-	core.CreateTestLog()
+	bootstrap.CreateTestLog()
 	mp := NewPlayer(0, true, &SampleCallback{})
 	mp.AppendForTest(mj.FromS(mj.BAMBOO1), false)
 	mp.AppendForTest(mj.FromS(mj.BAMBOO2), false)
@@ -186,7 +187,7 @@ func TestPlayerChow(t *testing.T) {
 }
 
 func TestPlayerPung(t *testing.T) {
-	core.CreateTestLog()
+	bootstrap.CreateTestLog()
 	mp := NewPlayer(0, true, &SampleCallback{})
 	mp.AppendForTest(mj.FromS(mj.EAST), false)
 	mp.AppendForTest(mj.FromS(mj.EAST), false)
@@ -250,7 +251,7 @@ func TestPlayerPung(t *testing.T) {
 }
 
 func TestPlayerKong(t *testing.T) {
-	core.CreateTestLog()
+	bootstrap.CreateTestLog()
 	mp := NewPlayer(0, true, &SampleCallback{})
 	mp.AppendForTest(mj.FromS(mj.EAST), false)
 	mp.AppendForTest(mj.FromS(mj.EAST), false)

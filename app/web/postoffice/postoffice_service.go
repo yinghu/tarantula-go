@@ -17,10 +17,10 @@ func (s *PostofficeService) Config() string {
 	return "/etc/tarantula/postoffice-conf.json"
 }
 
-func (s *PostofficeService) Start(env core.Env, p core.Pusher) error {
+func (s *PostofficeService) Start(env core.Env) error {
 	env.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	env.IsClusterMember = true
-	s.AppManager.Start(env, p)
+	s.AppManager.Start(env)
 
 	s.createSchema()
 

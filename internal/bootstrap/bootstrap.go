@@ -30,7 +30,7 @@ const (
 
 type TarantulaContext interface {
 	Config() string
-	Start(f core.Env, p core.Pusher) error
+	Start(f core.Env) error
 	Shutdown()
 	Context() string
 	Service() TarantulaService

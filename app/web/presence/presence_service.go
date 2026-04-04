@@ -20,9 +20,9 @@ func (s *PresenceService) Config() string {
 	return "/etc/tarantula/presence-conf.json"
 }
 
-func (s *PresenceService) Start(env core.Env, p core.Pusher) error {
+func (s *PresenceService) Start(env core.Env) error {
 	s.ItemUpdater = s
-	err := s.AppManager.Start(env, p)
+	err := s.AppManager.Start(env)
 	if err != nil {
 		return err
 	}

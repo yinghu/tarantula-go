@@ -29,7 +29,6 @@ func CreateAppLog(dir string, truncated bool, standAlone bool) {
 		return
 	}
 	core.AppLog = zerolog.New(zerolog.MultiLevelWriter(file, os.Stderr)).With().Timestamp().Logger().With().Caller().Logger()
-	//core.AppLog = zerolog.New(file).With().Timestamp().Logger().With().Caller().Logger()
 	core.AppLog.Info().Msg("Initialized app log")
 }
 
