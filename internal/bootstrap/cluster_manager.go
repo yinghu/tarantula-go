@@ -76,24 +76,29 @@ func (c *ClusterManager) KeyRing(r core.RingRequest) {
 		r.Async <- []core.Node{}
 		return
 	}
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	stream, err := dsp.KeyRing(context.Background(), &protocol.Request{Prefix: r.Token})
-	if err != nil {
-		return
-	}
-	ring := make([]core.Node, 0)
-	for {
-		data, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
+	c.wTask <- core.Task{Target: c.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
+
+		dsp := protocol.NewPostofficeServiceClient(tcp)
+		stream, err := dsp.KeyRing(context.Background(), &protocol.Request{Prefix: r.Token})
 		if err != nil {
-			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
-			break
+			r.Async <- []core.Node{}
+			return err
 		}
-		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
-	}
-	r.Async <- ring
+		ring := make([]core.Node, 0)
+		for {
+			data, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				core.AppLog.Debug().Msgf("streaming error %s", err.Error())
+				break
+			}
+			ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
+		}
+		r.Async <- ring
+		return nil
+	}}
 }
 
 func (c *ClusterManager) RingToken(key []byte) uint32 {
@@ -105,55 +110,62 @@ func (c *ClusterManager) Request(r core.DataRequest) {
 		r.Async <- core.Chunk{Remaining: false}
 		return
 	}
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
-	if r.Opt == core.QUERY_DATA_REQUEST || r.Opt == core.PULL_DATA_REQUEST {
-		mf, existed := TopicFactoryRegistry[r.Criteria.QTopic()]
-		if !existed {
-			r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: "query topic not existed"}}
-			return
+	c.wTask <- core.Task{Target: c.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
+
+		dsp := protocol.NewPostofficeServiceClient(tcp)
+		req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
+		if r.Opt == core.QUERY_DATA_REQUEST || r.Opt == core.PULL_DATA_REQUEST {
+			mf, existed := TopicFactoryRegistry[r.Criteria.QTopic()]
+			if !existed {
+				r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: "query topic not existed"}}
+				return nil
+			}
+			dt, err := mf().Export(r.Criteria)
+			if err != nil {
+				r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: err.Error()}}
+				return nil
+			}
+			q := protocol.Query{Id: r.Criteria.QTopic(), Criteria: dt}
+			req.Query = &q
 		}
-		dt, err := mf().Export(r.Criteria)
+		stream, err := dsp.Request(context.Background(), &req)
 		if err != nil {
 			r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: err.Error()}}
-			return
+			return err
 		}
-		q := protocol.Query{Id: r.Criteria.QTopic(), Criteria: dt}
-		req.Query = &q
-	}
-	stream, err := dsp.Request(context.Background(), &req)
-	if err != nil {
-		r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: err.Error()}}
-		return
-	}
-	crt := core.Chunk{Remaining: false}
-	for {
-		resp, err := stream.Recv()
-		if err == io.EOF {
-			break
+		crt := core.Chunk{Remaining: false}
+		for {
+			resp, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				core.AppLog.Warn().Msgf("streaming error %s", err.Error())
+				crt.Data = err
+				break
+			}
+			if resp.Successful {
+				r.Async <- core.Chunk{Remaining: true, Data: resp}
+			}
 		}
-		if err != nil {
-			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
-			crt.Data = err
-			break
-		}
-		if resp.Successful {
-			r.Async <- core.Chunk{Remaining: true, Data: resp}
-		}
-	}
-	r.Async <- crt
+		r.Async <- crt
+		return nil
+	}}
 }
 
 func (c *ClusterManager) Publish(e *protocol.Topic) error {
 	if !c.running {
 		return fmt.Errorf("not started")
 	}
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	resp, err := dsp.Publish(context.Background(), e)
-	if err != nil {
-		return err
-	}
-	core.AppLog.Debug().Msgf("topic publish %v", resp)
+	c.wTask <- core.Task{Target: c.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
+		dsp := protocol.NewPostofficeServiceClient(tcp)
+		resp, err := dsp.Publish(context.Background(), e)
+		if err != nil {
+			return err
+		}
+		core.AppLog.Debug().Msgf("topic publish %v", resp)
+		return nil
+	}}
 	return nil
 }
 
@@ -161,13 +173,17 @@ func (c *ClusterManager) Subscribe(topic string, listener core.TopicListener) er
 	if !c.running {
 		return fmt.Errorf("not started")
 	}
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	resp, err := dsp.Subscribe(context.Background(), &protocol.Topic{NodeId: c.App.NodeId(), Tag: c.App.Context(), Name: topic})
-	if err != nil {
-		return err
-	}
-	c.cSub <- Sub{opt: OPT_SUB, name: topic, listener: listener}
-	core.AppLog.Debug().Msgf("topic registered %v", resp)
+	c.wTask <- core.Task{Target: c.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
+
+		dsp := protocol.NewPostofficeServiceClient(tcp)
+		resp, err := dsp.Subscribe(context.Background(), &protocol.Topic{NodeId: c.App.NodeId(), Tag: c.App.Context(), Name: topic})
+		if err != nil {
+			return err
+		}
+		c.cSub <- Sub{opt: OPT_SUB, name: topic, listener: listener}
+		core.AppLog.Debug().Msgf("topic registered %v", resp)
+		return nil
+	}}
 	return nil
 }
 
@@ -175,13 +191,17 @@ func (c *ClusterManager) Unsubscribe(topic string) error {
 	if !c.running {
 		return fmt.Errorf("not started")
 	}
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	resp, err := dsp.Unsubscribe(context.Background(), &protocol.Topic{Tag: c.App.Context(), Name: topic})
-	if err != nil {
-		return err
-	}
-	c.cSub <- Sub{opt: OPT_UNSUB, name: topic}
-	core.AppLog.Debug().Msgf("topic unregistered %v", resp)
+	c.wTask <- core.Task{Target: c.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
+
+		dsp := protocol.NewPostofficeServiceClient(tcp)
+		resp, err := dsp.Unsubscribe(context.Background(), &protocol.Topic{Tag: c.App.Context(), Name: topic})
+		if err != nil {
+			return err
+		}
+		c.cSub <- Sub{opt: OPT_UNSUB, name: topic}
+		core.AppLog.Debug().Msgf("topic unregistered %v", resp)
+		return nil
+	}}
 	return nil
 }
 
@@ -190,13 +210,17 @@ func (c *ClusterManager) disconnect() error {
 		return fmt.Errorf("not started")
 	}
 	c.running = false
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	resp, err := dsp.Disconnect(context.Background(), &protocol.Topic{Tag: c.App.Context(), NodeId: c.App.NodeId()})
-	if err != nil {
-		return err
-	}
-	core.AppLog.Debug().Msgf("disconnecting topic %v", resp)
-	return c.rpc.Close()
+	c.wTask <- core.Task{Target: c.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
+
+		dsp := protocol.NewPostofficeServiceClient(tcp)
+		resp, err := dsp.Disconnect(context.Background(), &protocol.Topic{Tag: c.App.Context(), NodeId: c.App.NodeId()})
+		if err != nil {
+			return err
+		}
+		core.AppLog.Debug().Msgf("disconnecting topic %v", resp)
+		return c.rpc.Close()
+	}}
+	return nil
 }
 
 func (c *ClusterManager) connect(host string) error {
