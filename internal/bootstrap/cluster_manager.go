@@ -200,10 +200,10 @@ func (c *ClusterManager) disconnect() error {
 }
 
 func (c *ClusterManager) connect(host string) error {
-	c.cHost = host
+	c.cHost = fmt.Sprintf("%s:%d", host, core.RPC_PORT)
 	retries := RPC_CONNECT_RETRIES
 	for {
-		tcp, err := grpc.NewClient(fmt.Sprintf("%s:%d", host, core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
+		tcp, err := grpc.NewClient(c.cHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			retries--
 			if retries > 0 {
