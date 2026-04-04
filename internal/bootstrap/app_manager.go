@@ -199,7 +199,12 @@ func (c *AppManager) Atomic(prefix string, t core.Exec) error {
 	return t(&core.EtcdClient{Cli: cli, Prefix: prefix})
 }
 
+func (c *AppManager) Write(data []byte) (int, error) {
+	fmt.Printf("LOG : %s\n", string(data))
+	return len(data), nil
+}
+
 func (c *AppManager) Run(e *zerolog.Event, level zerolog.Level, msg string) {
-	fmt.Printf("log event %v\n", e)
-	fmt.Printf("log hook call %s %v\n", msg, level.String())
+	//fmt.Printf("log event %v\n", )
+	//fmt.Printf("log hook call %s %v\n", msg, level.String())
 }

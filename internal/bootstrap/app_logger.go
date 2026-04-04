@@ -1,13 +1,14 @@
 package bootstrap
 
 import (
+	"io"
 	"os"
 
 	"gameclustering.com/internal/core"
 	"github.com/rs/zerolog"
 )
 
-func CreateAppLog(dir string, truncated bool, standAlone bool, hook zerolog.Hook) {
+func CreateAppLog(dir string, truncated bool, standAlone bool, out io.Writer) {
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	if standAlone {
@@ -28,7 +29,7 @@ func CreateAppLog(dir string, truncated bool, standAlone bool, hook zerolog.Hook
 		CreateTestLog()
 		return
 	}
-	core.AppLog = zerolog.New(file).With().Timestamp().Caller().Logger().Hook(hook)
+	core.AppLog = zerolog.New(zerolog.MultiLevelWriter(file, out)).With().Timestamp().Caller().Logger()
 	core.AppLog.Info().Msg("Initialized app log")
 }
 
