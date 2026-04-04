@@ -7,6 +7,12 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/rs/zerolog"
+)
+
+var (
+	AppLog zerolog.Logger
 )
 
 type Sql struct {

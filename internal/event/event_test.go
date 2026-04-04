@@ -55,7 +55,6 @@ func createEvent() core.Event {
 	return &sub
 }
 func TestEventJson(t *testing.T) {
-	core.CreateTestLog()
 
 	sub := SubscriptionEvent{App: "presence", Name: "ban"}
 	data, err := json.Marshal(sub)
