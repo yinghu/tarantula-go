@@ -28,7 +28,7 @@ func CreateAppLog(dir string, truncated bool, standAlone bool, hook zerolog.Hook
 		CreateTestLog()
 		return
 	}
-	core.AppLog = zerolog.New(file).With().Timestamp().Logger().With().Caller().Logger().Hook(hook)
+	core.AppLog = zerolog.New(file).With().Timestamp().Caller().Logger().Hook(hook)
 	core.AppLog.Info().Msg("Initialized app log")
 }
 
