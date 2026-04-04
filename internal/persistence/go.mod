@@ -20,7 +20,6 @@ require (
 	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
 	github.com/dgraph-io/badger/v4 v4.7.0
-	github.com/dgraph-io/ristretto/v2 v2.2.0
 	github.com/jackc/pgx/v5 v5.7.4
 )
 
@@ -38,6 +37,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/coreos/go-semver v0.3.1 // indirect
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
+	github.com/dgraph-io/ristretto/v2 v2.2.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect

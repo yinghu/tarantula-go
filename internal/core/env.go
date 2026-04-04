@@ -59,13 +59,7 @@ func (f *Env) Load(fn string) error {
 	if err != nil {
 		return err
 	}
-	mountDir := fmt.Sprintf("%s/%s", homeDir, f.GroupName)
 	f.HomeDir = homeDir
-	err = os.MkdirAll(mountDir, 0755)
-	if err != nil {
-		return err
-	}
-	CreateAppLog(mountDir, f.LogTruncated, f.Standalone)
 	f.Prefix = "dev"
 
 	c, exists := os.LookupEnv("HOST")
@@ -102,7 +96,5 @@ func (f *Env) Load(fn string) error {
 	if exists {
 		f.Pgs.DatabaseURL = c
 	}
-	AppLog.Debug().Msgf("CONF : %s %s %s %d %s %s %s %s", f.Prefix, f.GroupName, f.NodeName, f.NodeId, f.HttpEndpoint, f.Evp.TcpEndpoint, f.EtcdEndpoints[0], f.Pgs.DatabaseURL)
-
 	return nil
 }
