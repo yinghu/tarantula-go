@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func CreateAppLog(dir string, truncated bool, standAlone bool) {
+func CreateAppLog(dir string, truncated bool, standAlone bool, hook zerolog.Hook) {
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	if standAlone {
@@ -28,7 +28,7 @@ func CreateAppLog(dir string, truncated bool, standAlone bool) {
 		CreateTestLog()
 		return
 	}
-	core.AppLog = zerolog.New(zerolog.MultiLevelWriter(file, os.Stderr)).With().Timestamp().Logger().With().Caller().Logger()
+	core.AppLog = zerolog.New(file).With().Timestamp().Logger().With().Caller().Logger().Hook(hook)
 	core.AppLog.Info().Msg("Initialized app log")
 }
 

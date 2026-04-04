@@ -9,6 +9,7 @@ import (
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
+	"github.com/rs/zerolog"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/concurrency"
 	"google.golang.org/grpc"
@@ -61,12 +62,11 @@ func (s *AppManager) NodeId() string {
 	return s.F.NodeName
 }
 func (s *AppManager) Start(f core.Env) error {
-	CreateAppLog(f.LogDir, f.LogTruncated, f.Standalone)
+	CreateAppLog(f.LogDir, f.LogTruncated, f.Standalone, s)
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
 
 	s.event = &EventManager{App: s}
 	s.ManagedApps = f.ManagedApps
-	//s.tcpPusher = p
 	s.F = f
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
@@ -197,4 +197,8 @@ func (c *AppManager) Atomic(prefix string, t core.Exec) error {
 	mutex.Lock(ctx)
 	defer mutex.Unlock(ctx)
 	return t(&core.EtcdClient{Cli: cli, Prefix: prefix})
+}
+
+func (c *AppManager) Run(e *zerolog.Event, level zerolog.Level, msg string) {
+	fmt.Printf("log hook call %s\n", msg)
 }
