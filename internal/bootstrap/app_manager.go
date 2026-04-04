@@ -61,6 +61,7 @@ func (s *AppManager) NodeId() string {
 	return s.F.NodeName
 }
 func (s *AppManager) Start(f core.Env) error {
+	CreateAppLog(f.LogDir, f.LogTruncated, f.Standalone)
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
 
 	s.event = &EventManager{App: s}

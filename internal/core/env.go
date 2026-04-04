@@ -41,6 +41,7 @@ type Env struct {
 	Pgs             Sql           `json:"Sql"`
 	HomeDir         string        `json:"HomeDir"`
 	LogTruncated    bool          `json:"LogTruncated"`
+	LogDir          string        `json:"LogDir"`
 	AuthLevel       int32         `json:"AuthLevel"`
 	IsClusterMember bool          `json:"IsClusterMember"`
 }

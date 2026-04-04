@@ -37,7 +37,8 @@ func AppBootstrap(tcx TarantulaContext) {
 	if err != nil {
 		return
 	}
-	CreateAppLog(mountDir, f.LogTruncated, f.Standalone)
+	f.LogDir = mountDir
+	//CreateAppLog(mountDir, f.LogTruncated, f.Standalone)
 	//e := event.TcpEndpoint{Endpoint: f.Evp.TcpEndpoint, Service: tcx.Service().Event(), OutboundEnabled: f.Evp.OutboundEnabled}
 	//if f.Evp.Enabled {
 	//go func() {
