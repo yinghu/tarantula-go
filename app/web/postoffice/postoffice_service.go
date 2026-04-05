@@ -14,9 +14,16 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+type LogData struct {
+	level zerolog.Level
+	log   []byte
+}
+
 type PostofficeService struct {
 	bootstrap.AppManager
-	mm *clustering.MemberlistManager
+	mm      *clustering.MemberlistManager
+	mLog    chan LogData
+	started bool
 }
 
 func (s *PostofficeService) Config() string {
@@ -26,6 +33,7 @@ func (s *PostofficeService) Config() string {
 func (s *PostofficeService) Start(env core.Env) error {
 	env.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	env.IsClusterMember = true
+	s.mLog = make(chan LogData, 100)
 	s.RegisterLogForwarder(s)
 	s.AppManager.Start(env)
 
@@ -40,29 +48,40 @@ func (s *PostofficeService) Start(env core.Env) error {
 		return err
 	}
 	s.mm = &m
-
-	core.AppLog.Printf("postoffice service started %s %s", env.HttpBinding, env.HomeDir)
+	s.started = true
+	go s.runForward()
+	core.AppLog.Debug().Msgf("postoffice service started %s %s", env.HttpBinding, env.HomeDir)
 	return nil
 }
 
 func (s *PostofficeService) Shutdown() {
-	core.AppLog.Println("postoffice service shutting down ...")
+	s.started = false
+	core.AppLog.Debug().Msg("postoffice service shutting down ...")
 	s.AppManager.Shutdown()
 	s.mm.ShutdownHook()
 }
 
 func (s *PostofficeService) Forward(level zerolog.Level, log []byte) {
-	lf := event.LogEventFactory{}
-	e := protocol.LogEvent{}
-	err := protojson.Unmarshal(log, &e)
-	if err != nil {
-		e.Level = "error"
-		e.Message = err.Error()
-		e.Time = timestamppb.Now()
-		e.Source = "postoffice:64"
+	s.mLog <- LogData{level: level, log: log}
+}
+
+func (s *PostofficeService) runForward() {
+	for s.started {
+		for data := range s.mLog {
+			lf := event.LogEventFactory{}
+			e := protocol.LogEvent{}
+			err := protojson.Unmarshal(data.log, &e)
+			if err != nil {
+				e.Level = "error"
+				e.Message = err.Error()
+				e.Time = timestamppb.Now()
+				e.Source = "postoffice:64"
+			}
+			t, _ := lf.FromLogEvent(&e)
+			t.NodeId = s.NodeId()
+			t.Tag = s.Context()
+			s.mm.DataServiceProvider.Publish(context.Background(), t)
+		}
 	}
-	t, _ := lf.FromLogEvent(&e)
-	t.NodeId = s.NodeId()
-	t.Tag = s.Context()
-	s.mm.DataServiceProvider.Publish(context.Background(), t)
+	close(s.mLog)
 }
