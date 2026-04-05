@@ -11,8 +11,10 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var TopicFactoryRegistry = make(map[string]func() core.ProtoTopicFactory)
@@ -26,6 +28,8 @@ func AppBootstrap(tcx TarantulaContext) {
 	Register(event.REGISTER_TOPIC_NAME, func() core.ProtoTopicFactory { return &event.RegisterEventFactory{} })
 	Register(event.LOG_TOPIC_NAME, func() core.ProtoTopicFactory { return &event.LogEventFactory{} })
 	Register(event.LOGIN_TOPIC_NAME, func() core.ProtoTopicFactory { return &event.LoginEventFactory{} })
+	Register(event.REQUEST_TOPIC_NAME, func() core.ProtoTopicFactory { return &event.RequestEventFactory{} })
+
 	f := core.Env{}
 	err := f.Load(tcx.Config())
 	if err != nil {
@@ -101,13 +105,23 @@ func metricsHandler(auth core.Authenticator, h http.Handler) http.HandlerFunc {
 func Logging(s TarantulaApp) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
-		var stub int32 = 0
+		//var stub int32 = 0
 		var code int32 = 0
 		defer func() {
 			dur := time.Since(start)
-			ms := core.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.NodeId(), ReqId: stub, ReqCode: code}
-			s.Metrics().WebRequest(ms)
-			core.HTTP_REQUEST_METRICS.WithLabelValues(r.URL.Path).Observe(dur.Seconds())
+			re := protocol.RequestEvent{Path: r.URL.Path, Method: r.Method, Duration: uint32(dur), Code: uint32(code)}
+			re.DateTime = timestamppb.Now()
+			re.Source = r.RemoteAddr
+			rf := event.RequestEventFactory{}
+			t, _ := rf.FromRequestEvent(&re)
+			t.NodeId = s.NodeId()
+			t.Tag = ""
+			id, _ := s.Sequence().Id()
+			t.Event.Id = uint64(id)
+			s.Cluster().Publish(t)
+			//ms := core.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.NodeId(), ReqId: stub, ReqCode: code}
+			//s.Metrics().WebRequest(ms)
+			//core.HTTP_REQUEST_METRICS.WithLabelValues(r.URL.Path).Observe(dur.Seconds())
 
 		}()
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -135,12 +149,12 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			return
 		}
 		if session.AccessControl < s.AccessControl() {
-			stub = session.Stub
+			//stub = session.Stub
 			code = int32(ILLEGAL_ACCESS_CODE)
 			illegalAccess(w, r)
 			return
 		}
-		stub = session.Stub
+		//stub = session.Stub
 		s.Request(session, w, r)
 	}
 }
