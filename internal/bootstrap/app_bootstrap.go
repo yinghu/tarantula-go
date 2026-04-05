@@ -125,7 +125,8 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 				fmt.Printf("request event id error %s\n", err.Error())
 			}
 			t.Event.Id = uint64(id)
-			s.Cluster().Publish(t)
+			fmt.Print("Request done !\n")
+			//s.Cluster().Publish(t)
 			//ms := core.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.NodeId(), ReqId: stub, ReqCode: code}
 			//s.Metrics().WebRequest(ms)
 			//core.HTTP_REQUEST_METRICS.WithLabelValues(r.URL.Path).Observe(dur.Seconds())
