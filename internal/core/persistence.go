@@ -52,9 +52,8 @@ type CompositeKey interface {
 type Persistentable interface {
 	CompositeKey
 	Write(value DataBuffer) error
-	//WriteKey(key DataBuffer) error
+
 	Read(value DataBuffer) error
-	//ReadKey(key DataBuffer) error
 	FactoryId() uint32
 	ClassId() uint32
 
@@ -62,7 +61,6 @@ type Persistentable interface {
 	Timestamp() uint64
 	OnTimestamp(tsp uint64)
 	OnRevision(rev uint64)
-	//ETag() string
 }
 
 type PersistentableObj struct {
@@ -109,34 +107,3 @@ func (s *PersistentableObj) OnTimestamp(tsp uint64) {
 func (s *PersistentableObj) OnRevision(rev uint64) {
 	s.Rev = rev
 }
-
-func (s *PersistentableObj) ETag() string {
-	return "ent"
-}
-
-//type ListingOpt struct {
-//	Prefix         []byte
-//	StartCursor    []byte
-//	Reverse        bool
-//	PrefetchSize   int
-//	PrefetchValues bool
-//	Limit          int
-//}
-
-//type Transaction interface {
-//Get(p Persistentable) error
-//Set(p Persistentable) error
-//Del(p Persistentable) error
-//Commit() error
-//Rollback()
-//}
-
-//type DataStore interface {
-//Load(p Persistentable) error
-//Save(p Persistentable) error
-//Delete(p Persistentable) error
-//Version(key []byte, s Stream) error
-//Query(opt ListingOpt, s Stream) error
-//Close() error
-//Tx() Transaction
-//}
