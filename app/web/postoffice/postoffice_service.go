@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -67,6 +68,7 @@ func (s *PostofficeService) Forward(level zerolog.Level, log []byte) {
 }
 
 func (s *PostofficeService) runForward() {
+	time.Sleep(3 * time.Second)
 	for s.started {
 		for data := range s.mLog {
 			lf := event.LogEventFactory{}
