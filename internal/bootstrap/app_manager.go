@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"runtime"
 	"time"
@@ -29,7 +30,7 @@ type AppManager struct {
 	ManagedApps []string
 	cluster     *ClusterManager
 	event       *EventManager
-	log         zerolog.Logger
+	log         io.Writer //zerolog.Logger
 	forward     LogForwarder
 }
 
@@ -251,7 +252,8 @@ func (c *AppManager) initLogger(f core.Env) {
 		CreateTestLog()
 		return
 	}
-	c.log = zerolog.New(file)
+	//c.log = zerolog.New(file)
+	c.log = file
 	core.AppLog = zerolog.New(zerolog.MultiLevelWriter(c)).With().Timestamp().Logger().Hook(c)
 	core.AppLog.Info().Msg("Initialized app log")
 
