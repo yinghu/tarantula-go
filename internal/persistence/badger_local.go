@@ -81,60 +81,6 @@ func (s *BadgerLocal) Load(t core.Persistentable) error {
 	return nil
 }
 
-func (s *BadgerLocal) Query(opt core.ListingOpt, stream core.Stream) error {
-	if opt.Prefix == nil {
-		return fmt.Errorf("query prefix cannot be nil")
-	}
-	op := badger.DefaultIteratorOptions
-	op.Reverse = opt.Reverse
-	if op.Reverse && opt.StartCursor == nil {
-		opt.StartCursor = append(opt.Prefix, 0xFF)
-	}
-	if opt.PrefetchValues {
-		op.PrefetchValues = true
-		op.PrefetchSize = opt.PrefetchSize
-	}
-	p := opt.Prefix
-	seek := p
-	if opt.StartCursor != nil {
-		seek = opt.StartCursor
-	}
-	key := core.BufferProxy{}
-	key.NewProxy(BDG_KEY_SIZE)
-	value := core.BufferProxy{}
-	value.NewProxy(BDG_VALUE_SIZE)
-	limit := -1
-	if opt.Limit > 0 {
-		limit = opt.Limit
-	}
-	return s.Db.View(func(txn *badger.Txn) error {
-		it := txn.NewIterator(op)
-		defer it.Close()
-		for it.Seek(seek); it.ValidForPrefix(p); it.Next() {
-			kv := it.Item()
-			key.Clear()
-			err := key.Write(kv.Key())
-			if err != nil {
-				return err
-			}
-			err = kv.Value(func(val []byte) error {
-				value.Clear()
-				return value.Write(val)
-			})
-			if err != nil {
-				return err
-			}
-			key.Flip()
-			value.Flip()
-			limit--
-			if !stream(&key, &value) || limit == 0 {
-				break
-			}
-		}
-		return nil
-	})
-}
-
 func (s *BadgerLocal) Version(key []byte, stream core.Stream) error {
 	op := badger.DefaultIteratorOptions
 	op.AllVersions = true
@@ -207,7 +153,7 @@ func (s *BadgerLocal) set(key *core.BufferProxy, value *core.BufferProxy, t core
 			return nil
 		}
 		//update stat total
-		se := event.StatEvent{ Name: event.STAT_TOTAL}
+		se := event.StatEvent{Name: event.STAT_TOTAL}
 		key.Clear()
 		se.WriteKey(key)
 		key.Flip()
@@ -335,13 +281,4 @@ func (s *BadgerLocal) Close() error {
 	}
 	s.Db.Sync()
 	return s.Db.Close()
-}
-
-func (s *BadgerLocal) Tx() core.Transaction {
-	k := core.BufferProxy{}
-	k.NewProxy(BDG_KEY_SIZE)
-	v := core.BufferProxy{}
-	v.NewProxy(BDG_VALUE_SIZE)
-	tx := BadgerLocalTransaction{ctx: s.Db.NewTransaction(true), key: &k, value: &v}
-	return &tx
 }
