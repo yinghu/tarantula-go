@@ -219,6 +219,12 @@ func (c *AppManager) WriteLevel(level zerolog.Level, data []byte) (int, error) {
 	return c.log.Write(data)
 }
 
+func (c *AppManager) Run(e *zerolog.Event, level zerolog.Level, msg string) {
+	if level.String() == "" {
+		e.Discard()
+	}
+}
+
 func (c *AppManager) initLogger(f core.Env) {
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
@@ -241,7 +247,7 @@ func (c *AppManager) initLogger(f core.Env) {
 		return
 	}
 	c.log = zerolog.New(file)
-	core.AppLog = zerolog.New(zerolog.MultiLevelWriter(c)).With().Timestamp().Caller().Logger()
+	core.AppLog = zerolog.New(zerolog.MultiLevelWriter(c)).With().Timestamp().Caller().Logger().Hook(c)
 	core.AppLog.Info().Msg("Initialized app log")
 
 }

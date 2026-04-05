@@ -7,13 +7,11 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/protobuf/encoding/protojson"
 )
 
 const (
@@ -314,26 +312,26 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 		return
 	}
 	fmt.Printf("cluster log %s %s\n", level.String(), string(log))
-	c.wTask <- core.Task{Target: c.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
-		e := protocol.LogEvent{}
-		err := protojson.Unmarshal(log, &e)
-		if err != nil {
-			fmt.Printf("json parse error %s\n", err.Error())
-			return nil
-		}
-		fmt.Printf("log %v\n", &e)
-		tf := event.LogEventFactory{}
-		t, err := tf.FromLogEvent(&e)
-		t.NodeId = c.App.NodeId()
-		t.Tag = c.App.Context()
-		id, _ := c.App.Sequence().Id()
-		t.Event.Id = uint64(id)
-		dsp := protocol.NewPostofficeServiceClient(tcp)
-		resp, err := dsp.Publish(context.Background(), t)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("log topic publish %v", resp)
-		return nil
-	}}
+	//c.wTask <- core.Task{Target: c.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
+	//e := protocol.LogEvent{}
+	//err := protojson.Unmarshal(log, &e)
+	//if err != nil {
+	//fmt.Printf("json parse error %s\n", err.Error())
+	//return nil
+	//}
+	//fmt.Printf("log %v\n", &e)
+	//tf := event.LogEventFactory{}
+	//t, err := tf.FromLogEvent(&e)
+	//t.NodeId = c.App.NodeId()
+	//t.Tag = c.App.Context()
+	//id, _ := c.App.Sequence().Id()
+	//t.Event.Id = uint64(id)
+	//dsp := protocol.NewPostofficeServiceClient(tcp)
+	//resp, err := dsp.Publish(context.Background(), t)
+	//if err != nil {
+	//return err
+	//}
+	//fmt.Printf("log topic publish %v", resp)
+	//return nil
+	//}}
 }
