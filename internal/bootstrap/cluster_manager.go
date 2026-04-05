@@ -184,7 +184,7 @@ func (c *ClusterManager) Subscribe(topic string, listener core.TopicListener) er
 			return err
 		}
 		c.cSub <- Sub{opt: OPT_SUB, name: topic, listener: listener}
-		core.AppLog.Debug().Msgf("topic registered %v", resp)
+		core.AppLog.Debug().Msgf("topic registered %v %s", resp.Successful, topic)
 		return nil
 	}}
 	return nil
@@ -202,7 +202,7 @@ func (c *ClusterManager) Unsubscribe(topic string) error {
 			return err
 		}
 		c.cSub <- Sub{opt: OPT_UNSUB, name: topic}
-		core.AppLog.Debug().Msgf("topic unregistered %v", resp)
+		core.AppLog.Debug().Msgf("topic unregistered %v %s", resp.Successful, topic)
 		return nil
 	}}
 	return nil
@@ -313,11 +313,12 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 	if !c.running {
 		return
 	}
-	fmt.Printf("cluster log %s %s\n", level.String(), string(log))
+	//fmt.Printf("cluster log %s %s\n", level.String(), string(log))
 	c.wTask <- core.Task{Target: c.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
 		e := protocol.LogEvent{}
 		err := protojson.Unmarshal(log, &e)
 		if err != nil {
+			fmt.Printf("json payload %s\n", string(log))
 			fmt.Printf("json parse error %s\n", err.Error())
 			return nil
 		}

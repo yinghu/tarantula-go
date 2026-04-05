@@ -221,8 +221,6 @@ func (c *AppManager) WriteLevel(level zerolog.Level, data []byte) (int, error) {
 }
 
 func (c *AppManager) Run(e *zerolog.Event, level zerolog.Level, msg string) {
-	//ts := timestamppb.Now()
-	//e.Dict("time", zerolog.Dict().Int64("seconds", ts.Seconds).Int32("nanos", ts.Nanos))
 	_, f, line, ok := runtime.Caller(3)
 	if !ok {
 		e.Str("source", "unknown")
