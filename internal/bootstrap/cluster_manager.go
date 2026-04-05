@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -313,16 +314,16 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 	if !c.running {
 		return
 	}
-	//fmt.Printf("cluster log %s %s\n", level.String(), string(log))
 	c.wTask <- core.Task{Target: c.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
 		e := protocol.LogEvent{}
 		err := protojson.Unmarshal(log, &e)
 		if err != nil {
-			fmt.Printf("json payload %s\n", string(log))
-			fmt.Printf("json parse error %s\n", err.Error())
-			return nil
+			//return nil
+			e.Level = "error"
+			e.Message = err.Error()
+			e.Time = timestamppb.Now()
+			e.Source = "forwarder:325"
 		}
-		fmt.Printf("log %v\n", &e)
 		tf := event.LogEventFactory{}
 		t, err := tf.FromLogEvent(&e)
 		t.NodeId = c.App.NodeId()
@@ -330,11 +331,10 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 		id, _ := c.App.Sequence().Id()
 		t.Event.Id = uint64(id)
 		dsp := protocol.NewPostofficeServiceClient(tcp)
-		resp, err := dsp.Publish(context.Background(), t)
+		_, err = dsp.Publish(context.Background(), t)
 		if err != nil {
 			return err
 		}
-		fmt.Printf("log topic publish %v", resp)
 		return nil
 	}}
 }
