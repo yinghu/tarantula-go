@@ -308,5 +308,19 @@ func (c *ClusterManager) async() {
 }
 
 func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
-	fmt.Printf("cluster log %s\n", level.String())
+	if !c.running {
+		return
+	}
+	fmt.Printf("cluster log %s %s\n", level.String(), string(log))
+	//c.wTask <- core.Task{Target: c.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
+	//tf := event.LogEventFactory{}
+	//t, err := tf.FromLogEvent(&protocol.LogEvent{})
+	//dsp := protocol.NewPostofficeServiceClient(tcp)
+	//resp, err := dsp.Publish(context.Background(), t)
+	//if err != nil {
+	//return err
+	//}
+	//core.AppLog.Debug().Msgf("topic publish %v", resp)
+	//return nil
+	//}}
 }
