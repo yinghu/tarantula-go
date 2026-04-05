@@ -207,7 +207,12 @@ func (c *AppManager) Write(data []byte) (int, error) {
 }
 
 func (c *AppManager) WriteLevel(level zerolog.Level, data []byte) (int, error) {
-	fmt.Printf("LOG : %s %s\n", string(data), level.String())
+	if !c.F.IsClusterMember {
+		fmt.Printf("LOG X : %s %s\n", string(data), level.String())
+	} else {
+		fmt.Printf("LOG Y: %s %s\n", string(data), level.String())
+	}
+	//lf := event.LogEventFactory{}
 
 	return c.log.Write(data)
 }

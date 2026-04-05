@@ -25,7 +25,7 @@ func Register(name string, fac func() core.ProtoTopicFactory) {
 func AppBootstrap(tcx TarantulaContext) {
 	Register(event.MESSAGE_TOPIC_NAME, func() core.ProtoTopicFactory { return &event.MessageEventFactory{} })
 	Register(event.REGISTER_TOPIC_NAME, func() core.ProtoTopicFactory { return &event.RegisterEventFactory{} })
-
+	Register(event.LOG_TOPIC_NAME, func() core.ProtoTopicFactory { return &event.LogEventFactory{} })
 	f := core.Env{}
 	err := f.Load(tcx.Config())
 	if err != nil {
