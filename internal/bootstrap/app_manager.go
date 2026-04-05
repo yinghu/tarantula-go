@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"runtime"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -223,6 +224,12 @@ func (c *AppManager) WriteLevel(level zerolog.Level, data []byte) (int, error) {
 func (c *AppManager) Run(e *zerolog.Event, level zerolog.Level, msg string) {
 	ts := timestamppb.Now()
 	e.Dict("time", zerolog.Dict().Int64("seconds", ts.Seconds).Int32("nanos", ts.Nanos))
+	_, f, line, ok := runtime.Caller(3)
+	if !ok {
+		e.Str("source", "unknown")
+		return
+	}
+	e.Str("source", fmt.Sprintf("%s:%d", f, line))
 }
 
 func (c *AppManager) initLogger(f core.Env) {
@@ -247,7 +254,7 @@ func (c *AppManager) initLogger(f core.Env) {
 		return
 	}
 	c.log = zerolog.New(file)
-	core.AppLog = zerolog.New(zerolog.MultiLevelWriter(c)).With().Caller().Logger().Hook(c)
+	core.AppLog = zerolog.New(zerolog.MultiLevelWriter(c)).Hook(c)
 	core.AppLog.Info().Msg("Initialized app log")
 
 }
