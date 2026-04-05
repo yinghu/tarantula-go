@@ -79,7 +79,7 @@ func illegalAccess(w http.ResponseWriter, r *http.Request) {
 	w.Write(util.ToJson(session))
 }
 func preflight(w http.ResponseWriter, r *http.Request) {
-	core.AppLog.Debug().Msg("checking options header here")
+	//core.AppLog.Debug().Msg("checking options header here")
 	defer r.Body.Close()
 	w.WriteHeader(http.StatusNoContent)
 }
@@ -113,10 +113,17 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			re.DateTime = timestamppb.Now()
 			re.Source = r.RemoteAddr
 			rf := event.RequestEventFactory{}
-			t, _ := rf.FromRequestEvent(&re)
+			t, err := rf.FromRequestEvent(&re)
+			if err != nil {
+				fmt.Printf("request event error %s\n", err.Error())
+				return
+			}
 			t.NodeId = s.NodeId()
-			t.Tag = ""
-			id, _ := s.Sequence().Id()
+			t.Tag = "admin"
+			id, err := s.Sequence().Id()
+			if err != nil {
+				fmt.Printf("request event id error %s\n", err.Error())
+			}
 			t.Event.Id = uint64(id)
 			s.Cluster().Publish(t)
 			//ms := core.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.NodeId(), ReqId: stub, ReqCode: code}
