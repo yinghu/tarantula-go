@@ -3,12 +3,12 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/item"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -44,13 +44,24 @@ func (s *PresenceLogin) Login(login bootstrap.Login) {
 	go func() {
 		id, err := s.Sequence().Id()
 		if err != nil {
+			core.AppLog.Warn().Msgf("failed to create seq %s", err.Error())
 			return
 		}
-		me := event.LoginEvent{SystemId: login.SystemId, Name: login.Name}
-		me.OnOId(id)
-		me.LoginTime = time.Now()
-		me.OnTopic("login")
-		//s.Publish(&me)
+		rf := event.LoginEventFactory{}
+		me := protocol.LoginEvent{SystemId: uint64(login.SystemId), Name: login.Name, Source: "web"}
+		tp, err := rf.FromLoginEvent(&me)
+		if err != nil {
+			core.AppLog.Warn().Msgf("failed to create topic %s", err.Error())
+			return
+		}
+		tp.Event.Id = uint64(id)
+		tp.NodeId = s.NodeId()
+		tp.Tag = s.Context()
+		err = s.Cluster().Publish(tp)
+		if err != nil {
+			core.AppLog.Warn().Msgf("failed to publish topic %s", err.Error())
+			return
+		}
 		rw := item.OnInventory{SystemId: login.SystemId, ItemId: s.LoginReward.Id, Source: "login"}
 		err = s.ItemService().InventoryManager().Grant(rw)
 		if err != nil {
