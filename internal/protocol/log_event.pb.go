@@ -27,7 +27,7 @@ type LogEvent struct {
 	Level         string                 `protobuf:"bytes,1,opt,name=level,proto3" json:"level,omitempty"`
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	Source        string                 `protobuf:"bytes,3,opt,name=source,proto3" json:"source,omitempty"`
-	DateTime      *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=dateTime,proto3" json:"dateTime,omitempty"`
+	Time          *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=time,proto3" json:"time,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -83,9 +83,9 @@ func (x *LogEvent) GetSource() string {
 	return ""
 }
 
-func (x *LogEvent) GetDateTime() *timestamppb.Timestamp {
+func (x *LogEvent) GetTime() *timestamppb.Timestamp {
 	if x != nil {
-		return x.DateTime
+		return x.Time
 	}
 	return nil
 }
@@ -94,12 +94,12 @@ var File_log_event_proto protoreflect.FileDescriptor
 
 const file_log_event_proto_rawDesc = "" +
 	"\n" +
-	"\x0flog_event.proto\x12\bprotocol\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8a\x01\n" +
+	"\x0flog_event.proto\x12\bprotocol\x1a\x1fgoogle/protobuf/timestamp.proto\"\x82\x01\n" +
 	"\bLogEvent\x12\x14\n" +
 	"\x05level\x18\x01 \x01(\tR\x05level\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x16\n" +
-	"\x06source\x18\x03 \x01(\tR\x06source\x126\n" +
-	"\bdateTime\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\bdateTimeBP\n" +
+	"\x06source\x18\x03 \x01(\tR\x06source\x12.\n" +
+	"\x04time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\x04timeBP\n" +
 	"\x17com.icodesoftware.protoB\x0fLogEventFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -120,7 +120,7 @@ var file_log_event_proto_goTypes = []any{
 	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
 }
 var file_log_event_proto_depIdxs = []int32{
-	1, // 0: protocol.LogEvent.dateTime:type_name -> google.protobuf.Timestamp
+	1, // 0: protocol.LogEvent.time:type_name -> google.protobuf.Timestamp
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
