@@ -39,7 +39,7 @@ func (s *AdminService) Start(f core.Env) error {
 	}
 	err = s.SaveLogin(&bootstrap.Login{Name: "root", Hash: hash, AccessControl: core.SUDO_ACCESS_CONTROL})
 	if err != nil {
-		core.AppLog.Printf("Root already existed %s\n", err.Error())
+		core.AppLog.Debug().Msg("Root already existed")
 	}
 	//s.Cluster().Subscribe("login", s.Event())
 	http.Handle("/admin/webprotected/{name}", bootstrap.Logging(&AdminWebProtected{AdminService: s}))
