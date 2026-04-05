@@ -49,6 +49,7 @@ func (s *PostofficeService) Start(env core.Env) error {
 	}
 	s.mm = &m
 	s.started = true
+	s.mm.DWait.Wait()
 	go s.runForward()
 	core.AppLog.Debug().Msgf("postoffice service started %s %s", env.HttpBinding, env.HomeDir)
 	return nil
