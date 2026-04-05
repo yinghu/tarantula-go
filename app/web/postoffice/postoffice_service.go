@@ -80,9 +80,11 @@ func (s *PostofficeService) runForward() {
 				e.Time = timestamppb.Now()
 				e.Source = "postoffice:64"
 			}
+			id, _ := s.Sequence().Id()
 			t, _ := lf.FromLogEvent(&e)
 			t.NodeId = s.NodeId()
 			t.Tag = s.Context()
+			t.Event.Id = uint64(id)
 			s.mm.DataServiceProvider.Publish(context.Background(), t)
 		}
 	}
