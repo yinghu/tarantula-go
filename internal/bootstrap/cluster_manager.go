@@ -9,6 +9,7 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
+	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -304,4 +305,8 @@ func (c *ClusterManager) async() {
 	clear(c.subscriptions)
 	close(c.cInbound)
 	close(c.cSub)
+}
+
+func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
+	fmt.Printf("cluster log %s\n", level.String())
 }

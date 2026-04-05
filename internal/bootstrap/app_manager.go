@@ -29,6 +29,7 @@ type AppManager struct {
 	cluster     *ClusterManager
 	event       *EventManager
 	log         zerolog.Logger
+	forward     LogForwarder
 }
 
 func (s *AppManager) ItemService() item.ItemService {
@@ -62,6 +63,10 @@ func (c *AppManager) Event() core.EventService {
 
 func (s *AppManager) NodeId() string {
 	return s.F.NodeName
+}
+
+func (s *AppManager) RegisterLogForwarder(logf LogForwarder) {
+	s.forward = logf
 }
 func (s *AppManager) Start(f core.Env) error {
 	s.F = f
@@ -109,6 +114,7 @@ func (s *AppManager) Start(f core.Env) error {
 	}
 	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.Host)
 	s.cluster = &ClusterManager{App: s}
+	s.RegisterLogForwarder(s.cluster)
 	task := make(chan core.Task, 10)
 	s.cluster.wTask = task
 	tex := core.ServiceCallOperator{RTask: task, LocalConns: make(map[string]*grpc.ClientConn)}
@@ -207,13 +213,9 @@ func (c *AppManager) Write(data []byte) (int, error) {
 }
 
 func (c *AppManager) WriteLevel(level zerolog.Level, data []byte) (int, error) {
-	if !c.F.IsClusterMember {
-		fmt.Printf("LOG X : %s %s\n", string(data), level.String())
-	} else {
-		fmt.Printf("LOG Y: %s %s\n", string(data), level.String())
+	if c.forward != nil {
+		c.forward.Forward(level, data)
 	}
-	//lf := event.LogEventFactory{}
-
 	return c.log.Write(data)
 }
 

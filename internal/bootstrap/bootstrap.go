@@ -5,6 +5,7 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
+	"github.com/rs/zerolog"
 )
 
 const (
@@ -28,6 +29,10 @@ const (
 	BAD_REQUEST_MSG    string = "bad request"
 )
 
+type LogForwarder interface {
+	Forward(level zerolog.Level, log []byte)
+}
+
 type TarantulaContext interface {
 	Config() string
 	Start(f core.Env) error
@@ -45,6 +50,7 @@ type TarantulaService interface {
 	Pusher() core.Pusher
 	Cluster() core.ClusterService
 	Event() core.EventService
+	RegisterLogForwarder(logf LogForwarder)
 }
 
 type TarantulaApp interface {

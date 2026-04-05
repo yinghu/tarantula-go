@@ -6,6 +6,7 @@ import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/postoffice/clustering"
+	"github.com/rs/zerolog"
 )
 
 type PostofficeService struct {
@@ -20,6 +21,7 @@ func (s *PostofficeService) Config() string {
 func (s *PostofficeService) Start(env core.Env) error {
 	env.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	env.IsClusterMember = true
+	s.RegisterLogForwarder(s)
 	s.AppManager.Start(env)
 
 	s.createSchema()
@@ -42,4 +44,8 @@ func (s *PostofficeService) Shutdown() {
 	core.AppLog.Println("postoffice service shutting down ...")
 	s.AppManager.Shutdown()
 	s.mm.ShutdownHook()
+}
+
+func (s *PostofficeService) Forward(level zerolog.Level, log []byte) {
+	fmt.Printf("post office forward log %s\n", level.String())
 }
