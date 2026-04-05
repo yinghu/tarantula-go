@@ -204,7 +204,13 @@ func (c *AppManager) Write(data []byte) (int, error) {
 	return len(data), nil
 }
 
+func (c *AppManager) WriteLevel(level zerolog.Level, data []byte) (int, error) {
+	fmt.Printf("LOG : %s %s\n", string(data), level.String())
+	return len(data), nil
+}
+
 func (c *AppManager) Run(e *zerolog.Event, level zerolog.Level, msg string) {
+
 	//fmt.Printf("log event %v\n", )
 	//fmt.Printf("log hook call %s %v\n", msg, level.String())
 }
