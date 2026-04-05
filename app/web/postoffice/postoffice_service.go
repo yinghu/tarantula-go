@@ -48,4 +48,5 @@ func (s *PostofficeService) Shutdown() {
 
 func (s *PostofficeService) Forward(level zerolog.Level, log []byte) {
 	fmt.Printf("post office forward log %s %s\n", level.String(), string(log))
+	//s.mm.DataServiceProvider.WTask<-
 }

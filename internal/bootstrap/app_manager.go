@@ -252,7 +252,6 @@ func (c *AppManager) initLogger(f core.Env) {
 		CreateTestLog()
 		return
 	}
-	//c.log = zerolog.New(file)
 	c.log = file
 	core.AppLog = zerolog.New(zerolog.MultiLevelWriter(c)).With().Timestamp().Logger().Hook(c)
 	core.AppLog.Info().Msg("Initialized app log")

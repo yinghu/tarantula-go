@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func CreateAppLog(dir string, truncated bool, standAlone bool, levelLog zerolog.LevelWriter) {
+func cCreateAppLog(dir string, truncated bool, standAlone bool, levelLog zerolog.LevelWriter) {
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	if standAlone {
