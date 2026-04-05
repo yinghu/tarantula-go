@@ -67,6 +67,10 @@ func (s *AppManager) NodeId() string {
 	return s.F.NodeName
 }
 
+func (s *AppManager) ClusterMember() bool {
+	return s.F.IsClusterMember
+}
+
 func (s *AppManager) RegisterLogForwarder(logf LogForwarder) {
 	s.forward = logf
 }

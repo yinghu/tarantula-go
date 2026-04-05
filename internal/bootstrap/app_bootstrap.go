@@ -119,14 +119,17 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 				return
 			}
 			t.NodeId = s.NodeId()
-			t.Tag = "admin"
+			t.Tag = s.Context()
 			id, err := s.Sequence().Id()
 			if err != nil {
 				fmt.Printf("request event id error %s\n", err.Error())
+				return
 			}
 			t.Event.Id = uint64(id)
-			fmt.Print("Request done !\n")
-			//s.Cluster().Publish(t)
+			if s.ClusterMember() {
+				return
+			}
+			go s.Cluster().Publish(t)
 			//ms := core.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.NodeId(), ReqId: stub, ReqCode: code}
 			//s.Metrics().WebRequest(ms)
 			//core.HTTP_REQUEST_METRICS.WithLabelValues(r.URL.Path).Observe(dur.Seconds())

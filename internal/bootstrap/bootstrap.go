@@ -57,6 +57,8 @@ type TarantulaApp interface {
 	TarantulaService
 	AccessControl() int32
 	NodeId() string
+	Context() string
+	ClusterMember() bool
 	Request(sesion core.OnSession, w http.ResponseWriter, r *http.Request)
 }
 
