@@ -11,7 +11,6 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
-	"gameclustering.com/internal/metrics"
 	"gameclustering.com/internal/util"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -108,7 +107,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			dur := time.Since(start)
 			ms := core.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.NodeId(), ReqId: stub, ReqCode: code}
 			s.Metrics().WebRequest(ms)
-			metrics.HTTP_REQUEST_METRICS.WithLabelValues(r.URL.Path).Observe(dur.Seconds())
+			core.HTTP_REQUEST_METRICS.WithLabelValues(r.URL.Path).Observe(dur.Seconds())
 
 		}()
 		w.Header().Set("Access-Control-Allow-Origin", "*")

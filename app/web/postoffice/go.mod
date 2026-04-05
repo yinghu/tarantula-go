@@ -14,8 +14,6 @@ replace gameclustering.com/internal/bootstrap => ../../../internal/bootstrap
 
 replace gameclustering.com/internal/item => ../../../internal/item
 
-replace gameclustering.com/internal/metrics => ../../../internal/metrics
-
 replace gameclustering.com/internal/protocol => ../../../internal/protocol
 
 require (
@@ -31,11 +29,11 @@ require (
 	github.com/rs/zerolog v1.34.0
 	github.com/spaolacci/murmur3 v1.1.0
 	google.golang.org/grpc v1.79.1
+	google.golang.org/protobuf v1.36.11
 )
 
 require (
 	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000 // indirect
-	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -90,5 +88,4 @@ require (
 	golang.org/x/tools v0.39.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
-	google.golang.org/protobuf v1.36.11 // indirect
 )

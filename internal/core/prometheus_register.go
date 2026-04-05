@@ -1,4 +1,4 @@
-package metrics
+package core
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
@@ -11,8 +11,6 @@ var (
 		Name: "tarantula_socket_concurrency",
 		Help: "Tarantual socket concurrency",
 	})
-
-	
 
 	HTTP_REQUEST_METRICS prometheus.HistogramVec = *prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "tarantula_http_request_duration",

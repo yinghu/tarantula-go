@@ -16,8 +16,6 @@ replace gameclustering.com/internal/item => ../../../internal/item
 
 replace gameclustering.com/internal/mj => ../../../internal/mj
 
-replace gameclustering.com/internal/metrics => ../../../internal/metrics
-
 replace gameclustering.com/internal/protocol => ../../../internal/protocol
 
 require (
@@ -30,7 +28,6 @@ require (
 )
 
 require (
-	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/protocol v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect

@@ -4,14 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
-	"gameclustering.com/internal/event"
 )
 
 type Simulator struct {
@@ -110,32 +108,6 @@ func (s *Simulator) inventory() error {
 }
 
 func (s *Simulator) tcp(ch chan bool) {
-	sb := event.TcpPublisher{Remote: fmt.Sprintf("tcp://%s:5050", s.Home)}
-	err := sb.Connect()
 
-	if err != nil {
-		ch <- false
-	}
-
-	e := event.JoinEvent{Ticket: s.Ticket}
-	e.OnListener(&SampleCreator{})
-	err = sb.Join(&e)
-	if err != nil {
-		ch <- false
-		sb.Close()
-		return
-	}
-	go sb.Subscribe(&SampleCreator{}, &SampleCreator{})
-
-	for range 10 {
-		me := MahjongEvent{Cmd: 0}
-		me.OnTopic("mahjong")
-		me.SystemId = s.SystemId
-		me.OnListener(&SampleCreator{})
-		sb.Publish(&me, s.Ticket)
-		time.Sleep(1000 * time.Millisecond)
-	}
-	time.Sleep(1 * time.Second)
-	sb.Close()
 	ch <- true
 }

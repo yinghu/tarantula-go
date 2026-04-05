@@ -8,13 +8,10 @@ replace gameclustering.com/internal/core => ../core
 
 replace gameclustering.com/internal/util => ../util
 
-replace gameclustering.com/internal/metrics => ../metrics
-
 replace gameclustering.com/internal/protocol => ../protocol
 
 require (
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
-	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/protocol v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
 	google.golang.org/protobuf v1.36.11
