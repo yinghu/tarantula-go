@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -27,6 +28,7 @@ type AppManager struct {
 	ManagedApps []string
 	cluster     *ClusterManager
 	event       *EventManager
+	log         zerolog.Logger
 }
 
 func (s *AppManager) ItemService() item.ItemService {
@@ -62,12 +64,12 @@ func (s *AppManager) NodeId() string {
 	return s.F.NodeName
 }
 func (s *AppManager) Start(f core.Env) error {
-	CreateAppLog(f.LogDir, f.LogTruncated, f.Standalone, s)
+	s.F = f
+	s.initLogger(f)
+	//CreateAppLog(f.LogDir, f.LogTruncated, f.Standalone, s)
 	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
-
 	s.event = &EventManager{App: s}
 	s.ManagedApps = f.ManagedApps
-	s.F = f
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
 	fctx := f.PresenceCtx()
@@ -206,11 +208,33 @@ func (c *AppManager) Write(data []byte) (int, error) {
 
 func (c *AppManager) WriteLevel(level zerolog.Level, data []byte) (int, error) {
 	fmt.Printf("LOG : %s %s\n", string(data), level.String())
-	return len(data), nil
+
+	return c.log.Write(data)
 }
 
-func (c *AppManager) Run(e *zerolog.Event, level zerolog.Level, msg string) {
+func (c *AppManager) initLogger(f core.Env) {
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	if f.Standalone {
+		CreateTestLog()
+		return
+	}
+	err := os.MkdirAll(f.LogDir+"/log", 0755)
+	if err != nil {
+		CreateTestLog()
+		return
+	}
+	opt := os.O_WRONLY | os.O_CREATE | os.O_APPEND
+	if f.LogTruncated {
+		opt = os.O_WRONLY | os.O_CREATE | os.O_TRUNC
+	}
+	file, err := os.OpenFile(f.LogDir+"/log/tarantula.log", opt, 0644)
+	if err != nil {
+		CreateTestLog()
+		return
+	}
+	c.log = zerolog.New(file)
+	core.AppLog = zerolog.New(zerolog.MultiLevelWriter(c)).With().Timestamp().Caller().Logger()
+	core.AppLog.Info().Msg("Initialized app log")
 
-	//fmt.Printf("log event %v\n", )
-	//fmt.Printf("log hook call %s %v\n", msg, level.String())
 }
