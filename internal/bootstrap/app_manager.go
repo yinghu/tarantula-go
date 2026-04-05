@@ -15,7 +15,6 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/concurrency"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type AppManager struct {
@@ -222,8 +221,8 @@ func (c *AppManager) WriteLevel(level zerolog.Level, data []byte) (int, error) {
 }
 
 func (c *AppManager) Run(e *zerolog.Event, level zerolog.Level, msg string) {
-	ts := timestamppb.Now()
-	e.Dict("time", zerolog.Dict().Int64("seconds", ts.Seconds).Int32("nanos", ts.Nanos))
+	//ts := timestamppb.Now()
+	//e.Dict("time", zerolog.Dict().Int64("seconds", ts.Seconds).Int32("nanos", ts.Nanos))
 	_, f, line, ok := runtime.Caller(3)
 	if !ok {
 		e.Str("source", "unknown")
@@ -234,7 +233,7 @@ func (c *AppManager) Run(e *zerolog.Event, level zerolog.Level, msg string) {
 
 func (c *AppManager) initLogger(f core.Env) {
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.TimeFieldFormat = time.RFC3339
 	if f.Standalone {
 		CreateTestLog()
 		return
@@ -254,7 +253,7 @@ func (c *AppManager) initLogger(f core.Env) {
 		return
 	}
 	c.log = zerolog.New(file)
-	core.AppLog = zerolog.New(zerolog.MultiLevelWriter(c)).Hook(c)
+	core.AppLog = zerolog.New(zerolog.MultiLevelWriter(c)).With().Timestamp().Logger().Hook(c)
 	core.AppLog.Info().Msg("Initialized app log")
 
 }
