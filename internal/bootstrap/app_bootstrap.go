@@ -109,7 +109,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 		var code int32 = 0
 		defer func() {
 			dur := time.Since(start)
-			re := protocol.RequestEvent{Path: r.URL.Path, Method: r.Method, Duration: uint32(dur), Code: uint32(code)}
+			re := protocol.RequestEvent{Path: r.URL.Path, Method: r.Method, Duration: uint64(dur.Milliseconds()), Code: uint32(code)}
 			re.DateTime = timestamppb.Now()
 			re.Source = r.RemoteAddr
 			rf := event.RequestEventFactory{}

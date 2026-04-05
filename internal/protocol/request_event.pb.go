@@ -26,7 +26,7 @@ type RequestEvent struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	Method        string                 `protobuf:"bytes,2,opt,name=method,proto3" json:"method,omitempty"`
-	Duration      uint32                 `protobuf:"fixed32,3,opt,name=duration,proto3" json:"duration,omitempty"`
+	Duration      uint64                 `protobuf:"fixed64,3,opt,name=duration,proto3" json:"duration,omitempty"`
 	DateTime      *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=dateTime,proto3" json:"dateTime,omitempty"`
 	Source        string                 `protobuf:"bytes,5,opt,name=source,proto3" json:"source,omitempty"`
 	Code          uint32                 `protobuf:"fixed32,6,opt,name=code,proto3" json:"code,omitempty"`
@@ -78,7 +78,7 @@ func (x *RequestEvent) GetMethod() string {
 	return ""
 }
 
-func (x *RequestEvent) GetDuration() uint32 {
+func (x *RequestEvent) GetDuration() uint64 {
 	if x != nil {
 		return x.Duration
 	}
@@ -114,7 +114,7 @@ const file_request_event_proto_rawDesc = "" +
 	"\fRequestEvent\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x16\n" +
 	"\x06method\x18\x02 \x01(\tR\x06method\x12\x1a\n" +
-	"\bduration\x18\x03 \x01(\aR\bduration\x126\n" +
+	"\bduration\x18\x03 \x01(\x06R\bduration\x126\n" +
 	"\bdateTime\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\bdateTime\x12\x16\n" +
 	"\x06source\x18\x05 \x01(\tR\x06source\x12\x12\n" +
 	"\x04code\x18\x06 \x01(\aR\x04codeBT\n" +
