@@ -1,12 +1,17 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/postoffice/clustering"
 	"github.com/rs/zerolog"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type PostofficeService struct {
@@ -47,6 +52,17 @@ func (s *PostofficeService) Shutdown() {
 }
 
 func (s *PostofficeService) Forward(level zerolog.Level, log []byte) {
-	fmt.Printf("post office forward log %s %s\n", level.String(), string(log))
-	//s.mm.DataServiceProvider.WTask<-
+	lf := event.LogEventFactory{}
+	e := protocol.LogEvent{}
+	err := protojson.Unmarshal(log, &e)
+	if err != nil {
+		e.Level = "error"
+		e.Message = err.Error()
+		e.Time = timestamppb.Now()
+		e.Source = "postoffice:64"
+	}
+	t, _ := lf.FromLogEvent(&e)
+	t.NodeId = s.NodeId()
+	t.Tag = s.Context()
+	s.mm.DataServiceProvider.Publish(context.Background(), t)
 }
