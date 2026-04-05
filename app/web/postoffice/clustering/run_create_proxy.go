@@ -45,7 +45,7 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request) (*protocol.Respon
 		}
 		break
 	}
-	core.AppLog.Printf("retry %s, %d %v", retry.Err, retry.Reties, retry.Suc)
+	core.AppLog.Debug().Msgf("retry %s, %d %v", retry.Err, retry.Reties, retry.Suc)
 	return &protocol.Response{Successful: retry.Suc, Message: retry.Err}, nil
 }
 
