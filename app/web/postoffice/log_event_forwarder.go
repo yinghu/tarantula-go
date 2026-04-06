@@ -13,6 +13,9 @@ type LogForwarder struct {
 }
 
 func (s *LogForwarder) Forward(level zerolog.Level, log []byte) {
+	if !s.App.started {
+		return
+	}
 	lf := event.LogEventFactory{}
 	e := protocol.LogEvent{}
 	err := protojson.Unmarshal(log, &e)
