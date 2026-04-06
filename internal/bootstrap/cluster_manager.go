@@ -306,7 +306,8 @@ func (c *ClusterManager) async() {
 				delete(c.subscriptions, sub.name)
 			}
 		case topic := <-c.cTopic:
-			go c.Publish(topic)
+			fmt.Printf("topic %v", topic)
+			//go c.Publish(topic)
 		}
 	}
 	core.AppLog.Warn().Msgf("cluster manager async task closed from remote %v", c.running)
@@ -314,6 +315,8 @@ func (c *ClusterManager) async() {
 	clear(c.subscriptions)
 	close(c.cInbound)
 	close(c.cSub)
+	close(c.cTopic)
+	close(c.wTask)
 }
 
 func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
