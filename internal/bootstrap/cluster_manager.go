@@ -43,7 +43,8 @@ type ClusterManager struct {
 	cSub     chan Sub
 	cInbound chan *protocol.Topic
 	cHost    string
-	wTask    chan<- core.Task
+	wTask    chan core.Task
+	cTopic   chan *protocol.Topic
 }
 
 func (c *ClusterManager) HashRing(r core.RingRequest) {
@@ -247,7 +248,11 @@ func (c *ClusterManager) connect(host string) error {
 	c.subscriptions = make(map[string]core.TopicListener)
 	c.cSub = make(chan Sub, SUB_CHAN_SIZE)
 	c.cInbound = make(chan *protocol.Topic, TOPIC_CHAN_SIZE)
+	c.cTopic = make(chan *protocol.Topic, 100)
+	tRun := core.ServiceCallOperator{}
+	c.wTask = make(chan core.Task, 100)
 	c.running = true
+	go tRun.RunTask()
 	go c.async()
 	go c.receive()
 	return nil
@@ -300,7 +305,8 @@ func (c *ClusterManager) async() {
 			case OPT_UNSUB:
 				delete(c.subscriptions, sub.name)
 			}
-
+		case topic := <-c.cTopic:
+			go c.Publish(topic)
 		}
 	}
 	core.AppLog.Warn().Msgf("cluster manager async task closed from remote %v", c.running)
@@ -328,5 +334,5 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 	t.Tag = c.App.Context()
 	id, _ := c.App.Sequence().Id()
 	t.Event.Id = uint64(id)
-	c.App.Forward(t)
+	c.cTopic <- t
 }

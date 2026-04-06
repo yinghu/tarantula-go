@@ -16,7 +16,6 @@ import (
 	"github.com/rs/zerolog"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/concurrency"
-	"google.golang.org/grpc"
 )
 
 type AppManager struct {
@@ -122,10 +121,10 @@ func (s *AppManager) Start(f core.Env) error {
 	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.Host)
 	s.cluster = &ClusterManager{App: s}
 	s.RegisterLogForwarder(s.cluster)
-	task := make(chan core.Task, 100)
-	s.cluster.wTask = task
-	tex := core.ServiceCallOperator{RTask: task, LocalConns: make(map[string]*grpc.ClientConn)}
-	go tex.RunTask()
+	//task := make(chan core.Task, 100)
+	//s.cluster.wTask = task
+	//tex := core.ServiceCallOperator{RTask: task, LocalConns: make(map[string]*grpc.ClientConn)}
+	//go tex.RunTask()
 	return s.cluster.connect(f.Host)
 }
 
@@ -147,13 +146,7 @@ func (s *AppManager) Service() TarantulaService {
 }
 
 func (s *AppManager) Forward(topic *protocol.Topic) {
-	fmt.Printf("topic forward process %v\n", topic)
-	s.cluster.Publish(topic)
-	//s.cluster.wTask <- core.Task{Target: s.cluster.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
-
-	//return nil
-	//}}
-
+	s.cluster.cTopic <- topic
 }
 
 func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
