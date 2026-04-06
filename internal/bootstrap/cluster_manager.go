@@ -306,7 +306,7 @@ func (c *ClusterManager) async() {
 				delete(c.subscriptions, sub.name)
 			}
 		case topic := <-c.cTopic:
-			fmt.Printf("topic %v", topic)
+			fmt.Printf("TOPPIC %v", topic)
 			//go c.Publish(topic)
 		}
 	}
