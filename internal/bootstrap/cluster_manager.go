@@ -337,5 +337,5 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 	t.Tag = c.App.Context()
 	id, _ := c.App.Sequence().Id()
 	t.Event.Id = uint64(id)
-	c.cTopic <- t
+	//c.cTopic <- t
 }
