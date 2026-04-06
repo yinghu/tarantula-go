@@ -163,11 +163,11 @@ func (c *ClusterManager) Publish(e *protocol.Topic) error {
 	}
 	c.wTask <- core.Task{Target: c.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
 		dsp := protocol.NewPostofficeServiceClient(tcp)
-		resp, err := dsp.Publish(context.Background(), e)
+		_, err := dsp.Publish(context.Background(), e)
 		if err != nil {
 			return err
 		}
-		core.AppLog.Debug().Msgf("topic publish %v", resp)
+		//core.AppLog.Debug().Msgf("topic publish %v", resp)
 		return nil
 	}}
 	return nil

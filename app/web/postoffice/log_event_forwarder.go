@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
 	"github.com/rs/zerolog"
@@ -9,7 +11,8 @@ import (
 )
 
 type LogForwarder struct {
-	App *PostofficeService
+	App    *PostofficeService
+	rTopoc <-chan *protocol.Topic
 }
 
 func (s *LogForwarder) Forward(level zerolog.Level, log []byte) {
@@ -31,4 +34,10 @@ func (s *LogForwarder) Forward(level zerolog.Level, log []byte) {
 	t.Tag = s.App.Context()
 	t.Event.Id = uint64(id)
 	s.App.Forward(t)
+}
+
+func (s LogForwarder) runTopic() {
+	for topic := range s.rTopoc {
+		s.App.mm.Mll.Publish(context.Background(), topic)
+	}
 }

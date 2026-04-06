@@ -148,6 +148,12 @@ func (s *AppManager) Service() TarantulaService {
 
 func (s *AppManager) Forward(topic *protocol.Topic) {
 	fmt.Printf("topic forward process %v\n", topic)
+	s.cluster.Publish(topic)
+	//s.cluster.wTask <- core.Task{Target: s.cluster.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
+
+	//return nil
+	//}}
+
 }
 
 func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
@@ -225,8 +231,8 @@ func (c *AppManager) Write(data []byte) (int, error) {
 
 func (c *AppManager) WriteLevel(level zerolog.Level, data []byte) (int, error) {
 	if c.forward != nil {
-		cp := append([]byte{}, data...)
-		c.forward.Forward(level, cp)
+		//cp := append([]byte{}, data...)
+		//c.forward.Forward(level, cp)
 	}
 	return c.log.Write(data)
 }

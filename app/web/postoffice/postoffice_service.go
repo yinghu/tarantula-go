@@ -19,6 +19,7 @@ type PostofficeService struct {
 	bootstrap.AppManager
 	mm      *clustering.MemberlistManager
 	started bool
+	wTopic  chan<- *protocol.Topic
 }
 
 func (s *PostofficeService) Config() string {
@@ -28,10 +29,11 @@ func (s *PostofficeService) Config() string {
 func (s *PostofficeService) Start(env core.Env) error {
 	env.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	env.IsClusterMember = true
-	fwd := LogForwarder{App: s}
+	cTopic := make(chan *protocol.Topic, 100)
+	fwd := LogForwarder{App: s, rTopoc: cTopic}
+	s.wTopic = cTopic
 	s.RegisterLogForwarder(&fwd)
 	s.AppManager.Start(env)
-
 	s.createSchema()
 
 	m := clustering.MemberlistManager{StoreDir: fmt.Sprintf("%s/%s", env.HomeDir, env.GroupName), Seq: s.Sequence()}
@@ -45,6 +47,7 @@ func (s *PostofficeService) Start(env core.Env) error {
 	s.mm = &m
 	s.mm.DWait.Wait()
 	s.started = true
+	go fwd.runTopic()
 	core.AppLog.Debug().Msgf("postoffice service started %s %s", env.HttpBinding, env.HomeDir)
 	return nil
 }
@@ -57,5 +60,5 @@ func (s *PostofficeService) Shutdown() {
 }
 
 func (s *PostofficeService) Forward(topic *protocol.Topic) {
-	fmt.Printf("postoffice topic forward process %v\n", topic)
+	s.wTopic <- topic
 }
