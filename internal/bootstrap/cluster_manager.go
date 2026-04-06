@@ -251,7 +251,7 @@ func (c *ClusterManager) connect(host string) error {
 	c.cTopic = make(chan *protocol.Topic, 100)
 
 	c.wTask = make(chan core.Task, 100)
-	tRun := core.ServiceCallOperator{RTask: c.wTask}
+	tRun := core.ServiceCallOperator{RTask: c.wTask, LocalConns: make(map[string]*grpc.ClientConn)}
 	c.running = true
 	go tRun.RunTask()
 	go c.async()
@@ -308,7 +308,7 @@ func (c *ClusterManager) async() {
 			}
 		case topic := <-c.cTopic:
 			fmt.Printf("TOPPIC %v", topic)
-			//go c.Publish(topic)
+			go c.Publish(topic)
 		}
 	}
 	core.AppLog.Warn().Msgf("cluster manager async task closed from remote %v", c.running)
