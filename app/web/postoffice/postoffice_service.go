@@ -59,6 +59,9 @@ func (s *PostofficeService) Shutdown() {
 }
 
 func (s *PostofficeService) Forward(level zerolog.Level, log []byte) {
+	if !s.started {
+		return
+	}
 	lf := event.LogEventFactory{}
 	e := protocol.LogEvent{}
 	err := protojson.Unmarshal(log, &e)
