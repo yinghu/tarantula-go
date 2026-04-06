@@ -17,7 +17,7 @@ func (s *AdminHashRingEndpoint) AccessControl() int32 {
 
 func (s *AdminHashRingEndpoint) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	rq := make(chan []core.Node, 1)
+	rq := make(chan []core.Node, 3)
 	defer close(rq)
 	s.Cluster().HashRing(core.RingRequest{Async: rq})
 	n := <-rq
