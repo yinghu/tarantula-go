@@ -121,7 +121,7 @@ func (s *AppManager) Start(f core.Env) error {
 	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.Host)
 	s.cluster = &ClusterManager{App: s}
 	s.RegisterLogForwarder(s.cluster)
-	task := make(chan core.Task, 10)
+	task := make(chan core.Task, 100)
 	s.cluster.wTask = task
 	tex := core.ServiceCallOperator{RTask: task, LocalConns: make(map[string]*grpc.ClientConn)}
 	go tex.RunTask()
