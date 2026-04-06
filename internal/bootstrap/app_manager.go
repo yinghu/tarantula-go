@@ -146,9 +146,9 @@ func (s *AppManager) Service() TarantulaService {
 }
 
 func (s *AppManager) Forward(topic *protocol.Topic) {
-	fmt.Printf("FFF topic %v\n", len(s.cluster.cTopic))
-	s.cluster.cTopic <- topic
-	fmt.Printf("FFForwarding topic %v\n", topic)
+	//fmt.Printf("FFF topic %v\n", len(s.cluster.cTopic))
+	//s.cluster.cTopic <- topic
+	//fmt.Printf("FFForwarding topic %v\n", topic)
 }
 
 func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
