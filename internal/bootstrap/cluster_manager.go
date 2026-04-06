@@ -249,8 +249,9 @@ func (c *ClusterManager) connect(host string) error {
 	c.cSub = make(chan Sub, SUB_CHAN_SIZE)
 	c.cInbound = make(chan *protocol.Topic, TOPIC_CHAN_SIZE)
 	c.cTopic = make(chan *protocol.Topic, 100)
-	tRun := core.ServiceCallOperator{}
+
 	c.wTask = make(chan core.Task, 100)
+	tRun := core.ServiceCallOperator{RTask: c.wTask}
 	c.running = true
 	go tRun.RunTask()
 	go c.async()
@@ -337,5 +338,5 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 	t.Tag = c.App.Context()
 	id, _ := c.App.Sequence().Id()
 	t.Event.Id = uint64(id)
-	//c.cTopic <- t
+	c.cTopic <- t
 }
