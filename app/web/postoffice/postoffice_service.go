@@ -1,9 +1,7 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -23,7 +21,6 @@ type LogData struct {
 type PostofficeService struct {
 	bootstrap.AppManager
 	mm      *clustering.MemberlistManager
-	mLog    chan LogData
 	started bool
 }
 
@@ -34,7 +31,6 @@ func (s *PostofficeService) Config() string {
 func (s *PostofficeService) Start(env core.Env) error {
 	env.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	env.IsClusterMember = true
-	s.mLog = make(chan LogData, 100)
 	s.RegisterLogForwarder(s)
 	s.AppManager.Start(env)
 
@@ -51,7 +47,6 @@ func (s *PostofficeService) Start(env core.Env) error {
 	s.mm = &m
 	s.started = true
 	s.mm.DWait.Wait()
-	go s.runForward()
 	core.AppLog.Debug().Msgf("postoffice service started %s %s", env.HttpBinding, env.HomeDir)
 	return nil
 }
@@ -64,29 +59,19 @@ func (s *PostofficeService) Shutdown() {
 }
 
 func (s *PostofficeService) Forward(level zerolog.Level, log []byte) {
-	s.mLog <- LogData{level: level, log: log}
-}
-
-func (s *PostofficeService) runForward() {
-	time.Sleep(3 * time.Second)
-	for s.started {
-		for data := range s.mLog {
-			lf := event.LogEventFactory{}
-			e := protocol.LogEvent{}
-			err := protojson.Unmarshal(data.log, &e)
-			if err != nil {
-				e.Level = "error"
-				e.Message = err.Error()
-				e.Time = timestamppb.Now()
-				e.Source = "postoffice:64"
-			}
-			id, _ := s.Sequence().Id()
-			t, _ := lf.FromLogEvent(&e)
-			t.NodeId = s.NodeId()
-			t.Tag = s.Context()
-			t.Event.Id = uint64(id)
-			s.mm.DataServiceProvider.Publish(context.Background(), t)
-		}
+	lf := event.LogEventFactory{}
+	e := protocol.LogEvent{}
+	err := protojson.Unmarshal(log, &e)
+	if err != nil {
+		e.Level = "error"
+		e.Message = err.Error()
+		e.Time = timestamppb.Now()
+		e.Source = "postoffice:64"
 	}
-	close(s.mLog)
+	id, _ := s.Sequence().Id()
+	t, _ := lf.FromLogEvent(&e)
+	t.NodeId = s.NodeId()
+	t.Tag = s.Context()
+	t.Event.Id = uint64(id)
+	s.AppManager.Forward(t)
 }

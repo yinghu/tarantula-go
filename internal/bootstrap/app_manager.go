@@ -11,6 +11,7 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	"github.com/rs/zerolog"
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -143,6 +144,10 @@ func (s *AppManager) Context() string {
 
 func (s *AppManager) Service() TarantulaService {
 	return s
+}
+
+func (s *AppManager) Forward(topic *protocol.Topic) {
+	fmt.Printf("topic forward process %v\n", topic)
 }
 
 func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {

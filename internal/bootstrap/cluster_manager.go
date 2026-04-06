@@ -314,27 +314,19 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 	if !c.running {
 		return
 	}
-	c.wTask <- core.Task{Target: c.cHost, Execute: func(tcp *grpc.ClientConn, opt int) error {
-		e := protocol.LogEvent{}
-		err := protojson.Unmarshal(log, &e)
-		if err != nil {
-			//return nil
-			e.Level = "error"
-			e.Message = err.Error()
-			e.Time = timestamppb.Now()
-			e.Source = "forwarder:325"
-		}
-		tf := event.LogEventFactory{}
-		t, err := tf.FromLogEvent(&e)
-		t.NodeId = c.App.NodeId()
-		t.Tag = c.App.Context()
-		id, _ := c.App.Sequence().Id()
-		t.Event.Id = uint64(id)
-		dsp := protocol.NewPostofficeServiceClient(tcp)
-		_, err = dsp.Publish(context.Background(), t)
-		if err != nil {
-			return err
-		}
-		return nil
-	}}
+	e := protocol.LogEvent{}
+	err := protojson.Unmarshal(log, &e)
+	if err != nil {
+		e.Level = "error"
+		e.Message = err.Error()
+		e.Time = timestamppb.Now()
+		e.Source = "forwarder:325"
+	}
+	tf := event.LogEventFactory{}
+	t, err := tf.FromLogEvent(&e)
+	t.NodeId = c.App.NodeId()
+	t.Tag = c.App.Context()
+	id, _ := c.App.Sequence().Id()
+	t.Event.Id = uint64(id)
+	c.App.Forward(t)
 }
