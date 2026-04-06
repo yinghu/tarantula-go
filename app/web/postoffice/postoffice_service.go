@@ -5,12 +5,9 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/postoffice/clustering"
 	"github.com/rs/zerolog"
-	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type LogData struct {
@@ -31,7 +28,8 @@ func (s *PostofficeService) Config() string {
 func (s *PostofficeService) Start(env core.Env) error {
 	env.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	env.IsClusterMember = true
-	s.RegisterLogForwarder(s)
+	fwd := LogForwarder{App: s}
+	s.RegisterLogForwarder(&fwd)
 	s.AppManager.Start(env)
 
 	s.createSchema()
@@ -58,23 +56,6 @@ func (s *PostofficeService) Shutdown() {
 	s.mm.ShutdownHook()
 }
 
-func (s *PostofficeService) Forward(level zerolog.Level, log []byte) {
-	if !s.started {
-		return
-	}
-	lf := event.LogEventFactory{}
-	e := protocol.LogEvent{}
-	err := protojson.Unmarshal(log, &e)
-	if err != nil {
-		e.Level = "error"
-		e.Message = err.Error()
-		e.Time = timestamppb.Now()
-		e.Source = "postoffice:64"
-	}
-	id, _ := s.Sequence().Id()
-	t, _ := lf.FromLogEvent(&e)
-	t.NodeId = s.NodeId()
-	t.Tag = s.Context()
-	t.Event.Id = uint64(id)
-	s.AppManager.Forward(t)
+func (s *PostofficeService) Forward(topic *protocol.Topic) {
+	fmt.Printf("postoffice topic forward process %v\n", topic)
 }
