@@ -42,7 +42,7 @@ type DataServiceProvider struct {
 	DRequest      chan TopicRequest
 
 	//service task caller
-	WTask chan<- core.Task
+	//WTask chan<- core.Task
 }
 
 func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
@@ -194,10 +194,6 @@ func (c *DataServiceProvider) Start(dir string) {
 	for n := range SET_OPERATOR_NUM {
 		go c.runSetData(n)
 	}
-	tak := make(chan core.Task, NODE_EVENT_BUFFER_SIZE)
-	c.WTask = tak
-	sc := core.ServiceCallOperator{RTask: tak, LocalConns: make(map[string]*grpc.ClientConn)}
-	go sc.RunTask()
 	tcp, err := net.Listen("tcp", fmt.Sprintf(":%d", core.RPC_PORT))
 	if err != nil {
 		panic(err)

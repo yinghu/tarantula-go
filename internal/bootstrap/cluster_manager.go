@@ -233,10 +233,7 @@ func (c *ClusterManager) disconnect() error {
 func (c *ClusterManager) connect(host string) error {
 	c.cHost = fmt.Sprintf("%s:%d", host, core.RPC_PORT)
 	c.cPool = core.RpcConnPool{Target: c.cHost}
-	err := c.cPool.Start()
-	if err != nil {
-		panic(fmt.Sprintf("target [%s] not available", c.cHost))
-	}
+	c.cPool.Start()
 	c.subscriptions = make(map[string]core.TopicListener)
 	c.cSub = make(chan Sub, SUB_CHAN_SIZE)
 	c.cInbound = make(chan *protocol.Topic, TOPIC_CHAN_SIZE)

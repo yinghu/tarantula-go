@@ -23,6 +23,7 @@ func (m *MemberHashRing) vNode(node core.Node, weight int) core.Node {
 
 func (m *MemberHashRing) OnAdd(node core.Node) {
 	pool := core.RpcConnPool{Target: node.RpcEndpoint}
+	pool.Start()
 	added := make([]core.Node, 0, m.weight)
 	for w := range m.weight {
 		v := m.vNode(node, w)

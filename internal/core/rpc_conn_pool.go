@@ -48,7 +48,7 @@ func (p *RpcConnPool) connect(target string) (*grpc.ClientConn, error) {
 	}
 }
 
-func (p *RpcConnPool) Start() error {
+func (p *RpcConnPool) Start() {
 	p.Lock()
 	defer p.Unlock()
 	if p.MinSize <= 0 {
@@ -58,16 +58,15 @@ func (p *RpcConnPool) Start() error {
 		p.MaxSize = MAX_POOL_SIZE
 	}
 	p.pool = make(map[string]*RpcConn)
-	for i := range p.MinSize {
-		cx, err := p.connect(p.Target)
-		if err != nil {
-			return err
-		}
-		ckey := fmt.Sprintf("%s_%d", p.Target, i)
-		p.pool[ckey] = &RpcConn{Conn: cx, Seq: i}
-	}
+	//for i := range p.MinSize {
+	//cx, err := p.connect(p.Target)
+	//if err != nil {
+	//return err
+	//}
+	//ckey := fmt.Sprintf("%s_%d", p.Target, i)
+	//p.pool[ckey] = &RpcConn{Conn: cx, Seq: i}
+	//}
 	p.index = 0
-	return nil
 }
 
 func (p *RpcConnPool) Conn() (*RpcConn, error) {

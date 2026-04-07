@@ -2,11 +2,9 @@ package clustering
 
 import (
 	context "context"
-	"fmt"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
-	"google.golang.org/grpc"
 )
 
 func (c *DataServiceProvider) runCreate(set *protocol.Request) (*protocol.Response, error) {
@@ -50,19 +48,15 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request) (*protocol.Respon
 }
 
 func (m *DataServiceProvider) clientCreate(target *core.Node, request *protocol.Request, ch chan *protocol.Response) {
-	task := core.Task{Target: target.RpcEndpoint, Execute: func(tcp *grpc.ClientConn, opt int) error {
-		if opt == core.NO_TCP_CONNECT {
-			ch <- &protocol.Response{Successful: false, Message: "no tcp connect"}
-			return fmt.Errorf("no tcp connect")
-		}
-		dsp := protocol.NewDataServiceClient(tcp)
-		resp, err := dsp.Create(context.Background(), request)
-		if err != nil {
-			ch <- &protocol.Response{Successful: false, Message: err.Error()}
-			return err
-		}
-		ch <- resp
-		return nil
-	}}
-	m.WTask <- task
+	conn, err := target.CPool.Conn()
+	if err != nil {
+		ch <- &protocol.Response{Successful: false, Message: "no tcp connect"}
+	}
+	dsp := protocol.NewDataServiceClient(conn.Conn)
+	resp, err := dsp.Create(context.Background(), request)
+	if err != nil {
+		ch <- &protocol.Response{Successful: false, Message: err.Error()}
+		return
+	}
+	ch <- resp
 }

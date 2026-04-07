@@ -5,7 +5,6 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
-	"google.golang.org/grpc"
 )
 
 func (c *DataServiceProvider) runDelete(set *protocol.Request) (*protocol.Response, error) {
@@ -37,11 +36,12 @@ func (c *DataServiceProvider) runDelete(set *protocol.Request) (*protocol.Respon
 }
 
 func (m *DataServiceProvider) clientDelete(target *core.Node, request *protocol.Request, ch chan *protocol.Response) {
-	task := core.Task{Target: target.RpcEndpoint, Execute: func(tcp *grpc.ClientConn, opt int) error {
-		dsp := protocol.NewDataServiceClient(tcp)
-		resp, _ := dsp.Delete(context.Background(), request)
-		ch <- resp
-		return nil
-	}}
-	m.WTask <- task
+	conn, err := target.CPool.Conn()
+	if err != nil {
+		ch <- &protocol.Response{Successful: false, Message: err.Error()}
+		return
+	}
+	dsp := protocol.NewDataServiceClient(conn.Conn)
+	resp, _ := dsp.Delete(context.Background(), request)
+	ch <- resp
 }
