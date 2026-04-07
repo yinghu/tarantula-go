@@ -60,5 +60,5 @@ func (s *PostofficeService) Shutdown() {
 }
 
 func (s *PostofficeService) Forward(topic *protocol.Topic) {
-	s.wTopic <- topic
+	//s.wTopic <- topic
 }
