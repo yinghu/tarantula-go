@@ -44,9 +44,8 @@ func (p *RpcConnPool) connect(target string) (*grpc.ClientConn, error) {
 			}
 			return tcp, err
 		}
-		break
+		return tcp, nil
 	}
-	return nil, fmt.Errorf("should not be here")
 }
 
 func (p *RpcConnPool) Start() error {
