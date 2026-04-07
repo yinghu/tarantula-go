@@ -32,8 +32,7 @@ type Sub struct {
 }
 
 type ClusterManager struct {
-	App *AppManager
-	//rpc     *grpc.ClientConn
+	App     *AppManager
 	running bool
 
 	subscriptions map[string]core.TopicListener
@@ -41,9 +40,8 @@ type ClusterManager struct {
 	cSub     chan Sub
 	cInbound chan *protocol.Topic
 	cHost    string
-	//wTask    chan core.Task
-	cTopic chan *protocol.Topic
-	cPool  RpcConnPool
+	cTopic   chan *protocol.Topic
+	cPool    core.RpcConnPool
 }
 
 func (c *ClusterManager) HashRing(r core.RingRequest) {
@@ -234,7 +232,7 @@ func (c *ClusterManager) disconnect() error {
 
 func (c *ClusterManager) connect(host string) error {
 	c.cHost = fmt.Sprintf("%s:%d", host, core.RPC_PORT)
-	c.cPool = RpcConnPool{Target: c.cHost}
+	c.cPool = core.RpcConnPool{Target: c.cHost}
 	err := c.cPool.Start()
 	if err != nil {
 		panic(fmt.Sprintf("target [%s] not available", c.cHost))

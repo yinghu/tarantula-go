@@ -41,6 +41,8 @@ type Node struct {
 	RpcEndpoint  string `json:"rpc,omitempty"`
 	HttpEndpoint string `json:"http,omitempty"`
 	TcpEndpoint  string `json:"tcp,omitempty"`
+
+	CPool *RpcConnPool `json:"-"`
 }
 type KVLoad func(k, v string) bool
 

@@ -1,4 +1,4 @@
-package bootstrap
+package core
 
 import (
 	"context"
@@ -6,15 +6,15 @@ import (
 	"sync"
 	"time"
 
-	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
-	MIN_POOL_SIZE int = 1
-	MAX_POOL_SIZE int = 1
+	MIN_POOL_SIZE       int = 1
+	MAX_POOL_SIZE       int = 1
+	RPC_CONNECT_RETRIES int = 3
 )
 
 type RpcConn struct {
@@ -38,7 +38,7 @@ func (p *RpcConnPool) connect(target string) (*grpc.ClientConn, error) {
 		if err != nil {
 			retries--
 			if retries > 0 {
-				core.AppLog.Warn().Msgf("retrying to connect gprc %s with retried times %d", err.Error(), retries)
+				AppLog.Warn().Msgf("retrying to connect gprc %s with retried times %d", err.Error(), retries)
 				time.Sleep(3 * time.Second)
 				continue
 			}
@@ -94,7 +94,7 @@ func (p *RpcConnPool) Release(t *protocol.Topic) {
 		if err != nil {
 			continue
 		}
-		core.AppLog.Debug().Msgf("disconnecting topic %v", resp)
+		AppLog.Debug().Msgf("disconnecting topic %v", resp)
 		c.Conn.Close()
 	}
 	clear(p.pool)
