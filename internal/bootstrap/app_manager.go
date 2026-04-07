@@ -121,10 +121,6 @@ func (s *AppManager) Start(f core.Env) error {
 	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.Host)
 	s.cluster = &ClusterManager{App: s}
 	s.RegisterLogForwarder(s.cluster)
-	//task := make(chan core.Task, 100)
-	//s.cluster.wTask = task
-	//tex := core.ServiceCallOperator{RTask: task, LocalConns: make(map[string]*grpc.ClientConn)}
-	//go tex.RunTask()
 	return s.cluster.connect(f.Host)
 }
 
@@ -146,9 +142,7 @@ func (s *AppManager) Service() TarantulaService {
 }
 
 func (s *AppManager) Forward(topic *protocol.Topic) {
-	fmt.Printf("FFF topic %v\n", len(s.cluster.cTopic))
-	//s.cluster.cTopic <- topic
-	fmt.Printf("FFForwarding topic %v\n", topic)
+	s.cluster.cTopic <- topic
 }
 
 func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
