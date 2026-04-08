@@ -41,12 +41,11 @@ type MemberListListener struct {
 	*memberlist.Memberlist
 	*MemberHashRing
 	*DataServiceProvider
-	meta []byte
+	//meta []byte
 }
 
 func (m *MemberListListener) toNode(e *memberlist.Node) core.Node {
 	parts := strings.Split(e.Address(), ":")
-	core.AppLog.Debug().Msgf("META %s", string(e.Meta))
 	return core.Node{Name: e.Name, Meta: string(e.Meta), IP: e.Address(), RpcEndpoint: fmt.Sprintf("%s:%d", parts[0], core.RPC_PORT), State: int(e.State)}
 }
 
@@ -58,6 +57,7 @@ func (m *MemberListListener) Listen() {
 		case e := <-m.MEvent:
 			switch e.Event {
 			case memberlist.NodeJoin:
+				core.AppLog.Debug().Msgf("META %s", string(e.Node.Meta))
 				m.OnAdd(m.toNode(e.Node))
 			case memberlist.NodeLeave:
 				if (m.LocalNode().Name) != e.Node.Name {
@@ -129,7 +129,7 @@ func (m *MemberListListener) NodeMeta(limit int) []byte {
 	//if m.balancing {
 	//return fmt.Append([]byte{}, "pending")
 	//}
-	return m.meta //nil //fmt.Appendf([]byte{}, "ready")
+	return nil //fmt.Appendf([]byte{}, "ready")
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
