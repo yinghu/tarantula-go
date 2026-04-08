@@ -56,37 +56,16 @@ func (c *ClusterManager) HashRing(r core.RingRequest) (grpc.ServerStreamingClien
 	return dsp.HashRing(context.Background(), &protocol.Request{Prefix: 0})
 }
 
-func (c *ClusterManager) KeyRing(r core.RingRequest) {
+func (c *ClusterManager) KeyRing(r core.RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error) {
 	if !c.running {
-		r.Async <- []core.Node{}
-		return
+		return nil, fmt.Errorf("cluster not started")
 	}
 	conn, err := c.cPool.Conn()
 	if err != nil {
-		r.Async <- []core.Node{}
-		return
+		return nil, err
 	}
-
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
-	stream, err := dsp.KeyRing(context.Background(), &protocol.Request{Prefix: r.Token})
-	if err != nil {
-		r.Async <- []core.Node{}
-		return
-	}
-	ring := make([]core.Node, 0)
-	for {
-		data, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
-			break
-		}
-		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
-	}
-	r.Async <- ring
-
+	return dsp.KeyRing(context.Background(), &protocol.Request{Prefix: r.Token})
 }
 
 func (c *ClusterManager) RingToken(key []byte) uint32 {
