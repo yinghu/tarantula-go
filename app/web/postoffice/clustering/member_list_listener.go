@@ -57,13 +57,14 @@ func (m *MemberListListener) Listen() {
 		case e := <-m.MEvent:
 			switch e.Event {
 			case memberlist.NodeJoin:
-				core.AppLog.Debug().Msgf("META %s", string(e.Node.Meta))
+				//core.AppLog.Debug().Msgf("META %s", string(e.Node.Meta))
 				m.OnAdd(m.toNode(e.Node))
 			case memberlist.NodeLeave:
 				if (m.LocalNode().Name) != e.Node.Name {
 					m.OnRemove(m.toNode(e.Node))
 				}
 			case memberlist.NodeUpdate:
+				core.AppLog.Debug().Msgf("META %s", string(e.Node.Meta))
 				m.OnUpdate(m.toNode(e.Node))
 			}
 		case mg := <-m.MMerge:
