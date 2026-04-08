@@ -39,7 +39,7 @@ func (c *DataServiceProvider) runPublish(topic *protocol.Topic) (*protocol.Respo
 	return &protocol.Response{Successful: true, Message: "topic delivered"}, nil
 }
 func (m *DataServiceProvider) clientPublish(target *core.Subscription, request *protocol.Topic, async chan *protocol.Response) {
-	//core.AppLog.Debug().Msgf("SUB POOL %s", target.CPool.Target)
+	core.AppLog.Debug().Msgf("SUB POOL %s", target.CPool.Target)
 	tcp, err := grpc.NewClient(target.Endpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		async <- &protocol.Response{Successful: false, Message: err.Error()}
