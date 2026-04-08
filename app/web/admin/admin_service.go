@@ -80,6 +80,6 @@ func (s *AdminService) Start(f core.Env) error {
 	http.Handle("/admin/cluster/delete/{key}", bootstrap.Logging(&AdminClusterDelete{AdminService: s}))
 	http.Handle("/admin/cluster/reset", bootstrap.Logging(&AdminClusterReset{AdminService: s}))
 
-	fmt.Printf("Admin service started %s\n", f.HttpBinding)
+	core.AppLog.Info().Msgf("Admin service started %s\n", f.HttpBinding)
 	return nil
 }
