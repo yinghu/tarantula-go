@@ -78,6 +78,8 @@ type Subscription struct {
 	Topic    string `json:"topic"`
 	Endpoint string `json:"endpoint"`
 	Deleting bool   `json:"deleting"`
+
+	CPool *RpcConnPool `json:"-"`
 }
 
 func (s *Subscription) Key() string {

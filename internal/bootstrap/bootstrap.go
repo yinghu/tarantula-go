@@ -5,7 +5,6 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
-	"gameclustering.com/internal/protocol"
 	"github.com/rs/zerolog"
 )
 
@@ -59,7 +58,7 @@ type TarantulaApp interface {
 	AccessControl() int32
 	NodeId() string
 	Context() string
-	Forward(topic *protocol.Topic)
+
 	Request(sesion core.OnSession, w http.ResponseWriter, r *http.Request)
 }
 

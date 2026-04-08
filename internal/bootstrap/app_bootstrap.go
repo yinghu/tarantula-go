@@ -126,12 +126,6 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 				return
 			}
 			t.Event.Id = uint64(id)
-			s.Forward(t)
-			//fmt.Printf("send out %s\n", re.Path)
-			//ms := core.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.NodeId(), ReqId: stub, ReqCode: code}
-			//s.Metrics().WebRequest(ms)
-			//core.HTTP_REQUEST_METRICS.WithLabelValues(r.URL.Path).Observe(dur.Seconds())
-
 		}()
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "*")

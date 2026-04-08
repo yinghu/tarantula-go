@@ -35,7 +35,6 @@ func (c *DataServiceProvider) runPublish(topic *protocol.Topic) (*protocol.Respo
 	for _, sub := range subs {
 		c.clientPublish(&sub, topic, rc)
 		resp = <-rc
-		core.AppLog.Debug().Msgf("publish %v", resp)
 	}
 	return &protocol.Response{Successful: true, Message: "topic delivered"}, nil
 }

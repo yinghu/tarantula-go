@@ -29,10 +29,6 @@ func (s *PostofficeService) Config() string {
 func (s *PostofficeService) Start(env core.Env) error {
 	env.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	env.IsClusterMember = true
-	cTopic := make(chan *protocol.Topic, 100)
-	fwd := LogForwarder{App: s, rTopoc: cTopic}
-	s.wTopic = cTopic
-	s.RegisterLogForwarder(&fwd)
 	s.AppManager.Start(env)
 	s.createSchema()
 
@@ -47,7 +43,6 @@ func (s *PostofficeService) Start(env core.Env) error {
 	s.mm = &m
 	s.mm.DWait.Wait()
 	s.started = true
-	go fwd.runTopic()
 	core.AppLog.Debug().Msgf("postoffice service started %s %s", env.HttpBinding, env.HomeDir)
 	return nil
 }
@@ -57,8 +52,4 @@ func (s *PostofficeService) Shutdown() {
 	core.AppLog.Debug().Msg("postoffice service shutting down ...")
 	s.AppManager.Shutdown()
 	s.mm.ShutdownHook()
-}
-
-func (s *PostofficeService) Forward(topic *protocol.Topic) {
-	//s.wTopic <- topic
 }

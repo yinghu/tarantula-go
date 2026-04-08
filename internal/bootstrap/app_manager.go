@@ -142,7 +142,7 @@ func (s *AppManager) Service() TarantulaService {
 }
 
 func (s *AppManager) Forward(topic *protocol.Topic) {
-	s.cluster.cTopic <- topic
+
 }
 
 func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {

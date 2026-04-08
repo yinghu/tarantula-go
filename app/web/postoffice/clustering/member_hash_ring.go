@@ -49,6 +49,7 @@ func (m *MemberHashRing) OnRemove(node core.Node) {
 	})
 	slices.SortFunc(m.nodes, cmp)
 	m.nodeNum--
+	//removed[0].CPool.Release()
 	m.WNode <- RingUpdate{State: NODE_STATE_DEAD, Nodes: removed}
 }
 

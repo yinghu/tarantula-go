@@ -40,7 +40,6 @@ type ClusterManager struct {
 	cSub     chan Sub
 	cInbound chan *protocol.Topic
 	cHost    string
-	cTopic   chan *protocol.Topic
 	cPool    core.RpcConnPool
 }
 
@@ -177,7 +176,6 @@ func (c *ClusterManager) Publish(e *protocol.Topic) error {
 	if err != nil {
 		return err
 	}
-	//core.AppLog.Debug().Msgf("topic publish %v", resp)
 	return nil
 
 }
@@ -237,8 +235,6 @@ func (c *ClusterManager) connect(host string) error {
 	c.subscriptions = make(map[string]core.TopicListener)
 	c.cSub = make(chan Sub, SUB_CHAN_SIZE)
 	c.cInbound = make(chan *protocol.Topic, TOPIC_CHAN_SIZE)
-	c.cTopic = make(chan *protocol.Topic, 100)
-
 	c.running = true
 	go c.async()
 	go c.receive()
@@ -296,15 +292,12 @@ func (c *ClusterManager) async() {
 			case OPT_UNSUB:
 				delete(c.subscriptions, sub.name)
 			}
-		case topic := <-c.cTopic:
-			go c.Publish(topic)
 		}
 	}
 	core.AppLog.Warn().Msgf("cluster manager async task closed from remote %v", c.running)
 	clear(c.subscriptions)
 	close(c.cInbound)
 	close(c.cSub)
-	close(c.cTopic)
 }
 
 func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
@@ -325,5 +318,4 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 	t.Tag = c.App.Context()
 	id, _ := c.App.Sequence().Id()
 	t.Event.Id = uint64(id)
-	c.cTopic <- t
 }
