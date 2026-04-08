@@ -3,18 +3,18 @@ package core
 import "time"
 
 type QueryObj struct {
-	Id        uint32     `json:"-"`
-	FactoryId uint32     `json:"-"`
-	ClassId   uint32     `json:"-"`
-	NodeId    string     `json:"NodeId"`
-	Tag       string     `json:"Tag"`
-	Topic     string     `json:"Topic"`
-	Limit     int32      `json:"Limit"`
-	Offset    int32      `json:"Offset"`
-	StartTime time.Time  `json:"StartTime"`
-	EndTime   time.Time  `json:"EndTime"`
-	Cc        chan Chunk `json:"-"`
-	Ee        Event      `json:"-"`
+	Id        uint32    `json:"-"`
+	FactoryId uint32    `json:"-"`
+	ClassId   uint32    `json:"-"`
+	NodeId    string    `json:"NodeId"`
+	Tag       string    `json:"Tag"`
+	Topic     string    `json:"Topic"`
+	Limit     int32     `json:"Limit"`
+	Offset    int32     `json:"Offset"`
+	StartTime time.Time `json:"StartTime"`
+	EndTime   time.Time `json:"EndTime"`
+	//Cc        chan Chunk `json:"-"`
+	Ee Event `json:"-"`
 }
 
 func (q *QueryObj) QRead(buff DataBuffer) error {
@@ -140,9 +140,9 @@ func (q *QueryObj) QOffset() int32 {
 	return q.Offset
 }
 
-func (q *QueryObj) QCc() chan Chunk {
-	return q.Cc
-}
+//func (q *QueryObj) QCc() chan Chunk {
+//return q.Cc
+//}
 
 func (q *QueryObj) QEvent() Event {
 	return q.Ee
