@@ -1,11 +1,11 @@
 package main
 
 import (
+	"io"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -31,33 +31,25 @@ func (s *PresenceClusterGet) Request(rs core.OnSession, w http.ResponseWriter, r
 	req := core.DataRequest{Key: k, Opt: core.GET_DATA_REQUEST}
 	req.FactoryId = co.FactoryId()
 	req.ClassId = co.ClassId()
-	aq := make(chan core.Chunk, 3)
-	req.Async = aq
-	defer close(aq)
-	s.Cluster().Request(req)
-	rt := core.OnSession{Successful: false}
-	for c := range aq {
-		if !c.Remaining {
-			break
-		}
-		resp, ok := c.Data.(*protocol.Response)
-		if ok {
-			core.AppLog.Debug().Msgf("payload %v, %s", resp.Successful, resp.Message)
-			if resp.Successful {
-				dt := resp.Data.List[0]
-				core.Import(&co, k, dt.Value, 100)
-				co.Mutable = dt.Header.Mutable
-				co.Rev = dt.Header.Revision
-				co.Tsp = dt.Header.Timestamp
-				rt.Successful = true
-			} else {
-				rt.Message = resp.Message
-			}
-		}
-	}
-	if !rt.Successful {
-		w.Write(util.ToJson(rt))
+	stream, err := s.Cluster().Request(req)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	w.Write(util.ToJson(co))
+	var data any
+	for {
+		resp, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
+
+			break
+		}
+		if resp.Successful {
+			//resp.Data
+		}
+	}
+	w.Write(util.ToJson(data))
 }

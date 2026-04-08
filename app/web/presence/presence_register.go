@@ -56,7 +56,7 @@ func (s *PresenceRegister) Register(login bootstrap.Login) {
 		tp.Event.Id = uint64(id)
 		tp.NodeId = s.NodeId()
 		tp.Tag = s.Context()
-		err = s.Cluster().Publish(tp)
+		_, err = s.Cluster().Publish(tp)
 		if err != nil {
 			core.AppLog.Warn().Msgf("failed to publish topic %s", err.Error())
 			return

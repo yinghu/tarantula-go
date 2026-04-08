@@ -49,10 +49,10 @@ func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 	tp.Event.Id = uint64(id)
 	tp.NodeId = s.NodeId()
 	tp.Tag = s.Context()
-	err = s.Cluster().Publish(tp)
+	resp, err := s.Cluster().Publish(tp)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	w.Write(util.ToJson(core.OnSession{Successful: true, Message: "message delivered"}))
+	w.Write(util.ToJson(core.OnSession{Successful: true, Message: resp.Message}))
 }

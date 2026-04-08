@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
@@ -34,15 +35,25 @@ func (s *InventoryClusterUpdate) Request(rs core.OnSession, w http.ResponseWrite
 	req.FactoryId = co.FactoryId()
 	req.ClassId = co.ClassId()
 	req.Revision = co.Rev
-	aq := make(chan core.Chunk, 3)
-	req.Async = aq
-	defer close(aq)
-	s.Cluster().Request(req)
-	for c := range aq {
-		if !c.Remaining {
+	stream, err := s.Cluster().Request(req)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	var data any
+	for {
+		resp, err := stream.Recv()
+		if err == io.EOF {
 			break
 		}
-		core.AppLog.Debug().Msgf("payload %v", c.Data)
-		w.Write(util.ToJson(c.Data))
+		if err != nil {
+			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
+
+			break
+		}
+		if resp.Successful {
+			//resp.Data
+		}
 	}
+	w.Write(util.ToJson(data))
 }

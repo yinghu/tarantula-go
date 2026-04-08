@@ -3,11 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -34,18 +34,23 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	defer close(me.QCc())
 	req := core.DataRequest{Opt: core.QUERY_DATA_REQUEST, Criteria: me}
-	req.Async = me.QCc()
-	go s.Cluster().Request(req)
+	stream, err := s.Cluster().Request(req)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
 	ms := make([]any, 0)
-	for c := range me.QCc() {
-		if !c.Remaining {
+	for {
+		resp, err := stream.Recv()
+		if err == io.EOF {
 			break
 		}
-		resp, ok := c.Data.(*protocol.Response)
-
-		if ok && resp.Successful {
+		if err != nil {
+			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
+			break
+		}
+		if resp.Successful {
 			for _, data := range resp.Data.List {
 				me, err := mf.Topic(data.Value)
 				if err != nil {

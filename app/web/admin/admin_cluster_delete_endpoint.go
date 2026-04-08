@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
@@ -30,15 +31,26 @@ func (s *AdminClusterDelete) Request(rs core.OnSession, w http.ResponseWriter, r
 	req := core.DataRequest{Key: k, Opt: core.DELETE_DATA_REQUEST}
 	req.FactoryId = co.FactoryId()
 	req.ClassId = co.ClassId()
-	aq := make(chan core.Chunk, 3)
-	req.Async = aq
-	defer close(aq)
-	s.Cluster().Request(req)
-	for c := range aq {
-		if !c.Remaining {
+	stream, err := s.Cluster().Request(req)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	ret := core.OnSession{}
+	for {
+		resp, err := stream.Recv()
+		if err == io.EOF {
 			break
 		}
-		core.AppLog.Debug().Msgf("payload %v", c.Data)
-		w.Write(util.ToJson(c.Data))
+		if err != nil {
+			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
+			ret.Successful = false
+			ret.Message = err.Error()
+			break
+		}
+		ret.Successful = resp.Successful
+		ret.Message = resp.Message
 	}
+	w.Write(util.ToJson(req))
+
 }

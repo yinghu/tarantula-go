@@ -120,7 +120,7 @@ type DataRequest struct {
 	Value    []byte
 	Opt      uint32
 	Criteria Query
-	Async    chan Chunk
+	//Async    chan Chunk
 }
 
 type TopicListener interface {
@@ -131,10 +131,11 @@ type ClusterService interface {
 	HashRing(r RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error)
 	KeyRing(r RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error)
 	RingToken(key []byte) uint32
-	Request(r DataRequest)
 
-	Publish(e *protocol.Topic) error
-	//List(q Query)
+	Request(r DataRequest) (grpc.ServerStreamingClient[protocol.Response], error)
+
+	Publish(e *protocol.Topic) (*protocol.Response, error)
+
 	Subscribe(topic string, listener TopicListener) error
 	Unsubscribe(topic string) error
 }
