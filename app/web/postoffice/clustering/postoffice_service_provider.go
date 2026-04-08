@@ -15,7 +15,7 @@ func (c *DataServiceProvider) HashRing(request *protocol.Request, stream grpc.Se
 	c.Mll.rangeRing(core.RingRequest{Async: rq, Opt: ALL_RING_OPT})
 	ring := <-rq
 	for _, n := range ring {
-		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name, Address: n.IP}
+		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name, Address: n.IP, Meta: n.Meta}
 		if err := stream.Send(&hn); err != nil {
 			return err
 		}

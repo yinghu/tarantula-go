@@ -27,6 +27,7 @@ type HashNode struct {
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Endpoint      string                 `protobuf:"bytes,3,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
 	Address       string                 `protobuf:"bytes,4,opt,name=address,proto3" json:"address,omitempty"`
+	Meta          string                 `protobuf:"bytes,5,opt,name=meta,proto3" json:"meta,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -89,16 +90,24 @@ func (x *HashNode) GetAddress() string {
 	return ""
 }
 
+func (x *HashNode) GetMeta() string {
+	if x != nil {
+		return x.Meta
+	}
+	return ""
+}
+
 var File_hash_node_proto protoreflect.FileDescriptor
 
 const file_hash_node_proto_rawDesc = "" +
 	"\n" +
-	"\x0fhash_node.proto\x12\bprotocol\"h\n" +
+	"\x0fhash_node.proto\x12\bprotocol\"|\n" +
 	"\bHashNode\x12\x12\n" +
 	"\x04hash\x18\x01 \x01(\aR\x04hash\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
 	"\bendpoint\x18\x03 \x01(\tR\bendpoint\x12\x18\n" +
-	"\aaddress\x18\x04 \x01(\tR\aaddressBP\n" +
+	"\aaddress\x18\x04 \x01(\tR\aaddress\x12\x12\n" +
+	"\x04meta\x18\x05 \x01(\tR\x04metaBP\n" +
 	"\x17com.icodesoftware.protoB\x0fHashNodeFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (

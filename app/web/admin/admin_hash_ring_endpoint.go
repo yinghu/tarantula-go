@@ -33,7 +33,7 @@ func (s *AdminHashRingEndpoint) Request(rs core.OnSession, w http.ResponseWriter
 			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
 			break
 		}
-		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
+		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address, Meta: data.Meta})
 	}
 	w.Write(util.ToJson(ring))
 }
