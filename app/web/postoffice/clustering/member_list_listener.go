@@ -46,6 +46,7 @@ type MemberListListener struct {
 
 func (m *MemberListListener) toNode(e *memberlist.Node) core.Node {
 	parts := strings.Split(e.Address(), ":")
+	core.AppLog.Debug().Msgf("META %s", string(e.Meta))
 	return core.Node{Name: e.Name, Meta: string(e.Meta), IP: e.Address(), RpcEndpoint: fmt.Sprintf("%s:%d", parts[0], core.RPC_PORT), State: int(e.State)}
 }
 
