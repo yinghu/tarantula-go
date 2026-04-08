@@ -41,7 +41,7 @@ type MemberListListener struct {
 	*memberlist.Memberlist
 	*MemberHashRing
 	*DataServiceProvider
-	//meta []byte
+	meta []byte
 }
 
 func (m *MemberListListener) toNode(e *memberlist.Node) core.Node {
@@ -130,7 +130,7 @@ func (m *MemberListListener) NodeMeta(limit int) []byte {
 	//if m.balancing {
 	//return fmt.Append([]byte{}, "pending")
 	//}
-	return nil //fmt.Appendf([]byte{}, "ready")
+	return m.meta //nil //fmt.Appendf([]byte{}, "ready")
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
