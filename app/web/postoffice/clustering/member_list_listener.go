@@ -127,7 +127,7 @@ func (m *MemberListListener) NodeMeta(limit int) []byte {
 	//if m.balancing {
 	//return fmt.Append([]byte{}, "pending")
 	//}
-	return fmt.Appendf([]byte{}, "ready")
+	return nil //fmt.Appendf([]byte{}, "ready")
 }
 
 func (m *MemberListListener) NotifyMsg(msg []byte) {
