@@ -86,8 +86,6 @@ func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
 	if sub.Deleting {
 		m.subscriptions.del(sub)
 	} else {
-		sub.CPool = &core.RpcConnPool{Target: sub.Endpoint, Tag: sub.Tag, NodeId: sub.NodeId}
-		sub.CPool.Start()
 		m.subscriptions.add(sub)
 	}
 }
