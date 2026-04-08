@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gameclustering.com/internal/protocol"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -127,7 +128,7 @@ type TopicListener interface {
 }
 
 type ClusterService interface {
-	HashRing(r RingRequest)
+	HashRing(r RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error)
 	KeyRing(r RingRequest)
 	RingToken(key []byte) uint32
 	Request(r DataRequest)

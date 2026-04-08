@@ -1,10 +1,11 @@
 package main
 
 import (
-	"encoding/json"
+	"io"
 	"net/http"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/util"
 )
 
 type AdminHashRingEndpoint struct {
@@ -17,14 +18,22 @@ func (s *AdminHashRingEndpoint) AccessControl() int32 {
 
 func (s *AdminHashRingEndpoint) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	rq := make(chan []core.Node, 1)
-	defer close(rq)
-	s.Cluster().HashRing(core.RingRequest{Async: rq})
-	n := <-rq
-	data, err := json.Marshal(n)
+	stream, err := s.Cluster().HashRing(core.RingRequest{})
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	w.Write(data)
+	ring := make([]core.Node, 0)
+	for {
+		data, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
+			break
+		}
+		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
+	}
+	w.Write(util.ToJson(ring))
 }

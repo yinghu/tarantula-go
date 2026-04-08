@@ -11,6 +11,7 @@ import (
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	"github.com/rs/zerolog"
+	"google.golang.org/grpc"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -43,36 +44,16 @@ type ClusterManager struct {
 	cPool    core.RpcConnPool
 }
 
-func (c *ClusterManager) HashRing(r core.RingRequest) {
+func (c *ClusterManager) HashRing(r core.RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error) {
 	if !c.running {
-		r.Async <- []core.Node{}
-		return
+		return nil, fmt.Errorf("cluster not started")
 	}
 	conn, err := c.cPool.Conn()
 	if err != nil {
-		r.Async <- []core.Node{}
-		return
+		return nil, err
 	}
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
-	stream, err := dsp.HashRing(context.Background(), &protocol.Request{Prefix: 0})
-	if err != nil {
-		r.Async <- []core.Node{}
-		return
-	}
-	ring := make([]core.Node, 0)
-	for {
-		data, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
-			break
-		}
-		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
-	}
-	r.Async <- ring
-
+	return dsp.HashRing(context.Background(), &protocol.Request{Prefix: 0})
 }
 
 func (c *ClusterManager) KeyRing(r core.RingRequest) {
