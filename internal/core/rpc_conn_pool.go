@@ -24,6 +24,8 @@ type RpcConn struct {
 
 type RpcConnPool struct {
 	Target  string
+	Tag     string
+	NodeId  string
 	MinSize int
 	MaxSize int
 	index   int
@@ -76,12 +78,12 @@ func (p *RpcConnPool) Conn() (*RpcConn, error) {
 	}
 	return c, nil
 }
-func (p *RpcConnPool) Release(t *protocol.Topic) {
+func (p *RpcConnPool) Release() {
 	p.Lock()
 	defer p.Unlock()
 	for _, c := range p.pool {
 		dsp := protocol.NewPostofficeServiceClient(c.Conn)
-		resp, err := dsp.Disconnect(context.Background(), t)
+		resp, err := dsp.Disconnect(context.Background(), &protocol.Topic{Tag: p.Tag, NodeId: p.NodeId})
 		if err != nil {
 			continue
 		}

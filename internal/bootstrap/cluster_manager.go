@@ -153,13 +153,13 @@ func (c *ClusterManager) disconnect() error {
 		return fmt.Errorf("not started")
 	}
 	c.running = false
-	c.cPool.Release(&protocol.Topic{Tag: c.App.Context(), NodeId: c.App.NodeId()})
+	c.cPool.Release()
 	return nil
 }
 
 func (c *ClusterManager) connect(host string) error {
 	c.cHost = fmt.Sprintf("%s:%d", host, core.RPC_PORT)
-	c.cPool = core.RpcConnPool{Target: c.cHost}
+	c.cPool = core.RpcConnPool{Target: c.cHost, Tag: c.App.Context(), NodeId: c.App.NodeId()}
 	c.cPool.Start()
 	c.subscriptions = make(map[string]core.TopicListener)
 	c.cSub = make(chan Sub, SUB_CHAN_SIZE)
