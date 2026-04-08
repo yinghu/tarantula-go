@@ -54,7 +54,7 @@ func (m *MemberlistManager) Start(meta []byte) error {
 		return err
 	}
 	m.meta = meta
-	list.LocalNode().Meta = meta
+	//list.LocalNode().Meta = meta
 	m.Memberlist = list
 	go m.Listen()
 	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode, RSync: rwSync}
