@@ -11,7 +11,6 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
-	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	"github.com/rs/zerolog"
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -32,6 +31,7 @@ type AppManager struct {
 	event       *EventManager
 	log         io.Writer //zerolog.Logger
 	forward     LogForwarder
+	threshold   zerolog.Level
 }
 
 func (s *AppManager) ItemService() item.ItemService {
@@ -71,7 +71,7 @@ func (s *AppManager) ClusterMember() bool {
 	return s.F.IsClusterMember
 }
 
-func (s *AppManager) RegisterLogForwarder(logf LogForwarder) {
+func (s *AppManager) RegisterLogForwarder(threshold zerolog.Level, logf LogForwarder) {
 	s.forward = logf
 }
 func (s *AppManager) Start(f core.Env) error {
@@ -120,7 +120,7 @@ func (s *AppManager) Start(f core.Env) error {
 	}
 	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.Host)
 	s.cluster = &ClusterManager{App: s}
-	s.RegisterLogForwarder(s.cluster)
+	s.RegisterLogForwarder(zerolog.DebugLevel, s.cluster)
 	return s.cluster.connect(f.Host)
 }
 
@@ -139,10 +139,6 @@ func (s *AppManager) Context() string {
 
 func (s *AppManager) Service() TarantulaService {
 	return s
-}
-
-func (s *AppManager) Forward(topic *protocol.Topic) {
-
 }
 
 func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
@@ -219,7 +215,7 @@ func (c *AppManager) Write(data []byte) (int, error) {
 }
 
 func (c *AppManager) WriteLevel(level zerolog.Level, data []byte) (int, error) {
-	if c.forward != nil {
+	if c.forward != nil && level >= c.threshold {
 		cp := append([]byte{}, data...)
 		c.forward.Forward(level, cp)
 	}

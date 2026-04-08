@@ -58,14 +58,6 @@ func (p *RpcConnPool) Start() {
 		p.MaxSize = MAX_POOL_SIZE
 	}
 	p.pool = make(map[string]*RpcConn)
-	//for i := range p.MinSize {
-	//cx, err := p.connect(p.Target)
-	//if err != nil {
-	//return err
-	//}
-	//ckey := fmt.Sprintf("%s_%d", p.Target, i)
-	//p.pool[ckey] = &RpcConn{Conn: cx, Seq: i}
-	//}
 	p.index = 0
 }
 

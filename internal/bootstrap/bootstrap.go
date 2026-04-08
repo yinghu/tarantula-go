@@ -50,7 +50,7 @@ type TarantulaService interface {
 	Pusher() core.Pusher
 	Cluster() core.ClusterService
 	Event() core.EventService
-	RegisterLogForwarder(logf LogForwarder)
+	RegisterLogForwarder(threshold zerolog.Level, logf LogForwarder)
 }
 
 type TarantulaApp interface {
@@ -58,7 +58,6 @@ type TarantulaApp interface {
 	AccessControl() int32
 	NodeId() string
 	Context() string
-
 	Request(sesion core.OnSession, w http.ResponseWriter, r *http.Request)
 }
 
