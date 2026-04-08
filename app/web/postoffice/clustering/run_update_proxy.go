@@ -11,14 +11,11 @@ func (c *DataServiceProvider) runUpdate(set *protocol.Request) (*protocol.Respon
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
 	retry := RetryTrack{Reties: RETRY_MAX}
-	ch := make(chan *protocol.Response, 3)
-	defer close(ch)
 	for retry.Reties > 0 {
 		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		c.clientUpdate(&ringNode, set, ch)
-		resp := <-ch
+		resp, _ := c.clientUpdate(&ringNode, set)
 		if !resp.Successful {
 			retry.Err = resp.Message
 			retry.Reties--
@@ -27,7 +24,7 @@ func (c *DataServiceProvider) runUpdate(set *protocol.Request) (*protocol.Respon
 		retry.Suc = true
 		slaves := nodes[1:]
 		for _, slave := range slaves {
-			c.clientUpdate(&slave, set, ch)
+			c.clientUpdate(&slave, set)
 		}
 		break
 	}
@@ -35,14 +32,11 @@ func (c *DataServiceProvider) runUpdate(set *protocol.Request) (*protocol.Respon
 	return &protocol.Response{Successful: retry.Suc, Message: retry.Err}, nil
 }
 
-func (m *DataServiceProvider) clientUpdate(target *core.Node, request *protocol.Request, ch chan *protocol.Response) {
+func (m *DataServiceProvider) clientUpdate(target *core.Node, request *protocol.Request) (*protocol.Response, error) {
 	conn, err := target.CPool.Conn()
 	if err != nil {
-		ch <- &protocol.Response{Successful: false, Message: err.Error()}
-		return
+		return &protocol.Response{Successful: false, Message: err.Error()}, err
 	}
 	dsp := protocol.NewDataServiceClient(conn.Conn)
-	resp, _ := dsp.Update(context.Background(), request)
-	ch <- resp
-
+	return dsp.Update(context.Background(), request)
 }
