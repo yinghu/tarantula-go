@@ -52,6 +52,6 @@ func (p *LoginEventFactory) Query() core.Query {
 	q.ClassId = LOGIN_EVENT_CID
 	q.FactoryId = core.EVENT_FACTORY_ID
 	q.Topic = LOGIN_TOPIC_NAME
-	q.Cc = make(chan core.Chunk, 3)
+	//q.Cc = make(chan core.Chunk, 3)
 	return &q
 }
