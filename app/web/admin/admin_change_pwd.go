@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -26,7 +26,7 @@ func (s *AdminChangePwd) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 	defer r.Body.Close()
 	var cp ChangePassword
 	json.NewDecoder(r.Body).Decode(&cp)
-	login := bootstrap.Login{Name: cp.Login}
+	login := protocol.LoginObject{Name: cp.Login}
 	err := s.LoadLogin(&login)
 	w.WriteHeader(http.StatusOK)
 	if err != nil {
@@ -40,7 +40,7 @@ func (s *AdminChangePwd) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 		w.Write(util.ToJson(session))
 		return
 	}
-	login.Hash = hash
+	login.Password = hash
 	err = s.UpdatePassword(&login)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}

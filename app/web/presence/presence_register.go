@@ -71,11 +71,8 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 }
 
 func (s *PresenceRegister) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
-	listener := make(chan core.Chunk)
-	defer func() {
-		close(listener)
-		r.Body.Close()
-	}()
+
+	defer r.Body.Close()
 	w.WriteHeader(http.StatusOK)
 	var login protocol.LoginObject
 	err := json.NewDecoder(r.Body).Decode(&login)

@@ -7,6 +7,7 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 )
 
 type AdminService struct {
@@ -37,7 +38,7 @@ func (s *AdminService) Start(f core.Env) error {
 	if err != nil {
 		return err
 	}
-	err = s.SaveLogin(&bootstrap.Login{Name: "root", Hash: hash, AccessControl: core.SUDO_ACCESS_CONTROL})
+	err = s.SaveLogin(&protocol.LoginObject{Name: "root", Password: hash, AccessControl: uint32(core.SUDO_ACCESS_CONTROL)})
 	if err != nil {
 		core.AppLog.Debug().Msg("Root already existed")
 	}

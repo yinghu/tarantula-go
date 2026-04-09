@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -18,14 +18,14 @@ func (s *AdminLogin) AccessControl() int32 {
 }
 func (s *AdminLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var login bootstrap.Login
+	var login protocol.LoginObject
 	err := json.NewDecoder(r.Body).Decode(&login)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	pwd := login.Hash
+	pwd := login.Password
 	err = s.LoadLogin(&login)
 	w.WriteHeader(http.StatusOK)
 	if err != nil {
@@ -33,18 +33,18 @@ func (s *AdminLogin) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 		w.Write(util.ToJson(session))
 		return
 	}
-	err = s.Authenticator().ValidatePassword(pwd, login.Hash)
+	err = s.Authenticator().ValidatePassword(pwd, login.Password)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	tk, err := s.Authenticator().CreateToken(login.SystemId, login.Id, login.AccessControl)
+	tk, err := s.Authenticator().CreateToken(int64(login.SystemId), int32(login.Id), int32(login.AccessControl))
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}
 		w.Write(util.ToJson(session))
 		return
 	}
-	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: ""}
+	session := core.OnSession{Successful: true, SystemId: int64(login.SystemId), Stub: int32(login.Id), Token: tk, Home: ""}
 	w.Write(util.ToJson(session))
 }
