@@ -85,23 +85,22 @@ func (c *ClusterManager) Request(r core.DataRequest) (*protocol.Response, error)
 	return dsp.Request(context.Background(), &req)
 }
 
-func (c *ClusterManager) List(r core.DataRequest) (grpc.ServerStreamingClient[protocol.Response], error) {
+func (c *ClusterManager) List(r core.Query) (grpc.ServerStreamingClient[protocol.Response], error) {
 	if !c.running {
 		return nil, fmt.Errorf("cluster not started")
 	}
-	req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
+	//req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
 	//if r.Opt == core.QUERY_DATA_REQUEST || r.Opt == core.PULL_DATA_REQUEST {
-	mf, existed := TopicFactoryRegistry[r.Criteria.QTopic()]
+	mf, existed := TopicFactoryRegistry[r.QTopic()]
 	if !existed {
 		return nil, fmt.Errorf("topic factory not existed")
 	}
-	dt, err := mf().Export(r.Criteria)
+	dt, err := mf().Export(r)
 	if err != nil {
 		return nil, err
 	}
-	q := protocol.Query{Id: r.Criteria.QTopic(), Criteria: dt}
-	req.Query = &q
-	//}
+	q := protocol.Query{Id: r.QTopic(), Criteria: dt}
+	req := protocol.Request{Prefix: c.RingToken([]byte(r.QTopic())), Query: &q}
 	conn, err := c.cPool.Conn()
 	if err != nil {
 		return nil, err

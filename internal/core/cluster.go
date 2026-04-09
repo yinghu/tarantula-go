@@ -132,7 +132,7 @@ type ClusterService interface {
 	KeyRing(r RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error)
 	RingToken(key []byte) uint32
 
-	List(r DataRequest) (grpc.ServerStreamingClient[protocol.Response], error)
+	List(r Query) (grpc.ServerStreamingClient[protocol.Response], error)
 	Request(r DataRequest) (*protocol.Response, error)
 
 	Publish(e *protocol.Topic) (*protocol.Response, error)

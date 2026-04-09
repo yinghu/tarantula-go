@@ -12,8 +12,8 @@ import (
 func (c *DataServiceProvider) runQuery(set *protocol.Request, responser grpc.ServerStreamingServer[protocol.Response]) {
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
-	kh := c.Mll.RingToken(set.Data.Key)
-	c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: kh, Replicas: REPLICA_MAX, Async: rq}
+	//kh := c.Mll.RingToken(set.Prefix)
+	c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: set.Prefix, Replicas: REPLICA_MAX, Async: rq}
 	nodes := <-rq
 	ringNode := nodes[0]
 	conn, err := ringNode.CPool.Conn()

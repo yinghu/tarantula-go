@@ -62,7 +62,6 @@ type Query interface {
 	QOffset() int32
 	QRead(b DataBuffer) error
 	QWrite(b DataBuffer) error
-	//QCc() chan Chunk
 	QEvent() Event
 	QFilter(k, v []byte) bool
 }
