@@ -27,6 +27,7 @@ type Request struct {
 	Prefix        uint32                 `protobuf:"fixed32,2,opt,name=prefix,proto3" json:"prefix,omitempty"`
 	Data          *Data                  `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
 	Query         *Query                 `protobuf:"bytes,4,opt,name=query,proto3" json:"query,omitempty"`
+	Object        *KeyValue              `protobuf:"bytes,5,opt,name=object,proto3" json:"object,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -89,17 +90,25 @@ func (x *Request) GetQuery() *Query {
 	return nil
 }
 
+func (x *Request) GetObject() *KeyValue {
+	if x != nil {
+		return x.Object
+	}
+	return nil
+}
+
 var File_request_proto protoreflect.FileDescriptor
 
 const file_request_proto_rawDesc = "" +
 	"\n" +
 	"\rrequest.proto\x12\bprotocol\x1a\n" +
-	"data.proto\x1a\vquery.proto\"~\n" +
+	"data.proto\x1a\vquery.proto\x1a\x0fkey_value.proto\"\xaa\x01\n" +
 	"\aRequest\x12\x10\n" +
 	"\x03opt\x18\x01 \x01(\aR\x03opt\x12\x16\n" +
 	"\x06prefix\x18\x02 \x01(\aR\x06prefix\x12\"\n" +
 	"\x04data\x18\x03 \x01(\v2\x0e.protocol.DataR\x04data\x12%\n" +
-	"\x05query\x18\x04 \x01(\v2\x0f.protocol.QueryR\x05queryBO\n" +
+	"\x05query\x18\x04 \x01(\v2\x0f.protocol.QueryR\x05query\x12*\n" +
+	"\x06object\x18\x05 \x01(\v2\x12.protocol.KeyValueR\x06objectBO\n" +
 	"\x17com.icodesoftware.protoB\x0eRequestFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -116,18 +125,20 @@ func file_request_proto_rawDescGZIP() []byte {
 
 var file_request_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_request_proto_goTypes = []any{
-	(*Request)(nil), // 0: protocol.Request
-	(*Data)(nil),    // 1: protocol.Data
-	(*Query)(nil),   // 2: protocol.Query
+	(*Request)(nil),  // 0: protocol.Request
+	(*Data)(nil),     // 1: protocol.Data
+	(*Query)(nil),    // 2: protocol.Query
+	(*KeyValue)(nil), // 3: protocol.KeyValue
 }
 var file_request_proto_depIdxs = []int32{
 	1, // 0: protocol.Request.data:type_name -> protocol.Data
 	2, // 1: protocol.Request.query:type_name -> protocol.Query
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 2: protocol.Request.object:type_name -> protocol.KeyValue
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_request_proto_init() }
@@ -137,6 +148,7 @@ func file_request_proto_init() {
 	}
 	file_data_proto_init()
 	file_query_proto_init()
+	file_key_value_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

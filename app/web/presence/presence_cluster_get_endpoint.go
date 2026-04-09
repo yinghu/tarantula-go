@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
@@ -31,25 +30,10 @@ func (s *PresenceClusterGet) Request(rs core.OnSession, w http.ResponseWriter, r
 	req := core.DataRequest{Key: k, Opt: core.GET_DATA_REQUEST}
 	req.FactoryId = co.FactoryId()
 	req.ClassId = co.ClassId()
-	stream, err := s.Cluster().Request(req)
+	resp, err := s.Cluster().Request(req)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	var data any
-	for {
-		resp, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
-
-			break
-		}
-		if resp.Successful {
-			data = resp.Data
-		}
-	}
-	w.Write(util.ToJson(data))
+	w.Write(util.ToJson(resp))
 }
