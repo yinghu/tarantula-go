@@ -52,7 +52,7 @@ func (s *InventoryClusterUpdate) Request(rs core.OnSession, w http.ResponseWrite
 			break
 		}
 		if resp.Successful {
-			//resp.Data
+			data = resp.Data
 		}
 	}
 	w.Write(util.ToJson(data))

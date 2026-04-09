@@ -48,7 +48,7 @@ func (s *PresenceClusterGet) Request(rs core.OnSession, w http.ResponseWriter, r
 			break
 		}
 		if resp.Successful {
-			//resp.Data
+			data = resp.Data
 		}
 	}
 	w.Write(util.ToJson(data))

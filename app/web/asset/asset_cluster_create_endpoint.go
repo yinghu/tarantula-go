@@ -56,5 +56,5 @@ func (s *AssetClusterCreate) Request(rs core.OnSession, w http.ResponseWriter, r
 		ret.Successful = resp.Successful
 		ret.Message = resp.Message
 	}
-	w.Write(util.ToJson(req))
+	w.Write(util.ToJson(ret))
 }
