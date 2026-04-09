@@ -27,7 +27,11 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: fmt.Sprintf("topic %s not existed", topic)}))
 		return
 	}
-	mf := mc()
+	mf, ok := mc().(core.ProtoTopicFactory)
+	if !ok {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: "proto factory not existed"}))
+		return
+	}
 	me := mf.Query()
 	err := json.NewDecoder(r.Body).Decode(&me)
 	if err != nil {
