@@ -45,74 +45,69 @@ type DataServiceProvider struct {
 	//WTask chan<- core.Task
 }
 
-func (c *DataServiceProvider) Get(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
-	if request.Opt == core.GET_DATA_REQUEST {
-		getdata := GetData{request}
-		data, err := c.get(getdata)
-		if err != nil {
-			return err
-		}
-		resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: []*protocol.Data{data}}}
-		return stream.Send(&resp)
+func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
+	getdata := GetData{in}
+	data, err := c.get(getdata)
+	if err != nil {
+		return &protocol.Response{Successful: false, Message: err.Error()}, err
 	}
-	if request.Opt == core.QUERY_DATA_REQUEST {
-		tf, existed := bootstrap.TopicFactoryRegistry[request.Query.Id]
-		if !existed {
-			return fmt.Errorf("event factory not registered %s", request.Query.Id)
-		}
-		q, err := tf().Import(request.Query.Criteria)
-		if err != nil {
-			return err
-		}
-		core.AppLog.Debug().Msgf("query %v", q)
-		buff := core.NewBuffer(16)
-		buff.WriteUInt32(q.QFactoryId())
-		buff.WriteUInt32(q.QClassId())
-		buff.Flip()
-		px, err := buff.Read(0)
-		if err != nil {
-			return err
-		}
-		p := px
-		rc := make(chan *protocol.Response, 3)
-		dset := make([]*protocol.Data, 0)
-		core.AppLog.Debug().Msgf("query : %d %d %d %d", q.QLimit(), q.QOffset(), q.QFactoryId(), q.QClassId())
-		go func() {
-			limit := q.QLimit()
-			offset := q.QOffset()
-			c.Local.Db.View(func(txn *badger.Txn) error {
-				op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
-				it := txn.NewIterator(op)
-				defer it.Close()
-				for it.Seek(p); it.ValidForPrefix(p); it.Next() {
-					if offset > 0 {
-						offset--
-						continue
-					}
-					p = px
-					item := it.Item()
-					k := append([]byte{}, item.Key()[12:]...)
-					item.Value(func(val []byte) error {
-						if q.QFilter(k, val) {
-							v := append([]byte{}, val...)
-							dset = append(dset, &protocol.Data{Key: k, Value: v, Header: &protocol.Header{}})
-							limit--
-						}
-						return nil
-					})
-					if limit == 0 {
-						break
-					}
+	return &protocol.Response{Successful: true, Data: &protocol.DataSet{List: []*protocol.Data{data}}}, nil
+
+}
+
+func (c *DataServiceProvider) Query(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
+
+	tf, existed := bootstrap.TopicFactoryRegistry[request.Query.Id]
+	if !existed {
+		return fmt.Errorf("event factory not registered %s", request.Query.Id)
+	}
+	q, err := tf().Import(request.Query.Criteria)
+	if err != nil {
+		return err
+	}
+	core.AppLog.Debug().Msgf("query %v", q)
+	buff := core.NewBuffer(16)
+	buff.WriteUInt32(q.QFactoryId())
+	buff.WriteUInt32(q.QClassId())
+	buff.Flip()
+	px, err := buff.Read(0)
+	if err != nil {
+		return err
+	}
+	p := px
+	dset := make([]*protocol.Data, 0)
+	core.AppLog.Debug().Msgf("query : %d %d %d %d", q.QLimit(), q.QOffset(), q.QFactoryId(), q.QClassId())
+
+	limit := q.QLimit()
+	offset := q.QOffset()
+	c.Local.Db.View(func(txn *badger.Txn) error {
+		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
+		it := txn.NewIterator(op)
+		defer it.Close()
+		for it.Seek(p); it.ValidForPrefix(p); it.Next() {
+			if offset > 0 {
+				offset--
+				continue
+			}
+			p = px
+			item := it.Item()
+			k := append([]byte{}, item.Key()[12:]...)
+			item.Value(func(val []byte) error {
+				if q.QFilter(k, val) {
+					v := append([]byte{}, val...)
+					dset = append(dset, &protocol.Data{Key: k, Value: v, Header: &protocol.Header{}})
+					limit--
 				}
 				return nil
 			})
-			resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: dset}}
-			rc <- &resp
-		}()
-		rs := <-rc
-		return stream.Send(rs)
-	}
-	return fmt.Errorf("opt not supported %d", request.Opt)
+			if limit == 0 {
+				break
+			}
+		}
+		return nil
+	})
+	resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: dset}}
+	return stream.Send(&resp)
 }
 
 func (c *DataServiceProvider) Reset(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {

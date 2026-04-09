@@ -2,6 +2,7 @@ package clustering
 
 import (
 	"fmt"
+	"io"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
@@ -66,16 +67,23 @@ start:
 	core.AppLog.Debug().Msgf("running recovery on operator %d", num)
 	sync := <-m.DPull
 	for _, h := range sync.Ranges {
-		req := protocol.Request{Prefix: h.From,Opt: h.To}
-		ch := make(chan *protocol.Response, 3)
-		go m.runPull(sync.Remote, &req, ch)
-		for resp := range ch {
-			if !resp.Successful {
+		req := protocol.Request{Prefix: h.From, Opt: h.To}
+		stream, err := m.runPull(sync.Remote, &req)
+		if err != nil {
+			core.AppLog.Warn().Msgf("remote error %s", sync.Remote)
+			continue
+		}
+		for {
+			data, err := stream.Recv()
+			if err == io.EOF {
 				break
 			}
-			m.set(resp)
+			if err != nil {
+				core.AppLog.Debug().Msgf("remote streaming error %s %s", sync.Remote, err.Error())
+				break
+			}
+			m.set(data)
 		}
-		close(ch)
 	}
 	m.DWait.Done()
 	goto start

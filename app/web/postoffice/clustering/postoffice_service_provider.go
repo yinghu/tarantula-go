@@ -88,10 +88,11 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 		stream.Send(resp)
 
 	case core.GET_DATA_REQUEST:
-		c.runGet(request, stream)
+		resp, _ := c.runGet(request)
+		stream.Send(resp)
 
 	case core.QUERY_DATA_REQUEST:
-		c.runGet(request, stream)
+		c.runQuery(request, stream)
 
 	case core.UPDATE_DATA_REQUEST:
 		resp, _ := c.runUpdate(request)
@@ -105,17 +106,6 @@ func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.Ser
 		resp, _ := c.runReset(request)
 		stream.Send(resp)
 
-	case core.PULL_DATA_REQUEST:
-		rc := make(chan *protocol.Response, 3)
-		defer close(rc)
-		core.AppLog.Debug().Msgf("run local pull %v", request)
-		c.pull(request.Prefix, request.Prefix, rc)
-		for resp := range rc {
-			if !resp.Successful {
-				break
-			}
-			stream.Send(resp)
-		}
 	default:
 		stream.Send(&protocol.Response{Successful: false, Message: fmt.Sprintf("request opt not suuported %d", request.Opt)})
 	}
