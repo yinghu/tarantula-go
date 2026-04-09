@@ -35,7 +35,7 @@ func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Re
 		return
 	}
 	req := core.DataRequest{Opt: core.QUERY_DATA_REQUEST, Criteria: me}
-	stream, err := s.Cluster().Request(req)
+	stream, err := s.Cluster().List(req)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return

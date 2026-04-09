@@ -81,33 +81,38 @@ func (c *DataServiceProvider) Unsubscribe(ctx context.Context, in *protocol.Topi
 	return &protocol.Response{Successful: true, Message: "topic removed"}, nil
 }
 
-func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
+func (c *DataServiceProvider) Request(ctx context.Context, request *protocol.Request) (*protocol.Response, error) {
 	switch request.Opt {
 	case core.CREATE_DATA_REQUEST:
-		resp, _ := c.runCreate(request)
-		stream.Send(resp)
+		return c.runCreate(request)
+		//stream.Send(resp)
 
 	case core.GET_DATA_REQUEST:
-		resp, _ := c.runGet(request)
-		stream.Send(resp)
+		return c.runGet(request)
+		//stream.Send(resp)
 
 	case core.QUERY_DATA_REQUEST:
-		c.runQuery(request, stream)
+		//c.runQuery(request, stream)
 
 	case core.UPDATE_DATA_REQUEST:
-		resp, _ := c.runUpdate(request)
-		stream.Send(resp)
+		return c.runUpdate(request)
+		//stream.Send(resp)
 
 	case core.DELETE_DATA_REQUEST:
-		resp, _ := c.runDelete(request)
-		stream.Send(resp)
+		return c.runDelete(request)
+		//stream.Send(resp)
 
 	case core.RESET_DATA_REQUEST:
-		resp, _ := c.runReset(request)
-		stream.Send(resp)
+		return c.runReset(request)
+		//stream.Send(resp)
 
 	default:
-		stream.Send(&protocol.Response{Successful: false, Message: fmt.Sprintf("request opt not suuported %d", request.Opt)})
+		//stream.Send(&protocol.Response{Successful: false, Message: fmt.Sprintf("request opt not suuported %d", request.Opt)})
 	}
+	return &protocol.Response{Successful: false, Message: "not suppotred"}, fmt.Errorf("opt not supported %d", request.Opt)
+}
+
+func (c *DataServiceProvider) List(in *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
+	c.runQuery(in, stream)
 	return nil
 }

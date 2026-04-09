@@ -72,29 +72,42 @@ func (c *ClusterManager) RingToken(key []byte) uint32 {
 	return util.Hash(key)
 }
 
-func (c *ClusterManager) Request(r core.DataRequest) (grpc.ServerStreamingClient[protocol.Response], error) {
+func (c *ClusterManager) Request(r core.DataRequest) (*protocol.Response, error) {
 	if !c.running {
-		return nil, fmt.Errorf("cluster not started")
+		return &protocol.Response{Successful: false}, fmt.Errorf("cluster not started")
 	}
 	req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
-	if r.Opt == core.QUERY_DATA_REQUEST || r.Opt == core.PULL_DATA_REQUEST {
-		mf, existed := TopicFactoryRegistry[r.Criteria.QTopic()]
-		if !existed {
-			return nil, fmt.Errorf("topic factory not existed")
-		}
-		dt, err := mf().Export(r.Criteria)
-		if err != nil {
-			return nil, err
-		}
-		q := protocol.Query{Id: r.Criteria.QTopic(), Criteria: dt}
-		req.Query = &q
-	}
 	conn, err := c.cPool.Conn()
 	if err != nil {
 		return nil, err
 	}
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
 	return dsp.Request(context.Background(), &req)
+}
+
+func (c *ClusterManager) List(r core.DataRequest) (grpc.ServerStreamingClient[protocol.Response], error) {
+	if !c.running {
+		return nil, fmt.Errorf("cluster not started")
+	}
+	req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
+	//if r.Opt == core.QUERY_DATA_REQUEST || r.Opt == core.PULL_DATA_REQUEST {
+	mf, existed := TopicFactoryRegistry[r.Criteria.QTopic()]
+	if !existed {
+		return nil, fmt.Errorf("topic factory not existed")
+	}
+	dt, err := mf().Export(r.Criteria)
+	if err != nil {
+		return nil, err
+	}
+	q := protocol.Query{Id: r.Criteria.QTopic(), Criteria: dt}
+	req.Query = &q
+	//}
+	conn, err := c.cPool.Conn()
+	if err != nil {
+		return nil, err
+	}
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	return dsp.List(context.Background(), &req)
 }
 
 func (c *ClusterManager) Publish(e *protocol.Topic) (*protocol.Response, error) {

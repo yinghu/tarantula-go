@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
@@ -35,25 +34,10 @@ func (s *AdminClusterReset) Request(rs core.OnSession, w http.ResponseWriter, r 
 	req.FactoryId = co.FactoryId()
 	req.ClassId = co.ClassId()
 	req.Mutable = co.Mutable
-	stream, err := s.Cluster().Request(req)
+	resp, err := s.Cluster().Request(req)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	ret := core.OnSession{}
-	for {
-		resp, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
-			ret.Successful = false
-			ret.Message = err.Error()
-			break
-		}
-		ret.Successful = resp.Successful
-		ret.Message = resp.Message
-	}
-	w.Write(util.ToJson(req))
+	w.Write(util.ToJson(resp))
 }
