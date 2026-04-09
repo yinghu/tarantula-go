@@ -28,12 +28,12 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 	err := s.SaveLogin(login)
 	if err != nil {
 		//login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
-		return core.OnSession{Successful: false}, err
+		return core.OnSession{Successful: false, Message: err.Error()}, err
 	}
 	tk, err := s.Authenticator().CreateToken(int64(login.SystemId), int32(login.Id), int32(login.AccessControl))
 	if err != nil {
 		//login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.INVALID_TOKEN_CODE)}
-		return core.OnSession{Successful: false}, err
+		return core.OnSession{Successful: false, Message: err.Error()}, err
 	}
 	session := core.OnSession{Successful: true, SystemId: int64(login.SystemId), Stub: int32(login.Id), Token: tk, Home: s.F.Host}
 	ticket, _ := s.Authenticator().CreateTicket(int64(login.SystemId), int32(login.Id), int32(login.AccessControl), bootstrap.TICKET_TIME_OUT_MINUTES)
@@ -78,7 +78,11 @@ func (s *PresenceRegister) Request(rs core.OnSession, w http.ResponseWriter, r *
 	}()
 	w.WriteHeader(http.StatusOK)
 	var login protocol.LoginObject
-	json.NewDecoder(r.Body).Decode(&login)
+	err := json.NewDecoder(r.Body).Decode(&login)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
 	resp, _ := s.Register(&login)
 	w.Write(util.ToJson(resp))
 }
