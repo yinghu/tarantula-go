@@ -65,3 +65,8 @@ type Query interface {
 	QEvent() Event
 	QFilter(k, v []byte) bool
 }
+
+type QueryFactory interface {
+	Export(query Query) ([]byte, error)
+	Import(criteria []byte) (Query, error)
+}

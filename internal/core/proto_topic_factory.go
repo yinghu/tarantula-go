@@ -9,7 +9,6 @@ type ProtoTopicFactory interface {
 	Request(topic *protocol.Topic) (*protocol.Request, error)
 	Topic(data []byte) (*protocol.Topic, error)
 	Message(topic *protocol.Topic) (any, error)
-	Export(query Query) ([]byte, error)
-	Import(criteria []byte) (Query, error)
+	QueryFactory
 	Query() Query
 }

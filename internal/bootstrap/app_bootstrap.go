@@ -17,18 +17,18 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-var TopicFactoryRegistry = make(map[string]func() core.ProtoTopicFactory)
+var TopicFactoryRegistry = make(map[string]func() core.QueryFactory)
 
-func Register(name string, fac func() core.ProtoTopicFactory) {
+func Register(name string, fac func() core.QueryFactory) {
 	TopicFactoryRegistry[name] = fac
 }
 
 func AppBootstrap(tcx TarantulaContext) {
-	Register(event.MESSAGE_TOPIC_NAME, func() core.ProtoTopicFactory { return &event.MessageEventFactory{} })
-	Register(event.REGISTER_TOPIC_NAME, func() core.ProtoTopicFactory { return &event.RegisterEventFactory{} })
-	Register(event.LOG_TOPIC_NAME, func() core.ProtoTopicFactory { return &event.LogEventFactory{} })
-	Register(event.LOGIN_TOPIC_NAME, func() core.ProtoTopicFactory { return &event.LoginEventFactory{} })
-	Register(event.REQUEST_TOPIC_NAME, func() core.ProtoTopicFactory { return &event.RequestEventFactory{} })
+	Register(event.MESSAGE_TOPIC_NAME, func() core.QueryFactory { return &event.MessageEventFactory{} })
+	Register(event.REGISTER_TOPIC_NAME, func() core.QueryFactory { return &event.RegisterEventFactory{} })
+	Register(event.LOG_TOPIC_NAME, func() core.QueryFactory { return &event.LogEventFactory{} })
+	Register(event.LOGIN_TOPIC_NAME, func() core.QueryFactory { return &event.LoginEventFactory{} })
+	Register(event.REQUEST_TOPIC_NAME, func() core.QueryFactory { return &event.RequestEventFactory{} })
 
 	f := core.Env{}
 	err := f.Load(tcx.Config())

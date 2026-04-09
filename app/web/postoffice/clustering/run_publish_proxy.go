@@ -14,7 +14,12 @@ func (c *DataServiceProvider) runPublish(topic *protocol.Topic) (*protocol.Respo
 	if !registered {
 		return &protocol.Response{Successful: false}, fmt.Errorf("event factory not registered")
 	}
-	req, err := tpf().Request(topic)
+	to := tpf()
+	tp, ok := to.(core.ProtoTopicFactory)
+	if !ok {
+		return &protocol.Response{Successful: false}, fmt.Errorf("event factory cannot casted from %s", topic.Name)
+	}
+	req, err := tp.Request(topic)
 	if err != nil {
 		return &protocol.Response{Successful: false}, err
 	}

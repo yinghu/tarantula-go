@@ -88,8 +88,6 @@ func (c *ClusterManager) List(r core.Query) (grpc.ServerStreamingClient[protocol
 	if !c.running {
 		return nil, fmt.Errorf("cluster not started")
 	}
-	//req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
-	//if r.Opt == core.QUERY_DATA_REQUEST || r.Opt == core.PULL_DATA_REQUEST {
 	mf, existed := TopicFactoryRegistry[r.QTopic()]
 	if !existed {
 		return nil, fmt.Errorf("topic factory not existed")
