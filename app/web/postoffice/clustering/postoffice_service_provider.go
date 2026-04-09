@@ -83,13 +83,12 @@ func (c *DataServiceProvider) Unsubscribe(ctx context.Context, in *protocol.Topi
 
 func (c *DataServiceProvider) Request(ctx context.Context, request *protocol.Request) (*protocol.Response, error) {
 	switch request.Opt {
-	case core.CREATE_DATA_REQUEST:
-		return c.runCreate(request)
 
 	case core.GET_DATA_REQUEST:
 		return c.runGet(request)
 
-	case core.QUERY_DATA_REQUEST:
+	case core.CREATE_DATA_REQUEST:
+		return c.runCreate(request)
 
 	case core.UPDATE_DATA_REQUEST:
 		return c.runUpdate(request)

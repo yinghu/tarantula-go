@@ -76,7 +76,6 @@ func (c *ClusterManager) Request(r *protocol.Request) (*protocol.Response, error
 	if !c.running {
 		return &protocol.Response{Successful: false}, fmt.Errorf("cluster not started")
 	}
-	//req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
 	conn, err := c.cPool.Conn()
 	if err != nil {
 		return nil, err

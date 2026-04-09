@@ -5,6 +5,7 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -23,8 +24,8 @@ func (s *PresenceService) createSchema() error {
 	return nil
 }
 
-func (s *PresenceService) SaveLogin(login *bootstrap.Login) error {
-	inserted, err := s.Sql.Exec(INSERT_LOGIN, login.Name, login.Hash, login.SystemId, login.ReferenceId)
+func (s *PresenceService) SaveLogin(login *protocol.LoginObject) error {
+	inserted, err := s.Sql.Exec(INSERT_LOGIN, login.Name, login.Password, login.SystemId, login.ReferenceId)
 	if err != nil {
 		core.APP_ERROR_METRICS.WithLabelValues("login", err.Error()).Inc()
 		return err

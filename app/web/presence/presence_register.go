@@ -7,7 +7,6 @@ import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
-	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
@@ -20,26 +19,27 @@ func (s *PresenceRegister) AccessControl() int32 {
 	return core.PUBLIC_ACCESS_CONTROL
 }
 
-func (s *PresenceRegister) Register(login bootstrap.Login) {
+func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession, error) {
 	id, _ := s.Sequence().Id()
-	login.SystemId = id
-	login.AccessControl = core.PROTECTED_ACCESS_CONTROL
-	hash, _ := s.Authenticator().HashPassword(login.Hash)
-	login.Hash = hash
-	err := s.SaveLogin(&login)
+	login.SystemId = uint64(id)
+	login.AccessControl = uint32(core.PROTECTED_ACCESS_CONTROL)
+	hash, _ := s.Authenticator().HashPassword(login.Password)
+	login.Password = hash
+	err := s.SaveLogin(login)
 	if err != nil {
-		login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
-		return
+		//login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
+		return core.OnSession{Successful: false}, err
 	}
-	tk, err := s.Authenticator().CreateToken(login.SystemId, login.Id, login.AccessControl)
+	tk, err := s.Authenticator().CreateToken(int64(login.SystemId), int32(login.Id), int32(login.AccessControl))
 	if err != nil {
-		login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.INVALID_TOKEN_CODE)}
-		return
+		//login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.INVALID_TOKEN_CODE)}
+		return core.OnSession{Successful: false}, err
 	}
-	session := core.OnSession{Successful: true, SystemId: login.SystemId, Stub: login.Id, Token: tk, Home: s.F.Host}
-	ticket, _ := s.Authenticator().CreateTicket(login.SystemId, login.Id, login.AccessControl, bootstrap.TICKET_TIME_OUT_MINUTES)
+	session := core.OnSession{Successful: true, SystemId: int64(login.SystemId), Stub: int32(login.Id), Token: tk, Home: s.F.Host}
+	ticket, _ := s.Authenticator().CreateTicket(int64(login.SystemId), int32(login.Id), int32(login.AccessControl), bootstrap.TICKET_TIME_OUT_MINUTES)
 	session.Ticket = ticket
-	login.Cc <- core.Chunk{Remaining: false, Data: util.ToJson(session)}
+
+	//login.Cc <- core.Chunk{Remaining: false, Data: util.ToJson(session)}
 	go func() {
 		id, err := s.Sequence().Id()
 		if err != nil {
@@ -61,12 +61,13 @@ func (s *PresenceRegister) Register(login bootstrap.Login) {
 			core.AppLog.Warn().Msgf("failed to publish topic %s", err.Error())
 			return
 		}
-		rw := item.OnInventory{SystemId: login.SystemId, ItemId: s.LoginReward.Id, Source: "login"}
-		err = s.ItemService().InventoryManager().Grant(rw)
-		if err != nil {
-			core.AppLog.Printf("grant failed %s\n", err.Error())
-		}
+		//rw := item.OnInventory{SystemId: login.SystemId, ItemId: s.LoginReward.Id, Source: "login"}
+		//err = s.ItemService().InventoryManager().Grant(rw)
+		//if err != nil {
+		//core.AppLog.Printf("grant failed %s\n", err.Error())
+		//}
 	}()
+	return session, nil
 }
 
 func (s *PresenceRegister) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
@@ -76,16 +77,8 @@ func (s *PresenceRegister) Request(rs core.OnSession, w http.ResponseWriter, r *
 		r.Body.Close()
 	}()
 	w.WriteHeader(http.StatusOK)
-	var login bootstrap.Login
+	var login protocol.LoginObject
 	json.NewDecoder(r.Body).Decode(&login)
-	login.Cc = listener
-	go s.Register(login)
-	for c := range listener {
-		cv, _ := c.Data.([]byte)
-		w.Write(cv)
-		if !c.Remaining {
-			break
-		}
-	}
-
+	resp, _ := s.Register(&login)
+	w.Write(util.ToJson(resp))
 }
