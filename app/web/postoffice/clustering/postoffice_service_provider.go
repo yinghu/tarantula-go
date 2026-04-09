@@ -85,29 +85,22 @@ func (c *DataServiceProvider) Request(ctx context.Context, request *protocol.Req
 	switch request.Opt {
 	case core.CREATE_DATA_REQUEST:
 		return c.runCreate(request)
-		//stream.Send(resp)
 
 	case core.GET_DATA_REQUEST:
 		return c.runGet(request)
-		//stream.Send(resp)
 
 	case core.QUERY_DATA_REQUEST:
-		//c.runQuery(request, stream)
 
 	case core.UPDATE_DATA_REQUEST:
 		return c.runUpdate(request)
-		//stream.Send(resp)
 
 	case core.DELETE_DATA_REQUEST:
 		return c.runDelete(request)
-		//stream.Send(resp)
 
 	case core.RESET_DATA_REQUEST:
 		return c.runReset(request)
-		//stream.Send(resp)
 
 	default:
-		//stream.Send(&protocol.Response{Successful: false, Message: fmt.Sprintf("request opt not suuported %d", request.Opt)})
 	}
 	return &protocol.Response{Successful: false, Message: "not suppotred"}, fmt.Errorf("opt not supported %d", request.Opt)
 }
