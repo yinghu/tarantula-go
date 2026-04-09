@@ -40,9 +40,6 @@ type DataServiceProvider struct {
 	subscriptions SubscriptionRegistry
 	listeners     map[string]ReceiverAsync //chan *protocol.Topic
 	DRequest      chan TopicRequest
-
-	//service task caller
-	//WTask chan<- core.Task
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
