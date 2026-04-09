@@ -6,6 +6,7 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -30,11 +31,12 @@ func (s *InventoryClusterUpdate) Request(rs core.OnSession, w http.ResponseWrite
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	req := core.DataRequest{Key: k, Value: v, Opt: core.UPDATE_DATA_REQUEST}
-	req.FactoryId = co.FactoryId()
-	req.ClassId = co.ClassId()
-	req.Revision = co.Rev
-	resp, err := s.Cluster().Request(req)
+	//req := core.DataRequest{Key: k, Value: v, Opt: core.UPDATE_DATA_REQUEST}
+	//req.FactoryId = co.FactoryId()
+	//req.ClassId = co.ClassId()
+	//req.Revision = co.Rev
+	q := protocol.Request{Opt: core.UPDATE_DATA_REQUEST, Data: &protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: co.FactoryId(), ClassId: co.ClassId(), Revision: co.Rev}}}
+	resp, err := s.Cluster().Request(&q)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return

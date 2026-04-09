@@ -72,17 +72,17 @@ func (c *ClusterManager) RingToken(key []byte) uint32 {
 	return util.Hash(key)
 }
 
-func (c *ClusterManager) Request(r core.DataRequest) (*protocol.Response, error) {
+func (c *ClusterManager) Request(r *protocol.Request) (*protocol.Response, error) {
 	if !c.running {
 		return &protocol.Response{Successful: false}, fmt.Errorf("cluster not started")
 	}
-	req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
+	//req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
 	conn, err := c.cPool.Conn()
 	if err != nil {
 		return nil, err
 	}
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
-	return dsp.Request(context.Background(), &req)
+	return dsp.Request(context.Background(), r)
 }
 
 func (c *ClusterManager) List(r core.Query) (grpc.ServerStreamingClient[protocol.Response], error) {

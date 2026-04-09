@@ -5,6 +5,7 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -27,10 +28,11 @@ func (s *PresenceClusterGet) Request(rs core.OnSession, w http.ResponseWriter, r
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	req := core.DataRequest{Key: k, Opt: core.GET_DATA_REQUEST}
-	req.FactoryId = co.FactoryId()
-	req.ClassId = co.ClassId()
-	resp, err := s.Cluster().Request(req)
+	//req := core.DataRequest{Key: k, Opt: core.GET_DATA_REQUEST}
+	//req.FactoryId = co.FactoryId()
+	//req.ClassId = co.ClassId()
+	q := protocol.Request{Opt: core.GET_DATA_REQUEST, Data: &protocol.Data{Key: k, Header: &protocol.Header{FactoryId: co.FactoryId(), ClassId: co.ClassId()}}}
+	resp, err := s.Cluster().Request(&q)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return

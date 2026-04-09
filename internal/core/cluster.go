@@ -18,7 +18,8 @@ const (
 	UPDATE_DATA_REQUEST uint32 = 12
 	DELETE_DATA_REQUEST uint32 = 13
 	RESET_DATA_REQUEST  uint32 = 14
-	QUERY_DATA_REQUEST  uint32 = 15
+
+	QUERY_DATA_REQUEST uint32 = 15
 
 	//PULL_DATA_REQUEST uint32 = 16
 
@@ -115,12 +116,11 @@ type DataHeader struct {
 
 type DataRequest struct {
 	DataHeader
-	Prefix   uint32
-	Key      []byte
-	Value    []byte
-	Opt      uint32
-	Criteria Query
-	//Async    chan Chunk
+	Prefix uint32
+	Key    []byte
+	Value  []byte
+	Opt    uint32
+	Object protocol.KeyValue
 }
 
 type TopicListener interface {
@@ -133,7 +133,7 @@ type ClusterService interface {
 	RingToken(key []byte) uint32
 
 	List(r Query) (grpc.ServerStreamingClient[protocol.Response], error)
-	Request(r DataRequest) (*protocol.Response, error)
+	Request(r *protocol.Request) (*protocol.Response, error)
 
 	Publish(e *protocol.Topic) (*protocol.Response, error)
 

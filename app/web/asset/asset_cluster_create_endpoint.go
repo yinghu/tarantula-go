@@ -35,7 +35,9 @@ func (s *AssetClusterCreate) Request(rs core.OnSession, w http.ResponseWriter, r
 	req.ClassId = co.ClassId()
 	req.Mutable = co.Mutable
 
-	resp, err := s.Cluster().Request(req)
+	//q := protocol.Request{Data: &protocol.Data{Key: k,Value: v,Header: }}
+
+	resp, err := s.Cluster().Request(&req)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
