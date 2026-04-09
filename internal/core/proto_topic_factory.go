@@ -10,5 +10,4 @@ type ProtoTopicFactory interface {
 	Topic(data []byte) (*protocol.Topic, error)
 	Message(topic *protocol.Topic) (any, error)
 	QueryFactory
-	Query() Query
 }
