@@ -151,6 +151,9 @@ func (q *QWithTag) QFactoryId() uint32 {
 func (q *QWithTag) QClassId() uint32 {
 	return q.ClassId
 }
+func (q *QWithTag) QNodeId() string {
+	return q.Tag
+}
 func (q *QWithTag) QTag() string {
 	return q.Tag
 }
@@ -180,12 +183,13 @@ func (q *QWithTag) QEvent() core.Event {
 }
 
 func (q *QWithTag) QFilter(k, v []byte) bool {
-	buff := core.NewBuffer(100)
-	buff.Write(k)
-	buff.Flip()
-	tag, _ := buff.ReadString()
-	oid, _ := buff.ReadInt64()
-	rev, _ := buff.ReadInt64()
-	core.AppLog.Debug().Msgf("filter %s %d %d", tag, oid, rev)
-	return tag == q.Tag
+	//buff := core.NewBuffer(100)
+	//buff.Write(k)
+	//buff.Flip()
+	//tag, _ := buff.ReadString()
+	//oid, _ := buff.ReadInt64()
+	//rev, _ := buff.ReadInt64()
+	//core.AppLog.Debug().Msgf("filter %s %d %d", tag, oid, rev)
+	return true
+	//return tag == q.Tag
 }

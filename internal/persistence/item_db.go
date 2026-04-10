@@ -3,7 +3,7 @@ package persistence
 import (
 	"fmt"
 
-	"gameclustering.com/internal/item"
+	"gameclustering.com/internal/core"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -31,7 +31,7 @@ type ItemDB struct {
 	//Cls core.Cluster
 }
 
-func (db *ItemDB) InventoryManager() item.InventoryManager {
+func (db *ItemDB) InventoryManager() core.InventoryManager {
 	return db.Gis
 }
 

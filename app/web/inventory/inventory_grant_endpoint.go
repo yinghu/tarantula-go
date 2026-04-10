@@ -7,7 +7,6 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
-	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
 )
 
@@ -21,7 +20,7 @@ func (s *InventoryGranter) AccessControl() int32 {
 
 func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	ivn := item.OnInventory{}
+	ivn := core.OnInventory{}
 	err := json.NewDecoder(r.Body).Decode(&ivn)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
@@ -33,16 +32,16 @@ func (s *InventoryGranter) Request(rs core.OnSession, w http.ResponseWriter, r *
 		return
 	}
 	core.AppLog.Printf("Granting item %d\n", conf.Id)
-	ivs := make([]item.Inventory, 0)
-	s.ItemService().InventoryManager().Validate(conf, func(prop string, c item.Configuration) {
+	ivs := make([]core.Inventory, 0)
+	s.ItemService().InventoryManager().Validate(conf, func(prop string, c core.Configuration) {
 		core.AppLog.Printf("Validating conf %s %s\n", prop, c.Category)
 		cat, err := s.ItemService().InventoryManager().LoadCategory(c.Category)
 		if err != nil {
 			core.AppLog.Printf("Error %s\n", err.Error())
 		} else {
 			core.AppLog.Printf("Category :%v\n", cat)
-			if cat.Scope == item.GRANTABLE_ITEM {
-				ivs = append(ivs, item.Inventory{SystemId: ivn.SystemId, TypeId: c.TypeId, Rechargeable: cat.Rechargeable, Amount: c.Amount(cat), UpdateTime: time.Now(), ItemId: c.Id})
+			if cat.Scope == core.GRANTABLE_ITEM {
+				ivs = append(ivs, core.Inventory{SystemId: ivn.SystemId, TypeId: c.TypeId, Rechargeable: cat.Rechargeable, Amount: c.Amount(cat), UpdateTime: time.Now(), ItemId: c.Id})
 			}
 		}
 	})

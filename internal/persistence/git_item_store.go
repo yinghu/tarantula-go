@@ -9,13 +9,12 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
 )
 
 type InventoryResp struct {
 	core.OnSession
-	Stock []item.Inventory
+	Stock []core.Inventory
 }
 
 type GitItemStore struct {
@@ -35,7 +34,7 @@ func (db *GitItemStore) Start() error {
 	return nil
 }
 
-func (db *GitItemStore) SaveCategory(c item.Category) error {
+func (db *GitItemStore) SaveCategory(c core.Category) error {
 	fn := fmt.Sprintf("%s/%d.json", db.CategoryDir, c.Id)
 	err := db.writeFile(fn, string(util.ToJson(c)))
 	if err != nil {
@@ -62,7 +61,7 @@ func (db *GitItemStore) SaveCategory(c item.Category) error {
 	return nil
 }
 
-func (db *GitItemStore) SaveEnum(c item.Enum) error {
+func (db *GitItemStore) SaveEnum(c core.Enum) error {
 	fn := fmt.Sprintf("%s/%d.json", db.EnumDir, c.Id)
 	dest, err := os.OpenFile(fn, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -85,7 +84,7 @@ func (db *GitItemStore) SaveEnum(c item.Enum) error {
 	return nil
 }
 
-func (db *GitItemStore) SaveConfiguration(c item.Configuration) error {
+func (db *GitItemStore) SaveConfiguration(c core.Configuration) error {
 	fn := fmt.Sprintf("%s/%d.json", db.ConfigurationDir, c.Id)
 	dest, err := os.OpenFile(fn, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -108,8 +107,8 @@ func (db *GitItemStore) SaveConfiguration(c item.Configuration) error {
 	return nil
 }
 
-func (db *GitItemStore) Load(cid int64) (item.Configuration, error) {
-	conf := item.Configuration{Id: cid}
+func (db *GitItemStore) Load(cid int64) (core.Configuration, error) {
+	conf := core.Configuration{Id: cid}
 	fn := fmt.Sprintf("%s/%d.json", db.ConfigurationDir, cid)
 	src, err := os.Open(fn)
 	if err != nil {
@@ -124,7 +123,7 @@ func (db *GitItemStore) Load(cid int64) (item.Configuration, error) {
 	conf.Reference = map[string]any{}
 	for k := range conf.Application {
 		refs := conf.Application[k]
-		confs := make([]item.Configuration, 0)
+		confs := make([]core.Configuration, 0)
 		for r := range refs {
 			cid, _ := strconv.ParseInt(refs[r], 10, 64)
 			conf, err := db.Load(cid)
@@ -179,15 +178,15 @@ func (db *GitItemStore) RemoveEnum(cid int64) error {
 	}
 	return nil
 }
-func (db *GitItemStore) Reload(kv item.KVUpdate) error {
+func (db *GitItemStore) Reload(kv core.KVUpdate) error {
 	util.GitPull()
-	var repo item.RepoUpdate
+	var repo core.RepoUpdate
 	json.Unmarshal([]byte(kv.Value), &repo)
 	core.AppLog.Printf("Repo : %v\n", repo)
 	return nil
 }
-func (db *GitItemStore) LoadCategory(name string) (item.Category, error) {
-	cat := item.Category{}
+func (db *GitItemStore) LoadCategory(name string) (core.Category, error) {
+	cat := core.Category{}
 	fn := fmt.Sprintf("%s/%s.json", db.CategoryDir, name)
 	src, err := os.Open(fn)
 	if err != nil {
@@ -215,7 +214,7 @@ func (db *GitItemStore) writeFile(fn string, data string) error {
 	return nil
 }
 
-func (db *GitItemStore) Grant(inv item.OnInventory) error {
+func (db *GitItemStore) Grant(inv core.OnInventory) error {
 	var er error
 	for i := range 5 {
 		ret := db.PostJsonSync("http://inventory:8080/inventory/grant", inv)
@@ -229,11 +228,11 @@ func (db *GitItemStore) Grant(inv item.OnInventory) error {
 	return er
 }
 
-func (db *GitItemStore) Validate(c item.Configuration, validator item.Validator) {
-	item.ItemValidator(c, validator)
+func (db *GitItemStore) Validate(c core.Configuration, validator core.Validator) {
+	core.ItemValidator(c, validator)
 }
 
-func (db *GitItemStore) Stock(inv item.OnInventory) ([]item.Inventory, error) {
+func (db *GitItemStore) Stock(inv core.OnInventory) ([]core.Inventory, error) {
 	stock := InventoryResp{}
 
 	ch := make(chan core.Chunk, 3)

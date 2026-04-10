@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
+	"github.com/rs/zerolog"
 )
 
 const (
@@ -28,38 +28,35 @@ const (
 	BAD_REQUEST_MSG    string = "bad request"
 )
 
+type LogForwarder interface {
+	Forward(level zerolog.Level, log []byte)
+}
+
 type TarantulaContext interface {
 	Config() string
-	Start(f core.Env, p core.Pusher) error
+	Start(f core.Env) error
 	Shutdown()
 	Context() string
 	Service() TarantulaService
 }
 
 type TarantulaService interface {
-	ItemService() item.ItemService
+	ItemService() core.ItemService
 	Metrics() core.MetricsService
 	Authenticator() core.Authenticator
 	Sequence() core.Sequence
-	ItemListener() item.ItemListener
+	ItemListener() core.ItemListener
 	Pusher() core.Pusher
 	Cluster() core.ClusterService
 	Event() core.EventService
+	RegisterLogForwarder(threshold zerolog.Level, logf LogForwarder)
 }
 
 type TarantulaApp interface {
 	TarantulaService
 	AccessControl() int32
 	NodeId() string
+	Context() string
+	ClusterMember() bool
 	Request(sesion core.OnSession, w http.ResponseWriter, r *http.Request)
-}
-
-type Login struct {
-	Id            int32           `json:"-"`
-	Name          string          `json:"login"`
-	Hash          string          `json:"password"`
-	ReferenceId   int32           `json:"referenceId"`
-	SystemId      int64           `json:"systemId:string"`
-	AccessControl int32           `json:"accessControl,string"`
-	Cc            chan core.Chunk `json:"-"`
 }

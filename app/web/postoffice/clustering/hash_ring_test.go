@@ -5,12 +5,13 @@ import (
 	"slices"
 	"testing"
 
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 )
 
 func TestHashRingScale(t *testing.T) {
-	core.CreateTestLog()
+	bootstrap.CreateTestLog()
 	rwNode := make(chan RingUpdate, NODE_EVENT_BUFFER_SIZE)
 	ring := MemberHashRing{weight: NODE_WEIGHT, WNode: rwNode}
 
@@ -51,7 +52,7 @@ func TestHashRingScale(t *testing.T) {
 }
 
 func TestHashRingPrefix(t *testing.T) {
-	core.CreateTestLog()
+	bootstrap.CreateTestLog()
 	rwNode := make(chan RingUpdate, NODE_EVENT_BUFFER_SIZE*100)
 	ring := MemberHashRing{weight: NODE_WEIGHT, WNode: rwNode}
 	ring.OnAdd(core.Node{Name: "node-a", IP: "192.168.1.10:6060"})
@@ -204,46 +205,44 @@ func TestHashRingPrefix(t *testing.T) {
 
 }
 
-
 func TestHashRingBalance(t *testing.T) {
-	core.CreateTestLog()
+	bootstrap.CreateTestLog()
 	ring := NodeRing{nodes: make([]core.Node, 0)}
 	for i := range NODE_WEIGHT {
-		ix := i+100
+		ix := i + 100
 		nm := fmt.Sprintf("a%d", i)
-		n := core.Node{Name: nm, RingToken: uint32(ix*i+100), IP: "192.168.1.10"}
+		n := core.Node{Name: nm, RingToken: uint32(ix*i + 100), IP: "192.168.1.10"}
 		ring.nodes = append(ring.nodes, n)
 	}
 	ring.nodeNum++
 	slices.SortFunc(ring.nodes, cmp)
 	core.AppLog.Debug().Msgf("nodes %v", ring)
-	
-	for i := range 3{
+
+	for i := range 3 {
 		nm := fmt.Sprintf("b%d", i)
-		n := core.Node{Name: nm, RingToken: uint32(i+105), IP: "192.168.1.20"}
+		n := core.Node{Name: nm, RingToken: uint32(i + 105), IP: "192.168.1.20"}
 		ns := ring.rangeOfRing(n.RingToken)
-		core.AppLog.Debug().Msgf("PUSH DATA RANGE >= %d AND < %d FROM %s[%d]",ns[0].RingToken,n.RingToken,ns[1].IP,ns[1].RingToken)
+		core.AppLog.Debug().Msgf("PUSH DATA RANGE >= %d AND < %d FROM %s[%d]", ns[0].RingToken, n.RingToken, ns[1].IP, ns[1].RingToken)
 		ring.nodes = append(ring.nodes, n)
-		slices.SortFunc(ring.nodes,cmp)
+		slices.SortFunc(ring.nodes, cmp)
 	}
 
-	for i := range 3{
+	for i := range 3 {
 		nm := fmt.Sprintf("b%d", i)
-		n := core.Node{Name: nm, RingToken: uint32(i+741), IP: "192.168.1.20"}
+		n := core.Node{Name: nm, RingToken: uint32(i + 741), IP: "192.168.1.20"}
 		ns := ring.rangeOfRing(n.RingToken)
-		core.AppLog.Debug().Msgf("PUSH DATA RANGE >= %d AND < %d FROM %s[%d]",ns[0].RingToken,n.RingToken,ns[1].IP,ns[1].RingToken)
+		core.AppLog.Debug().Msgf("PUSH DATA RANGE >= %d AND < %d FROM %s[%d]", ns[0].RingToken, n.RingToken, ns[1].IP, ns[1].RingToken)
 		ring.nodes = append(ring.nodes, n)
-		slices.SortFunc(ring.nodes,cmp)
+		slices.SortFunc(ring.nodes, cmp)
 	}
 
-	for i := range 3{
+	for i := range 3 {
 		nm := fmt.Sprintf("b%d", i)
-		n := core.Node{Name: nm, RingToken: uint32(i+441), IP: "192.168.1.20"}
+		n := core.Node{Name: nm, RingToken: uint32(i + 441), IP: "192.168.1.20"}
 		ns := ring.rangeOfRing(n.RingToken)
-		core.AppLog.Debug().Msgf("PUSH DATA RANGE >= %d AND < %d FROM %s[%d]",ns[0].RingToken,n.RingToken,ns[1].IP,ns[1].RingToken)
+		core.AppLog.Debug().Msgf("PUSH DATA RANGE >= %d AND < %d FROM %s[%d]", ns[0].RingToken, n.RingToken, ns[1].IP, ns[1].RingToken)
 		ring.nodes = append(ring.nodes, n)
-		slices.SortFunc(ring.nodes,cmp)
+		slices.SortFunc(ring.nodes, cmp)
 	}
-
 
 }

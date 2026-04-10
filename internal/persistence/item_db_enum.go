@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"gameclustering.com/internal/item"
+	"gameclustering.com/internal/core"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -19,7 +19,7 @@ const (
 	DELETE_ENUM_VALUE_WITH_ID   string = "DELETE FROM item_enum_value WHERE enum_id = $1"
 )
 
-func (db *ItemDB) SaveEnum(c item.Enum) error {
+func (db *ItemDB) SaveEnum(c core.Enum) error {
 	err := db.validateEnum(c)
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func (db *ItemDB) SaveEnum(c item.Enum) error {
 	})
 }
 
-func (db *ItemDB) validateEnum(c item.Enum) error {
+func (db *ItemDB) validateEnum(c core.Enum) error {
 	if c.Id <= 0 {
 		return errors.New("none negative id required")
 	}
@@ -68,8 +68,8 @@ func (db *ItemDB) validateEnum(c item.Enum) error {
 	return nil
 }
 
-func (db *ItemDB) LoadEnum(cname string) (item.Enum, error) {
-	cat := item.Enum{Name: cname}
+func (db *ItemDB) LoadEnum(cname string) (core.Enum, error) {
+	cat := core.Enum{Name: cname}
 	err := db.Sql.Query(func(row pgx.Rows) error {
 		err := row.Scan(&cat.Id)
 		if err != nil {
@@ -87,10 +87,10 @@ func (db *ItemDB) LoadEnum(cname string) (item.Enum, error) {
 	return cat, nil
 }
 
-func (db *ItemDB) LoadEnums() ([]item.Enum, error) {
-	enums := make([]item.Enum, 0)
+func (db *ItemDB) LoadEnums() ([]core.Enum, error) {
+	enums := make([]core.Enum, 0)
 	err := db.Sql.Query(func(row pgx.Rows) error {
-		var enum item.Enum
+		var enum core.Enum
 		err := row.Scan(&enum.Id, &enum.Name)
 		if err != nil {
 			return err
@@ -146,10 +146,10 @@ func (db *ItemDB) DeleteEnumWithId(cid int64) error {
 	return nil
 }
 
-func (db *ItemDB) loadValues(enum *item.Enum) error {
-	enum.Values = make([]item.EnumValue, 0)
+func (db *ItemDB) loadValues(enum *core.Enum) error {
+	enum.Values = make([]core.EnumValue, 0)
 	err := db.Sql.Query(func(row pgx.Rows) error {
-		var prop item.EnumValue
+		var prop core.EnumValue
 		err := row.Scan(&prop.Name, &prop.Value)
 		if err != nil {
 			return err

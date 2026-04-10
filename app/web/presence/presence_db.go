@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 
-	"gameclustering.com/internal/bootstrap"
-	"gameclustering.com/internal/metrics"
+	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -23,20 +23,20 @@ func (s *PresenceService) createSchema() error {
 	return nil
 }
 
-func (s *PresenceService) SaveLogin(login *bootstrap.Login) error {
-	inserted, err := s.Sql.Exec(INSERT_LOGIN, login.Name, login.Hash, login.SystemId, login.ReferenceId)
+func (s *PresenceService) SaveLogin(login *protocol.LoginObject) error {
+	inserted, err := s.Sql.Exec(INSERT_LOGIN, login.Name, login.Password, login.SystemId, login.ReferenceId)
 	if err != nil {
-		metrics.APP_ERROR_METRICS.WithLabelValues("login", err.Error()).Inc()
+		core.APP_ERROR_METRICS.WithLabelValues("login", err.Error()).Inc()
 		return err
 	}
 	if inserted == 0 {
-		metrics.APP_ERROR_METRICS.WithLabelValues("login", "cannot be saved").Inc()
+		core.APP_ERROR_METRICS.WithLabelValues("login", "cannot be saved").Inc()
 		return errors.New("login cannot be saved")
 	}
 	return nil
 }
 
-func (s *PresenceService) LoadLogin(login *bootstrap.Login) error {
+func (s *PresenceService) LoadLogin(login *protocol.LoginObject) error {
 	err := s.Sql.Query(func(rows pgx.Rows) error {
 		var hash string
 		var systemId int64
@@ -46,10 +46,10 @@ func (s *PresenceService) LoadLogin(login *bootstrap.Login) error {
 		if err != nil {
 			return err
 		}
-		login.Hash = hash
-		login.SystemId = systemId
-		login.AccessControl = accessControl
-		login.Id = id
+		login.Password = hash
+		login.SystemId = uint64(systemId)
+		login.AccessControl = uint32(accessControl)
+		login.Id = uint32(id)
 		return nil
 	}, SELECT_LOGIN_WITH_NAME, login.Name)
 	if err != nil {
@@ -61,8 +61,8 @@ func (s *PresenceService) LoadLogin(login *bootstrap.Login) error {
 	return nil
 }
 
-func (s *PresenceService) UpdatePassword(login *bootstrap.Login) error {
-	updated, err := s.Sql.Exec(UPDATE_HASH, login.Hash, login.Name)
+func (s *PresenceService) UpdatePassword(login *protocol.LoginObject) error {
+	updated, err := s.Sql.Exec(UPDATE_HASH, login.Password, login.Name)
 	if err != nil {
 		return err
 	}

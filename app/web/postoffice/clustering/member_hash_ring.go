@@ -22,9 +22,12 @@ func (m *MemberHashRing) vNode(node core.Node, weight int) core.Node {
 }
 
 func (m *MemberHashRing) OnAdd(node core.Node) {
+	pool := core.RpcConnPool{Target: node.RpcEndpoint}
+	pool.Start()
 	added := make([]core.Node, 0, m.weight)
 	for w := range m.weight {
 		v := m.vNode(node, w)
+		v.CPool = &pool
 		node.RingToken = m.RingToken([]byte(v.Name))
 		m.nodes = append(m.nodes, v)
 		added = append(added, v)
@@ -46,6 +49,11 @@ func (m *MemberHashRing) OnRemove(node core.Node) {
 	})
 	slices.SortFunc(m.nodes, cmp)
 	m.nodeNum--
+	core.AppLog.Debug().Msgf("remove meta %s", removed[0].Meta)
+	mpart := strings.Split(removed[0].Meta, ":")
+	removed[0].CPool.Tag = mpart[0]
+	removed[0].CPool.NodeId = mpart[1]
+	removed[0].CPool.Release()
 	m.WNode <- RingUpdate{State: NODE_STATE_DEAD, Nodes: removed}
 }
 

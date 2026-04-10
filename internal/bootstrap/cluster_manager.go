@@ -10,8 +10,10 @@ import (
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
+	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -32,135 +34,106 @@ type Sub struct {
 
 type ClusterManager struct {
 	App     *AppManager
-	rpc     *grpc.ClientConn
 	running bool
 
 	subscriptions map[string]core.TopicListener
 
 	cSub     chan Sub
 	cInbound chan *protocol.Topic
+	cHost    string
+	cPool    core.RpcConnPool
 }
 
-func (c *ClusterManager) HashRing(r core.RingRequest) {
+func (c *ClusterManager) HashRing(r core.RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error) {
 	if !c.running {
-		r.Async <- []core.Node{}
-		return
+		return nil, fmt.Errorf("cluster not started")
 	}
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	stream, err := dsp.HashRing(context.Background(), &protocol.Request{Prefix: 0})
+	conn, err := c.cPool.Conn()
 	if err != nil {
-		return
+		return nil, err
 	}
-	ring := make([]core.Node, 0)
-	for {
-		data, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
-			break
-		}
-		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
-	}
-	r.Async <- ring
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	return dsp.HashRing(context.Background(), &protocol.Request{Prefix: 0})
 }
 
-func (c *ClusterManager) KeyRing(r core.RingRequest) {
+func (c *ClusterManager) KeyRing(r core.RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error) {
 	if !c.running {
-		r.Async <- []core.Node{}
-		return
+		return nil, fmt.Errorf("cluster not started")
 	}
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	stream, err := dsp.KeyRing(context.Background(), &protocol.Request{Prefix: r.Token})
+	conn, err := c.cPool.Conn()
 	if err != nil {
-		return
+		return nil, err
 	}
-	ring := make([]core.Node, 0)
-	for {
-		data, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
-			break
-		}
-		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
-	}
-	r.Async <- ring
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	return dsp.KeyRing(context.Background(), &protocol.Request{Prefix: r.Token})
 }
 
 func (c *ClusterManager) RingToken(key []byte) uint32 {
 	return util.Hash(key)
 }
 
-func (c *ClusterManager) Request(r core.DataRequest) {
+func (c *ClusterManager) Request(r *protocol.Request) (*protocol.Response, error) {
 	if !c.running {
-		r.Async <- core.Chunk{Remaining: false}
-		return
+		return &protocol.Response{Successful: false}, fmt.Errorf("cluster not started")
 	}
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	req := protocol.Request{Prefix: r.Prefix, Opt: r.Opt, Data: &protocol.Data{Key: r.Key, Value: r.Value, Header: &protocol.Header{Revision: r.Revision, FactoryId: r.FactoryId, ClassId: r.ClassId, Mutable: r.Mutable}}}
-	if r.Opt == core.QUERY_DATA_REQUEST || r.Opt == core.PULL_DATA_REQUEST {
-		dt, err := event.Export(r.Criteria, 100)
-		if err != nil {
-			r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: err.Error()}}
-			return
-		}
-		q := protocol.Query{Id: r.Criteria.QId(), Criteria: dt}
-		req.Query = &q
-	}
-	stream, err := dsp.Request(context.Background(), &req)
+	conn, err := c.cPool.Conn()
 	if err != nil {
-		r.Async <- core.Chunk{Remaining: false, Data: protocol.Response{Successful: false, Message: err.Error()}}
-		return
+		return nil, err
 	}
-	crt := core.Chunk{Remaining: false}
-	for {
-		resp, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
-			crt.Data = err
-			break
-		}
-		r.Async <- core.Chunk{Remaining: true, Data: resp}
-	}
-	r.Async <- crt
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	return dsp.Request(context.Background(), r)
 }
 
-func (c *ClusterManager) Publish(e *protocol.Topic) error {
+func (c *ClusterManager) List(r core.Query) (grpc.ServerStreamingClient[protocol.Response], error) {
 	if !c.running {
-		return fmt.Errorf("not started")
+		return nil, fmt.Errorf("cluster not started")
 	}
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	resp, err := dsp.Publish(context.Background(), e)
+	mf, existed := TopicFactoryRegistry[r.QTopic()]
+	if !existed {
+		return nil, fmt.Errorf("topic factory not existed")
+	}
+	dt, err := mf().Export(r)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	core.AppLog.Debug().Msgf("topic publish %v", resp)
-	return nil
+	q := protocol.Query{Id: r.QTopic(), Criteria: dt}
+	req := protocol.Request{Prefix: c.RingToken([]byte(r.QTopic())), Query: &q}
+	conn, err := c.cPool.Conn()
+	if err != nil {
+		return nil, err
+	}
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	return dsp.List(context.Background(), &req)
 }
-func (c *ClusterManager) List(query core.Query) {
-	req := core.DataRequest{Opt: core.QUERY_DATA_REQUEST, Criteria: query}
-	req.Async = query.QCc()
-	c.Request(req)
+
+func (c *ClusterManager) Publish(e *protocol.Topic) (*protocol.Response, error) {
+	if !c.running {
+		return &protocol.Response{Successful: false}, fmt.Errorf("not started")
+	}
+	conn, err := c.cPool.Conn()
+	if err != nil {
+		return &protocol.Response{Successful: false}, err
+	}
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	return dsp.Publish(context.Background(), e)
 }
 
 func (c *ClusterManager) Subscribe(topic string, listener core.TopicListener) error {
 	if !c.running {
 		return fmt.Errorf("not started")
 	}
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
+	conn, err := c.cPool.Conn()
+	if err != nil {
+		return err
+	}
+
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
 	resp, err := dsp.Subscribe(context.Background(), &protocol.Topic{NodeId: c.App.NodeId(), Tag: c.App.Context(), Name: topic})
 	if err != nil {
 		return err
 	}
 	c.cSub <- Sub{opt: OPT_SUB, name: topic, listener: listener}
-	core.AppLog.Debug().Msgf("topic registered %v", resp)
+	core.AppLog.Debug().Msgf("topic registered %v %s", resp.Successful, topic)
 	return nil
 }
 
@@ -168,14 +141,20 @@ func (c *ClusterManager) Unsubscribe(topic string) error {
 	if !c.running {
 		return fmt.Errorf("not started")
 	}
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
+	conn, err := c.cPool.Conn()
+	if err != nil {
+		return err
+	}
+
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
 	resp, err := dsp.Unsubscribe(context.Background(), &protocol.Topic{Tag: c.App.Context(), Name: topic})
 	if err != nil {
 		return err
 	}
 	c.cSub <- Sub{opt: OPT_UNSUB, name: topic}
-	core.AppLog.Debug().Msgf("topic unregistered %v", resp)
+	core.AppLog.Debug().Msgf("topic unregistered %v %s", resp.Successful, topic)
 	return nil
+
 }
 
 func (c *ClusterManager) disconnect() error {
@@ -183,31 +162,14 @@ func (c *ClusterManager) disconnect() error {
 		return fmt.Errorf("not started")
 	}
 	c.running = false
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
-	resp, err := dsp.Disconnect(context.Background(), &protocol.Topic{Tag: c.App.Context(), NodeId: c.App.NodeId()})
-	if err != nil {
-		return err
-	}
-	core.AppLog.Debug().Msgf("disconnecting topic %v", resp)
-	return c.rpc.Close()
+	c.cPool.Release()
+	return nil
 }
 
 func (c *ClusterManager) connect(host string) error {
-	retries := RPC_CONNECT_RETRIES
-	for {
-		tcp, err := grpc.NewClient(fmt.Sprintf("%s:%d", host, core.RPC_PORT), grpc.WithTransportCredentials(insecure.NewCredentials()))
-		if err != nil {
-			retries--
-			if retries > 0 {
-				core.AppLog.Warn().Msgf("retrying to connect gprc %s with retried times %d", err.Error(), retries)
-				time.Sleep(3 * time.Second)
-				continue
-			}
-			return err
-		}
-		c.rpc = tcp
-		break
-	}
+	c.cHost = fmt.Sprintf("%s:%d", host, core.RPC_PORT)
+	c.cPool = core.RpcConnPool{Target: c.cHost, Tag: c.App.Context(), NodeId: c.App.NodeId()}
+	c.cPool.Start()
 	c.subscriptions = make(map[string]core.TopicListener)
 	c.cSub = make(chan Sub, SUB_CHAN_SIZE)
 	c.cInbound = make(chan *protocol.Topic, TOPIC_CHAN_SIZE)
@@ -219,8 +181,12 @@ func (c *ClusterManager) connect(host string) error {
 
 func (c *ClusterManager) receive() {
 	retries := RPC_CONNECT_RETRIES
+	conn, err := c.cPool.Conn()
+	if err != nil {
+		panic(err.Error())
+	}
 ro:
-	dsp := protocol.NewPostofficeServiceClient(c.rpc)
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
 	stream, err := dsp.Receive(context.Background(), &protocol.Topic{NodeId: c.App.NodeId(), Tag: c.App.Context()})
 	if err != nil {
 		retries--
@@ -264,11 +230,30 @@ func (c *ClusterManager) async() {
 			case OPT_UNSUB:
 				delete(c.subscriptions, sub.name)
 			}
-
 		}
 	}
 	core.AppLog.Warn().Msgf("cluster manager async task closed from remote %v", c.running)
 	clear(c.subscriptions)
 	close(c.cInbound)
 	close(c.cSub)
+}
+
+func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
+	if !c.running {
+		return
+	}
+	e := protocol.LogEvent{}
+	err := protojson.Unmarshal(log, &e)
+	if err != nil {
+		e.Level = "error"
+		e.Message = err.Error()
+		e.Time = timestamppb.Now()
+		e.Source = "forwarder:325"
+	}
+	tf := event.LogEventFactory{}
+	t, err := tf.FromLogEvent(&e)
+	t.NodeId = c.App.NodeId()
+	t.Tag = c.App.Context()
+	id, _ := c.App.Sequence().Id()
+	t.Event.Id = uint64(id)
 }

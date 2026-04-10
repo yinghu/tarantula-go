@@ -20,7 +20,6 @@ func TestEvent(t *testing.T) {
 		t.Errorf("should not be error %s", err.Error())
 		return
 	}
-	fmt.Printf("size of data %d\n", len(data))
 
 	var ex Event
 	err = proto.Unmarshal(data, &ex)
@@ -28,14 +27,12 @@ func TestEvent(t *testing.T) {
 		t.Errorf("should not be error %s", err.Error())
 		return
 	}
-	fmt.Printf("header %v\n", ex.Header)
 	var me MessageEvent
 	err = ex.Message.UnmarshalTo(&me)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 		return
 	}
-	fmt.Printf("data %v\n", &me)
 
 	tp := Topic{NodeId: "pd.1", Tag: "presence", Name: "message", Event: &e}
 	tdd, err := proto.Marshal(&tp)
@@ -43,7 +40,6 @@ func TestEvent(t *testing.T) {
 		t.Errorf("should not be error %s", err.Error())
 		return
 	}
-	fmt.Printf("size of topic %d\n", len(tdd))
 
 	var tpx Topic
 	err = proto.Unmarshal(tdd, &tpx)
@@ -51,5 +47,34 @@ func TestEvent(t *testing.T) {
 		t.Errorf("should not be error %s", err.Error())
 		return
 	}
-	fmt.Printf("topic %v\n", &tpx)
+}
+
+func TestLoginObject(t *testing.T) {
+	login := LoginObject{Name: "p100", Password: "password", SystemId: 100, Id: 2, ReferenceId: 1, AccessControl: 0}
+	k := Key{Array: []byte(login.Name), Header: &Header{FactoryId: 10, ClassId: 2, Mutable: true}}
+	v, err := anypb.New(&login)
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+		return
+	}
+	kv := KeyValue{Key: &k, Message: v}
+	bs, err := proto.Marshal(&kv)
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+		return
+	}
+	var pkv KeyValue
+	err = proto.Unmarshal(bs, &pkv)
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+		return
+	}
+	var loginx LoginObject
+	err = pkv.Message.UnmarshalTo(&loginx)
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+		return
+	}
+	fmt.Printf("kv %v\n", &pkv)
+	fmt.Printf("obj %v\n", &loginx)
 }

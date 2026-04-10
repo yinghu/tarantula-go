@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
 )
@@ -20,7 +19,7 @@ func (s *InventoryLoader) AccessControl() int32 {
 
 func (s *InventoryLoader) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	ivn := item.OnInventory{}
+	ivn := core.OnInventory{}
 	err := json.NewDecoder(r.Body).Decode(&ivn)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))

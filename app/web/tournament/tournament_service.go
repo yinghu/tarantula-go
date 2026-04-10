@@ -23,9 +23,9 @@ func (s *TournamentService) Config() string {
 	return "/etc/tarantula/tournament-conf.json"
 }
 
-func (s *TournamentService) Start(f core.Env, p core.Pusher) error {
+func (s *TournamentService) Start(f core.Env) error {
 	s.ItemUpdater = s
-	s.AppManager.Start(f, p)
+	s.AppManager.Start(f)
 	s.createSchema()
 	s.tournaments = make(map[int64]Tournament)
 	ids, err := s.loadSchedule()

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/metrics"
 )
 
 const (
@@ -147,12 +146,12 @@ func (s *TcpEndpoint) outbound() {
 					delete(s.outboundIndex, e.RecipientId())
 					kickoff.Flag = oc.Flag
 					s.Service.OnEvent(kickoff)
-					metrics.SOCKET_CONCURRENCY_METRICS.Dec()
+					core.SOCKET_CONCURRENCY_METRICS.Dec()
 				}
 				continue
 			}
 			if e.ClassId() == JOIN_CID {
-				metrics.SOCKET_CONCURRENCY_METRICS.Inc()
+				core.SOCKET_CONCURRENCY_METRICS.Inc()
 				join, _ := e.(*JoinEvent)
 				cout := OutboundSocket{C: join.Client, Pending: make(chan core.Event, 10), B: core.NewBuffer(TCP_READ_BUFFER_SIZE), Flag: join.Flag}
 				go cout.Subscribe()

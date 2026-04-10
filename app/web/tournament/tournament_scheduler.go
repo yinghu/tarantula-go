@@ -5,8 +5,6 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
-	"gameclustering.com/internal/item"
 )
 
 type Schedule struct {
@@ -15,7 +13,7 @@ type Schedule struct {
 	EndTime   time.Time `json:"EndTime"`
 }
 
-func (a *TournamentService) scheduleInstance(conf item.Configuration) {
+func (a *TournamentService) scheduleInstance(conf core.Configuration) {
 	header, err := json.Marshal(conf.Header)
 	if err != nil {
 		core.AppLog.Printf("no header data %s\n", err.Error())
@@ -29,7 +27,7 @@ func (a *TournamentService) scheduleInstance(conf item.Configuration) {
 		return
 	}
 	core.AppLog.Printf("Schedule :%d %v\n", ins.TournamentId, ins)
-	sc, ok := conf.Reference["Schedule"].([]item.Configuration)
+	sc, ok := conf.Reference["Schedule"].([]core.Configuration)
 	if !ok {
 		core.AppLog.Printf("no schedule data\n")
 		return
@@ -50,14 +48,14 @@ func (a *TournamentService) scheduleInstance(conf item.Configuration) {
 	if err != nil {
 		core.AppLog.Printf("sql err :%s\n", err.Error())
 	}
-	info := event.MessageEvent{Title: "info", Message: "tournament registered", Source: a.Context(), DateTime: time.Now()}
-	id, _ := a.Sequence().Id()
-	info.OnOId(id)
-	info.OnTopic("message")
+	//info := event.MessageEvent{Title: "info", Message: "tournament registered", Source: a.Context(), DateTime: time.Now()}
+	//id, _ := a.Sequence().Id()
+	//info.OnOId(id)
+	//info.OnTopic("message")
 	//a.Publish(&info)
 }
 
-func (a *TournamentService) scheduleSegment(conf item.Configuration) {
+func (a *TournamentService) scheduleSegment(conf core.Configuration) {
 	header, err := json.Marshal(conf.Header)
 	if err != nil {
 		core.AppLog.Printf("no header data %s\n", err.Error())
@@ -70,7 +68,7 @@ func (a *TournamentService) scheduleSegment(conf item.Configuration) {
 		core.AppLog.Printf("no header data %s\n", err.Error())
 		return
 	}
-	sc, ok := conf.Reference["Schedule"].([]item.Configuration)
+	sc, ok := conf.Reference["Schedule"].([]core.Configuration)
 	if !ok {
 		core.AppLog.Printf("no schedule data\n")
 		return
@@ -87,7 +85,7 @@ func (a *TournamentService) scheduleSegment(conf item.Configuration) {
 	}
 
 	core.AppLog.Printf("Schedule :%d %v\n", seg.TournamentId, conf.Reference)
-	refs, ok := conf.Reference["SegmentList"].([]item.Configuration)
+	refs, ok := conf.Reference["SegmentList"].([]core.Configuration)
 	if !ok {
 		core.AppLog.Printf("no segement data\n")
 		return
@@ -105,7 +103,7 @@ func (a *TournamentService) scheduleSegment(conf item.Configuration) {
 			continue
 		}
 		seg.Segments = append(seg.Segments, &sg)
-		core.AppLog.Printf("segement data %d %v\n", sg.InstanceId, sg)
+		core.AppLog.Printf("segement data %d %v\n", sg.InstanceId, &sg)
 	}
 	core.AppLog.Printf("SEG SCHEDULE %s\n", seg.Name)
 	//seg.Start()

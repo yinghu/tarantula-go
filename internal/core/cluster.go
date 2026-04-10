@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gameclustering.com/internal/protocol"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -17,13 +18,18 @@ const (
 	UPDATE_DATA_REQUEST uint32 = 12
 	DELETE_DATA_REQUEST uint32 = 13
 	RESET_DATA_REQUEST  uint32 = 14
-	QUERY_DATA_REQUEST  uint32 = 15
 
-	PULL_DATA_REQUEST uint32 = 16
+	//GET_OBJ_REQUEST    uint32 = 20
+	//CR/EATE_OBJ_REQUEST uint32 = 21
+	//UPDATE_OBJ_REQUEST uint32 = 22
+	//DELETE_OBJ_REQUEST uint32 = 23
+	//RESET_OBJ_REQUEST  uint32 = 24
 
 	DATA_STATE_READY   uint32 = 0
 	DATA_STATE_PENDING uint32 = 1
 	DATA_STATE_DELETED uint32 = 2
+
+	COMPOSIT_KEY_MAX int = 500
 )
 
 type Chunk struct {
@@ -39,6 +45,8 @@ type Node struct {
 	RpcEndpoint  string `json:"rpc,omitempty"`
 	HttpEndpoint string `json:"http,omitempty"`
 	TcpEndpoint  string `json:"tcp,omitempty"`
+
+	CPool *RpcConnPool `json:"-"`
 }
 type KVLoad func(k, v string) bool
 
@@ -74,6 +82,8 @@ type Subscription struct {
 	Topic    string `json:"topic"`
 	Endpoint string `json:"endpoint"`
 	Deleting bool   `json:"deleting"`
+
+	CPool *RpcConnPool `json:"-"`
 }
 
 func (s *Subscription) Key() string {
@@ -108,12 +118,11 @@ type DataHeader struct {
 
 type DataRequest struct {
 	DataHeader
-	Prefix   uint32
-	Key      []byte
-	Value    []byte
-	Opt      uint32
-	Criteria Query
-	Async    chan Chunk
+	Prefix uint32
+	Key    []byte
+	Value  []byte
+	Opt    uint32
+	Object protocol.KeyValue
 }
 
 type TopicListener interface {
@@ -121,13 +130,15 @@ type TopicListener interface {
 }
 
 type ClusterService interface {
-	HashRing(r RingRequest)
-	KeyRing(r RingRequest)
+	HashRing(r RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error)
+	KeyRing(r RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error)
 	RingToken(key []byte) uint32
-	Request(r DataRequest)
 
-	Publish(e *protocol.Topic) error
-	List(q Query)
+	List(r Query) (grpc.ServerStreamingClient[protocol.Response], error)
+	Request(r *protocol.Request) (*protocol.Response, error)
+
+	Publish(e *protocol.Topic) (*protocol.Response, error)
+
 	Subscribe(topic string, listener TopicListener) error
 	Unsubscribe(topic string) error
 }

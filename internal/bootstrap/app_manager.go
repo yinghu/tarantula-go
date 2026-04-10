@@ -3,31 +3,37 @@ package bootstrap
 import (
 	"context"
 	"fmt"
+	"io"
+	"os"
+	"runtime"
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
+	"github.com/rs/zerolog"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/concurrency"
 )
 
 type AppManager struct {
 	metr        core.MetricsService
-	imse        item.ItemService
+	imse        core.ItemService
 	auth        core.Authenticator
 	Sql         persistence.Postgresql
 	F           core.Env
 	seq         core.Sequence
-	ItemUpdater item.ItemListener
+	ItemUpdater core.ItemListener
 	tcpPusher   core.Pusher
 	ManagedApps []string
 	cluster     *ClusterManager
 	event       *EventManager
+	log         io.Writer //zerolog.Logger
+	forward     LogForwarder
+	threshold   zerolog.Level
 }
 
-func (s *AppManager) ItemService() item.ItemService {
+func (s *AppManager) ItemService() core.ItemService {
 	return s.imse
 }
 
@@ -45,7 +51,7 @@ func (s *AppManager) Authenticator() core.Authenticator {
 func (s *AppManager) Sequence() core.Sequence {
 	return s.seq
 }
-func (s *AppManager) ItemListener() item.ItemListener {
+func (s *AppManager) ItemListener() core.ItemListener {
 	return s.ItemUpdater
 }
 
@@ -59,13 +65,20 @@ func (c *AppManager) Event() core.EventService {
 func (s *AppManager) NodeId() string {
 	return s.F.NodeName
 }
-func (s *AppManager) Start(f core.Env, p core.Pusher) error {
-	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
 
+func (s *AppManager) ClusterMember() bool {
+	return s.F.IsClusterMember
+}
+
+func (s *AppManager) RegisterLogForwarder(threshold zerolog.Level, logf LogForwarder) {
+	s.forward = logf
+}
+func (s *AppManager) Start(f core.Env) error {
+	s.F = f
+	s.initLogger(f)
+	core.AppLog.Info().Msgf("app manager starting on %s %v\n", f.Prefix, f)
 	s.event = &EventManager{App: s}
 	s.ManagedApps = f.ManagedApps
-	s.tcpPusher = p
-	s.F = f
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
 	fctx := f.PresenceCtx()
@@ -105,6 +118,7 @@ func (s *AppManager) Start(f core.Env, p core.Pusher) error {
 	}
 	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.Host)
 	s.cluster = &ClusterManager{App: s}
+	s.RegisterLogForwarder(zerolog.DebugLevel, s.cluster)
 	return s.cluster.connect(f.Host)
 }
 
@@ -191,4 +205,53 @@ func (c *AppManager) Atomic(prefix string, t core.Exec) error {
 	mutex.Lock(ctx)
 	defer mutex.Unlock(ctx)
 	return t(&core.EtcdClient{Cli: cli, Prefix: prefix})
+}
+
+func (c *AppManager) Write(data []byte) (int, error) {
+	fmt.Printf("LOG : %s\n", string(data))
+	return len(data), nil
+}
+
+func (c *AppManager) WriteLevel(level zerolog.Level, data []byte) (int, error) {
+	if c.forward != nil && level >= c.threshold {
+		cp := append([]byte{}, data...)
+		c.forward.Forward(level, cp)
+	}
+	return c.log.Write(data)
+}
+
+func (c *AppManager) Run(e *zerolog.Event, level zerolog.Level, msg string) {
+	_, f, line, ok := runtime.Caller(3)
+	if !ok {
+		e.Str("source", "unknown")
+		return
+	}
+	e.Str("source", fmt.Sprintf("%s:%d", f, line))
+}
+
+func (c *AppManager) initLogger(f core.Env) {
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	zerolog.TimeFieldFormat = time.RFC3339
+	if f.Standalone {
+		CreateTestLog()
+		return
+	}
+	err := os.MkdirAll(f.LogDir+"/log", 0755)
+	if err != nil {
+		CreateTestLog()
+		return
+	}
+	opt := os.O_WRONLY | os.O_CREATE | os.O_APPEND
+	if f.LogTruncated {
+		opt = os.O_WRONLY | os.O_CREATE | os.O_TRUNC
+	}
+	file, err := os.OpenFile(f.LogDir+"/log/tarantula.log", opt, 0644)
+	if err != nil {
+		CreateTestLog()
+		return
+	}
+	c.log = file
+	core.AppLog = zerolog.New(zerolog.MultiLevelWriter(c)).With().Timestamp().Logger().Hook(c)
+	core.AppLog.Info().Msg("Initialized app log")
+
 }

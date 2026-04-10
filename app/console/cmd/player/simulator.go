@@ -4,14 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
-	"gameclustering.com/internal/event"
 )
 
 type Simulator struct {
@@ -46,8 +43,8 @@ func (s *Simulator) Play() error {
 
 func (s *Simulator) register() error {
 	hc := util.HttpCaller{Host: s.Host}
-	login := bootstrap.Login{Name: s.Player, Hash: "password"}
-	err := hc.PostJson("presence/register", login, func(resp *http.Response) error {
+	login := protocol.LoginObject{Name: s.Player, Password: "password"}
+	err := hc.PostJson("presence/register", &login, func(resp *http.Response) error {
 		session := core.OnSession{}
 		err := json.NewDecoder(resp.Body).Decode(&session)
 		if err != nil {
@@ -70,8 +67,8 @@ func (s *Simulator) register() error {
 
 func (s *Simulator) login() error {
 	hc := util.HttpCaller{Host: s.Host}
-	login := bootstrap.Login{Name: s.Player, Hash: "password"}
-	err := hc.PostJson("presence/login", login, func(resp *http.Response) error {
+	login := protocol.LoginObject{Name: s.Player, Password: "password"}
+	err := hc.PostJson("presence/login", &login, func(resp *http.Response) error {
 		session := core.OnSession{}
 		err := json.NewDecoder(resp.Body).Decode(&session)
 		if err != nil {
@@ -94,7 +91,7 @@ func (s *Simulator) login() error {
 
 func (s *Simulator) inventory() error {
 	hc := util.HttpCaller{Host: s.Host, Token: s.Token, SystemId: s.SystemId}
-	req := item.OnInventory{SystemId: hc.SystemId, TypeId: "gold"}
+	req := core.OnInventory{SystemId: hc.SystemId, TypeId: "gold"}
 	err := hc.PostJson("inventory/load", req, func(resp *http.Response) error {
 		inv := persistence.InventoryResp{}
 		err := json.NewDecoder(resp.Body).Decode(&inv)
@@ -110,32 +107,6 @@ func (s *Simulator) inventory() error {
 }
 
 func (s *Simulator) tcp(ch chan bool) {
-	sb := event.TcpPublisher{Remote: fmt.Sprintf("tcp://%s:5050", s.Home)}
-	err := sb.Connect()
 
-	if err != nil {
-		ch <- false
-	}
-
-	e := event.JoinEvent{Ticket: s.Ticket}
-	e.OnListener(&SampleCreator{})
-	err = sb.Join(&e)
-	if err != nil {
-		ch <- false
-		sb.Close()
-		return
-	}
-	go sb.Subscribe(&SampleCreator{}, &SampleCreator{})
-
-	for range 10 {
-		me := MahjongEvent{Cmd: 0}
-		me.OnTopic("mahjong")
-		me.SystemId = s.SystemId
-		me.OnListener(&SampleCreator{})
-		sb.Publish(&me, s.Ticket)
-		time.Sleep(1000 * time.Millisecond)
-	}
-	time.Sleep(1 * time.Second)
-	sb.Close()
 	ch <- true
 }

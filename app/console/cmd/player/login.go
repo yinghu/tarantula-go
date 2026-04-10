@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	"github.com/spf13/cobra"
 )
@@ -29,9 +29,9 @@ var loginCmd = &cobra.Command{
 		password, _ := cmd.Flags().GetString("password")
 		host, _ := cmd.Flags().GetString("host")
 		hc := util.HttpCaller{Host: host}
-		login := bootstrap.Login{Name: user, Hash: password}
+		login := protocol.LoginObject{Name: user, Password: password}
 		start := time.Now()
-		err := hc.PostJson("presence/login", login, func(resp *http.Response) error {
+		err := hc.PostJson("presence/login", &login, func(resp *http.Response) error {
 			session := core.OnSession{}
 			err := json.NewDecoder(resp.Body).Decode(&session)
 			if err != nil {

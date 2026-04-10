@@ -6,6 +6,7 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -30,19 +31,15 @@ func (s *AdminClusterReset) Request(rs core.OnSession, w http.ResponseWriter, r 
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	req := core.DataRequest{Key: k, Value: v, Opt: core.RESET_DATA_REQUEST}
-	req.FactoryId = co.FactoryId()
-	req.ClassId = co.ClassId()
-	req.Mutable = co.Mutable
-	aq := make(chan core.Chunk, 3)
-	req.Async = aq
-	defer close(aq)
-	s.Cluster().Request(req)
-	for c := range aq {
-		if !c.Remaining {
-			break
-		}
-		core.AppLog.Debug().Msgf("payload %v", c.Data)
-		w.Write(util.ToJson(c.Data))
+	//req := core.DataRequest{Key: k, Value: v, Opt: core.RESET_DATA_REQUEST}
+	//req.FactoryId = co.FactoryId()
+	//req.ClassId = co.ClassId()
+	//req.Mutable = co.Mutable
+	q := protocol.Request{Opt: core.RESET_DATA_REQUEST, Data: &protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: co.FactoryId(), ClassId: co.ClassId(), Mutable: co.Mutable}}}
+	resp, err := s.Cluster().Request(&q)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
 	}
+	w.Write(util.ToJson(resp))
 }

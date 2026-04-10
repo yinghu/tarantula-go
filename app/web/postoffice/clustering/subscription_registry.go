@@ -8,6 +8,7 @@ type sub func(sub core.Subscription)
 
 type SubscriptionRegistry struct {
 	topicEnds map[core.TopicKey]map[string]core.Subscription
+	cPools    map[core.TopicKey]*core.RpcConnPool
 }
 
 func (s *SubscriptionRegistry) add(sub core.Subscription) {
@@ -15,6 +16,9 @@ func (s *SubscriptionRegistry) add(sub core.Subscription) {
 	if !exists {
 		subs = make(map[string]core.Subscription)
 		s.topicEnds[sub.TopicKey()] = subs
+		cp := core.RpcConnPool{Target: sub.Endpoint, Tag: sub.Tag, NodeId: sub.NodeId}
+		cp.Start()
+		s.cPools[sub.TopicKey()] = &cp
 	}
 	_, exists = subs[sub.Key()]
 	if exists {
@@ -32,6 +36,8 @@ func (s *SubscriptionRegistry) del(sub core.Subscription) {
 	if len(subs) > 0 {
 		return
 	}
+	s.cPools[sub.TopicKey()].Release()
+	delete(s.cPools, sub.TopicKey())
 	delete(s.topicEnds, sub.TopicKey())
 }
 
@@ -40,13 +46,15 @@ func (s *SubscriptionRegistry) size() int {
 }
 
 func (s *SubscriptionRegistry) topic(req TopicRequest) []core.Subscription {
-	sub := make([]core.Subscription, 0)
+	subs := make([]core.Subscription, 0)
 	for k := range s.topicEnds {
 		if req.Name == k.Topic {
-			sub = append(sub, core.Subscription{Topic: k.Topic, Endpoint: k.Endpoint})
+			cp := s.cPools[k]
+			sub := core.Subscription{Topic: k.Topic, Endpoint: k.Endpoint, CPool: cp}
+			subs = append(subs, sub)
 		}
 	}
-	return sub
+	return subs
 }
 
 func (s *SubscriptionRegistry) lookup(sub sub) {

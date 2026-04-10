@@ -1,13 +1,15 @@
 package main
 
 import (
-	"encoding/json"
+	"bytes"
+	"io"
 	"net/http"
-	"time"
 
-	"gameclustering.com/internal/bootstrap"
+	"google.golang.org/protobuf/encoding/protojson"
+
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -20,31 +22,37 @@ func (s *CSMessager) AccessControl() int32 {
 }
 func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var me event.MessageEvent
-	err := json.NewDecoder(r.Body).Decode(&me)
+	mf := event.MessageEventFactory{}
+	var me protocol.MessageEvent
+	var buf bytes.Buffer
+	_, err := io.Copy(&buf, r.Body)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
+	err = protojson.Unmarshal(buf.Bytes(), &me)
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	core.AppLog.Debug().Msgf("event %v", &me)
 	id, err := s.Sequence().Id()
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	me.OnOId(id)
-	me.Source = s.Context()
-	me.DateTime = time.Now()
-	tf := bootstrap.MessageEventFactory{}
-	tf.Cluster = s.Cluster()
-	tp, err := tf.FromMessageEvent(me)
+	tp, err := mf.FromMessageEvent(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	err = s.Cluster().Publish(tp)
+	tp.Event.Id = uint64(id)
+	tp.NodeId = s.NodeId()
+	tp.Tag = s.Context()
+	resp, err := s.Cluster().Publish(tp)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	w.Write(util.ToJson(core.OnSession{Successful: true, Message: "message delivered"}))
+	w.Write(util.ToJson(core.OnSession{Successful: true, Message: resp.Message}))
 }

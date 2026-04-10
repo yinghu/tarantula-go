@@ -15,9 +15,9 @@ func (s *InventoryService) Config() string {
 	return "/etc/tarantula/inventory-conf.json"
 }
 
-func (s *InventoryService) Start(f core.Env, p core.Pusher) error {
+func (s *InventoryService) Start(f core.Env) error {
 	s.ItemUpdater = s
-	s.AppManager.Start(f, p)
+	s.AppManager.Start(f)
 	s.createSchema()
 	//s.Cluster().Subscribe("login", s.Event())
 	http.Handle("/inventory/grant", bootstrap.Logging(&InventoryGranter{InventoryService: s}))

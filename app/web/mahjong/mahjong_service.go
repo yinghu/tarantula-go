@@ -20,9 +20,9 @@ func (s *MahjongService) Config() string {
 	return "/etc/tarantula/mahjong-conf.json"
 }
 
-func (s *MahjongService) Start(f core.Env, p core.Pusher) error {
+func (s *MahjongService) Start(f core.Env) error {
 	s.ItemUpdater = s
-	s.AppManager.Start(f, p)
+	s.AppManager.Start(f)
 	s.TableIndex = make(map[int64]*MahjongTable)
 	s.Dispatcher = make(chan MahjongPlayToken, 10)
 	go s.dispatch()
@@ -63,8 +63,6 @@ func (s *MahjongService) OnError(e core.Event, err error) {
 	core.AppLog.Printf("On event error %s\n", err.Error())
 }
 
-
-
 func (s *MahjongService) OnEvent(e core.Event) {
 	switch e.ClassId() {
 	case event.MESSAGE_CID:
@@ -82,7 +80,7 @@ func (s *MahjongService) OnEvent(e core.Event) {
 		e.OnTopic("mahjong")
 		//err := s.Publish(e)
 		//if err != nil {
-			//core.AppLog.Printf("failed to send event %s\n", err.Error())
+		//core.AppLog.Printf("failed to send event %s\n", err.Error())
 		//}
 	default:
 	}

@@ -24,7 +24,7 @@ type MemberlistManager struct {
 	Seq      core.Sequence
 }
 
-func (m *MemberlistManager) Start() error {
+func (m *MemberlistManager) Start(meta []byte) error {
 	m.MemberHashRing = &MemberHashRing{weight: NODE_WEIGHT}
 	m.nodes = make([]core.Node, 0)
 	cfg := memberlist.DefaultLANConfig()
@@ -53,6 +53,7 @@ func (m *MemberlistManager) Start() error {
 		core.AppLog.Printf("erorr on member create %s", err.Error())
 		return err
 	}
+	m.meta = meta
 	m.Memberlist = list
 	go m.Listen()
 	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode, RSync: rwSync}
@@ -61,6 +62,7 @@ func (m *MemberlistManager) Start() error {
 	m.Mll.DWait.Add(1)
 	go m.DataServiceProvider.Start(m.StoreDir)
 	m.Mll.DWait.Wait()
+	list.UpdateNode(time.Second * 5)
 	go m.RingUpdated()
 	joined, err := list.Join(m.Seed)
 	if err != nil {

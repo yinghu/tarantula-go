@@ -15,7 +15,7 @@ func (c *DataServiceProvider) HashRing(request *protocol.Request, stream grpc.Se
 	c.Mll.rangeRing(core.RingRequest{Async: rq, Opt: ALL_RING_OPT})
 	ring := <-rq
 	for _, n := range ring {
-		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name, Address: n.IP}
+		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name, Address: n.IP, Meta: n.Meta}
 		if err := stream.Send(&hn); err != nil {
 			return err
 		}
@@ -81,43 +81,30 @@ func (c *DataServiceProvider) Unsubscribe(ctx context.Context, in *protocol.Topi
 	return &protocol.Response{Successful: true, Message: "topic removed"}, nil
 }
 
-func (c *DataServiceProvider) Request(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
+func (c *DataServiceProvider) Request(ctx context.Context, request *protocol.Request) (*protocol.Response, error) {
 	switch request.Opt {
-	case core.CREATE_DATA_REQUEST:
-		resp, _ := c.runCreate(request)
-		stream.Send(resp)
 
 	case core.GET_DATA_REQUEST:
-		c.runGet(request, stream)
+		return c.runGet(request)
 
-	case core.QUERY_DATA_REQUEST:
-		c.runGet(request, stream)
+	case core.CREATE_DATA_REQUEST:
+		return c.runCreate(request)
 
 	case core.UPDATE_DATA_REQUEST:
-		resp, _ := c.runUpdate(request)
-		stream.Send(resp)
+		return c.runUpdate(request)
 
 	case core.DELETE_DATA_REQUEST:
-		resp, _ := c.runDelete(request)
-		stream.Send(resp)
+		return c.runDelete(request)
 
 	case core.RESET_DATA_REQUEST:
-		resp, _ := c.runReset(request)
-		stream.Send(resp)
+		return c.runReset(request)
 
-	case core.PULL_DATA_REQUEST:
-		rc := make(chan *protocol.Response, 3)
-		defer close(rc)
-		core.AppLog.Debug().Msgf("run local pull %v", request)
-		c.pull(request.Prefix, request.Prefix, rc)
-		for resp := range rc {
-			if !resp.Successful {
-				break
-			}
-			stream.Send(resp)
-		}
 	default:
-		stream.Send(&protocol.Response{Successful: false, Message: fmt.Sprintf("request opt not suuported %d", request.Opt)})
 	}
+	return &protocol.Response{Successful: false, Message: "not suppotred"}, fmt.Errorf("opt not supported %d", request.Opt)
+}
+
+func (c *DataServiceProvider) List(in *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
+	c.runQuery(in, stream)
 	return nil
 }

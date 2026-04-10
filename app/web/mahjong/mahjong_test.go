@@ -3,6 +3,7 @@ package main
 import (
 	"testing"
 
+	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/mj"
 )
@@ -23,7 +24,7 @@ func (s *SampleCallback) Push(e core.Event) {
 }
 
 func TestMahjongTable(t *testing.T) {
-	core.CreateTestLog()
+	bootstrap.CreateTestLog()
 	mt := MahjongTable{Pusher: &SampleCallback{}}
 	mt.New()
 	mt.Sit(1)

@@ -11,27 +11,41 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
-	"gameclustering.com/internal/metrics"
+	"gameclustering.com/internal/persistence"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+var TopicFactoryRegistry = make(map[string]func() core.QueryFactory)
+
+func Register(name string, fac func() core.QueryFactory) {
+	TopicFactoryRegistry[name] = fac
+}
+
 func AppBootstrap(tcx TarantulaContext) {
+	Register(event.MESSAGE_TOPIC_NAME, func() core.QueryFactory { return event.NewMessageEventFactory() })
+	Register(event.REGISTER_TOPIC_NAME, func() core.QueryFactory { return event.NewRegisterEventFactory() })
+	Register(event.LOG_TOPIC_NAME, func() core.QueryFactory { return event.NewLogEventFactory() })
+	Register(event.LOGIN_TOPIC_NAME, func() core.QueryFactory { return event.NewLoginEventFactory() })
+	Register(event.REQUEST_TOPIC_NAME, func() core.QueryFactory { return event.NewRequestEventFactory() })
+	Register(persistence.LOGIN_OBJECT_FACTORY_NAME, func() core.QueryFactory { return persistence.NewLoginObjectFactory() })
+
 	f := core.Env{}
 	err := f.Load(tcx.Config())
 	if err != nil {
 		fmt.Printf("Config not existed %s\n", err.Error())
 		return
 	}
-
-	e := event.TcpEndpoint{Endpoint: f.Evp.TcpEndpoint, Service: tcx.Service().Event(), OutboundEnabled: f.Evp.OutboundEnabled}
-	if f.Evp.Enabled {
-		go func() {
-			e.Open()
-		}()
+	mountDir := fmt.Sprintf("%s/%s", f.HomeDir, f.GroupName)
+	err = os.MkdirAll(mountDir, 0755)
+	if err != nil {
+		return
 	}
+	f.LogDir = mountDir
 	go func() {
-		err := tcx.Start(f, &e)
+		err := tcx.Start(f)
 		if err != nil {
 			core.AppLog.Printf("Error %s\n", err.Error())
 		}
@@ -46,9 +60,6 @@ func AppBootstrap(tcx TarantulaContext) {
 	<-sigs
 	core.AppLog.Println("Signal to exit")
 	tcx.Shutdown()
-	if f.Evp.Enabled {
-		e.Close()
-	}
 	signal.Stop(sigs)
 	close(sigs)
 }
@@ -70,7 +81,7 @@ func illegalAccess(w http.ResponseWriter, r *http.Request) {
 	w.Write(util.ToJson(session))
 }
 func preflight(w http.ResponseWriter, r *http.Request) {
-	core.AppLog.Debug().Msg("checking options header here")
+	//core.AppLog.Debug().Msg("checking options header here")
 	defer r.Body.Close()
 	w.WriteHeader(http.StatusNoContent)
 }
@@ -96,14 +107,31 @@ func metricsHandler(auth core.Authenticator, h http.Handler) http.HandlerFunc {
 func Logging(s TarantulaApp) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
-		var stub int32 = 0
+		//var stub int32 = 0
 		var code int32 = 0
 		defer func() {
+			if s.ClusterMember() {
+				return
+			}
 			dur := time.Since(start)
-			ms := core.ReqMetrics{Path: r.URL.Path, ReqTimed: dur.Milliseconds(), Node: s.NodeId(), ReqId: stub, ReqCode: code}
-			s.Metrics().WebRequest(ms)
-			metrics.HTTP_REQUEST_METRICS.WithLabelValues(r.URL.Path).Observe(dur.Seconds())
-
+			re := protocol.RequestEvent{Path: r.URL.Path, Method: r.Method, Duration: uint64(dur.Milliseconds()), Code: uint32(code)}
+			re.DateTime = timestamppb.Now()
+			re.Source = r.RemoteAddr
+			rf := event.RequestEventFactory{}
+			t, err := rf.FromRequestEvent(&re)
+			if err != nil {
+				fmt.Printf("request event error %s\n", err.Error())
+				return
+			}
+			t.NodeId = s.NodeId()
+			t.Tag = s.Context()
+			id, err := s.Sequence().Id()
+			if err != nil {
+				fmt.Printf("request event id error %s\n", err.Error())
+				return
+			}
+			t.Event.Id = uint64(id)
+			s.Cluster().Publish(t)
 		}()
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "*")
@@ -130,12 +158,12 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			return
 		}
 		if session.AccessControl < s.AccessControl() {
-			stub = session.Stub
+			//stub = session.Stub
 			code = int32(ILLEGAL_ACCESS_CODE)
 			illegalAccess(w, r)
 			return
 		}
-		stub = session.Stub
+		//stub = session.Stub
 		s.Request(session, w, r)
 	}
 }

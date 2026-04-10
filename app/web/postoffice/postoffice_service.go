@@ -5,41 +5,51 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/postoffice/clustering"
+	"github.com/rs/zerolog"
 )
+
+type LogData struct {
+	level zerolog.Level
+	log   []byte
+}
 
 type PostofficeService struct {
 	bootstrap.AppManager
-	mm *clustering.MemberlistManager
+	mm      *clustering.MemberlistManager
+	started bool
+	wTopic  chan<- *protocol.Topic
 }
 
 func (s *PostofficeService) Config() string {
 	return "/etc/tarantula/postoffice-conf.json"
 }
 
-func (s *PostofficeService) Start(env core.Env, p core.Pusher) error {
+func (s *PostofficeService) Start(env core.Env) error {
 	env.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	env.IsClusterMember = true
-	s.AppManager.Start(env, p)
-
+	s.AppManager.Start(env)
 	s.createSchema()
 
 	m := clustering.MemberlistManager{StoreDir: fmt.Sprintf("%s/%s", env.HomeDir, env.GroupName), Seq: s.Sequence()}
 	m.Seed = []string{"192.168.1.11", "192.168.1.6"}
 	m.Binding = env.NodeName
-	err := m.Start()
+	err := m.Start(fmt.Appendf([]byte{}, "%s:%s", s.Context(), s.NodeId()))
 	if err != nil {
 		core.AppLog.Printf("no cluster can join %s", err.Error())
 		return err
 	}
 	s.mm = &m
-
-	core.AppLog.Printf("postoffice service started %s %s", env.HttpBinding, env.HomeDir)
+	s.mm.DWait.Wait()
+	s.started = true
+	core.AppLog.Debug().Msgf("postoffice service started %s %s", env.HttpBinding, env.HomeDir)
 	return nil
 }
 
 func (s *PostofficeService) Shutdown() {
-	core.AppLog.Println("postoffice service shutting down ...")
+	s.started = false
+	core.AppLog.Debug().Msg("postoffice service shutting down ...")
 	s.AppManager.Shutdown()
 	s.mm.ShutdownHook()
 }

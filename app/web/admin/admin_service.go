@@ -7,6 +7,7 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 )
 
 type AdminService struct {
@@ -21,9 +22,9 @@ func (s *AdminService) Config() string {
 	return "/etc/tarantula/admin-conf.json"
 }
 
-func (s *AdminService) Start(f core.Env, p core.Pusher) error {
+func (s *AdminService) Start(f core.Env) error {
 	f.AuthLevel = core.ADMIN_ACCESS_CONTROL
-	s.AppManager.Start(f, p)
+	s.AppManager.Start(f)
 	s.managedApps = f.ManagedApps
 	s.contentDir = fmt.Sprintf("%s/%s", f.HomeDir, "bin")
 	s.assetDir = fmt.Sprintf("%s/%s/%s", f.HomeDir, f.GroupName, "asset")
@@ -37,9 +38,9 @@ func (s *AdminService) Start(f core.Env, p core.Pusher) error {
 	if err != nil {
 		return err
 	}
-	err = s.SaveLogin(&bootstrap.Login{Name: "root", Hash: hash, AccessControl: core.SUDO_ACCESS_CONTROL})
+	err = s.SaveLogin(&protocol.LoginObject{Name: "root", Password: hash, AccessControl: uint32(core.SUDO_ACCESS_CONTROL)})
 	if err != nil {
-		core.AppLog.Printf("Root already existed %s\n", err.Error())
+		core.AppLog.Debug().Msg("Root already existed")
 	}
 	//s.Cluster().Subscribe("login", s.Event())
 	http.Handle("/admin/webprotected/{name}", bootstrap.Logging(&AdminWebProtected{AdminService: s}))
@@ -49,7 +50,8 @@ func (s *AdminService) Start(f core.Env, p core.Pusher) error {
 
 	http.Handle("/admin/cs/message/send", bootstrap.Logging(&CSMessager{AdminService: s}))
 
-	http.Handle("/admin/cs/query/{id}", bootstrap.Logging(&CSQueryer{AdminService: s}))
+	http.Handle("/admin/cs/query/topic/{topic}", bootstrap.Logging(&CSQueryTopic{AdminService: s}))
+	http.Handle("/admin/cs/query/object/{topic}", bootstrap.Logging(&CSQueryObject{AdminService: s}))
 	http.Handle("/admin/cs/inventory/grant", bootstrap.Logging(&CSGranter{AdminService: s}))
 	http.Handle("/admin/cs/inventory/load", bootstrap.Logging(&CSInventoryLoader{AdminService: s}))
 
@@ -79,8 +81,7 @@ func (s *AdminService) Start(f core.Env, p core.Pusher) error {
 
 	http.Handle("/admin/cluster/delete/{key}", bootstrap.Logging(&AdminClusterDelete{AdminService: s}))
 	http.Handle("/admin/cluster/reset", bootstrap.Logging(&AdminClusterReset{AdminService: s}))
-	http.Handle("/admin/cluster/pull/{ringToken}/{limit}", bootstrap.Logging(&AdminClusterPull{AdminService: s}))
 
-	fmt.Printf("Admin service started %s\n", f.HttpBinding)
+	core.AppLog.Info().Msgf("Admin service started %s\n", f.HttpBinding)
 	return nil
 }

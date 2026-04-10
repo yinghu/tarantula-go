@@ -5,7 +5,6 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
@@ -13,16 +12,16 @@ import (
 type PresenceService struct {
 	bootstrap.AppManager
 	Started     bool
-	LoginReward item.Configuration
+	LoginReward core.Configuration
 }
 
 func (s *PresenceService) Config() string {
 	return "/etc/tarantula/presence-conf.json"
 }
 
-func (s *PresenceService) Start(env core.Env, p core.Pusher) error {
+func (s *PresenceService) Start(env core.Env) error {
 	s.ItemUpdater = s
-	err := s.AppManager.Start(env, p)
+	err := s.AppManager.Start(env)
 	if err != nil {
 		return err
 	}

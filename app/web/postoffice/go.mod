@@ -12,10 +12,6 @@ replace gameclustering.com/internal/core => ../../../internal/core
 
 replace gameclustering.com/internal/bootstrap => ../../../internal/bootstrap
 
-replace gameclustering.com/internal/item => ../../../internal/item
-
-replace gameclustering.com/internal/metrics => ../../../internal/metrics
-
 replace gameclustering.com/internal/protocol => ../../../internal/protocol
 
 require (
@@ -28,13 +24,12 @@ require (
 	github.com/dgraph-io/badger/v4 v4.7.0
 	github.com/hashicorp/memberlist v0.5.4
 	github.com/jackc/pgx/v5 v5.7.4
+	github.com/rs/zerolog v1.34.0
 	github.com/spaolacci/murmur3 v1.1.0
 	google.golang.org/grpc v1.79.1
 )
 
 require (
-	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000 // indirect
-	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -69,7 +64,6 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.66.1 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
-	github.com/rs/zerolog v1.34.0 // indirect
 	github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529 // indirect
 	go.etcd.io/etcd/api/v3 v3.6.5 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.6.5 // indirect

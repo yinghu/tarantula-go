@@ -12,23 +12,17 @@ replace gameclustering.com/internal/core => ../../../internal/core
 
 replace gameclustering.com/internal/bootstrap => ../../../internal/bootstrap
 
-replace gameclustering.com/internal/item => ../../../internal/item
-
-replace gameclustering.com/internal/metrics => ../../../internal/metrics
-
 replace gameclustering.com/internal/protocol => ../../../internal/protocol
 
 require (
 	gameclustering.com/internal/bootstrap v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000
-	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
 	github.com/jackc/pgx/v5 v5.7.4
 )
 
 require (
-	gameclustering.com/internal/metrics v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/persistence v0.0.0-00010101000000-000000000000 // indirect
 	gameclustering.com/internal/protocol v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect

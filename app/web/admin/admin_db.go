@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 
-	"gameclustering.com/internal/bootstrap"
+	"gameclustering.com/internal/protocol"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -22,8 +22,8 @@ func (s *AdminService) createSchema() error {
 	return nil
 }
 
-func (s *AdminService) SaveLogin(login *bootstrap.Login) error {
-	inserted, err := s.Sql.Exec(INSERT_LOGIN, login.Name, login.Hash, login.AccessControl)
+func (s *AdminService) SaveLogin(login *protocol.LoginObject) error {
+	inserted, err := s.Sql.Exec(INSERT_LOGIN, login.Name, login.Password, login.AccessControl)
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func (s *AdminService) SaveLogin(login *bootstrap.Login) error {
 	return nil
 }
 
-func (s *AdminService) LoadLogin(login *bootstrap.Login) error {
+func (s *AdminService) LoadLogin(login *protocol.LoginObject) error {
 	err := s.Sql.Query(func(rows pgx.Rows) error {
 		var hash string
 		var id int32
@@ -42,9 +42,9 @@ func (s *AdminService) LoadLogin(login *bootstrap.Login) error {
 		if err != nil {
 			return err
 		}
-		login.Hash = hash
-		login.Id = id
-		login.AccessControl = accessControl
+		login.Password = hash
+		login.Id = uint32(id)
+		login.AccessControl = uint32(accessControl)
 		return nil
 	}, SELECT_LOGIN_WITH_NAME, login.Name)
 	if err != nil {
@@ -56,8 +56,8 @@ func (s *AdminService) LoadLogin(login *bootstrap.Login) error {
 	return nil
 }
 
-func (s *AdminService) UpdatePassword(login *bootstrap.Login) error {
-	updated, err := s.Sql.Exec(UPDATE_HASH, login.Hash, login.Name)
+func (s *AdminService) UpdatePassword(login *protocol.LoginObject) error {
+	updated, err := s.Sql.Exec(UPDATE_HASH, login.Password, login.Name)
 	if err != nil {
 		return err
 	}

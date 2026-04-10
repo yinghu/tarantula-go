@@ -7,13 +7,12 @@ import (
 	"strconv"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
 )
 
 type CategoryPreview struct {
-	Cat item.Category        `json:"category"`
-	Ins []item.Configuration `json:"list"`
+	Cat core.Category        `json:"category"`
+	Ins []core.Configuration `json:"list"`
 }
 
 type CategoryPreviewer struct {
@@ -42,7 +41,7 @@ func (s *CategoryPreviewer) Request(rs core.OnSession, w http.ResponseWriter, r 
 		return
 	}
 	for i := range ins {
-		item.ItemValidator(ins[i], func(prop string, c item.Configuration) {
+		core.ItemValidator(ins[i], func(prop string, c core.Configuration) {
 			fmt.Printf("Config %s , %s\n", prop, c.Category)
 		})
 	}
