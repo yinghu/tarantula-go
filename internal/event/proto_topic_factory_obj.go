@@ -7,10 +7,13 @@ import (
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 type ProtoTopicFactoryObj struct {
 	Target *protocol.Topic
+	core.QueryFactoryObj
+	M proto.Message
 }
 
 func (p *ProtoTopicFactoryObj) Request(topic *protocol.Topic) (*protocol.Request, error) {
@@ -40,16 +43,16 @@ func (p *ProtoTopicFactoryObj) WriteKey(key core.DataBuffer) error {
 	return key.WriteUInt64(p.Target.Event.Id)
 }
 
-func (p *ProtoTopicFactoryObj) ReadKey(key core.DataBuffer) error {
-	return nil
-}
-
 func (p *ProtoTopicFactoryObj) Topic(data []byte) (*protocol.Topic, error) {
 	var tp protocol.Topic
 	err := proto.Unmarshal(data, &tp)
 	return &tp, err
 }
 
-func (p *ProtoTopicFactoryObj) Export(query core.Query) ([]byte, error) {
-	return Export(query, core.COMPOSIT_KEY_MAX)
+func (p *ProtoTopicFactoryObj) Message(topic *protocol.Topic) (any, error) {
+	err := anypb.UnmarshalTo(topic.Event.Message, p.M, proto.UnmarshalOptions{})
+	if err != nil {
+		return p.M, err
+	}
+	return p.M, nil
 }

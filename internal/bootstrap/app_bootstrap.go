@@ -24,9 +24,9 @@ func Register(name string, fac func() core.QueryFactory) {
 }
 
 func AppBootstrap(tcx TarantulaContext) {
-	Register(event.MESSAGE_TOPIC_NAME, func() core.QueryFactory { return &event.MessageEventFactory{} })
+	Register(event.MESSAGE_TOPIC_NAME, func() core.QueryFactory { return event.NewMessageEventFactory() })
 	Register(event.REGISTER_TOPIC_NAME, func() core.QueryFactory { return &event.RegisterEventFactory{} })
-	Register(event.LOG_TOPIC_NAME, func() core.QueryFactory { return &event.LogEventFactory{} })
+	Register(event.LOG_TOPIC_NAME, func() core.QueryFactory { return event.NewLogEventFactory() })
 	Register(event.LOGIN_TOPIC_NAME, func() core.QueryFactory { return &event.LoginEventFactory{} })
 	Register(event.REQUEST_TOPIC_NAME, func() core.QueryFactory { return &event.RequestEventFactory{} })
 

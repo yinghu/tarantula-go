@@ -3,7 +3,6 @@ package event
 import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
-	"google.golang.org/protobuf/proto"
 
 	"google.golang.org/protobuf/types/known/anypb"
 )
@@ -12,6 +11,17 @@ const (
 	MESSAGE_EVENT_CID  uint32 = 3
 	MESSAGE_TOPIC_NAME string = "message"
 )
+
+func NewMessageEventFactory() *MessageEventFactory {
+	mf := MessageEventFactory{}
+	mq := MessageEventQuery{}
+	mq.FactoryId = core.EVENT_FACTORY_ID
+	mq.ClassId = MESSAGE_EVENT_CID
+	mq.Topic = MESSAGE_TOPIC_NAME
+	mf.Q = &mq
+	mf.M = &protocol.MessageEvent{}
+	return &mf
+}
 
 type MessageEventFactory struct {
 	ProtoTopicFactoryObj
@@ -27,30 +37,4 @@ func (p *MessageEventFactory) FromMessageEvent(e *protocol.MessageEvent) (*proto
 	msg.Message = obj
 	tpx.Event = &msg
 	return &tpx, nil
-}
-
-func (p *MessageEventFactory) Message(topic *protocol.Topic) (any, error) {
-	me := protocol.MessageEvent{}
-	err := anypb.UnmarshalTo(topic.Event.Message, &me, proto.UnmarshalOptions{})
-	if err != nil {
-		return &me, err
-	}
-	return &me, nil
-}
-
-func (p *MessageEventFactory) Import(criteria []byte) (core.Query, error) {
-	q := MessageEventQuery{}
-	err := Import(&q, criteria, core.COMPOSIT_KEY_MAX)
-	if err != nil {
-		return &q, err
-	}
-	return &q, nil
-}
-
-func (p *MessageEventFactory) Query() core.Query {
-	q := MessageEventQuery{}
-	q.ClassId = MESSAGE_EVENT_CID
-	q.FactoryId = core.EVENT_FACTORY_ID
-	q.Topic = MESSAGE_TOPIC_NAME
-	return &q
 }

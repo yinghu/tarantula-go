@@ -1,6 +1,8 @@
 package core
 
-import "time"
+import (
+	"time"
+)
 
 type QueryObj struct {
 	Id        uint32    `json:"-"`
