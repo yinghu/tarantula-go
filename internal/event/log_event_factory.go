@@ -17,7 +17,7 @@ func NewLogEventFactory() *LogEventFactory {
 	mq := LogEventQuery{}
 	mq.FactoryId = core.EVENT_FACTORY_ID
 	mq.ClassId = LOG_EVENT_CID
-	mq.Topic = LOGIN_TOPIC_NAME
+	mq.Topic = LOG_TOPIC_NAME
 	mf.Q = &mq
 	mf.M = &protocol.LogEvent{}
 	return &mf
