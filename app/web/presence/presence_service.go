@@ -5,7 +5,6 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
@@ -13,7 +12,7 @@ import (
 type PresenceService struct {
 	bootstrap.AppManager
 	Started     bool
-	LoginReward item.Configuration
+	LoginReward core.Configuration
 }
 
 func (s *PresenceService) Config() string {

@@ -12,8 +12,6 @@ replace gameclustering.com/internal/event => ../../../internal/event
 
 replace gameclustering.com/internal/core => ../../../internal/core
 
-replace gameclustering.com/internal/item => ../../../internal/item
-
 replace gameclustering.com/internal/mj => ../../../internal/mj
 
 replace gameclustering.com/internal/protocol => ../../../internal/protocol
@@ -22,7 +20,6 @@ require (
 	gameclustering.com/internal/bootstrap v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000
-	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/mj v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
 )

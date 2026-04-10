@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/util"
 	"github.com/rs/zerolog"
@@ -19,12 +18,12 @@ import (
 
 type AppManager struct {
 	metr        core.MetricsService
-	imse        item.ItemService
+	imse        core.ItemService
 	auth        core.Authenticator
 	Sql         persistence.Postgresql
 	F           core.Env
 	seq         core.Sequence
-	ItemUpdater item.ItemListener
+	ItemUpdater core.ItemListener
 	tcpPusher   core.Pusher
 	ManagedApps []string
 	cluster     *ClusterManager
@@ -34,7 +33,7 @@ type AppManager struct {
 	threshold   zerolog.Level
 }
 
-func (s *AppManager) ItemService() item.ItemService {
+func (s *AppManager) ItemService() core.ItemService {
 	return s.imse
 }
 
@@ -52,7 +51,7 @@ func (s *AppManager) Authenticator() core.Authenticator {
 func (s *AppManager) Sequence() core.Sequence {
 	return s.seq
 }
-func (s *AppManager) ItemListener() item.ItemListener {
+func (s *AppManager) ItemListener() core.ItemListener {
 	return s.ItemUpdater
 }
 

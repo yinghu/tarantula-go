@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -32,11 +31,11 @@ func (s *InventoryService) createSchema() error {
 	return nil
 }
 
-func (s *InventoryService) loadInventory(iv item.OnInventory) ([]item.Inventory, error) {
-	ilist := make([]item.Inventory, 0)
+func (s *InventoryService) loadInventory(iv core.OnInventory) ([]core.Inventory, error) {
+	ilist := make([]core.Inventory, 0)
 	if iv.TypeId == "" {
 		err := s.Sql.Query(func(row pgx.Rows) error {
-			inv := item.Inventory{SystemId: iv.SystemId}
+			inv := core.Inventory{SystemId: iv.SystemId}
 			var t int64
 			err := row.Scan(&inv.Id, &inv.TypeId, &inv.Rechargeable, &inv.Amount, &t)
 			if err != nil {
@@ -55,7 +54,7 @@ func (s *InventoryService) loadInventory(iv item.OnInventory) ([]item.Inventory,
 		return ilist, nil
 	}
 	err := s.Sql.Query(func(row pgx.Rows) error {
-		inv := item.Inventory{SystemId: iv.SystemId,TypeId: iv.TypeId}
+		inv := core.Inventory{SystemId: iv.SystemId, TypeId: iv.TypeId}
 		var t int64
 		err := row.Scan(&inv.Id, &inv.Rechargeable, &inv.Amount, &t)
 		if err != nil {
@@ -67,14 +66,14 @@ func (s *InventoryService) loadInventory(iv item.OnInventory) ([]item.Inventory,
 		inv.UpdateTime = time.UnixMilli(t)
 		ilist = append(ilist, inv)
 		return nil
-	}, SELECT_INVENTORY_WITH_TYPE_ID, iv.SystemId,iv.TypeId)
+	}, SELECT_INVENTORY_WITH_TYPE_ID, iv.SystemId, iv.TypeId)
 	if err != nil {
 		return ilist, err
 	}
 	return ilist, nil
 }
 
-func (s *InventoryService) updateInventory(iv item.Inventory) (int32,error) {
+func (s *InventoryService) updateInventory(iv core.Inventory) (int32, error) {
 	var id int32
 	var amount int32
 	err := s.Sql.Txn(func(tx pgx.Tx) error {
@@ -95,8 +94,8 @@ func (s *InventoryService) updateInventory(iv item.Inventory) (int32,error) {
 		return nil
 	})
 	if err != nil {
-		return id,err
+		return id, err
 	}
 	core.AppLog.Printf("Id %d\n", id)
-	return id,nil
+	return id, nil
 }

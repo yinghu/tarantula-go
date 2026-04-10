@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"gameclustering.com/internal/item"
+	"gameclustering.com/internal/core"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -23,7 +23,7 @@ func (db *ItemDB) DeleteRegistration(itemId int64, app string, env string) error
 	}
 	return nil
 }
-func (db *ItemDB) SaveRegistration(reg item.ConfigRegistration) error {
+func (db *ItemDB) SaveRegistration(reg core.ConfigRegistration) error {
 	if reg.Scheduling {
 		_, err := db.Sql.Exec(INSERT_REGISTRATION, reg.ItemId, reg.App, reg.Env, true, reg.StartTime.UnixMilli(), reg.CloseTime.UnixMilli(), reg.EndTime.UnixMilli())
 		if err != nil {
@@ -37,10 +37,10 @@ func (db *ItemDB) SaveRegistration(reg item.ConfigRegistration) error {
 	}
 	return nil
 }
-func (db *ItemDB) LoadRegistrations(app string, env string) ([]item.ConfigRegistration, error) {
-	regs := make([]item.ConfigRegistration, 0)
+func (db *ItemDB) LoadRegistrations(app string, env string) ([]core.ConfigRegistration, error) {
+	regs := make([]core.ConfigRegistration, 0)
 	err := db.Sql.Query(func(row pgx.Rows) error {
-		var reg item.ConfigRegistration
+		var reg core.ConfigRegistration
 		var st, ct, et int64
 		err := row.Scan(&reg.ItemId, &reg.Scheduling, &st, &ct, &et)
 		if err != nil {

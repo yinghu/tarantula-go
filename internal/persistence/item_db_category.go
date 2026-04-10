@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gameclustering.com/internal/item"
+	"gameclustering.com/internal/core"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -21,7 +21,7 @@ const (
 	DELETE_CATEGORY_PROPERTY_WITH_ID string = "DELETE FROM item_category_property WHERE category_id = $1"
 )
 
-func (db *ItemDB) SaveCategory(c item.Category) error {
+func (db *ItemDB) SaveCategory(c core.Category) error {
 	refids, err := db.validateCategory(c)
 	if err != nil {
 		return err
@@ -60,8 +60,8 @@ func (db *ItemDB) SaveCategory(c item.Category) error {
 	})
 }
 
-func (db *ItemDB) LoadCategoryWithId(cid int64) (item.Category, error) {
-	cat := item.Category{Id: cid}
+func (db *ItemDB) LoadCategoryWithId(cid int64) (core.Category, error) {
+	cat := core.Category{Id: cid}
 	err := db.Sql.Query(func(row pgx.Rows) error {
 		err := row.Scan(&cat.Name, &cat.Scope, &cat.ScopeSequence, &cat.Rechargeable, &cat.Description)
 		if err != nil {
@@ -75,9 +75,9 @@ func (db *ItemDB) LoadCategoryWithId(cid int64) (item.Category, error) {
 	if cat.Name == "" {
 		return cat, errors.New("category not existed")
 	}
-	cat.Properties = make([]item.Property, 0)
+	cat.Properties = make([]core.Property, 0)
 	err = db.Sql.Query(func(row pgx.Rows) error {
-		var prop item.Property
+		var prop core.Property
 		err := row.Scan(&prop.Name, &prop.Type, &prop.Reference, &prop.Nullable)
 		if err != nil {
 			return err
@@ -91,8 +91,8 @@ func (db *ItemDB) LoadCategoryWithId(cid int64) (item.Category, error) {
 	return cat, nil
 }
 
-func (db *ItemDB) LoadCategory(cname string) (item.Category, error) {
-	cat := item.Category{Name: cname}
+func (db *ItemDB) LoadCategory(cname string) (core.Category, error) {
+	cat := core.Category{Name: cname}
 	err := db.Sql.Query(func(row pgx.Rows) error {
 		err := row.Scan(&cat.Id, &cat.Scope, &cat.ScopeSequence, &cat.Rechargeable, &cat.Description)
 		if err != nil {
@@ -106,9 +106,9 @@ func (db *ItemDB) LoadCategory(cname string) (item.Category, error) {
 	if cat.Id == 0 {
 		return cat, errors.New("category not existed")
 	}
-	cat.Properties = make([]item.Property, 0)
+	cat.Properties = make([]core.Property, 0)
 	err = db.Sql.Query(func(row pgx.Rows) error {
-		var prop item.Property
+		var prop core.Property
 		err := row.Scan(&prop.Name, &prop.Type, &prop.Reference, &prop.Nullable)
 		if err != nil {
 			return err
@@ -122,10 +122,10 @@ func (db *ItemDB) LoadCategory(cname string) (item.Category, error) {
 	return cat, nil
 }
 
-func (db *ItemDB) LoadCategories(scopeEnd int32, targetScope string) []item.Category {
-	list := make([]item.Category, 0)
+func (db *ItemDB) LoadCategories(scopeEnd int32, targetScope string) []core.Category {
+	list := make([]core.Category, 0)
 	db.Sql.Query(func(row pgx.Rows) error {
-		var cat = item.Category{}
+		var cat = core.Category{}
 		err := row.Scan(&cat.Id, &cat.Name, &cat.Scope, &cat.ScopeSequence, &cat.Rechargeable, &cat.Description)
 		if err != nil {
 			return err
@@ -161,7 +161,7 @@ func (db *ItemDB) DeleteCategoryWithId(cid int64) error {
 		if err != nil {
 			return err
 		}
-		err = db.Gis.RemoveCategory(cid,cname)
+		err = db.Gis.RemoveCategory(cid, cname)
 		if err != nil {
 			return err
 		}
@@ -173,7 +173,7 @@ func (db *ItemDB) DeleteCategoryWithId(cid int64) error {
 	return nil
 }
 
-func (db *ItemDB) validateCategory(c item.Category) ([]int64, error) {
+func (db *ItemDB) validateCategory(c core.Category) ([]int64, error) {
 	refids := make([]int64, 0)
 	if c.Id <= 0 {
 		return refids, errors.New("none negative id required")

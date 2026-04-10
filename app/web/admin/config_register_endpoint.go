@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
 )
 
@@ -30,7 +29,7 @@ func (s *ConfigRegister) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 	}
 	switch opt {
 	case "save":
-		var reg item.ConfigRegistration
+		var reg core.ConfigRegistration
 		err := json.NewDecoder(r.Body).Decode(&reg)
 		if err != nil {
 			w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
@@ -59,7 +58,7 @@ func (s *ConfigRegister) Request(rs core.OnSession, w http.ResponseWriter, r *ht
 			w.Write(util.ToJson(core.OnSession{Successful: false, Message: "env not existed"}))
 			return
 		}
-		reg, err := s.ItemService().Check(item.ConfigRegistration{ItemId: cid, App: app, Env: env.Message})
+		reg, err := s.ItemService().Check(core.ConfigRegistration{ItemId: cid, App: app, Env: env.Message})
 		if err == nil {
 			w.Write(util.ToJson(reg))
 		} else {

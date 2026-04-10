@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 	"github.com/rs/zerolog"
 )
 
@@ -42,11 +41,11 @@ type TarantulaContext interface {
 }
 
 type TarantulaService interface {
-	ItemService() item.ItemService
+	ItemService() core.ItemService
 	Metrics() core.MetricsService
 	Authenticator() core.Authenticator
 	Sequence() core.Sequence
-	ItemListener() item.ItemListener
+	ItemListener() core.ItemListener
 	Pusher() core.Pusher
 	Cluster() core.ClusterService
 	Event() core.EventService

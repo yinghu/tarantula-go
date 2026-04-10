@@ -1,4 +1,4 @@
-package item
+package core
 
 type Validator func(prop string, c Configuration)
 

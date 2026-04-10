@@ -1,9 +1,7 @@
-package item
+package core
 
 import (
 	"time"
-
-	"gameclustering.com/internal/core"
 )
 
 const (
@@ -114,7 +112,7 @@ type InventoryManager interface {
 }
 
 type ItemService interface {
-	core.SetUp
+	SetUp
 	SaveEnum(c Enum) error
 	LoadEnum(cname string) (Enum, error)
 	LoadEnums() ([]Enum, error)
@@ -147,9 +145,9 @@ type RepoUpdate struct {
 }
 
 type KVUpdate struct {
-	Key      string `json:"Key"`
-	Value    string `json:"value"`
-	core.Opt `json:"Opt"`
+	Key   string `json:"Key"`
+	Value string `json:"value"`
+	Opt   `json:"Opt"`
 }
 
 type ItemListener interface {

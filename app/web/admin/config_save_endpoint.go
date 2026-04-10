@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/util"
 )
 
@@ -18,7 +17,7 @@ func (s *ConfigSaver) AccessControl() int32 {
 }
 func (s *ConfigSaver) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var conf item.Configuration
+	var conf core.Configuration
 	err := json.NewDecoder(r.Body).Decode(&conf)
 	if err != nil {
 		session := core.OnSession{Successful: false, Message: err.Error()}

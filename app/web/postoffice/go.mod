@@ -12,8 +12,6 @@ replace gameclustering.com/internal/core => ../../../internal/core
 
 replace gameclustering.com/internal/bootstrap => ../../../internal/bootstrap
 
-replace gameclustering.com/internal/item => ../../../internal/item
-
 replace gameclustering.com/internal/protocol => ../../../internal/protocol
 
 require (
@@ -32,7 +30,6 @@ require (
 )
 
 require (
-	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect

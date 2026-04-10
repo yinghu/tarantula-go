@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -34,7 +33,7 @@ const (
 	DELETE_REGISTRATION_WITH_ID          string = "DELETE FROM item_registration AS d WHERE id = $1 RETURNING d.item_id, d.app, d.env"
 )
 
-func (db *ItemDB) Save(c item.Configuration) error {
+func (db *ItemDB) Save(c core.Configuration) error {
 	refids, err := db.validate(c)
 	if err != nil {
 		return err
@@ -85,11 +84,11 @@ func (db *ItemDB) Save(c item.Configuration) error {
 	})
 }
 
-func (db *ItemDB) LoadWithName(cname string, limit int) ([]item.Configuration, error) {
-	list := make([]item.Configuration, limit)
+func (db *ItemDB) LoadWithName(cname string, limit int) ([]core.Configuration, error) {
+	list := make([]core.Configuration, limit)
 	ct := 0
 	err := db.Sql.Query(func(row pgx.Rows) error {
-		conf := item.Configuration{Category: cname}
+		conf := core.Configuration{Category: cname}
 		err := row.Scan(&conf.Id, &conf.Name, &conf.Type, &conf.TypeId, &conf.Version)
 		if err != nil {
 			return err
@@ -109,7 +108,7 @@ func (db *ItemDB) LoadWithName(cname string, limit int) ([]item.Configuration, e
 		list[i].Reference = map[string]any{}
 		for k := range list[i].Application {
 			refs := list[i].Application[k]
-			confs := make([]item.Configuration, 0)
+			confs := make([]core.Configuration, 0)
 			for r := range refs {
 				//fmt.Printf("Ref 1 id : %s\n", refs[r])
 				cid, _ := strconv.ParseInt(refs[r], 10, 64)
@@ -126,8 +125,8 @@ func (db *ItemDB) LoadWithName(cname string, limit int) ([]item.Configuration, e
 
 }
 
-func (db *ItemDB) LoadWithId(cid int64) (item.Configuration, error) {
-	conf := item.Configuration{Id: cid}
+func (db *ItemDB) LoadWithId(cid int64) (core.Configuration, error) {
+	conf := core.Configuration{Id: cid}
 	err := db.Sql.Query(func(row pgx.Rows) error {
 		err := row.Scan(&conf.Name, &conf.Type, &conf.TypeId, &conf.Category, &conf.Version)
 		if err != nil {
@@ -146,7 +145,7 @@ func (db *ItemDB) LoadWithId(cid int64) (item.Configuration, error) {
 	conf.Reference = map[string]any{}
 	for k := range conf.Application {
 		refs := conf.Application[k]
-		confs := make([]item.Configuration, 0)
+		confs := make([]core.Configuration, 0)
 		for r := range refs {
 			cid, _ := strconv.ParseInt(refs[r], 10, 64)
 			conf, err := db.LoadWithId(cid)
@@ -194,12 +193,12 @@ func (db *ItemDB) DeleteWithId(cid int64) error {
 	})
 }
 
-func (db *ItemDB) Register(reg item.ConfigRegistration) error {
+func (db *ItemDB) Register(reg core.ConfigRegistration) error {
 	conf, err := db.LoadWithId(reg.ItemId)
 	if err != nil {
 		return err
 	}
-	sc, ok := conf.Reference["Schedule"].([]item.Configuration)
+	sc, ok := conf.Reference["Schedule"].([]core.Configuration)
 	reg.Scheduling = ok
 	if reg.Scheduling {
 		jsc, err := json.Marshal(sc[0].Header)
@@ -248,7 +247,7 @@ func (db *ItemDB) checkRegs(itemId int64) error {
 	return nil
 }
 
-func (db *ItemDB) Check(reg item.ConfigRegistration) (item.ConfigRegistration, error) {
+func (db *ItemDB) Check(reg core.ConfigRegistration) (core.ConfigRegistration, error) {
 	//reg := item.ConfigRegistration{ItemId: itemId, App: app}
 	err := db.Sql.Query(func(row pgx.Rows) error {
 		err := row.Scan(&reg.Id, &reg.Scheduling, &reg.StartTime, &reg.CloseTime, &reg.EndTime)
@@ -266,7 +265,7 @@ func (db *ItemDB) Check(reg item.ConfigRegistration) (item.ConfigRegistration, e
 	return reg, nil
 }
 func (db *ItemDB) Release(regId int32) error {
-	var deleted item.ConfigRegistration
+	var deleted core.ConfigRegistration
 	err := db.Sql.Txn(func(tx pgx.Tx) error {
 		return tx.QueryRow(context.Background(), DELETE_REGISTRATION_WITH_ID, regId).Scan(&deleted.ItemId, &deleted.App, &deleted.Env)
 	})
@@ -280,7 +279,7 @@ func (db *ItemDB) Release(regId int32) error {
 	return nil
 }
 
-func (db *ItemDB) loadHeader(c *item.Configuration) error {
+func (db *ItemDB) loadHeader(c *core.Configuration) error {
 	c.Header = make(map[string]any)
 	return db.Sql.Query(func(row pgx.Rows) error {
 		var k string
@@ -294,7 +293,7 @@ func (db *ItemDB) loadHeader(c *item.Configuration) error {
 	}, SELECT_CONFIG_HEADER_WIHT_ID, c.Id)
 }
 
-func (db *ItemDB) loadApplication(c *item.Configuration) error {
+func (db *ItemDB) loadApplication(c *core.Configuration) error {
 	c.Application = make(map[string][]string)
 	return db.Sql.Query(func(row pgx.Rows) error {
 		var k string
@@ -308,7 +307,7 @@ func (db *ItemDB) loadApplication(c *item.Configuration) error {
 	}, SELECT_CONFIG_APPLICATION_WITH_ID, c.Id)
 }
 
-func (db *ItemDB) validate(c item.Configuration) ([]int64, error) {
+func (db *ItemDB) validate(c core.Configuration) ([]int64, error) {
 	refids := make([]int64, 0)
 	if c.Name == "" {
 		return refids, errors.New("name none empty string required")

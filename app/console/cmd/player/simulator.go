@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 	"gameclustering.com/internal/persistence"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -44,8 +43,8 @@ func (s *Simulator) Play() error {
 
 func (s *Simulator) register() error {
 	hc := util.HttpCaller{Host: s.Host}
-	login := bootstrap.Login{Name: s.Player, Hash: "password"}
-	err := hc.PostJson("presence/register", login, func(resp *http.Response) error {
+	login := protocol.LoginObject{Name: s.Player, Password: "password"}
+	err := hc.PostJson("presence/register", &login, func(resp *http.Response) error {
 		session := core.OnSession{}
 		err := json.NewDecoder(resp.Body).Decode(&session)
 		if err != nil {
@@ -68,8 +67,8 @@ func (s *Simulator) register() error {
 
 func (s *Simulator) login() error {
 	hc := util.HttpCaller{Host: s.Host}
-	login := bootstrap.Login{Name: s.Player, Hash: "password"}
-	err := hc.PostJson("presence/login", login, func(resp *http.Response) error {
+	login := protocol.LoginObject{Name: s.Player, Password: "password"}
+	err := hc.PostJson("presence/login", &login, func(resp *http.Response) error {
 		session := core.OnSession{}
 		err := json.NewDecoder(resp.Body).Decode(&session)
 		if err != nil {
@@ -92,7 +91,7 @@ func (s *Simulator) login() error {
 
 func (s *Simulator) inventory() error {
 	hc := util.HttpCaller{Host: s.Host, Token: s.Token, SystemId: s.SystemId}
-	req := item.OnInventory{SystemId: hc.SystemId, TypeId: "gold"}
+	req := core.OnInventory{SystemId: hc.SystemId, TypeId: "gold"}
 	err := hc.PostJson("inventory/load", req, func(resp *http.Response) error {
 		inv := persistence.InventoryResp{}
 		err := json.NewDecoder(resp.Body).Decode(&inv)

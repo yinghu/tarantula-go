@@ -2,12 +2,11 @@ package main
 
 import (
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/item"
 )
 
-func (a *AssetService) OnRegister(conf item.Configuration) {
+func (a *AssetService) OnRegister(conf core.Configuration) {
 	core.AppLog.Printf("item reigster %d\n", conf.Id)
 }
-func (a *AssetService) OnRelease(conf item.Configuration) {
+func (a *AssetService) OnRelease(conf core.Configuration) {
 	core.AppLog.Printf("item reigster %d\n", conf.Id)
 }
