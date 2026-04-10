@@ -7,11 +7,6 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
-const (
-	REQUEST_EVENT_CID  uint32 = 5
-	REQUEST_TOPIC_NAME string = "request"
-)
-
 func NewRequestEventFactory() *RequestEventFactory {
 	mf := RequestEventFactory{}
 	mq := RequestEventQuery{}

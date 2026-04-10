@@ -11,6 +11,7 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -25,10 +26,11 @@ func Register(name string, fac func() core.QueryFactory) {
 
 func AppBootstrap(tcx TarantulaContext) {
 	Register(event.MESSAGE_TOPIC_NAME, func() core.QueryFactory { return event.NewMessageEventFactory() })
-	Register(event.REGISTER_TOPIC_NAME, func() core.QueryFactory { return &event.RegisterEventFactory{} })
+	Register(event.REGISTER_TOPIC_NAME, func() core.QueryFactory { return event.NewRegisterEventFactory() })
 	Register(event.LOG_TOPIC_NAME, func() core.QueryFactory { return event.NewLogEventFactory() })
-	Register(event.LOGIN_TOPIC_NAME, func() core.QueryFactory { return &event.LoginEventFactory{} })
-	Register(event.REQUEST_TOPIC_NAME, func() core.QueryFactory { return &event.RequestEventFactory{} })
+	Register(event.LOGIN_TOPIC_NAME, func() core.QueryFactory { return event.NewLoginEventFactory() })
+	Register(event.REQUEST_TOPIC_NAME, func() core.QueryFactory { return event.NewRequestEventFactory() })
+	Register(persistence.LOGIN_OBJECT_FACTORY_NAME, func() core.QueryFactory { return persistence.NewLoginObjectFactory() })
 
 	f := core.Env{}
 	err := f.Load(tcx.Config())

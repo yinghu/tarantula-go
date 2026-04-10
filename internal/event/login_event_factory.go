@@ -7,11 +7,6 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
-const (
-	LOGIN_EVENT_CID  uint32 = 4
-	LOGIN_TOPIC_NAME string = "login"
-)
-
 func NewLoginEventFactory() *LoginEventFactory {
 	mf := LoginEventFactory{}
 	mq := LoginEventQuery{}

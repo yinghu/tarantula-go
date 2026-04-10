@@ -1,9 +1,5 @@
 package core
 
-const (
-	EVENT_FACTORY_ID uint32 = 1
-)
-
 type EventListener interface {
 	OnEvent(e Event)
 	OnError(e Event, err error)

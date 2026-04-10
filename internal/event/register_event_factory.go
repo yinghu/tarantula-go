@@ -7,11 +7,6 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
-const (
-	REGISTER_EVENT_CID  uint32 = 2
-	REGISTER_TOPIC_NAME string = "register"
-)
-
 func NewRegisterEventFactory() *RegisterEventFactory {
 	mf := RegisterEventFactory{}
 	mq := RegisterEventQuery{}

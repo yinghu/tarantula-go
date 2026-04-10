@@ -7,11 +7,6 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
-const (
-	MESSAGE_EVENT_CID  uint32 = 3
-	MESSAGE_TOPIC_NAME string = "message"
-)
-
 func NewMessageEventFactory() *MessageEventFactory {
 	mf := MessageEventFactory{}
 	mq := MessageEventQuery{}

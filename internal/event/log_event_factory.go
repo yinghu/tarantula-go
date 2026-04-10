@@ -7,11 +7,6 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
-const (
-	LOG_EVENT_CID  uint32 = 1
-	LOG_TOPIC_NAME string = "log"
-)
-
 func NewLogEventFactory() *LogEventFactory {
 	mf := LogEventFactory{}
 	mq := LogEventQuery{}

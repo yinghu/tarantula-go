@@ -10,6 +10,23 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
+const (
+	LOG_EVENT_CID  uint32 = 1
+	LOG_TOPIC_NAME string = "log"
+
+	REGISTER_EVENT_CID  uint32 = 2
+	REGISTER_TOPIC_NAME string = "register"
+
+	MESSAGE_EVENT_CID  uint32 = 3
+	MESSAGE_TOPIC_NAME string = "message"
+
+	LOGIN_EVENT_CID  uint32 = 4
+	LOGIN_TOPIC_NAME string = "login"
+
+	REQUEST_EVENT_CID  uint32 = 5
+	REQUEST_TOPIC_NAME string = "request"
+)
+
 type ProtoTopicFactoryObj struct {
 	Target *protocol.Topic
 	core.QueryFactoryObj
