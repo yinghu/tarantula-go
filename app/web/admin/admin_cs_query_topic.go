@@ -11,15 +11,15 @@ import (
 	"gameclustering.com/internal/util"
 )
 
-type CSQueryer struct {
+type CSQueryTopic struct {
 	*AdminService
 }
 
-func (s *CSQueryer) AccessControl() int32 {
+func (s *CSQueryTopic) AccessControl() int32 {
 	return core.ADMIN_ACCESS_CONTROL
 }
 
-func (s *CSQueryer) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
+func (s *CSQueryTopic) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	topic := r.PathValue("topic")
 	mc, existed := bootstrap.TopicFactoryRegistry[topic]

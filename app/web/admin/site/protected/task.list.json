@@ -78,9 +78,9 @@
         {
             "Name":"CSTool","ScopeSequence":0,"Icon":"support",
             "Jobs":[
-                {"Name":"SendMessage","Type":13},
-                {"Name":"LoadMessage","Type":14},
-                {"Name":"QueryEvent","Type":15},
+                {"Name":"SendTopic","Type":13},
+                {"Name":"QueryTopic","Type":14},
+                {"Name":"QueryObject","Type":15},
                 {"Name":"QueryTournament","Form":"/admin/webprotected/cs.query.tournament.json","Path":"/admin/cs/query","Query":["Id"],"Type":5},
                 {"Name":"QueryTournamentJoin","Form":"/admin/webprotected/cs.query.tournament.join.json","Path":"/admin/cs/query","Query":["Id"],"Type":5},
                 {"Name":"InventroyGrant","Form":"/admin/webprotected/cs.inventory.grant.json","Path":"/admin/cs/inventory/grant","Type":5},

@@ -50,7 +50,8 @@ func (s *AdminService) Start(f core.Env) error {
 
 	http.Handle("/admin/cs/message/send", bootstrap.Logging(&CSMessager{AdminService: s}))
 
-	http.Handle("/admin/cs/query/{topic}", bootstrap.Logging(&CSQueryer{AdminService: s}))
+	http.Handle("/admin/cs/query/topic/{topic}", bootstrap.Logging(&CSQueryTopic{AdminService: s}))
+	http.Handle("/admin/cs/query/object/{topic}", bootstrap.Logging(&CSQueryObject{AdminService: s}))
 	http.Handle("/admin/cs/inventory/grant", bootstrap.Logging(&CSGranter{AdminService: s}))
 	http.Handle("/admin/cs/inventory/load", bootstrap.Logging(&CSInventoryLoader{AdminService: s}))
 
