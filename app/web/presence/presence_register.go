@@ -7,6 +7,7 @@ import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
@@ -57,6 +58,26 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 			core.AppLog.Warn().Msgf("failed to publish topic %s", err.Error())
 			return
 		}
+		mf := persistence.NewLoginObjectFactory()
+		kv, err := mf.FromLoginObject(login)
+		if err != nil {
+			core.AppLog.Warn().Msgf("failed to request %s", err.Error())
+
+			return
+		}
+		req, err := mf.Request(kv)
+		if err != nil {
+			core.AppLog.Warn().Msgf("failed to request %s", err.Error())
+
+			return
+		}
+		resp, err := s.Cluster().Request(req)
+		if err != nil {
+			core.AppLog.Warn().Msgf("failed to request %s", err.Error())
+			return
+		}
+		core.AppLog.Debug().Msgf("REQ %v", resp)
+		//req := mf.Request()
 		//rw := item.OnInventory{SystemId: login.SystemId, ItemId: s.LoginReward.Id, Source: "login"}
 		//err = s.ItemService().InventoryManager().Grant(rw)
 		//if err != nil {
