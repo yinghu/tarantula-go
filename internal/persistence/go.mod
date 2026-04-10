@@ -15,9 +15,11 @@ replace gameclustering.com/internal/protocol => ../protocol
 require (
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/item v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/protocol v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
 	github.com/dgraph-io/badger/v4 v4.7.0
 	github.com/jackc/pgx/v5 v5.7.4
+	google.golang.org/protobuf v1.36.11
 )
 
 require (
@@ -27,7 +29,6 @@ require (
 )
 
 require (
-	gameclustering.com/internal/protocol v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
@@ -68,5 +69,4 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	google.golang.org/grpc v1.79.1 // indirect
-	google.golang.org/protobuf v1.36.11 // indirect
 )
