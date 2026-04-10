@@ -110,6 +110,9 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 		//var stub int32 = 0
 		var code int32 = 0
 		defer func() {
+			if s.ClusterMember() {
+				return
+			}
 			dur := time.Since(start)
 			re := protocol.RequestEvent{Path: r.URL.Path, Method: r.Method, Duration: uint64(dur.Milliseconds()), Code: uint32(code)}
 			re.DateTime = timestamppb.Now()
@@ -128,6 +131,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 				return
 			}
 			t.Event.Id = uint64(id)
+			s.Cluster().Publish(t)
 		}()
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "*")

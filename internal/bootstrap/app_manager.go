@@ -76,8 +76,7 @@ func (s *AppManager) RegisterLogForwarder(threshold zerolog.Level, logf LogForwa
 func (s *AppManager) Start(f core.Env) error {
 	s.F = f
 	s.initLogger(f)
-	//CreateAppLog(f.LogDir, f.LogTruncated, f.Standalone, s)
-	core.AppLog.Printf("app manager starting on %s %v\n", f.Prefix, f)
+	core.AppLog.Info().Msgf("app manager starting on %s %v\n", f.Prefix, f)
 	s.event = &EventManager{App: s}
 	s.ManagedApps = f.ManagedApps
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
