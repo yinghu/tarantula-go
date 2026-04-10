@@ -69,5 +69,12 @@ func TestLoginObject(t *testing.T) {
 		t.Errorf("should not be error %s", err.Error())
 		return
 	}
-	fmt.Printf("kv %v", &pkv)
+	var loginx LoginObject
+	err = pkv.Message.UnmarshalTo(&loginx)
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+		return
+	}
+	fmt.Printf("kv %v\n", &pkv)
+	fmt.Printf("obj %v\n", &loginx)
 }

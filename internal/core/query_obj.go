@@ -13,7 +13,7 @@ type QueryObj struct {
 	Offset    int32     `json:"Offset"`
 	StartTime time.Time `json:"StartTime"`
 	EndTime   time.Time `json:"EndTime"`
-	//Cc        chan Chunk `json:"-"`
+
 	Ee Event `json:"-"`
 }
 
@@ -139,10 +139,6 @@ func (q *QueryObj) QLimit() int32 {
 func (q *QueryObj) QOffset() int32 {
 	return q.Offset
 }
-
-//func (q *QueryObj) QCc() chan Chunk {
-//return q.Cc
-//}
 
 func (q *QueryObj) QEvent() Event {
 	return q.Ee

@@ -27,19 +27,15 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 	login.Password = hash
 	err := s.SaveLogin(login)
 	if err != nil {
-		//login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.DB_OP_ERR_CODE)}
 		return core.OnSession{Successful: false, Message: err.Error()}, err
 	}
 	tk, err := s.Authenticator().CreateToken(int64(login.SystemId), int32(login.Id), int32(login.AccessControl))
 	if err != nil {
-		//login.Cc <- core.Chunk{Remaining: false, Data: bootstrap.ErrorMessage(err.Error(), bootstrap.INVALID_TOKEN_CODE)}
 		return core.OnSession{Successful: false, Message: err.Error()}, err
 	}
 	session := core.OnSession{Successful: true, SystemId: int64(login.SystemId), Stub: int32(login.Id), Token: tk, Home: s.F.Host}
 	ticket, _ := s.Authenticator().CreateTicket(int64(login.SystemId), int32(login.Id), int32(login.AccessControl), bootstrap.TICKET_TIME_OUT_MINUTES)
 	session.Ticket = ticket
-
-	//login.Cc <- core.Chunk{Remaining: false, Data: util.ToJson(session)}
 	go func() {
 		id, err := s.Sequence().Id()
 		if err != nil {

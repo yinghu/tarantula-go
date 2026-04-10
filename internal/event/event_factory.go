@@ -31,8 +31,6 @@ const (
 
 func CreateEvent(cid uint32) core.Event {
 	switch cid {
-	case STAT_CID:
-		return &StatEvent{}
 	case TOURNAMENT_CID:
 		return &TournamentEvent{}
 	case SUBSCRIPTION_CID:
