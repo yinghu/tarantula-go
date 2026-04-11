@@ -44,7 +44,7 @@ func (p *QueryFactoryObj) ReadKey(key DataBuffer) error {
 	return nil
 }
 
-func (f *QueryFactoryObj) List(resp *protocol.Response) Query {
+func (f *QueryFactoryObj) Set(resp *protocol.Response) Query {
 	f.Q.QResponse(resp)
 	return f.Q
 }

@@ -32,5 +32,5 @@ type QueryFactory interface {
 	Export(query Query) ([]byte, error)
 	Import(criteria []byte) (Query, error)
 	Query() Query
-	List(resp *protocol.Response) Query
+	Set(resp *protocol.Response) Query
 }

@@ -55,7 +55,7 @@ func (s *CSQueryObject) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
 			break
 		}
-		mf.List(resp).QList(func(h *protocol.Header, m any) bool {
+		mf.Set(resp).QList(func(h *protocol.Header, m any) bool {
 			ms = append(ms, m)
 			return true
 		})
