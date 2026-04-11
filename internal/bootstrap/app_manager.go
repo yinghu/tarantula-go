@@ -128,7 +128,7 @@ func (s *AppManager) Shutdown() {
 	}
 	util.GitPush()
 	s.Sql.Close()
-	core.AppLog.Println("app manager shutting down ...")
+	core.AppLog.Info().Msg("app manager shutting down ...")
 }
 
 func (s *AppManager) Context() string {
