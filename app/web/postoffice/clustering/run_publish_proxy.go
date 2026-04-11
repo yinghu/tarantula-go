@@ -10,7 +10,7 @@ import (
 )
 
 func (c *DataServiceProvider) runPublish(topic *protocol.Topic) (*protocol.Response, error) {
-	tpf, registered := bootstrap.TopicFactoryRegistry[topic.Name]
+	tpf, registered := bootstrap.QueryFactoryRegistry[topic.Name]
 	if !registered {
 		return &protocol.Response{Successful: false}, fmt.Errorf("event factory not registered")
 	}

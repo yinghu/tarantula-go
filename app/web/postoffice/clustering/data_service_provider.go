@@ -54,7 +54,7 @@ func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*p
 
 func (c *DataServiceProvider) Query(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
 
-	tf, existed := bootstrap.TopicFactoryRegistry[request.Query.Id]
+	tf, existed := bootstrap.QueryFactoryRegistry[request.Query.Id]
 	if !existed {
 		return fmt.Errorf("event factory not registered %s", request.Query.Id)
 	}

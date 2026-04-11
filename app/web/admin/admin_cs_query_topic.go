@@ -22,7 +22,7 @@ func (s *CSQueryTopic) AccessControl() int32 {
 func (s *CSQueryTopic) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	topic := r.PathValue("topic")
-	mc, existed := bootstrap.TopicFactoryRegistry[topic]
+	mc, existed := bootstrap.QueryFactoryRegistry[topic]
 	if !existed {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: fmt.Sprintf("topic %s not existed", topic)}))
 		return
