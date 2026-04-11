@@ -19,7 +19,7 @@ type QueryObj struct {
 	StartTime time.Time `json:"StartTime"`
 	EndTime   time.Time `json:"EndTime"`
 
-	Respnse *protocol.Response
+	Payload *protocol.Response
 }
 
 func (q *QueryObj) QRead(buff DataBuffer) error {
@@ -150,9 +150,15 @@ func (q *QueryObj) QFilter(k, v []byte) bool {
 }
 
 func (q *QueryObj) QList(list List) error {
-	return fmt.Errorf("not implemented")
+	if q.Payload == nil {
+		return fmt.Errorf("no response assigned")
+	}
+	if !q.Payload.Successful {
+		return fmt.Errorf("not found")
+	}
+	return nil
 }
 
 func (q *QueryObj) QResponse(resp *protocol.Response) {
-	q.Respnse = resp
+	q.Payload = resp
 }
