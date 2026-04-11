@@ -45,6 +45,7 @@ func (q *LoginObjectQuery) QList(list core.List) error {
 		if err != nil {
 			continue
 		}
+
 		if !list(me.Key.Header, e) {
 			break
 		}

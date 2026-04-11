@@ -1,6 +1,8 @@
 package persistence
 
 import (
+	"fmt"
+
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/protobuf/types/known/anypb"
@@ -9,6 +11,7 @@ import (
 func NewLoginObjectFactory() *LoginObjectFactory {
 	mf := LoginObjectFactory{}
 	mf.M = &protocol.LoginObject{}
+
 	mq := LoginObjectQuery{}
 	mq.FactoryId = core.OBJECT_FACTORY_ID
 	mq.ClassId = LOGIN_OBJECT_ID
@@ -30,4 +33,16 @@ func (p *LoginObjectFactory) FromLoginObject(login *protocol.LoginObject) (*prot
 	}
 	kv.Message = obj
 	return &kv, nil
+}
+
+func (p *LoginObjectFactory) Message(obj *protocol.KeyValue) (any, error) {
+	mo, err := p.ProtoObjectFactoryObj.Message(obj)
+	if err != nil {
+		return mo, err
+	}
+	m, ok := mo.(*protocol.LoginObject)
+	if !ok {
+		return mo, fmt.Errorf("cannot cast to %s", "login object")
+	}
+	return protocol.LoginObject{Name: m.Name, Password: m.Password, SystemId: m.SystemId, AccessControl: m.AccessControl}, nil
 }

@@ -1,6 +1,11 @@
 package core
 
-import "gameclustering.com/internal/protocol"
+import (
+	"gameclustering.com/internal/protocol"
+	"github.com/gogo/protobuf/proto"
+)
+
+type MessageObject func() proto.Message
 
 type QueryFactoryObj struct {
 	Q Query

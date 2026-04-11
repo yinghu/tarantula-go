@@ -37,6 +37,7 @@ func (p *ProtoObjectFactoryObj) Object(data []byte) (*protocol.KeyValue, error) 
 }
 
 func (p *ProtoObjectFactoryObj) Message(obj *protocol.KeyValue) (any, error) {
+
 	err := anypb.UnmarshalTo(obj.Message, p.M, proto.UnmarshalOptions{})
 	if err != nil {
 		return p.M, err
