@@ -5,21 +5,13 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/protocol"
 	"gameclustering.com/postoffice/clustering"
-	"github.com/rs/zerolog"
 )
-
-type LogData struct {
-	level zerolog.Level
-	log   []byte
-}
 
 type PostofficeService struct {
 	bootstrap.AppManager
 	mm      *clustering.MemberlistManager
 	started bool
-	wTopic  chan<- *protocol.Topic
 }
 
 func (s *PostofficeService) Config() string {
