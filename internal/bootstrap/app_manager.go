@@ -17,7 +17,6 @@ import (
 )
 
 type AppManager struct {
-	metr        core.MetricsService
 	imse        core.ItemService
 	auth        core.Authenticator
 	Sql         persistence.Postgresql
@@ -39,10 +38,6 @@ func (s *AppManager) ItemService() core.ItemService {
 
 func (s *AppManager) Pusher() core.Pusher {
 	return s.tcpPusher
-}
-
-func (s *AppManager) Metrics() core.MetricsService {
-	return s.metr
 }
 
 func (s *AppManager) Authenticator() core.Authenticator {
@@ -98,13 +93,6 @@ func (s *AppManager) Start(f core.Env) error {
 		return err
 	}
 	s.Sql = sql
-	ms := persistence.MetricsDB{Sql: &sql}
-	err = ms.Start()
-
-	if err != nil {
-		return err
-	}
-	s.metr = &ms
 	gitStore := persistence.GitItemStore{RepositoryDir: f.HomeDir + "/bin/tarantula", JsonRequester: s}
 	gitStore.Start()
 	is := persistence.ItemDB{Sql: &sql, Gis: &gitStore}
