@@ -36,17 +36,20 @@ func (q *LoginObjectQuery) QList(list core.List) error {
 	}
 	mf := NewLoginObjectFactory()
 	for _, data := range q.Payload.Data.List {
-		me, err := mf.Object(data.Value)
+		kv, err := mf.Object(data.Value)
 		if err != nil {
 			continue
 		}
-		core.AppLog.Debug().Msgf("key value : %v", me)
-		e, err := mf.Message(me)
+		core.AppLog.Debug().Msgf("key value : %v", kv)
+		e, err := mf.Message(kv)
 		if err != nil {
 			continue
 		}
-
-		if !list(me.Key.Header, e) {
+		_, ok := e.(*protocol.LoginObject)
+		if !ok {
+			core.AppLog.Warn().Msg("casting error")
+		}
+		if !list(kv.Key.Header, e) {
 			break
 		}
 	}
