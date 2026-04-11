@@ -1,7 +1,10 @@
 package core
 
 import (
+	"fmt"
 	"time"
+
+	"gameclustering.com/internal/protocol"
 )
 
 type QueryObj struct {
@@ -16,7 +19,7 @@ type QueryObj struct {
 	StartTime time.Time `json:"StartTime"`
 	EndTime   time.Time `json:"EndTime"`
 
-	Ee Event `json:"-"`
+	Respnse *protocol.Response
 }
 
 func (q *QueryObj) QRead(buff DataBuffer) error {
@@ -142,10 +145,14 @@ func (q *QueryObj) QOffset() int32 {
 	return q.Offset
 }
 
-func (q *QueryObj) QEvent() Event {
-	return q.Ee
-}
-
 func (q *QueryObj) QFilter(k, v []byte) bool {
 	return true
+}
+
+func (q *QueryObj) QList(list List) error {
+	return fmt.Errorf("not implemented")
+}
+
+func (q *QueryObj) QResponse(resp *protocol.Response) {
+	q.Respnse = resp
 }

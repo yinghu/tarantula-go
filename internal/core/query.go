@@ -1,6 +1,12 @@
 package core
 
-import "time"
+import (
+	"time"
+
+	"gameclustering.com/internal/protocol"
+)
+
+type List func(h *protocol.Header, m any) bool
 
 type Query interface {
 	QId() uint32
@@ -15,12 +21,16 @@ type Query interface {
 	QOffset() int32
 	QRead(b DataBuffer) error
 	QWrite(b DataBuffer) error
-	QEvent() Event
 	QFilter(k, v []byte) bool
+
+	//read
+	QList(list List) error
+	QResponse(resp *protocol.Response)
 }
 
 type QueryFactory interface {
 	Export(query Query) ([]byte, error)
 	Import(criteria []byte) (Query, error)
 	Query() Query
+	List(resp *protocol.Response) Query
 }

@@ -38,7 +38,6 @@ func (s *CSQueryTopic) Request(rs core.OnSession, w http.ResponseWriter, r *http
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	//req := core.DataRequest{Opt: core.QUERY_DATA_REQUEST, Criteria: me}
 	stream, err := s.Cluster().List(me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))

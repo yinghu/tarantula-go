@@ -1,9 +1,11 @@
 package event
 
 import (
+	"fmt"
 	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 )
 
 const (
@@ -192,4 +194,12 @@ func (q *QWithTag) QFilter(k, v []byte) bool {
 	//core.AppLog.Debug().Msgf("filter %s %d %d", tag, oid, rev)
 	return true
 	//return tag == q.Tag
+}
+
+func (q *QWithTag) QList(list core.List) error {
+	return fmt.Errorf("not implemented")
+}
+
+func (q *QWithTag) QResponse(resp *protocol.Response) {
+
 }

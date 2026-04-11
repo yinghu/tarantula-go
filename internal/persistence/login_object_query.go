@@ -1,6 +1,8 @@
 package persistence
 
 import (
+	"fmt"
+
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 )
@@ -28,4 +30,29 @@ func (q *LoginObjectQuery) QFilter(k, v []byte) bool {
 	}
 	core.AppLog.Debug().Msgf("filter here %v", m)
 	return true
+}
+
+func (q *LoginObjectQuery) QList(list core.List) error {
+	if q.Respnse == nil {
+		return fmt.Errorf("no response assigned")
+	}
+	if !q.Respnse.Successful {
+		return fmt.Errorf("not found")
+	}
+	mf := NewLoginObjectFactory()
+	for _, data := range q.Respnse.Data.List {
+		me, err := mf.Object(data.Value)
+		if err != nil {
+			continue
+		}
+		core.AppLog.Debug().Msgf("key value : %v", me)
+		e, err := mf.Message(me)
+		if err != nil {
+			continue
+		}
+		if !list(me.Key.Header, e) {
+			break
+		}
+	}
+	return nil
 }

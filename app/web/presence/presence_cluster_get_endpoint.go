@@ -38,5 +38,11 @@ func (s *PresenceClusterGet) Request(rs core.OnSession, w http.ResponseWriter, r
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	w.Write(util.ToJson(resp))
+
+	if err := mf.List(resp).QList(func(h *protocol.Header, m any) bool {
+		w.Write(util.ToJson(m))
+		return false
+	}); err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: "not found"}))
+	}
 }
