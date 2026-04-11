@@ -45,11 +45,12 @@ func (q *LoginObjectQuery) QList(list core.List) error {
 		if err != nil {
 			continue
 		}
-		_, ok := e.(*protocol.LoginObject)
+		mo, ok := e.(*protocol.LoginObject)
 		if !ok {
 			core.AppLog.Warn().Msg("casting error")
+			continue
 		}
-		if !list(kv.Key.Header, e) {
+		if !list(kv.Key.Header, protocol.LoginObject{Name: mo.Name, Password: mo.Password, SystemId: mo.SystemId, AccessControl: mo.AccessControl}) {
 			break
 		}
 	}
