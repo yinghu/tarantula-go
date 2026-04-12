@@ -4,6 +4,7 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
@@ -15,7 +16,7 @@ func NewLogEventFactory() *LogEventFactory {
 	mq.ClassId = LOG_EVENT_CID
 	mq.Topic = LOG_TOPIC_NAME
 	mf.Q = &mq
-	mf.M = &protocol.LogEvent{}
+	mf.Mt = func() proto.Message { return &protocol.LogEvent{} }
 	return &mf
 }
 

@@ -17,7 +17,7 @@ type MessageObject func() proto.Message
 
 type ProtoObjectFactoryObj struct {
 	core.QueryFactoryObj
-	Mx MessageObject
+	Mo MessageObject
 }
 
 func (p *ProtoObjectFactoryObj) Request(obj *protocol.KeyValue) (*protocol.Request, error) {
@@ -39,7 +39,7 @@ func (p *ProtoObjectFactoryObj) Object(data []byte) (*protocol.KeyValue, error) 
 }
 
 func (p *ProtoObjectFactoryObj) Message(obj *protocol.KeyValue) (any, error) {
-	m := p.Mx()
+	m := p.Mo()
 	err := anypb.UnmarshalTo(obj.Message, m, proto.UnmarshalOptions{})
 	if err != nil {
 		return m, err

@@ -6,7 +6,7 @@ import (
 )
 
 type LoginEventQuery struct {
-	core.QueryObj
+	TopicQueryObj
 }
 
 func (q *LoginEventQuery) QFilter(k, v []byte) bool {

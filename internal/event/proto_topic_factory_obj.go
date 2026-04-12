@@ -27,10 +27,12 @@ const (
 	REQUEST_TOPIC_NAME string = "request"
 )
 
+type MessageTopic func() proto.Message
+
 type ProtoTopicFactoryObj struct {
 	Target *protocol.Topic
 	core.QueryFactoryObj
-	M proto.Message
+	Mt MessageTopic
 }
 
 func (p *ProtoTopicFactoryObj) Request(topic *protocol.Topic) (*protocol.Request, error) {
@@ -67,9 +69,10 @@ func (p *ProtoTopicFactoryObj) Topic(data []byte) (*protocol.Topic, error) {
 }
 
 func (p *ProtoTopicFactoryObj) Message(topic *protocol.Topic) (any, error) {
-	err := anypb.UnmarshalTo(topic.Event.Message, p.M, proto.UnmarshalOptions{})
+	m := p.Mt()
+	err := anypb.UnmarshalTo(topic.Event.Message, m, proto.UnmarshalOptions{})
 	if err != nil {
-		return p.M, err
+		return m, err
 	}
-	return p.M, nil
+	return m, nil
 }

@@ -4,6 +4,7 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
@@ -15,7 +16,7 @@ func NewRequestEventFactory() *RequestEventFactory {
 	mq.ClassId = REQUEST_EVENT_CID
 	mq.Topic = REQUEST_TOPIC_NAME
 	mf.Q = &mq
-	mf.M = &protocol.RequestEvent{}
+	mf.Mt = func() proto.Message { return &protocol.RequestEvent{} }
 	return &mf
 }
 

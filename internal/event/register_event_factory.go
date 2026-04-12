@@ -4,6 +4,7 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
@@ -15,7 +16,7 @@ func NewRegisterEventFactory() *RegisterEventFactory {
 	mq.ClassId = REGISTER_EVENT_CID
 	mq.Topic = REGISTER_TOPIC_NAME
 	mf.Q = &mq
-	mf.M = &protocol.RegisterEvent{}
+	mf.Mt = func() proto.Message { return &protocol.RegisterEvent{} }
 	return &mf
 }
 

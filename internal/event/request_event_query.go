@@ -6,7 +6,7 @@ import (
 )
 
 type RequestEventQuery struct {
-	core.QueryObj
+	TopicQueryObj
 }
 
 func (q *RequestEventQuery) QFilter(k, v []byte) bool {

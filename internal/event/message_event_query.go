@@ -6,7 +6,7 @@ import (
 )
 
 type MessageEventQuery struct {
-	core.QueryObj
+	TopicQueryObj
 }
 
 func (q *MessageEventQuery) QFilter(k, v []byte) bool {

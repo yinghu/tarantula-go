@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
 
@@ -52,20 +53,10 @@ func (s *CSQueryTopic) Request(rs core.OnSession, w http.ResponseWriter, r *http
 			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
 			break
 		}
-		if resp.Successful {
-			for _, data := range resp.Data.List {
-				me, err := mf.Topic(data.Value)
-				if err != nil {
-					continue
-				}
-				core.AppLog.Debug().Msgf("topic : %v", me)
-				e, err := mf.Message(me)
-				if err != nil {
-					continue
-				}
-				ms = append(ms, e)
-			}
-		}
+		mf.Set(resp).QList(func(h *protocol.Header, m any) bool {
+			ms = append(ms, m)
+			return true
+		})
 	}
 	w.Write(util.ToJson(ms))
 }
