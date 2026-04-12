@@ -10,7 +10,7 @@ import (
 func NewLoginObjectFactory() *LoginObjectFactory {
 	mf := LoginObjectFactory{}
 
-	mf.Mx = func() proto.Message { return &protocol.LoginObject{} }
+	mf.Mo = func() proto.Message { return &protocol.LoginObject{} }
 
 	mq := LoginObjectQuery{}
 	mq.Id = LOGIN_OBJECT_FACTORY_NAME
