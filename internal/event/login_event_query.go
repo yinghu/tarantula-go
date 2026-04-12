@@ -10,7 +10,7 @@ type LoginEventQuery struct {
 }
 
 func (q *LoginEventQuery) QFilter(k, v []byte) bool {
-	mf := LoginEventFactory{}
+	mf := NewLoginEventFactory()
 	t, err := mf.Topic(v)
 	if err != nil {
 		core.AppLog.Warn().Msgf("wrong decode format %s", err)

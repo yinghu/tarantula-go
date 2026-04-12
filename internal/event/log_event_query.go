@@ -10,7 +10,7 @@ type LogEventQuery struct {
 }
 
 func (q *LogEventQuery) QFilter(k, v []byte) bool {
-	mf := LogEventFactory{}
+	mf := NewLogEventFactory()
 	t, err := mf.Topic(v)
 	if err != nil {
 		core.AppLog.Warn().Msgf("wrong decode format %s", err)
