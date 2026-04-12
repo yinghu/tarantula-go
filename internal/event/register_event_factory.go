@@ -10,6 +10,7 @@ import (
 func NewRegisterEventFactory() *RegisterEventFactory {
 	mf := RegisterEventFactory{}
 	mq := RegisterEventQuery{}
+	mq.Id = REGISTER_TOPIC_NAME
 	mq.FactoryId = core.EVENT_FACTORY_ID
 	mq.ClassId = REGISTER_EVENT_CID
 	mq.Topic = REGISTER_TOPIC_NAME

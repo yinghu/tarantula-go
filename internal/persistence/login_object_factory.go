@@ -3,14 +3,17 @@ package persistence
 import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
 func NewLoginObjectFactory() *LoginObjectFactory {
 	mf := LoginObjectFactory{}
-	mf.M = &protocol.LoginObject{}
+
+	mf.Mx = func() proto.Message { return &protocol.LoginObject{} }
 
 	mq := LoginObjectQuery{}
+	mq.Id = LOGIN_OBJECT_FACTORY_NAME
 	mq.FactoryId = core.OBJECT_FACTORY_ID
 	mq.ClassId = LOGIN_OBJECT_ID
 	mq.Topic = LOGIN_OBJECT_FACTORY_NAME

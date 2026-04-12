@@ -10,6 +10,7 @@ import (
 func NewRequestEventFactory() *RequestEventFactory {
 	mf := RequestEventFactory{}
 	mq := RequestEventQuery{}
+	mq.Id = REQUEST_TOPIC_NAME
 	mq.FactoryId = core.EVENT_FACTORY_ID
 	mq.ClassId = REQUEST_EVENT_CID
 	mq.Topic = REQUEST_TOPIC_NAME

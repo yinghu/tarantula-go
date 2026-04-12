@@ -10,6 +10,7 @@ import (
 func NewMessageEventFactory() *MessageEventFactory {
 	mf := MessageEventFactory{}
 	mq := MessageEventQuery{}
+	mq.Id = MESSAGE_TOPIC_NAME
 	mq.FactoryId = core.EVENT_FACTORY_ID
 	mq.ClassId = MESSAGE_EVENT_CID
 	mq.Topic = MESSAGE_TOPIC_NAME

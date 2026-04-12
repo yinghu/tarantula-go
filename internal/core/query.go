@@ -9,7 +9,7 @@ import (
 type List func(h *protocol.Header, m any) bool
 
 type Query interface {
-	QId() uint32
+	QId() string
 	QFactoryId() uint32
 	QClassId() uint32
 	QNodeId() string

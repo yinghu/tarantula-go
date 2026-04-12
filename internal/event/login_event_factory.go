@@ -10,6 +10,7 @@ import (
 func NewLoginEventFactory() *LoginEventFactory {
 	mf := LoginEventFactory{}
 	mq := LoginEventQuery{}
+	mq.Id = LOGIN_TOPIC_NAME
 	mq.FactoryId = core.EVENT_FACTORY_ID
 	mq.ClassId = LOGIN_EVENT_CID
 	mq.Topic = LOGIN_TOPIC_NAME

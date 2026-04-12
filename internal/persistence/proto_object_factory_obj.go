@@ -13,9 +13,11 @@ const (
 	LOGIN_OBJECT_FACTORY_NAME        = "obj_login"
 )
 
+type MO func() proto.Message
 type ProtoObjectFactoryObj struct {
 	core.QueryFactoryObj
-	M proto.Message
+	//M  proto.Message
+	Mx MO
 }
 
 func (p *ProtoObjectFactoryObj) Request(obj *protocol.KeyValue) (*protocol.Request, error) {
@@ -37,10 +39,10 @@ func (p *ProtoObjectFactoryObj) Object(data []byte) (*protocol.KeyValue, error) 
 }
 
 func (p *ProtoObjectFactoryObj) Message(obj *protocol.KeyValue) (any, error) {
-
-	err := anypb.UnmarshalTo(obj.Message, p.M, proto.UnmarshalOptions{})
+	m := p.Mx()
+	err := anypb.UnmarshalTo(obj.Message, m, proto.UnmarshalOptions{})
 	if err != nil {
-		return p.M, err
+		return m, err
 	}
-	return p.M, nil
+	return m, nil
 }
