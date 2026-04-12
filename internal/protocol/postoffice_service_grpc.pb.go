@@ -34,11 +34,12 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PostofficeServiceClient interface {
-	// cluster service API hook
+	// data API
 	HashRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error)
 	KeyRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error)
 	Request(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	List(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error)
+	// topic API
 	Receive(ctx context.Context, in *Topic, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Topic], error)
 	Subscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
 	Unsubscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
@@ -184,11 +185,12 @@ func (c *postofficeServiceClient) Disconnect(ctx context.Context, in *Topic, opt
 // All implementations must embed UnimplementedPostofficeServiceServer
 // for forward compatibility.
 type PostofficeServiceServer interface {
-	// cluster service API hook
+	// data API
 	HashRing(*Request, grpc.ServerStreamingServer[HashNode]) error
 	KeyRing(*Request, grpc.ServerStreamingServer[HashNode]) error
 	Request(context.Context, *Request) (*Response, error)
 	List(*Request, grpc.ServerStreamingServer[Response]) error
+	// topic API
 	Receive(*Topic, grpc.ServerStreamingServer[Topic]) error
 	Subscribe(context.Context, *Topic) (*Response, error)
 	Unsubscribe(context.Context, *Topic) (*Response, error)
