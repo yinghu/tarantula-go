@@ -15,7 +15,7 @@ const (
 func (m *DataServiceProvider) runSetData(num int) {
 start:
 	m.DWait.Wait()
-	core.AppLog.Debug().Msgf("starting set operator %d", num)
+	core.AppLog.Info().Msgf("starting set operator %d", num)
 	for sd := range m.DSet {
 		if sd.Opt == core.SET_OPT_RECOVER {
 			break
@@ -64,7 +64,7 @@ start:
 			sd.Resp <- &protocol.Response{Successful: false, Message: fmt.Sprintf("set opt not supported %d", sd.Opt)}
 		}
 	}
-	core.AppLog.Debug().Msgf("running recovery on operator %d", num)
+	core.AppLog.Info().Msgf("running recovery on operator %d", num)
 	sync := <-m.DPull
 	for _, h := range sync.Ranges {
 		req := protocol.Request{Prefix: h.From, Opt: h.To}
@@ -79,7 +79,7 @@ start:
 				break
 			}
 			if err != nil {
-				core.AppLog.Debug().Msgf("remote streaming error %s %s", sync.Remote, err.Error())
+				core.AppLog.Warn().Msgf("remote streaming error %s %s", sync.Remote, err.Error())
 				break
 			}
 			m.set(data)

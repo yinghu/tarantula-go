@@ -10,7 +10,7 @@ import (
 )
 
 func (c *DataServiceProvider) runPull(target string, set *protocol.Request) (grpc.ServerStreamingClient[protocol.Response], error) {
-	core.AppLog.Debug().Msgf("run remote pull %s >= %d < %d", target, set.Prefix, set.Opt)
+	core.AppLog.Info().Msgf("run remote pull %s >= %d < %d", target, set.Prefix, set.Opt)
 	tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err

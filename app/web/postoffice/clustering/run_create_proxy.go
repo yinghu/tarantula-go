@@ -14,7 +14,6 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request) (*protocol.Respon
 	var rt uint32
 	if set.Prefix > 0 {
 		rt = set.Prefix
-		core.AppLog.Debug().Msgf("using prefix %d", set.Prefix)
 	} else {
 		rt = c.Mll.RingToken(set.Data.Key)
 	}
@@ -39,7 +38,6 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request) (*protocol.Respon
 		}
 		break
 	}
-	core.AppLog.Debug().Msgf("retry %s, %d %v", retry.Err, retry.Reties, retry.Suc)
 	return &protocol.Response{Successful: retry.Suc, Message: retry.Err}, nil
 }
 
