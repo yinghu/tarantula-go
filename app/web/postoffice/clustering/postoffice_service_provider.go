@@ -42,7 +42,7 @@ func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerS
 	c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: topic.NodeId, Async: aq}
 	ch := <-aq
 	close(aq)
-	core.AppLog.Debug().Msgf("start event receiver on [%s]", topic.NodeId)
+	core.AppLog.Info().Msgf("start event receiver on [%s]", topic.NodeId)
 	defer close(ch.Rev)
 	defer close(ch.Q)
 	receiving := true
@@ -111,4 +111,8 @@ func (c *DataServiceProvider) List(in *protocol.Request, stream grpc.ServerStrea
 
 func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
 	return c.runTask(task)
+}
+
+func (c *DataServiceProvider) Accept(t *protocol.Task, stream grpc.ServerStreamingServer[protocol.Task]) error {
+	return nil
 }

@@ -28,7 +28,6 @@ func (c *DataServiceProvider) runReset(set *protocol.Request) (*protocol.Respons
 		}
 		break
 	}
-	core.AppLog.Printf("retry %s, %d , %v", retry.Err, retry.Reties, retry.Suc)
 	return &protocol.Response{Successful: retry.Suc, Message: retry.Err}, nil
 }
 

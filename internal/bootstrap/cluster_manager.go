@@ -213,7 +213,7 @@ ro:
 	for c.running {
 		resp, err := stream.Recv()
 		if err == io.EOF {
-			core.AppLog.Debug().Msgf("eof %s", err.Error())
+			core.AppLog.Warn().Msgf("eof %s", err.Error())
 			break
 		}
 		if err != nil {
