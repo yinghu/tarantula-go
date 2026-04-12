@@ -6,7 +6,7 @@ import (
 )
 
 type LoginObjectQuery struct {
-	core.QueryObj
+	ObjectQueryObj
 }
 
 func (q *LoginObjectQuery) QFilter(k, v []byte) bool {
@@ -28,26 +28,4 @@ func (q *LoginObjectQuery) QFilter(k, v []byte) bool {
 	}
 	core.AppLog.Debug().Msgf("filter here %v", m)
 	return true
-}
-
-func (q *LoginObjectQuery) QList(list core.List) error {
-	if err := q.QueryObj.QList(list); err != nil {
-		return err
-	}
-	mf := NewLoginObjectFactory()
-	for _, data := range q.Payload.Data.List {
-		kv, err := mf.Object(data.Value)
-		if err != nil {
-			continue
-		}
-		core.AppLog.Debug().Msgf("key value : %v", kv)
-		e, err := mf.Message(kv)
-		if err != nil {
-			continue
-		}
-		if !list(kv.Key.Header, e) {
-			break
-		}
-	}
-	return nil
 }
