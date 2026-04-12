@@ -108,3 +108,7 @@ func (c *DataServiceProvider) List(in *protocol.Request, stream grpc.ServerStrea
 	c.runQuery(in, stream)
 	return nil
 }
+
+func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
+	return c.runTask(task)
+}

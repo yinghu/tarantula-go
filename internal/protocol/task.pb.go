@@ -26,7 +26,8 @@ type Task struct {
 	NodeId        string                 `protobuf:"bytes,1,opt,name=nodeId,proto3" json:"nodeId,omitempty"`
 	Tag           string                 `protobuf:"bytes,2,opt,name=tag,proto3" json:"tag,omitempty"`
 	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Transaction   *Transaction           `protobuf:"bytes,4,opt,name=transaction,proto3" json:"transaction,omitempty"`
+	Prefix        uint32                 `protobuf:"fixed32,4,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	Transaction   *Transaction           `protobuf:"bytes,5,opt,name=transaction,proto3" json:"transaction,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -82,6 +83,13 @@ func (x *Task) GetName() string {
 	return ""
 }
 
+func (x *Task) GetPrefix() uint32 {
+	if x != nil {
+		return x.Prefix
+	}
+	return 0
+}
+
 func (x *Task) GetTransaction() *Transaction {
 	if x != nil {
 		return x.Transaction
@@ -94,12 +102,13 @@ var File_task_proto protoreflect.FileDescriptor
 const file_task_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"task.proto\x12\bprotocol\x1a\x11transaction.proto\"}\n" +
+	"task.proto\x12\bprotocol\x1a\x11transaction.proto\"\x95\x01\n" +
 	"\x04Task\x12\x16\n" +
 	"\x06nodeId\x18\x01 \x01(\tR\x06nodeId\x12\x10\n" +
 	"\x03tag\x18\x02 \x01(\tR\x03tag\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x127\n" +
-	"\vtransaction\x18\x04 \x01(\v2\x15.protocol.TransactionR\vtransactionBL\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x16\n" +
+	"\x06prefix\x18\x04 \x01(\aR\x06prefix\x127\n" +
+	"\vtransaction\x18\x05 \x01(\v2\x15.protocol.TransactionR\vtransactionBL\n" +
 	"\x17com.icodesoftware.protoB\vTaskFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (

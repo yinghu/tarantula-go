@@ -124,15 +124,20 @@ type TopicListener interface {
 }
 
 type ClusterService interface {
+	//hash
 	HashRing(r RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error)
 	KeyRing(r RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error)
 	RingToken(key []byte) uint32
 
+	//data
 	List(r Query) (grpc.ServerStreamingClient[protocol.Response], error)
 	Request(r *protocol.Request) (*protocol.Response, error)
 
+	//topic
 	Publish(e *protocol.Topic) (*protocol.Response, error)
-
 	Subscribe(topic string, listener TopicListener) error
 	Unsubscribe(topic string) error
+
+	//task
+	Issue(t *protocol.Task) (*protocol.Response, error)
 }

@@ -28,23 +28,26 @@ const (
 	PostofficeService_Unsubscribe_FullMethodName = "/protocol.PostofficeService/unsubscribe"
 	PostofficeService_Publish_FullMethodName     = "/protocol.PostofficeService/publish"
 	PostofficeService_Disconnect_FullMethodName  = "/protocol.PostofficeService/disconnect"
+	PostofficeService_Issue_FullMethodName       = "/protocol.PostofficeService/issue"
 )
 
 // PostofficeServiceClient is the client API for PostofficeService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PostofficeServiceClient interface {
-	// data API
+	// data delegate API
 	HashRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error)
 	KeyRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error)
 	Request(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	List(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error)
-	// topic API
+	// topic delegate API
 	Receive(ctx context.Context, in *Topic, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Topic], error)
 	Subscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
 	Unsubscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
 	Publish(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
 	Disconnect(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
+	// task delegate API
+	Issue(ctx context.Context, in *Task, opts ...grpc.CallOption) (*Response, error)
 }
 
 type postofficeServiceClient struct {
@@ -181,21 +184,33 @@ func (c *postofficeServiceClient) Disconnect(ctx context.Context, in *Topic, opt
 	return out, nil
 }
 
+func (c *postofficeServiceClient) Issue(ctx context.Context, in *Task, opts ...grpc.CallOption) (*Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, PostofficeService_Issue_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PostofficeServiceServer is the server API for PostofficeService service.
 // All implementations must embed UnimplementedPostofficeServiceServer
 // for forward compatibility.
 type PostofficeServiceServer interface {
-	// data API
+	// data delegate API
 	HashRing(*Request, grpc.ServerStreamingServer[HashNode]) error
 	KeyRing(*Request, grpc.ServerStreamingServer[HashNode]) error
 	Request(context.Context, *Request) (*Response, error)
 	List(*Request, grpc.ServerStreamingServer[Response]) error
-	// topic API
+	// topic delegate API
 	Receive(*Topic, grpc.ServerStreamingServer[Topic]) error
 	Subscribe(context.Context, *Topic) (*Response, error)
 	Unsubscribe(context.Context, *Topic) (*Response, error)
 	Publish(context.Context, *Topic) (*Response, error)
 	Disconnect(context.Context, *Topic) (*Response, error)
+	// task delegate API
+	Issue(context.Context, *Task) (*Response, error)
 	mustEmbedUnimplementedPostofficeServiceServer()
 }
 
@@ -232,6 +247,9 @@ func (UnimplementedPostofficeServiceServer) Publish(context.Context, *Topic) (*R
 }
 func (UnimplementedPostofficeServiceServer) Disconnect(context.Context, *Topic) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Disconnect not implemented")
+}
+func (UnimplementedPostofficeServiceServer) Issue(context.Context, *Task) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method Issue not implemented")
 }
 func (UnimplementedPostofficeServiceServer) mustEmbedUnimplementedPostofficeServiceServer() {}
 func (UnimplementedPostofficeServiceServer) testEmbeddedByValue()                           {}
@@ -388,6 +406,24 @@ func _PostofficeService_Disconnect_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PostofficeService_Issue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Task)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostofficeServiceServer).Issue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostofficeService_Issue_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostofficeServiceServer).Issue(ctx, req.(*Task))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PostofficeService_ServiceDesc is the grpc.ServiceDesc for PostofficeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -414,6 +450,10 @@ var PostofficeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "disconnect",
 			Handler:    _PostofficeService_Disconnect_Handler,
+		},
+		{
+			MethodName: "issue",
+			Handler:    _PostofficeService_Issue_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

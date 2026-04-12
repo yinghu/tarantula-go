@@ -118,6 +118,18 @@ func (c *ClusterManager) Publish(e *protocol.Topic) (*protocol.Response, error) 
 	return dsp.Publish(context.Background(), e)
 }
 
+func (c *ClusterManager) Issue(e *protocol.Task) (*protocol.Response, error) {
+	if !c.running {
+		return &protocol.Response{Successful: false}, fmt.Errorf("not started")
+	}
+	conn, err := c.cPool.Conn()
+	if err != nil {
+		return &protocol.Response{Successful: false}, err
+	}
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	return dsp.Issue(context.Background(), e)
+}
+
 func (c *ClusterManager) Subscribe(topic string, listener core.TopicListener) error {
 	if !c.running {
 		return fmt.Errorf("not started")

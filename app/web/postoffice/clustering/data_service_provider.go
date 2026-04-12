@@ -21,6 +21,7 @@ const (
 type DataServiceProvider struct {
 	protocol.UnimplementedDataServiceServer
 	protocol.UnimplementedPostofficeServiceServer
+	protocol.UnimplementedTaskServiceServer
 	Local       *persistence.BadgerLocal
 	RNode       <-chan RingUpdate
 	RSync       <-chan []byte
@@ -193,6 +194,7 @@ func (c *DataServiceProvider) Start(dir string) {
 	c.server = rpc
 	protocol.RegisterDataServiceServer(rpc, c)
 	protocol.RegisterPostofficeServiceServer(rpc, c)
+	protocol.RegisterTaskServiceServer(rpc, c)
 	core.AppLog.Debug().Msgf("local data service provider started on : %s", tcp.Addr().String())
 	c.DWait.Done()
 	err = rpc.Serve(tcp)
