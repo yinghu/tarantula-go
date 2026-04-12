@@ -88,7 +88,7 @@ func (c *ClusterManager) List(r core.Query) (grpc.ServerStreamingClient[protocol
 	if !c.running {
 		return nil, fmt.Errorf("cluster not started")
 	}
-	mf, existed := QueryFactoryRegistry[r.QTopic()]
+	mf, existed := core.QueryFactoryRegistry[r.QTopic()]
 	if !existed {
 		return nil, fmt.Errorf("topic factory not existed")
 	}

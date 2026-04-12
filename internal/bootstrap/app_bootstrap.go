@@ -18,10 +18,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-var QueryFactoryRegistry = make(map[string]func() core.QueryFactory)
-
 func Register(name string, fac func() core.QueryFactory) {
-	QueryFactoryRegistry[name] = fac
+	core.QueryFactoryRegistry[name] = fac
 }
 
 func AppBootstrap(tcx TarantulaContext) {

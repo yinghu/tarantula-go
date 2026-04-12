@@ -7,7 +7,6 @@ import (
 	"os"
 	"sync"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
@@ -54,7 +53,7 @@ func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*p
 
 func (c *DataServiceProvider) Query(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
 
-	tf, existed := bootstrap.QueryFactoryRegistry[request.Query.Id]
+	tf, existed := core.QueryFactoryRegistry[request.Query.Id]
 	if !existed {
 		return fmt.Errorf("event factory not registered %s", request.Query.Id)
 	}

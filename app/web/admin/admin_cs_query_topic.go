@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
 )
@@ -22,7 +21,7 @@ func (s *CSQueryTopic) AccessControl() int32 {
 func (s *CSQueryTopic) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	topic := r.PathValue("topic")
-	mc, existed := bootstrap.QueryFactoryRegistry[topic]
+	mc, existed := core.QueryFactoryRegistry[topic]
 	if !existed {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: fmt.Sprintf("topic %s not existed", topic)}))
 		return

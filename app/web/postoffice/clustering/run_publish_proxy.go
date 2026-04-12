@@ -4,13 +4,12 @@ import (
 	context "context"
 	"fmt"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 )
 
 func (c *DataServiceProvider) runPublish(topic *protocol.Topic) (*protocol.Response, error) {
-	tpf, registered := bootstrap.QueryFactoryRegistry[topic.Name]
+	tpf, registered := core.QueryFactoryRegistry[topic.Name]
 	if !registered {
 		return &protocol.Response{Successful: false}, fmt.Errorf("event factory not registered")
 	}

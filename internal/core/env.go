@@ -13,6 +13,8 @@ import (
 
 var (
 	AppLog zerolog.Logger
+
+	QueryFactoryRegistry = make(map[string]func() QueryFactory)
 )
 
 type Sql struct {
