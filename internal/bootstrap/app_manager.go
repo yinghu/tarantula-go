@@ -196,8 +196,7 @@ func (c *AppManager) Atomic(prefix string, t core.Exec) error {
 }
 
 func (c *AppManager) Write(data []byte) (int, error) {
-	fmt.Printf("LOG : %s\n", string(data))
-	return len(data), nil
+	return c.log.Write(data)
 }
 
 func (c *AppManager) WriteLevel(level zerolog.Level, data []byte) (int, error) {
@@ -205,7 +204,7 @@ func (c *AppManager) WriteLevel(level zerolog.Level, data []byte) (int, error) {
 		cp := append([]byte{}, data...)
 		c.forward.Forward(level, cp)
 	}
-	return c.log.Write(data)
+	return c.Write(data)
 }
 
 func (c *AppManager) Run(e *zerolog.Event, level zerolog.Level, msg string) {
