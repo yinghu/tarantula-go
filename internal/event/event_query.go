@@ -43,46 +43,11 @@ func Export(q core.Query, buffSize int) ([]byte, error) {
 }
 
 func CreateQuery(qid uint32) core.Query {
-	switch qid {
-	case TAG_MESSAGE_QID:
-		q := QWithTag{Id: qid, Cc: make(chan core.Chunk, 3), FactoryId: core.EVENT_FACTORY_ID, ClassId: MESSAGE_CID}
-		return &q
-	case TAG_LOGIN_QID:
-		q := QWithTag{Id: qid, Tag: LOGIN_ETAG, Cc: make(chan core.Chunk, 3)}
-		return &q
-
-	case TAG_TOURNAMENT_QID:
-		q := QWithTag{Id: qid, Tag: TOURNAMENT_ETAG, Cc: make(chan core.Chunk, 3)}
-		return &q
-	case TAG_INVENTORY_QID:
-		q := QWithTag{Id: qid, Tag: INVENTORY_ETAG, Cc: make(chan core.Chunk, 3)}
-		return &q
-	case TAG_KICKOFF_QID:
-		q := QWithTag{Id: qid, Tag: KICKOFF_ETAG, Cc: make(chan core.Chunk, 3)}
-		return &q
-	case TAG_REGISTER_QID:
-		q := QWithTag{Id: qid, Tag: REGISTER_ETAG, Cc: make(chan core.Chunk, 3)}
-		return &q
-	case Q_TOURNAMENT_QID:
-		q := QTournament{}
-		q.Id = qid
-		q.Tag = TOURNAMENT_ETAG
-		q.Cc = make(chan core.Chunk, 3)
-		return &q
-	case QT_SCORE_QID:
-		q := QScore{}
-		q.Id = qid
-		q.Tag = TOURNAMENT_ETAG
-		q.Cc = make(chan core.Chunk, 3)
-		return &q
-	default:
-		q := QWithTag{Id: qid, Cc: make(chan core.Chunk, 3)}
-		return &q
-	}
+	return &QWithTag{}
 }
 
 type QWithTag struct {
-	Id        uint32          `json:"-"`
+	Id        string          `json:"-"`
 	FactoryId uint32          `json:"-"`
 	ClassId   uint32          `json:"-"`
 	Tag       string          `json:"Tag"`
@@ -144,7 +109,7 @@ func (q *QWithTag) QWrite(buff core.DataBuffer) error {
 	return nil
 }
 
-func (q *QWithTag) QId() uint32 {
+func (q *QWithTag) QId() string {
 	return q.Id
 }
 func (q *QWithTag) QFactoryId() uint32 {

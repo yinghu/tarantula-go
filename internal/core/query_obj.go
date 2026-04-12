@@ -8,7 +8,7 @@ import (
 )
 
 type QueryObj struct {
-	Id        uint32    `json:"-"`
+	Id        string    `json:"Id"`
 	FactoryId uint32    `json:"-"`
 	ClassId   uint32    `json:"-"`
 	NodeId    string    `json:"NodeId"`
@@ -23,7 +23,7 @@ type QueryObj struct {
 }
 
 func (q *QueryObj) QRead(buff DataBuffer) error {
-	id, err := buff.ReadUInt32()
+	id, err := buff.ReadString()
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (q *QueryObj) QRead(buff DataBuffer) error {
 }
 
 func (q *QueryObj) QWrite(buff DataBuffer) error {
-	if err := buff.WriteUInt32(q.Id); err != nil {
+	if err := buff.WriteString(q.Id); err != nil {
 		return nil
 	}
 	if err := buff.WriteUInt32(q.FactoryId); err != nil {
@@ -111,7 +111,7 @@ func (q *QueryObj) QWrite(buff DataBuffer) error {
 	return nil
 }
 
-func (q *QueryObj) QId() uint32 {
+func (q *QueryObj) QId() string {
 	return q.Id
 }
 func (q *QueryObj) QFactoryId() uint32 {
