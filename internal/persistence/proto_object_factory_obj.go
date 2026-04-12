@@ -13,11 +13,11 @@ const (
 	LOGIN_OBJECT_FACTORY_NAME        = "obj_login"
 )
 
-type MO func() proto.Message
+type MessageObject func() proto.Message
+
 type ProtoObjectFactoryObj struct {
 	core.QueryFactoryObj
-	//M  proto.Message
-	Mx MO
+	Mx MessageObject
 }
 
 func (p *ProtoObjectFactoryObj) Request(obj *protocol.KeyValue) (*protocol.Request, error) {
