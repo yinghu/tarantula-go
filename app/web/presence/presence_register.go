@@ -77,6 +77,11 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 			return
 		}
 		core.AppLog.Debug().Msgf("REQ %v", resp)
+		tsk := protocol.Task{NodeId: s.NodeId(), Tag: s.Context(), Name: "register", Prefix: s.Cluster().RingToken([]byte(login.Name))}
+		tsk.Transaction = &protocol.Transaction{Id: 100}
+		rp, _ := s.Cluster().Issue(&tsk)
+		core.AppLog.Debug().Msgf("TASK %v", rp)
+
 		//req := mf.Request()
 		//rw := item.OnInventory{SystemId: login.SystemId, ItemId: s.LoginReward.Id, Source: "login"}
 		//err = s.ItemService().InventoryManager().Grant(rw)
