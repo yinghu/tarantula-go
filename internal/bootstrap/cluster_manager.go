@@ -38,10 +38,11 @@ type ClusterManager struct {
 
 	subscriptions map[string]core.TopicListener
 
-	cSub     chan Sub
-	cInbound chan *protocol.Topic
-	cHost    string
-	cPool    core.RpcConnPool
+	cSub          chan Sub
+	cInboundTopic chan *protocol.Topic
+	cInboundTask  chan *protocol.Task
+	cHost         string
+	cPool         core.RpcConnPool
 }
 
 func (c *ClusterManager) HashRing(r core.RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error) {
@@ -184,7 +185,8 @@ func (c *ClusterManager) connect(host string) error {
 	c.cPool.Start()
 	c.subscriptions = make(map[string]core.TopicListener)
 	c.cSub = make(chan Sub, SUB_CHAN_SIZE)
-	c.cInbound = make(chan *protocol.Topic, TOPIC_CHAN_SIZE)
+	c.cInboundTopic = make(chan *protocol.Topic, TOPIC_CHAN_SIZE)
+	c.cInboundTask = make(chan *protocol.Task, TOPIC_CHAN_SIZE)
 	c.running = true
 	go c.async()
 	go c.receive()
@@ -222,9 +224,9 @@ ro:
 		}
 		switch resp.Opt {
 		case 0:
-			c.cInbound <- resp.Topic
+			c.cInboundTopic <- resp.Topic
 		case 1:
-			core.AppLog.Debug().Msgf("task received %v", resp.Task)
+			c.cInboundTask <- resp.Task
 		}
 	}
 	core.AppLog.Warn().Msgf("cluster manager receiver closed from remote %v", c.running)
@@ -233,7 +235,9 @@ ro:
 func (c *ClusterManager) async() {
 	for c.running {
 		select {
-		case topic := <-c.cInbound:
+		case task := <-c.cInboundTask:
+			core.AppLog.Debug().Msgf("TASK %v", task)
+		case topic := <-c.cInboundTopic:
 			tl, ok := c.subscriptions[topic.Name]
 			if ok {
 				tl.OnTopic(topic)
@@ -251,7 +255,8 @@ func (c *ClusterManager) async() {
 	}
 	core.AppLog.Warn().Msgf("cluster manager async task closed from remote %v", c.running)
 	clear(c.subscriptions)
-	close(c.cInbound)
+	close(c.cInboundTopic)
+	close(c.cInboundTask)
 	close(c.cSub)
 }
 
