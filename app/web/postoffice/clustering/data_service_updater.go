@@ -21,8 +21,9 @@ const (
 )
 
 type ReceiverAsync struct {
-	Rev chan *protocol.Mail
-	Q   chan string
+	Rev  chan *protocol.Mail
+	Q    chan string
+	Subs map[string]core.Subscription
 }
 
 type TopicRequest struct {
@@ -84,11 +85,14 @@ func (m *DataServiceProvider) balanceOnNodeRemoved(removed RingUpdate) {
 func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
 	core.AppLog.Debug().Msgf("subscription %v", sub)
 	listener := m.listeners[sub.NodeId]
-	core.AppLog.Debug().Msgf("lis %v",listener)
+	core.AppLog.Debug().Msgf("lis %v", listener)
 	if sub.Deleting {
 		m.subscriptions.del(sub)
+		delete(listener.Subs, sub.Topic)
+
 	} else {
 		m.subscriptions.add(sub)
+		listener.Subs[sub.Topic] = sub
 	}
 }
 
@@ -135,7 +139,7 @@ func (m *DataServiceProvider) RingUpdated() {
 			case RECEIVER_START:
 				rev, ok := m.listeners[req.Name]
 				if !ok {
-					rev = ReceiverAsync{Rev: make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2)}
+					rev = ReceiverAsync{Rev: make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2), Subs: make(map[string]core.Subscription)}
 					m.listeners[req.Name] = rev
 				}
 				req.Async <- rev
@@ -153,6 +157,7 @@ func (m *DataServiceProvider) RingUpdated() {
 		case msg := <-m.DMessager:
 
 			for _, ch := range m.listeners {
+				core.AppLog.Debug().Msgf("subs %v", ch.Subs)
 				ch.Rev <- msg
 			}
 
