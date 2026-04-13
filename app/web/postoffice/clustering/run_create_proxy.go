@@ -17,7 +17,7 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request) (*protocol.Respon
 	} else {
 		rt = c.Mll.RingToken(set.Data.Key)
 	}
-	core.AppLog.Debug().Msgf("data header %v", set.Data.Header)
+	//core.AppLog.Debug().Msgf("data header %v", set.Data.Header)
 	for retry.Reties > 0 {
 		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: rt, Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
