@@ -158,7 +158,7 @@ func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.Server
 }
 
 func (c *DataServiceProvider) Send(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	c.DMessager <- &protocol.Mail{Topic: in, Opt: 0}
+	c.DMessager <- &protocol.Mail{Topic: in, Opt: core.TOPIC_MAIL}
 	return &protocol.Response{Successful: true, Message: "event published"}, nil
 }
 

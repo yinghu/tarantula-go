@@ -223,9 +223,9 @@ ro:
 			break
 		}
 		switch resp.Opt {
-		case 0:
+		case core.TOPIC_MAIL:
 			c.cInboundTopic <- resp.Topic
-		case 1:
+		case core.TASK_MAIL:
 			c.cInboundTask <- resp.Task
 		}
 	}

@@ -14,6 +14,6 @@ func (c *DataServiceProvider) Run(ctx context.Context, in *protocol.Task) (*prot
 	//c.DSet <- setData
 	//resp := <-msg
 	core.AppLog.Debug().Msg("running task on target node")
-	c.DMessager <- &protocol.Mail{Task: in, Opt: 1}
+	c.DMessager <- &protocol.Mail{Task: in, Opt: core.TASK_MAIL}
 	return &protocol.Response{Successful: true, Message: "run task"}, nil
 }

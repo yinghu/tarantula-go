@@ -24,6 +24,9 @@ const (
 	DATA_STATE_DELETED uint32 = 2
 
 	COMPOSIT_KEY_MAX int = 500
+
+	TOPIC_MAIL uint32 = 0
+	TASK_MAIL  uint32 = 1
 )
 
 type Chunk struct {
