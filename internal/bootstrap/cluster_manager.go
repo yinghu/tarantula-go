@@ -25,12 +25,16 @@ const (
 
 	OPT_SUB   int = 100
 	OPT_UNSUB int = 200
+
+	OPT_TASK   int = 300
+	OPT_UNTASK int = 400
 )
 
 type Sub struct {
-	opt      int
-	name     string
-	listener core.TopicListener
+	opt          int
+	name         string
+	listener     core.TopicListener
+	taskListener core.TaskListener
 }
 
 type ClusterManager struct {
@@ -38,7 +42,7 @@ type ClusterManager struct {
 	running bool
 
 	subscriptions map[string]core.TopicListener
-
+	tasks         map[string]core.TaskListener
 	cSub          chan Sub
 	cInboundTopic chan *protocol.Topic
 	cInboundTask  chan *protocol.Task
@@ -133,16 +137,7 @@ func (c *ClusterManager) Issue(e *protocol.Task) (*protocol.Response, error) {
 }
 
 func (c *ClusterManager) Subscribe(topic string, listener core.TopicListener) error {
-	if !c.running {
-		return fmt.Errorf("not started")
-	}
-	conn, err := c.cPool.Conn()
-	if err != nil {
-		return err
-	}
-
-	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
-	resp, err := dsp.Subscribe(context.Background(), &protocol.Topic{NodeId: c.App.NodeId(), Tag: c.App.Context(), Name: topic})
+	resp, err := c.subscribe(topic)
 	if err != nil {
 		return err
 	}
@@ -151,17 +146,33 @@ func (c *ClusterManager) Subscribe(topic string, listener core.TopicListener) er
 	return nil
 }
 
-func (c *ClusterManager) Unsubscribe(topic string) error {
+func (c *ClusterManager) subscribe(name string) (*protocol.Response, error) {
 	if !c.running {
-		return fmt.Errorf("not started")
+		return &protocol.Response{Successful: false}, fmt.Errorf("not started")
 	}
 	conn, err := c.cPool.Conn()
 	if err != nil {
-		return err
+		return &protocol.Response{Successful: false}, err
 	}
 
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
-	resp, err := dsp.Unsubscribe(context.Background(), &protocol.Topic{Tag: c.App.Context(), Name: topic})
+	return dsp.Subscribe(context.Background(), &protocol.Topic{NodeId: c.App.NodeId(), Tag: c.App.Context(), Name: name})
+}
+func (c *ClusterManager) unsubscribe(name string) (*protocol.Response, error) {
+	if !c.running {
+		return &protocol.Response{Successful: false}, fmt.Errorf("not started")
+	}
+	conn, err := c.cPool.Conn()
+	if err != nil {
+		return &protocol.Response{Successful: false}, err
+	}
+
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	return dsp.Unsubscribe(context.Background(), &protocol.Topic{NodeId: c.App.NodeId(), Tag: c.App.Context(), Name: name})
+}
+
+func (c *ClusterManager) Unsubscribe(topic string) error {
+	resp, err := c.unsubscribe(topic)
 	if err != nil {
 		return err
 	}
@@ -169,6 +180,25 @@ func (c *ClusterManager) Unsubscribe(topic string) error {
 	core.AppLog.Debug().Msgf("topic unregistered %v %s", resp.Successful, topic)
 	return nil
 
+}
+
+func (c *ClusterManager) Register(name string, listener core.TaskListener) error {
+	resp, err := c.subscribe(name)
+	if err != nil {
+		return err
+	}
+	c.cSub <- Sub{opt: OPT_TASK, name: name, taskListener: listener}
+	core.AppLog.Debug().Msgf("task registered %v %s", resp.Successful, name)
+	return nil
+}
+func (c *ClusterManager) Unregister(name string) error {
+	resp, err := c.unsubscribe(name)
+	if err != nil {
+		return err
+	}
+	c.cSub <- Sub{opt: OPT_UNTASK, name: name}
+	core.AppLog.Debug().Msgf("task unregistered %v %s", resp.Successful, name)
+	return nil
 }
 
 func (c *ClusterManager) disconnect() error {
@@ -185,6 +215,7 @@ func (c *ClusterManager) connect(host string) error {
 	c.cPool = core.RpcConnPool{Target: c.cHost, Tag: c.App.Context(), NodeId: c.App.NodeId()}
 	c.cPool.Start()
 	c.subscriptions = make(map[string]core.TopicListener)
+	c.tasks = make(map[string]core.TaskListener)
 	c.cSub = make(chan Sub, SUB_CHAN_SIZE)
 	c.cInboundTopic = make(chan *protocol.Topic, TOPIC_CHAN_SIZE)
 	c.cInboundTask = make(chan *protocol.Task, TOPIC_CHAN_SIZE)
@@ -241,13 +272,18 @@ func (c *ClusterManager) async() {
 	for c.running {
 		select {
 		case task := <-c.cInboundTask:
-			core.AppLog.Debug().Msgf("TASK %v", task)
+			tl, ok := c.tasks[task.Name]
+			if ok {
+				tl.OnTask(task)
+			} else {
+				core.AppLog.Warn().Msgf("dead task %v", task)
+			}
 		case topic := <-c.cInboundTopic:
 			tl, ok := c.subscriptions[topic.Name]
 			if ok {
 				tl.OnTopic(topic)
 			} else {
-				core.AppLog.Debug().Msgf("dead topic %v", topic)
+				core.AppLog.Warn().Msgf("dead topic %v", topic)
 			}
 		case sub := <-c.cSub:
 			switch sub.opt {
@@ -255,6 +291,10 @@ func (c *ClusterManager) async() {
 				c.subscriptions[sub.name] = sub.listener
 			case OPT_UNSUB:
 				delete(c.subscriptions, sub.name)
+			case OPT_TASK:
+				c.tasks[sub.name] = sub.taskListener
+			case OPT_UNTASK:
+				delete(c.tasks, sub.name)
 			}
 		}
 	}

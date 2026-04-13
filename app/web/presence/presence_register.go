@@ -10,6 +10,7 @@ import (
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 type PresenceRegister struct {
@@ -78,7 +79,11 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 		}
 		core.AppLog.Debug().Msgf("REQ %v", resp)
 		tsk := protocol.Task{NodeId: s.NodeId(), Tag: s.Context(), Name: "register", Prefix: s.Cluster().RingToken([]byte(login.Name))}
-		tsk.Transaction = &protocol.Transaction{Id: 100}
+		obj, err := anypb.New(login)
+		if err != nil {
+			return
+		}
+		tsk.Transaction = &protocol.Transaction{Id: 100, Message: obj}
 		rp, _ := s.Cluster().Issue(&tsk)
 		core.AppLog.Debug().Msgf("TASK %v", rp)
 

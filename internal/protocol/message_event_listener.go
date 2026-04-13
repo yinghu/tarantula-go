@@ -1,9 +1,9 @@
 package protocol
 
-type Handler func(e *MessageEvent) error
+type MessageEventHandler func(e *MessageEvent) error
 
 type MessageEventListener struct {
-	Callback Handler
+	Callback MessageEventHandler
 }
 
 func (m *MessageEventListener) OnTopic(topic *Topic) error {

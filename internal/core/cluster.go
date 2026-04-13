@@ -126,6 +126,10 @@ type TopicListener interface {
 	OnTopic(topic *protocol.Topic) error
 }
 
+type TaskListener interface {
+	OnTask(topic *protocol.Task) error
+}
+
 type ClusterService interface {
 	//hash
 	HashRing(r RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error)
@@ -142,5 +146,7 @@ type ClusterService interface {
 	Unsubscribe(topic string) error
 
 	//task
+	Register(name string, listener TaskListener) error
+	Unregister(name string) error
 	Issue(t *protocol.Task) (*protocol.Response, error)
 }
