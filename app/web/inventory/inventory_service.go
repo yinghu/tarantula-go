@@ -5,6 +5,7 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 )
 
 type InventoryService struct {
@@ -19,7 +20,10 @@ func (s *InventoryService) Start(f core.Env) error {
 	s.ItemUpdater = s
 	s.AppManager.Start(f)
 	s.createSchema()
-	//s.Cluster().Subscribe("login", s.Event())
+	s.Cluster().Subscribe("message", &protocol.MessageEventListener{Callback: func(e *protocol.MessageEvent) error {
+		core.AppLog.Debug().Msgf("REV : %v", e)
+		return nil
+	}})
 	http.Handle("/inventory/grant", bootstrap.Logging(&InventoryGranter{InventoryService: s}))
 	http.Handle("/inventory/load", bootstrap.Logging(&InventoryLoader{InventoryService: s}))
 	http.Handle("/inventory/cluster/update", bootstrap.Logging(&InventoryClusterUpdate{InventoryService: s}))

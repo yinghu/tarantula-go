@@ -6,6 +6,7 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 )
 
 type AssetService struct {
@@ -25,7 +26,10 @@ func (s *AssetService) Start(f core.Env) error {
 	if err != nil {
 		return nil
 	}
-	//s.Cluster().Subscribe("ban", s.Event())
+	s.Cluster().Subscribe("message", &protocol.MessageEventListener{Callback: func(e *protocol.MessageEvent) error {
+		core.AppLog.Debug().Msgf("REV : %v", e)
+		return nil
+	}})
 	core.AppLog.Printf("Asset service started %s %s\n", f.HttpBinding, s.assetDir)
 	http.Handle("/asset/upload/{name}", bootstrap.Logging(&AssetUpload{AssetService: s}))
 	http.Handle("/asset/download/{name}", bootstrap.Logging(&AssetDownload{AssetService: s}))
