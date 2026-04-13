@@ -220,7 +220,6 @@ ro:
 			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
 			break
 		}
-		core.AppLog.Debug().Msgf("RCV :%v", resp)
 		c.cInbound <- resp
 	}
 	core.AppLog.Warn().Msgf("cluster manager receiver closed from remote %v", c.running)
@@ -230,7 +229,6 @@ func (c *ClusterManager) async() {
 	for c.running {
 		select {
 		case topic := <-c.cInbound:
-			core.AppLog.Debug().Msgf("TOPIC :%v", topic)
 			tl, ok := c.subscriptions[topic.Name]
 			if ok {
 				tl.OnTopic(topic)
