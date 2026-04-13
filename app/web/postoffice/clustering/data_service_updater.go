@@ -30,7 +30,7 @@ type TopicRequest struct {
 	NodeId string
 	Tag    string
 	Name   string
-	
+
 	Async chan ReceiverAsync
 	Subs  chan []core.Subscription
 }
@@ -83,6 +83,8 @@ func (m *DataServiceProvider) balanceOnNodeRemoved(removed RingUpdate) {
 
 func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
 	core.AppLog.Debug().Msgf("subscription %v", sub)
+	listener := m.listeners[sub.NodeId]
+	core.AppLog.Debug().Msgf("lis %v",listener)
 	if sub.Deleting {
 		m.subscriptions.del(sub)
 	} else {
