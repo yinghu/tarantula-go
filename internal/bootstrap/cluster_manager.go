@@ -220,7 +220,12 @@ ro:
 			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
 			break
 		}
-		c.cInbound <- resp.Topic
+		switch resp.Opt {
+		case 0:
+			c.cInbound <- resp.Topic
+		case 1:
+			core.AppLog.Debug().Msgf("task received %v", resp.Task)
+		}
 	}
 	core.AppLog.Warn().Msgf("cluster manager receiver closed from remote %v", c.running)
 }
