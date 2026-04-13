@@ -21,7 +21,7 @@ const (
 )
 
 type ReceiverAsync struct {
-	Rev chan *protocol.Topic
+	Rev chan *protocol.Mail
 	Q   chan string
 }
 
@@ -133,7 +133,7 @@ func (m *DataServiceProvider) RingUpdated() {
 			case RECEIVER_START:
 				rev, ok := m.listeners[req.Name]
 				if !ok {
-					rev = ReceiverAsync{Rev: make(chan *protocol.Topic, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2)}
+					rev = ReceiverAsync{Rev: make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2)}
 					m.listeners[req.Name] = rev
 				}
 				req.Async <- rev

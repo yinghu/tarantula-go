@@ -37,7 +37,7 @@ func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.Ser
 	return nil
 }
 
-func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerStreamingServer[protocol.Topic]) error {
+func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerStreamingServer[protocol.Mail]) error {
 	aq := make(chan ReceiverAsync, 2)
 	c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: topic.NodeId, Async: aq}
 	ch := <-aq

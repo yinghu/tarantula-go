@@ -35,8 +35,8 @@ type DataServiceProvider struct {
 	DWait   sync.WaitGroup
 	running bool
 
-	//messaging
-	DMessager     chan *protocol.Topic
+	//topic message
+	DMessager     chan *protocol.Mail
 	subscriptions SubscriptionRegistry
 	listeners     map[string]ReceiverAsync //chan *protocol.Topic
 	DRequest      chan TopicRequest
@@ -158,7 +158,7 @@ func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.Server
 }
 
 func (c *DataServiceProvider) Send(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	c.DMessager <- in
+	c.DMessager <- &protocol.Mail{Topic: in, Opt: 0}
 	return &protocol.Response{Successful: true, Message: "event published"}, nil
 }
 
@@ -176,7 +176,7 @@ func (c *DataServiceProvider) Start(dir string) {
 	if err != nil {
 		panic(err)
 	}
-	c.DMessager = make(chan *protocol.Topic, NODE_EVENT_BUFFER_SIZE)
+	c.DMessager = make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE)
 	c.DRequest = make(chan TopicRequest, NODE_EVENT_BUFFER_SIZE)
 	c.listeners = make(map[string]ReceiverAsync) //chan *protocol.Topic)
 	c.subscriptions = SubscriptionRegistry{topicEnds: make(map[core.TopicKey]map[string]core.Subscription), cPools: make(map[core.TopicKey]*core.RpcConnPool)}

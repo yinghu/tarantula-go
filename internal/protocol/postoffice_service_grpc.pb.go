@@ -23,11 +23,11 @@ const (
 	PostofficeService_KeyRing_FullMethodName     = "/protocol.PostofficeService/keyRing"
 	PostofficeService_Request_FullMethodName     = "/protocol.PostofficeService/request"
 	PostofficeService_List_FullMethodName        = "/protocol.PostofficeService/list"
-	PostofficeService_Receive_FullMethodName     = "/protocol.PostofficeService/receive"
 	PostofficeService_Subscribe_FullMethodName   = "/protocol.PostofficeService/subscribe"
 	PostofficeService_Unsubscribe_FullMethodName = "/protocol.PostofficeService/unsubscribe"
 	PostofficeService_Publish_FullMethodName     = "/protocol.PostofficeService/publish"
 	PostofficeService_Disconnect_FullMethodName  = "/protocol.PostofficeService/disconnect"
+	PostofficeService_Receive_FullMethodName     = "/protocol.PostofficeService/receive"
 	PostofficeService_Issue_FullMethodName       = "/protocol.PostofficeService/issue"
 	PostofficeService_Accept_FullMethodName      = "/protocol.PostofficeService/accept"
 )
@@ -42,11 +42,12 @@ type PostofficeServiceClient interface {
 	Request(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	List(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error)
 	// topic delegate API
-	Receive(ctx context.Context, in *Topic, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Topic], error)
 	Subscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
 	Unsubscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
 	Publish(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
 	Disconnect(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
+	// mail down stream receive
+	Receive(ctx context.Context, in *Topic, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Mail], error)
 	// task delegate API
 	Issue(ctx context.Context, in *Task, opts ...grpc.CallOption) (*Response, error)
 	Accept(ctx context.Context, in *Task, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Task], error)
@@ -127,25 +128,6 @@ func (c *postofficeServiceClient) List(ctx context.Context, in *Request, opts ..
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type PostofficeService_ListClient = grpc.ServerStreamingClient[Response]
 
-func (c *postofficeServiceClient) Receive(ctx context.Context, in *Topic, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Topic], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &PostofficeService_ServiceDesc.Streams[3], PostofficeService_Receive_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[Topic, Topic]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type PostofficeService_ReceiveClient = grpc.ServerStreamingClient[Topic]
-
 func (c *postofficeServiceClient) Subscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Response)
@@ -186,6 +168,25 @@ func (c *postofficeServiceClient) Disconnect(ctx context.Context, in *Topic, opt
 	return out, nil
 }
 
+func (c *postofficeServiceClient) Receive(ctx context.Context, in *Topic, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Mail], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &PostofficeService_ServiceDesc.Streams[3], PostofficeService_Receive_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[Topic, Mail]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type PostofficeService_ReceiveClient = grpc.ServerStreamingClient[Mail]
+
 func (c *postofficeServiceClient) Issue(ctx context.Context, in *Task, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Response)
@@ -225,11 +226,12 @@ type PostofficeServiceServer interface {
 	Request(context.Context, *Request) (*Response, error)
 	List(*Request, grpc.ServerStreamingServer[Response]) error
 	// topic delegate API
-	Receive(*Topic, grpc.ServerStreamingServer[Topic]) error
 	Subscribe(context.Context, *Topic) (*Response, error)
 	Unsubscribe(context.Context, *Topic) (*Response, error)
 	Publish(context.Context, *Topic) (*Response, error)
 	Disconnect(context.Context, *Topic) (*Response, error)
+	// mail down stream receive
+	Receive(*Topic, grpc.ServerStreamingServer[Mail]) error
 	// task delegate API
 	Issue(context.Context, *Task) (*Response, error)
 	Accept(*Task, grpc.ServerStreamingServer[Task]) error
@@ -255,9 +257,6 @@ func (UnimplementedPostofficeServiceServer) Request(context.Context, *Request) (
 func (UnimplementedPostofficeServiceServer) List(*Request, grpc.ServerStreamingServer[Response]) error {
 	return status.Error(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedPostofficeServiceServer) Receive(*Topic, grpc.ServerStreamingServer[Topic]) error {
-	return status.Error(codes.Unimplemented, "method Receive not implemented")
-}
 func (UnimplementedPostofficeServiceServer) Subscribe(context.Context, *Topic) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Subscribe not implemented")
 }
@@ -269,6 +268,9 @@ func (UnimplementedPostofficeServiceServer) Publish(context.Context, *Topic) (*R
 }
 func (UnimplementedPostofficeServiceServer) Disconnect(context.Context, *Topic) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Disconnect not implemented")
+}
+func (UnimplementedPostofficeServiceServer) Receive(*Topic, grpc.ServerStreamingServer[Mail]) error {
+	return status.Error(codes.Unimplemented, "method Receive not implemented")
 }
 func (UnimplementedPostofficeServiceServer) Issue(context.Context, *Task) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Issue not implemented")
@@ -348,17 +350,6 @@ func _PostofficeService_List_Handler(srv interface{}, stream grpc.ServerStream) 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type PostofficeService_ListServer = grpc.ServerStreamingServer[Response]
 
-func _PostofficeService_Receive_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(Topic)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(PostofficeServiceServer).Receive(m, &grpc.GenericServerStream[Topic, Topic]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type PostofficeService_ReceiveServer = grpc.ServerStreamingServer[Topic]
-
 func _PostofficeService_Subscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Topic)
 	if err := dec(in); err != nil {
@@ -430,6 +421,17 @@ func _PostofficeService_Disconnect_Handler(srv interface{}, ctx context.Context,
 	}
 	return interceptor(ctx, in, info, handler)
 }
+
+func _PostofficeService_Receive_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Topic)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(PostofficeServiceServer).Receive(m, &grpc.GenericServerStream[Topic, Mail]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type PostofficeService_ReceiveServer = grpc.ServerStreamingServer[Mail]
 
 func _PostofficeService_Issue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Task)
