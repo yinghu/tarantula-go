@@ -30,7 +30,7 @@ type TopicRequest struct {
 	NodeId string
 	Tag    string
 	Name   string
-	//Rev    chan chan *protocol.Topic
+	
 	Async chan ReceiverAsync
 	Subs  chan []core.Subscription
 }

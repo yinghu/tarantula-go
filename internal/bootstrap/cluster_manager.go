@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"sync"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -188,12 +189,15 @@ func (c *ClusterManager) connect(host string) error {
 	c.cInboundTopic = make(chan *protocol.Topic, TOPIC_CHAN_SIZE)
 	c.cInboundTask = make(chan *protocol.Task, TOPIC_CHAN_SIZE)
 	c.running = true
+	var wt sync.WaitGroup
+	wt.Add(1)
 	go c.async()
-	go c.receive()
+	go c.receive(&wt)
+	wt.Wait()
 	return nil
 }
 
-func (c *ClusterManager) receive() {
+func (c *ClusterManager) receive(w *sync.WaitGroup) {
 	retries := RPC_CONNECT_RETRIES
 	conn, err := c.cPool.Conn()
 	if err != nil {
@@ -212,6 +216,7 @@ ro:
 		core.AppLog.Warn().Msgf("rpc connection error after retried %s", err.Error())
 		return
 	}
+	w.Done()
 	for c.running {
 		resp, err := stream.Recv()
 		if err == io.EOF {
