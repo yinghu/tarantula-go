@@ -29,7 +29,6 @@ const (
 	PostofficeService_Disconnect_FullMethodName  = "/protocol.PostofficeService/disconnect"
 	PostofficeService_Receive_FullMethodName     = "/protocol.PostofficeService/receive"
 	PostofficeService_Issue_FullMethodName       = "/protocol.PostofficeService/issue"
-	PostofficeService_Accept_FullMethodName      = "/protocol.PostofficeService/accept"
 )
 
 // PostofficeServiceClient is the client API for PostofficeService service.
@@ -50,7 +49,6 @@ type PostofficeServiceClient interface {
 	Receive(ctx context.Context, in *Topic, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Mail], error)
 	// task delegate API
 	Issue(ctx context.Context, in *Task, opts ...grpc.CallOption) (*Response, error)
-	Accept(ctx context.Context, in *Task, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Task], error)
 }
 
 type postofficeServiceClient struct {
@@ -197,25 +195,6 @@ func (c *postofficeServiceClient) Issue(ctx context.Context, in *Task, opts ...g
 	return out, nil
 }
 
-func (c *postofficeServiceClient) Accept(ctx context.Context, in *Task, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Task], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &PostofficeService_ServiceDesc.Streams[4], PostofficeService_Accept_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[Task, Task]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type PostofficeService_AcceptClient = grpc.ServerStreamingClient[Task]
-
 // PostofficeServiceServer is the server API for PostofficeService service.
 // All implementations must embed UnimplementedPostofficeServiceServer
 // for forward compatibility.
@@ -234,7 +213,6 @@ type PostofficeServiceServer interface {
 	Receive(*Topic, grpc.ServerStreamingServer[Mail]) error
 	// task delegate API
 	Issue(context.Context, *Task) (*Response, error)
-	Accept(*Task, grpc.ServerStreamingServer[Task]) error
 	mustEmbedUnimplementedPostofficeServiceServer()
 }
 
@@ -274,9 +252,6 @@ func (UnimplementedPostofficeServiceServer) Receive(*Topic, grpc.ServerStreaming
 }
 func (UnimplementedPostofficeServiceServer) Issue(context.Context, *Task) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Issue not implemented")
-}
-func (UnimplementedPostofficeServiceServer) Accept(*Task, grpc.ServerStreamingServer[Task]) error {
-	return status.Error(codes.Unimplemented, "method Accept not implemented")
 }
 func (UnimplementedPostofficeServiceServer) mustEmbedUnimplementedPostofficeServiceServer() {}
 func (UnimplementedPostofficeServiceServer) testEmbeddedByValue()                           {}
@@ -451,17 +426,6 @@ func _PostofficeService_Issue_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PostofficeService_Accept_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(Task)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(PostofficeServiceServer).Accept(m, &grpc.GenericServerStream[Task, Task]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type PostofficeService_AcceptServer = grpc.ServerStreamingServer[Task]
-
 // PostofficeService_ServiceDesc is the grpc.ServiceDesc for PostofficeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -513,11 +477,6 @@ var PostofficeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "receive",
 			Handler:       _PostofficeService_Receive_Handler,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "accept",
-			Handler:       _PostofficeService_Accept_Handler,
 			ServerStreams: true,
 		},
 	},

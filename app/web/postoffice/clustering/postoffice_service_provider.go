@@ -112,7 +112,3 @@ func (c *DataServiceProvider) List(in *protocol.Request, stream grpc.ServerStrea
 func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
 	return c.runTask(task)
 }
-
-func (c *DataServiceProvider) Accept(t *protocol.Task, stream grpc.ServerStreamingServer[protocol.Task]) error {
-	return nil
-}
