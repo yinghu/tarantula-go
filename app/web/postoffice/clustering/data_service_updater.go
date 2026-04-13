@@ -158,6 +158,7 @@ func (m *DataServiceProvider) RingUpdated() {
 
 			for _, ch := range m.listeners {
 				core.AppLog.Debug().Msgf("subs %v", ch.Subs)
+				core.AppLog.Debug().Msgf("mail %v", msg)
 				ch.Rev <- msg
 			}
 
