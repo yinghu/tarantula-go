@@ -110,5 +110,8 @@ func (c *DataServiceProvider) List(in *protocol.Request, stream grpc.ServerStrea
 }
 
 func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
-	return c.runTransaction(task.Transactions[0])
+	for _, t := range task.Transactions {
+		return c.runTransaction(t)
+	}
+	return &protocol.Response{Successful: true}, nil
 }

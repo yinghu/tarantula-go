@@ -23,7 +23,11 @@ const (
 
 type Meta struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	NodeId        string                 `protobuf:"bytes,1,opt,name=nodeId,proto3" json:"nodeId,omitempty"`
+	Tag           string                 `protobuf:"bytes,2,opt,name=tag,proto3" json:"tag,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Prefix        uint32                 `protobuf:"fixed32,4,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	Timeout       uint32                 `protobuf:"fixed32,5,opt,name=timeout,proto3" json:"timeout,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -58,6 +62,20 @@ func (*Meta) Descriptor() ([]byte, []int) {
 	return file_meta_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *Meta) GetNodeId() string {
+	if x != nil {
+		return x.NodeId
+	}
+	return ""
+}
+
+func (x *Meta) GetTag() string {
+	if x != nil {
+		return x.Tag
+	}
+	return ""
+}
+
 func (x *Meta) GetName() string {
 	if x != nil {
 		return x.Name
@@ -65,14 +83,32 @@ func (x *Meta) GetName() string {
 	return ""
 }
 
+func (x *Meta) GetPrefix() uint32 {
+	if x != nil {
+		return x.Prefix
+	}
+	return 0
+}
+
+func (x *Meta) GetTimeout() uint32 {
+	if x != nil {
+		return x.Timeout
+	}
+	return 0
+}
+
 var File_meta_proto protoreflect.FileDescriptor
 
 const file_meta_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"meta.proto\x12\bprotocol\"\x1a\n" +
-	"\x04Meta\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04nameBL\n" +
+	"meta.proto\x12\bprotocol\"v\n" +
+	"\x04Meta\x12\x16\n" +
+	"\x06nodeId\x18\x01 \x01(\tR\x06nodeId\x12\x10\n" +
+	"\x03tag\x18\x02 \x01(\tR\x03tag\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x16\n" +
+	"\x06prefix\x18\x04 \x01(\aR\x06prefix\x12\x18\n" +
+	"\atimeout\x18\x05 \x01(\aR\atimeoutBL\n" +
 	"\x17com.icodesoftware.protoB\vMetaFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (

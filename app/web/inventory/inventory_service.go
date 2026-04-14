@@ -24,6 +24,10 @@ func (s *InventoryService) Start(f core.Env) error {
 		core.AppLog.Debug().Msgf("REV : %v", e)
 		return nil
 	}})
+	s.Cluster().Register("grant", &protocol.KeyValueListener{Callback: func(e *protocol.KeyValue) error {
+		core.AppLog.Debug().Msgf("Grant %v", e)
+		return nil
+	}})
 	http.Handle("/inventory/grant", bootstrap.Logging(&InventoryGranter{InventoryService: s}))
 	http.Handle("/inventory/load", bootstrap.Logging(&InventoryLoader{InventoryService: s}))
 	http.Handle("/inventory/cluster/update", bootstrap.Logging(&InventoryClusterUpdate{InventoryService: s}))
