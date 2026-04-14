@@ -164,8 +164,8 @@ func (m *DataServiceProvider) RingUpdated() {
 						core.AppLog.Debug().Msgf("topic down streaming to %v", sub)
 						ch.Rev <- msg
 					}
-				case core.TASK_MAIL:
-					sub, subed := ch.Subs[msg.Task.Name]
+				case core.TRANS_MAIL:
+					sub, subed := ch.Subs[msg.Transaction.Meta.Name]
 					if subed {
 						core.AppLog.Debug().Msgf("task down streaming to %v", sub)
 						ch.Rev <- msg

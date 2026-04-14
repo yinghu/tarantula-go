@@ -26,7 +26,7 @@ const (
 	COMPOSIT_KEY_MAX int = 500
 
 	TOPIC_MAIL uint32 = 0
-	TASK_MAIL  uint32 = 1
+	TRANS_MAIL uint32 = 1
 )
 
 type Chunk struct {
@@ -126,8 +126,8 @@ type TopicListener interface {
 	OnTopic(topic *protocol.Topic) error
 }
 
-type TaskListener interface {
-	OnTask(topic *protocol.Task) error
+type TransactionListener interface {
+	OnTransaction(t *protocol.Transaction) error
 }
 
 type ClusterService interface {
@@ -145,8 +145,8 @@ type ClusterService interface {
 	Subscribe(topic string, listener TopicListener) error
 	Unsubscribe(topic string) error
 
-	//task
-	Register(name string, listener TaskListener) error
+	//transaction
+	Register(name string, listener TransactionListener) error
 	Unregister(name string) error
 	Issue(t *protocol.Task) (*protocol.Response, error)
 }

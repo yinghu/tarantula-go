@@ -26,15 +26,15 @@ const (
 	OPT_SUB   int = 100
 	OPT_UNSUB int = 200
 
-	OPT_TASK   int = 300
-	OPT_UNTASK int = 400
+	OPT_TRANS   int = 300
+	OPT_UNTRANS int = 400
 )
 
 type Sub struct {
-	opt          int
-	name         string
-	listener     core.TopicListener
-	taskListener core.TaskListener
+	opt                 int
+	name                string
+	listener            core.TopicListener
+	transactionListener core.TransactionListener
 }
 
 type ClusterManager struct {
@@ -42,10 +42,10 @@ type ClusterManager struct {
 	running bool
 
 	subscriptions map[string]core.TopicListener
-	tasks         map[string]core.TaskListener
+	transactions  map[string]core.TransactionListener
 	cSub          chan Sub
 	cInboundTopic chan *protocol.Topic
-	cInboundTask  chan *protocol.Task
+	cInboundTrans chan *protocol.Transaction
 	cHost         string
 	cPool         core.RpcConnPool
 }
@@ -182,13 +182,13 @@ func (c *ClusterManager) Unsubscribe(topic string) error {
 
 }
 
-func (c *ClusterManager) Register(name string, listener core.TaskListener) error {
+func (c *ClusterManager) Register(name string, listener core.TransactionListener) error {
 	resp, err := c.subscribe(name)
 	if err != nil {
 		return err
 	}
-	c.cSub <- Sub{opt: OPT_TASK, name: name, taskListener: listener}
-	core.AppLog.Debug().Msgf("task registered %v %s", resp.Successful, name)
+	c.cSub <- Sub{opt: OPT_TRANS, name: name, transactionListener: listener}
+	core.AppLog.Debug().Msgf("transaction registered %v %s", resp.Successful, name)
 	return nil
 }
 func (c *ClusterManager) Unregister(name string) error {
@@ -196,8 +196,8 @@ func (c *ClusterManager) Unregister(name string) error {
 	if err != nil {
 		return err
 	}
-	c.cSub <- Sub{opt: OPT_UNTASK, name: name}
-	core.AppLog.Debug().Msgf("task unregistered %v %s", resp.Successful, name)
+	c.cSub <- Sub{opt: OPT_UNTRANS, name: name}
+	core.AppLog.Debug().Msgf("transaction unregistered %v %s", resp.Successful, name)
 	return nil
 }
 
@@ -215,10 +215,10 @@ func (c *ClusterManager) connect(host string) error {
 	c.cPool = core.RpcConnPool{Target: c.cHost, Tag: c.App.Context(), NodeId: c.App.NodeId()}
 	c.cPool.Start()
 	c.subscriptions = make(map[string]core.TopicListener)
-	c.tasks = make(map[string]core.TaskListener)
+	c.transactions = make(map[string]core.TransactionListener)
 	c.cSub = make(chan Sub, SUB_CHAN_SIZE)
 	c.cInboundTopic = make(chan *protocol.Topic, TOPIC_CHAN_SIZE)
-	c.cInboundTask = make(chan *protocol.Task, TOPIC_CHAN_SIZE)
+	c.cInboundTrans = make(chan *protocol.Transaction, TOPIC_CHAN_SIZE)
 	c.running = true
 	var wt sync.WaitGroup
 	wt.Add(1)
@@ -261,8 +261,8 @@ ro:
 		switch resp.Opt {
 		case core.TOPIC_MAIL:
 			c.cInboundTopic <- resp.Topic
-		case core.TASK_MAIL:
-			c.cInboundTask <- resp.Task
+		case core.TRANS_MAIL:
+			c.cInboundTrans <- resp.Transaction
 		}
 	}
 	core.AppLog.Warn().Msgf("cluster manager receiver closed from remote %v", c.running)
@@ -271,12 +271,12 @@ ro:
 func (c *ClusterManager) async() {
 	for c.running {
 		select {
-		case task := <-c.cInboundTask:
-			tl, ok := c.tasks[task.Name]
+		case tran := <-c.cInboundTrans:
+			tl, ok := c.transactions[tran.Meta.Name]
 			if ok {
-				tl.OnTask(task)
+				tl.OnTransaction(tran)
 			} else {
-				core.AppLog.Warn().Msgf("dead task %v", task)
+				core.AppLog.Warn().Msgf("dead task %v", tran)
 			}
 		case topic := <-c.cInboundTopic:
 			tl, ok := c.subscriptions[topic.Name]
@@ -291,17 +291,17 @@ func (c *ClusterManager) async() {
 				c.subscriptions[sub.name] = sub.listener
 			case OPT_UNSUB:
 				delete(c.subscriptions, sub.name)
-			case OPT_TASK:
-				c.tasks[sub.name] = sub.taskListener
-			case OPT_UNTASK:
-				delete(c.tasks, sub.name)
+			case OPT_TRANS:
+				c.transactions[sub.name] = sub.transactionListener
+			case OPT_UNTRANS:
+				delete(c.transactions, sub.name)
 			}
 		}
 	}
 	core.AppLog.Warn().Msgf("cluster manager async task closed from remote %v", c.running)
 	clear(c.subscriptions)
 	close(c.cInboundTopic)
-	close(c.cInboundTask)
+	close(c.cInboundTrans)
 	close(c.cSub)
 }
 

@@ -10,7 +10,6 @@ import (
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
-	"google.golang.org/protobuf/types/known/anypb"
 )
 
 type PresenceRegister struct {
@@ -63,27 +62,29 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 		kv, err := mf.FromLoginObject(login)
 		if err != nil {
 			core.AppLog.Warn().Msgf("failed to request %s", err.Error())
+			return
+		}
+		//req, err := mf.Request(kv)
+		//if err != nil {
+		//core.AppLog.Warn().Msgf("failed to request %s", err.Error())
 
-			return
-		}
-		req, err := mf.Request(kv)
-		if err != nil {
-			core.AppLog.Warn().Msgf("failed to request %s", err.Error())
-
-			return
-		}
-		resp, err := s.Cluster().Request(req)
-		if err != nil {
-			core.AppLog.Warn().Msgf("failed to request %s", err.Error())
-			return
-		}
-		core.AppLog.Debug().Msgf("REQ %v", resp)
+		//return
+		//}
+		//resp, err := s.Cluster().Request(req)
+		//if err != nil {
+		//core.AppLog.Warn().Msgf("failed to request %s", err.Error())
+		//return
+		//}
+		//core.AppLog.Debug().Msgf("REQ %v", resp)
 		tsk := protocol.Task{NodeId: s.NodeId(), Tag: s.Context(), Name: "register", Prefix: s.Cluster().RingToken([]byte(login.Name))}
-		obj, err := anypb.New(login)
-		if err != nil {
-			return
-		}
-		tsk.Transaction = &protocol.Transaction{Id: 100, Message: obj}
+
+		//obj, err := anypb.New(login)
+		//if err != nil {
+		//return
+		//}
+		ts := make([]*protocol.Transaction, 0)
+		ts = append(ts, &protocol.Transaction{Meta: &protocol.Meta{Name: "register"}, Object: kv})
+		tsk.Transactions = ts
 		rp, _ := s.Cluster().Issue(&tsk)
 		core.AppLog.Debug().Msgf("TASK %v", rp)
 
