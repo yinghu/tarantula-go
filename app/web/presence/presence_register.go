@@ -85,7 +85,6 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 		ts := make([]*protocol.Transaction, 0)
 		ts = append(ts, &protocol.Transaction{Meta: &protocol.Meta{Name: "register"}, Object: kv})
 		ts = append(ts, &protocol.Transaction{Meta: &protocol.Meta{Name: "grant"}, Object: kv})
-
 		tsk.Transactions = ts
 		rp, _ := s.Cluster().Issue(&tsk)
 		core.AppLog.Debug().Msgf("TASK %v", rp)
