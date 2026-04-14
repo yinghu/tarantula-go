@@ -111,6 +111,7 @@ func (c *DataServiceProvider) List(in *protocol.Request, stream grpc.ServerStrea
 
 func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
 	for _, t := range task.Transactions {
+		core.AppLog.Debug().Msgf("dispatch transaction %v", t)
 		return c.runTransaction(t)
 	}
 	return &protocol.Response{Successful: true}, nil

@@ -8,7 +8,7 @@ import (
 )
 
 func (c *DataServiceProvider) Run(ctx context.Context, in *protocol.Transaction) (*protocol.Response, error) {
-	core.AppLog.Debug().Msg("running task on target node")
+	core.AppLog.Debug().Msgf("running task on target node %v", in)
 	c.DMessager <- &protocol.Mail{Transaction: in, Opt: core.TRANS_MAIL}
 	return &protocol.Response{Successful: true, Message: "run task"}, nil
 }
