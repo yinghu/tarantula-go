@@ -48,8 +48,10 @@ func (s *PresenceService) Start(env core.Env) error {
 		core.AppLog.Debug().Msgf("event time %v", e.DateTime.AsTime())
 		return nil
 	}})
-	s.Cluster().Register("register", &protocol.KeyValueListener{Callback: func(e *protocol.KeyValue) error {
+	s.Cluster().Register("register", &protocol.TccTransationListener{Confirm: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("tRANSTION %v", e)
+		return nil
+	}, Cancel: func(e *protocol.Transaction) error {
 		return nil
 	}})
 	core.AppLog.Printf("Presence service started %s\n", env.HttpBinding)

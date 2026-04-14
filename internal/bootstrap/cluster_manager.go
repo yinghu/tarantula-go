@@ -274,7 +274,7 @@ func (c *ClusterManager) async() {
 		case tran := <-c.cInboundTrans:
 			tl, ok := c.transactions[tran.Meta.Name]
 			if ok {
-				tl.OnTransaction(tran)
+				go c.handleTranstion(tl, tran)
 			} else {
 				core.AppLog.Warn().Msgf("dead task %v", tran)
 			}
@@ -323,4 +323,22 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 	t.Tag = c.App.Context()
 	id, _ := c.App.Sequence().Id()
 	t.Event.Id = uint64(id)
+}
+
+func (c *ClusterManager) handleTranstion(l core.TransactionListener, t *protocol.Transaction) {
+	state := t.Meta.State
+	err := l.OnTransaction(t)
+	if err != nil {
+		//cancel
+		//send cancel to cluster
+	}
+	switch state {
+	case protocol.TCC_RESERVING:
+		//send confirmed to cluster
+	case protocol.TCC_CONFIRMED:
+		//send commited to cluster
+	case protocol.TCC_CANCELED:
+		//send aborted to cluster
+	}
+
 }

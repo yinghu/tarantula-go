@@ -118,6 +118,7 @@ func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*
 	for _, t := range task.Transactions {
 		tid, _ := c.seq.Id()
 		t.Meta.Id = uint64(tid)
+		t.Meta.State = protocol.TCC_RESERVING
 		c.runTransaction(t)
 	}
 	return &protocol.Response{Successful: true}, nil

@@ -30,8 +30,10 @@ func (s *AssetService) Start(f core.Env) error {
 		core.AppLog.Debug().Msgf("REV : %v", e)
 		return nil
 	}})
-	s.Cluster().Register("update", &protocol.KeyValueListener{Callback: func(e *protocol.KeyValue) error {
+	s.Cluster().Register("update", &protocol.TccTransationListener{Confirm: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("update %v", e)
+		return nil
+	}, Cancel: func(e *protocol.Transaction) error {
 		return nil
 	}})
 	core.AppLog.Printf("Asset service started %s %s\n", f.HttpBinding, s.assetDir)
