@@ -23,12 +23,13 @@ const (
 
 type Task struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	NodeId        string                 `protobuf:"bytes,1,opt,name=nodeId,proto3" json:"nodeId,omitempty"`
-	Tag           string                 `protobuf:"bytes,2,opt,name=tag,proto3" json:"tag,omitempty"`
-	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Prefix        uint32                 `protobuf:"fixed32,4,opt,name=prefix,proto3" json:"prefix,omitempty"`
-	Timeout       uint32                 `protobuf:"fixed32,5,opt,name=timeout,proto3" json:"timeout,omitempty"`
-	Transactions  []*Transaction         `protobuf:"bytes,6,rep,name=transactions,proto3" json:"transactions,omitempty"`
+	Id            uint64                 `protobuf:"fixed64,1,opt,name=id,proto3" json:"id,omitempty"`
+	NodeId        string                 `protobuf:"bytes,2,opt,name=nodeId,proto3" json:"nodeId,omitempty"`
+	Tag           string                 `protobuf:"bytes,3,opt,name=tag,proto3" json:"tag,omitempty"`
+	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	Prefix        uint32                 `protobuf:"fixed32,5,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	Timeout       uint32                 `protobuf:"fixed32,6,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	Transactions  []*Transaction         `protobuf:"bytes,7,rep,name=transactions,proto3" json:"transactions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -61,6 +62,13 @@ func (x *Task) ProtoReflect() protoreflect.Message {
 // Deprecated: Use Task.ProtoReflect.Descriptor instead.
 func (*Task) Descriptor() ([]byte, []int) {
 	return file_task_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *Task) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
 }
 
 func (x *Task) GetNodeId() string {
@@ -110,14 +118,15 @@ var File_task_proto protoreflect.FileDescriptor
 const file_task_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"task.proto\x12\bprotocol\x1a\x11transaction.proto\"\xb1\x01\n" +
-	"\x04Task\x12\x16\n" +
-	"\x06nodeId\x18\x01 \x01(\tR\x06nodeId\x12\x10\n" +
-	"\x03tag\x18\x02 \x01(\tR\x03tag\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x12\x16\n" +
-	"\x06prefix\x18\x04 \x01(\aR\x06prefix\x12\x18\n" +
-	"\atimeout\x18\x05 \x01(\aR\atimeout\x129\n" +
-	"\ftransactions\x18\x06 \x03(\v2\x15.protocol.TransactionR\ftransactionsBL\n" +
+	"task.proto\x12\bprotocol\x1a\x11transaction.proto\"\xc1\x01\n" +
+	"\x04Task\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x06R\x02id\x12\x16\n" +
+	"\x06nodeId\x18\x02 \x01(\tR\x06nodeId\x12\x10\n" +
+	"\x03tag\x18\x03 \x01(\tR\x03tag\x12\x12\n" +
+	"\x04name\x18\x04 \x01(\tR\x04name\x12\x16\n" +
+	"\x06prefix\x18\x05 \x01(\aR\x06prefix\x12\x18\n" +
+	"\atimeout\x18\x06 \x01(\aR\atimeout\x129\n" +
+	"\ftransactions\x18\a \x03(\v2\x15.protocol.TransactionR\ftransactionsBL\n" +
 	"\x17com.icodesoftware.protoB\vTaskFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (

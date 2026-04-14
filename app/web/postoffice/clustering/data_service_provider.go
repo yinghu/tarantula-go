@@ -29,6 +29,7 @@ type DataServiceProvider struct {
 	Mll         *MemberListListener
 	backRing    NodeRing
 	rpcEndpoint string
+	seq         core.Sequence
 	//write worker chan
 	DSet    chan SetData
 	DPull   chan core.RingSync

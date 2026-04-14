@@ -24,10 +24,10 @@ func (s *PostofficeService) Start(env core.Env) error {
 	s.AppManager.Start(env)
 	s.createSchema()
 
-	m := clustering.MemberlistManager{StoreDir: fmt.Sprintf("%s/%s", env.HomeDir, env.GroupName), Seq: s.Sequence()}
+	m := clustering.MemberlistManager{StoreDir: fmt.Sprintf("%s/%s", env.HomeDir, env.GroupName)}
 	m.Seed = []string{"192.168.1.11", "192.168.1.6"}
 	m.Binding = env.NodeName
-	err := m.Start(fmt.Appendf([]byte{}, "%s:%s", s.Context(), s.NodeId()))
+	err := m.Start(fmt.Appendf([]byte{}, "%s:%s", s.Context(), s.NodeId()), s.Sequence())
 	if err != nil {
 		core.AppLog.Printf("no cluster can join %s", err.Error())
 		return err

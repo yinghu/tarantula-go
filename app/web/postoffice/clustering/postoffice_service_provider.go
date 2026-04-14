@@ -110,7 +110,14 @@ func (c *DataServiceProvider) List(in *protocol.Request, stream grpc.ServerStrea
 }
 
 func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
+	id, err := c.seq.Id()
+	if err != nil {
+		return &protocol.Response{Successful: false, Message: fmt.Sprintf("cannot start transaction with err %s", err.Error())}, err
+	}
+	task.Id = uint64(id)
 	for _, t := range task.Transactions {
+		tid, _ := c.seq.Id()
+		t.Meta.Id = uint64(tid)
 		c.runTransaction(t)
 	}
 	return &protocol.Response{Successful: true}, nil
