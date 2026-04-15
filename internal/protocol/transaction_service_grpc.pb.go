@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	TransactionService_Setup_FullMethodName     = "/protocol.TransactionService/setup"
 	TransactionService_Reserve_FullMethodName   = "/protocol.TransactionService/reserve"
 	TransactionService_Confirmed_FullMethodName = "/protocol.TransactionService/confirmed"
 	TransactionService_Canceled_FullMethodName  = "/protocol.TransactionService/canceled"
@@ -30,6 +31,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TransactionServiceClient interface {
 	// micro transaction API
+	Setup(ctx context.Context, in *Task, opts ...grpc.CallOption) (*Response, error)
 	Reserve(ctx context.Context, in *Transaction, opts ...grpc.CallOption) (*Response, error)
 	Confirmed(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Response, error)
 	Canceled(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Response, error)
@@ -42,6 +44,16 @@ type transactionServiceClient struct {
 
 func NewTransactionServiceClient(cc grpc.ClientConnInterface) TransactionServiceClient {
 	return &transactionServiceClient{cc}
+}
+
+func (c *transactionServiceClient) Setup(ctx context.Context, in *Task, opts ...grpc.CallOption) (*Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, TransactionService_Setup_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *transactionServiceClient) Reserve(ctx context.Context, in *Transaction, opts ...grpc.CallOption) (*Response, error) {
@@ -89,6 +101,7 @@ func (c *transactionServiceClient) Finished(ctx context.Context, in *Meta, opts 
 // for forward compatibility.
 type TransactionServiceServer interface {
 	// micro transaction API
+	Setup(context.Context, *Task) (*Response, error)
 	Reserve(context.Context, *Transaction) (*Response, error)
 	Confirmed(context.Context, *Meta) (*Response, error)
 	Canceled(context.Context, *Meta) (*Response, error)
@@ -103,6 +116,9 @@ type TransactionServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedTransactionServiceServer struct{}
 
+func (UnimplementedTransactionServiceServer) Setup(context.Context, *Task) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method Setup not implemented")
+}
 func (UnimplementedTransactionServiceServer) Reserve(context.Context, *Transaction) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Reserve not implemented")
 }
@@ -134,6 +150,24 @@ func RegisterTransactionServiceServer(s grpc.ServiceRegistrar, srv TransactionSe
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&TransactionService_ServiceDesc, srv)
+}
+
+func _TransactionService_Setup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Task)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TransactionServiceServer).Setup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TransactionService_Setup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TransactionServiceServer).Setup(ctx, req.(*Task))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _TransactionService_Reserve_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -215,6 +249,10 @@ var TransactionService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "protocol.TransactionService",
 	HandlerType: (*TransactionServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "setup",
+			Handler:    _TransactionService_Setup_Handler,
+		},
 		{
 			MethodName: "reserve",
 			Handler:    _TransactionService_Reserve_Handler,

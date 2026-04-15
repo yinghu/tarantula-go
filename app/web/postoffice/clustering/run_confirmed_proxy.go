@@ -10,7 +10,7 @@ import (
 func (c *DataServiceProvider) runConfirmed(t *protocol.Meta) (*protocol.Response, error) {
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
-	kh := c.Mll.RingToken([]byte(t.Name))
+	kh := c.tprefix(t.TaskId)
 	c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: kh, Replicas: REPLICA_MAX, Async: rq}
 	nodes := <-rq
 	ringNode := nodes[0]

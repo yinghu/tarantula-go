@@ -7,6 +7,15 @@ import (
 	"gameclustering.com/internal/protocol"
 )
 
+const (
+	TASK_TIMEOUT_SECONDS uint32 = 10
+)
+
+func (c *DataServiceProvider) Setup(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
+	core.AppLog.Debug().Msgf("running setup on target node %v", task)
+	return &protocol.Response{Successful: true, Message: ""}, nil
+}
+
 func (c *DataServiceProvider) Reserve(ctx context.Context, in *protocol.Transaction) (*protocol.Response, error) {
 	core.AppLog.Debug().Msgf("running reserve on target node %v", in)
 	c.DMessager <- &protocol.Mail{Transaction: in, Opt: core.TRANS_MAIL}

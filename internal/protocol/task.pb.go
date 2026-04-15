@@ -23,13 +23,8 @@ const (
 
 type Task struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint64                 `protobuf:"fixed64,1,opt,name=id,proto3" json:"id,omitempty"`
-	NodeId        string                 `protobuf:"bytes,2,opt,name=nodeId,proto3" json:"nodeId,omitempty"`
-	Tag           string                 `protobuf:"bytes,3,opt,name=tag,proto3" json:"tag,omitempty"`
-	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	Prefix        uint32                 `protobuf:"fixed32,5,opt,name=prefix,proto3" json:"prefix,omitempty"`
-	Timeout       uint32                 `protobuf:"fixed32,6,opt,name=timeout,proto3" json:"timeout,omitempty"`
-	Transactions  []*Transaction         `protobuf:"bytes,7,rep,name=transactions,proto3" json:"transactions,omitempty"`
+	Meta          *Meta                  `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
+	Transactions  []*Transaction         `protobuf:"bytes,2,rep,name=transactions,proto3" json:"transactions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -64,46 +59,11 @@ func (*Task) Descriptor() ([]byte, []int) {
 	return file_task_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Task) GetId() uint64 {
+func (x *Task) GetMeta() *Meta {
 	if x != nil {
-		return x.Id
+		return x.Meta
 	}
-	return 0
-}
-
-func (x *Task) GetNodeId() string {
-	if x != nil {
-		return x.NodeId
-	}
-	return ""
-}
-
-func (x *Task) GetTag() string {
-	if x != nil {
-		return x.Tag
-	}
-	return ""
-}
-
-func (x *Task) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *Task) GetPrefix() uint32 {
-	if x != nil {
-		return x.Prefix
-	}
-	return 0
-}
-
-func (x *Task) GetTimeout() uint32 {
-	if x != nil {
-		return x.Timeout
-	}
-	return 0
+	return nil
 }
 
 func (x *Task) GetTransactions() []*Transaction {
@@ -118,15 +78,11 @@ var File_task_proto protoreflect.FileDescriptor
 const file_task_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"task.proto\x12\bprotocol\x1a\x11transaction.proto\"\xc1\x01\n" +
-	"\x04Task\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x06R\x02id\x12\x16\n" +
-	"\x06nodeId\x18\x02 \x01(\tR\x06nodeId\x12\x10\n" +
-	"\x03tag\x18\x03 \x01(\tR\x03tag\x12\x12\n" +
-	"\x04name\x18\x04 \x01(\tR\x04name\x12\x16\n" +
-	"\x06prefix\x18\x05 \x01(\aR\x06prefix\x12\x18\n" +
-	"\atimeout\x18\x06 \x01(\aR\atimeout\x129\n" +
-	"\ftransactions\x18\a \x03(\v2\x15.protocol.TransactionR\ftransactionsBL\n" +
+	"task.proto\x12\bprotocol\x1a\x11transaction.proto\x1a\n" +
+	"meta.proto\"e\n" +
+	"\x04Task\x12\"\n" +
+	"\x04meta\x18\x01 \x01(\v2\x0e.protocol.MetaR\x04meta\x129\n" +
+	"\ftransactions\x18\x02 \x03(\v2\x15.protocol.TransactionR\ftransactionsBL\n" +
 	"\x17com.icodesoftware.protoB\vTaskFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -144,15 +100,17 @@ func file_task_proto_rawDescGZIP() []byte {
 var file_task_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_task_proto_goTypes = []any{
 	(*Task)(nil),        // 0: protocol.Task
-	(*Transaction)(nil), // 1: protocol.Transaction
+	(*Meta)(nil),        // 1: protocol.Meta
+	(*Transaction)(nil), // 2: protocol.Transaction
 }
 var file_task_proto_depIdxs = []int32{
-	1, // 0: protocol.Task.transactions:type_name -> protocol.Transaction
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	1, // 0: protocol.Task.meta:type_name -> protocol.Meta
+	2, // 1: protocol.Task.transactions:type_name -> protocol.Transaction
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_task_proto_init() }
@@ -161,6 +119,7 @@ func file_task_proto_init() {
 		return
 	}
 	file_transaction_proto_init()
+	file_meta_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -23,13 +23,14 @@ const (
 
 type Meta struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint64                 `protobuf:"fixed64,1,opt,name=id,proto3" json:"id,omitempty"`
-	NodeId        string                 `protobuf:"bytes,2,opt,name=nodeId,proto3" json:"nodeId,omitempty"`
-	Tag           string                 `protobuf:"bytes,3,opt,name=tag,proto3" json:"tag,omitempty"`
-	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	Prefix        uint32                 `protobuf:"fixed32,5,opt,name=prefix,proto3" json:"prefix,omitempty"`
-	Timeout       uint32                 `protobuf:"fixed32,6,opt,name=timeout,proto3" json:"timeout,omitempty"`
-	State         uint32                 `protobuf:"fixed32,7,opt,name=state,proto3" json:"state,omitempty"`
+	TaskId        uint64                 `protobuf:"fixed64,1,opt,name=taskId,proto3" json:"taskId,omitempty"`
+	Id            uint64                 `protobuf:"fixed64,2,opt,name=id,proto3" json:"id,omitempty"`
+	NodeId        string                 `protobuf:"bytes,3,opt,name=nodeId,proto3" json:"nodeId,omitempty"`
+	Tag           string                 `protobuf:"bytes,4,opt,name=tag,proto3" json:"tag,omitempty"`
+	Name          string                 `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`
+	Prefix        uint32                 `protobuf:"fixed32,6,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	Timeout       uint32                 `protobuf:"fixed32,7,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	State         uint32                 `protobuf:"fixed32,8,opt,name=state,proto3" json:"state,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -62,6 +63,13 @@ func (x *Meta) ProtoReflect() protoreflect.Message {
 // Deprecated: Use Meta.ProtoReflect.Descriptor instead.
 func (*Meta) Descriptor() ([]byte, []int) {
 	return file_meta_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *Meta) GetTaskId() uint64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
 }
 
 func (x *Meta) GetId() uint64 {
@@ -118,15 +126,16 @@ var File_meta_proto protoreflect.FileDescriptor
 const file_meta_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"meta.proto\x12\bprotocol\"\x9c\x01\n" +
-	"\x04Meta\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x06R\x02id\x12\x16\n" +
-	"\x06nodeId\x18\x02 \x01(\tR\x06nodeId\x12\x10\n" +
-	"\x03tag\x18\x03 \x01(\tR\x03tag\x12\x12\n" +
-	"\x04name\x18\x04 \x01(\tR\x04name\x12\x16\n" +
-	"\x06prefix\x18\x05 \x01(\aR\x06prefix\x12\x18\n" +
-	"\atimeout\x18\x06 \x01(\aR\atimeout\x12\x14\n" +
-	"\x05state\x18\a \x01(\aR\x05stateBL\n" +
+	"meta.proto\x12\bprotocol\"\xb4\x01\n" +
+	"\x04Meta\x12\x16\n" +
+	"\x06taskId\x18\x01 \x01(\x06R\x06taskId\x12\x0e\n" +
+	"\x02id\x18\x02 \x01(\x06R\x02id\x12\x16\n" +
+	"\x06nodeId\x18\x03 \x01(\tR\x06nodeId\x12\x10\n" +
+	"\x03tag\x18\x04 \x01(\tR\x03tag\x12\x12\n" +
+	"\x04name\x18\x05 \x01(\tR\x04name\x12\x16\n" +
+	"\x06prefix\x18\x06 \x01(\aR\x06prefix\x12\x18\n" +
+	"\atimeout\x18\a \x01(\aR\atimeout\x12\x14\n" +
+	"\x05state\x18\b \x01(\aR\x05stateBL\n" +
 	"\x17com.icodesoftware.protoB\vMetaFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (

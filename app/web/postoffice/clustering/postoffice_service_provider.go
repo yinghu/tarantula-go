@@ -3,6 +3,7 @@ package clustering
 import (
 	context "context"
 	"fmt"
+	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
@@ -110,18 +111,17 @@ func (c *DataServiceProvider) List(in *protocol.Request, stream grpc.ServerStrea
 }
 
 func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
-	id, err := c.seq.Id()
-	if err != nil {
-		return &protocol.Response{Successful: false, Message: fmt.Sprintf("cannot start transaction with err %s", err.Error())}, err
-	}
-	task.Id = uint64(id)
+	task.Meta.Id = c.tid()
+	task.Meta.Prefix = c.tprefix(task.Meta.Id)
+	c.runSetup(task)
+	
 	for _, t := range task.Transactions {
-		tid, _ := c.seq.Id()
-		t.Meta.Id = uint64(tid)
+		t.Meta.TaskId = task.Meta.TaskId
+		t.Meta.Id = c.tid()
 		t.Meta.State = protocol.TCC_RESERVING
 		c.runReserve(t)
 	}
-	return &protocol.Response{Successful: true}, nil
+	return &protocol.Response{Successful: true, Meta: task.Meta}, nil
 }
 
 func (c *DataServiceProvider) Confirm(ctx context.Context, meta *protocol.Meta) (*protocol.Response, error) {
@@ -140,4 +140,21 @@ func (c *DataServiceProvider) Finish(ctx context.Context, meta *protocol.Meta) (
 	//call Canceled
 	c.runFinished(meta)
 	return &protocol.Response{Successful: true}, nil
+}
+
+func (c *DataServiceProvider) tid() uint64 {
+	for {
+		id, err := c.seq.Id()
+		if err == nil {
+			return uint64(id)
+		}
+		time.Sleep(1 * time.Millisecond)
+	}
+}
+func (c *DataServiceProvider) tprefix(id uint64) uint32 {
+	buff := core.NewBuffer(8)
+	buff.WriteUInt64(id)
+	buff.Flip()
+	bt, _ := buff.Read(0)
+	return c.Mll.RingToken(bt)
 }

@@ -76,7 +76,7 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 		//return
 		//}
 		//core.AppLog.Debug().Msgf("REQ %v", resp)
-		tsk := protocol.Task{NodeId: s.NodeId(), Tag: s.Context(), Name: "register", Prefix: s.Cluster().RingToken([]byte(login.Name))}
+		tsk := protocol.Task{Meta: &protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"}}
 
 		//obj, err := anypb.New(login)
 		//if err != nil {
@@ -84,7 +84,7 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 		//}
 		ts := make([]*protocol.Transaction, 0)
 		//ts = append(ts, &protocol.Transaction{Meta: &protocol.Meta{Name: "register"}, Object: kv})
-		ts = append(ts, &protocol.Transaction{Meta: &protocol.Meta{Name: "grant"}, Object: kv})
+		ts = append(ts, &protocol.Transaction{Meta: &protocol.Meta{Name: "grant", Prefix: s.Cluster().RingToken(kv.Key.Array)}, Object: kv})
 		//ts = append(ts, &protocol.Transaction{Meta: &protocol.Meta{Name: "update"}, Object: kv})
 		tsk.Transactions = ts
 		rp, _ := s.Cluster().Issue(&tsk)
