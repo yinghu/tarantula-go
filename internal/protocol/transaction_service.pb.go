@@ -24,20 +24,31 @@ var File_transaction_service_proto protoreflect.FileDescriptor
 
 const file_transaction_service_proto_rawDesc = "" +
 	"\n" +
-	"\x19transaction_service.proto\x12\bprotocol\x1a\x0eresponse.proto\x1a\x11transaction.proto2H\n" +
-	"\x12TransactionService\x122\n" +
-	"\x03run\x12\x15.protocol.Transaction\x1a\x12.protocol.Response\"\x00BZ\n" +
+	"\x19transaction_service.proto\x12\bprotocol\x1a\x0eresponse.proto\x1a\x11transaction.proto\x1a\n" +
+	"meta.proto2\xe3\x01\n" +
+	"\x12TransactionService\x126\n" +
+	"\areserve\x12\x15.protocol.Transaction\x1a\x12.protocol.Response\"\x00\x121\n" +
+	"\tconfirmed\x12\x0e.protocol.Meta\x1a\x12.protocol.Response\"\x00\x120\n" +
+	"\bcanceled\x12\x0e.protocol.Meta\x1a\x12.protocol.Response\"\x00\x120\n" +
+	"\bfinished\x12\x0e.protocol.Meta\x1a\x12.protocol.Response\"\x00BZ\n" +
 	"\x17com.icodesoftware.protoB\x19TransactionServiceFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var file_transaction_service_proto_goTypes = []any{
 	(*Transaction)(nil), // 0: protocol.Transaction
-	(*Response)(nil),    // 1: protocol.Response
+	(*Meta)(nil),        // 1: protocol.Meta
+	(*Response)(nil),    // 2: protocol.Response
 }
 var file_transaction_service_proto_depIdxs = []int32{
-	0, // 0: protocol.TransactionService.run:input_type -> protocol.Transaction
-	1, // 1: protocol.TransactionService.run:output_type -> protocol.Response
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	0, // 0: protocol.TransactionService.reserve:input_type -> protocol.Transaction
+	1, // 1: protocol.TransactionService.confirmed:input_type -> protocol.Meta
+	1, // 2: protocol.TransactionService.canceled:input_type -> protocol.Meta
+	1, // 3: protocol.TransactionService.finished:input_type -> protocol.Meta
+	2, // 4: protocol.TransactionService.reserve:output_type -> protocol.Response
+	2, // 5: protocol.TransactionService.confirmed:output_type -> protocol.Response
+	2, // 6: protocol.TransactionService.canceled:output_type -> protocol.Response
+	2, // 7: protocol.TransactionService.finished:output_type -> protocol.Response
+	4, // [4:8] is the sub-list for method output_type
+	0, // [0:4] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -50,6 +61,7 @@ func file_transaction_service_proto_init() {
 	}
 	file_response_proto_init()
 	file_transaction_proto_init()
+	file_meta_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -24,10 +24,14 @@ func (s *InventoryService) Start(f core.Env) error {
 		core.AppLog.Debug().Msgf("REV : %v", e)
 		return nil
 	}})
-	s.Cluster().Register("grant", &protocol.TccTransationListener{Confirm: func(e *protocol.Transaction) error {
-		core.AppLog.Debug().Msgf("Grant %v", e)
+	s.Cluster().Register("grant", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
+		core.AppLog.Debug().Msgf("reserve resource %v", e)
+		return nil
+	}, Confirm: func(e *protocol.Transaction) error {
+		core.AppLog.Debug().Msgf("confirm resource %v", e)
 		return nil
 	}, Cancel: func(e *protocol.Transaction) error {
+		core.AppLog.Debug().Msgf("cancel resource %v", e)
 		return nil
 	}})
 	http.Handle("/inventory/grant", bootstrap.Logging(&InventoryGranter{InventoryService: s}))

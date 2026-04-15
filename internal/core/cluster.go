@@ -149,4 +149,7 @@ type ClusterService interface {
 	Register(name string, listener TransactionListener) error
 	Unregister(name string) error
 	Issue(t *protocol.Task) (*protocol.Response, error)
+	Confirm(t *protocol.Meta) (*protocol.Response, error)
+	Cancel(t *protocol.Meta) (*protocol.Response, error)
+	Finish(t *protocol.Meta) (*protocol.Response, error)
 }

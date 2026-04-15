@@ -119,7 +119,25 @@ func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*
 		tid, _ := c.seq.Id()
 		t.Meta.Id = uint64(tid)
 		t.Meta.State = protocol.TCC_RESERVING
-		c.runTransaction(t)
+		c.runReserve(t)
 	}
+	return &protocol.Response{Successful: true}, nil
+}
+
+func (c *DataServiceProvider) Confirm(ctx context.Context, meta *protocol.Meta) (*protocol.Response, error) {
+	//call Confirmed
+	c.runConfirmed(meta)
+	return &protocol.Response{Successful: true}, nil
+}
+
+func (c *DataServiceProvider) Cancel(ctx context.Context, meta *protocol.Meta) (*protocol.Response, error) {
+	//call Canceled
+	c.runCanceled(meta)
+	return &protocol.Response{Successful: true}, nil
+}
+
+func (c *DataServiceProvider) Finish(ctx context.Context, meta *protocol.Meta) (*protocol.Response, error) {
+	//call Canceled
+	c.runFinished(meta)
 	return &protocol.Response{Successful: true}, nil
 }

@@ -7,10 +7,10 @@ import (
 	"gameclustering.com/internal/protocol"
 )
 
-func (c *DataServiceProvider) runTransaction(t *protocol.Transaction) (*protocol.Response, error) {
+func (c *DataServiceProvider) runConfirmed(t *protocol.Meta) (*protocol.Response, error) {
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
-	kh := c.Mll.RingToken([]byte(t.Meta.Name))
+	kh := c.Mll.RingToken([]byte(t.Name))
 	c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: kh, Replicas: REPLICA_MAX, Async: rq}
 	nodes := <-rq
 	ringNode := nodes[0]
@@ -19,5 +19,5 @@ func (c *DataServiceProvider) runTransaction(t *protocol.Transaction) (*protocol
 		return &protocol.Response{Successful: false, Message: err.Error()}, err
 	}
 	dsp := protocol.NewTransactionServiceClient(conn.Conn)
-	return dsp.Run(context.Background(), t)
+	return dsp.Confirmed(context.Background(), t)
 }

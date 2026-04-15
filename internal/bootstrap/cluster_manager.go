@@ -136,6 +136,42 @@ func (c *ClusterManager) Issue(e *protocol.Task) (*protocol.Response, error) {
 	return dsp.Issue(context.Background(), e)
 }
 
+func (c *ClusterManager) Confirm(e *protocol.Meta) (*protocol.Response, error) {
+	if !c.running {
+		return &protocol.Response{Successful: false}, fmt.Errorf("not started")
+	}
+	conn, err := c.cPool.Conn()
+	if err != nil {
+		return &protocol.Response{Successful: false}, err
+	}
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	return dsp.Confirm(context.Background(), e)
+}
+
+func (c *ClusterManager) Cancel(e *protocol.Meta) (*protocol.Response, error) {
+	if !c.running {
+		return &protocol.Response{Successful: false}, fmt.Errorf("not started")
+	}
+	conn, err := c.cPool.Conn()
+	if err != nil {
+		return &protocol.Response{Successful: false}, err
+	}
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	return dsp.Cancel(context.Background(), e)
+}
+
+func (c *ClusterManager) Finish(e *protocol.Meta) (*protocol.Response, error) {
+	if !c.running {
+		return &protocol.Response{Successful: false}, fmt.Errorf("not started")
+	}
+	conn, err := c.cPool.Conn()
+	if err != nil {
+		return &protocol.Response{Successful: false}, err
+	}
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	return dsp.Finish(context.Background(), e)
+}
+
 func (c *ClusterManager) Subscribe(topic string, listener core.TopicListener) error {
 	resp, err := c.subscribe(topic)
 	if err != nil {
@@ -331,14 +367,21 @@ func (c *ClusterManager) handleTranstion(l core.TransactionListener, t *protocol
 	if err != nil {
 		//cancel
 		//send cancel to cluster
+		t.Meta.State = protocol.TCC_CANCELED
+		c.Cancel(t.Meta)
+		return
 	}
 	switch state {
 	case protocol.TCC_RESERVING:
+		t.Meta.State = protocol.TCC_CONFIRMED
 		//send confirmed to cluster
+		c.Confirm(t.Meta)
 	case protocol.TCC_CONFIRMED:
 		//send commited to cluster
+		c.Finish(t.Meta)
 	case protocol.TCC_CANCELED:
 		//send aborted to cluster
+		c.Finish(t.Meta)
 	}
 
 }

@@ -29,6 +29,9 @@ const (
 	PostofficeService_Disconnect_FullMethodName  = "/protocol.PostofficeService/disconnect"
 	PostofficeService_Receive_FullMethodName     = "/protocol.PostofficeService/receive"
 	PostofficeService_Issue_FullMethodName       = "/protocol.PostofficeService/issue"
+	PostofficeService_Confirm_FullMethodName     = "/protocol.PostofficeService/confirm"
+	PostofficeService_Cancel_FullMethodName      = "/protocol.PostofficeService/cancel"
+	PostofficeService_Finish_FullMethodName      = "/protocol.PostofficeService/finish"
 )
 
 // PostofficeServiceClient is the client API for PostofficeService service.
@@ -49,6 +52,9 @@ type PostofficeServiceClient interface {
 	Receive(ctx context.Context, in *Topic, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Mail], error)
 	// task delegate API
 	Issue(ctx context.Context, in *Task, opts ...grpc.CallOption) (*Response, error)
+	Confirm(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Response, error)
+	Cancel(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Response, error)
+	Finish(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Response, error)
 }
 
 type postofficeServiceClient struct {
@@ -195,6 +201,36 @@ func (c *postofficeServiceClient) Issue(ctx context.Context, in *Task, opts ...g
 	return out, nil
 }
 
+func (c *postofficeServiceClient) Confirm(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, PostofficeService_Confirm_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postofficeServiceClient) Cancel(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, PostofficeService_Cancel_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postofficeServiceClient) Finish(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, PostofficeService_Finish_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PostofficeServiceServer is the server API for PostofficeService service.
 // All implementations must embed UnimplementedPostofficeServiceServer
 // for forward compatibility.
@@ -213,6 +249,9 @@ type PostofficeServiceServer interface {
 	Receive(*Topic, grpc.ServerStreamingServer[Mail]) error
 	// task delegate API
 	Issue(context.Context, *Task) (*Response, error)
+	Confirm(context.Context, *Meta) (*Response, error)
+	Cancel(context.Context, *Meta) (*Response, error)
+	Finish(context.Context, *Meta) (*Response, error)
 	mustEmbedUnimplementedPostofficeServiceServer()
 }
 
@@ -252,6 +291,15 @@ func (UnimplementedPostofficeServiceServer) Receive(*Topic, grpc.ServerStreaming
 }
 func (UnimplementedPostofficeServiceServer) Issue(context.Context, *Task) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Issue not implemented")
+}
+func (UnimplementedPostofficeServiceServer) Confirm(context.Context, *Meta) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method Confirm not implemented")
+}
+func (UnimplementedPostofficeServiceServer) Cancel(context.Context, *Meta) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method Cancel not implemented")
+}
+func (UnimplementedPostofficeServiceServer) Finish(context.Context, *Meta) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method Finish not implemented")
 }
 func (UnimplementedPostofficeServiceServer) mustEmbedUnimplementedPostofficeServiceServer() {}
 func (UnimplementedPostofficeServiceServer) testEmbeddedByValue()                           {}
@@ -426,6 +474,60 @@ func _PostofficeService_Issue_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PostofficeService_Confirm_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Meta)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostofficeServiceServer).Confirm(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostofficeService_Confirm_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostofficeServiceServer).Confirm(ctx, req.(*Meta))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PostofficeService_Cancel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Meta)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostofficeServiceServer).Cancel(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostofficeService_Cancel_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostofficeServiceServer).Cancel(ctx, req.(*Meta))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PostofficeService_Finish_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Meta)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostofficeServiceServer).Finish(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostofficeService_Finish_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostofficeServiceServer).Finish(ctx, req.(*Meta))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PostofficeService_ServiceDesc is the grpc.ServiceDesc for PostofficeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -456,6 +558,18 @@ var PostofficeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "issue",
 			Handler:    _PostofficeService_Issue_Handler,
+		},
+		{
+			MethodName: "confirm",
+			Handler:    _PostofficeService_Confirm_Handler,
+		},
+		{
+			MethodName: "cancel",
+			Handler:    _PostofficeService_Cancel_Handler,
+		},
+		{
+			MethodName: "finish",
+			Handler:    _PostofficeService_Finish_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

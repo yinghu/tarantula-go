@@ -19,7 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TransactionService_Run_FullMethodName = "/protocol.TransactionService/run"
+	TransactionService_Reserve_FullMethodName   = "/protocol.TransactionService/reserve"
+	TransactionService_Confirmed_FullMethodName = "/protocol.TransactionService/confirmed"
+	TransactionService_Canceled_FullMethodName  = "/protocol.TransactionService/canceled"
+	TransactionService_Finished_FullMethodName  = "/protocol.TransactionService/finished"
 )
 
 // TransactionServiceClient is the client API for TransactionService service.
@@ -27,7 +30,10 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TransactionServiceClient interface {
 	// micro transaction API
-	Run(ctx context.Context, in *Transaction, opts ...grpc.CallOption) (*Response, error)
+	Reserve(ctx context.Context, in *Transaction, opts ...grpc.CallOption) (*Response, error)
+	Confirmed(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Response, error)
+	Canceled(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Response, error)
+	Finished(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Response, error)
 }
 
 type transactionServiceClient struct {
@@ -38,10 +44,40 @@ func NewTransactionServiceClient(cc grpc.ClientConnInterface) TransactionService
 	return &transactionServiceClient{cc}
 }
 
-func (c *transactionServiceClient) Run(ctx context.Context, in *Transaction, opts ...grpc.CallOption) (*Response, error) {
+func (c *transactionServiceClient) Reserve(ctx context.Context, in *Transaction, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Response)
-	err := c.cc.Invoke(ctx, TransactionService_Run_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, TransactionService_Reserve_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *transactionServiceClient) Confirmed(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, TransactionService_Confirmed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *transactionServiceClient) Canceled(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, TransactionService_Canceled_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *transactionServiceClient) Finished(ctx context.Context, in *Meta, opts ...grpc.CallOption) (*Response, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, TransactionService_Finished_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +89,10 @@ func (c *transactionServiceClient) Run(ctx context.Context, in *Transaction, opt
 // for forward compatibility.
 type TransactionServiceServer interface {
 	// micro transaction API
-	Run(context.Context, *Transaction) (*Response, error)
+	Reserve(context.Context, *Transaction) (*Response, error)
+	Confirmed(context.Context, *Meta) (*Response, error)
+	Canceled(context.Context, *Meta) (*Response, error)
+	Finished(context.Context, *Meta) (*Response, error)
 	mustEmbedUnimplementedTransactionServiceServer()
 }
 
@@ -64,8 +103,17 @@ type TransactionServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedTransactionServiceServer struct{}
 
-func (UnimplementedTransactionServiceServer) Run(context.Context, *Transaction) (*Response, error) {
-	return nil, status.Error(codes.Unimplemented, "method Run not implemented")
+func (UnimplementedTransactionServiceServer) Reserve(context.Context, *Transaction) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method Reserve not implemented")
+}
+func (UnimplementedTransactionServiceServer) Confirmed(context.Context, *Meta) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method Confirmed not implemented")
+}
+func (UnimplementedTransactionServiceServer) Canceled(context.Context, *Meta) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method Canceled not implemented")
+}
+func (UnimplementedTransactionServiceServer) Finished(context.Context, *Meta) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method Finished not implemented")
 }
 func (UnimplementedTransactionServiceServer) mustEmbedUnimplementedTransactionServiceServer() {}
 func (UnimplementedTransactionServiceServer) testEmbeddedByValue()                            {}
@@ -88,20 +136,74 @@ func RegisterTransactionServiceServer(s grpc.ServiceRegistrar, srv TransactionSe
 	s.RegisterService(&TransactionService_ServiceDesc, srv)
 }
 
-func _TransactionService_Run_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _TransactionService_Reserve_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Transaction)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TransactionServiceServer).Run(ctx, in)
+		return srv.(TransactionServiceServer).Reserve(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TransactionService_Run_FullMethodName,
+		FullMethod: TransactionService_Reserve_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TransactionServiceServer).Run(ctx, req.(*Transaction))
+		return srv.(TransactionServiceServer).Reserve(ctx, req.(*Transaction))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TransactionService_Confirmed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Meta)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TransactionServiceServer).Confirmed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TransactionService_Confirmed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TransactionServiceServer).Confirmed(ctx, req.(*Meta))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TransactionService_Canceled_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Meta)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TransactionServiceServer).Canceled(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TransactionService_Canceled_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TransactionServiceServer).Canceled(ctx, req.(*Meta))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TransactionService_Finished_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Meta)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TransactionServiceServer).Finished(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TransactionService_Finished_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TransactionServiceServer).Finished(ctx, req.(*Meta))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -114,8 +216,20 @@ var TransactionService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*TransactionServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "run",
-			Handler:    _TransactionService_Run_Handler,
+			MethodName: "reserve",
+			Handler:    _TransactionService_Reserve_Handler,
+		},
+		{
+			MethodName: "confirmed",
+			Handler:    _TransactionService_Confirmed_Handler,
+		},
+		{
+			MethodName: "canceled",
+			Handler:    _TransactionService_Canceled_Handler,
+		},
+		{
+			MethodName: "finished",
+			Handler:    _TransactionService_Finished_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
