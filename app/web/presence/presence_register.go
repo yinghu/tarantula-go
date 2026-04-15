@@ -76,18 +76,21 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 		//return
 		//}
 		//core.AppLog.Debug().Msgf("REQ %v", resp)
-		tsk := protocol.Task{Meta: &protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"}}
+		tb := persistence.NewTaskBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
+		tb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "grant", Prefix: s.Cluster().RingToken(kv.Key.Array)}, Object: kv})
+		tb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "update", Prefix: s.Cluster().RingToken(kv.Key.Array)}, Object: kv})
+		//tsk := protocol.Task{Meta: &protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"}}
 
 		//obj, err := anypb.New(login)
 		//if err != nil {
 		//return
 		//}
-		ts := make([]*protocol.Transaction, 0)
+		//ts := make([]*protocol.Transaction, 0)
 		//ts = append(ts, &protocol.Transaction{Meta: &protocol.Meta{Name: "register"}, Object: kv})
-		ts = append(ts, &protocol.Transaction{Meta: &protocol.Meta{Name: "grant", Prefix: s.Cluster().RingToken(kv.Key.Array)}, Object: kv})
+		//ts = append(ts, &protocol.Transaction{Meta: &protocol.Meta{Name: "grant", Prefix: s.Cluster().RingToken(kv.Key.Array)}, Object: kv})
 		//ts = append(ts, &protocol.Transaction{Meta: &protocol.Meta{Name: "update"}, Object: kv})
-		tsk.Transactions = ts
-		rp, _ := s.Cluster().Issue(&tsk)
+		//tsk.Transactions = ts
+		rp, _ := s.Cluster().Issue(tb.Task())
 		core.AppLog.Debug().Msgf("TASK %v", rp)
 
 		//req := mf.Request()

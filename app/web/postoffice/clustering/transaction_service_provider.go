@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	TASK_TIMEOUT_SECONDS uint32 = 10
+	TASK_TIMEOUT_SECONDS        uint32 = 30
+	TRANSACTION_TIMEOUT_SECONDS uint32 = 10
 )
 
 func (c *DataServiceProvider) Setup(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
