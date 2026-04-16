@@ -30,7 +30,8 @@ type Meta struct {
 	Name          string                 `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`
 	Prefix        uint32                 `protobuf:"fixed32,6,opt,name=prefix,proto3" json:"prefix,omitempty"`
 	Timeout       uint32                 `protobuf:"fixed32,7,opt,name=timeout,proto3" json:"timeout,omitempty"`
-	State         uint32                 `protobuf:"fixed32,8,opt,name=state,proto3" json:"state,omitempty"`
+	Retries       uint32                 `protobuf:"fixed32,8,opt,name=retries,proto3" json:"retries,omitempty"`
+	State         uint32                 `protobuf:"fixed32,9,opt,name=state,proto3" json:"state,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -114,6 +115,13 @@ func (x *Meta) GetTimeout() uint32 {
 	return 0
 }
 
+func (x *Meta) GetRetries() uint32 {
+	if x != nil {
+		return x.Retries
+	}
+	return 0
+}
+
 func (x *Meta) GetState() uint32 {
 	if x != nil {
 		return x.State
@@ -126,7 +134,7 @@ var File_meta_proto protoreflect.FileDescriptor
 const file_meta_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"meta.proto\x12\bprotocol\"\xb4\x01\n" +
+	"meta.proto\x12\bprotocol\"\xce\x01\n" +
 	"\x04Meta\x12\x16\n" +
 	"\x06taskId\x18\x01 \x01(\x06R\x06taskId\x12\x0e\n" +
 	"\x02id\x18\x02 \x01(\x06R\x02id\x12\x16\n" +
@@ -134,8 +142,9 @@ const file_meta_proto_rawDesc = "" +
 	"\x03tag\x18\x04 \x01(\tR\x03tag\x12\x12\n" +
 	"\x04name\x18\x05 \x01(\tR\x04name\x12\x16\n" +
 	"\x06prefix\x18\x06 \x01(\aR\x06prefix\x12\x18\n" +
-	"\atimeout\x18\a \x01(\aR\atimeout\x12\x14\n" +
-	"\x05state\x18\b \x01(\aR\x05stateBL\n" +
+	"\atimeout\x18\a \x01(\aR\atimeout\x12\x18\n" +
+	"\aretries\x18\b \x01(\aR\aretries\x12\x14\n" +
+	"\x05state\x18\t \x01(\aR\x05stateBL\n" +
 	"\x17com.icodesoftware.protoB\vMetaFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (

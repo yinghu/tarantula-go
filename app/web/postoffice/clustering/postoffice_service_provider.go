@@ -115,11 +115,13 @@ func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*
 	task.Meta.Id = c.tid()
 	task.Meta.Prefix = c.tprefix(task.Meta.Id)
 	task.Meta.Timeout = TASK_TIMEOUT_SECONDS
+	task.Meta.Retries = TASK_RETRY_MAX
 	for _, t := range task.Transactions {
 		t.Meta.TaskId = task.Meta.Id
 		t.Meta.Id = c.tid()
 		t.Meta.State = protocol.TCC_RESERVING
 		t.Meta.Timeout = TRANSACTION_TIMEOUT_SECONDS
+		t.Meta.Retries = TASK_RETRY_MAX
 	}
 	tb := persistence.TaskBuilder{Target: task}
 	req, err := tb.Request()
