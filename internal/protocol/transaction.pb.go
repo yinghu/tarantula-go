@@ -25,6 +25,7 @@ type Transaction struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Meta          *Meta                  `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
 	Object        *KeyValue              `protobuf:"bytes,2,opt,name=object,proto3" json:"object,omitempty"`
+	Data          *Data                  `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -73,15 +74,24 @@ func (x *Transaction) GetObject() *KeyValue {
 	return nil
 }
 
+func (x *Transaction) GetData() *Data {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
 var File_transaction_proto protoreflect.FileDescriptor
 
 const file_transaction_proto_rawDesc = "" +
 	"\n" +
 	"\x11transaction.proto\x12\bprotocol\x1a\x0fkey_value.proto\x1a\n" +
-	"meta.proto\"]\n" +
+	"meta.proto\x1a\n" +
+	"data.proto\"\x81\x01\n" +
 	"\vTransaction\x12\"\n" +
 	"\x04meta\x18\x01 \x01(\v2\x0e.protocol.MetaR\x04meta\x12*\n" +
-	"\x06object\x18\x02 \x01(\v2\x12.protocol.KeyValueR\x06objectBS\n" +
+	"\x06object\x18\x02 \x01(\v2\x12.protocol.KeyValueR\x06object\x12\"\n" +
+	"\x04data\x18\x03 \x01(\v2\x0e.protocol.DataR\x04dataBS\n" +
 	"\x17com.icodesoftware.protoB\x12TransactionFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -101,15 +111,17 @@ var file_transaction_proto_goTypes = []any{
 	(*Transaction)(nil), // 0: protocol.Transaction
 	(*Meta)(nil),        // 1: protocol.Meta
 	(*KeyValue)(nil),    // 2: protocol.KeyValue
+	(*Data)(nil),        // 3: protocol.Data
 }
 var file_transaction_proto_depIdxs = []int32{
 	1, // 0: protocol.Transaction.meta:type_name -> protocol.Meta
 	2, // 1: protocol.Transaction.object:type_name -> protocol.KeyValue
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 2: protocol.Transaction.data:type_name -> protocol.Data
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_transaction_proto_init() }
@@ -119,6 +131,7 @@ func file_transaction_proto_init() {
 	}
 	file_key_value_proto_init()
 	file_meta_proto_init()
+	file_data_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
