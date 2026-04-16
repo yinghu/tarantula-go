@@ -2,6 +2,7 @@ package clustering
 
 import (
 	"encoding/json"
+	"fmt"
 	"slices"
 
 	"gameclustering.com/internal/core"
@@ -18,6 +19,8 @@ const (
 	TOPIC_REGISTER  uint32 = 2
 	RECEIVER_REMOVE uint32 = 3
 	RECEIVER_END    uint32 = 4
+
+	TRANS_SUB_PREFIX string = "_t_"
 )
 
 type ReceiverAsync struct {
@@ -83,6 +86,9 @@ func (m *DataServiceProvider) balanceOnNodeRemoved(removed RingUpdate) {
 }
 
 func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
+	if sub.Type == core.TRANS_MAIL {
+		sub.Topic = fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, sub.Topic)
+	}
 	core.AppLog.Debug().Msgf("subscription %v", sub)
 	listener := m.listeners[sub.NodeId]
 	core.AppLog.Debug().Msgf("lis %v", listener)
@@ -165,7 +171,8 @@ func (m *DataServiceProvider) RingUpdated() {
 						ch.Rev <- msg
 					}
 				case core.TRANS_MAIL:
-					sub, subed := ch.Subs[msg.Transaction.Meta.Name]
+					tn := fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, msg.Transaction.Meta.Name)
+					sub, subed := ch.Subs[tn]
 					if subed {
 						core.AppLog.Debug().Msgf("task down streaming to %v", sub)
 						ch.Rev <- msg
