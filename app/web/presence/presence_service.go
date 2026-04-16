@@ -7,6 +7,7 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
+	"google.golang.org/protobuf/proto"
 )
 
 type PresenceService struct {
@@ -44,9 +45,15 @@ func (s *PresenceService) Start(env core.Env) error {
 		core.AppLog.Printf("Error on load registration %s %s\n", err.Error(), brn.Message)
 	}
 	s.Started = true
-	s.Cluster().Subscribe("message", &protocol.MessageEventListener{Callback: func(e *protocol.MessageEvent) error {
-		core.AppLog.Debug().Msgf("event time %v", e.DateTime.AsTime())
-		return nil
+	s.Cluster().Subscribe("register", &protocol.TopicEventListener{C: func() proto.Message {
+		return &protocol.RegisterEvent{}
+	}, M: func(m proto.Message) {
+		ro, ok := m.(*protocol.RegisterEvent)
+		if ok {
+			core.AppLog.Debug().Msgf("register event %s %s", ro.Name, ro.Source)
+		} else {
+			core.AppLog.Debug().Msg("wrong type")
+		}
 	}})
 	s.Cluster().Register("register", &protocol.TccTransationListener{Confirm: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("tRANSTION %v", e)
