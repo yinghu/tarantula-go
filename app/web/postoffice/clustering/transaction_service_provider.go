@@ -16,7 +16,7 @@ const (
 
 func (c *DataServiceProvider) Setup(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
 	core.AppLog.Debug().Msgf("running setup on target node %v", task)
-	req := c.request(task.Meta.TaskId)
+	req := c.request(task.Meta.Id)
 	get := GetData{Request: req}
 	data, err := c.get(get)
 	if err != nil {
