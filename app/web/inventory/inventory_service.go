@@ -7,6 +7,7 @@ import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
+	"google.golang.org/protobuf/proto"
 )
 
 type InventoryService struct {
@@ -21,9 +22,15 @@ func (s *InventoryService) Start(f core.Env) error {
 	s.ItemUpdater = s
 	s.AppManager.Start(f)
 	s.createSchema()
-	s.Cluster().Subscribe("message", &protocol.MessageEventListener{Callback: func(e *protocol.MessageEvent) error {
-		core.AppLog.Debug().Msgf("REV : %v", e)
-		return nil
+	s.Cluster().Subscribe("message", &protocol.TopicEventListener{C: func() proto.Message {
+		return &protocol.MessageEvent{}
+	}, M: func(m proto.Message) {
+		ro, ok := m.(*protocol.MessageEvent)
+		if ok {
+			core.AppLog.Debug().Msgf("MESSAGE event %s %s", ro.Message, ro.Source)
+		} else {
+			core.AppLog.Debug().Msg("wrong type")
+		}
 	}})
 	s.Cluster().Register("grant", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("reserve resource %v", e)
