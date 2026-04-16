@@ -18,5 +18,10 @@ func TestTaskBuilder(t *testing.T) {
 	fmt.Printf("task meta %v\n", task.Meta)
 	fmt.Printf("task trans 0 %v\n", task.Transactions[0])
 	fmt.Printf("task trans 1 %v\n", task.Transactions[1])
+	req, err := tb.Request()
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+	}
+	fmt.Printf("request %v\n", req)
 
 }
