@@ -6,6 +6,7 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/protobuf/proto"
 )
@@ -27,7 +28,7 @@ func (s *AssetService) Start(f core.Env) error {
 	if err != nil {
 		return nil
 	}
-	s.Cluster().Subscribe("message", &protocol.TopicEventListener{C: func() proto.Message {
+	s.Cluster().Subscribe(event.MESSAGE_TOPIC_NAME, &protocol.TopicEventListener{C: func() proto.Message {
 		return &protocol.MessageEvent{}
 	}, M: func(m proto.Message) {
 		ro, ok := m.(*protocol.MessageEvent)
