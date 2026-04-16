@@ -173,7 +173,7 @@ func (c *ClusterManager) Finish(e *protocol.Meta) (*protocol.Response, error) {
 }
 
 func (c *ClusterManager) Subscribe(topic string, listener core.TopicListener) error {
-	resp, err := c.subscribe(topic)
+	resp, err := c.subscribe(topic, core.TOPIC_MAIL)
 	if err != nil {
 		return err
 	}
@@ -182,7 +182,7 @@ func (c *ClusterManager) Subscribe(topic string, listener core.TopicListener) er
 	return nil
 }
 
-func (c *ClusterManager) subscribe(name string) (*protocol.Response, error) {
+func (c *ClusterManager) subscribe(name string, opt uint32) (*protocol.Response, error) {
 	if !c.running {
 		return &protocol.Response{Successful: false}, fmt.Errorf("not started")
 	}
@@ -192,9 +192,9 @@ func (c *ClusterManager) subscribe(name string) (*protocol.Response, error) {
 	}
 
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
-	return dsp.Subscribe(context.Background(), &protocol.Topic{NodeId: c.App.NodeId(), Tag: c.App.Context(), Name: name})
+	return dsp.Subscribe(context.Background(), &protocol.Subscription{Opt: opt, NodeId: c.App.NodeId(), Tag: c.App.Context(), Name: name})
 }
-func (c *ClusterManager) unsubscribe(name string) (*protocol.Response, error) {
+func (c *ClusterManager) unsubscribe(name string, opt uint32) (*protocol.Response, error) {
 	if !c.running {
 		return &protocol.Response{Successful: false}, fmt.Errorf("not started")
 	}
@@ -204,11 +204,11 @@ func (c *ClusterManager) unsubscribe(name string) (*protocol.Response, error) {
 	}
 
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
-	return dsp.Unsubscribe(context.Background(), &protocol.Topic{NodeId: c.App.NodeId(), Tag: c.App.Context(), Name: name})
+	return dsp.Unsubscribe(context.Background(), &protocol.Subscription{Opt: opt, NodeId: c.App.NodeId(), Tag: c.App.Context(), Name: name})
 }
 
 func (c *ClusterManager) Unsubscribe(topic string) error {
-	resp, err := c.unsubscribe(topic)
+	resp, err := c.unsubscribe(topic, core.TOPIC_MAIL)
 	if err != nil {
 		return err
 	}
@@ -219,7 +219,7 @@ func (c *ClusterManager) Unsubscribe(topic string) error {
 }
 
 func (c *ClusterManager) Register(name string, listener core.TransactionListener) error {
-	resp, err := c.subscribe(name)
+	resp, err := c.subscribe(name, core.TRANS_MAIL)
 	if err != nil {
 		return err
 	}
@@ -228,7 +228,7 @@ func (c *ClusterManager) Register(name string, listener core.TransactionListener
 	return nil
 }
 func (c *ClusterManager) Unregister(name string) error {
-	resp, err := c.unsubscribe(name)
+	resp, err := c.unsubscribe(name, core.TRANS_MAIL)
 	if err != nil {
 		return err
 	}

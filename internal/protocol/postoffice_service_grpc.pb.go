@@ -44,8 +44,8 @@ type PostofficeServiceClient interface {
 	Request(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	List(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error)
 	// topic delegate API
-	Subscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
-	Unsubscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
+	Subscribe(ctx context.Context, in *Subscription, opts ...grpc.CallOption) (*Response, error)
+	Unsubscribe(ctx context.Context, in *Subscription, opts ...grpc.CallOption) (*Response, error)
 	Publish(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
 	Disconnect(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error)
 	// mail down stream receive
@@ -132,7 +132,7 @@ func (c *postofficeServiceClient) List(ctx context.Context, in *Request, opts ..
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type PostofficeService_ListClient = grpc.ServerStreamingClient[Response]
 
-func (c *postofficeServiceClient) Subscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error) {
+func (c *postofficeServiceClient) Subscribe(ctx context.Context, in *Subscription, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Response)
 	err := c.cc.Invoke(ctx, PostofficeService_Subscribe_FullMethodName, in, out, cOpts...)
@@ -142,7 +142,7 @@ func (c *postofficeServiceClient) Subscribe(ctx context.Context, in *Topic, opts
 	return out, nil
 }
 
-func (c *postofficeServiceClient) Unsubscribe(ctx context.Context, in *Topic, opts ...grpc.CallOption) (*Response, error) {
+func (c *postofficeServiceClient) Unsubscribe(ctx context.Context, in *Subscription, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Response)
 	err := c.cc.Invoke(ctx, PostofficeService_Unsubscribe_FullMethodName, in, out, cOpts...)
@@ -241,8 +241,8 @@ type PostofficeServiceServer interface {
 	Request(context.Context, *Request) (*Response, error)
 	List(*Request, grpc.ServerStreamingServer[Response]) error
 	// topic delegate API
-	Subscribe(context.Context, *Topic) (*Response, error)
-	Unsubscribe(context.Context, *Topic) (*Response, error)
+	Subscribe(context.Context, *Subscription) (*Response, error)
+	Unsubscribe(context.Context, *Subscription) (*Response, error)
 	Publish(context.Context, *Topic) (*Response, error)
 	Disconnect(context.Context, *Topic) (*Response, error)
 	// mail down stream receive
@@ -274,10 +274,10 @@ func (UnimplementedPostofficeServiceServer) Request(context.Context, *Request) (
 func (UnimplementedPostofficeServiceServer) List(*Request, grpc.ServerStreamingServer[Response]) error {
 	return status.Error(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedPostofficeServiceServer) Subscribe(context.Context, *Topic) (*Response, error) {
+func (UnimplementedPostofficeServiceServer) Subscribe(context.Context, *Subscription) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Subscribe not implemented")
 }
-func (UnimplementedPostofficeServiceServer) Unsubscribe(context.Context, *Topic) (*Response, error) {
+func (UnimplementedPostofficeServiceServer) Unsubscribe(context.Context, *Subscription) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Unsubscribe not implemented")
 }
 func (UnimplementedPostofficeServiceServer) Publish(context.Context, *Topic) (*Response, error) {
@@ -374,7 +374,7 @@ func _PostofficeService_List_Handler(srv interface{}, stream grpc.ServerStream) 
 type PostofficeService_ListServer = grpc.ServerStreamingServer[Response]
 
 func _PostofficeService_Subscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Topic)
+	in := new(Subscription)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -386,13 +386,13 @@ func _PostofficeService_Subscribe_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: PostofficeService_Subscribe_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostofficeServiceServer).Subscribe(ctx, req.(*Topic))
+		return srv.(PostofficeServiceServer).Subscribe(ctx, req.(*Subscription))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _PostofficeService_Unsubscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Topic)
+	in := new(Subscription)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -404,7 +404,7 @@ func _PostofficeService_Unsubscribe_Handler(srv interface{}, ctx context.Context
 		FullMethod: PostofficeService_Unsubscribe_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostofficeServiceServer).Unsubscribe(ctx, req.(*Topic))
+		return srv.(PostofficeServiceServer).Unsubscribe(ctx, req.(*Subscription))
 	}
 	return interceptor(ctx, in, info, handler)
 }

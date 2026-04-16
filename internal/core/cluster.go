@@ -74,6 +74,7 @@ type TopicKey struct {
 }
 
 type Subscription struct {
+	Type     uint32 `json:"type"`
 	NodeId   string `json:"nodeId"`
 	Tag      string `json:"tag"`
 	Topic    string `json:"topic"`
