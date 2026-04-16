@@ -30,7 +30,10 @@ func (s *AssetService) Start(f core.Env) error {
 		core.AppLog.Debug().Msgf("REV : %v", e)
 		return nil
 	}})
-	s.Cluster().Register("update", &protocol.TccTransationListener{Confirm: func(e *protocol.Transaction) error {
+	s.Cluster().Register("update", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
+		core.AppLog.Debug().Msgf("reserve update %v", e)
+		return nil
+	}, Confirm: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("update %v", e)
 		return nil
 	}, Cancel: func(e *protocol.Transaction) error {

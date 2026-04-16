@@ -23,5 +23,20 @@ func TestTaskBuilder(t *testing.T) {
 		t.Errorf("should not be error %s", err.Error())
 	}
 	fmt.Printf("request %v\n", req)
+	tbx := TaskBuilder{Target: task}
+	reqx, err := tbx.Request()
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+	}
+	fmt.Printf("request %v\n", reqx)
+
+	tbc := TaskBuilder{}
+	tk, err := tbc.From(req.Data.Value)
+	if err != nil {
+		t.Errorf("should not be error %s", err.Error())
+	}
+	fmt.Printf("task meta %v\n", tk.Meta)
+	fmt.Printf("task trans 0 %v\n", tk.Transactions[0])
+	fmt.Printf("task trans 1 %v\n", tk.Transactions[1])
 
 }
