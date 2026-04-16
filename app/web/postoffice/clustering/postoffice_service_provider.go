@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/grpc"
 )
@@ -114,13 +115,26 @@ func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*
 	task.Meta.Id = c.tid()
 	task.Meta.Prefix = c.tprefix(task.Meta.Id)
 	task.Meta.Timeout = TASK_TIMEOUT_SECONDS
-	c.runSetup(task)
-
 	for _, t := range task.Transactions {
 		t.Meta.TaskId = task.Meta.TaskId
 		t.Meta.Id = c.tid()
 		t.Meta.State = protocol.TCC_RESERVING
 		t.Meta.Timeout = TRANSACTION_TIMEOUT_SECONDS
+	}
+	tb := persistence.TaskBuilder{Target: task}
+	req, err := tb.Request()
+	if err != nil {
+		return &protocol.Response{Successful: false, Message: err.Error()}, err
+	}
+	resp, err := c.runCreate(req)
+	if err != nil {
+		return resp, err
+	}
+	resp, err = c.runSetup(task)
+	if err != nil {
+		return resp, err
+	}
+	for _, t := range task.Transactions {
 		c.runReserve(t)
 	}
 	return &protocol.Response{Successful: true, Meta: task.Meta}, nil
