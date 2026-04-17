@@ -23,11 +23,12 @@ func (c *DataServiceProvider) Setup(ctx context.Context, task *protocol.Task) (*
 }
 
 func (c *DataServiceProvider) Reserve(ctx context.Context, in *protocol.Transaction) (*protocol.Response, error) {
-	tr,err := c.TManager.Get(in.Meta.TaskId)
-	if err!=nil{
+	core.AppLog.Debug().Msgf("running reserve on target node %v", in)
+	tr, err := c.TManager.Get(in.Meta.TaskId)
+	if err != nil {
 		t, err := c.load(in.Meta.TaskId)
-		if err!=nil{
-			return &protocol.Response{Successful: false},err
+		if err != nil {
+			return &protocol.Response{Successful: false}, err
 		}
 		tr = c.TManager.Set(t)
 	}
