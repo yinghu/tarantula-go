@@ -60,7 +60,7 @@ func (m *TaskManager) Set(t *protocol.Task) *TaskResource {
 		tr := TaskResource{resource: t, ds: m.s, C: &sync.Mutex{}}
 		m.trs[t.Meta.Id] = &tr
 		r = &tr
-		r.timer = time.AfterFunc(time.Duration(r.resource.Meta.Timeout)*time.Second, r.Monitor)
+		//r.timer = time.AfterFunc(time.Duration(r.resource.Meta.Timeout)*time.Second, r.Monitor)
 	}
 	return r
 }
