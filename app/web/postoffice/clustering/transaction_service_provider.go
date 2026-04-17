@@ -19,27 +19,19 @@ func (c *DataServiceProvider) Setup(ctx context.Context, task *protocol.Task) (*
 	core.AppLog.Debug().Msgf("running setup on target node %v", task)
 	tr := c.TManager.Set(task)
 	tr.Start()
-	//for _, t := range task.Transactions {
-	//c.runReserve(t)
-	//}
-	//req := c.request(task.Meta.Id)
-	//get := GetData{Request: req}
-	//data, err := c.get(get)
-	//if err != nil {
-	//core.AppLog.Warn().Msgf("cannot load task %s", err.Error())
-	//return &protocol.Response{Successful: false}, err
-	//}
-	//tb := persistence.TaskBuilder{}
-	//tk, err := tb.From(data.Value)
-	//if err != nil {
-	//core.AppLog.Warn().Msgf("cannot parse task %s", err.Error())
-	//return &protocol.Response{Successful: false}, err
-	//}
-	//core.AppLog.Debug().Msgf("running setup on target node %v", tk)
 	return &protocol.Response{Successful: true, Meta: task.Meta}, nil
 }
 
 func (c *DataServiceProvider) Reserve(ctx context.Context, in *protocol.Transaction) (*protocol.Response, error) {
+	tr,err := c.TManager.Get(in.Meta.TaskId)
+	if err!=nil{
+		t, err := c.load(in.Meta.TaskId)
+		if err!=nil{
+			return &protocol.Response{Successful: false},err
+		}
+		tr = c.TManager.Set(t)
+	}
+	tr.Update(in.Meta)
 	core.AppLog.Debug().Msgf("running reserve on target node %v", in)
 	c.DMessager <- &protocol.Mail{Transaction: in, Opt: core.TRANS_MAIL}
 	return &protocol.Response{Successful: true, Message: "run task"}, nil
@@ -72,11 +64,17 @@ func (c *DataServiceProvider) Finished(ctx context.Context, in *protocol.Meta) (
 	return &protocol.Response{Successful: true, Message: "run task"}, nil
 }
 
-func (c *DataServiceProvider) Xrequest(taskId uint64) *protocol.Request {
+func (c *DataServiceProvider) load(taskId uint64) (*protocol.Task, error) {
 	buff := core.NewBuffer(8)
 	buff.WriteUInt64(taskId)
 	buff.Flip()
 	k, _ := buff.Read(0)
 	req := protocol.Request{Data: &protocol.Data{Key: k, Header: &protocol.Header{FactoryId: persistence.TASK_FACTORY_ID, ClassId: persistence.TASK_CLASS_ID}}}
-	return &req
+	get := GetData{Request: &req}
+	data, err := c.get(get)
+	if err != nil {
+		return nil, err
+	}
+	tb := persistence.TaskBuilder{}
+	return tb.From(data.Value)
 }

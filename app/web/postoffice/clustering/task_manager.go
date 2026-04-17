@@ -19,6 +19,7 @@ type TaskResource struct {
 func (t *TaskResource) Update(u *protocol.Meta) {
 	t.C.Lock()
 	defer t.C.Unlock()
+	core.AppLog.Debug().Msgf("update %v", u)
 }
 
 func (t *TaskResource) Start() {
