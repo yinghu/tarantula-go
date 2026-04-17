@@ -25,6 +25,9 @@ const (
 
 	REQUEST_EVENT_CID  uint32 = 5
 	REQUEST_TOPIC_NAME string = "request"
+
+	TRANSACTION_EVENT_CID  uint32 = 6
+	TRANSACTION_TOPIC_NAME string = "transaction"
 )
 
 type MessageTopic func() proto.Message

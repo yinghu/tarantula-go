@@ -7,7 +7,9 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
+	"google.golang.org/protobuf/proto"
 )
 
 type AdminService struct {
@@ -42,7 +44,16 @@ func (s *AdminService) Start(f core.Env) error {
 	if err != nil {
 		core.AppLog.Debug().Msg("Root already existed")
 	}
-	//s.Cluster().Subscribe("login", s.Event())
+	s.Cluster().Subscribe(event.TRANSACTION_TOPIC_NAME, &protocol.TopicEventListener{C: func() proto.Message {
+		return &protocol.TransactionEvent{}
+	}, M: func(m proto.Message) {
+		ro, ok := m.(*protocol.TransactionEvent)
+		if ok {
+			core.AppLog.Debug().Msgf("transaction event %v", ro.Meta)
+		} else {
+			core.AppLog.Debug().Msg("wrong type")
+		}
+	}})
 	http.Handle("/admin/webprotected/{name}", bootstrap.Logging(&AdminWebProtected{AdminService: s}))
 	http.Handle("/admin/web/{name}", bootstrap.Logging(&AdminWebIndex{AdminService: s}))
 	//handle / context from nginx proxy

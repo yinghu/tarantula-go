@@ -4,6 +4,7 @@ import (
 	context "context"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 )
@@ -62,10 +63,14 @@ func (c *DataServiceProvider) Finished(ctx context.Context, in *protocol.Meta) (
 	core.AppLog.Debug().Msgf("running finish on target node %v", in)
 	//c.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: in}, Opt: core.TRANS_MAIL}
 	//waiting all parties to canceled
+	tf := event.NewTransactionEventFactory()
+	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: in})
+	e.Event.Id = c.tid()
+	c.runPublish(e)
 	return &protocol.Response{Successful: true, Message: "run task"}, nil
 }
 
-func (c *DataServiceProvider) request(taskId uint64) *protocol.Request {
+func (c *DataServiceProvider) Xrequest(taskId uint64) *protocol.Request {
 	buff := core.NewBuffer(8)
 	buff.WriteUInt64(taskId)
 	buff.Flip()
