@@ -41,6 +41,9 @@ type DataServiceProvider struct {
 	subscriptions SubscriptionRegistry
 	listeners     map[string]ReceiverAsync //chan *protocol.Topic
 	DRequest      chan TopicRequest
+
+	//task transaction
+	TManager *TaskManager
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
@@ -187,6 +190,7 @@ func (c *DataServiceProvider) Start(dir string) {
 	for n := range SET_OPERATOR_NUM {
 		go c.runSetData(n)
 	}
+	c.TManager = &TaskManager{trs: make(map[uint64]*TaskResource), s: c}
 	tcp, err := net.Listen("tcp", fmt.Sprintf(":%d", core.RPC_PORT))
 	if err != nil {
 		panic(err)
