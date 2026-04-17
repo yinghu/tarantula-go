@@ -10,29 +10,29 @@ import (
 )
 
 type TaskResource struct {
-	C        *sync.Mutex
+	LC        *sync.Mutex
 	resource *protocol.Task
 	timer    *time.Timer
 	ds       *DataServiceProvider
 }
 
 func (t *TaskResource) Update(u *protocol.Meta) {
-	//t.C.Lock()
-	//defer t.C.Unlock()
+	t.LC.Lock()
+	defer t.LC.Unlock()
 	core.AppLog.Debug().Msgf("update %v", u)
 }
 
 func (t *TaskResource) Start() {
-	t.C.Lock()
-	defer t.C.Unlock()
+	t.LC.Lock()
+	defer t.LC.Unlock()
 	for _, tc := range t.resource.Transactions {
 		t.ds.runReserve(tc)
 	}
 }
 
 func (t *TaskResource) Monitor() {
-	t.C.Lock()
-	defer t.C.Unlock()
+	t.LC.Lock()
+	defer t.LC.Unlock()
 	core.AppLog.Debug().Msgf("timeout %v", t.resource)
 }
 
@@ -57,10 +57,10 @@ func (m *TaskManager) Set(t *protocol.Task) *TaskResource {
 	defer m.C.Unlock()
 	r, ok := m.trs[t.Meta.Id]
 	if !ok {
-		tr := TaskResource{resource: t, ds: m.s, C: &sync.Mutex{}}
+		tr := TaskResource{resource: t, ds: m.s, LC: &sync.Mutex{}}
 		m.trs[t.Meta.Id] = &tr
 		r = &tr
-		//r.timer = time.AfterFunc(time.Duration(r.resource.Meta.Timeout)*time.Second, r.Monitor)
+		r.timer = time.AfterFunc(time.Duration(r.resource.Meta.Timeout)*time.Second, r.Monitor)
 	}
 	return r
 }
