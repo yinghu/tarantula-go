@@ -16,21 +16,24 @@ const (
 
 func (c *DataServiceProvider) Setup(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
 	core.AppLog.Debug().Msgf("running setup on target node %v", task)
-	req := c.request(task.Meta.Id)
-	get := GetData{Request: req}
-	data, err := c.get(get)
-	if err != nil {
-		core.AppLog.Warn().Msgf("cannot load task %s", err.Error())
-		return &protocol.Response{Successful: false}, err
+	for _, t := range task.Transactions {
+		c.runReserve(t)
 	}
-	tb := persistence.TaskBuilder{}
-	tk, err := tb.From(data.Value)
-	if err != nil {
-		core.AppLog.Warn().Msgf("cannot parse task %s", err.Error())
-		return &protocol.Response{Successful: false}, err
-	}
-	core.AppLog.Debug().Msgf("running setup on target node %v", tk)
-	return &protocol.Response{Successful: true, Message: ""}, nil
+	//req := c.request(task.Meta.Id)
+	//get := GetData{Request: req}
+	//data, err := c.get(get)
+	//if err != nil {
+	//core.AppLog.Warn().Msgf("cannot load task %s", err.Error())
+	//return &protocol.Response{Successful: false}, err
+	//}
+	//tb := persistence.TaskBuilder{}
+	//tk, err := tb.From(data.Value)
+	//if err != nil {
+	//core.AppLog.Warn().Msgf("cannot parse task %s", err.Error())
+	//return &protocol.Response{Successful: false}, err
+	//}
+	//core.AppLog.Debug().Msgf("running setup on target node %v", tk)
+	return &protocol.Response{Successful: true, Meta: task.Meta}, nil
 }
 
 func (c *DataServiceProvider) Reserve(ctx context.Context, in *protocol.Transaction) (*protocol.Response, error) {

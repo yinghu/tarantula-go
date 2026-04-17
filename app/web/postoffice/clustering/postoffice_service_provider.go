@@ -132,14 +132,7 @@ func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*
 	if err != nil {
 		return resp, err
 	}
-	resp, err = c.runSetup(task)
-	if err != nil {
-		return resp, err
-	}
-	for _, t := range task.Transactions {
-		c.runReserve(t)
-	}
-	return &protocol.Response{Successful: true, Meta: task.Meta}, nil
+	return c.runSetup(task)
 }
 
 func (c *DataServiceProvider) Confirm(ctx context.Context, meta *protocol.Meta) (*protocol.Response, error) {
