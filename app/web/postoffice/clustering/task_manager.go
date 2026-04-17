@@ -10,7 +10,7 @@ import (
 )
 
 type TaskResource struct {
-	LC        *sync.Mutex
+	LC       *sync.Mutex
 	resource *protocol.Task
 	timer    *time.Timer
 	ds       *DataServiceProvider
@@ -28,6 +28,7 @@ func (t *TaskResource) Start() {
 	for _, tc := range t.resource.Transactions {
 		t.ds.runReserve(tc)
 	}
+	core.AppLog.Debug().Msgf("started")
 }
 
 func (t *TaskResource) Monitor() {
