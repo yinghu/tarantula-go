@@ -23,10 +23,8 @@ func (t *TaskResource) Update(u *protocol.Meta) {
 }
 
 func (t *TaskResource) Start() {
-	t.LC.Lock()
-	defer t.LC.Unlock()
 	for _, tc := range t.resource.Transactions {
-		t.ds.runReserve(tc)
+		go t.ds.runReserve(tc)
 	}
 	core.AppLog.Debug().Msgf("started")
 }
