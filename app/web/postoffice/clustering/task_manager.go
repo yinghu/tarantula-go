@@ -19,10 +19,6 @@ func (t *TaskResource) Start() {
 	}
 }
 
-func (t *TaskResource) Monitor() {
-	core.AppLog.Debug().Msgf("timeout %v", t.resource)
-}
-
 type TaskManager struct {
 	trs     map[uint64]*TaskResource
 	s       *DataServiceProvider
@@ -44,11 +40,23 @@ func (m *TaskManager) Wait() {
 	for m.s.running {
 		select {
 		case task := <-m.tasks:
-			tr := TaskResource{resource: task, ds: m.s}
+			tr := TaskResource{resource: task, ds: m.s, timer: time.AfterFunc(time.Duration(task.Meta.Timeout)*time.Second, func() {
+				task.Meta.State = protocol.TCC_FINISHED
+				m.updates <- task.Meta
+			})}
 			m.trs[task.Meta.TaskId] = &tr
 			go tr.Start()
 		case meta := <-m.updates:
 			core.AppLog.Debug().Msgf("update %v", meta)
+			//task := m.trs[meta.TaskId]
+			switch meta.State {
+			case protocol.TCC_CONFIRMED:
+				m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: meta}, Opt: core.TRANS_MAIL}
+			case protocol.TCC_CANCELED:
+				m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: meta}, Opt: core.TRANS_MAIL}
+			case protocol.TCC_FINISHED:
+				core.AppLog.Debug().Msgf("task finished %v", meta)
+			}
 		}
 	}
 }
