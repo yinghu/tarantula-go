@@ -81,8 +81,8 @@ func (m *TaskManager) Wait() {
 					continue
 				}
 				tr = loaded
+				core.AppLog.Debug().Msgf("task loaded %v",tr)
 			}
-			core.AppLog.Debug().Msgf("task loaded %v", tr)
 			switch meta.State {
 			case protocol.TCC_CONFIRMED:
 				m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: meta}, Opt: core.TRANS_MAIL}
