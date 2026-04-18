@@ -44,7 +44,7 @@ func (m *TaskManager) Wait() {
 	for m.s.running {
 		select {
 		case task := <-m.tasks:
-			tr := TaskResource{resource: task}
+			tr := TaskResource{resource: task, ds: m.s}
 			m.trs[task.Meta.TaskId] = &tr
 			go tr.Start()
 		case meta := <-m.updates:
