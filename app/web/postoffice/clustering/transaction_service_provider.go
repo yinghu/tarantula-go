@@ -21,8 +21,8 @@ func (c *DataServiceProvider) Setup(ctx context.Context, task *protocol.Task) (*
 }
 
 func (c *DataServiceProvider) Reserve(ctx context.Context, in *protocol.Transaction) (*protocol.Response, error) {
-	c.TManager.Update(in.Meta)
-	c.DMessager <- &protocol.Mail{Transaction: in, Opt: core.TRANS_MAIL}
+	in.Meta.State = protocol.TCC_RESERVING
+	c.TManager.Reserve(in)
 	return &protocol.Response{Successful: true, Message: "run reserve task"}, nil
 }
 

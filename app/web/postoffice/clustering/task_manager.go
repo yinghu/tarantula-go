@@ -16,6 +16,7 @@ type TaskManager struct {
 	tms     map[uint64]*time.Timer
 	s       *DataServiceProvider
 	tasks   chan *protocol.Task
+	trans   chan *protocol.Transaction
 	updates chan *protocol.Meta
 }
 
@@ -27,6 +28,7 @@ func (m *TaskManager) start(t *TaskResource) {
 		m.tms[tc.Meta.Id] = time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		})
+		tc.Meta.State = protocol.TCC_RESERVING
 		go m.s.runReserve(tc)
 	}
 }
@@ -45,6 +47,10 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 	return &tr, nil
 }
 
+func (m *TaskManager) Reserve(transaction *protocol.Transaction) {
+	m.trans <- transaction
+}
+
 func (m *TaskManager) Update(meta *protocol.Meta) {
 	m.updates <- meta
 }
@@ -55,6 +61,7 @@ func (m *TaskManager) Set(t *protocol.Task) {
 
 func (m *TaskManager) Wait() {
 	m.tasks = make(chan *protocol.Task, 10)
+	m.trans = make(chan *protocol.Transaction, 10)
 	m.updates = make(chan *protocol.Meta, 10)
 	for m.s.running {
 		select {
@@ -62,6 +69,8 @@ func (m *TaskManager) Wait() {
 			tr := TaskResource{resource: task}
 			m.trs[task.Meta.TaskId] = &tr
 			go m.start(&tr)
+		case tran := <-m.trans:
+			m.s.DMessager <- &protocol.Mail{Transaction: tran, Opt: core.TRANS_MAIL}
 		case meta := <-m.updates:
 			core.AppLog.Debug().Msgf("update %v", meta)
 			tr, existing := m.trs[meta.TaskId]
@@ -81,9 +90,9 @@ func (m *TaskManager) Wait() {
 			case protocol.TCC_FINISHED:
 				core.AppLog.Debug().Msgf("task finished %v", meta)
 			case protocol.TCC_TRANSACTION_TIMEOUT:
-				core.AppLog.Debug().Msgf("task transaction finished %v", meta)
+				core.AppLog.Debug().Msgf("task transaction timeout %v", meta)
 			case protocol.TCC_TASK_TIMEOUT:
-				core.AppLog.Debug().Msgf("task finished %v", meta)
+				core.AppLog.Debug().Msgf("task timeout %v", meta)
 			}
 		}
 	}
