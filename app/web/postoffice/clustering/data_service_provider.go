@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"sync"
+	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
@@ -190,7 +191,7 @@ func (c *DataServiceProvider) Start(dir string) {
 	for n := range SET_OPERATOR_NUM {
 		go c.runSetData(n)
 	}
-	c.TManager = &TaskManager{trs: make(map[uint64]*TaskResource), s: c}
+	c.TManager = &TaskManager{trs: make(map[uint64]*TaskResource), tms: make(map[uint64]*time.Timer), s: c}
 	go c.TManager.Wait()
 	tcp, err := net.Listen("tcp", fmt.Sprintf(":%d", core.RPC_PORT))
 	if err != nil {

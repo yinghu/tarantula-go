@@ -8,24 +8,23 @@ import (
 )
 
 type TaskResource struct {
-	resource          *protocol.Task
-	timer             *time.Timer
-	transactionTimers map[uint64]*time.Timer
+	resource *protocol.Task
 }
 
 type TaskManager struct {
 	trs     map[uint64]*TaskResource
+	tms     map[uint64]*time.Timer
 	s       *DataServiceProvider
 	tasks   chan *protocol.Task
 	updates chan *protocol.Meta
 }
 
 func (m *TaskManager) start(t *TaskResource) {
-	t.timer = time.AfterFunc(time.Duration(t.resource.Meta.Timeout)*time.Second, func() {
+	m.tms[t.resource.Meta.Id] = time.AfterFunc(time.Duration(t.resource.Meta.Timeout)*time.Second, func() {
 		m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
 	})
 	for _, tc := range t.resource.Transactions {
-		t.transactionTimers[tc.Meta.Id] = time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
+		m.tms[tc.Meta.Id] = time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		})
 		go m.s.runReserve(tc)
@@ -38,9 +37,10 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 		core.AppLog.Warn().Msgf("task not existed %d", meta.TaskId)
 		return nil, err
 	}
-	tr := TaskResource{resource: task, timer: time.AfterFunc(time.Duration(task.Meta.Timeout)*time.Second, func() {
+	tr := TaskResource{resource: task}
+	m.tms[meta.TaskId] = time.AfterFunc(time.Duration(task.Meta.Timeout)*time.Second, func() {
 		m.updates <- &protocol.Meta{TaskId: task.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
-	})}
+	})
 	m.trs[meta.TaskId] = &tr
 	return &tr, nil
 }
