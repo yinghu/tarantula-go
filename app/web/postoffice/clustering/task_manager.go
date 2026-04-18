@@ -9,6 +9,7 @@ import (
 
 type TaskResource struct {
 	resource *protocol.Task
+	//transaction bookkeeping
 }
 
 type TaskManager struct {
@@ -96,4 +97,10 @@ func (m *TaskManager) Wait() {
 			}
 		}
 	}
+	clear(m.tms)
+	clear(m.trs)
+	close(m.tasks)
+	close(m.trans)
+	close(m.updates)
+	core.AppLog.Warn().Msg("task manager stopped")
 }
