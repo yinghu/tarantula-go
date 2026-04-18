@@ -7,10 +7,12 @@ type ConfirmHandler func(e *Transaction) error
 type CancelHandler func(e *Transaction) error
 
 const (
-	TCC_RESERVING uint32 = 1
-	TCC_CONFIRMED uint32 = 2
-	TCC_CANCELED  uint32 = 3
-	TCC_FINISHED  uint32 = 4
+	TCC_RESERVING           uint32 = 1
+	TCC_CONFIRMED           uint32 = 2
+	TCC_CANCELED            uint32 = 3
+	TCC_FINISHED            uint32 = 4
+	TCC_TASK_TIMEOUT        uint32 = 5
+	TCC_TRANSACTION_TIMEOUT uint32 = 6
 )
 
 type TccTransationListener struct {
