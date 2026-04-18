@@ -41,8 +41,7 @@ func (m *TaskManager) Wait() {
 		select {
 		case task := <-m.tasks:
 			tr := TaskResource{resource: task, ds: m.s, timer: time.AfterFunc(time.Duration(task.Meta.Timeout)*time.Second, func() {
-				task.Meta.State = protocol.TCC_FINISHED
-				m.updates <- task.Meta
+				m.updates <- &protocol.Meta{TaskId: task.Meta.Id, State: protocol.TCC_FINISHED}
 			})}
 			m.trs[task.Meta.TaskId] = &tr
 			go tr.Start()
