@@ -35,6 +35,7 @@ func (m *TaskManager) start(t *TaskResource) {
 }
 
 func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
+	core.AppLog.Debug().Msgf("reload task %d", meta.TaskId)
 	task, err := m.s.load(meta.TaskId)
 	if err != nil {
 		core.AppLog.Warn().Msgf("task not existed %d", meta.TaskId)
@@ -81,7 +82,7 @@ func (m *TaskManager) Wait() {
 					continue
 				}
 				tr = loaded
-				core.AppLog.Debug().Msgf("task loaded %v",tr)
+				core.AppLog.Debug().Msgf("task loaded %v", tr)
 			}
 			switch meta.State {
 			case protocol.TCC_CONFIRMED:
