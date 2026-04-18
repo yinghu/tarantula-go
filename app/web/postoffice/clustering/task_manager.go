@@ -49,6 +49,12 @@ func (m *TaskManager) Wait() {
 		case meta := <-m.updates:
 			core.AppLog.Debug().Msgf("update %v", meta)
 			//task := m.trs[meta.TaskId]
+			task, err := m.s.load(meta.TaskId)
+			if err != nil {
+				core.AppLog.Warn().Msgf("task not existed %d", meta.TaskId)
+				continue
+			}
+			core.AppLog.Debug().Msgf("task loaded %v", task)
 			switch meta.State {
 			case protocol.TCC_CONFIRMED:
 				m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: meta}, Opt: core.TRANS_MAIL}

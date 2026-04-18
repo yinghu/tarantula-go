@@ -49,7 +49,7 @@ func (c *DataServiceProvider) Finished(ctx context.Context, in *protocol.Meta) (
 	return &protocol.Response{Successful: true, Message: "run finish task"}, nil
 }
 
-func (c *DataServiceProvider) Xload(taskId uint64) (*protocol.Task, error) {
+func (c *DataServiceProvider) load(taskId uint64) (*protocol.Task, error) {
 	buff := core.NewBuffer(8)
 	buff.WriteUInt64(taskId)
 	buff.Flip()
