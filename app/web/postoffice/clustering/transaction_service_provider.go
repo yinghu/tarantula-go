@@ -27,7 +27,7 @@ func (c *DataServiceProvider) Reserve(ctx context.Context, in *protocol.Transact
 }
 
 func (c *DataServiceProvider) Confirmed(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
-	core.AppLog.Debug().Msgf("running confirm on target node %v", in)
+	//core.AppLog.Debug().Msgf("running confirm on target node %v", in)
 	c.TManager.Update(in)
 	in.State = protocol.TCC_CONFIRMED
 	c.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: in}, Opt: core.TRANS_MAIL}
@@ -36,7 +36,7 @@ func (c *DataServiceProvider) Confirmed(ctx context.Context, in *protocol.Meta) 
 }
 
 func (c *DataServiceProvider) Canceled(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
-	core.AppLog.Debug().Msgf("running cancel on target node %v", in)
+	//core.AppLog.Debug().Msgf("running cancel on target node %v", in)
 	c.TManager.Update(in)
 	in.State = protocol.TCC_CANCELED
 	c.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: in}, Opt: core.TRANS_MAIL}
@@ -45,7 +45,7 @@ func (c *DataServiceProvider) Canceled(ctx context.Context, in *protocol.Meta) (
 }
 
 func (c *DataServiceProvider) Finished(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
-	core.AppLog.Debug().Msgf("running finish on target node %v", in)
+	//core.AppLog.Debug().Msgf("running finish on target node %v", in)
 	//c.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: in}, Opt: core.TRANS_MAIL}
 	//waiting all parties to canceled
 	c.TManager.Update(in)
