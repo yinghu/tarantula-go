@@ -69,8 +69,8 @@ func (m *TaskManager) Wait() {
 		select {
 		case task := <-m.tasks:
 			tr := TaskResource{resource: task}
-			m.trs[task.Meta.TaskId] = &tr
-			go m.start(&tr)
+			m.trs[task.Meta.Id] = &tr
+			m.start(&tr)
 		case tran := <-m.trans:
 			m.s.DMessager <- &protocol.Mail{Transaction: tran, Opt: core.TRANS_MAIL}
 		case meta := <-m.updates:
