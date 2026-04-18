@@ -1,8 +1,6 @@
 package clustering
 
 import (
-	"fmt"
-	"sync"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -10,56 +8,47 @@ import (
 )
 
 type TaskResource struct {
-	LC       *sync.Mutex
 	resource *protocol.Task
 	timer    *time.Timer
 	ds       *DataServiceProvider
 }
 
-func (t *TaskResource) Update(u *protocol.Meta) {
-	t.LC.Lock()
-	defer t.LC.Unlock()
-	core.AppLog.Debug().Msgf("update %v", u)
-}
-
 func (t *TaskResource) Start() {
 	for _, tc := range t.resource.Transactions {
-		go t.ds.runReserve(tc)
+		t.ds.runReserve(tc)
 	}
-	core.AppLog.Debug().Msgf("started")
 }
 
 func (t *TaskResource) Monitor() {
-	t.LC.Lock()
-	defer t.LC.Unlock()
 	core.AppLog.Debug().Msgf("timeout %v", t.resource)
 }
 
 type TaskManager struct {
-	C   *sync.Mutex
-	trs map[uint64]*TaskResource
-	s   *DataServiceProvider
+	trs     map[uint64]*TaskResource
+	s       *DataServiceProvider
+	tasks   chan *protocol.Task
+	updates chan *protocol.Meta
 }
 
-func (m *TaskManager) Get(tid uint64) (*TaskResource, error) {
-	m.C.Lock()
-	defer m.C.Unlock()
-	r, ok := m.trs[tid]
-	if !ok {
-		return nil, fmt.Errorf("not existed")
-	}
-	return r, nil
+func (m *TaskManager) Update(meta *protocol.Meta) {
+	m.updates <- meta
 }
 
-func (m *TaskManager) Set(t *protocol.Task) *TaskResource {
-	m.C.Lock()
-	defer m.C.Unlock()
-	r, ok := m.trs[t.Meta.Id]
-	if !ok {
-		tr := TaskResource{resource: t, ds: m.s, LC: &sync.Mutex{}}
-		m.trs[t.Meta.Id] = &tr
-		r = &tr
-		r.timer = time.AfterFunc(time.Duration(r.resource.Meta.Timeout)*time.Second, r.Monitor)
+func (m *TaskManager) Set(t *protocol.Task) {
+	m.tasks <- t
+}
+
+func (m *TaskManager) Wait() {
+	m.tasks = make(chan *protocol.Task, 10)
+	m.updates = make(chan *protocol.Meta, 10)
+	for m.s.running {
+		select {
+		case task := <-m.tasks:
+			tr := TaskResource{resource: task}
+			m.trs[task.Meta.TaskId] = &tr
+			go tr.Start()
+		case meta := <-m.updates:
+			core.AppLog.Debug().Msgf("update %v", meta)
+		}
 	}
-	return r
 }
