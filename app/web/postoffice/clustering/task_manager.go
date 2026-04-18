@@ -47,11 +47,16 @@ func (m *TaskManager) Wait() {
 			go tr.Start()
 		case meta := <-m.updates:
 			core.AppLog.Debug().Msgf("update %v", meta)
-			//task := m.trs[meta.TaskId]
-			task, err := m.s.load(meta.TaskId)
-			if err != nil {
-				core.AppLog.Warn().Msgf("task not existed %d", meta.TaskId)
-				continue
+			task, existing := m.trs[meta.TaskId]
+			if !existing {
+				task, err := m.s.load(meta.TaskId)
+				if err != nil {
+					core.AppLog.Warn().Msgf("task not existed %d", meta.TaskId)
+					continue
+				}
+				m.trs[meta.TaskId] = &TaskResource{resource: task, timer: time.AfterFunc(time.Duration(task.Meta.Timeout)*time.Second, func() {
+					m.updates <- &protocol.Meta{TaskId: task.Meta.Id, State: protocol.TCC_FINISHED}
+				})}
 			}
 			core.AppLog.Debug().Msgf("task loaded %v", task)
 			switch meta.State {
