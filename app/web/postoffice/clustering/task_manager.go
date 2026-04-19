@@ -75,6 +75,10 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 	return &tr, nil
 }
 
+func (m *TaskManager) log(meta *protocol.Meta) {
+	go m.s.saveLog(meta)
+}
+
 func (m *TaskManager) Reserve(transaction *protocol.Transaction) {
 	m.trans <- transaction
 }
@@ -109,6 +113,7 @@ func (m *TaskManager) Wait() {
 				tr = loaded
 				core.AppLog.Debug().Msgf("task loaded %v", tr.resource)
 			}
+			m.log(meta)
 			switch meta.State {
 			case protocol.TCC_CONFIRMED:
 				tr.confirmed--

@@ -4,6 +4,7 @@ import (
 	context "context"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 )
@@ -50,10 +51,21 @@ func (c *DataServiceProvider) load(taskId uint64) (*protocol.Task, error) {
 	buff.Flip()
 	k, _ := buff.Read(0)
 	req := protocol.Request{Data: &protocol.Data{Key: k, Header: &protocol.Header{FactoryId: persistence.TASK_FACTORY_ID, ClassId: persistence.TASK_CLASS_ID}}}
-	resp , err :=c.runGet(&req)
+	resp, err := c.runGet(&req)
 	if err != nil {
 		return nil, err
 	}
 	tb := persistence.TaskBuilder{}
 	return tb.From(resp.Data.List[0].Value)
+}
+func (c *DataServiceProvider) saveLog(meta *protocol.Meta) {
+	tf := event.NewTransactionEventFactory()
+	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: meta})
+	e.Event.Id = c.tid()
+	req, err := tf.Request(e)
+	if err != nil {
+		core.AppLog.Warn().Msgf("log save failed %s", err.Error())
+		return
+	}
+	c.runCreate(req)
 }
