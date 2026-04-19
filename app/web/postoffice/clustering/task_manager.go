@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
 )
 
@@ -50,6 +51,13 @@ func (m *TaskManager) canceled(t *TaskResource) {
 		tc.Meta.State = protocol.TCC_CANCELED
 		m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
 	}
+}
+
+func (m *TaskManager) finished(t *TaskResource) {
+	tf := event.NewTransactionEventFactory()
+	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: t.resource.Meta})
+	e.Event.Id = m.s.tid()
+	go m.s.runPublish(e)
 }
 
 func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
@@ -108,12 +116,15 @@ func (m *TaskManager) Wait() {
 					m.confirmed(tr)
 				}
 				core.AppLog.Debug().Msgf("task confirmed %v", meta)
-				
 			case protocol.TCC_CANCELED:
+				core.AppLog.Debug().Msgf("task canceled %v", meta)
 				m.canceled(tr)
 			case protocol.TCC_FINISHED:
 				core.AppLog.Debug().Msgf("task finished %v", meta)
 				tr.finished--
+				if tr.finished == 0 {
+					m.finished(tr)
+				}
 			case protocol.TCC_TRANSACTION_TIMEOUT:
 				core.AppLog.Debug().Msgf("task transaction timeout %d %d", tr.confirmed, tr.finished)
 			case protocol.TCC_TASK_TIMEOUT:

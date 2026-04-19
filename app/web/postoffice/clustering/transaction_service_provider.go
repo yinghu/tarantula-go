@@ -4,7 +4,6 @@ import (
 	context "context"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 )
@@ -42,10 +41,6 @@ func (c *DataServiceProvider) Canceled(ctx context.Context, in *protocol.Meta) (
 func (c *DataServiceProvider) Finished(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
 	in.State = protocol.TCC_FINISHED
 	c.TManager.Update(in)
-	tf := event.NewTransactionEventFactory()
-	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: in})
-	e.Event.Id = c.tid()
-	c.runPublish(e)
 	return &protocol.Response{Successful: true, Message: "run finish task"}, nil
 }
 
