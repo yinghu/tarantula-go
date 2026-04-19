@@ -15,9 +15,11 @@ type TaskResource struct {
 	finished  int
 }
 
+type Pending func()
 type Timeout struct {
 	t       *time.Timer
 	retried int
+	p       Pending
 }
 
 type TaskManager struct {
@@ -38,7 +40,9 @@ func (m *TaskManager) start(t *TaskResource) {
 	for _, tc := range t.resource.Transactions {
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
-		})}
+		}), p: func() {
+			core.AppLog.Debug().Msg("running retry with timeout")
+		}}
 		tc.Meta.State = protocol.TCC_RESERVING
 		go m.s.runReserve(tc)
 	}
@@ -73,6 +77,14 @@ func (m *TaskManager) closeTimer(mkey uint64) {
 		return
 	}
 	tm.t.Stop()
+}
+
+func (m *TaskManager) timeout(mkey uint64) {
+	tm, ok := m.tms[mkey]
+	if !ok {
+		return
+	}
+	tm.p()
 }
 
 func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
@@ -142,15 +154,17 @@ func (m *TaskManager) Wait() {
 			case protocol.TCC_FINISHED:
 				core.AppLog.Debug().Msgf("task finished %v", meta)
 				tr.finished--
-				m.closeTimer(meta.Id)
+				//m.closeTimer(meta.Id)
 				if tr.finished == 0 {
 					m.finished(tr)
 				}
 
 			case protocol.TCC_TRANSACTION_TIMEOUT:
 				core.AppLog.Debug().Msgf("task transaction timeout %d %d", tr.confirmed, tr.finished)
+				m.timeout(meta.Id)
 			case protocol.TCC_TASK_TIMEOUT:
 				core.AppLog.Debug().Msgf("task timeout %d %d", tr.confirmed, tr.finished)
+				m.timeout(meta.TaskId)
 			}
 		}
 	}
