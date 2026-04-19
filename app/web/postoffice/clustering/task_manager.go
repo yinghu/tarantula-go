@@ -15,9 +15,14 @@ type TaskResource struct {
 	finished  int
 }
 
+type Timeout struct {
+	t       *time.Timer
+	retried int
+}
+
 type TaskManager struct {
 	trs     map[uint64]*TaskResource
-	tms     map[uint64]*time.Timer
+	tms     map[uint64]*Timeout
 	s       *DataServiceProvider
 	tasks   chan *protocol.Task
 	trans   chan *protocol.Transaction
@@ -25,15 +30,15 @@ type TaskManager struct {
 }
 
 func (m *TaskManager) start(t *TaskResource) {
-	m.tms[t.resource.Meta.Id] = time.AfterFunc(time.Duration(t.resource.Meta.Timeout)*time.Second, func() {
+	m.tms[t.resource.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(t.resource.Meta.Timeout)*time.Second, func() {
 		m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
-	})
+	})}
 	t.confirmed = len(t.resource.Transactions)
 	t.finished = t.confirmed
 	for _, tc := range t.resource.Transactions {
-		m.tms[tc.Meta.Id] = time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
+		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
-		})
+		})}
 		tc.Meta.State = protocol.TCC_RESERVING
 		go m.s.runReserve(tc)
 	}
@@ -54,10 +59,20 @@ func (m *TaskManager) canceled(t *TaskResource) {
 }
 
 func (m *TaskManager) finished(t *TaskResource) {
+	m.closeTimer(t.resource.Meta.Id)
+	delete(m.trs, t.resource.Meta.Id)
 	tf := event.NewTransactionEventFactory()
 	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: t.resource.Meta})
 	e.Event.Id = m.s.tid()
 	go m.s.runPublish(e)
+}
+
+func (m *TaskManager) closeTimer(mkey uint64) {
+	tm, ok := m.tms[mkey]
+	if !ok {
+		return
+	}
+	tm.t.Stop()
 }
 
 func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
@@ -68,9 +83,9 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 		return nil, err
 	}
 	tr := TaskResource{resource: task}
-	m.tms[meta.TaskId] = time.AfterFunc(time.Duration(task.Meta.Timeout)*time.Second, func() {
+	m.tms[meta.TaskId] = &Timeout{t: time.AfterFunc(time.Duration(task.Meta.Timeout)*time.Second, func() {
 		m.updates <- &protocol.Meta{TaskId: task.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
-	})
+	})}
 	m.trs[meta.TaskId] = &tr
 	return &tr, nil
 }
@@ -127,10 +142,11 @@ func (m *TaskManager) Wait() {
 			case protocol.TCC_FINISHED:
 				core.AppLog.Debug().Msgf("task finished %v", meta)
 				tr.finished--
+				m.closeTimer(meta.Id)
 				if tr.finished == 0 {
 					m.finished(tr)
-					delete(m.trs, tr.resource.Meta.Id)
 				}
+
 			case protocol.TCC_TRANSACTION_TIMEOUT:
 				core.AppLog.Debug().Msgf("task transaction timeout %d %d", tr.confirmed, tr.finished)
 			case protocol.TCC_TASK_TIMEOUT:

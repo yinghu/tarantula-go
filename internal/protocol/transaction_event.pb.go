@@ -25,7 +25,8 @@ const (
 type TransactionEvent struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Meta          *Meta                  `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
-	Time          *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=time,proto3" json:"time,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"` //
+	Time          *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=time,proto3" json:"time,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -67,6 +68,13 @@ func (x *TransactionEvent) GetMeta() *Meta {
 	return nil
 }
 
+func (x *TransactionEvent) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
 func (x *TransactionEvent) GetTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.Time
@@ -79,10 +87,11 @@ var File_transaction_event_proto protoreflect.FileDescriptor
 const file_transaction_event_proto_rawDesc = "" +
 	"\n" +
 	"\x17transaction_event.proto\x12\bprotocol\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\n" +
-	"meta.proto\"f\n" +
+	"meta.proto\"\x88\x01\n" +
 	"\x10TransactionEvent\x12\"\n" +
-	"\x04meta\x18\x01 \x01(\v2\x0e.protocol.MetaR\x04meta\x12.\n" +
-	"\x04time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\x04timeBX\n" +
+	"\x04meta\x18\x01 \x01(\v2\x0e.protocol.MetaR\x04meta\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12.\n" +
+	"\x04time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x04timeBX\n" +
 	"\x17com.icodesoftware.protoB\x17TransactionEventFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
