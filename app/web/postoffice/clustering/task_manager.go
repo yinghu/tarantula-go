@@ -92,7 +92,6 @@ func (m *TaskManager) Wait() {
 		case tran := <-m.trans:
 			m.s.DMessager <- &protocol.Mail{Transaction: tran, Opt: core.TRANS_MAIL}
 		case meta := <-m.updates:
-			core.AppLog.Debug().Msgf("update %v", meta)
 			tr, existing := m.trs[meta.TaskId]
 			if !existing {
 				loaded, err := m.reload(meta)
@@ -109,10 +108,9 @@ func (m *TaskManager) Wait() {
 					m.confirmed(tr)
 				}
 				core.AppLog.Debug().Msgf("task confirmed %v", meta)
-				//m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: meta}, Opt: core.TRANS_MAIL}
+				
 			case protocol.TCC_CANCELED:
 				m.canceled(tr)
-				//m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: meta}, Opt: core.TRANS_MAIL}
 			case protocol.TCC_FINISHED:
 				core.AppLog.Debug().Msgf("task finished %v", meta)
 				tr.finished--
