@@ -50,11 +50,10 @@ func (c *DataServiceProvider) load(taskId uint64) (*protocol.Task, error) {
 	buff.Flip()
 	k, _ := buff.Read(0)
 	req := protocol.Request{Data: &protocol.Data{Key: k, Header: &protocol.Header{FactoryId: persistence.TASK_FACTORY_ID, ClassId: persistence.TASK_CLASS_ID}}}
-	get := GetData{Request: &req}
-	data, err := c.get(get)
+	resp , err :=c.runGet(&req)
 	if err != nil {
 		return nil, err
 	}
 	tb := persistence.TaskBuilder{}
-	return tb.From(data.Value)
+	return tb.From(resp.Data.List[0].Value)
 }

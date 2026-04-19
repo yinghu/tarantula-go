@@ -124,6 +124,7 @@ func (m *TaskManager) Wait() {
 				tr.finished--
 				if tr.finished == 0 {
 					m.finished(tr)
+					delete(m.trs, tr.resource.Meta.Id)
 				}
 			case protocol.TCC_TRANSACTION_TIMEOUT:
 				core.AppLog.Debug().Msgf("task transaction timeout %d %d", tr.confirmed, tr.finished)
