@@ -107,7 +107,7 @@ func (m *TaskManager) Wait() {
 					continue
 				}
 				tr = loaded
-				core.AppLog.Debug().Msgf("task loaded %v", tr)
+				core.AppLog.Debug().Msgf("task loaded %v", tr.resource)
 			}
 			switch meta.State {
 			case protocol.TCC_CONFIRMED:
