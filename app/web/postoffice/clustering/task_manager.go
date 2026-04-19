@@ -99,7 +99,9 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 	tr := TaskResource{resource: task}
 	m.tms[meta.TaskId] = &Timeout{t: time.AfterFunc(time.Duration(task.Meta.Timeout)*time.Second, func() {
 		m.updates <- &protocol.Meta{TaskId: task.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
-	})}
+	}), p: func() {
+		core.AppLog.Debug().Msg("running task with timeout")
+	}}
 	m.trs[meta.TaskId] = &tr
 	return &tr, nil
 }
