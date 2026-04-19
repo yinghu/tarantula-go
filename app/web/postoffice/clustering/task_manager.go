@@ -10,6 +10,8 @@ import (
 type TaskResource struct {
 	resource *protocol.Task
 	//transaction bookkeeping
+	confirmed int
+	finished  int
 }
 
 type TaskManager struct {
@@ -25,12 +27,28 @@ func (m *TaskManager) start(t *TaskResource) {
 	m.tms[t.resource.Meta.Id] = time.AfterFunc(time.Duration(t.resource.Meta.Timeout)*time.Second, func() {
 		m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
 	})
+	t.confirmed = len(t.resource.Transactions)
+	t.finished = t.confirmed
 	for _, tc := range t.resource.Transactions {
 		m.tms[tc.Meta.Id] = time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		})
 		tc.Meta.State = protocol.TCC_RESERVING
 		go m.s.runReserve(tc)
+	}
+}
+
+func (m *TaskManager) confirmed(t *TaskResource) {
+	for _, tc := range t.resource.Transactions {
+		tc.Meta.State = protocol.TCC_CONFIRMED
+		m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
+	}
+}
+
+func (m *TaskManager) canceled(t *TaskResource) {
+	for _, tc := range t.resource.Transactions {
+		tc.Meta.State = protocol.TCC_CANCELED
+		m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
 	}
 }
 
@@ -86,15 +104,21 @@ func (m *TaskManager) Wait() {
 			}
 			switch meta.State {
 			case protocol.TCC_CONFIRMED:
-				m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: meta}, Opt: core.TRANS_MAIL}
+				tr.confirmed--
+				if tr.confirmed == 0 {
+					m.confirmed(tr)
+				}
+				//m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: meta}, Opt: core.TRANS_MAIL}
 			case protocol.TCC_CANCELED:
-				m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: meta}, Opt: core.TRANS_MAIL}
+				m.canceled(tr)
+				//m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: meta}, Opt: core.TRANS_MAIL}
 			case protocol.TCC_FINISHED:
 				core.AppLog.Debug().Msgf("task finished %v", meta)
+				tr.finished--
 			case protocol.TCC_TRANSACTION_TIMEOUT:
-				core.AppLog.Debug().Msgf("task transaction timeout %v", meta)
+				core.AppLog.Debug().Msgf("task transaction timeout %d %d", tr.confirmed, tr.finished)
 			case protocol.TCC_TASK_TIMEOUT:
-				core.AppLog.Debug().Msgf("task timeout %v", meta)
+				core.AppLog.Debug().Msgf("task timeout %d %d", tr.confirmed, tr.finished)
 			}
 		}
 	}
