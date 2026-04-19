@@ -27,6 +27,9 @@ const (
 
 	TOPIC_MAIL uint32 = 0
 	TRANS_MAIL uint32 = 1
+
+	TRANSACTION_MODE_CONCURRENT uint32 = 0
+	TRANSACTION_MODE_SEQUENCE   uint32 = 1
 )
 
 type Chunk struct {
