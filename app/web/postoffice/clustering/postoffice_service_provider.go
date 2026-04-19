@@ -132,6 +132,7 @@ func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*
 	if err != nil {
 		return resp, err
 	}
+	core.AppLog.Debug().Msgf("data %v", resp)
 	return c.runSetup(task)
 }
 
