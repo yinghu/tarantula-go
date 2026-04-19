@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	TASK_TIMEOUT_SECONDS        uint32 = 30
+	TASK_TIMEOUT_SECONDS        uint32 = 60
 	TRANSACTION_TIMEOUT_SECONDS uint32 = 10
 	TASK_RETRY_MAX              uint32 = 3
 )

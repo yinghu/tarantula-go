@@ -17,9 +17,10 @@ type TaskResource struct {
 
 type Pending func()
 type Timeout struct {
-	t       *time.Timer
-	retried int
-	p       Pending
+	t *time.Timer
+	d time.Duration
+	r uint32
+	p Pending
 }
 
 type TaskManager struct {
@@ -44,7 +45,8 @@ func (m *TaskManager) start(t *TaskResource) {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
 			core.AppLog.Debug().Msg("running retry with timeout")
-		}}
+
+		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
 		tc.Meta.State = protocol.TCC_RESERVING
 		go m.s.runReserve(tc)
 	}
@@ -87,6 +89,12 @@ func (m *TaskManager) timeout(mkey uint64) {
 		return
 	}
 	tm.p()
+	tm.r--
+	if tm.d > 0 && tm.r > 0 {
+		tm.t = time.AfterFunc(tm.d, func() {
+			tm.p()
+		})
+	}
 }
 
 func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
