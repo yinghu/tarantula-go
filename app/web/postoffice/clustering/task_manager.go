@@ -34,7 +34,9 @@ type TaskManager struct {
 func (m *TaskManager) start(t *TaskResource) {
 	m.tms[t.resource.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(t.resource.Meta.Timeout)*time.Second, func() {
 		m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
-	})}
+	}), p: func() {
+		core.AppLog.Debug().Msg("running task with timeout")
+	}}
 	t.confirmed = len(t.resource.Transactions)
 	t.finished = t.confirmed
 	for _, tc := range t.resource.Transactions {
