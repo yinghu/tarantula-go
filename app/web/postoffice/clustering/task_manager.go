@@ -1,6 +1,7 @@
 package clustering
 
 import (
+	"fmt"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -130,6 +131,9 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 		core.AppLog.Warn().Msgf("task not existed %d", meta.TaskId)
 		return nil, err
 	}
+	if task.Meta.State == protocol.TCC_FINISHED {
+		return nil, fmt.Errorf("task alread finished")
+	}
 	tr := TaskResource{resource: task}
 	m.tms[meta.TaskId] = &Timeout{t: time.AfterFunc(time.Duration(task.Meta.Timeout)*time.Second, func() {
 		m.updates <- &protocol.Meta{TaskId: task.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
@@ -173,6 +177,7 @@ func (m *TaskManager) Wait() {
 			if !existing {
 				loaded, err := m.reload(meta)
 				if err != nil {
+					core.AppLog.Warn().Msgf("task load error %s",err.Error())	
 					continue
 				}
 				tr = loaded
