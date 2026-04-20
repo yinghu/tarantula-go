@@ -15,12 +15,12 @@ type TaskResource struct {
 	finished  int
 }
 
-type Pending func()
+type Retrying func()
 type Timeout struct {
 	t *time.Timer
 	d time.Duration
 	r uint32
-	p Pending
+	p Retrying
 }
 
 type TaskManager struct {
@@ -83,18 +83,21 @@ func (m *TaskManager) closeTimer(mkey uint64) {
 	tm.t.Stop()
 }
 
-func (m *TaskManager) timeout(mkey uint64) {
+func (m *TaskManager) timeout(mkey uint64, meta *protocol.Meta) {
 	tm, ok := m.tms[mkey]
 	if !ok {
 		return
 	}
-	tm.p()
 	tm.r--
 	if tm.d > 0 && tm.r > 0 {
+		tm.p() // retry
 		tm.t = time.AfterFunc(tm.d, func() {
-			tm.p()
+			m.updates <- meta
 		})
+		return
 	}
+	delete(m.tms, mkey)
+
 }
 
 func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
@@ -173,10 +176,10 @@ func (m *TaskManager) Wait() {
 
 			case protocol.TCC_TRANSACTION_TIMEOUT:
 				core.AppLog.Debug().Msgf("task transaction timeout %d %d", tr.confirmed, tr.finished)
-				m.timeout(meta.Id)
+				m.timeout(meta.Id, meta)
 			case protocol.TCC_TASK_TIMEOUT:
 				core.AppLog.Debug().Msgf("task timeout %d %d", tr.confirmed, tr.finished)
-				m.timeout(meta.TaskId)
+				m.timeout(meta.TaskId, meta)
 			}
 		}
 	}
