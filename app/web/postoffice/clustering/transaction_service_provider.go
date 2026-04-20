@@ -69,3 +69,19 @@ func (c *DataServiceProvider) saveLog(meta *protocol.Meta) {
 	}
 	c.runCreate(req)
 }
+
+func (c *DataServiceProvider) updateTask(t *protocol.Task) {
+	tb := persistence.TaskBuilder{Target: t}
+	req, err := tb.Request()
+	if err != nil {
+		core.AppLog.Warn().Msgf("cannot request %s", err.Error())
+		return
+	}
+	req.Data.Header.Revision = 1
+	resp, err := c.runUpdate(req)
+	if err != nil {
+		core.AppLog.Warn().Msgf("cannot update %s", err.Error())
+		return
+	}
+	core.AppLog.Info().Msgf("saved %v", resp)
+}
