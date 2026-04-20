@@ -57,7 +57,7 @@ func (m *TaskManager) confirmed(t *TaskResource) {
 		tc.Meta.State = protocol.TCC_CONFIRMED
 		//retry to finish
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
-			m.updates <- tc.Meta
+			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
 			core.AppLog.Debug().Msg("retry to finish with confirm/timeout")
 			m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
@@ -74,7 +74,7 @@ func (m *TaskManager) canceled(t *TaskResource) {
 		tc.Meta.State = protocol.TCC_CANCELED
 		//retry to finish on cancel
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
-			m.updates <- tc.Meta
+			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
 			core.AppLog.Debug().Msg("retry to finish with cancel/timeout")
 			m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
