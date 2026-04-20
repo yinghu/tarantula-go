@@ -25,7 +25,7 @@ func (s *PostofficeService) Start(env core.Env) error {
 	s.createSchema()
 
 	m := clustering.MemberlistManager{StoreDir: fmt.Sprintf("%s/%s", env.HomeDir, env.GroupName)}
-	m.Seed = []string{"192.168.1.11", "192.168.1.6"}
+	m.Seed = []string{"192.168.1.11", "192.168.1.3"}
 	m.Binding = env.NodeName
 	err := m.Start(fmt.Appendf([]byte{}, "%s:%s", s.Context(), s.NodeId()), s.Sequence())
 	if err != nil {
