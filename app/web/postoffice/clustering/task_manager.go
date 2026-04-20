@@ -53,6 +53,10 @@ func (m *TaskManager) start(t *TaskResource) {
 	}
 }
 
+func (m *TaskManager) reserve(t *protocol.Transaction) {
+	m.s.DMessager <- &protocol.Mail{Transaction: t, Opt: core.TRANS_MAIL}
+}
+
 func (m *TaskManager) confirmed(t *TaskResource) {
 	for _, tc := range t.resource.Transactions {
 		tc.Meta.State = protocol.TCC_CONFIRMED
@@ -125,6 +129,11 @@ func (m *TaskManager) timeout(mkey uint64, meta *protocol.Meta) {
 
 }
 
+func (m *TaskManager) clearResource(rkey uint64) {
+	delete(m.trs, rkey)
+	core.AppLog.Debug().Msgf("task removed %d", rkey)
+}
+
 func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 	core.AppLog.Debug().Msgf("reload task %d", meta.TaskId)
 	task, err := m.s.load(meta.TaskId)
@@ -172,11 +181,10 @@ func (m *TaskManager) Wait() {
 			m.trs[task.Meta.Id] = &tr
 			m.start(&tr)
 		case tran := <-m.trans:
-			m.s.DMessager <- &protocol.Mail{Transaction: tran, Opt: core.TRANS_MAIL}
+			m.reserve(tran)
 		case meta := <-m.updates:
 			if meta.State == protocol.TCC_TASK_CLEAR {
-				delete(m.trs, meta.Id)
-				core.AppLog.Debug().Msg("CLEAR RESOURCE")
+				m.clearResource(meta.Id)
 				continue
 			}
 			tr, existing := m.trs[meta.TaskId]
