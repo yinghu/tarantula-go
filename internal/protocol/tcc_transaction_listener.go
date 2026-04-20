@@ -13,6 +13,8 @@ const (
 	TCC_FINISHED            uint32 = 4
 	TCC_TRANSACTION_TIMEOUT uint32 = 5
 	TCC_TASK_TIMEOUT        uint32 = 6
+
+	TCC_TASK_CLEAR uint32 = 7
 )
 
 type TccTransationListener struct {

@@ -89,8 +89,7 @@ func (m *TaskManager) finished(t *TaskResource) {
 	t.resource.Meta.State = protocol.TCC_FINISHED
 	m.closeTimer(t.resource.Meta.Id)
 	go m.s.updateTask(t.resource, func() {
-		core.AppLog.Debug().Msg("CLEAR RESOURCE")
-		delete(m.trs, t.resource.Meta.Id)
+		m.updates <- &protocol.Meta{Id: t.resource.Meta.Id, State: protocol.TCC_TASK_CLEAR}
 	})
 	tf := event.NewTransactionEventFactory()
 	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: t.resource.Meta})
@@ -175,6 +174,11 @@ func (m *TaskManager) Wait() {
 		case tran := <-m.trans:
 			m.s.DMessager <- &protocol.Mail{Transaction: tran, Opt: core.TRANS_MAIL}
 		case meta := <-m.updates:
+			if meta.State == protocol.TCC_TASK_CLEAR {
+				delete(m.trs, meta.Id)
+				core.AppLog.Debug().Msg("CLEAR RESOURCE")
+				continue
+			}
 			tr, existing := m.trs[meta.TaskId]
 			if !existing {
 				loaded, err := m.reload(meta)
