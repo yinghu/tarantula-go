@@ -202,6 +202,7 @@ func (m *TaskManager) Wait() {
 			case protocol.TCC_TASK_TIMEOUT:
 				core.AppLog.Debug().Msgf("task timeout %d %d", tr.confirmed, tr.finished)
 				m.timeout(meta.TaskId, meta)
+				m.finished(tr) //forcefully finished
 			}
 		}
 	}
