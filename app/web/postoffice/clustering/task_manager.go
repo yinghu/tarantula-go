@@ -89,6 +89,7 @@ func (m *TaskManager) timeout(mkey uint64, meta *protocol.Meta) {
 		return
 	}
 	tm.r--
+	core.AppLog.Debug().Msgf("retried %d", tm.r)
 	if tm.d > 0 && tm.r > 0 {
 		tm.p() // retry
 		tm.t = time.AfterFunc(tm.d, func() {
