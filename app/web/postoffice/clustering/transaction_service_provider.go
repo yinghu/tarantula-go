@@ -78,6 +78,7 @@ func (c *DataServiceProvider) updateTask(t *protocol.Task) {
 		return
 	}
 	req.Data.Header.Revision = 1
+	req.Opt = core.UPDATE_DATA_REQUEST
 	resp, err := c.runUpdate(req)
 	if err != nil {
 		core.AppLog.Warn().Msgf("cannot update %s", err.Error())
