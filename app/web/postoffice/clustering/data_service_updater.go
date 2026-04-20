@@ -90,7 +90,11 @@ func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
 		sub.Topic = fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, sub.Topic)
 	}
 	core.AppLog.Debug().Msgf("subscription %v", sub)
-	listener := m.listeners[sub.NodeId]
+	listener, ok := m.listeners[sub.NodeId]
+	if !ok {
+		listener = ReceiverAsync{Rev: make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2), Subs: make(map[string]core.Subscription)}
+		m.listeners[sub.NodeId] = listener
+	}
 	core.AppLog.Debug().Msgf("lis %v", listener)
 	if sub.Deleting {
 		m.subscriptions.del(sub)

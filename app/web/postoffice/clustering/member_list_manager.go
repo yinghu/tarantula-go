@@ -63,8 +63,8 @@ func (m *MemberlistManager) Start(meta []byte, seq core.Sequence) error {
 	go m.DataServiceProvider.Start(m.StoreDir)
 	m.Mll.DWait.Wait()
 	go m.RingUpdated()
-	list.UpdateNode(time.Second * 5)
 	joined, err := list.Join(m.Seed)
+	list.UpdateNode(time.Second * 5)
 	if err != nil {
 		core.AppLog.Printf("erorr on member join %s", err.Error())
 		return err
