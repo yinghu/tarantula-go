@@ -35,19 +35,19 @@ type TaskManager struct {
 func (m *TaskManager) start(t *TaskResource) {
 	m.tms[t.resource.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(t.resource.Meta.Timeout)*time.Second, func() {
 		m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
-	}), p: func() {
-		core.AppLog.Debug().Msg("running task with timeout")
-	}}
+	})}
 	t.confirmed = len(t.resource.Transactions)
 	t.finished = t.confirmed
 	for _, tc := range t.resource.Transactions {
+		tc.Meta.State = protocol.TCC_RESERVING
+		//retry to reserve
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
-			core.AppLog.Debug().Msg("running retry with timeout")
-
+			core.AppLog.Debug().Msg("retry to reserve with timeout")
+			go m.s.runReserve(tc)
 		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
-		tc.Meta.State = protocol.TCC_RESERVING
+		//ask to reserve
 		go m.s.runReserve(tc)
 	}
 }
@@ -55,13 +55,31 @@ func (m *TaskManager) start(t *TaskResource) {
 func (m *TaskManager) confirmed(t *TaskResource) {
 	for _, tc := range t.resource.Transactions {
 		tc.Meta.State = protocol.TCC_CONFIRMED
+		//retry to finish
+		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
+			m.updates <- tc.Meta
+		}), p: func() {
+			core.AppLog.Debug().Msg("retry to finish with confirm/timeout")
+			m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
+		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
+
+		//ask to finish
 		m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
 	}
 }
 
 func (m *TaskManager) canceled(t *TaskResource) {
 	for _, tc := range t.resource.Transactions {
+		m.closeTimer(tc.Meta.Id)
 		tc.Meta.State = protocol.TCC_CANCELED
+		//retry to finish on cancel
+		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
+			m.updates <- tc.Meta
+		}), p: func() {
+			core.AppLog.Debug().Msg("retry to finish with cancel/timeout")
+			m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
+		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
+		//ask to finish
 		m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
 	}
 }
@@ -81,6 +99,7 @@ func (m *TaskManager) closeTimer(mkey uint64) {
 		return
 	}
 	tm.t.Stop()
+	delete(m.tms, mkey)
 }
 
 func (m *TaskManager) timeout(mkey uint64, meta *protocol.Meta) {
@@ -88,14 +107,14 @@ func (m *TaskManager) timeout(mkey uint64, meta *protocol.Meta) {
 	if !ok {
 		return
 	}
-
 	if tm.d > 0 && tm.r > 0 {
 		core.AppLog.Debug().Msgf("retried %d", tm.r)
-		tm.p() // retry
+		// retry
 		tm.t = time.AfterFunc(tm.d, func() {
 			m.updates <- meta
 		})
 		tm.r--
+		tm.p()
 		return
 	}
 	delete(m.tms, mkey)
@@ -161,6 +180,7 @@ func (m *TaskManager) Wait() {
 			switch meta.State {
 			case protocol.TCC_CONFIRMED:
 				tr.confirmed--
+				m.closeTimer(meta.Id)
 				if tr.confirmed == 0 {
 					m.confirmed(tr)
 				}
@@ -171,7 +191,7 @@ func (m *TaskManager) Wait() {
 			case protocol.TCC_FINISHED:
 				core.AppLog.Debug().Msgf("task finished %v", meta)
 				tr.finished--
-				//m.closeTimer(meta.Id)
+				m.closeTimer(meta.Id)
 				if tr.finished == 0 {
 					m.finished(tr)
 				}
