@@ -22,7 +22,11 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request) (*protocol.Respon
 		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: rt, Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		resp, _ := c.clientCreate(&ringNode, set)
+		resp, err := c.clientCreate(&ringNode, set)
+		if err != nil {
+			retry.Reties--
+			continue
+		}
 		if !resp.Successful {
 			retry.Err = resp.Message
 			retry.Reties--
