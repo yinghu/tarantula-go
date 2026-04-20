@@ -131,7 +131,7 @@ func (m *TaskManager) timeout(mkey uint64, meta *protocol.Meta) {
 
 func (m *TaskManager) clearResource(rkey uint64) {
 	delete(m.trs, rkey)
-	core.AppLog.Debug().Msgf("task removed %d", rkey)
+	core.AppLog.Debug().Msgf("task removed %d %d %d", rkey, len(m.tms), len(m.trs))
 }
 
 func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
