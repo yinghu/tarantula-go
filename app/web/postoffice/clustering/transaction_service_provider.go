@@ -15,6 +15,8 @@ const (
 	TASK_RETRY_MAX              uint32 = 3
 )
 
+type ClearResource func()
+
 func (c *DataServiceProvider) Setup(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
 	c.TManager.Set(task)
 	return &protocol.Response{Successful: true, Meta: task.Meta}, nil
@@ -70,7 +72,8 @@ func (c *DataServiceProvider) saveLog(meta *protocol.Meta) {
 	c.runCreate(req)
 }
 
-func (c *DataServiceProvider) updateTask(t *protocol.Task) {
+func (c *DataServiceProvider) updateTask(t *protocol.Task, clear ClearResource) {
+	defer clear()
 	tb := persistence.TaskBuilder{Target: t}
 	req, err := tb.Request()
 	if err != nil {

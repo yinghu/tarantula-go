@@ -88,8 +88,10 @@ func (m *TaskManager) canceled(t *TaskResource) {
 func (m *TaskManager) finished(t *TaskResource) {
 	t.resource.Meta.State = protocol.TCC_FINISHED
 	m.closeTimer(t.resource.Meta.Id)
-	delete(m.trs, t.resource.Meta.Id)
-	go m.s.updateTask(t.resource)
+	go m.s.updateTask(t.resource, func() {
+		core.AppLog.Debug().Msg("CLEAR RESOURCE")
+		delete(m.trs, t.resource.Meta.Id)
+	})
 	tf := event.NewTransactionEventFactory()
 	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: t.resource.Meta})
 	e.Event.Id = m.s.tid()
@@ -177,7 +179,7 @@ func (m *TaskManager) Wait() {
 			if !existing {
 				loaded, err := m.reload(meta)
 				if err != nil {
-					core.AppLog.Warn().Msgf("task load error %s",err.Error())	
+					core.AppLog.Warn().Msgf("task load error %s", err.Error())
 					continue
 				}
 				tr = loaded
