@@ -46,7 +46,7 @@ func (m *TaskManager) start(t *TaskResource) {
 		}), p: func() {
 			core.AppLog.Debug().Msg("running retry with timeout")
 
-		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
+		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries + 1}
 		tc.Meta.State = protocol.TCC_RESERVING
 		go m.s.runReserve(tc)
 	}
