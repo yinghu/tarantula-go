@@ -19,7 +19,7 @@ type Retrying func()
 type Timeout struct {
 	t *time.Timer
 	d time.Duration
-	r uint32
+	r int
 	p Retrying
 }
 
@@ -46,7 +46,7 @@ func (m *TaskManager) start(t *TaskResource) {
 		}), p: func() {
 			core.AppLog.Debug().Msg("running retry with timeout")
 
-		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries + 1}
+		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: int(tc.Meta.Retries)}
 		tc.Meta.State = protocol.TCC_RESERVING
 		go m.s.runReserve(tc)
 	}
@@ -88,13 +88,14 @@ func (m *TaskManager) timeout(mkey uint64, meta *protocol.Meta) {
 	if !ok {
 		return
 	}
-	tm.r--
-	core.AppLog.Debug().Msgf("retried %d", tm.r)
+
 	if tm.d > 0 && tm.r > 0 {
+		core.AppLog.Debug().Msgf("retried %d", tm.r)
 		tm.p() // retry
 		tm.t = time.AfterFunc(tm.d, func() {
 			m.updates <- meta
 		})
+		tm.r--
 		return
 	}
 	delete(m.tms, mkey)
