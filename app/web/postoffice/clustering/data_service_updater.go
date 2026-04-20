@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"slices"
+	"strings"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
@@ -86,7 +87,7 @@ func (m *DataServiceProvider) balanceOnNodeRemoved(removed RingUpdate) {
 }
 
 func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
-	if sub.Type == core.TRANS_MAIL {
+	if sub.Type == core.TRANS_MAIL && !strings.HasPrefix(sub.Topic, TRANS_SUB_PREFIX) {
 		sub.Topic = fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, sub.Topic)
 	}
 	core.AppLog.Debug().Msgf("subscription %v", sub)
