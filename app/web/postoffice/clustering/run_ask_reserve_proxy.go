@@ -8,7 +8,7 @@ import (
 	"gameclustering.com/internal/protocol"
 )
 
-func (c *DataServiceProvider) runReserve(t *protocol.Transaction) (*protocol.Response, error) {
+func (c *DataServiceProvider) runAskReserve(t *protocol.Transaction) (*protocol.Response, error) {
 	rq := make(chan []core.Subscription, 3)
 	defer close(rq)
 	c.DRequest <- TopicRequest{Opt: TASK_REGISTER, Subs: rq, NodeId: t.Meta.NodeId, Tag: t.Meta.Tag, Name: t.Meta.Name}
@@ -20,7 +20,7 @@ func (c *DataServiceProvider) runReserve(t *protocol.Transaction) (*protocol.Res
 			continue
 		}
 		dsp := protocol.NewTransactionServiceClient(conn.Conn)
-		return dsp.Reserve(context.Background(), t)
+		return dsp.AskReserve(context.Background(), t)
 	}
 	return &protocol.Response{Successful: false}, fmt.Errorf("no subscription available")
 }

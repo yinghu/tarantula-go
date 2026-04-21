@@ -25,11 +25,10 @@ type Timeout struct {
 }
 
 type TaskManager struct {
-	trs     map[uint64]*TaskResource
-	tms     map[uint64]*Timeout
-	s       *DataServiceProvider
-	tasks   chan *protocol.Task
-	trans   chan *protocol.Transaction
+	trs   map[uint64]*TaskResource
+	tms   map[uint64]*Timeout
+	s     *DataServiceProvider
+	tasks chan *protocol.Task
 	updates chan *protocol.Meta
 }
 
@@ -46,15 +45,11 @@ func (m *TaskManager) start(t *TaskResource) {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
 			core.AppLog.Debug().Msg("retry to reserve with timeout")
-			go m.s.runReserve(tc)
+			go m.s.runAskReserve(tc)
 		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
 		//ask to reserve
-		go m.s.runReserve(tc)
+		go m.s.runAskReserve(tc)
 	}
-}
-
-func (m *TaskManager) reserve(t *protocol.Transaction) {
-	m.s.DMessager <- &protocol.Mail{Transaction: t, Opt: core.TRANS_MAIL}
 }
 
 func (m *TaskManager) confirmed(t *TaskResource) {
@@ -65,11 +60,13 @@ func (m *TaskManager) confirmed(t *TaskResource) {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
 			core.AppLog.Debug().Msg("retry to finish with confirm/timeout")
-			m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
+			go m.s.runAskFinish(tc.Meta)
+			//m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
 		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
 
 		//ask to finish
-		m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
+		go m.s.runAskFinish(tc.Meta)
+		//m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
 	}
 }
 
@@ -82,10 +79,12 @@ func (m *TaskManager) canceled(t *TaskResource) {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
 			core.AppLog.Debug().Msg("retry to finish with cancel/timeout")
-			m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
+			go m.s.runAskFinish(tc.Meta)
+			//m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
 		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
 		//ask to finish
-		m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
+		go m.s.runAskFinish(tc.Meta)
+		//m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
 	}
 }
 
@@ -159,7 +158,10 @@ func (m *TaskManager) log(meta *protocol.Meta) {
 }
 
 func (m *TaskManager) Reserve(transaction *protocol.Transaction) {
-	m.trans <- transaction
+	m.s.DMessager <- &protocol.Mail{Transaction: transaction, Opt: core.TRANS_MAIL}
+}
+func (m *TaskManager) Finish(meta *protocol.Meta) {
+	m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: meta}, Opt: core.TRANS_MAIL}
 }
 
 func (m *TaskManager) Update(meta *protocol.Meta) {
@@ -172,7 +174,6 @@ func (m *TaskManager) Set(t *protocol.Task) {
 
 func (m *TaskManager) Wait() {
 	m.tasks = make(chan *protocol.Task, 10)
-	m.trans = make(chan *protocol.Transaction, 10)
 	m.updates = make(chan *protocol.Meta, 10)
 	for m.s.running {
 		select {
@@ -180,8 +181,7 @@ func (m *TaskManager) Wait() {
 			tr := TaskResource{resource: task}
 			m.trs[task.Meta.Id] = &tr
 			m.start(&tr)
-		case tran := <-m.trans:
-			m.reserve(tran)
+		
 		case meta := <-m.updates:
 			if meta.State == protocol.TCC_TASK_CLEAR {
 				m.clearResource(meta.Id)
@@ -234,7 +234,6 @@ func (m *TaskManager) Wait() {
 	clear(m.tms)
 	clear(m.trs)
 	close(m.tasks)
-	close(m.trans)
 	close(m.updates)
 	core.AppLog.Warn().Msg("task manager stopped")
 }

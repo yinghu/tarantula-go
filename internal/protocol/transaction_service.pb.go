@@ -26,10 +26,12 @@ const file_transaction_service_proto_rawDesc = "" +
 	"\n" +
 	"\x19transaction_service.proto\x12\bprotocol\x1a\x0eresponse.proto\x1a\x11transaction.proto\x1a\n" +
 	"meta.proto\x1a\n" +
-	"task.proto2\x92\x02\n" +
+	"task.proto2\xc8\x02\n" +
 	"\x12TransactionService\x12-\n" +
-	"\x05setup\x12\x0e.protocol.Task\x1a\x12.protocol.Response\"\x00\x126\n" +
-	"\areserve\x12\x15.protocol.Transaction\x1a\x12.protocol.Response\"\x00\x121\n" +
+	"\x05setup\x12\x0e.protocol.Task\x1a\x12.protocol.Response\"\x00\x129\n" +
+	"\n" +
+	"askReserve\x12\x15.protocol.Transaction\x1a\x12.protocol.Response\"\x00\x121\n" +
+	"\taskFinish\x12\x0e.protocol.Meta\x1a\x12.protocol.Response\"\x00\x121\n" +
 	"\tconfirmed\x12\x0e.protocol.Meta\x1a\x12.protocol.Response\"\x00\x120\n" +
 	"\bcanceled\x12\x0e.protocol.Meta\x1a\x12.protocol.Response\"\x00\x120\n" +
 	"\bfinished\x12\x0e.protocol.Meta\x1a\x12.protocol.Response\"\x00BZ\n" +
@@ -43,17 +45,19 @@ var file_transaction_service_proto_goTypes = []any{
 }
 var file_transaction_service_proto_depIdxs = []int32{
 	0, // 0: protocol.TransactionService.setup:input_type -> protocol.Task
-	1, // 1: protocol.TransactionService.reserve:input_type -> protocol.Transaction
-	2, // 2: protocol.TransactionService.confirmed:input_type -> protocol.Meta
-	2, // 3: protocol.TransactionService.canceled:input_type -> protocol.Meta
-	2, // 4: protocol.TransactionService.finished:input_type -> protocol.Meta
-	3, // 5: protocol.TransactionService.setup:output_type -> protocol.Response
-	3, // 6: protocol.TransactionService.reserve:output_type -> protocol.Response
-	3, // 7: protocol.TransactionService.confirmed:output_type -> protocol.Response
-	3, // 8: protocol.TransactionService.canceled:output_type -> protocol.Response
-	3, // 9: protocol.TransactionService.finished:output_type -> protocol.Response
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
+	1, // 1: protocol.TransactionService.askReserve:input_type -> protocol.Transaction
+	2, // 2: protocol.TransactionService.askFinish:input_type -> protocol.Meta
+	2, // 3: protocol.TransactionService.confirmed:input_type -> protocol.Meta
+	2, // 4: protocol.TransactionService.canceled:input_type -> protocol.Meta
+	2, // 5: protocol.TransactionService.finished:input_type -> protocol.Meta
+	3, // 6: protocol.TransactionService.setup:output_type -> protocol.Response
+	3, // 7: protocol.TransactionService.askReserve:output_type -> protocol.Response
+	3, // 8: protocol.TransactionService.askFinish:output_type -> protocol.Response
+	3, // 9: protocol.TransactionService.confirmed:output_type -> protocol.Response
+	3, // 10: protocol.TransactionService.canceled:output_type -> protocol.Response
+	3, // 11: protocol.TransactionService.finished:output_type -> protocol.Response
+	6, // [6:12] is the sub-list for method output_type
+	0, // [0:6] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

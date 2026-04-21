@@ -23,10 +23,15 @@ func (c *DataServiceProvider) Setup(ctx context.Context, task *protocol.Task) (*
 	return &protocol.Response{Successful: true, Meta: task.Meta}, nil
 }
 
-func (c *DataServiceProvider) Reserve(ctx context.Context, in *protocol.Transaction) (*protocol.Response, error) {
+func (c *DataServiceProvider) AskReserve(ctx context.Context, in *protocol.Transaction) (*protocol.Response, error) {
 	in.Meta.State = protocol.TCC_RESERVING
 	c.TManager.Reserve(in)
 	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Meta.Name, Endpoint: c.rpcEndpoint}}, nil
+}
+
+func (c *DataServiceProvider) AskFinish(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
+	c.TManager.Finish(in)
+	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name, Endpoint: c.rpcEndpoint}}, nil
 }
 
 func (c *DataServiceProvider) Confirmed(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
