@@ -79,7 +79,7 @@ start:
 				break
 			}
 			if err != nil {
-				core.AppLog.Warn().Msgf("remote streaming error %s %s", sync.Remote, err.Error())
+				core.AppLog.Warn().Msgf("remote streaming error %s %s %d", sync.Remote, err.Error(), num)
 				break
 			}
 			m.set(data)
