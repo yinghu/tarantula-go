@@ -19,6 +19,7 @@ type ClearResource func()
 
 func (c *DataServiceProvider) Setup(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
 	c.TManager.Set(task)
+	task.Meta.Endpoint = c.rpcEndpoint
 	return &protocol.Response{Successful: true, Meta: task.Meta}, nil
 }
 

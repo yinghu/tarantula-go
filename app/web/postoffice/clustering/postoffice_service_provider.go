@@ -132,6 +132,7 @@ func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*
 	if err != nil {
 		return resp, err
 	}
+	
 	return c.runSetup(task)
 }
 
