@@ -20,6 +20,7 @@ const (
 	TOPIC_REGISTER  uint32 = 2
 	RECEIVER_REMOVE uint32 = 3
 	RECEIVER_END    uint32 = 4
+	TASK_REGISTER   uint32 = 5
 
 	TRANS_SUB_PREFIX string = "_t_"
 )
@@ -158,6 +159,9 @@ func (m *DataServiceProvider) RingUpdated() {
 				delete(m.listeners, req.Name)
 				core.AppLog.Debug().Msgf("listener removed %s", req.Name)
 			case TOPIC_REGISTER:
+				req.Subs <- m.subscriptions.topic(req)
+			case TASK_REGISTER:
+				req.Name = fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, req.Name)
 				req.Subs <- m.subscriptions.topic(req)
 			case RECEIVER_END:
 				rev, ok := m.listeners[req.Name]

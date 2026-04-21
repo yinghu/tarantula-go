@@ -2,22 +2,26 @@ package clustering
 
 import (
 	context "context"
+	"fmt"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 )
 
 func (c *DataServiceProvider) runSetup(t *protocol.Task) (*protocol.Response, error) {
-	rq := make(chan []core.Node, 3)
+	rq := make(chan []core.Subscription, 3)
 	defer close(rq)
-	kh := t.Meta.Prefix
-	c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: kh, Replicas: REPLICA_MAX, Async: rq}
-	nodes := <-rq
-	ringNode := nodes[0]
-	conn, err := ringNode.CPool.Conn()
-	if err != nil {
-		return &protocol.Response{Successful: false, Message: err.Error()}, err
+	c.DRequest <- TopicRequest{Opt: TASK_REGISTER, Subs: rq, NodeId: t.Meta.NodeId, Tag: t.Meta.Tag, Name: t.Meta.Name}
+	subs := <-rq
+	for _, sub := range subs {
+		conn, err := sub.CPool.Conn()
+		if err != nil {
+			core.AppLog.Warn().Msgf("no connection available on sub %v", sub)
+			continue
+		}
+		dsp := protocol.NewTransactionServiceClient(conn.Conn)
+		return dsp.Setup(context.Background(), t)
 	}
-	dsp := protocol.NewTransactionServiceClient(conn.Conn)
-	return dsp.Setup(context.Background(), t)
+	return &protocol.Response{Successful: false}, fmt.Errorf("no subscription available")
+
 }
