@@ -359,10 +359,10 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 	t.Tag = c.App.Context()
 	id, _ := c.App.Sequence().Id()
 	t.Event.Id = uint64(id)
+	c.Publish(t)
 }
 
 func (c *ClusterManager) handleTranstion(l core.TransactionListener, t *protocol.Transaction) {
-	core.AppLog.Debug().Msgf("META %v",t.Meta)
 	state := t.Meta.State
 	err := l.OnTransaction(t)
 	if err != nil {
