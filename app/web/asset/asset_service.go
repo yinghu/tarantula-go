@@ -45,7 +45,7 @@ func (s *AssetService) Start(f core.Env) error {
 		return nil //fmt.Errorf("no item")
 	}, Confirm: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("confirm %v", e)
-		time.Sleep(1 * time.Second)
+		//time.Sleep(1 * time.Second)
 		return nil
 	}, Cancel: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("cancel %v", e)

@@ -33,7 +33,6 @@ type Meta struct {
 	Retries       uint32                 `protobuf:"fixed32,8,opt,name=retries,proto3" json:"retries,omitempty"`
 	State         uint32                 `protobuf:"fixed32,9,opt,name=state,proto3" json:"state,omitempty"`
 	Mode          uint32                 `protobuf:"fixed32,10,opt,name=mode,proto3" json:"mode,omitempty"` //streaming, concurrent
-	Endpoint      string                 `protobuf:"bytes,11,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -138,19 +137,12 @@ func (x *Meta) GetMode() uint32 {
 	return 0
 }
 
-func (x *Meta) GetEndpoint() string {
-	if x != nil {
-		return x.Endpoint
-	}
-	return ""
-}
-
 var File_meta_proto protoreflect.FileDescriptor
 
 const file_meta_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"meta.proto\x12\bprotocol\"\xfe\x01\n" +
+	"meta.proto\x12\bprotocol\"\xe2\x01\n" +
 	"\x04Meta\x12\x16\n" +
 	"\x06taskId\x18\x01 \x01(\x06R\x06taskId\x12\x0e\n" +
 	"\x02id\x18\x02 \x01(\x06R\x02id\x12\x16\n" +
@@ -162,8 +154,7 @@ const file_meta_proto_rawDesc = "" +
 	"\aretries\x18\b \x01(\aR\aretries\x12\x14\n" +
 	"\x05state\x18\t \x01(\aR\x05state\x12\x12\n" +
 	"\x04mode\x18\n" +
-	" \x01(\aR\x04mode\x12\x1a\n" +
-	"\bendpoint\x18\v \x01(\tR\bendpointBL\n" +
+	" \x01(\aR\x04modeBL\n" +
 	"\x17com.icodesoftware.protoB\vMetaFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (

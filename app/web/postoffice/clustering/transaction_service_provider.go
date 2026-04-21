@@ -19,38 +19,37 @@ type ClearResource func()
 
 func (c *DataServiceProvider) Setup(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
 	c.TManager.Set(task)
-	task.Meta.Endpoint = c.rpcEndpoint
 	return &protocol.Response{Successful: true, Meta: task.Meta}, nil
 }
 
 func (c *DataServiceProvider) AskReserve(ctx context.Context, in *protocol.Transaction) (*protocol.Response, error) {
 	in.Meta.State = protocol.TCC_RESERVING
 	c.TManager.Reserve(in)
-	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Meta.Name, Endpoint: c.rpcEndpoint}}, nil
+	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Meta.Name}}, nil
 }
 
 func (c *DataServiceProvider) AskFinish(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
 	c.TManager.Finish(in)
-	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name, Endpoint: c.rpcEndpoint}}, nil
+	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name}}, nil
 }
 
 func (c *DataServiceProvider) Confirmed(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
 	in.State = protocol.TCC_CONFIRMED
 	c.TManager.Update(in)
 
-	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name, Endpoint: c.rpcEndpoint}}, nil
+	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name}}, nil
 }
 
 func (c *DataServiceProvider) Canceled(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
 	in.State = protocol.TCC_CANCELED
 	c.TManager.Update(in)
-	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name, Endpoint: c.rpcEndpoint}}, nil
+	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name}}, nil
 }
 
 func (c *DataServiceProvider) Finished(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
 	in.State = protocol.TCC_FINISHED
 	c.TManager.Update(in)
-	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name, Endpoint: c.rpcEndpoint}}, nil
+	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name}}, nil
 }
 
 func (c *DataServiceProvider) load(taskId uint64) (*protocol.Task, error) {
