@@ -26,26 +26,26 @@ func (c *DataServiceProvider) Setup(ctx context.Context, task *protocol.Task) (*
 func (c *DataServiceProvider) Reserve(ctx context.Context, in *protocol.Transaction) (*protocol.Response, error) {
 	in.Meta.State = protocol.TCC_RESERVING
 	c.TManager.Reserve(in)
-	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Endpoint: c.rpcEndpoint}}, nil
+	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Meta.Name, Endpoint: c.rpcEndpoint}}, nil
 }
 
 func (c *DataServiceProvider) Confirmed(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
 	in.State = protocol.TCC_CONFIRMED
 	c.TManager.Update(in)
 
-	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Endpoint: c.rpcEndpoint}}, nil
+	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name, Endpoint: c.rpcEndpoint}}, nil
 }
 
 func (c *DataServiceProvider) Canceled(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
 	in.State = protocol.TCC_CANCELED
 	c.TManager.Update(in)
-	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Endpoint: c.rpcEndpoint}}, nil
+	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name, Endpoint: c.rpcEndpoint}}, nil
 }
 
 func (c *DataServiceProvider) Finished(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
 	in.State = protocol.TCC_FINISHED
 	c.TManager.Update(in)
-	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Endpoint: c.rpcEndpoint}}, nil
+	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name, Endpoint: c.rpcEndpoint}}, nil
 }
 
 func (c *DataServiceProvider) load(taskId uint64) (*protocol.Task, error) {

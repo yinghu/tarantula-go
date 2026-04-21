@@ -362,6 +362,7 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 }
 
 func (c *ClusterManager) handleTranstion(l core.TransactionListener, t *protocol.Transaction) {
+	core.AppLog.Debug().Msgf("META %v",t.Meta)
 	state := t.Meta.State
 	err := l.OnTransaction(t)
 	if err != nil {
