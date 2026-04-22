@@ -15,10 +15,7 @@ type TaskResource struct {
 	confirmed int
 	finished  int
 }
-type TransactionResource struct {
-	resource *protocol.Transaction
-	revision uint64
-}
+
 type Retrying func()
 type Timeout struct {
 	t *time.Timer
@@ -30,7 +27,7 @@ type Timeout struct {
 type TaskManager struct {
 	trs     map[uint64]*TaskResource
 	tms     map[uint64]*Timeout
-	tns     map[uint64]*TransactionResource
+
 	s       *DataServiceProvider
 	tasks   chan *protocol.Task
 	updates chan *protocol.Meta
@@ -44,9 +41,6 @@ func (m *TaskManager) start(t *TaskResource) {
 	t.finished = t.confirmed
 	for _, tc := range t.resource.Transactions {
 		tc.Meta.State = protocol.TCC_RESERVING
-		ts := TransactionResource{resource: tc, revision: 1}
-		m.tns[tc.Meta.Id] = &ts
-		go m.s.updateTransaction(&ts)
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
@@ -110,14 +104,6 @@ func (m *TaskManager) closeTimer(mkey uint64) {
 	}
 	tm.t.Stop()
 	delete(m.tms, mkey)
-}
-
-func (m *TaskManager) updateTransaction(meta *protocol.Meta) {
-	ts, ok := m.tns[meta.Id]
-	if !ok {
-		return
-	}
-	go m.s.updateTransaction(ts)
 }
 
 func (m *TaskManager) timeout(mkey uint64, meta *protocol.Meta) {
@@ -216,7 +202,6 @@ func (m *TaskManager) Wait() {
 			m.log(meta)
 			switch meta.State {
 			case protocol.TCC_CONFIRMED:
-				m.updateTransaction(meta)
 				tr.confirmed--
 				m.closeTimer(meta.Id)
 				if tr.confirmed == 0 {
@@ -224,11 +209,9 @@ func (m *TaskManager) Wait() {
 				}
 				core.AppLog.Debug().Msgf("task confirmed %v", meta)
 			case protocol.TCC_CANCELED:
-				m.updateTransaction(meta)
 				core.AppLog.Debug().Msgf("task canceled %v", meta)
 				m.canceled(tr)
 			case protocol.TCC_FINISHED:
-				m.updateTransaction(meta)
 				core.AppLog.Debug().Msgf("task finished %v", meta)
 				tr.finished--
 				m.closeTimer(meta.Id)

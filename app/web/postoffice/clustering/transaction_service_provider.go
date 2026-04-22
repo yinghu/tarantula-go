@@ -2,7 +2,6 @@ package clustering
 
 import (
 	context "context"
-	"fmt"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -94,54 +93,4 @@ func (c *DataServiceProvider) updateTask(t *protocol.Task, clear ClearResource) 
 		return
 	}
 	core.AppLog.Info().Msgf("saved %v", resp)
-}
-
-func (c *DataServiceProvider) updateTransaction(t *TransactionResource) error {
-	tf := persistence.NewTransactionObjectFactory()
-	kv, err := tf.FromTransactionObject(t.resource)
-	if err != nil {
-		return err
-	}
-	req, err := tf.Request(kv)
-	if err != nil {
-		return err
-	}
-	req.Data.Header.Revision = t.revision
-	req.Opt = core.UPDATE_DATA_REQUEST
-	resp, err := c.runUpdate(req)
-	if err != nil {
-		return err
-	}
-	core.AppLog.Debug().Msgf("RES : %v", resp)
-	//t.revision = resp.Data.List[0].Header.Revision
-	//core.AppLog.Debug().Msgf("REV %d, %d", t.revision, t.resource.Meta.Id)
-	return nil
-}
-
-func (c *DataServiceProvider) loadTransaction(tid uint64) (*TransactionResource, error) {
-	tr := TransactionResource{}
-	tf := persistence.NewTransactionObjectFactory()
-	req, err := tf.FromId(tid)
-	if err != nil {
-		return &tr, err
-	}
-	resp, err := c.runGet(req)
-	if err != nil {
-		return &tr, err
-	}
-	kv, err := tf.Object(resp.Data.List[0].Value)
-	if err != nil {
-		return &tr, err
-	}
-	obj, err := tf.Message(kv)
-	if err != nil {
-		return &tr, err
-	}
-	tc, ok := obj.(*protocol.Meta)
-	if !ok {
-		return &tr, fmt.Errorf("cast err")
-	}
-	tr.resource = &protocol.Transaction{Meta: tc}
-	tr.revision = resp.Data.List[0].Header.Revision
-	return &tr, nil
 }
