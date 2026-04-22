@@ -15,7 +15,10 @@ type TaskResource struct {
 	confirmed int
 	finished  int
 }
-
+type TransactionResource struct {
+	resource *protocol.Transaction
+	revision uint64
+}
 type Retrying func()
 type Timeout struct {
 	t *time.Timer
@@ -25,10 +28,11 @@ type Timeout struct {
 }
 
 type TaskManager struct {
-	trs   map[uint64]*TaskResource
-	tms   map[uint64]*Timeout
-	s     *DataServiceProvider
-	tasks chan *protocol.Task
+	trs     map[uint64]*TaskResource
+	tms     map[uint64]*Timeout
+	tns     map[uint64]*TransactionResource
+	s       *DataServiceProvider
+	tasks   chan *protocol.Task
 	updates chan *protocol.Meta
 }
 
@@ -40,6 +44,11 @@ func (m *TaskManager) start(t *TaskResource) {
 	t.finished = t.confirmed
 	for _, tc := range t.resource.Transactions {
 		tc.Meta.State = protocol.TCC_RESERVING
+		ts, err := m.s.loadTransaction(tc.Meta.Id)
+		if err != nil {
+			core.AppLog.Debug().Msgf("error on load %s", err.Error())
+		}
+		core.AppLog.Debug().Msgf("obj %v", ts)
 		//retry to reserve
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
@@ -65,7 +74,7 @@ func (m *TaskManager) confirmed(t *TaskResource) {
 
 		//ask to finish
 		go m.s.runAskFinish(tc.Meta)
-		
+
 	}
 }
 
@@ -172,13 +181,14 @@ func (m *TaskManager) Set(t *protocol.Task) {
 func (m *TaskManager) Wait() {
 	m.tasks = make(chan *protocol.Task, 10)
 	m.updates = make(chan *protocol.Meta, 10)
+
 	for m.s.running {
 		select {
 		case task := <-m.tasks:
 			tr := TaskResource{resource: task}
 			m.trs[task.Meta.Id] = &tr
 			m.start(&tr)
-		
+
 		case meta := <-m.updates:
 			if meta.State == protocol.TCC_TASK_CLEAR {
 				m.clearResource(meta.Id)

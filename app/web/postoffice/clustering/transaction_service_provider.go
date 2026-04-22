@@ -2,6 +2,7 @@ package clustering
 
 import (
 	context "context"
+	"fmt"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -93,4 +94,32 @@ func (c *DataServiceProvider) updateTask(t *protocol.Task, clear ClearResource) 
 		return
 	}
 	core.AppLog.Info().Msgf("saved %v", resp)
+}
+
+func (c *DataServiceProvider) loadTransaction(tid uint64) (*TransactionResource, error) {
+	tr := TransactionResource{}
+	tf := persistence.NewTransactionObjectFactory()
+	req, err := tf.FromId(tid)
+	if err != nil {
+		return &tr, err
+	}
+	resp, err := c.runGet(req)
+	if err != nil {
+		return &tr, err
+	}
+	kv, err := tf.Object(resp.Data.List[0].Value)
+	if err != nil {
+		return &tr, err
+	}
+	obj, err := tf.Message(kv)
+	if err != nil {
+		return &tr, err
+	}
+	tc, ok := obj.(*protocol.Transaction)
+	if !ok {
+		return &tr, fmt.Errorf("cast err")
+	}
+	tr.resource = tc
+	tr.revision = resp.Data.List[0].Header.Revision
+	return &tr, nil
 }
