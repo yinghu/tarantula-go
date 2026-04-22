@@ -61,12 +61,11 @@ func (m *TaskManager) confirmed(t *TaskResource) {
 		}), p: func() {
 			core.AppLog.Debug().Msg("retry to finish with confirm/timeout")
 			go m.s.runAskFinish(tc.Meta)
-			//m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
 		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
 
 		//ask to finish
 		go m.s.runAskFinish(tc.Meta)
-		//m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
+		
 	}
 }
 
@@ -80,11 +79,9 @@ func (m *TaskManager) canceled(t *TaskResource) {
 		}), p: func() {
 			core.AppLog.Debug().Msg("retry to finish with cancel/timeout")
 			go m.s.runAskFinish(tc.Meta)
-			//m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
 		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
 		//ask to finish
 		go m.s.runAskFinish(tc.Meta)
-		//m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: tc.Meta}, Opt: core.TRANS_MAIL}
 	}
 }
 
