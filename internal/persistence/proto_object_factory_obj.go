@@ -11,6 +11,9 @@ import (
 const (
 	LOGIN_OBJECT_ID           uint32 = 1
 	LOGIN_OBJECT_FACTORY_NAME        = "obj_login"
+
+	TRANSACTION_OBJECT_ID           uint32 = 2
+	TRANSACTION_OBJECT_FACTORY_NAME        = "obj_transaction"
 )
 
 type MessageObject func() proto.Message
