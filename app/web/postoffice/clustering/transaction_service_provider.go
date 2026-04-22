@@ -112,9 +112,8 @@ func (c *DataServiceProvider) updateTransaction(t *TransactionResource) error {
 	if err != nil {
 		return err
 	}
-	core.AppLog.Debug().Msgf("resp %v", resp)
-	//t.revision = resp.Data.List[0].Header.Revision
-	//core.AppLog.Debug().Msgf("REV %d, %d", t.revision, t.resource.Meta.Id)
+	t.revision = resp.Data.List[0].Header.Revision
+	core.AppLog.Debug().Msgf("REV %d, %d", t.revision, t.resource.Meta.Id)
 	return nil
 }
 
