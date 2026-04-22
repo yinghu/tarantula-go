@@ -11,6 +11,7 @@ func (c *DataServiceProvider) runUpdate(set *protocol.Request) (*protocol.Respon
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
 	retry := RetryTrack{Reties: RETRY_MAX}
+	var mresp *protocol.Response
 	for retry.Reties > 0 {
 		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
@@ -21,6 +22,7 @@ func (c *DataServiceProvider) runUpdate(set *protocol.Request) (*protocol.Respon
 			retry.Reties--
 			continue
 		}
+		mresp = resp
 		retry.Suc = true
 		slaves := nodes[1:]
 		for _, slave := range slaves {
@@ -28,7 +30,10 @@ func (c *DataServiceProvider) runUpdate(set *protocol.Request) (*protocol.Respon
 		}
 		break
 	}
-	return &protocol.Response{Successful: retry.Suc, Message: retry.Err}, nil
+	if retry.Suc {
+		return mresp, nil
+	}
+	return &protocol.Response{Successful: false, Message: retry.Err}, nil
 }
 
 func (m *DataServiceProvider) clientUpdate(target *core.Node, request *protocol.Request) (*protocol.Response, error) {
