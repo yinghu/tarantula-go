@@ -44,12 +44,9 @@ func (m *TaskManager) start(t *TaskResource) {
 	t.finished = t.confirmed
 	for _, tc := range t.resource.Transactions {
 		tc.Meta.State = protocol.TCC_RESERVING
-		ts, err := m.s.loadTransaction(tc.Meta.Id)
-		if err != nil {
-			core.AppLog.Debug().Msgf("error on load %s", err.Error())
-		}
-		core.AppLog.Debug().Msgf("obj %v", ts)
-		//retry to reserve
+		ts := TransactionResource{resource: tc,revision: 1}
+		m.tns[tc.Meta.Id]=&ts
+		go m.s.updateTransaction(&ts)
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
