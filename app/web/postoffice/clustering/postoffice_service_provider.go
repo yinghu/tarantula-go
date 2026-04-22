@@ -132,21 +132,6 @@ func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*
 	if err != nil {
 		return resp, err
 	}
-	tf := persistence.NewTransactionObjectFactory()
-	for _, t := range task.Transactions {
-		kv, err := tf.FromTransactionObject(t)
-		if err != nil {
-			return &protocol.Response{Successful: false, Message: err.Error()}, err
-		}
-		r, err := tf.Request(kv)
-		if err != nil {
-			return &protocol.Response{Successful: false, Message: err.Error()}, err
-		}
-		resp, err := c.runCreate(r)
-		if err != nil {
-			return resp, err
-		}
-	}
 	return c.runSetup(task)
 }
 
