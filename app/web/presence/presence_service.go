@@ -55,8 +55,11 @@ func (s *PresenceService) Start(env core.Env) error {
 			core.AppLog.Debug().Msg("wrong type")
 		}
 	}})
-	s.Cluster().Register("register", &protocol.TccTransationListener{Confirm: func(e *protocol.Transaction) error {
-		core.AppLog.Debug().Msgf("tRANSTION %v", e)
+	s.Cluster().Register("register", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
+		core.AppLog.Debug().Msgf("reserve %v", e)
+		return nil
+	}, Confirm: func(e *protocol.Transaction) error {
+		core.AppLog.Debug().Msgf("confirm %v", e)
 		return nil
 	}, Cancel: func(e *protocol.Transaction) error {
 		return nil
