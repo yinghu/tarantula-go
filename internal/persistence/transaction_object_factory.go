@@ -13,7 +13,7 @@ import (
 func NewTransactionObjectFactory() *TransactionObjectFactory {
 	mf := TransactionObjectFactory{}
 
-	mf.Mo = func() proto.Message { return &protocol.Transaction{} }
+	mf.Mo = func() proto.Message { return &protocol.Meta{} }
 
 	mq := TransactionObjectQuery{}
 	mq.Id = TRANSACTION_OBJECT_FACTORY_NAME
@@ -38,7 +38,7 @@ func (p *TransactionObjectFactory) FromId(tid uint64) (*protocol.Request, error)
 		return &req, err
 	}
 	req.Prefix = util.Hash(k)
-	req.Data = &protocol.Data{Key: k,Header: &protocol.Header{FactoryId: core.OBJECT_FACTORY_ID, ClassId: TRANSACTION_OBJECT_ID, Mutable: true}}
+	req.Data = &protocol.Data{Key: k, Header: &protocol.Header{FactoryId: core.OBJECT_FACTORY_ID, ClassId: TRANSACTION_OBJECT_ID, Mutable: true}}
 	return &req, nil
 }
 func (p *TransactionObjectFactory) FromTransactionObject(trans *protocol.Transaction) (*protocol.KeyValue, error) {

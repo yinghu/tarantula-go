@@ -115,11 +115,11 @@ func (c *DataServiceProvider) loadTransaction(tid uint64) (*TransactionResource,
 	if err != nil {
 		return &tr, err
 	}
-	tc, ok := obj.(*protocol.Transaction)
+	tc, ok := obj.(*protocol.Meta)
 	if !ok {
 		return &tr, fmt.Errorf("cast err")
 	}
-	tr.resource = tc
+	tr.resource = &protocol.Transaction{Meta: tc}
 	tr.revision = resp.Data.List[0].Header.Revision
 	return &tr, nil
 }
