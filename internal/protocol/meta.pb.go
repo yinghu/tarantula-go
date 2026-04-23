@@ -9,6 +9,7 @@ package protocol
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -32,6 +33,7 @@ type Meta struct {
 	Retries       uint32                 `protobuf:"fixed32,7,opt,name=retries,proto3" json:"retries,omitempty"`
 	State         uint32                 `protobuf:"fixed32,8,opt,name=state,proto3" json:"state,omitempty"`
 	Mode          uint32                 `protobuf:"fixed32,9,opt,name=mode,proto3" json:"mode,omitempty"` //streaming, concurrent
+	Time          *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=time,proto3" json:"time,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -129,12 +131,19 @@ func (x *Meta) GetMode() uint32 {
 	return 0
 }
 
+func (x *Meta) GetTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Time
+	}
+	return nil
+}
+
 var File_meta_proto protoreflect.FileDescriptor
 
 const file_meta_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"meta.proto\x12\bprotocol\"\xca\x01\n" +
+	"meta.proto\x12\bprotocol\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfa\x01\n" +
 	"\x04Meta\x12\x16\n" +
 	"\x06taskId\x18\x01 \x01(\x06R\x06taskId\x12\x0e\n" +
 	"\x02id\x18\x02 \x01(\x06R\x02id\x12\x16\n" +
@@ -144,7 +153,9 @@ const file_meta_proto_rawDesc = "" +
 	"\atimeout\x18\x06 \x01(\aR\atimeout\x12\x18\n" +
 	"\aretries\x18\a \x01(\aR\aretries\x12\x14\n" +
 	"\x05state\x18\b \x01(\aR\x05state\x12\x12\n" +
-	"\x04mode\x18\t \x01(\aR\x04modeBL\n" +
+	"\x04mode\x18\t \x01(\aR\x04mode\x12.\n" +
+	"\x04time\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\x04timeBL\n" +
 	"\x17com.icodesoftware.protoB\vMetaFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -161,14 +172,16 @@ func file_meta_proto_rawDescGZIP() []byte {
 
 var file_meta_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_meta_proto_goTypes = []any{
-	(*Meta)(nil), // 0: protocol.Meta
+	(*Meta)(nil),                  // 0: protocol.Meta
+	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
 }
 var file_meta_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: protocol.Meta.time:type_name -> google.protobuf.Timestamp
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_meta_proto_init() }

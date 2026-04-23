@@ -7,6 +7,7 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type TaskResource struct {
@@ -78,10 +79,10 @@ func (m *TaskManager) canceled(t *TaskResource) {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
 			core.AppLog.Debug().Msg("retry to finish with cancel/timeout")
-			go m.s.runAskFinish(tc.Meta)
+			go m.s.runAskFinish(m.copy(tc.Meta))
 		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
 		//ask to finish
-		go m.s.runAskFinish(tc.Meta)
+		go m.s.runAskFinish(m.copy(tc.Meta))
 	}
 }
 
@@ -240,5 +241,6 @@ func (m *TaskManager) copy(meta *protocol.Meta) *protocol.Meta {
 	cp := protocol.Meta{TaskId: meta.TaskId, Id: meta.Id, State: meta.State, NodeId: meta.NodeId, Tag: meta.Tag, Name: meta.Name, Mode: meta.Mode}
 	cp.Timeout = meta.Timeout
 	cp.Retries = meta.Retries
+	cp.Time = timestamppb.Now()
 	return &cp
 }

@@ -2,6 +2,7 @@ package clustering
 
 import (
 	context "context"
+	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -79,6 +80,7 @@ func (c *DataServiceProvider) saveLog(meta *protocol.Meta) {
 }
 
 func (c *DataServiceProvider) loadLog(meta *protocol.Meta) {
+	time.Sleep(1 * time.Second)
 	tf := event.NewTransactionEventFactory()
 	buff := core.NewBuffer(20)
 	buff.WriteUInt64(meta.Id)
