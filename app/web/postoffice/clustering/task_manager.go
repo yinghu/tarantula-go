@@ -25,8 +25,8 @@ type Timeout struct {
 }
 
 type TaskManager struct {
-	trs     map[uint64]*TaskResource
-	tms     map[uint64]*Timeout
+	trs map[uint64]*TaskResource
+	tms map[uint64]*Timeout
 
 	s       *DataServiceProvider
 	tasks   chan *protocol.Task
@@ -93,7 +93,7 @@ func (m *TaskManager) finished(t *TaskResource) {
 	})
 	tf := event.NewTransactionEventFactory()
 	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: t.resource.Meta})
-	e.Event.Id = m.s.tid()
+	e.Event.Key.Array = core.ToBytes(m.s.seq)
 	go m.s.runPublish(e)
 }
 

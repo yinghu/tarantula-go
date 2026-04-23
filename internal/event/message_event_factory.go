@@ -26,7 +26,7 @@ type MessageEventFactory struct {
 
 func (p *MessageEventFactory) FromMessageEvent(e *protocol.MessageEvent) (*protocol.Topic, error) {
 	tpx := protocol.Topic{Name: MESSAGE_TOPIC_NAME}
-	msg := protocol.Event{Header: &protocol.Header{FactoryId: core.EVENT_FACTORY_ID, ClassId: MESSAGE_EVENT_CID}}
+	msg := protocol.Event{Key:&protocol.Key{Header: &protocol.Header{FactoryId: core.EVENT_FACTORY_ID, ClassId: MESSAGE_EVENT_CID}}}
 	obj, err := anypb.New(e)
 	if err != nil {
 		return &tpx, err

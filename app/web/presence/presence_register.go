@@ -38,11 +38,7 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 	ticket, _ := s.Authenticator().CreateTicket(int64(login.SystemId), int32(login.Id), int32(login.AccessControl), bootstrap.TICKET_TIME_OUT_MINUTES)
 	session.Ticket = ticket
 	go func() {
-		id, err := s.Sequence().Id()
-		if err != nil {
-			core.AppLog.Warn().Msgf("failed to create seq %s", err.Error())
-			return
-		}
+		
 		rf := event.RegisterEventFactory{}
 		me := protocol.RegisterEvent{SystemId: uint64(login.SystemId), Name: login.Name, Source: "web"}
 		tp, err := rf.FromRegisterEvent(&me)
@@ -50,7 +46,7 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 			core.AppLog.Warn().Msgf("failed to create topic %s", err.Error())
 			return
 		}
-		tp.Event.Id = uint64(id)
+		tp.Event.Key.Array = core.ToBytes(s.Sequence())
 		tp.NodeId = s.NodeId()
 		tp.Tag = s.Context()
 		_, err = s.Cluster().Publish(tp)

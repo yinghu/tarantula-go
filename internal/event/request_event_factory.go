@@ -26,7 +26,7 @@ type RequestEventFactory struct {
 
 func (p *RequestEventFactory) FromRequestEvent(e *protocol.RequestEvent) (*protocol.Topic, error) {
 	tpx := protocol.Topic{Name: REQUEST_TOPIC_NAME}
-	msg := protocol.Event{Header: &protocol.Header{FactoryId: core.EVENT_FACTORY_ID, ClassId: REQUEST_EVENT_CID}}
+	msg := protocol.Event{Key:&protocol.Key{Header: &protocol.Header{FactoryId: core.EVENT_FACTORY_ID, ClassId: REQUEST_EVENT_CID}}}
 	obj, err := anypb.New(e)
 	if err != nil {
 		return &tpx, err

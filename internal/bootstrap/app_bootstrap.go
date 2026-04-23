@@ -124,12 +124,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			}
 			t.NodeId = s.NodeId()
 			t.Tag = s.Context()
-			id, err := s.Sequence().Id()
-			if err != nil {
-				fmt.Printf("request event id error %s\n", err.Error())
-				return
-			}
-			t.Event.Id = uint64(id)
+			t.Event.Key.Array = core.ToBytes(s.Sequence())
 			s.Cluster().Publish(t)
 		}()
 		w.Header().Set("Access-Control-Allow-Origin", "*")

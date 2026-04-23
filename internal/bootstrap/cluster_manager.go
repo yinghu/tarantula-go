@@ -357,8 +357,7 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 	t, err := tf.FromLogEvent(&e)
 	t.NodeId = c.App.NodeId()
 	t.Tag = c.App.Context()
-	id, _ := c.App.Sequence().Id()
-	t.Event.Id = uint64(id)
+	t.Event.Key.Array = core.ToBytes(c.App.seq)
 	go c.Publish(t)
 }
 

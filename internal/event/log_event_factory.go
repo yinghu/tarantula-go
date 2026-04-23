@@ -26,7 +26,7 @@ type LogEventFactory struct {
 
 func (p *LogEventFactory) FromLogEvent(e *protocol.LogEvent) (*protocol.Topic, error) {
 	tpx := protocol.Topic{Name: LOG_TOPIC_NAME}
-	msg := protocol.Event{Header: &protocol.Header{FactoryId: core.EVENT_FACTORY_ID, ClassId: LOG_EVENT_CID}}
+	msg := protocol.Event{Key:&protocol.Key{Header: &protocol.Header{FactoryId: core.EVENT_FACTORY_ID, ClassId: LOG_EVENT_CID}}}
 	obj, err := anypb.New(e)
 	if err != nil {
 		return &tpx, err

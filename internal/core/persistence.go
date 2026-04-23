@@ -1,5 +1,23 @@
 package core
 
+import "time"
+
+func ToBytes(seq Sequence) []byte {
+	for {
+		id, err := seq.Id()
+		if err != nil {
+			time.Sleep(1 * time.Millisecond)
+			continue
+		}
+		buff := NewBuffer(8)
+		buff.WriteUInt64(uint64(id))
+		buff.Flip()
+		key, _ := buff.Read(0)
+		return key
+	}
+
+}
+
 func Export(obj Persistentable, buffSize int) ([]byte, []byte, error) {
 	buff := NewBuffer(buffSize)
 	var k []byte

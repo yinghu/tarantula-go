@@ -29,7 +29,7 @@ type TransactionEventFactory struct {
 
 func (p *TransactionEventFactory) FromTransactionEvent(e *protocol.TransactionEvent) (*protocol.Topic, error) {
 	tpx := protocol.Topic{Name: TRANSACTION_TOPIC_NAME}
-	msg := protocol.Event{Header: &protocol.Header{FactoryId: core.EVENT_FACTORY_ID, ClassId: TRANSACTION_EVENT_CID}}
+	msg := protocol.Event{Key:&protocol.Key{Header: &protocol.Header{FactoryId: core.EVENT_FACTORY_ID, ClassId: TRANSACTION_EVENT_CID}}}
 	e.Time = timestamppb.New(time.Now())
 	obj, err := anypb.New(e)
 	if err != nil {

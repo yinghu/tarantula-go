@@ -68,7 +68,7 @@ func (c *DataServiceProvider) load(taskId uint64) (*protocol.Task, error) {
 func (c *DataServiceProvider) saveLog(meta *protocol.Meta) {
 	tf := event.NewTransactionEventFactory()
 	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: meta})
-	e.Event.Id = c.tid()
+	e.Event.Key.Array = core.ToBytes(c.seq)
 	req, err := tf.Request(e)
 	if err != nil {
 		core.AppLog.Warn().Msgf("log save failed %s", err.Error())

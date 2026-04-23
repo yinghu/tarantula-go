@@ -14,7 +14,7 @@ func TestEvent(t *testing.T) {
 		t.Errorf("should not be error %s", err.Error())
 		return
 	}
-	e := Event{Header: &Header{FactoryId: 1, ClassId: 1}, Message: obj}
+	e := Event{Key:&Key{Header: &Header{FactoryId: 1, ClassId: 1}}, Message: obj}
 	data, err := proto.Marshal(&e)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())

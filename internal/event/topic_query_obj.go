@@ -33,7 +33,7 @@ func (q *TopicQueryObj) QList(list core.List) error {
 		if err != nil {
 			continue
 		}
-		if !list(tp.Event.Header, e) {
+		if !list(tp.Event.Key.Header, e) {
 			break
 		}
 	}
