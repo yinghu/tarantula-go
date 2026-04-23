@@ -34,6 +34,8 @@ type Meta struct {
 	State         uint32                 `protobuf:"fixed32,8,opt,name=state,proto3" json:"state,omitempty"`
 	Mode          uint32                 `protobuf:"fixed32,9,opt,name=mode,proto3" json:"mode,omitempty"` //streaming, concurrent
 	Time          *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=time,proto3" json:"time,omitempty"`
+	Persistent    bool                   `protobuf:"varint,11,opt,name=persistent,proto3" json:"persistent,omitempty"`
+	Description   string                 `protobuf:"bytes,12,opt,name=description,proto3" json:"description,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -138,12 +140,26 @@ func (x *Meta) GetTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Meta) GetPersistent() bool {
+	if x != nil {
+		return x.Persistent
+	}
+	return false
+}
+
+func (x *Meta) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
 var File_meta_proto protoreflect.FileDescriptor
 
 const file_meta_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"meta.proto\x12\bprotocol\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfa\x01\n" +
+	"meta.proto\x12\bprotocol\x1a\x1fgoogle/protobuf/timestamp.proto\"\xbc\x02\n" +
 	"\x04Meta\x12\x16\n" +
 	"\x06taskId\x18\x01 \x01(\x06R\x06taskId\x12\x0e\n" +
 	"\x02id\x18\x02 \x01(\x06R\x02id\x12\x16\n" +
@@ -155,7 +171,11 @@ const file_meta_proto_rawDesc = "" +
 	"\x05state\x18\b \x01(\aR\x05state\x12\x12\n" +
 	"\x04mode\x18\t \x01(\aR\x04mode\x12.\n" +
 	"\x04time\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.TimestampR\x04timeBL\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\x04time\x12\x1e\n" +
+	"\n" +
+	"persistent\x18\v \x01(\bR\n" +
+	"persistent\x12 \n" +
+	"\vdescription\x18\f \x01(\tR\vdescriptionBL\n" +
 	"\x17com.icodesoftware.protoB\vMetaFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
