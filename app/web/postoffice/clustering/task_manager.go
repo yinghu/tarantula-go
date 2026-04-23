@@ -42,10 +42,12 @@ func (m *TaskManager) start(t *TaskResource) {
 	t.finished = t.confirmed
 	for _, tc := range t.resource.Transactions {
 		tc.Meta.State = protocol.TCC_RESERVING
+		tc.Meta.Time = timestamppb.Now()
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
 			core.AppLog.Debug().Msg("retry to reserve with timeout")
+			tc.Meta.Time = timestamppb.Now()
 			go m.s.runAskReserve(tc)
 		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
 		//ask to reserve
