@@ -199,7 +199,7 @@ func (m *TaskManager) Wait() {
 				core.AppLog.Warn().Msgf("task already finished %v", meta)
 				continue
 			}
-			m.log(meta)
+			m.log(m.copy(meta))
 			switch meta.State {
 			case protocol.TCC_CONFIRMED:
 				tr.confirmed--
@@ -234,4 +234,11 @@ func (m *TaskManager) Wait() {
 	close(m.tasks)
 	close(m.updates)
 	core.AppLog.Warn().Msg("task manager stopped")
+}
+
+func (m *TaskManager) copy(meta *protocol.Meta) *protocol.Meta {
+	cp := protocol.Meta{TaskId: meta.TaskId, Id: meta.Id, State: meta.State, NodeId: meta.NodeId, Tag: meta.Tag, Name: meta.Name, Mode: meta.Mode}
+	cp.Timeout = meta.Timeout
+	cp.Retries = meta.Retries
+	return &cp
 }

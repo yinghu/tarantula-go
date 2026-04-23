@@ -91,7 +91,17 @@ func (c *DataServiceProvider) loadLog(meta *protocol.Meta) {
 	buff.Flip()
 	k, _ := buff.Read(0)
 	req := tf.GetRequest(k)
-	resp, _ := c.runGet(req)
+	resp, err := c.runGet(req)
+	if err == nil && resp.Successful {
+		topic, err := tf.Topic(resp.Data.List[0].Value)
+		if err == nil {
+			obj, _ := tf.Message(topic)
+			te, ok := obj.(*protocol.TransactionEvent)
+			if ok {
+				core.AppLog.Debug().Msgf("META : %v", te.Meta)
+			}
+		}
+	}
 	core.AppLog.Debug().Msgf("LOG :%v", resp)
 }
 
