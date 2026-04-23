@@ -9,7 +9,7 @@ const (
 )
 
 type ProtoTopicFactory interface {
-	CompositeKey
+	//CompositeKey
 	Request(topic *protocol.Topic) (*protocol.Request, error)
 	Topic(data []byte) (*protocol.Topic, error)
 	Message(topic *protocol.Topic) (any, error)

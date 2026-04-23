@@ -9,7 +9,7 @@ const (
 )
 
 type ProtoObjectFactory interface {
-	CompositeKey
+	//CompositeKey
 	Request(obj *protocol.KeyValue) (*protocol.Request, error)
 	Object(data []byte) (*protocol.KeyValue, error)
 	Message(obj *protocol.KeyValue) (any, error)

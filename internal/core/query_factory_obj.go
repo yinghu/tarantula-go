@@ -33,14 +33,6 @@ func (f *QueryFactoryObj) Query() Query {
 	return f.Q
 }
 
-func (p *QueryFactoryObj) WriteKey(key DataBuffer) error {
-	return nil
-}
-
-func (p *QueryFactoryObj) ReadKey(key DataBuffer) error {
-	return nil
-}
-
 func (f *QueryFactoryObj) Set(resp *protocol.Response) Query {
 	f.Q.QResponse(resp)
 	return f.Q
