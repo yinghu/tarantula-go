@@ -73,14 +73,8 @@ func (c *DataServiceProvider) saveLog(meta *protocol.Meta) {
 	buff.WriteUInt32(meta.State)
 	buff.Flip()
 	k, _ := buff.Read(0)
-	e.Event.Key.Array = k //core.ToBytes(c.seq)
+	e.Event.Key.Array = k
 	go c.runPublish(e)
-	//req, err := tf.Request(e)
-	//if err != nil {
-	//core.AppLog.Warn().Msgf("log save failed %s", err.Error())
-	//return
-	//}
-	//c.runCreate(req)
 	go c.loadLog(meta)
 }
 

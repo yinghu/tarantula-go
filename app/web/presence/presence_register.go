@@ -38,7 +38,7 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 	ticket, _ := s.Authenticator().CreateTicket(int64(login.SystemId), int32(login.Id), int32(login.AccessControl), bootstrap.TICKET_TIME_OUT_MINUTES)
 	session.Ticket = ticket
 	go func() {
-		
+
 		rf := event.RegisterEventFactory{}
 		me := protocol.RegisterEvent{SystemId: uint64(login.SystemId), Name: login.Name, Source: "web"}
 		tp, err := rf.FromRegisterEvent(&me)
@@ -72,10 +72,10 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 		//return
 		//}
 		//core.AppLog.Debug().Msgf("REQ %v", resp)
-		tb := persistence.NewTaskBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register", Mode: core.TRANSACTION_MODE_SEQUENCE})
-		tb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "register", Prefix: s.Cluster().RingToken(kv.Key.Array)}, Object: kv})
-		tb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "grant", Prefix: s.Cluster().RingToken(kv.Key.Array)}, Object: kv})
-		tb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "update", Prefix: s.Cluster().RingToken(kv.Key.Array)}, Object: kv})
+		tb := persistence.NewTaskBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register", Mode: core.TRANSACTION_MODE_CONCURRENT})
+		tb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "register"}, Object: kv})
+		tb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "grant"}, Object: kv})
+		tb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "update"}, Object: kv})
 		//tsk := protocol.Task{Meta: &protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"}}
 
 		//obj, err := anypb.New(login)

@@ -113,13 +113,12 @@ func (c *DataServiceProvider) List(in *protocol.Request, stream grpc.ServerStrea
 
 func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
 	task.Meta.Id = c.tid()
-	task.Meta.Prefix = c.tprefix(task.Meta.Id)
+	//task.Meta.Prefix = c.tprefix(task.Meta.Id)
 	task.Meta.Timeout = TASK_TIMEOUT_SECONDS
 	task.Meta.Retries = TASK_RETRY_MAX
 	for _, t := range task.Transactions {
 		t.Meta.TaskId = task.Meta.Id
 		t.Meta.Id = c.tid()
-		t.Meta.State = protocol.TCC_RESERVING
 		t.Meta.Timeout = TRANSACTION_TIMEOUT_SECONDS
 		t.Meta.Retries = TASK_RETRY_MAX
 	}

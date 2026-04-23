@@ -49,7 +49,7 @@ func (s *AdminService) Start(f core.Env) error {
 	}, M: func(m proto.Message) {
 		ro, ok := m.(*protocol.TransactionEvent)
 		if ok {
-			core.AppLog.Debug().Msgf("transaction event %v", ro.Meta)
+			core.AppLog.Debug().Msgf("transaction event %s %v", ro.Description, ro.Meta)
 		} else {
 			core.AppLog.Debug().Msg("wrong type")
 		}
