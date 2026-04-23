@@ -99,7 +99,7 @@ func (c *DataServiceProvider) loadLog(meta *protocol.Meta) {
 			}
 		}
 	}
-	core.AppLog.Debug().Msgf("LOG :%v", resp)
+	//core.AppLog.Debug().Msgf("LOG :%v", resp)
 }
 
 func (c *DataServiceProvider) updateTask(t *protocol.Task, clear ClearResource) {
