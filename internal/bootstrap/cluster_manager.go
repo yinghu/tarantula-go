@@ -133,6 +133,7 @@ func (c *ClusterManager) Issue(e *protocol.Task) (*protocol.Response, error) {
 		return &protocol.Response{Successful: false}, err
 	}
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	e.Meta.Time = timestamppb.Now()
 	return dsp.Issue(context.Background(), e)
 }
 

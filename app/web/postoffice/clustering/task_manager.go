@@ -95,7 +95,7 @@ func (m *TaskManager) finished(t *TaskResource) {
 		m.updates <- &protocol.Meta{Id: t.resource.Meta.Id, State: protocol.TCC_TASK_CLEAR}
 	})
 	tf := event.NewTransactionEventFactory()
-	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: t.resource.Meta, Start: timestamppb.Now(), End: timestamppb.Now()})
+	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: t.resource.Meta, Start: t.resource.Meta.Time, End: timestamppb.Now()})
 	e.Event.Key.Array = core.ToBytes(m.s.seq)
 	go m.s.runPublish(e)
 }
