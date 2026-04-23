@@ -8,6 +8,7 @@ import (
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -68,7 +69,7 @@ func (c *DataServiceProvider) load(taskId uint64) (*protocol.Task, error) {
 }
 func (c *DataServiceProvider) saveLog(meta *protocol.Meta) {
 	tf := event.NewTransactionEventFactory()
-	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: meta})
+	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: meta, Start: meta.Time, End: timestamppb.Now()})
 	buff := core.NewBuffer(20)
 	buff.WriteUInt64(meta.Id)
 	buff.WriteUInt32(meta.State)

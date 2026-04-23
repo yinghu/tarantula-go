@@ -243,6 +243,6 @@ func (m *TaskManager) copy(meta *protocol.Meta) *protocol.Meta {
 	cp := protocol.Meta{TaskId: meta.TaskId, Id: meta.Id, State: meta.State, NodeId: meta.NodeId, Tag: meta.Tag, Name: meta.Name, Mode: meta.Mode}
 	cp.Timeout = meta.Timeout
 	cp.Retries = meta.Retries
-	cp.Time = timestamppb.Now()
+	cp.Time = meta.Time
 	return &cp
 }

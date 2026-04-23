@@ -25,8 +25,9 @@ const (
 type TransactionEvent struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Meta          *Meta                  `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
-	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"` //
-	Time          *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=time,proto3" json:"time,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Start         *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start,proto3" json:"start,omitempty"`
+	End           *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=end,proto3" json:"end,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -75,9 +76,16 @@ func (x *TransactionEvent) GetDescription() string {
 	return ""
 }
 
-func (x *TransactionEvent) GetTime() *timestamppb.Timestamp {
+func (x *TransactionEvent) GetStart() *timestamppb.Timestamp {
 	if x != nil {
-		return x.Time
+		return x.Start
+	}
+	return nil
+}
+
+func (x *TransactionEvent) GetEnd() *timestamppb.Timestamp {
+	if x != nil {
+		return x.End
 	}
 	return nil
 }
@@ -87,11 +95,12 @@ var File_transaction_event_proto protoreflect.FileDescriptor
 const file_transaction_event_proto_rawDesc = "" +
 	"\n" +
 	"\x17transaction_event.proto\x12\bprotocol\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\n" +
-	"meta.proto\"\x88\x01\n" +
+	"meta.proto\"\xb8\x01\n" +
 	"\x10TransactionEvent\x12\"\n" +
 	"\x04meta\x18\x01 \x01(\v2\x0e.protocol.MetaR\x04meta\x12 \n" +
-	"\vdescription\x18\x02 \x01(\tR\vdescription\x12.\n" +
-	"\x04time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x04timeBX\n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x120\n" +
+	"\x05start\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x05start\x12,\n" +
+	"\x03end\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\x03endBX\n" +
 	"\x17com.icodesoftware.protoB\x17TransactionEventFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -114,12 +123,13 @@ var file_transaction_event_proto_goTypes = []any{
 }
 var file_transaction_event_proto_depIdxs = []int32{
 	1, // 0: protocol.TransactionEvent.meta:type_name -> protocol.Meta
-	2, // 1: protocol.TransactionEvent.time:type_name -> google.protobuf.Timestamp
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	2, // 1: protocol.TransactionEvent.start:type_name -> google.protobuf.Timestamp
+	2, // 2: protocol.TransactionEvent.end:type_name -> google.protobuf.Timestamp
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_transaction_event_proto_init() }
