@@ -364,6 +364,8 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 func (c *ClusterManager) handleTranstion(l core.TransactionListener, t *protocol.Transaction) {
 	state := t.Meta.State
 	err := l.OnTransaction(t)
+	t.Meta.NodeId = c.App.NodeId()
+	t.Meta.Tag = c.App.Context()
 	if err != nil {
 		//cancel
 		//send cancel to cluster
