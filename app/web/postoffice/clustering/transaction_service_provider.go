@@ -69,7 +69,7 @@ func (c *DataServiceProvider) saveLog(meta *protocol.Meta) {
 	tf := event.NewTransactionEventFactory()
 	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: meta})
 	buff := core.NewBuffer(20)
-	buff.WriteUInt64(c.tid())
+	buff.WriteUInt64(meta.Id)
 	buff.WriteUInt32(meta.State)
 	buff.Flip()
 	k, _ := buff.Read(0)
@@ -80,6 +80,19 @@ func (c *DataServiceProvider) saveLog(meta *protocol.Meta) {
 		return
 	}
 	c.runCreate(req)
+	go c.loadLog(meta)
+}
+
+func (c *DataServiceProvider) loadLog(meta *protocol.Meta) {
+	tf := event.NewTransactionEventFactory()
+	buff := core.NewBuffer(20)
+	buff.WriteUInt64(meta.Id)
+	buff.WriteUInt32(meta.State)
+	buff.Flip()
+	k, _ := buff.Read(0)
+	req := tf.GetRequest(k)
+	resp, _ := c.runGet(req)
+	core.AppLog.Debug().Msgf("LOG :%v", resp)
 }
 
 func (c *DataServiceProvider) updateTask(t *protocol.Task, clear ClearResource) {
