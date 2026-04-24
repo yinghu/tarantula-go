@@ -63,6 +63,8 @@ func (m *TaskManager) start(j *JobResource) {
 	m.tms[j.resource.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(j.resource.Meta.Timeout)*time.Second, func() {
 		m.updates <- &protocol.Meta{TaskId: j.resource.Meta.TaskId, JobId: j.resource.Meta.Id, State: protocol.TCC_JOB_TIMEOUT}
 	})}
+	j.confirmed = len(j.resource.Transactions)
+	j.finished = j.confirmed
 	for _, tc := range j.resource.Transactions {
 		tc.Meta.State = protocol.TCC_RESERVING
 		tc.Meta.Time = timestamppb.Now()
@@ -84,10 +86,10 @@ func (m *TaskManager) stop(t *JobResource) {
 
 func (m *TaskManager) confirmed(t *JobResource) {
 	for _, tc := range t.resource.Transactions {
-		//tc.Meta.State = protocol.TCC_CONFIRMED
+		tc.Meta.State = protocol.TCC_CONFIRMED
 		//retry to finish
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
-			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
+			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.TaskId, JobId: t.resource.Meta.JobId, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
 			core.AppLog.Debug().Msg("retry to finish with confirm/timeout")
 			go m.s.runAskFinish(tc.Meta)
@@ -105,7 +107,7 @@ func (m *TaskManager) canceled(t *JobResource) {
 		tc.Meta.State = protocol.TCC_CANCELED
 		//retry to finish on cancel
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
-			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
+			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.TaskId, JobId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
 			core.AppLog.Debug().Msg("retry to finish with cancel/timeout")
 			go m.s.runAskFinish(m.copy(tc.Meta))
@@ -248,13 +250,13 @@ func (m *TaskManager) Wait() {
 				if tj.confirmed == 0 {
 					m.confirmed(tj)
 				}
-				core.AppLog.Debug().Msgf("task confirmed %v", meta)
+				core.AppLog.Debug().Msgf("job confirmed %v", meta)
 			case protocol.TCC_CANCELED:
-				core.AppLog.Debug().Msgf("task canceled %v", meta)
+				core.AppLog.Debug().Msgf("job canceled %v", meta)
 				m.canceled(tj)
 
 			case protocol.TCC_FINISHED:
-				core.AppLog.Debug().Msgf("task finished %v", meta)
+				core.AppLog.Debug().Msgf("job finished %v", meta)
 				tj.finished--
 				m.closeTimer(meta.Id)
 				if tj.finished == 0 {
