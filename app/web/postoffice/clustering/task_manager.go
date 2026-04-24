@@ -118,7 +118,7 @@ func (m *TaskManager) canceled(t *JobResource) {
 }
 
 func (m *TaskManager) finished(t *JobResource) {
-	m.closeTimer(t.resource.Meta.JobId)
+	m.closeTimer(t.resource.Meta.Id)
 	tr := m.trs[t.resource.Meta.TaskId]
 	m.end(tr)
 }
