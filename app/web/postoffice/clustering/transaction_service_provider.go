@@ -55,18 +55,22 @@ func (c *DataServiceProvider) Finished(ctx context.Context, in *protocol.Meta) (
 	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name}}, nil
 }
 
-func (c *DataServiceProvider) load(taskId uint64) (*protocol.Task, error) {
+func (c *DataServiceProvider) load(taskId uint64) (*TaskResource, error) {
 	buff := core.NewBuffer(8)
 	buff.WriteUInt64(taskId)
 	buff.Flip()
 	k, _ := buff.Read(0)
-	req := protocol.Request{Data: &protocol.Data{Key: k, Header: &protocol.Header{FactoryId: persistence.TASK_FACTORY_ID, ClassId: persistence.TASK_CLASS_ID}}}
+	req := protocol.Request{Data: &protocol.Data{Key: k, Header: &protocol.Header{FactoryId: core.TASK_FACTORY_ID, ClassId: persistence.TASK_CLASS_ID}}}
 	resp, err := c.runGet(&req)
 	if err != nil {
 		return nil, err
 	}
 	tb := persistence.TaskBuilder{}
-	return tb.From(resp.Data.List[0].Value)
+	t, err := tb.From(resp.Data.List[0].Value)
+	if err != nil {
+		return nil, err
+	}
+	return &TaskResource{resource: t, revision: resp.Data.List[0].Header.Revision}, nil
 }
 func (c *DataServiceProvider) saveLog(meta *protocol.Meta) {
 	tf := event.NewTransactionEventFactory()
@@ -104,20 +108,21 @@ func (c *DataServiceProvider) loadLog(meta *protocol.Meta) {
 	//core.AppLog.Debug().Msgf("LOG :%v", resp)
 }
 
-func (c *DataServiceProvider) updateTask(t *protocol.Task, clear ClearResource) {
+func (c *DataServiceProvider) updateTask(t *TaskResource, clear ClearResource) {
 	defer clear()
-	tb := persistence.TaskBuilder{Target: t}
+	tb := persistence.TaskBuilder{Target: t.resource}
 	req, err := tb.Request()
 	if err != nil {
 		core.AppLog.Warn().Msgf("cannot request %s", err.Error())
 		return
 	}
-	req.Data.Header.Revision = 1
+	req.Data.Header.Revision = t.revision
 	req.Opt = core.UPDATE_DATA_REQUEST
 	resp, err := c.runUpdate(req)
 	if err != nil {
 		core.AppLog.Warn().Msgf("cannot update %s", err.Error())
 		return
 	}
+	t.revision++
 	core.AppLog.Info().Msgf("saved %v", resp)
 }

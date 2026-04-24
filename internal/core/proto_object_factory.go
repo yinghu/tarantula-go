@@ -4,9 +4,6 @@ import (
 	"gameclustering.com/internal/protocol"
 )
 
-const (
-	OBJECT_FACTORY_ID uint32 = 2
-)
 
 type ProtoObjectFactory interface {
 	//CompositeKey

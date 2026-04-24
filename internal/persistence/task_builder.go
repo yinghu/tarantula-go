@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	TASK_FACTORY_ID uint32 = 3
+	
 	TASK_CLASS_ID   uint32 = 1
 )
 
@@ -49,7 +49,7 @@ func (b *TaskBuilder) Request() (*protocol.Request, error) {
 	if err != nil {
 		return &req, err
 	}
-	req.Data.Header = &protocol.Header{FactoryId: TASK_FACTORY_ID, ClassId: TASK_CLASS_ID, Mutable: true}
+	req.Data.Header = &protocol.Header{FactoryId: core.TASK_FACTORY_ID, ClassId: TASK_CLASS_ID, Mutable: true}
 	req.Data.Key = key
 	req.Data.Value = value
 	return &req, nil
