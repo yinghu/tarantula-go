@@ -67,7 +67,7 @@ func (m *TaskManager) start(j *JobResource) {
 		tc.Meta.State = protocol.TCC_RESERVING
 		tc.Meta.Time = timestamppb.Now()
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
-			m.updates <- &protocol.Meta{JobId: j.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
+			m.updates <- &protocol.Meta{TaskId: j.resource.Meta.TaskId, JobId: j.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
 			core.AppLog.Debug().Msg("retry to reserve with timeout")
 			tc.Meta.Time = timestamppb.Now()
@@ -220,6 +220,7 @@ func (m *TaskManager) Wait() {
 			m.tjs[job.Meta.Id] = &tj
 			m.start(&tj)
 		case meta := <-m.updates:
+			core.AppLog.Debug().Msgf("CMETA %v", meta)
 			if meta.State == protocol.TCC_TASK_CLEAR {
 				m.clearResource(meta.Id)
 				continue
@@ -282,7 +283,7 @@ func (m *TaskManager) Wait() {
 }
 
 func (m *TaskManager) copy(meta *protocol.Meta) *protocol.Meta {
-	cp := protocol.Meta{TaskId: meta.TaskId, Id: meta.Id, State: meta.State, NodeId: meta.NodeId, Tag: meta.Tag, Name: meta.Name}
+	cp := protocol.Meta{TaskId: meta.TaskId, JobId: meta.JobId, Id: meta.Id, State: meta.State, NodeId: meta.NodeId, Tag: meta.Tag, Name: meta.Name}
 	cp.Timeout = meta.Timeout
 	cp.Retries = meta.Retries
 	cp.Time = meta.Time
