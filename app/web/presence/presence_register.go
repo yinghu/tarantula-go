@@ -73,10 +73,12 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 		//}
 		//core.AppLog.Debug().Msgf("REQ %v", resp)
 		tb := persistence.NewTaskBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
+		jb1 := persistence.NewJobBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
+		jb1.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "register"}, Object: kv})
 		jb := persistence.NewJobBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
-		jb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "register"}, Object: kv})
 		jb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "grant"}, Object: kv})
 		jb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "update"}, Object: kv})
+		tb.Add(jb1.Target)
 		tb.Add(jb.Target)
 		//tsk := protocol.Task{Meta: &protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"}}
 
