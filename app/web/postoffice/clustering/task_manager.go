@@ -13,10 +13,10 @@ import (
 type TaskResource struct {
 	resource *protocol.Task
 	//transaction bookkeeping
-	revision  uint64
-	confirmed int
-	finished  int
-	jobIndex  int
+	revision uint64
+	//confirmed int
+	//finished  int
+	jobIndex int
 }
 
 type JobResource struct {
@@ -48,8 +48,8 @@ func (m *TaskManager) set(t *TaskResource) {
 	m.tms[t.resource.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(t.resource.Meta.Timeout)*time.Second, func() {
 		m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
 	})}
-	t.confirmed = len(t.resource.Jobs)
-	t.finished = t.confirmed
+	//t.confirmed = len(t.resource.Jobs)
+	//t.finished = t.confirmed
 	t.jobIndex = 0
 	job := t.resource.Jobs[t.jobIndex]
 	job.Meta.State = protocol.TCC_JOB_TIMEOUT
@@ -120,6 +120,14 @@ func (m *TaskManager) canceled(t *JobResource) {
 func (m *TaskManager) finished(t *JobResource) {
 	m.closeTimer(t.resource.Meta.Id)
 	tr := m.trs[t.resource.Meta.TaskId]
+	if tr.jobIndex+1 < len(tr.resource.Jobs) {
+		tr.jobIndex++
+		next := tr.resource.Jobs[tr.jobIndex]
+		go func() {
+			m.jobs <- next
+		}()
+		return
+	}
 	m.end(tr)
 }
 
@@ -264,14 +272,14 @@ func (m *TaskManager) Wait() {
 				}
 
 			case protocol.TCC_TRANSACTION_TIMEOUT:
-				core.AppLog.Debug().Msgf("task transaction timeout %d %d", tr.confirmed, tr.finished)
+				core.AppLog.Debug().Msgf("task transaction timeout %d", tr.jobIndex)
 				m.timeout(meta.Id, meta)
 			case protocol.TCC_JOB_TIMEOUT:
-				core.AppLog.Debug().Msgf("task job timeout %d %d", tr.confirmed, tr.finished)
+				core.AppLog.Debug().Msgf("task job timeout %d", tr.jobIndex)
 				m.timeout(meta.JobId, meta)
 				m.stop(tj)
 			case protocol.TCC_TASK_TIMEOUT:
-				core.AppLog.Debug().Msgf("task timeout %d %d", tr.confirmed, tr.finished)
+				core.AppLog.Debug().Msgf("task timeout %d", tr.jobIndex)
 				m.timeout(meta.TaskId, meta)
 				m.end(tr) //forcefully finished
 			}
