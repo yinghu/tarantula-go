@@ -61,7 +61,7 @@ func (m *TaskManager) set(t *TaskResource) {
 
 func (m *TaskManager) start(j *JobResource) {
 	m.tms[j.resource.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(j.resource.Meta.Timeout)*time.Second, func() {
-		m.updates <- &protocol.Meta{JobId: j.resource.Meta.Id, State: protocol.TCC_JOB_TIMEOUT}
+		m.updates <- &protocol.Meta{TaskId: j.resource.Meta.TaskId, JobId: j.resource.Meta.Id, State: protocol.TCC_JOB_TIMEOUT}
 	})}
 	for _, tc := range j.resource.Transactions {
 		tc.Meta.State = protocol.TCC_RESERVING
