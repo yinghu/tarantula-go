@@ -54,6 +54,10 @@ func (m *TaskManager) set(t *TaskResource) {
 	job := t.resource.Jobs[t.jobIndex]
 	job.Meta.State = protocol.TCC_JOB_TIMEOUT
 	go m.s.updateTask(t, func() {})
+	m.schedule(job)
+}
+
+func (m *TaskManager) schedule(job *protocol.Job) {
 	go func() {
 		m.jobs <- job
 	}()
@@ -123,9 +127,7 @@ func (m *TaskManager) finished(t *JobResource) {
 	if tr.jobIndex+1 < len(tr.resource.Jobs) {
 		tr.jobIndex++
 		next := tr.resource.Jobs[tr.jobIndex]
-		go func() {
-			m.jobs <- next
-		}()
+		m.schedule(next)
 		return
 	}
 	m.end(tr)
