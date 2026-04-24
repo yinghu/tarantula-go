@@ -15,6 +15,13 @@ type TaskResource struct {
 	//transaction bookkeeping
 	confirmed int
 	finished  int
+	jobIndex  int
+}
+
+type JobResource struct {
+	resource  *protocol.Job
+	confirmed int
+	finished  int
 }
 
 type Retrying func()
@@ -27,24 +34,37 @@ type Timeout struct {
 
 type TaskManager struct {
 	trs map[uint64]*TaskResource
+	tjs map[uint64]*JobResource
 	tms map[uint64]*Timeout
 
 	s       *DataServiceProvider
 	tasks   chan *protocol.Task
+	jobs    chan *protocol.Job
 	updates chan *protocol.Meta
 }
 
-func (m *TaskManager) start(t *TaskResource) {
+func (m *TaskManager) set(t *TaskResource) {
 	m.tms[t.resource.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(t.resource.Meta.Timeout)*time.Second, func() {
 		m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
 	})}
-	t.confirmed = len(t.resource.Transactions)
+	t.confirmed = len(t.resource.Jobs)
 	t.finished = t.confirmed
-	for _, tc := range t.resource.Transactions {
+	t.jobIndex = 0
+	job := t.resource.Jobs[t.jobIndex]
+	go func() {
+		m.jobs <- job
+	}()
+}
+
+func (m *TaskManager) start(j *JobResource) {
+	m.tms[j.resource.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(j.resource.Meta.Timeout)*time.Second, func() {
+		m.updates <- &protocol.Meta{JobId: j.resource.Meta.Id, State: protocol.TCC_JOB_TIMEOUT}
+	})}
+	for _, tc := range j.resource.Transactions {
 		tc.Meta.State = protocol.TCC_RESERVING
 		tc.Meta.Time = timestamppb.Now()
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
-			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
+			m.updates <- &protocol.Meta{TaskId: j.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
 			core.AppLog.Debug().Msg("retry to reserve with timeout")
 			tc.Meta.Time = timestamppb.Now()
@@ -56,7 +76,7 @@ func (m *TaskManager) start(t *TaskResource) {
 }
 
 func (m *TaskManager) confirmed(t *TaskResource) {
-	for _, tc := range t.resource.Transactions {
+	for _, tc := range t.resource.Jobs[0].Transactions {
 		tc.Meta.State = protocol.TCC_CONFIRMED
 		//retry to finish
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
@@ -73,7 +93,7 @@ func (m *TaskManager) confirmed(t *TaskResource) {
 }
 
 func (m *TaskManager) canceled(t *TaskResource) {
-	for _, tc := range t.resource.Transactions {
+	for _, tc := range t.resource.Jobs[0].Transactions {
 		m.closeTimer(tc.Meta.Id)
 		tc.Meta.State = protocol.TCC_CANCELED
 		//retry to finish on cancel
@@ -181,8 +201,11 @@ func (m *TaskManager) Wait() {
 		case task := <-m.tasks:
 			tr := TaskResource{resource: task}
 			m.trs[task.Meta.Id] = &tr
-			m.start(&tr)
-
+			m.set(&tr)
+		case job := <-m.jobs:
+			tj := JobResource{resource: job}
+			m.tjs[job.Meta.Id] = &tj
+			m.start(&tj)
 		case meta := <-m.updates:
 			if meta.State == protocol.TCC_TASK_CLEAR {
 				m.clearResource(meta.Id)
@@ -225,6 +248,9 @@ func (m *TaskManager) Wait() {
 			case protocol.TCC_TRANSACTION_TIMEOUT:
 				core.AppLog.Debug().Msgf("task transaction timeout %d %d", tr.confirmed, tr.finished)
 				m.timeout(meta.Id, meta)
+			case protocol.TCC_JOB_TIMEOUT:
+				core.AppLog.Debug().Msgf("task job timeout %d %d", tr.confirmed, tr.finished)
+				m.timeout(meta.JobId, meta)
 			case protocol.TCC_TASK_TIMEOUT:
 				core.AppLog.Debug().Msgf("task timeout %d %d", tr.confirmed, tr.finished)
 				m.timeout(meta.TaskId, meta)
@@ -240,7 +266,7 @@ func (m *TaskManager) Wait() {
 }
 
 func (m *TaskManager) copy(meta *protocol.Meta) *protocol.Meta {
-	cp := protocol.Meta{TaskId: meta.TaskId, Id: meta.Id, State: meta.State, NodeId: meta.NodeId, Tag: meta.Tag, Name: meta.Name, Mode: meta.Mode}
+	cp := protocol.Meta{TaskId: meta.TaskId, Id: meta.Id, State: meta.State, NodeId: meta.NodeId, Tag: meta.Tag, Name: meta.Name}
 	cp.Timeout = meta.Timeout
 	cp.Retries = meta.Retries
 	cp.Time = meta.Time

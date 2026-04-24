@@ -18,12 +18,12 @@ type TaskBuilder struct {
 }
 
 func NewTaskBuilder(meta *protocol.Meta) *TaskBuilder {
-	trans := make([]*protocol.Transaction, 0)
-	return &TaskBuilder{Target: &protocol.Task{Meta: meta, Transactions: trans}}
+	jobs := make([]*protocol.Job, 0)
+	return &TaskBuilder{Target: &protocol.Task{Meta: meta, Jobs: jobs}}
 }
 
-func (b *TaskBuilder) Add(t *protocol.Transaction) *TaskBuilder {
-	b.Target.Transactions = append(b.Target.Transactions, t)
+func (b *TaskBuilder) Add(j *protocol.Job) *TaskBuilder {
+	b.Target.Jobs = append(b.Target.Jobs, j)
 	return b
 }
 

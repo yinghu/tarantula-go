@@ -24,7 +24,7 @@ const (
 type Task struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Meta          *Meta                  `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
-	Transactions  []*Transaction         `protobuf:"bytes,2,rep,name=transactions,proto3" json:"transactions,omitempty"`
+	Jobs          []*Job                 `protobuf:"bytes,2,rep,name=jobs,proto3" json:"jobs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -66,9 +66,9 @@ func (x *Task) GetMeta() *Meta {
 	return nil
 }
 
-func (x *Task) GetTransactions() []*Transaction {
+func (x *Task) GetJobs() []*Job {
 	if x != nil {
-		return x.Transactions
+		return x.Jobs
 	}
 	return nil
 }
@@ -78,11 +78,11 @@ var File_task_proto protoreflect.FileDescriptor
 const file_task_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"task.proto\x12\bprotocol\x1a\x11transaction.proto\x1a\n" +
-	"meta.proto\"e\n" +
+	"task.proto\x12\bprotocol\x1a\tjob.proto\x1a\n" +
+	"meta.proto\"M\n" +
 	"\x04Task\x12\"\n" +
-	"\x04meta\x18\x01 \x01(\v2\x0e.protocol.MetaR\x04meta\x129\n" +
-	"\ftransactions\x18\x02 \x03(\v2\x15.protocol.TransactionR\ftransactionsBL\n" +
+	"\x04meta\x18\x01 \x01(\v2\x0e.protocol.MetaR\x04meta\x12!\n" +
+	"\x04jobs\x18\x02 \x03(\v2\r.protocol.JobR\x04jobsBL\n" +
 	"\x17com.icodesoftware.protoB\vTaskFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -99,13 +99,13 @@ func file_task_proto_rawDescGZIP() []byte {
 
 var file_task_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_task_proto_goTypes = []any{
-	(*Task)(nil),        // 0: protocol.Task
-	(*Meta)(nil),        // 1: protocol.Meta
-	(*Transaction)(nil), // 2: protocol.Transaction
+	(*Task)(nil), // 0: protocol.Task
+	(*Meta)(nil), // 1: protocol.Meta
+	(*Job)(nil),  // 2: protocol.Job
 }
 var file_task_proto_depIdxs = []int32{
 	1, // 0: protocol.Task.meta:type_name -> protocol.Meta
-	2, // 1: protocol.Task.transactions:type_name -> protocol.Transaction
+	2, // 1: protocol.Task.jobs:type_name -> protocol.Job
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -118,7 +118,7 @@ func file_task_proto_init() {
 	if File_task_proto != nil {
 		return
 	}
-	file_transaction_proto_init()
+	file_job_proto_init()
 	file_meta_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{

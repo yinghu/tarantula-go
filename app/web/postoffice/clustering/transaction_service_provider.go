@@ -12,9 +12,10 @@ import (
 )
 
 const (
-	TASK_TIMEOUT_SECONDS        uint32 = 60
+	TASK_TIMEOUT_SECONDS        uint32 = 100
+	JOB_TIMEOUT_SECONDS         uint32 = 30
 	TRANSACTION_TIMEOUT_SECONDS uint32 = 10
-	TASK_RETRY_MAX              uint32 = 3
+	TCC_RETRY_MAX               uint32 = 3
 )
 
 type ClearResource func()

@@ -25,14 +25,14 @@ const (
 type Meta struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TaskId        uint64                 `protobuf:"fixed64,1,opt,name=taskId,proto3" json:"taskId,omitempty"`
-	Id            uint64                 `protobuf:"fixed64,2,opt,name=id,proto3" json:"id,omitempty"`
-	NodeId        string                 `protobuf:"bytes,3,opt,name=nodeId,proto3" json:"nodeId,omitempty"`
-	Tag           string                 `protobuf:"bytes,4,opt,name=tag,proto3" json:"tag,omitempty"`
-	Name          string                 `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`
-	Timeout       uint32                 `protobuf:"fixed32,6,opt,name=timeout,proto3" json:"timeout,omitempty"`
-	Retries       uint32                 `protobuf:"fixed32,7,opt,name=retries,proto3" json:"retries,omitempty"`
-	State         uint32                 `protobuf:"fixed32,8,opt,name=state,proto3" json:"state,omitempty"`
-	Mode          uint32                 `protobuf:"fixed32,9,opt,name=mode,proto3" json:"mode,omitempty"` //streaming, concurrent
+	JobId         uint64                 `protobuf:"fixed64,2,opt,name=jobId,proto3" json:"jobId,omitempty"`
+	Id            uint64                 `protobuf:"fixed64,3,opt,name=id,proto3" json:"id,omitempty"`
+	NodeId        string                 `protobuf:"bytes,4,opt,name=nodeId,proto3" json:"nodeId,omitempty"`
+	Tag           string                 `protobuf:"bytes,5,opt,name=tag,proto3" json:"tag,omitempty"`
+	Name          string                 `protobuf:"bytes,6,opt,name=name,proto3" json:"name,omitempty"`
+	Timeout       uint32                 `protobuf:"fixed32,7,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	Retries       uint32                 `protobuf:"fixed32,8,opt,name=retries,proto3" json:"retries,omitempty"`
+	State         uint32                 `protobuf:"fixed32,9,opt,name=state,proto3" json:"state,omitempty"`
 	Time          *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=time,proto3" json:"time,omitempty"`
 	Persistent    bool                   `protobuf:"varint,11,opt,name=persistent,proto3" json:"persistent,omitempty"`
 	Description   string                 `protobuf:"bytes,12,opt,name=description,proto3" json:"description,omitempty"`
@@ -73,6 +73,13 @@ func (*Meta) Descriptor() ([]byte, []int) {
 func (x *Meta) GetTaskId() uint64 {
 	if x != nil {
 		return x.TaskId
+	}
+	return 0
+}
+
+func (x *Meta) GetJobId() uint64 {
+	if x != nil {
+		return x.JobId
 	}
 	return 0
 }
@@ -126,13 +133,6 @@ func (x *Meta) GetState() uint32 {
 	return 0
 }
 
-func (x *Meta) GetMode() uint32 {
-	if x != nil {
-		return x.Mode
-	}
-	return 0
-}
-
 func (x *Meta) GetTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.Time
@@ -159,17 +159,17 @@ var File_meta_proto protoreflect.FileDescriptor
 const file_meta_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"meta.proto\x12\bprotocol\x1a\x1fgoogle/protobuf/timestamp.proto\"\xbc\x02\n" +
+	"meta.proto\x12\bprotocol\x1a\x1fgoogle/protobuf/timestamp.proto\"\xbe\x02\n" +
 	"\x04Meta\x12\x16\n" +
-	"\x06taskId\x18\x01 \x01(\x06R\x06taskId\x12\x0e\n" +
-	"\x02id\x18\x02 \x01(\x06R\x02id\x12\x16\n" +
-	"\x06nodeId\x18\x03 \x01(\tR\x06nodeId\x12\x10\n" +
-	"\x03tag\x18\x04 \x01(\tR\x03tag\x12\x12\n" +
-	"\x04name\x18\x05 \x01(\tR\x04name\x12\x18\n" +
-	"\atimeout\x18\x06 \x01(\aR\atimeout\x12\x18\n" +
-	"\aretries\x18\a \x01(\aR\aretries\x12\x14\n" +
-	"\x05state\x18\b \x01(\aR\x05state\x12\x12\n" +
-	"\x04mode\x18\t \x01(\aR\x04mode\x12.\n" +
+	"\x06taskId\x18\x01 \x01(\x06R\x06taskId\x12\x14\n" +
+	"\x05jobId\x18\x02 \x01(\x06R\x05jobId\x12\x0e\n" +
+	"\x02id\x18\x03 \x01(\x06R\x02id\x12\x16\n" +
+	"\x06nodeId\x18\x04 \x01(\tR\x06nodeId\x12\x10\n" +
+	"\x03tag\x18\x05 \x01(\tR\x03tag\x12\x12\n" +
+	"\x04name\x18\x06 \x01(\tR\x04name\x12\x18\n" +
+	"\atimeout\x18\a \x01(\aR\atimeout\x12\x18\n" +
+	"\aretries\x18\b \x01(\aR\aretries\x12\x14\n" +
+	"\x05state\x18\t \x01(\aR\x05state\x12.\n" +
 	"\x04time\x18\n" +
 	" \x01(\v2\x1a.google.protobuf.TimestampR\x04time\x12\x1e\n" +
 	"\n" +
