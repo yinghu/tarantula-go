@@ -126,7 +126,7 @@ func (c *DataServiceProvider) updateTask(t *TaskResource, clear ClearResource) {
 	t.revision++
 	core.AppLog.Info().Msgf("saved %v", resp)
 	tx, _ := c.load(t.resource.Meta.Id)
-	core.AppLog.Debug().Msgf("v %v", tx.resource.Meta)
-	core.AppLog.Debug().Msgf("j %v", tx.resource.Meta)
+	core.AppLog.Debug().Msgf("v %v", tx.resource.Validator.Meta)
+	core.AppLog.Debug().Msgf("j %v", tx.resource.Job.Meta)
 	core.AppLog.Debug().Msgf("t %v", tx.resource.Meta)
 }
