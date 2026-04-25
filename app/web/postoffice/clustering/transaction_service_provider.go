@@ -82,10 +82,10 @@ func (c *DataServiceProvider) saveLog(meta *protocol.Meta) {
 	k, _ := buff.Read(0)
 	e.Event.Key.Array = k
 	go c.runPublish(e)
-	go c.loadLog(meta)
+	//go c.loadLog(meta)
 }
 
-func (c *DataServiceProvider) loadLog(meta *protocol.Meta) {
+func (c *DataServiceProvider) XloadLog(meta *protocol.Meta) {
 	time.Sleep(1 * time.Second)
 	tf := event.NewTransactionEventFactory()
 	buff := core.NewBuffer(20)
@@ -125,8 +125,8 @@ func (c *DataServiceProvider) updateTask(t *TaskResource, clear ClearResource) {
 	}
 	t.revision++
 	core.AppLog.Info().Msgf("saved %v", resp)
-	tx, _ := c.load(t.resource.Meta.Id)
-	core.AppLog.Debug().Msgf("v %v", tx.resource.Validator.Meta)
-	core.AppLog.Debug().Msgf("j %v", tx.resource.Job.Meta)
-	core.AppLog.Debug().Msgf("t %v", tx.resource.Meta)
+	//tx, _ := c.load(t.resource.Meta.Id)
+	//core.AppLog.Debug().Msgf("v %v", tx.resource.Validator.Meta)
+	//core.AppLog.Debug().Msgf("j %v", tx.resource.Job.Meta)
+	//core.AppLog.Debug().Msgf("t %v", tx.resource.Meta)
 }
