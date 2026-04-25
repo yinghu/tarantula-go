@@ -55,13 +55,13 @@ func (m *TaskManager) set(t *TaskResource) {
 	t.jobIndex = 0
 	job := t.pending[t.jobIndex]
 	job.Meta.State = protocol.TCC_JOB_TIMEOUT
+	m.schedule(t,job)
+}
+
+func (m *TaskManager) schedule(t *TaskResource,job *protocol.Job) {
 	go m.s.updateTask(t, func() {
 		core.AppLog.Debug().Msgf("task updated %d", t.revision)
 	})
-	m.schedule(job)
-}
-
-func (m *TaskManager) schedule(job *protocol.Job) {
 	go func() {
 		m.jobs <- job
 	}()
@@ -133,12 +133,9 @@ func (m *TaskManager) finished(t *JobResource) {
 		tr.jobIndex++
 		next := tr.pending[tr.jobIndex]
 		next.Meta.State = protocol.TCC_JOB_TIMEOUT
-		m.schedule(next)
+		m.schedule(tr,next)
 		return
 	}
-	go m.s.updateTask(tr, func() {
-		core.AppLog.Debug().Msgf("task updated %d", tr.revision)
-	})
 	m.end(tr)
 }
 

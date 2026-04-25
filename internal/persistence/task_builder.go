@@ -38,7 +38,7 @@ func (b *TaskBuilder) Task() *protocol.Task {
 // query request
 func (b *TaskBuilder) Request() (*protocol.Request, error) {
 	req := protocol.Request{Opt: core.CREATE_DATA_REQUEST, Data: &protocol.Data{}}
-	if b.Target.Meta.Id <= 0 {
+	if b.Target.Meta.Id == 0 {
 		return &req, fmt.Errorf("task id should be more than zero uint64")
 	}
 	buff := core.NewBuffer(8)
