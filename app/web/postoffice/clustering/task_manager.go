@@ -14,8 +14,6 @@ type TaskResource struct {
 	resource *protocol.Task
 	//transaction bookkeeping
 	revision uint64
-	//confirmed int
-	//finished  int
 	pending  []*protocol.Job
 	jobIndex int
 }
@@ -39,7 +37,8 @@ type TaskManager struct {
 	tjs map[uint64]*JobResource
 	tms map[uint64]*Timeout
 
-	s       *DataServiceProvider
+	s *DataServiceProvider
+
 	tasks   chan *protocol.Task
 	jobs    chan *protocol.Job
 	updates chan *protocol.Meta
@@ -49,14 +48,16 @@ func (m *TaskManager) set(t *TaskResource) {
 	m.tms[t.resource.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(t.resource.Meta.Timeout)*time.Second, func() {
 		m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
 	})}
-	if t.resource.Validator!=nil{
+	if t.resource.Validator != nil {
 		t.pending = append(t.pending, t.resource.Validator)
 	}
 	t.pending = append(t.pending, t.resource.Job)
 	t.jobIndex = 0
 	job := t.pending[t.jobIndex]
 	job.Meta.State = protocol.TCC_JOB_TIMEOUT
-	go m.s.updateTask(t, func() {})
+	go m.s.updateTask(t, func() {
+		core.AppLog.Debug().Msgf("task updated %d", t.revision)
+	})
 	m.schedule(job)
 }
 
@@ -127,12 +128,17 @@ func (m *TaskManager) canceled(t *JobResource) {
 func (m *TaskManager) finished(t *JobResource) {
 	m.closeTimer(t.resource.Meta.Id)
 	tr := m.trs[t.resource.Meta.TaskId]
+	t.resource.Meta.State = protocol.TCC_FINISHED
 	if tr.jobIndex+1 < len(tr.pending) {
 		tr.jobIndex++
 		next := tr.pending[tr.jobIndex]
+		next.Meta.State = protocol.TCC_JOB_TIMEOUT
 		m.schedule(next)
 		return
 	}
+	go m.s.updateTask(tr, func() {
+		core.AppLog.Debug().Msgf("task updated %d", tr.revision)
+	})
 	m.end(tr)
 }
 
@@ -227,7 +233,7 @@ func (m *TaskManager) Wait() {
 	for m.s.running {
 		select {
 		case task := <-m.tasks:
-			tr := TaskResource{resource: task, revision: 1,pending: make([]*protocol.Job, 0)}
+			tr := TaskResource{resource: task, revision: 1, pending: make([]*protocol.Job, 0)}
 			m.trs[task.Meta.Id] = &tr
 			m.set(&tr)
 		case job := <-m.jobs:
@@ -235,7 +241,6 @@ func (m *TaskManager) Wait() {
 			m.tjs[job.Meta.Id] = &tj
 			m.start(&tj)
 		case meta := <-m.updates:
-			core.AppLog.Debug().Msgf("CMETA %v", meta)
 			if meta.State == protocol.TCC_TASK_CLEAR {
 				m.clearResource(meta.Id)
 				continue
