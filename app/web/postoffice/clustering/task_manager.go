@@ -94,7 +94,7 @@ func (m *TaskManager) start(j *JobResource) {
 }
 
 func (m *TaskManager) stop(t *JobResource) {
-
+	
 }
 
 func (m *TaskManager) confirmed(t *JobResource) {
