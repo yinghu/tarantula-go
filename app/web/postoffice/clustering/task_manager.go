@@ -94,7 +94,11 @@ func (m *TaskManager) start(j *JobResource) {
 }
 
 func (m *TaskManager) stop(t *JobResource) {
-	
+	tr := m.trs[t.resource.Meta.TaskId]
+	tr.resource.Meta.State = protocol.TCC_FINISHED
+	tr.resource.Validator.Meta.State = protocol.TCC_FINISHED
+	tr.resource.Job.Meta.State = protocol.TCC_FINISHED
+	m.end(tr)
 }
 
 func (m *TaskManager) confirmed(t *JobResource) {
