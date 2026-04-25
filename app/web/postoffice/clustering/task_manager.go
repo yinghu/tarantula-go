@@ -190,7 +190,6 @@ func (m *TaskManager) timeout(mkey uint64, meta *protocol.Meta) {
 		return
 	}
 	delete(m.tms, mkey)
-
 }
 
 func (m *TaskManager) clearResource(rkey uint64) {
