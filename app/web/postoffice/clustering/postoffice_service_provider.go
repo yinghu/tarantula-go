@@ -114,12 +114,10 @@ func (c *DataServiceProvider) List(in *protocol.Request, stream grpc.ServerStrea
 func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
 	task.Meta.Id = c.tid()
 	task.Meta.Timeout = TASK_TIMEOUT_SECONDS
-	task.Meta.Retries = TCC_RETRY_MAX
 	if task.Validator != nil {
 		task.Validator.Meta.TaskId = task.Meta.Id
 		task.Validator.Meta.Id = c.tid()
 		task.Validator.Meta.Timeout = JOB_TIMEOUT_SECONDS
-		task.Validator.Meta.Retries = TCC_RETRY_MAX
 		for _, t := range task.Validator.Transactions {
 			t.Meta.TaskId = task.Meta.Id
 			t.Meta.JobId = task.Validator.Meta.Id
@@ -134,7 +132,6 @@ func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*
 	task.Job.Meta.TaskId = task.Meta.Id
 	task.Job.Meta.Id = c.tid()
 	task.Job.Meta.Timeout = JOB_TIMEOUT_SECONDS
-	task.Job.Meta.Retries = TCC_RETRY_MAX
 	for _, t := range task.Job.Transactions {
 		t.Meta.TaskId = task.Meta.Id
 		t.Meta.JobId = task.Job.Meta.Id
