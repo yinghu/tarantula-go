@@ -15,11 +15,11 @@ func TestTaskBuilder(t *testing.T) {
 	jb := NewJobBuilder(&protocol.Meta{NodeId: "node1", Tag: "", Name: "register", Id: 1})
 	jb.Add(&protocol.Transaction{Meta: &protocol.Meta{NodeId: "node1", Tag: "inventory", Name: "grant", TaskId: 1, Id: 10}, Object: kv})
 	jb.Add(&protocol.Transaction{Meta: &protocol.Meta{NodeId: "node1", Tag: "asset", Name: "update", TaskId: 1, Id: 20}, Object: kv})
-	tb.Add(jb.Job())
+	tb.SetJob(jb.Job())
 	task := tb.Task()
 	fmt.Printf("task meta %v\n", task.Meta)
-	fmt.Printf("task trans 0 %v\n", task.Jobs[0].Transactions[0])
-	fmt.Printf("task trans 1 %v\n", task.Jobs[0].Transactions[1])
+	fmt.Printf("task trans 0 %v\n", task.Job.Transactions[0])
+	fmt.Printf("task trans 1 %v\n", task.Job.Transactions[1])
 	req, err := tb.Request()
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
@@ -38,7 +38,7 @@ func TestTaskBuilder(t *testing.T) {
 		t.Errorf("should not be error %s", err.Error())
 	}
 	fmt.Printf("task meta %v\n", tk.Meta)
-	fmt.Printf("task trans 0 %v\n", tk.Jobs[0].Transactions[0])
-	fmt.Printf("task trans 1 %v\n", tk.Jobs[0].Transactions[1])
+	fmt.Printf("task trans 0 %v\n", tk.Job.Transactions[0])
+	fmt.Printf("task trans 1 %v\n", tk.Job.Transactions[1])
 
 }

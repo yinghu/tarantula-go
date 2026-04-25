@@ -115,19 +115,34 @@ func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*
 	task.Meta.Id = c.tid()
 	task.Meta.Timeout = TASK_TIMEOUT_SECONDS
 	task.Meta.Retries = TCC_RETRY_MAX
-	for _, j := range task.Jobs {
-		j.Meta.TaskId = task.Meta.Id
-		j.Meta.Id = c.tid()
-		j.Meta.Timeout = JOB_TIMEOUT_SECONDS
-		j.Meta.Retries = TCC_RETRY_MAX
-		for _, t := range j.Transactions {
+	if task.Validator != nil {
+		task.Validator.Meta.TaskId = task.Meta.Id
+		task.Validator.Meta.Id = c.tid()
+		task.Validator.Meta.Timeout = JOB_TIMEOUT_SECONDS
+		task.Validator.Meta.Retries = TCC_RETRY_MAX
+		for _, t := range task.Validator.Transactions {
 			t.Meta.TaskId = task.Meta.Id
-			t.Meta.JobId = j.Meta.Id
+			t.Meta.JobId = task.Validator.Meta.Id
 			t.Meta.Id = c.tid()
 			t.Meta.Timeout = TRANSACTION_TIMEOUT_SECONDS
 			t.Meta.Retries = TCC_RETRY_MAX
 		}
 	}
+	if task.Job == nil || len(task.Job.Transactions) == 0 {
+		return &protocol.Response{Successful: false, Message: ""}, fmt.Errorf("task job reqiured")
+	}
+	task.Job.Meta.TaskId = task.Meta.Id
+	task.Job.Meta.Id = c.tid()
+	task.Job.Meta.Timeout = JOB_TIMEOUT_SECONDS
+	task.Job.Meta.Retries = TCC_RETRY_MAX
+	for _, t := range task.Job.Transactions {
+		t.Meta.TaskId = task.Meta.Id
+		t.Meta.JobId = task.Job.Meta.Id
+		t.Meta.Id = c.tid()
+		t.Meta.Timeout = TRANSACTION_TIMEOUT_SECONDS
+		t.Meta.Retries = TCC_RETRY_MAX
+	}
+
 	tb := persistence.TaskBuilder{Target: task}
 	req, err := tb.Request()
 	if err != nil {

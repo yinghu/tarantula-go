@@ -78,8 +78,8 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 		jb := persistence.NewJobBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
 		jb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "grant"}, Object: kv})
 		jb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "update"}, Object: kv})
-		tb.Add(jb1.Target)
-		tb.Add(jb.Target)
+		tb.SetValidator(jb1.Target)
+		tb.SetJob(jb.Target)
 		//tsk := protocol.Task{Meta: &protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"}}
 
 		//obj, err := anypb.New(login)

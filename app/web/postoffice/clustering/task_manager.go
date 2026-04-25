@@ -16,6 +16,7 @@ type TaskResource struct {
 	revision uint64
 	//confirmed int
 	//finished  int
+	pending  []*protocol.Job
 	jobIndex int
 }
 
@@ -48,10 +49,12 @@ func (m *TaskManager) set(t *TaskResource) {
 	m.tms[t.resource.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(t.resource.Meta.Timeout)*time.Second, func() {
 		m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
 	})}
-	//t.confirmed = len(t.resource.Jobs)
-	//t.finished = t.confirmed
+	if t.resource.Validator!=nil{
+		t.pending = append(t.pending, t.resource.Validator)
+	}
+	t.pending = append(t.pending, t.resource.Job)
 	t.jobIndex = 0
-	job := t.resource.Jobs[t.jobIndex]
+	job := t.pending[t.jobIndex]
 	job.Meta.State = protocol.TCC_JOB_TIMEOUT
 	go m.s.updateTask(t, func() {})
 	m.schedule(job)
@@ -124,9 +127,9 @@ func (m *TaskManager) canceled(t *JobResource) {
 func (m *TaskManager) finished(t *JobResource) {
 	m.closeTimer(t.resource.Meta.Id)
 	tr := m.trs[t.resource.Meta.TaskId]
-	if tr.jobIndex+1 < len(tr.resource.Jobs) {
+	if tr.jobIndex+1 < len(tr.pending) {
 		tr.jobIndex++
-		next := tr.resource.Jobs[tr.jobIndex]
+		next := tr.pending[tr.jobIndex]
 		m.schedule(next)
 		return
 	}
@@ -224,7 +227,7 @@ func (m *TaskManager) Wait() {
 	for m.s.running {
 		select {
 		case task := <-m.tasks:
-			tr := TaskResource{resource: task, revision: 1}
+			tr := TaskResource{resource: task, revision: 1,pending: make([]*protocol.Job, 0)}
 			m.trs[task.Meta.Id] = &tr
 			m.set(&tr)
 		case job := <-m.jobs:

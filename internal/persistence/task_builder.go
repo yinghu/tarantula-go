@@ -9,8 +9,7 @@ import (
 )
 
 const (
-	
-	TASK_CLASS_ID   uint32 = 1
+	TASK_CLASS_ID uint32 = 1
 )
 
 type TaskBuilder struct {
@@ -18,12 +17,16 @@ type TaskBuilder struct {
 }
 
 func NewTaskBuilder(meta *protocol.Meta) *TaskBuilder {
-	jobs := make([]*protocol.Job, 0)
-	return &TaskBuilder{Target: &protocol.Task{Meta: meta, Jobs: jobs}}
+	return &TaskBuilder{Target: &protocol.Task{Meta: meta}}
 }
 
-func (b *TaskBuilder) Add(j *protocol.Job) *TaskBuilder {
-	b.Target.Jobs = append(b.Target.Jobs, j)
+func (b *TaskBuilder) SetJob(j *protocol.Job) *TaskBuilder {
+	b.Target.Job = j
+	return b
+}
+
+func (b *TaskBuilder) SetValidator(j *protocol.Job) *TaskBuilder {
+	b.Target.Validator = j
 	return b
 }
 
