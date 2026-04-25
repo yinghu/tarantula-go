@@ -19,9 +19,14 @@ type TaskResource struct {
 }
 
 type JobResource struct {
-	resource  *protocol.Job
-	confirmed int
-	finished  int
+	resource    *protocol.Job
+	joinParties int
+	confirmed   int
+}
+
+func (j *JobResource) join() bool {
+	j.confirmed++
+	return j.joinParties == j.confirmed
 }
 
 type Retrying func()
@@ -55,10 +60,10 @@ func (m *TaskManager) set(t *TaskResource) {
 	t.jobIndex = 0
 	job := t.pending[t.jobIndex]
 	job.Meta.State = protocol.TCC_JOB_TIMEOUT
-	m.schedule(t,job)
+	m.schedule(t, job)
 }
 
-func (m *TaskManager) schedule(t *TaskResource,job *protocol.Job) {
+func (m *TaskManager) schedule(t *TaskResource, job *protocol.Job) {
 	go m.s.updateTask(t, func() {
 		core.AppLog.Debug().Msgf("task updated %d", t.revision)
 	})
@@ -71,8 +76,8 @@ func (m *TaskManager) start(j *JobResource) {
 	m.tms[j.resource.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(j.resource.Meta.Timeout)*time.Second, func() {
 		m.updates <- &protocol.Meta{TaskId: j.resource.Meta.TaskId, JobId: j.resource.Meta.Id, State: protocol.TCC_JOB_TIMEOUT}
 	})}
-	j.confirmed = len(j.resource.Transactions)
-	j.finished = j.confirmed
+	j.joinParties = len(j.resource.Transactions)
+	j.confirmed = 0
 	for _, tc := range j.resource.Transactions {
 		tc.Meta.State = protocol.TCC_RESERVING
 		tc.Meta.Time = timestamppb.Now()
@@ -93,6 +98,7 @@ func (m *TaskManager) stop(t *JobResource) {
 }
 
 func (m *TaskManager) confirmed(t *JobResource) {
+	t.confirmed = 0
 	for _, tc := range t.resource.Transactions {
 		tc.Meta.State = protocol.TCC_CONFIRMED
 		//retry to finish
@@ -110,6 +116,9 @@ func (m *TaskManager) confirmed(t *JobResource) {
 }
 
 func (m *TaskManager) canceled(t *JobResource) {
+	t.confirmed = 0
+	tr := m.trs[t.resource.Meta.TaskId]
+	tr.jobIndex = len(tr.pending)
 	for _, tc := range t.resource.Transactions {
 		m.closeTimer(tc.Meta.Id)
 		tc.Meta.State = protocol.TCC_CANCELED
@@ -133,7 +142,7 @@ func (m *TaskManager) finished(t *JobResource) {
 		tr.jobIndex++
 		next := tr.pending[tr.jobIndex]
 		next.Meta.State = protocol.TCC_JOB_TIMEOUT
-		m.schedule(tr,next)
+		m.schedule(tr, next)
 		return
 	}
 	m.end(tr)
@@ -142,6 +151,7 @@ func (m *TaskManager) finished(t *JobResource) {
 func (m *TaskManager) end(t *TaskResource) {
 	t.resource.Meta.State = protocol.TCC_FINISHED
 	m.closeTimer(t.resource.Meta.Id)
+
 	go m.s.updateTask(t, func() {
 		m.updates <- &protocol.Meta{Id: t.resource.Meta.Id, State: protocol.TCC_TASK_CLEAR}
 	})
@@ -260,9 +270,8 @@ func (m *TaskManager) Wait() {
 			tj := m.tjs[meta.JobId]
 			switch meta.State {
 			case protocol.TCC_CONFIRMED:
-				tj.confirmed--
 				m.closeTimer(meta.Id)
-				if tj.confirmed == 0 {
+				if tj.join() {
 					m.confirmed(tj)
 				}
 				core.AppLog.Debug().Msgf("job confirmed %v", meta)
@@ -272,9 +281,8 @@ func (m *TaskManager) Wait() {
 
 			case protocol.TCC_FINISHED:
 				core.AppLog.Debug().Msgf("job finished %v", meta)
-				tj.finished--
 				m.closeTimer(meta.Id)
-				if tj.finished == 0 {
+				if tj.join() {
 					m.finished(tj)
 				}
 
