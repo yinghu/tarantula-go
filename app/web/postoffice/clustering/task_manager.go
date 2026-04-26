@@ -192,7 +192,7 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 		return nil, err
 	}
 	if tr.resource.Meta.State == protocol.TCC_FINISHED {
-		return nil, fmt.Errorf("task alread finished")
+		return nil, fmt.Errorf("task alread finished on %d", meta.Id)
 	}
 	m.trs[meta.TaskId] = tr
 	if tr.resource.Validator.Meta.State != protocol.TCC_FINISHED {
