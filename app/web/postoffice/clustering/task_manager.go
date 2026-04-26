@@ -29,6 +29,10 @@ func (j *JobResource) join() bool {
 	return j.joinParties == j.confirmed
 }
 
+type TransactionResource struct {
+	resource *protocol.Transaction
+}
+
 type Retrying func()
 type Timeout struct {
 	t *time.Timer
@@ -50,9 +54,9 @@ type TaskManager struct {
 }
 
 func (m *TaskManager) set(t *TaskResource) {
-	m.tms[t.resource.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(t.resource.Meta.Timeout)*time.Second, func() {
-		m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
-	})}
+	//m.tms[t.resource.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(t.resource.Meta.Timeout)*time.Second, func() {
+		//m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
+	//})}
 	if t.resource.Validator != nil {
 		t.pending = append(t.pending, t.resource.Validator)
 	}
@@ -154,7 +158,7 @@ func (m *TaskManager) finished(t *JobResource) {
 
 func (m *TaskManager) end(t *TaskResource) {
 	t.resource.Meta.State = protocol.TCC_FINISHED
-	m.closeTimer(t.resource.Meta.Id)
+	//m.closeTimer(t.resource.Meta.Id)
 
 	go m.s.updateTask(t, func() {
 		m.updates <- &protocol.Meta{Id: t.resource.Meta.Id, State: protocol.TCC_TASK_CLEAR}
@@ -207,13 +211,31 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 	if tr.resource.Meta.State == protocol.TCC_FINISHED {
 		return nil, fmt.Errorf("task alread finished")
 	}
-	m.tms[meta.TaskId] = &Timeout{t: time.AfterFunc(time.Duration(tr.resource.Meta.Timeout)*time.Second, func() {
-		m.updates <- &protocol.Meta{TaskId: tr.resource.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
-	}), p: func() {
-		core.AppLog.Debug().Msg("running task with timeout")
-	}}
+	//m.tms[meta.TaskId] = &Timeout{t: time.AfterFunc(time.Duration(tr.resource.Meta.Timeout)*time.Second, func() {
+		//m.updates <- &protocol.Meta{TaskId: tr.resource.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
+	//}), p: func() {
+		//core.AppLog.Debug().Msg("running task with timeout")
+	//}}
 	m.trs[meta.TaskId] = tr
+	if tr.resource.Validator.Meta.State != protocol.TCC_FINISHED {
+		tr.pending = append(tr.pending, tr.resource.Validator)
+	}
+	if tr.resource.Job.Meta.State != protocol.TCC_FINISHED {
+		tr.pending = append(tr.pending, tr.resource.Job)
+	}
+	if len(tr.pending) == 0 {
+		return tr, fmt.Errorf("no job available")
+	}
+	tr.jobIndex = 0
 
+	job := tr.pending[tr.jobIndex]
+	job.Meta.State = protocol.TCC_JOB_TIMEOUT
+	go m.s.updateTask(tr, func() {
+		core.AppLog.Debug().Msgf("task updated from reload %d", tr.revision)
+	})
+	tj := JobResource{resource: job}
+	m.tjs[job.Meta.Id] = &tj
+	m.start(&tj)
 	return tr, nil
 }
 
@@ -269,7 +291,6 @@ func (m *TaskManager) Wait() {
 				core.AppLog.Warn().Msgf("task already finished %v", meta)
 				continue
 			}
-			m.log(m.copy(meta))
 			tj := m.tjs[meta.JobId]
 			switch meta.State {
 			case protocol.TCC_CONFIRMED:
@@ -296,10 +317,10 @@ func (m *TaskManager) Wait() {
 				core.AppLog.Debug().Msgf("task job timeout %d", tr.jobIndex)
 				m.timeout(meta.JobId, meta)
 				m.stop(tj)
-			case protocol.TCC_TASK_TIMEOUT:
-				core.AppLog.Debug().Msgf("task timeout %d", tr.jobIndex)
-				m.timeout(meta.TaskId, meta)
-				m.end(tr) //forcefully finished
+			//case protocol.TCC_TASK_TIMEOUT:
+				//core.AppLog.Debug().Msgf("task timeout %d", tr.jobIndex)
+				//m.timeout(meta.TaskId, meta)
+				//m.end(tr) //forcefully finished
 			}
 		}
 	}

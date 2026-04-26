@@ -10,13 +10,15 @@ const (
 	TCC_RESERVING uint32 = 1
 	TCC_CONFIRMED uint32 = 2
 	TCC_CANCELED  uint32 = 3
-	TCC_FINISHED  uint32 = 4
 
-	TCC_TRANSACTION_TIMEOUT uint32 = 5
-	TCC_JOB_TIMEOUT         uint32 = 6
-	TCC_TASK_TIMEOUT        uint32 = 7
+	TCC_FINISHING uint32 = 4
+	TCC_FINISHED uint32 = 5
 
-	TCC_TASK_CLEAR uint32 = 8
+	TCC_TRANSACTION_TIMEOUT uint32 = 6
+	TCC_JOB_TIMEOUT         uint32 = 7
+	//TCC_TASK_TIMEOUT        uint32 = 8
+
+	TCC_TASK_CLEAR uint32 = 9
 )
 
 type TccTransationListener struct {

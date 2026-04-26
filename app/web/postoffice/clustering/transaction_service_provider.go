@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	TASK_TIMEOUT_SECONDS        uint32 = 100
+	//TASK_TIMEOUT_SECONDS        uint32 = 100
 	JOB_TIMEOUT_SECONDS         uint32 = 60
 	TRANSACTION_TIMEOUT_SECONDS uint32 = 10
 	TCC_RETRY_MAX               uint32 = 3
@@ -70,7 +70,7 @@ func (c *DataServiceProvider) load(taskId uint64) (*TaskResource, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &TaskResource{resource: t, revision: resp.Data.List[0].Header.Revision}, nil
+	return &TaskResource{resource: t, revision: resp.Data.List[0].Header.Revision,pending: make([]*protocol.Job, 0)}, nil
 }
 func (c *DataServiceProvider) saveLog(meta *protocol.Meta) {
 	tf := event.NewTransactionEventFactory()
