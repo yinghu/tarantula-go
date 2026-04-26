@@ -259,7 +259,7 @@ func (m *TaskManager) Wait() {
 		select {
 		case task := <-m.tasks:
 			tr := TaskResource{resource: task, revision: 1, pending: make([]*protocol.Job, 0)}
-			//m.trs[task.Meta.Id] = &tr
+			m.trs[task.Meta.Id] = &tr
 			m.set(&tr)
 		case job := <-m.jobs:
 			tj := JobResource{resource: job}
