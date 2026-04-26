@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
@@ -58,7 +57,7 @@ func (s *PresenceService) Start(env core.Env) error {
 	}})
 	s.Cluster().Register("register", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("reserve %v", e)
-		return fmt.Errorf("no")
+		return nil ///fmt.Errorf("no")
 	}, Confirm: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("confirm %v", e)
 		return nil
