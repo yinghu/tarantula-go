@@ -54,9 +54,7 @@ type TaskManager struct {
 }
 
 func (m *TaskManager) set(t *TaskResource) {
-	//m.tms[t.resource.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(t.resource.Meta.Timeout)*time.Second, func() {
-		//m.updates <- &protocol.Meta{TaskId: t.resource.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
-	//})}
+
 	if t.resource.Validator != nil {
 		t.pending = append(t.pending, t.resource.Validator)
 	}
@@ -158,7 +156,6 @@ func (m *TaskManager) finished(t *JobResource) {
 
 func (m *TaskManager) end(t *TaskResource) {
 	t.resource.Meta.State = protocol.TCC_FINISHED
-	//m.closeTimer(t.resource.Meta.Id)
 
 	go m.s.updateTask(t, func() {
 		m.updates <- &protocol.Meta{Id: t.resource.Meta.Id, State: protocol.TCC_TASK_CLEAR}
@@ -169,13 +166,14 @@ func (m *TaskManager) end(t *TaskResource) {
 	go m.s.runPublish(e)
 }
 
-func (m *TaskManager) closeTimer(mkey uint64) {
+func (m *TaskManager) closeTimer(mkey uint64) bool {
 	tm, ok := m.tms[mkey]
 	if !ok {
-		return
+		return false
 	}
 	tm.t.Stop()
 	delete(m.tms, mkey)
+	return true
 }
 
 func (m *TaskManager) timeout(mkey uint64, meta *protocol.Meta) {
@@ -211,11 +209,6 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 	if tr.resource.Meta.State == protocol.TCC_FINISHED {
 		return nil, fmt.Errorf("task alread finished")
 	}
-	//m.tms[meta.TaskId] = &Timeout{t: time.AfterFunc(time.Duration(tr.resource.Meta.Timeout)*time.Second, func() {
-		//m.updates <- &protocol.Meta{TaskId: tr.resource.Meta.Id, State: protocol.TCC_TASK_TIMEOUT}
-	//}), p: func() {
-		//core.AppLog.Debug().Msg("running task with timeout")
-	//}}
 	m.trs[meta.TaskId] = tr
 	if tr.resource.Validator.Meta.State != protocol.TCC_FINISHED {
 		tr.pending = append(tr.pending, tr.resource.Validator)
@@ -294,18 +287,25 @@ func (m *TaskManager) Wait() {
 			tj := m.tjs[meta.JobId]
 			switch meta.State {
 			case protocol.TCC_CONFIRMED:
-				m.closeTimer(meta.Id)
+				if !m.closeTimer(meta.Id) {
+					continue
+				}
 				if tj.join() {
 					m.confirmed(tj)
 				}
 				core.AppLog.Debug().Msgf("job confirmed %v", meta)
 			case protocol.TCC_CANCELED:
+				if !m.closeTimer(meta.Id) {
+					continue
+				}
 				core.AppLog.Debug().Msgf("job canceled %v", meta)
 				m.canceled(tj)
 
 			case protocol.TCC_FINISHED:
+				if !m.closeTimer(meta.Id) {
+					continue
+				}
 				core.AppLog.Debug().Msgf("job finished %v", meta)
-				m.closeTimer(meta.Id)
 				if tj.join() {
 					m.finished(tj)
 				}
@@ -317,10 +317,6 @@ func (m *TaskManager) Wait() {
 				core.AppLog.Debug().Msgf("task job timeout %d", tr.jobIndex)
 				m.timeout(meta.JobId, meta)
 				m.stop(tj)
-			//case protocol.TCC_TASK_TIMEOUT:
-				//core.AppLog.Debug().Msgf("task timeout %d", tr.jobIndex)
-				//m.timeout(meta.TaskId, meta)
-				//m.end(tr) //forcefully finished
 			}
 		}
 	}
