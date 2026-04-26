@@ -15,6 +15,7 @@ import (
 type AssetService struct {
 	bootstrap.AppManager
 	assetDir string
+	ct       int
 }
 
 func (s *AssetService) Config() string {
@@ -45,7 +46,9 @@ func (s *AssetService) Start(f core.Env) error {
 		return nil //fmt.Errorf("no item")
 	}, Confirm: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("confirm %v", e)
-		//time.Sleep(1 * time.Second)
+		if s.ct == 0 {
+			time.Sleep(12 * time.Second)
+		}
 		return nil
 	}, Cancel: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("cancel %v", e)
