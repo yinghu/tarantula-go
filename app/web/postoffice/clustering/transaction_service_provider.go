@@ -2,7 +2,6 @@ package clustering
 
 import (
 	context "context"
-	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
@@ -69,7 +68,7 @@ func (c *DataServiceProvider) load(taskId uint64) (*TaskResource, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &TaskResource{resource: t, revision: resp.Data.List[0].Header.Revision,pending: make([]*protocol.Job, 0)}, nil
+	return &TaskResource{resource: t, revision: resp.Data.List[0].Header.Revision, pending: make([]*protocol.Job, 0)}, nil
 }
 func (c *DataServiceProvider) saveLog(meta *protocol.Meta) {
 	tf := event.NewTransactionEventFactory()
@@ -81,30 +80,6 @@ func (c *DataServiceProvider) saveLog(meta *protocol.Meta) {
 	k, _ := buff.Read(0)
 	e.Event.Key.Array = k
 	go c.runPublish(e)
-	//go c.loadLog(meta)
-}
-
-func (c *DataServiceProvider) XloadLog(meta *protocol.Meta) {
-	time.Sleep(1 * time.Second)
-	tf := event.NewTransactionEventFactory()
-	buff := core.NewBuffer(20)
-	buff.WriteUInt64(meta.Id)
-	buff.WriteUInt32(meta.State)
-	buff.Flip()
-	k, _ := buff.Read(0)
-	req := tf.GetRequest(k)
-	resp, err := c.runGet(req)
-	if err == nil && resp.Successful {
-		topic, err := tf.Topic(resp.Data.List[0].Value)
-		if err == nil {
-			obj, _ := tf.Message(topic)
-			te, ok := obj.(*protocol.TransactionEvent)
-			if ok {
-				core.AppLog.Debug().Msgf("META : %v", te.Meta)
-			}
-		}
-	}
-	//core.AppLog.Debug().Msgf("LOG :%v", resp)
 }
 
 func (c *DataServiceProvider) updateTask(t *TaskResource, clear ClearResource) {

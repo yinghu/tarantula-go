@@ -288,6 +288,7 @@ func (m *TaskManager) Wait() {
 			switch meta.State {
 			case protocol.TCC_CONFIRMED:
 				if !m.closeTimer(meta.Id) {
+					core.AppLog.Debug().Msgf("job already confirmed %v", meta)
 					continue
 				}
 				if tj.join() {
