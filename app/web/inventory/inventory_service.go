@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -36,10 +35,7 @@ func (s *InventoryService) Start(f core.Env) error {
 	}})
 	s.Cluster().Register("grant", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("reserve resource %v", e)
-		if s.ct == 0 {
-			time.Sleep(15 * time.Second)
-			s.ct++
-		}
+
 		return nil //fmt.Errorf("no resource")
 	}, Confirm: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("confirm resource %v", e)

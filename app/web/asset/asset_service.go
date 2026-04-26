@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -42,13 +41,11 @@ func (s *AssetService) Start(f core.Env) error {
 	}})
 	s.Cluster().Register("update", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("reserve update %v", e)
-		time.Sleep(1 * time.Second)
+
 		return nil //fmt.Errorf("no item")
 	}, Confirm: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("confirm %v", e)
-		if s.ct == 0 {
-			time.Sleep(12 * time.Second)
-		}
+
 		return nil
 	}, Cancel: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("cancel %v", e)
