@@ -13,6 +13,7 @@ import (
 
 type InventoryService struct {
 	bootstrap.AppManager
+	ct int
 }
 
 func (s *InventoryService) Config() string {
@@ -35,7 +36,10 @@ func (s *InventoryService) Start(f core.Env) error {
 	}})
 	s.Cluster().Register("grant", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("reserve resource %v", e)
-		time.Sleep(100 * time.Second)
+		if s.ct == 0 {
+			time.Sleep(15 * time.Second)
+			s.ct++
+		}
 		return nil //fmt.Errorf("no resource")
 	}, Confirm: func(e *protocol.Transaction) error {
 		core.AppLog.Debug().Msgf("confirm resource %v", e)
