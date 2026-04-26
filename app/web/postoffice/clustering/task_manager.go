@@ -20,17 +20,36 @@ type TaskResource struct {
 
 type JobResource struct {
 	resource    *protocol.Job
+	joining     map[uint64]*TransactionResource
 	joinParties int
 	confirmed   int
 }
 
-func (j *JobResource) join() bool {
+func (j *JobResource) join(meta *protocol.Meta) bool {
+	t := j.joining[meta.JobId]
+	switch meta.State {
+	case protocol.TCC_CONFIRMED:
+		if t.confirmed > 0 {
+			return false
+		}
+		t.confirmed++
+
+	case protocol.TCC_FINISHED:
+		if t.finished > 0 {
+			return false
+		}
+		t.finished++
+	default:
+		return false
+	}
 	j.confirmed++
 	return j.joinParties == j.confirmed
 }
 
 type TransactionResource struct {
-	resource *protocol.Transaction
+	resource  *protocol.Transaction
+	confirmed int
+	finished  int
 }
 
 type Retrying func()
@@ -81,6 +100,7 @@ func (m *TaskManager) start(j *JobResource) {
 	j.joinParties = len(j.resource.Transactions)
 	j.confirmed = 0
 	for _, tc := range j.resource.Transactions {
+		j.joining[tc.Meta.Id] = &TransactionResource{resource: tc}
 		tc.Meta.State = protocol.TCC_RESERVING
 		tc.Meta.Time = timestamppb.Now()
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
@@ -166,14 +186,13 @@ func (m *TaskManager) end(t *TaskResource) {
 	go m.s.runPublish(e)
 }
 
-func (m *TaskManager) closeTimer(mkey uint64) bool {
+func (m *TaskManager) closeTimer(mkey uint64) {
 	tm, ok := m.tms[mkey]
 	if !ok {
-		return false
+		return
 	}
 	tm.t.Stop()
 	delete(m.tms, mkey)
-	return true
 }
 
 func (m *TaskManager) timeout(mkey uint64, meta *protocol.Meta) {
@@ -226,7 +245,7 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 	go m.s.updateTask(tr, func() {
 		core.AppLog.Debug().Msgf("task updated from reload %d", tr.revision)
 	})
-	tj := JobResource{resource: job}
+	tj := JobResource{resource: job, joining: make(map[uint64]*TransactionResource)}
 	m.tjs[job.Meta.Id] = &tj
 	m.start(&tj)
 	return tr, nil
@@ -262,7 +281,7 @@ func (m *TaskManager) Wait() {
 			m.trs[task.Meta.Id] = &tr
 			m.set(&tr)
 		case job := <-m.jobs:
-			tj := JobResource{resource: job}
+			tj := JobResource{resource: job, joining: make(map[uint64]*TransactionResource)}
 			m.tjs[job.Meta.Id] = &tj
 			m.start(&tj)
 		case meta := <-m.updates:
@@ -287,28 +306,23 @@ func (m *TaskManager) Wait() {
 			tj := m.tjs[meta.JobId]
 			switch meta.State {
 			case protocol.TCC_CONFIRMED:
-				if !m.closeTimer(meta.Id) {
-					core.AppLog.Debug().Msgf("job already confirmed %v", meta)
-					continue
-				}
-				if tj.join() {
+				m.closeTimer(meta.Id)
+				if tj.join(meta) {
 					m.confirmed(tj)
+				} else {
+					core.AppLog.Debug().Msgf("job already confirmed %v", meta)
 				}
-				core.AppLog.Debug().Msgf("job confirmed %v", meta)
 			case protocol.TCC_CANCELED:
-				if !m.closeTimer(meta.Id) {
-					continue
-				}
+				m.closeTimer(meta.Id)
 				core.AppLog.Debug().Msgf("job canceled %v", meta)
 				m.canceled(tj)
 
 			case protocol.TCC_FINISHED:
-				if !m.closeTimer(meta.Id) {
-					continue
-				}
-				core.AppLog.Debug().Msgf("job finished %v", meta)
-				if tj.join() {
+				m.closeTimer(meta.Id)
+				if tj.join(meta) {
 					m.finished(tj)
+				} else {
+					core.AppLog.Debug().Msgf("job already finished %v", meta)
 				}
 
 			case protocol.TCC_TRANSACTION_TIMEOUT:
