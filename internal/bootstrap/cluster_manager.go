@@ -379,7 +379,7 @@ func (c *ClusterManager) handleTranstion(l core.TransactionListener, t *protocol
 		t.Meta.State = protocol.TCC_CONFIRMED
 		//send confirmed to cluster
 		c.Confirm(t.Meta)
-		c.Confirm(t.Meta)
+		//c.Confirm(t.Meta)
 	case protocol.TCC_CONFIRMED:
 		//send commited to cluster
 		c.Finish(t.Meta)
