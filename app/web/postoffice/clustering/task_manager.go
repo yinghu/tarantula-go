@@ -18,7 +18,6 @@ type TaskResource struct {
 	jobIndex int
 }
 
-
 type Retrying func()
 type Timeout struct {
 	t *time.Timer
@@ -73,7 +72,7 @@ func (m *TaskManager) start(j *JobResource) {
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: j.resource.Meta.TaskId, JobId: j.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
-			core.AppLog.Debug().Msg("retry to reserve with timeout")
+			core.AppLog.Debug().Msgf("retry to reserve with timeout on %d", tc.Meta.Id)
 			tc.Meta.Time = timestamppb.Now()
 			go m.s.runAskReserve(tc)
 		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
@@ -98,7 +97,7 @@ func (m *TaskManager) confirmed(t *JobResource) {
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.TaskId, JobId: t.resource.Meta.JobId, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
-			core.AppLog.Debug().Msg("retry to finish with confirm/timeout")
+			core.AppLog.Debug().Msgf("retry to finish with confirm/timeout on %d", tc.Meta.Id)
 			go m.s.runAskFinish(tc.Meta)
 		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
 
@@ -119,7 +118,7 @@ func (m *TaskManager) canceled(t *JobResource) {
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.TaskId, JobId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
-			core.AppLog.Debug().Msg("retry to finish with cancel/timeout")
+			core.AppLog.Debug().Msgf("retry to finish with cancel/timeout on %d", tc.Meta.Id)
 			go m.s.runAskFinish(m.copy(tc.Meta))
 		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
 		//ask to finish
