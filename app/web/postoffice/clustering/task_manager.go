@@ -19,12 +19,6 @@ type TaskResource struct {
 }
 
 
-type TransactionResource struct {
-	resource  *protocol.Transaction
-	confirmed int
-	finished  int
-}
-
 type Retrying func()
 type Timeout struct {
 	t *time.Timer
