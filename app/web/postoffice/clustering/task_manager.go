@@ -18,34 +18,6 @@ type TaskResource struct {
 	jobIndex int
 }
 
-type JobResource struct {
-	resource    *protocol.Job
-	joining     map[uint64]*TransactionResource
-	joinParties int
-	confirmed   int
-}
-
-func (j *JobResource) join(meta *protocol.Meta) bool {
-	t := j.joining[meta.Id]
-	core.AppLog.Debug().Msgf("meta ID : %d STATE : %d CONFIRMED : %d FINISHED %d", meta.Id, meta.State, t.confirmed, t.finished)
-	switch meta.State {
-	case protocol.TCC_CONFIRMED:
-		if t.confirmed > 0 {
-			return false
-		}
-		t.confirmed++
-
-	case protocol.TCC_FINISHED:
-		if t.finished > 0 {
-			return false
-		}
-		t.finished++
-	default:
-		return false
-	}
-	j.confirmed++
-	return j.joinParties == j.confirmed
-}
 
 type TransactionResource struct {
 	resource  *protocol.Transaction
@@ -310,20 +282,15 @@ func (m *TaskManager) Wait() {
 				m.closeTimer(meta.Id)
 				if tj.join(meta) {
 					m.confirmed(tj)
-				} else {
-					core.AppLog.Debug().Msgf("job already confirmed %v", meta)
 				}
 			case protocol.TCC_CANCELED:
 				m.closeTimer(meta.Id)
-				core.AppLog.Debug().Msgf("job canceled %v", meta)
 				m.canceled(tj)
 
 			case protocol.TCC_FINISHED:
 				m.closeTimer(meta.Id)
 				if tj.join(meta) {
 					m.finished(tj)
-				} else {
-					core.AppLog.Debug().Msgf("job already finished %v", meta)
 				}
 
 			case protocol.TCC_TRANSACTION_TIMEOUT:
