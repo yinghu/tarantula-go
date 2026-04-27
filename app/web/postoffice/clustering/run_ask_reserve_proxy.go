@@ -22,5 +22,6 @@ func (c *DataServiceProvider) runAskReserve(t *protocol.Transaction) (*protocol.
 		dsp := protocol.NewTransactionServiceClient(conn.Conn)
 		return dsp.AskReserve(context.Background(), t)
 	}
+	core.AppLog.Warn().Msgf("no subscrition available %v", t.Meta)
 	return &protocol.Response{Successful: false}, fmt.Errorf("no subscription available")
 }

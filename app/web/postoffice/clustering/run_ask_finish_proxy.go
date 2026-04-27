@@ -22,5 +22,6 @@ func (c *DataServiceProvider) runAskFinish(t *protocol.Meta) (*protocol.Response
 		dsp := protocol.NewTransactionServiceClient(conn.Conn)
 		return dsp.AskFinish(context.Background(), t)
 	}
+	core.AppLog.Warn().Msgf("no subscrition available %v", t)
 	return &protocol.Response{Successful: false}, fmt.Errorf("no subscription available")
 }
