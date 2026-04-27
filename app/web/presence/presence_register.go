@@ -60,46 +60,21 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 			core.AppLog.Warn().Msgf("failed to request %s", err.Error())
 			return
 		}
-		//req, err := mf.Request(kv)
-		//if err != nil {
-		//core.AppLog.Warn().Msgf("failed to request %s", err.Error())
 
-		//return
-		//}
-		//resp, err := s.Cluster().Request(req)
-		//if err != nil {
-		//core.AppLog.Warn().Msgf("failed to request %s", err.Error())
-		//return
-		//}
-		//core.AppLog.Debug().Msgf("REQ %v", resp)
 		tb := persistence.NewTaskBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
-		jb1 := persistence.NewJobBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
+
+		jb1 := persistence.NewJobBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "validator"})
+
 		jb1.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "register"}, Object: kv})
-		jb := persistence.NewJobBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
+
+		jb := persistence.NewJobBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "job"})
 		jb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "grant"}, Object: kv})
 		jb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "update"}, Object: kv})
 		tb.SetValidator(jb1.Target)
 		tb.SetJob(jb.Target)
-		//tsk := protocol.Task{Meta: &protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"}}
-
-		//obj, err := anypb.New(login)
-		//if err != nil {
-		//return
-		//}
-		//ts := make([]*protocol.Transaction, 0)
-		//ts = append(ts, &protocol.Transaction{Meta: &protocol.Meta{Name: "register"}, Object: kv})
-		//ts = append(ts, &protocol.Transaction{Meta: &protocol.Meta{Name: "grant", Prefix: s.Cluster().RingToken(kv.Key.Array)}, Object: kv})
-		//ts = append(ts, &protocol.Transaction{Meta: &protocol.Meta{Name: "update"}, Object: kv})
-		//tsk.Transactions = ts
 		rp, _ := s.Cluster().Issue(tb.Task())
 		core.AppLog.Debug().Msgf("TASK %v", rp)
 
-		//req := mf.Request()
-		//rw := item.OnInventory{SystemId: login.SystemId, ItemId: s.LoginReward.Id, Source: "login"}
-		//err = s.ItemService().InventoryManager().Grant(rw)
-		//if err != nil {
-		//core.AppLog.Printf("grant failed %s\n", err.Error())
-		//}
 	}()
 	return session, nil
 }

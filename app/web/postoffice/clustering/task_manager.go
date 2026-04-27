@@ -149,6 +149,7 @@ func (m *TaskManager) end(t *TaskResource) {
 	tf := event.NewTransactionEventFactory()
 	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: t.resource.Meta, Start: t.resource.Meta.Time, End: timestamppb.Now()})
 	e.Event.Key.Array = core.ToBytes(m.s.seq)
+	
 	go m.s.runPublish(e)
 }
 
