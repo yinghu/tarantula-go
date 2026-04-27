@@ -14,7 +14,6 @@ import (
 type AssetService struct {
 	bootstrap.AppManager
 	assetDir string
-	ct       int
 }
 
 func (s *AssetService) Config() string {

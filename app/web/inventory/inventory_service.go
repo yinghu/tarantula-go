@@ -12,7 +12,6 @@ import (
 
 type InventoryService struct {
 	bootstrap.AppManager
-	ct int
 }
 
 func (s *InventoryService) Config() string {
