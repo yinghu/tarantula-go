@@ -2,6 +2,7 @@ package clustering
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -25,7 +26,7 @@ type MemberlistManager struct {
 }
 
 func (m *MemberlistManager) Start(meta []byte, seq core.Sequence) error {
-	m.MemberHashRing = &MemberHashRing{weight: NODE_WEIGHT}
+	m.MemberHashRing = &MemberHashRing{weight: NODE_WEIGHT, hLock: sync.Mutex{}}
 	m.nodes = make([]core.Node, 0)
 	cfg := memberlist.DefaultLANConfig()
 	cfg.Name = m.Binding
