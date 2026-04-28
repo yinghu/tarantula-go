@@ -169,6 +169,28 @@ func (c *DataServiceProvider) Finish(ctx context.Context, meta *protocol.Meta) (
 	return &protocol.Response{Successful: true}, nil
 }
 
+func (c *DataServiceProvider) TopicList(req *protocol.Request, stream grpc.ServerStreamingServer[protocol.Subscription]) error {
+	rq := make(chan []core.Subscription, 3)
+	defer close(rq)
+	c.DRequest <- TopicRequest{Opt: TOPIC_LIST, Subs: rq}
+	subs := <-rq
+	for _,sub := range subs{
+		stream.Send(&protocol.Subscription{NodeId:sub.NodeId,Tag: sub.Tag,Name: sub.Topic})
+	}
+	return nil
+}
+
+func (c *DataServiceProvider) TaskList(req *protocol.Request, stream grpc.ServerStreamingServer[protocol.Subscription]) error {
+	rq := make(chan []core.Subscription, 3)
+	defer close(rq)
+	c.DRequest <- TopicRequest{Opt: TASK_LIST, Subs: rq}
+	subs := <-rq
+	for _,sub := range subs{
+		stream.Send(&protocol.Subscription{NodeId:sub.NodeId,Tag: sub.Tag,Name: sub.Topic})
+	}
+	return nil
+}
+
 func (c *DataServiceProvider) tid() uint64 {
 	for {
 		id, err := c.seq.Id()

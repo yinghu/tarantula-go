@@ -27,12 +27,14 @@ const file_postoffice_service_proto_rawDesc = "" +
 	"\x18postoffice_service.proto\x12\bprotocol\x1a\rrequest.proto\x1a\x0eresponse.proto\x1a\x0fhash_node.proto\x1a\vtopic.proto\x1a\x12subscription.proto\x1a\n" +
 	"task.proto\x1a\n" +
 	"mail.proto\x1a\n" +
-	"meta.proto2\xb6\x05\n" +
+	"meta.proto2\xad\x06\n" +
 	"\x11PostofficeService\x125\n" +
 	"\bhashRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01\x124\n" +
 	"\akeyRing\x12\x11.protocol.Request\x1a\x12.protocol.HashNode\"\x000\x01\x122\n" +
 	"\arequest\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x00\x121\n" +
-	"\x04list\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x000\x01\x129\n" +
+	"\x04list\x12\x11.protocol.Request\x1a\x12.protocol.Response\"\x000\x01\x12:\n" +
+	"\ttopicList\x12\x11.protocol.Request\x1a\x16.protocol.Subscription\"\x000\x01\x129\n" +
+	"\btaskList\x12\x11.protocol.Request\x1a\x16.protocol.Subscription\"\x000\x01\x129\n" +
 	"\tsubscribe\x12\x16.protocol.Subscription\x1a\x12.protocol.Response\"\x00\x12;\n" +
 	"\vunsubscribe\x12\x16.protocol.Subscription\x1a\x12.protocol.Response\"\x00\x120\n" +
 	"\apublish\x12\x0f.protocol.Topic\x1a\x12.protocol.Response\"\x00\x123\n" +
@@ -60,30 +62,34 @@ var file_postoffice_service_proto_depIdxs = []int32{
 	0,  // 1: protocol.PostofficeService.keyRing:input_type -> protocol.Request
 	0,  // 2: protocol.PostofficeService.request:input_type -> protocol.Request
 	0,  // 3: protocol.PostofficeService.list:input_type -> protocol.Request
-	1,  // 4: protocol.PostofficeService.subscribe:input_type -> protocol.Subscription
-	1,  // 5: protocol.PostofficeService.unsubscribe:input_type -> protocol.Subscription
-	2,  // 6: protocol.PostofficeService.publish:input_type -> protocol.Topic
-	2,  // 7: protocol.PostofficeService.disconnect:input_type -> protocol.Topic
-	2,  // 8: protocol.PostofficeService.receive:input_type -> protocol.Topic
-	3,  // 9: protocol.PostofficeService.issue:input_type -> protocol.Task
-	4,  // 10: protocol.PostofficeService.confirm:input_type -> protocol.Meta
-	4,  // 11: protocol.PostofficeService.cancel:input_type -> protocol.Meta
-	4,  // 12: protocol.PostofficeService.finish:input_type -> protocol.Meta
-	5,  // 13: protocol.PostofficeService.hashRing:output_type -> protocol.HashNode
-	5,  // 14: protocol.PostofficeService.keyRing:output_type -> protocol.HashNode
-	6,  // 15: protocol.PostofficeService.request:output_type -> protocol.Response
-	6,  // 16: protocol.PostofficeService.list:output_type -> protocol.Response
-	6,  // 17: protocol.PostofficeService.subscribe:output_type -> protocol.Response
-	6,  // 18: protocol.PostofficeService.unsubscribe:output_type -> protocol.Response
-	6,  // 19: protocol.PostofficeService.publish:output_type -> protocol.Response
-	6,  // 20: protocol.PostofficeService.disconnect:output_type -> protocol.Response
-	7,  // 21: protocol.PostofficeService.receive:output_type -> protocol.Mail
-	6,  // 22: protocol.PostofficeService.issue:output_type -> protocol.Response
-	6,  // 23: protocol.PostofficeService.confirm:output_type -> protocol.Response
-	6,  // 24: protocol.PostofficeService.cancel:output_type -> protocol.Response
-	6,  // 25: protocol.PostofficeService.finish:output_type -> protocol.Response
-	13, // [13:26] is the sub-list for method output_type
-	0,  // [0:13] is the sub-list for method input_type
+	0,  // 4: protocol.PostofficeService.topicList:input_type -> protocol.Request
+	0,  // 5: protocol.PostofficeService.taskList:input_type -> protocol.Request
+	1,  // 6: protocol.PostofficeService.subscribe:input_type -> protocol.Subscription
+	1,  // 7: protocol.PostofficeService.unsubscribe:input_type -> protocol.Subscription
+	2,  // 8: protocol.PostofficeService.publish:input_type -> protocol.Topic
+	2,  // 9: protocol.PostofficeService.disconnect:input_type -> protocol.Topic
+	2,  // 10: protocol.PostofficeService.receive:input_type -> protocol.Topic
+	3,  // 11: protocol.PostofficeService.issue:input_type -> protocol.Task
+	4,  // 12: protocol.PostofficeService.confirm:input_type -> protocol.Meta
+	4,  // 13: protocol.PostofficeService.cancel:input_type -> protocol.Meta
+	4,  // 14: protocol.PostofficeService.finish:input_type -> protocol.Meta
+	5,  // 15: protocol.PostofficeService.hashRing:output_type -> protocol.HashNode
+	5,  // 16: protocol.PostofficeService.keyRing:output_type -> protocol.HashNode
+	6,  // 17: protocol.PostofficeService.request:output_type -> protocol.Response
+	6,  // 18: protocol.PostofficeService.list:output_type -> protocol.Response
+	1,  // 19: protocol.PostofficeService.topicList:output_type -> protocol.Subscription
+	1,  // 20: protocol.PostofficeService.taskList:output_type -> protocol.Subscription
+	6,  // 21: protocol.PostofficeService.subscribe:output_type -> protocol.Response
+	6,  // 22: protocol.PostofficeService.unsubscribe:output_type -> protocol.Response
+	6,  // 23: protocol.PostofficeService.publish:output_type -> protocol.Response
+	6,  // 24: protocol.PostofficeService.disconnect:output_type -> protocol.Response
+	7,  // 25: protocol.PostofficeService.receive:output_type -> protocol.Mail
+	6,  // 26: protocol.PostofficeService.issue:output_type -> protocol.Response
+	6,  // 27: protocol.PostofficeService.confirm:output_type -> protocol.Response
+	6,  // 28: protocol.PostofficeService.cancel:output_type -> protocol.Response
+	6,  // 29: protocol.PostofficeService.finish:output_type -> protocol.Response
+	15, // [15:30] is the sub-list for method output_type
+	0,  // [0:15] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name

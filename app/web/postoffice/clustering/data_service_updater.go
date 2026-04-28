@@ -22,6 +22,9 @@ const (
 	RECEIVER_END    uint32 = 4
 	TASK_REGISTER   uint32 = 5
 
+	TOPIC_LIST uint32 = 6
+	TASK_LIST  uint32 = 7
+
 	TRANS_SUB_PREFIX string = "_t_"
 )
 
@@ -155,6 +158,12 @@ func (m *DataServiceProvider) RingUpdated() {
 					m.listeners[req.Name] = rev
 				}
 				req.Async <- rev
+			case RECEIVER_END:
+				rev, ok := m.listeners[req.Name]
+				if ok {
+					rev.Q <- req.Name
+				}
+
 			case RECEIVER_REMOVE:
 				delete(m.listeners, req.Name)
 				core.AppLog.Debug().Msgf("listener removed %s", req.Name)
@@ -163,11 +172,10 @@ func (m *DataServiceProvider) RingUpdated() {
 			case TASK_REGISTER:
 				req.Name = fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, req.Name)
 				req.Subs <- m.subscriptions.topic(req)
-			case RECEIVER_END:
-				rev, ok := m.listeners[req.Name]
-				if ok {
-					rev.Q <- req.Name
-				}
+			case TOPIC_LIST:
+				req.Subs <- m.subscriptions.list(false)
+			case TASK_LIST:
+				req.Subs <- m.subscriptions.list(true)
 			}
 		case msg := <-m.DMessager:
 

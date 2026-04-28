@@ -379,7 +379,7 @@ func (c *ClusterManager) handleTranstion(l core.TransactionListener, t *protocol
 		t.Meta.State = protocol.TCC_CONFIRMED
 		//send confirmed to cluster
 		c.Confirm(t.Meta)
-		
+
 	case protocol.TCC_CONFIRMED:
 		//send commited to cluster
 		t.Meta.State = protocol.TCC_FINISHED
@@ -390,4 +390,29 @@ func (c *ClusterManager) handleTranstion(l core.TransactionListener, t *protocol
 		c.Finish(t.Meta)
 	}
 
+}
+
+func (c *ClusterManager) TopicList() (grpc.ServerStreamingClient[protocol.Subscription], error) {
+	if !c.running {
+		return nil, fmt.Errorf("cluster not started")
+	}
+	conn, err := c.cPool.Conn()
+	if err != nil {
+		return nil, err
+	}
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	return dsp.TopicList(context.Background(), &protocol.Request{Prefix: 0})
+}
+
+
+func (c *ClusterManager) TaskList() (grpc.ServerStreamingClient[protocol.Subscription], error) {
+	if !c.running {
+		return nil, fmt.Errorf("cluster not started")
+	}
+	conn, err := c.cPool.Conn()
+	if err != nil {
+		return nil, err
+	}
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	return dsp.TaskList(context.Background(), &protocol.Request{Prefix: 0})
 }

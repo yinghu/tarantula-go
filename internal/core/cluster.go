@@ -156,4 +156,8 @@ type ClusterService interface {
 	Confirm(t *protocol.Meta) (*protocol.Response, error)
 	Cancel(t *protocol.Meta) (*protocol.Response, error)
 	Finish(t *protocol.Meta) (*protocol.Response, error)
+
+	//subscription
+	TopicList() (grpc.ServerStreamingClient[protocol.Subscription], error)
+	TaskList() (grpc.ServerStreamingClient[protocol.Subscription], error)
 }

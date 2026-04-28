@@ -1,6 +1,8 @@
 package clustering
 
 import (
+	"strings"
+
 	"gameclustering.com/internal/core"
 )
 
@@ -52,6 +54,30 @@ func (s *SubscriptionRegistry) topic(req TopicRequest) []core.Subscription {
 			cp := s.cPools[k]
 			sub := core.Subscription{Topic: k.Topic, Endpoint: k.Endpoint, CPool: cp}
 			subs = append(subs, sub)
+		}
+	}
+	return subs
+}
+
+func (s *SubscriptionRegistry) list(prefixed bool) []core.Subscription {
+	subs := make([]core.Subscription, 0)
+	if prefixed {
+		for k, s := range s.topicEnds {
+			if strings.HasPrefix(k.Topic, TRANS_SUB_PREFIX) {
+				for _, v := range s {
+					sub := core.Subscription{NodeId: v.NodeId, Tag: v.Tag, Topic: v.Topic, Endpoint: k.Endpoint}
+					subs = append(subs, sub)
+				}
+			}
+		}
+		return subs
+	}
+	for k, s := range s.topicEnds {
+		if !strings.HasPrefix(k.Topic, TRANS_SUB_PREFIX) {
+			for _, v := range s {
+				sub := core.Subscription{NodeId: v.NodeId, Tag: v.Tag, Topic: v.Topic, Endpoint: k.Endpoint}
+				subs = append(subs, sub)
+			}
 		}
 	}
 	return subs
