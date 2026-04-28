@@ -204,6 +204,9 @@ func (c *AppManager) WriteLevel(level zerolog.Level, data []byte) (int, error) {
 		cp := append([]byte{}, data...)
 		c.forward.Forward(level, cp)
 	}
+	if level < 0 {
+		return 0, nil
+	}
 	return c.Write(data)
 }
 

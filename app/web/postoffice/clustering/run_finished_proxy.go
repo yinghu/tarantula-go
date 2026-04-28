@@ -14,7 +14,7 @@ func (c *DataServiceProvider) runFinished(t *protocol.Meta) (*protocol.Response,
 	c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: kh, Replicas: REPLICA_MAX, Async: rq}
 	nodes := <-rq
 	ringNode := nodes[0]
-	core.AppLog.Debug().Msgf("Hash node %s", ringNode.RpcEndpoint)
+	//core.AppLog.Debug().Msgf("Hash node %s", ringNode.RpcEndpoint)
 	conn, err := ringNode.CPool.Conn()
 	if err != nil {
 		return &protocol.Response{Successful: false, Message: err.Error()}, err
