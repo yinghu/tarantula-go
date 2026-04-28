@@ -66,8 +66,7 @@
                 {"Name":"Reset","Type":105}, 
                 {"Name":"Create","Type":106},
                 {"Name":"Update","Type":107},
-                 {"Name":"Delete","Type":108},
-                 {"Name":"Pull","Type":109}                  
+                {"Name":"Delete","Type":108}                
             ]        
         },
         {
