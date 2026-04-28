@@ -6,8 +6,6 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
-	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
@@ -37,6 +35,7 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 	session := core.OnSession{Successful: true, SystemId: int64(login.SystemId), Stub: int32(login.Id), Token: tk, Home: s.F.Host}
 	ticket, _ := s.Authenticator().CreateTicket(int64(login.SystemId), int32(login.Id), int32(login.AccessControl), bootstrap.TICKET_TIME_OUT_MINUTES)
 	session.Ticket = ticket
+	/**
 	go func() {
 
 		rf := event.RegisterEventFactory{}
@@ -76,7 +75,7 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 		rp, _ := s.Cluster().Issue(tb.Task())
 		core.AppLog.Debug().Msgf("TASK %v", rp)
 
-	}()
+	}()**/
 	return session, nil
 }
 
