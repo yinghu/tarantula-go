@@ -188,7 +188,7 @@ func (m *TaskManager) clearResource(rkey uint64) {
 }
 
 func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
-	core.AppLog.Debug().Msgf("reload task %d", meta.TaskId)
+	core.AppLog.Debug().Msgf("reload task from %v", meta)
 	tr, err := m.s.load(meta.TaskId)
 	if err != nil {
 		core.AppLog.Warn().Msgf("task not existed %d", meta.TaskId)
