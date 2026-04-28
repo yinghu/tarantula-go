@@ -14,7 +14,7 @@ type MemberHashRing struct {
 	NodeRing
 	weight int
 	WNode  chan<- RingUpdate
-	hLock  sync.Mutex
+	hLock  *sync.Mutex
 }
 
 func (m *MemberHashRing) vNode(node core.Node, weight int) core.Node {

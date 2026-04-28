@@ -52,7 +52,7 @@ func (m *TaskManager) set(t *TaskResource) {
 
 func (m *TaskManager) schedule(t *TaskResource, job *protocol.Job) {
 	go m.s.updateTask(t, func() {
-		core.AppLog.Debug().Msgf("task updated %d", t.revision)
+		core.AppLog.Debug().Msgf("task updated %d %d", t.revision, t.resource.Meta.Id)
 	})
 	go func() {
 		m.jobs <- job
