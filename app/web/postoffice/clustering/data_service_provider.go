@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	PULL_BATCH_SIZE int = 10
+	PULL_BATCH_SIZE int = 100
 )
 
 type DataServiceProvider struct {
@@ -148,8 +148,7 @@ func (c *DataServiceProvider) Delete(ctx context.Context, in *protocol.Request) 
 }
 
 func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
-	c.pull(request.Prefix, request.Opt, stream)
-	return nil
+	return c.pull(request.Prefix, request.Opt, stream)
 }
 
 func (c *DataServiceProvider) Send(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {

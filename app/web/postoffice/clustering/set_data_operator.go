@@ -66,6 +66,7 @@ start:
 	}
 	core.AppLog.Info().Msgf("running recovery on operator %d", num)
 	sync := <-m.DPull
+	total := 0
 	for _, h := range sync.Ranges {
 		req := protocol.Request{Prefix: h.From, Opt: h.To}
 		stream, err := m.runPull(sync.Remote, &req)
@@ -82,9 +83,12 @@ start:
 				core.AppLog.Warn().Msgf("remote streaming error %s %s %d", sync.Remote, err.Error(), num)
 				break
 			}
+			total += len(data.Data.List)
+			core.AppLog.Info().Msgf("p total data rows %d on %d", total, num)
 			m.set(data)
 		}
 	}
+	core.AppLog.Info().Msgf("total data rows %d on %d", total, num)
 	m.DWait.Done()
 	goto start
 }

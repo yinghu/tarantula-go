@@ -15,7 +15,7 @@ func (c *DataServiceProvider) runPull(target string, set *protocol.Request) (grp
 	if err != nil {
 		return nil, err
 	}
-	defer tcp.Close()
+	//defer tcp.Close()
 	dsp := protocol.NewDataServiceClient(tcp)
 	return dsp.Pull(context.Background(), set)
 }

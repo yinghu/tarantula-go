@@ -63,6 +63,7 @@ func (m *MemberlistManager) Start(meta []byte, seq core.Sequence) error {
 	m.Mll.DWait.Add(1)
 	go m.DataServiceProvider.Start(m.StoreDir)
 	m.Mll.DWait.Wait()
+	time.Sleep(2 * time.Second)
 	go m.RingUpdated()
 	joined, err := list.Join(m.Seed)
 	list.UpdateNode(time.Second * 5)

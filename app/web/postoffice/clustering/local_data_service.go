@@ -213,7 +213,7 @@ func (m *DataServiceProvider) reset(sd SetData) (KeyIndex, error) {
 	return ki, err
 }
 
-func (m *DataServiceProvider) pull(from, to uint32, ch grpc.ServerStreamingServer[protocol.Response]) {
+func (m *DataServiceProvider) pull(from, to uint32, ch grpc.ServerStreamingServer[protocol.Response]) error {
 	index := KeyIndex{}
 	pre, _ := index.lookupPrefix(INDEX_PREFIX)
 	data := make([]*protocol.Data, 0, PULL_BATCH_SIZE)
@@ -244,7 +244,10 @@ func (m *DataServiceProvider) pull(from, to uint32, ch grpc.ServerStreamingServe
 				if len(data) == PULL_BATCH_SIZE {
 					resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
 					total += PULL_BATCH_SIZE
-					ch.Send(&resp)
+					err = ch.Send(&resp)
+					if err != nil {
+						core.AppLog.Warn().Msgf("rpc send error %s", err.Error())
+					}
 					data = make([]*protocol.Data, 0, PULL_BATCH_SIZE)
 				}
 				continue
@@ -265,7 +268,10 @@ func (m *DataServiceProvider) pull(from, to uint32, ch grpc.ServerStreamingServe
 						data = append(data, &vdata)
 						if len(data) == PULL_BATCH_SIZE {
 							resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
-							ch.Send(&resp)
+							err = ch.Send(&resp)
+							if err != nil {
+								core.AppLog.Warn().Msgf("rpc send error %s", err.Error())
+							}
 							total += PULL_BATCH_SIZE
 							data = make([]*protocol.Data, 0, PULL_BATCH_SIZE)
 						}
@@ -288,7 +294,10 @@ func (m *DataServiceProvider) pull(from, to uint32, ch grpc.ServerStreamingServe
 						data = append(data, &vdata)
 						if len(data) == PULL_BATCH_SIZE {
 							resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
-							ch.Send(&resp)
+							err = ch.Send(&resp)
+							if err != nil {
+								core.AppLog.Warn().Msgf("rpc send error %s", err.Error())
+							}
 							total += PULL_BATCH_SIZE
 							data = make([]*protocol.Data, 0, PULL_BATCH_SIZE)
 						}
@@ -303,9 +312,13 @@ func (m *DataServiceProvider) pull(from, to uint32, ch grpc.ServerStreamingServe
 	if last > 0 {
 		total += last
 		resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
-		ch.Send(&resp)
+		err := ch.Send(&resp)
+		if err != nil {
+			core.AppLog.Warn().Msgf("rpc send error %s", err.Error())
+		}
 	}
 	core.AppLog.Info().Msgf("run pull data rows %d range from %d to %d", total, from, to)
+	return nil
 }
 
 func (c *DataServiceProvider) set(resp *protocol.Response) {
