@@ -175,7 +175,7 @@ func (c *DataServiceProvider) TopicList(req *protocol.Request, stream grpc.Serve
 	c.DRequest <- TopicRequest{Opt: TOPIC_LIST, Subs: rq}
 	subs := <-rq
 	for _,sub := range subs{
-		stream.Send(&protocol.Subscription{NodeId:sub.NodeId,Tag: sub.Tag,Name: sub.Topic})
+		stream.Send(&protocol.Subscription{NodeId:sub.NodeId,Tag: sub.Tag,Name: sub.Topic,Endpoint: sub.Endpoint})
 	}
 	return nil
 }
@@ -186,7 +186,7 @@ func (c *DataServiceProvider) TaskList(req *protocol.Request, stream grpc.Server
 	c.DRequest <- TopicRequest{Opt: TASK_LIST, Subs: rq}
 	subs := <-rq
 	for _,sub := range subs{
-		stream.Send(&protocol.Subscription{NodeId:sub.NodeId,Tag: sub.Tag,Name: sub.Topic})
+		stream.Send(&protocol.Subscription{NodeId:sub.NodeId,Tag: sub.Tag,Name: sub.Topic,Endpoint: sub.Endpoint})
 	}
 	return nil
 }

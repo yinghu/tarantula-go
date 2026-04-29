@@ -27,6 +27,7 @@ type Subscription struct {
 	NodeId        string                 `protobuf:"bytes,2,opt,name=nodeId,proto3" json:"nodeId,omitempty"`
 	Tag           string                 `protobuf:"bytes,3,opt,name=tag,proto3" json:"tag,omitempty"`
 	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	Endpoint      string                 `protobuf:"bytes,5,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -89,16 +90,24 @@ func (x *Subscription) GetName() string {
 	return ""
 }
 
+func (x *Subscription) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
 var File_subscription_proto protoreflect.FileDescriptor
 
 const file_subscription_proto_rawDesc = "" +
 	"\n" +
-	"\x12subscription.proto\x12\bprotocol\"^\n" +
+	"\x12subscription.proto\x12\bprotocol\"z\n" +
 	"\fSubscription\x12\x10\n" +
 	"\x03opt\x18\x01 \x01(\aR\x03opt\x12\x16\n" +
 	"\x06nodeId\x18\x02 \x01(\tR\x06nodeId\x12\x10\n" +
 	"\x03tag\x18\x03 \x01(\tR\x03tag\x12\x12\n" +
-	"\x04name\x18\x04 \x01(\tR\x04nameBT\n" +
+	"\x04name\x18\x04 \x01(\tR\x04name\x12\x1a\n" +
+	"\bendpoint\x18\x05 \x01(\tR\bendpointBT\n" +
 	"\x17com.icodesoftware.protoB\x13SubscriptionFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
