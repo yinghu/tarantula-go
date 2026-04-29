@@ -6,6 +6,8 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
@@ -67,9 +69,13 @@ start:
 	core.AppLog.Info().Msgf("running recovery on operator %d", num)
 	sync := <-m.DPull
 	total := 0
+	tcp, err := grpc.NewClient(sync.Remote, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		core.AppLog.Warn().Msgf("rpc connect error %s from %s", err.Error(), sync.Remote)
+	}
 	for _, h := range sync.Ranges {
 		req := protocol.Request{Prefix: h.From, Opt: h.To}
-		stream, err := m.runPull(sync.Remote, &req)
+		stream, err := m.runPull(tcp, &req)
 		if err != nil {
 			core.AppLog.Warn().Msgf("remote error %s", sync.Remote)
 			continue
@@ -84,11 +90,11 @@ start:
 				break
 			}
 			total += len(data.Data.List)
-			core.AppLog.Info().Msgf("p total data rows %d on %d", total, num)
 			m.set(data)
 		}
 	}
 	core.AppLog.Info().Msgf("total data rows %d on %d", total, num)
+	tcp.Close()
 	m.DWait.Done()
 	goto start
 }
