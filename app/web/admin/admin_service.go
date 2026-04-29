@@ -78,7 +78,6 @@ func (s *AdminService) Start(f core.Env) error {
 	http.Handle("/admin/category/preview/{id}", bootstrap.Logging(&CategoryPreviewer{AdminService: s}))
 	http.Handle("/admin/item/delete/{type}/{id}", bootstrap.Logging(&ItemDeleter{AdminService: s}))
 
-	http.Handle("/admin/topic/subscribe", bootstrap.Logging(&AdminTopicSubscriber{AdminService: s}))
 	http.Handle("/admin/view/{id}", bootstrap.Logging(&AdminItemViewer{AdminService: s}))
 	http.Handle("/admin/repo/sync", bootstrap.Logging(&AdminPublisher{AdminService: s}))
 	http.Handle("/admin/env", bootstrap.Logging(&AdminEnv{AdminService: s}))
@@ -90,6 +89,8 @@ func (s *AdminService) Start(f core.Env) error {
 
 	http.Handle("/admin/presence/hashring", bootstrap.Logging(&AdminHashRingEndpoint{AdminService: s}))
 	http.Handle("/admin/presence/keyring/{key}", bootstrap.Logging(&AdminKeyRingEndpoint{AdminService: s}))
+	http.Handle("/admin/presence/subscription/task", bootstrap.Logging(&AdminSubscriptionTaskEndpoint{AdminService: s}))
+	http.Handle("/admin/presence/subscription/topic", bootstrap.Logging(&AdminSubscriptionTopicEndpoint{AdminService: s}))
 
 	http.Handle("/admin/cluster/delete/{key}", bootstrap.Logging(&AdminClusterDelete{AdminService: s}))
 	http.Handle("/admin/cluster/reset", bootstrap.Logging(&AdminClusterReset{AdminService: s}))
