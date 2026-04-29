@@ -72,6 +72,8 @@ start:
 	tcp, err := grpc.NewClient(sync.Remote, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		core.AppLog.Warn().Msgf("rpc connect error %s from %s", err.Error(), sync.Remote)
+		m.DWait.Done()
+		goto start
 	}
 	for _, h := range sync.Ranges {
 		req := protocol.Request{Prefix: h.From, Opt: h.To}

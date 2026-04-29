@@ -317,7 +317,7 @@ func (m *DataServiceProvider) pull(from, to uint32, ch grpc.ServerStreamingServe
 			core.AppLog.Warn().Msgf("rpc send error %s", err.Error())
 		}
 	}
-	core.AppLog.Info().Msgf("run pull data rows %d range from %d to %d", total, from, to)
+	core.AppLog.Info().Msgf("local pull data rows %d range from %d to %d", total, from, to)
 	return nil
 }
 
