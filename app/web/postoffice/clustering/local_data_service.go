@@ -7,6 +7,7 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 	badger "github.com/dgraph-io/badger/v4"
+	"google.golang.org/grpc"
 )
 
 // internal operations
@@ -212,11 +213,11 @@ func (m *DataServiceProvider) reset(sd SetData) (KeyIndex, error) {
 	return ki, err
 }
 
-func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) {
-	core.AppLog.Info().Msgf("run pull data range from %d to %d", from, to)
+func (m *DataServiceProvider) pull(from, to uint32, ch grpc.ServerStreamingServer[protocol.Response]) {
 	index := KeyIndex{}
 	pre, _ := index.lookupPrefix(INDEX_PREFIX)
 	data := make([]*protocol.Data, 0, PULL_BATCH_SIZE)
+	total := 0
 	m.Local.Db.View(func(txn *badger.Txn) error {
 		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
 		it := txn.NewIterator(op)
@@ -242,7 +243,8 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 				data = append(data, &vdata)
 				if len(data) == PULL_BATCH_SIZE {
 					resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
-					ch <- &resp
+					total += PULL_BATCH_SIZE
+					ch.Send(&resp)
 					data = make([]*protocol.Data, 0, PULL_BATCH_SIZE)
 				}
 				continue
@@ -263,7 +265,8 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 						data = append(data, &vdata)
 						if len(data) == PULL_BATCH_SIZE {
 							resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
-							ch <- &resp
+							ch.Send(&resp)
+							total += PULL_BATCH_SIZE
 							data = make([]*protocol.Data, 0, PULL_BATCH_SIZE)
 						}
 						return nil
@@ -285,7 +288,8 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 						data = append(data, &vdata)
 						if len(data) == PULL_BATCH_SIZE {
 							resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
-							ch <- &resp
+							ch.Send(&resp)
+							total += PULL_BATCH_SIZE
 							data = make([]*protocol.Data, 0, PULL_BATCH_SIZE)
 						}
 						return nil
@@ -295,12 +299,13 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 		}
 		return nil
 	})
-	if len(data) > 0 {
-
+	last := len(data)
+	if last > 0 {
+		total += last
 		resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
-		ch <- &resp
+		ch.Send(&resp)
 	}
-	ch <- &protocol.Response{Successful: false}
+	core.AppLog.Info().Msgf("run pull data rows %d range from %d to %d", total, from, to)
 }
 
 func (c *DataServiceProvider) set(resp *protocol.Response) {

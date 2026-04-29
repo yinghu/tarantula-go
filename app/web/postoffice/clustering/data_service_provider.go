@@ -148,16 +148,7 @@ func (c *DataServiceProvider) Delete(ctx context.Context, in *protocol.Request) 
 }
 
 func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
-	ch := make(chan *protocol.Response, 3)
-	go c.pull(request.Prefix, request.Opt, ch)
-	for resp := range ch {
-		if !resp.Successful {
-			break
-		}
-		if err := stream.Send(resp); err != nil {
-			break
-		}
-	}
+	c.pull(request.Prefix, request.Opt, stream)
 	return nil
 }
 
