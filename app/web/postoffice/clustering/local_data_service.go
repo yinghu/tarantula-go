@@ -213,6 +213,7 @@ func (m *DataServiceProvider) reset(sd SetData) (KeyIndex, error) {
 }
 
 func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) {
+	core.AppLog.Info().Msgf("run pull data range from %d to %d", from, to)
 	index := KeyIndex{}
 	pre, _ := index.lookupPrefix(INDEX_PREFIX)
 	data := make([]*protocol.Data, 0, PULL_BATCH_SIZE)
