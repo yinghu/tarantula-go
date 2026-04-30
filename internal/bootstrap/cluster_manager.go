@@ -50,7 +50,7 @@ type ClusterManager struct {
 	cPool         core.RpcConnPool
 }
 
-func (c *ClusterManager) HashRing(r core.RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error) {
+func (c *ClusterManager) HashRing(r core.RingRequest) (*protocol.Response, error) {
 	if !c.running {
 		return nil, fmt.Errorf("cluster not started")
 	}
@@ -62,7 +62,7 @@ func (c *ClusterManager) HashRing(r core.RingRequest) (grpc.ServerStreamingClien
 	return dsp.HashRing(context.Background(), &protocol.Request{Prefix: 0})
 }
 
-func (c *ClusterManager) KeyRing(r core.RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error) {
+func (c *ClusterManager) KeyRing(r core.RingRequest) (*protocol.Response, error) {
 	if !c.running {
 		return nil, fmt.Errorf("cluster not started")
 	}
@@ -392,7 +392,7 @@ func (c *ClusterManager) handleTranstion(l core.TransactionListener, t *protocol
 
 }
 
-func (c *ClusterManager) TopicList() (grpc.ServerStreamingClient[protocol.Subscription], error) {
+func (c *ClusterManager) TopicList() (*protocol.Response, error) {
 	if !c.running {
 		return nil, fmt.Errorf("cluster not started")
 	}
@@ -404,8 +404,7 @@ func (c *ClusterManager) TopicList() (grpc.ServerStreamingClient[protocol.Subscr
 	return dsp.TopicList(context.Background(), &protocol.Request{Prefix: 0})
 }
 
-
-func (c *ClusterManager) TaskList() (grpc.ServerStreamingClient[protocol.Subscription], error) {
+func (c *ClusterManager) TaskList() (*protocol.Response, error) {
 	if !c.running {
 		return nil, fmt.Errorf("cluster not started")
 	}

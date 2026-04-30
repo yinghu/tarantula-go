@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"net/http"
 
 	"gameclustering.com/internal/core"
@@ -19,21 +18,13 @@ func (s *AdminKeyRingEndpoint) AccessControl() int32 {
 func (s *AdminKeyRingEndpoint) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	key := r.PathValue("key")
-	stream, err := s.Cluster().KeyRing(core.RingRequest{Token: s.Cluster().RingToken([]byte(key))})
+	resp, err := s.Cluster().KeyRing(core.RingRequest{Token: s.Cluster().RingToken([]byte(key))})
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
 	ring := make([]core.Node, 0)
-	for {
-		data, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			core.AppLog.Debug().Msgf("streaming error %s", err.Error())
-			break
-		}
+	for _, data := range resp.Nodes {
 		ring = append(ring, core.Node{Name: data.Name, RingToken: data.Hash, RpcEndpoint: data.Endpoint, IP: data.Address})
 	}
 	w.Write(util.ToJson(ring))

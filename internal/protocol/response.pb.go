@@ -29,6 +29,8 @@ type Response struct {
 	Data          *DataSet               `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
 	Task          *Task                  `protobuf:"bytes,5,opt,name=task,proto3" json:"task,omitempty"`
 	Meta          *Meta                  `protobuf:"bytes,6,opt,name=meta,proto3" json:"meta,omitempty"`
+	Nodes         []*HashNode            `protobuf:"bytes,7,rep,name=nodes,proto3" json:"nodes,omitempty"`
+	Subscriptions []*Subscription        `protobuf:"bytes,8,rep,name=subscriptions,proto3" json:"subscriptions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -105,13 +107,27 @@ func (x *Response) GetMeta() *Meta {
 	return nil
 }
 
+func (x *Response) GetNodes() []*HashNode {
+	if x != nil {
+		return x.Nodes
+	}
+	return nil
+}
+
+func (x *Response) GetSubscriptions() []*Subscription {
+	if x != nil {
+		return x.Subscriptions
+	}
+	return nil
+}
+
 var File_response_proto protoreflect.FileDescriptor
 
 const file_response_proto_rawDesc = "" +
 	"\n" +
 	"\x0eresponse.proto\x12\bprotocol\x1a\x0edata_set.proto\x1a\n" +
 	"task.proto\x1a\n" +
-	"meta.proto\"\xc7\x01\n" +
+	"meta.proto\x1a\x0fhash_node.proto\x1a\x12subscription.proto\"\xaf\x02\n" +
 	"\bResponse\x12\x1e\n" +
 	"\n" +
 	"successful\x18\x01 \x01(\bR\n" +
@@ -120,7 +136,9 @@ const file_response_proto_rawDesc = "" +
 	"\amessage\x18\x03 \x01(\tR\amessage\x12%\n" +
 	"\x04data\x18\x04 \x01(\v2\x11.protocol.DataSetR\x04data\x12\"\n" +
 	"\x04task\x18\x05 \x01(\v2\x0e.protocol.TaskR\x04task\x12\"\n" +
-	"\x04meta\x18\x06 \x01(\v2\x0e.protocol.MetaR\x04metaBP\n" +
+	"\x04meta\x18\x06 \x01(\v2\x0e.protocol.MetaR\x04meta\x12(\n" +
+	"\x05nodes\x18\a \x03(\v2\x12.protocol.HashNodeR\x05nodes\x12<\n" +
+	"\rsubscriptions\x18\b \x03(\v2\x16.protocol.SubscriptionR\rsubscriptionsBP\n" +
 	"\x17com.icodesoftware.protoB\x0fResponseFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -137,20 +155,24 @@ func file_response_proto_rawDescGZIP() []byte {
 
 var file_response_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_response_proto_goTypes = []any{
-	(*Response)(nil), // 0: protocol.Response
-	(*DataSet)(nil),  // 1: protocol.DataSet
-	(*Task)(nil),     // 2: protocol.Task
-	(*Meta)(nil),     // 3: protocol.Meta
+	(*Response)(nil),     // 0: protocol.Response
+	(*DataSet)(nil),      // 1: protocol.DataSet
+	(*Task)(nil),         // 2: protocol.Task
+	(*Meta)(nil),         // 3: protocol.Meta
+	(*HashNode)(nil),     // 4: protocol.HashNode
+	(*Subscription)(nil), // 5: protocol.Subscription
 }
 var file_response_proto_depIdxs = []int32{
 	1, // 0: protocol.Response.data:type_name -> protocol.DataSet
 	2, // 1: protocol.Response.task:type_name -> protocol.Task
 	3, // 2: protocol.Response.meta:type_name -> protocol.Meta
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	4, // 3: protocol.Response.nodes:type_name -> protocol.HashNode
+	5, // 4: protocol.Response.subscriptions:type_name -> protocol.Subscription
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_response_proto_init() }
@@ -161,6 +183,8 @@ func file_response_proto_init() {
 	file_data_set_proto_init()
 	file_task_proto_init()
 	file_meta_proto_init()
+	file_hash_node_proto_init()
+	file_subscription_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

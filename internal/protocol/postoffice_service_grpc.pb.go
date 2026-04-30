@@ -41,13 +41,13 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PostofficeServiceClient interface {
 	// data delegate API
-	HashRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error)
-	KeyRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error)
+	HashRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	KeyRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	Request(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	List(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error)
 	// subscription list API
-	TopicList(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Subscription], error)
-	TaskList(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Subscription], error)
+	TopicList(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	TaskList(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	// topic delegate API
 	Subscribe(ctx context.Context, in *Subscription, opts ...grpc.CallOption) (*Response, error)
 	Unsubscribe(ctx context.Context, in *Subscription, opts ...grpc.CallOption) (*Response, error)
@@ -70,43 +70,25 @@ func NewPostofficeServiceClient(cc grpc.ClientConnInterface) PostofficeServiceCl
 	return &postofficeServiceClient{cc}
 }
 
-func (c *postofficeServiceClient) HashRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error) {
+func (c *postofficeServiceClient) HashRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &PostofficeService_ServiceDesc.Streams[0], PostofficeService_HashRing_FullMethodName, cOpts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, PostofficeService_HashRing_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[Request, HashNode]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	return out, nil
 }
 
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type PostofficeService_HashRingClient = grpc.ServerStreamingClient[HashNode]
-
-func (c *postofficeServiceClient) KeyRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[HashNode], error) {
+func (c *postofficeServiceClient) KeyRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &PostofficeService_ServiceDesc.Streams[1], PostofficeService_KeyRing_FullMethodName, cOpts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, PostofficeService_KeyRing_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[Request, HashNode]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	return out, nil
 }
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type PostofficeService_KeyRingClient = grpc.ServerStreamingClient[HashNode]
 
 func (c *postofficeServiceClient) Request(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -120,7 +102,7 @@ func (c *postofficeServiceClient) Request(ctx context.Context, in *Request, opts
 
 func (c *postofficeServiceClient) List(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &PostofficeService_ServiceDesc.Streams[2], PostofficeService_List_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &PostofficeService_ServiceDesc.Streams[0], PostofficeService_List_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -137,43 +119,25 @@ func (c *postofficeServiceClient) List(ctx context.Context, in *Request, opts ..
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type PostofficeService_ListClient = grpc.ServerStreamingClient[Response]
 
-func (c *postofficeServiceClient) TopicList(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Subscription], error) {
+func (c *postofficeServiceClient) TopicList(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &PostofficeService_ServiceDesc.Streams[3], PostofficeService_TopicList_FullMethodName, cOpts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, PostofficeService_TopicList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[Request, Subscription]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	return out, nil
 }
 
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type PostofficeService_TopicListClient = grpc.ServerStreamingClient[Subscription]
-
-func (c *postofficeServiceClient) TaskList(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Subscription], error) {
+func (c *postofficeServiceClient) TaskList(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &PostofficeService_ServiceDesc.Streams[4], PostofficeService_TaskList_FullMethodName, cOpts...)
+	out := new(Response)
+	err := c.cc.Invoke(ctx, PostofficeService_TaskList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[Request, Subscription]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
+	return out, nil
 }
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type PostofficeService_TaskListClient = grpc.ServerStreamingClient[Subscription]
 
 func (c *postofficeServiceClient) Subscribe(ctx context.Context, in *Subscription, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -217,7 +181,7 @@ func (c *postofficeServiceClient) Disconnect(ctx context.Context, in *Topic, opt
 
 func (c *postofficeServiceClient) Receive(ctx context.Context, in *Topic, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Mail], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &PostofficeService_ServiceDesc.Streams[5], PostofficeService_Receive_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &PostofficeService_ServiceDesc.Streams[1], PostofficeService_Receive_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -279,13 +243,13 @@ func (c *postofficeServiceClient) Finish(ctx context.Context, in *Meta, opts ...
 // for forward compatibility.
 type PostofficeServiceServer interface {
 	// data delegate API
-	HashRing(*Request, grpc.ServerStreamingServer[HashNode]) error
-	KeyRing(*Request, grpc.ServerStreamingServer[HashNode]) error
+	HashRing(context.Context, *Request) (*Response, error)
+	KeyRing(context.Context, *Request) (*Response, error)
 	Request(context.Context, *Request) (*Response, error)
 	List(*Request, grpc.ServerStreamingServer[Response]) error
 	// subscription list API
-	TopicList(*Request, grpc.ServerStreamingServer[Subscription]) error
-	TaskList(*Request, grpc.ServerStreamingServer[Subscription]) error
+	TopicList(context.Context, *Request) (*Response, error)
+	TaskList(context.Context, *Request) (*Response, error)
 	// topic delegate API
 	Subscribe(context.Context, *Subscription) (*Response, error)
 	Unsubscribe(context.Context, *Subscription) (*Response, error)
@@ -308,11 +272,11 @@ type PostofficeServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPostofficeServiceServer struct{}
 
-func (UnimplementedPostofficeServiceServer) HashRing(*Request, grpc.ServerStreamingServer[HashNode]) error {
-	return status.Error(codes.Unimplemented, "method HashRing not implemented")
+func (UnimplementedPostofficeServiceServer) HashRing(context.Context, *Request) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method HashRing not implemented")
 }
-func (UnimplementedPostofficeServiceServer) KeyRing(*Request, grpc.ServerStreamingServer[HashNode]) error {
-	return status.Error(codes.Unimplemented, "method KeyRing not implemented")
+func (UnimplementedPostofficeServiceServer) KeyRing(context.Context, *Request) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method KeyRing not implemented")
 }
 func (UnimplementedPostofficeServiceServer) Request(context.Context, *Request) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Request not implemented")
@@ -320,11 +284,11 @@ func (UnimplementedPostofficeServiceServer) Request(context.Context, *Request) (
 func (UnimplementedPostofficeServiceServer) List(*Request, grpc.ServerStreamingServer[Response]) error {
 	return status.Error(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedPostofficeServiceServer) TopicList(*Request, grpc.ServerStreamingServer[Subscription]) error {
-	return status.Error(codes.Unimplemented, "method TopicList not implemented")
+func (UnimplementedPostofficeServiceServer) TopicList(context.Context, *Request) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method TopicList not implemented")
 }
-func (UnimplementedPostofficeServiceServer) TaskList(*Request, grpc.ServerStreamingServer[Subscription]) error {
-	return status.Error(codes.Unimplemented, "method TaskList not implemented")
+func (UnimplementedPostofficeServiceServer) TaskList(context.Context, *Request) (*Response, error) {
+	return nil, status.Error(codes.Unimplemented, "method TaskList not implemented")
 }
 func (UnimplementedPostofficeServiceServer) Subscribe(context.Context, *Subscription) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method Subscribe not implemented")
@@ -374,27 +338,41 @@ func RegisterPostofficeServiceServer(s grpc.ServiceRegistrar, srv PostofficeServ
 	s.RegisterService(&PostofficeService_ServiceDesc, srv)
 }
 
-func _PostofficeService_HashRing_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(Request)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _PostofficeService_HashRing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(PostofficeServiceServer).HashRing(m, &grpc.GenericServerStream[Request, HashNode]{ServerStream: stream})
+	if interceptor == nil {
+		return srv.(PostofficeServiceServer).HashRing(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostofficeService_HashRing_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostofficeServiceServer).HashRing(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type PostofficeService_HashRingServer = grpc.ServerStreamingServer[HashNode]
-
-func _PostofficeService_KeyRing_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(Request)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _PostofficeService_KeyRing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(PostofficeServiceServer).KeyRing(m, &grpc.GenericServerStream[Request, HashNode]{ServerStream: stream})
+	if interceptor == nil {
+		return srv.(PostofficeServiceServer).KeyRing(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostofficeService_KeyRing_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostofficeServiceServer).KeyRing(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
 }
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type PostofficeService_KeyRingServer = grpc.ServerStreamingServer[HashNode]
 
 func _PostofficeService_Request_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
@@ -425,27 +403,41 @@ func _PostofficeService_List_Handler(srv interface{}, stream grpc.ServerStream) 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type PostofficeService_ListServer = grpc.ServerStreamingServer[Response]
 
-func _PostofficeService_TopicList_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(Request)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _PostofficeService_TopicList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(PostofficeServiceServer).TopicList(m, &grpc.GenericServerStream[Request, Subscription]{ServerStream: stream})
+	if interceptor == nil {
+		return srv.(PostofficeServiceServer).TopicList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostofficeService_TopicList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostofficeServiceServer).TopicList(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type PostofficeService_TopicListServer = grpc.ServerStreamingServer[Subscription]
-
-func _PostofficeService_TaskList_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(Request)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _PostofficeService_TaskList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(PostofficeServiceServer).TaskList(m, &grpc.GenericServerStream[Request, Subscription]{ServerStream: stream})
+	if interceptor == nil {
+		return srv.(PostofficeServiceServer).TaskList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostofficeService_TaskList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostofficeServiceServer).TaskList(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
 }
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type PostofficeService_TaskListServer = grpc.ServerStreamingServer[Subscription]
 
 func _PostofficeService_Subscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Subscription)
@@ -610,8 +602,24 @@ var PostofficeService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*PostofficeServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "hashRing",
+			Handler:    _PostofficeService_HashRing_Handler,
+		},
+		{
+			MethodName: "keyRing",
+			Handler:    _PostofficeService_KeyRing_Handler,
+		},
+		{
 			MethodName: "request",
 			Handler:    _PostofficeService_Request_Handler,
+		},
+		{
+			MethodName: "topicList",
+			Handler:    _PostofficeService_TopicList_Handler,
+		},
+		{
+			MethodName: "taskList",
+			Handler:    _PostofficeService_TaskList_Handler,
 		},
 		{
 			MethodName: "subscribe",
@@ -648,28 +656,8 @@ var PostofficeService_ServiceDesc = grpc.ServiceDesc{
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "hashRing",
-			Handler:       _PostofficeService_HashRing_Handler,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "keyRing",
-			Handler:       _PostofficeService_KeyRing_Handler,
-			ServerStreams: true,
-		},
-		{
 			StreamName:    "list",
 			Handler:       _PostofficeService_List_Handler,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "topicList",
-			Handler:       _PostofficeService_TopicList_Handler,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "taskList",
-			Handler:       _PostofficeService_TaskList_Handler,
 			ServerStreams: true,
 		},
 		{

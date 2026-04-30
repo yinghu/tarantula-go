@@ -9,7 +9,7 @@ type QueryFactoryObj struct {
 }
 
 func (f *QueryFactoryObj) Import(data []byte) (Query, error) {
-	buff := NewBuffer(COMPOSIT_KEY_MAX)
+	buff := NewBuffer(QUERY_SIZE_MAX)
 	if err := buff.Write(data); err != nil {
 		return f.Q, err
 	}
@@ -21,7 +21,7 @@ func (f *QueryFactoryObj) Import(data []byte) (Query, error) {
 }
 func (f *QueryFactoryObj) Export(query Query) ([]byte, error) {
 	var v []byte
-	buff := NewBuffer(COMPOSIT_KEY_MAX)
+	buff := NewBuffer(QUERY_SIZE_MAX)
 	if err := query.QWrite(buff); err != nil {
 		return v, nil
 	}

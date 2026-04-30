@@ -22,7 +22,7 @@ type Query interface {
 	QRead(b DataBuffer) error
 	QWrite(b DataBuffer) error
 	QFilter(k, v []byte) bool
-
+	
 	//read
 	QList(list List) error
 	QResponse(resp *protocol.Response)

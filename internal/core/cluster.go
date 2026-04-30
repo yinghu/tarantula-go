@@ -24,6 +24,7 @@ const (
 	DATA_STATE_DELETED uint32 = 2
 
 	COMPOSIT_KEY_MAX int = 500
+	QUERY_SIZE_MAX   int = 2000
 
 	TOPIC_MAIL uint32 = 0
 	TRANS_MAIL uint32 = 1
@@ -136,8 +137,8 @@ type TransactionListener interface {
 
 type ClusterService interface {
 	//hash
-	HashRing(r RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error)
-	KeyRing(r RingRequest) (grpc.ServerStreamingClient[protocol.HashNode], error)
+	HashRing(r RingRequest) (*protocol.Response, error)
+	KeyRing(r RingRequest) (*protocol.Response, error)
 	RingToken(key []byte) uint32
 
 	//data
@@ -158,6 +159,6 @@ type ClusterService interface {
 	Finish(t *protocol.Meta) (*protocol.Response, error)
 
 	//subscription
-	TopicList() (grpc.ServerStreamingClient[protocol.Subscription], error)
-	TaskList() (grpc.ServerStreamingClient[protocol.Subscription], error)
+	TopicList() (*protocol.Response, error)
+	TaskList() (*protocol.Response, error)
 }

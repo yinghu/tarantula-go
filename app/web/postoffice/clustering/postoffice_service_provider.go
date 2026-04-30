@@ -11,32 +11,30 @@ import (
 	"google.golang.org/grpc"
 )
 
-func (c *DataServiceProvider) HashRing(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.HashNode]) error {
+func (c *DataServiceProvider) HashRing(ctx context.Context, request *protocol.Request) (*protocol.Response, error) {
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
 	c.Mll.rangeRing(core.RingRequest{Async: rq, Opt: ALL_RING_OPT})
 	ring := <-rq
+	nodes := make([]*protocol.HashNode, 0)
 	for _, n := range ring {
 		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name, Address: n.IP, Meta: n.Meta}
-		if err := stream.Send(&hn); err != nil {
-			return err
-		}
+		nodes = append(nodes, &hn)
 	}
-	return nil
+	return &protocol.Response{Nodes: nodes}, nil
 }
 
-func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.HashNode]) error {
+func (c *DataServiceProvider) KeyRing(ctx context.Context, request *protocol.Request) (*protocol.Response, error) {
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
 	c.Mll.rangeRing(core.RingRequest{Async: rq, Opt: REPLICA_RING_OPT, Token: request.Prefix})
 	ring := <-rq
+	nodes := make([]*protocol.HashNode, 0)
 	for _, n := range ring {
 		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name, Address: n.IP}
-		if err := stream.Send(&hn); err != nil {
-			return err
-		}
+		nodes = append(nodes, &hn)
 	}
-	return nil
+	return &protocol.Response{Nodes: nodes}, nil
 }
 
 func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerStreamingServer[protocol.Mail]) error {
@@ -169,26 +167,28 @@ func (c *DataServiceProvider) Finish(ctx context.Context, meta *protocol.Meta) (
 	return &protocol.Response{Successful: true}, nil
 }
 
-func (c *DataServiceProvider) TopicList(req *protocol.Request, stream grpc.ServerStreamingServer[protocol.Subscription]) error {
+func (c *DataServiceProvider) TopicList(ctx context.Context, req *protocol.Request) (*protocol.Response, error) {
 	rq := make(chan []core.Subscription, 3)
 	defer close(rq)
 	c.DRequest <- TopicRequest{Opt: TOPIC_LIST, Subs: rq}
 	subs := <-rq
-	for _,sub := range subs{
-		stream.Send(&protocol.Subscription{NodeId:sub.NodeId,Tag: sub.Tag,Name: sub.Topic,Endpoint: sub.Endpoint})
+	tps := make([]*protocol.Subscription, 0)
+	for _, sub := range subs {
+		tps = append(tps, &protocol.Subscription{NodeId: sub.NodeId, Tag: sub.Tag, Name: sub.Topic, Endpoint: sub.Endpoint})
 	}
-	return nil
+	return &protocol.Response{Subscriptions: tps}, nil
 }
 
-func (c *DataServiceProvider) TaskList(req *protocol.Request, stream grpc.ServerStreamingServer[protocol.Subscription]) error {
+func (c *DataServiceProvider) TaskList(ctx context.Context, req *protocol.Request) (*protocol.Response, error) {
 	rq := make(chan []core.Subscription, 3)
 	defer close(rq)
 	c.DRequest <- TopicRequest{Opt: TASK_LIST, Subs: rq}
 	subs := <-rq
-	for _,sub := range subs{
-		stream.Send(&protocol.Subscription{NodeId:sub.NodeId,Tag: sub.Tag,Name: sub.Topic,Endpoint: sub.Endpoint})
+	tks := make([]*protocol.Subscription, 0)
+	for _, sub := range subs {
+		tks = append(tks, &protocol.Subscription{NodeId: sub.NodeId, Tag: sub.Tag, Name: sub.Topic, Endpoint: sub.Endpoint})
 	}
-	return nil
+	return &protocol.Response{Subscriptions: tks}, nil
 }
 
 func (c *DataServiceProvider) tid() uint64 {
