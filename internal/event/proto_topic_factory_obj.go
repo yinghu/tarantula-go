@@ -43,7 +43,6 @@ func (p *ProtoTopicFactoryObj) Request(topic *protocol.Topic) (*protocol.Request
 	if len(topic.Event.Key.Array) == 0 {
 		return &req, fmt.Errorf("key must be assigned")
 	}
-	//req.Prefix = util.Hash(topic.Event.Key.Array)
 	value, err := proto.Marshal(topic)
 	if err != nil {
 		return &req, err

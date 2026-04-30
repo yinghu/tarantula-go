@@ -21,7 +21,6 @@ type ProtoObjectFactoryObj struct {
 
 func (p *ProtoObjectFactoryObj) Request(obj *protocol.KeyValue) (*protocol.Request, error) {
 	req := protocol.Request{Opt: core.CREATE_DATA_REQUEST}
-	//req.Prefix = util.Hash(obj.Key.Array)
 	value, err := proto.Marshal(obj)
 	if err != nil {
 		return &req, err
