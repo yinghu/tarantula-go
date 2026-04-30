@@ -88,5 +88,5 @@ func (m *MemberHashRing) OnConflict(nodes []core.Node) {
 func (m *MemberHashRing) RingToken(key []byte) uint32 {
 	m.hLock.Lock()
 	defer m.hLock.Unlock()
-	return util.Hash(key)
+	return util.Hash32(key)
 }

@@ -5,7 +5,6 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
-	"gameclustering.com/internal/util"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
@@ -44,16 +43,15 @@ func (p *ProtoTopicFactoryObj) Request(topic *protocol.Topic) (*protocol.Request
 	if len(topic.Event.Key.Array) == 0 {
 		return &req, fmt.Errorf("key must be assigned")
 	}
-	req.Prefix = util.Hash(topic.Event.Key.Array)
+	//req.Prefix = util.Hash(topic.Event.Key.Array)
 	value, err := proto.Marshal(topic)
 	if err != nil {
 		return &req, err
 	}
-	data := protocol.Data{Header: topic.Event.Key.Header, Key:topic.Event.Key.Array , Value: value}
+	data := protocol.Data{Header: topic.Event.Key.Header, Key: topic.Event.Key.Array, Value: value}
 	req.Data = &data
 	return &req, nil
 }
-
 
 func (p *ProtoTopicFactoryObj) Topic(data []byte) (*protocol.Topic, error) {
 	var tp protocol.Topic

@@ -83,9 +83,6 @@ func (c *DataServiceProvider) Create(ctx context.Context, in *protocol.Request) 
 	setData := SetData{Opt: in.Opt, Prefix: in.Prefix, Data: in.Data, Resp: msg}
 	if setData.Prefix == 0 {
 		c.Mll.RingToken(setData.Key)
-
-
-		
 	}
 	c.DSet <- setData
 	resp := <-msg
@@ -96,6 +93,9 @@ func (c *DataServiceProvider) Update(ctx context.Context, in *protocol.Request) 
 	msg := make(chan *protocol.Response, 1)
 	defer close(msg)
 	setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
+	if setData.Prefix == 0 {
+		c.Mll.RingToken(setData.Key)
+	}
 	c.DSet <- setData
 	resp := <-msg
 	return resp, nil
@@ -105,6 +105,9 @@ func (c *DataServiceProvider) Delete(ctx context.Context, in *protocol.Request) 
 	msg := make(chan *protocol.Response, 1)
 	defer close(msg)
 	setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
+	if setData.Prefix == 0 {
+		c.Mll.RingToken(setData.Key)
+	}
 	c.DSet <- setData
 	resp := <-msg
 	return resp, nil

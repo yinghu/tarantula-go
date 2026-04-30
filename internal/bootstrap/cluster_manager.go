@@ -48,6 +48,7 @@ type ClusterManager struct {
 	cInboundTrans chan *protocol.Transaction
 	cHost         string
 	cPool         core.RpcConnPool
+	cLock         *sync.Mutex
 }
 
 func (c *ClusterManager) HashRing(r core.RingRequest) (*protocol.Response, error) {
@@ -75,7 +76,9 @@ func (c *ClusterManager) KeyRing(r core.RingRequest) (*protocol.Response, error)
 }
 
 func (c *ClusterManager) RingToken(key []byte) uint32 {
-	return util.Hash(key)
+	c.cLock.Lock()
+	defer c.cLock.Unlock()
+	return util.Hash32(key)
 }
 
 func (c *ClusterManager) Request(r *protocol.Request) (*protocol.Response, error) {
@@ -256,6 +259,7 @@ func (c *ClusterManager) connect(host string) error {
 	c.cSub = make(chan Sub, SUB_CHAN_SIZE)
 	c.cInboundTopic = make(chan *protocol.Topic, TOPIC_CHAN_SIZE)
 	c.cInboundTrans = make(chan *protocol.Transaction, TOPIC_CHAN_SIZE)
+	c.cLock = &sync.Mutex{}
 	c.running = true
 	var wt sync.WaitGroup
 	wt.Add(1)

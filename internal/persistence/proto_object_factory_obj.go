@@ -3,7 +3,6 @@ package persistence
 import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
-	"gameclustering.com/internal/util"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
@@ -22,7 +21,7 @@ type ProtoObjectFactoryObj struct {
 
 func (p *ProtoObjectFactoryObj) Request(obj *protocol.KeyValue) (*protocol.Request, error) {
 	req := protocol.Request{Opt: core.CREATE_DATA_REQUEST}
-	req.Prefix = util.Hash(obj.Key.Array)
+	//req.Prefix = util.Hash(obj.Key.Array)
 	value, err := proto.Marshal(obj)
 	if err != nil {
 		return &req, err
