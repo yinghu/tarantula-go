@@ -1,6 +1,8 @@
 package event
 
 import (
+	"time"
+
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 )
@@ -16,7 +18,7 @@ func (q *LogEventQuery) QFilter(k, v []byte) bool {
 		core.AppLog.Warn().Msgf("wrong decode format %s", err)
 		return false
 	}
-	core.AppLog.Debug().Msgf("topic %v", t.Event.Key.Header)
+	core.AppLog.Debug().Msgf("topic %v", time.UnixMilli(int64(t.Event.Key.Header.Timestamp)))
 	obj, err := mf.Message(t)
 	if err != nil {
 		core.AppLog.Warn().Msgf("wrong decode format %s", err)
