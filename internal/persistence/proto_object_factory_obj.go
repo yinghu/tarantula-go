@@ -15,11 +15,13 @@ const (
 type MessageObject func() proto.Message
 
 type ProtoObjectFactoryObj struct {
+	Target *protocol.KeyValue
 	core.QueryFactoryObj
 	Mo MessageObject
 }
 
 func (p *ProtoObjectFactoryObj) Request(obj *protocol.KeyValue) (*protocol.Request, error) {
+	p.Target = obj
 	req := protocol.Request{Opt: core.CREATE_DATA_REQUEST}
 	value, err := proto.Marshal(obj)
 	if err != nil {
@@ -43,4 +45,7 @@ func (p *ProtoObjectFactoryObj) Message(obj *protocol.KeyValue) (any, error) {
 		return m, err
 	}
 	return m, nil
+}
+func (p *ProtoObjectFactoryObj) Hash(mh core.MessageHash) uint32 {
+	return mh.RingToken(p.Target.Key.Array)
 }

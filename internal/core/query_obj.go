@@ -162,3 +162,7 @@ func (q *QueryObj) QList(list List) error {
 func (q *QueryObj) QResponse(resp *protocol.Response) {
 	q.Payload = resp
 }
+
+func (q *QueryObj) Hash(mh MessageHash) uint32 {
+	return mh.RingToken([]byte(q.Topic))
+}

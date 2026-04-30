@@ -106,7 +106,7 @@ func (c *ClusterManager) List(r core.Query) (grpc.ServerStreamingClient[protocol
 		return nil, err
 	}
 	q := protocol.Query{Id: r.QTopic(), Criteria: dt}
-	req := protocol.Request{Prefix: c.RingToken([]byte(r.QTopic())), Query: &q}
+	req := protocol.Request{Prefix: r.Hash(c), Query: &q}
 	conn, err := c.cPool.Conn()
 	if err != nil {
 		return nil, err

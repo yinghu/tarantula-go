@@ -37,3 +37,7 @@ func (f *QueryFactoryObj) Set(resp *protocol.Response) Query {
 	f.Q.QResponse(resp)
 	return f.Q
 }
+
+func (f *QueryFactoryObj) Hash(h MessageHash) uint32{
+	return 0
+}

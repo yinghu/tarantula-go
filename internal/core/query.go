@@ -22,10 +22,12 @@ type Query interface {
 	QRead(b DataBuffer) error
 	QWrite(b DataBuffer) error
 	QFilter(k, v []byte) bool
-	
+
 	//read
 	QList(list List) error
 	QResponse(resp *protocol.Response)
+	//query target ring
+	Hash(h MessageHash) uint32
 }
 
 type QueryFactory interface {

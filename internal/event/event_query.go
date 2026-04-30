@@ -168,3 +168,7 @@ func (q *QWithTag) QList(list core.List) error {
 func (q *QWithTag) QResponse(resp *protocol.Response) {
 
 }
+
+func (q *QWithTag) Hash(mh core.MessageHash) uint32 {
+	return 0
+}

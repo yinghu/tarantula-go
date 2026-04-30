@@ -4,9 +4,9 @@ import (
 	"gameclustering.com/internal/protocol"
 )
 
-
 type ProtoObjectFactory interface {
 	//CompositeKey
+	Hash(h MessageHash) uint32
 	Request(obj *protocol.KeyValue) (*protocol.Request, error)
 	Object(data []byte) (*protocol.KeyValue, error)
 	Message(obj *protocol.KeyValue) (any, error)
