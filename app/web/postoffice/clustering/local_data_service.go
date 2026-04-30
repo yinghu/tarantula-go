@@ -369,3 +369,48 @@ func (c *DataServiceProvider) set(resp *protocol.Response) {
 		return
 	}
 }
+
+func (c *DataServiceProvider) query(q core.Query,stream grpc.ServerStreamingServer[protocol.Response]) error {
+	//core.AppLog.Debug().Msgf("query %v", q)
+	buff := core.NewBuffer(16)
+	buff.WriteUInt32(q.QFactoryId())
+	buff.WriteUInt32(q.QClassId())
+	buff.Flip()
+	px, err := buff.Read(0)
+	if err != nil {
+		return err
+	}
+	p := px
+	dset := make([]*protocol.Data, 0)
+	//core.AppLog.Debug().Msgf("query : %d %d %d %d", q.QLimit(), q.QOffset(), q.QFactoryId(), q.QClassId())
+	limit := q.QLimit()
+	offset := q.QOffset()
+	c.Local.Db.View(func(txn *badger.Txn) error {
+		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
+		it := txn.NewIterator(op)
+		defer it.Close()
+		for it.Seek(p); it.ValidForPrefix(p); it.Next() {
+			if offset > 0 {
+				offset--
+				continue
+			}
+			p = px
+			item := it.Item()
+			k := append([]byte{}, item.Key()[12:]...)
+			item.Value(func(val []byte) error {
+				if q.QFilter(k, val) {
+					v := append([]byte{}, val...)
+					dset = append(dset, &protocol.Data{Key: k, Value: v, Header: &protocol.Header{}})
+					limit--
+				}
+				return nil
+			})
+			if limit == 0 {
+				break
+			}
+		}
+		return nil
+	})
+	resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: dset}}
+	return stream.Send(&resp)
+}
