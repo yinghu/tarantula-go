@@ -16,6 +16,7 @@ func (q *MessageEventQuery) QFilter(k, v []byte) bool {
 		core.AppLog.Warn().Msgf("wrong decode format %s", err)
 		return false
 	}
+	core.AppLog.Debug().Msgf("topic %v", t.Event.Key.Header)
 	obj, err := mf.Message(t)
 	if err != nil {
 		core.AppLog.Warn().Msgf("wrong decode format %s", err)

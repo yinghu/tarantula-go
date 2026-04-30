@@ -1,6 +1,8 @@
 package event
 
 import (
+	"time"
+
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 
@@ -26,7 +28,7 @@ type MessageEventFactory struct {
 
 func (p *MessageEventFactory) FromMessageEvent(e *protocol.MessageEvent) (*protocol.Topic, error) {
 	tpx := protocol.Topic{Name: MESSAGE_TOPIC_NAME}
-	msg := protocol.Event{Key:&protocol.Key{Header: &protocol.Header{FactoryId: core.EVENT_FACTORY_ID, ClassId: MESSAGE_EVENT_CID}}}
+	msg := protocol.Event{Key: &protocol.Key{Header: &protocol.Header{FactoryId: core.EVENT_FACTORY_ID, ClassId: MESSAGE_EVENT_CID, Timestamp: uint64(time.Now().UnixMilli())}}}
 	obj, err := anypb.New(e)
 	if err != nil {
 		return &tpx, err
