@@ -135,11 +135,16 @@ type TransactionListener interface {
 	OnTransaction(t *protocol.Transaction) error
 }
 
+type MessageHash interface {
+	RingToken(key []byte) uint32
+}
+
 type ClusterService interface {
 	//hash
+	MessageHash
 	HashRing(r RingRequest) (*protocol.Response, error)
 	KeyRing(r RingRequest) (*protocol.Response, error)
-	RingToken(key []byte) uint32
+	//RingToken(key []byte) uint32
 
 	//data
 	List(r Query) (grpc.ServerStreamingClient[protocol.Response], error)

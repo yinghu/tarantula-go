@@ -66,3 +66,7 @@ func (p *ProtoTopicFactoryObj) Message(topic *protocol.Topic) (any, error) {
 	}
 	return m, nil
 }
+
+func (p *ProtoTopicFactoryObj) Hash(mh core.MessageHash) uint32 {
+	return mh.RingToken(p.Target.Event.Key.Array)
+}
