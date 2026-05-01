@@ -14,10 +14,10 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request) (*protocol.Respon
 	var rt uint32
 	if set.Prefix > 0 {
 		rt = set.Prefix
-	} else {
+	} else {	
 		rt = c.Mll.RingToken(set.Data.Key)
+		core.AppLog.Debug().Msgf("using key hash %d",rt)
 	}
-	//core.AppLog.Debug().Msgf("data header %v", set.Data.Header)
 	for retry.Reties > 0 {
 		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: rt, Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
