@@ -86,7 +86,11 @@ func (c *DataServiceProvider) updateTask(t *TaskResource, clear ClearResource) {
 	}
 	t.revision++
 	core.AppLog.Info().Msgf("saved %v", resp)
-	tx, _ := c.load(t.resource.Meta.Id)
+	tx, err := c.load(t.resource.Meta.Id)
+	if err != nil {
+		core.AppLog.Error().Msgf("no task loaded %s", err.Error())
+		return
+	}
 	core.AppLog.Debug().Msgf("v %v", tx.resource.Validator.Meta)
 	core.AppLog.Debug().Msgf("j %v", tx.resource.Job.Meta)
 	core.AppLog.Debug().Msgf("t %v", tx.resource.Meta)
