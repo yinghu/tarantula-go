@@ -356,7 +356,7 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 		e.Level = "error"
 		e.Message = err.Error()
 		e.Time = timestamppb.Now()
-		e.Source = "forwarder:325"
+		e.Source = "forwarder:359"
 	}
 	tf := event.LogEventFactory{}
 	t, err := tf.FromLogEvent(&e)
@@ -367,7 +367,6 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 }
 
 func (c *ClusterManager) handleTranstion(l core.TransactionListener, t *protocol.Transaction) {
-	core.AppLog.Debug().Msgf("tv %v", t)
 	state := t.Meta.State
 	err := l.OnTransaction(t)
 	t.Meta.NodeId = c.App.NodeId()
