@@ -56,7 +56,7 @@ func (c *DataServiceProvider) load(taskId uint64) (*TaskResource, error) {
 	buff.WriteUInt64(taskId)
 	buff.Flip()
 	k, _ := buff.Read(0)
-	req := protocol.Request{Data: &protocol.Data{Key: k, Header: &protocol.Header{FactoryId: core.TASK_FACTORY_ID, ClassId: persistence.TASK_CLASS_ID}}}
+	req := protocol.Request{Prefix: c.Mll.RingToken(k), Data: &protocol.Data{Key: k, Header: &protocol.Header{FactoryId: core.TASK_FACTORY_ID, ClassId: persistence.TASK_CLASS_ID}}}
 	resp, err := c.runGet(&req)
 	if err != nil {
 		return nil, err
