@@ -50,6 +50,7 @@ func (m *DataServiceProvider) update(sd SetData) (KeyIndex, error) {
 	if err != nil {
 		return ki, err
 	}
+	core.AppLog.Debug().Msgf("PREFIX %d", sd.Prefix)
 	rev := sd.Header.Revision
 	err = m.Local.Db.Update(func(txn *badger.Txn) error {
 		item, err := txn.Get(k)
