@@ -64,3 +64,7 @@ func (b *TaskBuilder) From(data []byte) (*protocol.Task, error) {
 	err := proto.Unmarshal(data, b.Target)
 	return b.Target, err
 }
+
+func (b *TaskBuilder) Hash(h core.MessageHash) uint32 {
+	return 0
+}
