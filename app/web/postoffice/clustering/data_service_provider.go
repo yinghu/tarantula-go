@@ -84,7 +84,6 @@ func (c *DataServiceProvider) Create(ctx context.Context, in *protocol.Request) 
 	if setData.Prefix == 0 {
 		setData.Prefix = c.Mll.RingToken(setData.Key)
 	}
-	core.AppLog.Debug().Msgf("CPR :%d %d %v", setData.Prefix, in.Prefix, in.Data.Header)
 	c.DSet <- setData
 	resp := <-msg
 	return resp, nil

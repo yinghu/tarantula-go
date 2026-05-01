@@ -50,7 +50,6 @@ func (m *DataServiceProvider) update(sd SetData) (KeyIndex, error) {
 	if err != nil {
 		return ki, err
 	}
-	core.AppLog.Debug().Msgf("PREFIX %d", sd.Prefix)
 	rev := sd.Header.Revision
 	err = m.Local.Db.Update(func(txn *badger.Txn) error {
 		item, err := txn.Get(k)
@@ -136,18 +135,15 @@ func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
 	if err != nil {
 		return &data, err
 	}
-	core.AppLog.Debug().Msgf("PREFIX %d", gd.Prefix)
 	err = m.Local.Db.View(func(txn *badger.Txn) error {
 		item, err := txn.Get(k)
 		if err != nil {
-			core.AppLog.Debug().Msgf("E0  %s", err.Error())
 			return err
 		}
 		if err = item.Value(func(val []byte) error {
 			v := append([]byte{}, val...)
 			return ki.Val(v)
 		}); err != nil {
-			core.AppLog.Debug().Msgf("E1  %s", err.Error())
 			return err
 		}
 		//use latest revision
@@ -157,12 +153,10 @@ func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
 		gd.Data.Header.Revision = ki.Header.Revision
 		dk, err := gd.DataKey()
 		if err != nil {
-			core.AppLog.Debug().Msgf("E2  %s", err.Error())
 			return err
 		}
 		item, err = txn.Get(dk)
 		if err != nil {
-			core.AppLog.Debug().Msgf("E3  %s", err.Error())
 			return err
 		}
 		return item.Value(func(val []byte) error {
