@@ -71,7 +71,7 @@ func (c *DataServiceProvider) Query(request *protocol.Request, stream grpc.Serve
 func (c *DataServiceProvider) Reset(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
 	msg := make(chan *protocol.Response, 1)
 	defer close(msg)
-	setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
+	setData := SetData{Opt: in.Opt, Prefix: in.Prefix, Data: in.Data, Resp: msg}
 	c.DSet <- setData
 	resp := <-msg
 	return resp, nil
@@ -92,7 +92,7 @@ func (c *DataServiceProvider) Create(ctx context.Context, in *protocol.Request) 
 func (c *DataServiceProvider) Update(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
 	msg := make(chan *protocol.Response, 1)
 	defer close(msg)
-	setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
+	setData := SetData{Opt: in.Opt, Prefix: in.Prefix, Data: in.Data, Resp: msg}
 	if setData.Prefix == 0 {
 		c.Mll.RingToken(setData.Key)
 	}
@@ -104,7 +104,7 @@ func (c *DataServiceProvider) Update(ctx context.Context, in *protocol.Request) 
 func (c *DataServiceProvider) Delete(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
 	msg := make(chan *protocol.Response, 1)
 	defer close(msg)
-	setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
+	setData := SetData{Opt: in.Opt, Prefix: in.Prefix, Data: in.Data, Resp: msg}
 	if setData.Prefix == 0 {
 		c.Mll.RingToken(setData.Key)
 	}
