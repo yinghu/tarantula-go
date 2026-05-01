@@ -140,13 +140,14 @@ func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
 	err = m.Local.Db.View(func(txn *badger.Txn) error {
 		item, err := txn.Get(k)
 		if err != nil {
+			core.AppLog.Debug().Msgf("E0  %s", err.Error())
 			return err
 		}
 		if err = item.Value(func(val []byte) error {
 			v := append([]byte{}, val...)
 			return ki.Val(v)
 		}); err != nil {
-			core.AppLog.Debug().Msgf("E1  %s",err.Error())		
+			core.AppLog.Debug().Msgf("E1  %s", err.Error())
 			return err
 		}
 		//use latest revision
@@ -156,12 +157,12 @@ func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
 		gd.Data.Header.Revision = ki.Header.Revision
 		dk, err := gd.DataKey()
 		if err != nil {
-			core.AppLog.Debug().Msgf("E2  %s",err.Error())
+			core.AppLog.Debug().Msgf("E2  %s", err.Error())
 			return err
 		}
 		item, err = txn.Get(dk)
 		if err != nil {
-			core.AppLog.Debug().Msgf("E3  %s",err.Error())
+			core.AppLog.Debug().Msgf("E3  %s", err.Error())
 			return err
 		}
 		return item.Value(func(val []byte) error {
