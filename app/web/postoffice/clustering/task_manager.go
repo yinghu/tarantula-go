@@ -103,11 +103,11 @@ func (m *TaskManager) confirmed(t *JobResource) {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.TaskId, JobId: t.resource.Meta.JobId, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
 			core.AppLog.Debug().Msgf("retry to finish with confirm/timeout on %d", tc.Meta.Id)
-			go m.s.runAskFinish(tc.Meta)
+			go m.s.runAskFinish(m.copy(tc.Meta))
 		}, d: time.Duration(tc.Meta.Timeout) * time.Second, r: tc.Meta.Retries}
 
 		//ask to finish
-		go m.s.runAskFinish(tc.Meta)
+		go m.s.runAskFinish(m.copy(tc.Meta))
 
 	}
 }
@@ -120,6 +120,7 @@ func (m *TaskManager) canceled(c *protocol.Meta, t *JobResource) {
 		m.closeTimer(tc.Meta.Id)
 		tc.Meta.State = protocol.TCC_CANCELED
 		tc.Meta.Description = c.Description
+		tc.Meta.Prefix = t.resource.Meta.Prefix
 		//retry to finish on cancel
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.TaskId, JobId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
@@ -140,6 +141,7 @@ func (m *TaskManager) finished(t *JobResource) {
 		tr.jobIndex++
 		next := tr.pending[tr.jobIndex]
 		next.Meta.State = protocol.TCC_JOB_TIMEOUT
+		next.Meta.Prefix = tr.resource.Meta.Prefix
 		m.schedule(tr, next)
 		return
 	}
