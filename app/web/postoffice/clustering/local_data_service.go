@@ -135,7 +135,7 @@ func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
 	if err != nil {
 		return &data, err
 	}
-
+	core.AppLog.Debug().Msgf("PREFIX %d", gd.Prefix)
 	err = m.Local.Db.View(func(txn *badger.Txn) error {
 		item, err := txn.Get(k)
 		if err != nil {
@@ -370,7 +370,7 @@ func (c *DataServiceProvider) set(resp *protocol.Response) {
 	}
 }
 
-func (c *DataServiceProvider) query(q core.Query,stream grpc.ServerStreamingServer[protocol.Response]) error {
+func (c *DataServiceProvider) query(q core.Query, stream grpc.ServerStreamingServer[protocol.Response]) error {
 	//core.AppLog.Debug().Msgf("query %v", q)
 	buff := core.NewBuffer(16)
 	buff.WriteUInt32(q.QFactoryId())

@@ -78,6 +78,7 @@ func (c *DataServiceProvider) updateTask(t *TaskResource, clear ClearResource) {
 		return
 	}
 	req.Data.Header.Revision = t.revision
+	req.Prefix = c.Mll.RingToken(req.Data.Key)
 	req.Opt = core.UPDATE_DATA_REQUEST
 	resp, err := c.runUpdate(req)
 	if err != nil {
