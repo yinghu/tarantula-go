@@ -38,7 +38,7 @@ func (j *JobResource) join(meta *protocol.Meta) bool {
 	default:
 		return false
 	}
-	core.AppLog.Debug().Msgf("meta ID : %d STATE : %d CONFIRMED : %d FINISHED %d", meta.Id, meta.State, t.confirmed, t.finished)
+	core.AppLog.Debug().Msgf("meta ID : %d STATE : %d CONFIRMED : %d FINISHED %d PREFIX %d", meta.Id, meta.State, t.confirmed, t.finished, meta.Prefix)
 	j.confirmed++
 	return j.joinParties == j.confirmed
 }

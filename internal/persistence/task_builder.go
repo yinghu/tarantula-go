@@ -14,6 +14,7 @@ const (
 
 type TaskBuilder struct {
 	Target *protocol.Task
+	key    []byte
 }
 
 func NewTaskBuilder(meta *protocol.Meta) *TaskBuilder {
@@ -48,6 +49,7 @@ func (b *TaskBuilder) Request() (*protocol.Request, error) {
 	if err != nil {
 		return &req, err
 	}
+	b.key = key
 	value, err := proto.Marshal(b.Target)
 	if err != nil {
 		return &req, err
@@ -66,5 +68,7 @@ func (b *TaskBuilder) From(data []byte) (*protocol.Task, error) {
 }
 
 func (b *TaskBuilder) Hash(h core.MessageHash) uint32 {
-	return 0
+	hash := h.RingToken(b.key)
+	b.Target.Meta.Prefix = hash
+	return hash
 }

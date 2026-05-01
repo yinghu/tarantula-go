@@ -142,6 +142,7 @@ func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*
 	if err != nil {
 		return &protocol.Response{Successful: false, Message: err.Error()}, err
 	}
+	req.Prefix = tb.Hash(c.Mll)
 	resp, err := c.runCreate(req)
 	if err != nil {
 		return resp, err

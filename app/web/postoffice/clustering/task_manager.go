@@ -47,6 +47,7 @@ func (m *TaskManager) set(t *TaskResource) {
 	t.jobIndex = 0
 	job := t.pending[t.jobIndex]
 	job.Meta.State = protocol.TCC_JOB_TIMEOUT
+	job.Meta.Prefix = t.resource.Meta.Prefix
 	m.schedule(t, job)
 }
 
@@ -69,6 +70,7 @@ func (m *TaskManager) start(j *JobResource) {
 		j.joining[tc.Meta.Id] = &TransactionResource{resource: tc}
 		tc.Meta.State = protocol.TCC_RESERVING
 		tc.Meta.Time = timestamppb.Now()
+		tc.Meta.Prefix = j.resource.Meta.Prefix
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: j.resource.Meta.TaskId, JobId: j.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
@@ -95,6 +97,7 @@ func (m *TaskManager) confirmed(t *JobResource) {
 	t.confirmed = 0
 	for _, tc := range t.resource.Transactions {
 		tc.Meta.State = protocol.TCC_CONFIRMED
+		tc.Meta.Prefix = t.resource.Meta.Prefix
 		//retry to finish
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.TaskId, JobId: t.resource.Meta.JobId, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
@@ -308,5 +311,6 @@ func (m *TaskManager) copy(meta *protocol.Meta) *protocol.Meta {
 	cp.Timeout = meta.Timeout
 	cp.Retries = meta.Retries
 	cp.Time = meta.Time
+	cp.Prefix = meta.Prefix
 	return &cp
 }
