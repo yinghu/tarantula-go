@@ -375,6 +375,7 @@ func (c *ClusterManager) handleTranstion(l core.TransactionListener, t *protocol
 		//cancel
 		//send cancel to cluster
 		t.Meta.State = protocol.TCC_CANCELED
+		t.Meta.Description = err.Error()
 		c.Cancel(t.Meta)
 		return
 	}

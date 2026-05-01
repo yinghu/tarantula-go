@@ -109,13 +109,14 @@ func (m *TaskManager) confirmed(t *JobResource) {
 	}
 }
 
-func (m *TaskManager) canceled(t *JobResource) {
+func (m *TaskManager) canceled(c *protocol.Meta, t *JobResource) {
 	t.confirmed = 0
 	tr := m.trs[t.resource.Meta.TaskId]
 	tr.jobIndex = len(tr.pending)
 	for _, tc := range t.resource.Transactions {
 		m.closeTimer(tc.Meta.Id)
 		tc.Meta.State = protocol.TCC_CANCELED
+		tc.Meta.Description = c.Description
 		//retry to finish on cancel
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
 			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.TaskId, JobId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
@@ -220,10 +221,6 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 	return tr, nil
 }
 
-func (m *TaskManager) log(meta *protocol.Meta) {
-	go m.s.saveLog(meta)
-}
-
 func (m *TaskManager) Reserve(transaction *protocol.Transaction) {
 	m.s.DMessager <- &protocol.Mail{Transaction: transaction, Opt: core.TRANS_MAIL}
 }
@@ -281,7 +278,7 @@ func (m *TaskManager) Wait() {
 				}
 			case protocol.TCC_CANCELED:
 				m.closeTimer(meta.Id)
-				m.canceled(tj)
+				m.canceled(meta, tj)
 
 			case protocol.TCC_FINISHED:
 				m.closeTimer(meta.Id)

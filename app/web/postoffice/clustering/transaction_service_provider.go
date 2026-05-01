@@ -4,10 +4,8 @@ import (
 	context "context"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -70,17 +68,6 @@ func (c *DataServiceProvider) load(taskId uint64) (*TaskResource, error) {
 	}
 	return &TaskResource{resource: t, revision: resp.Data.List[0].Header.Revision, pending: make([]*protocol.Job, 0)}, nil
 }
-func (c *DataServiceProvider) saveLog(meta *protocol.Meta) {
-	tf := event.NewTransactionEventFactory()
-	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: meta, Start: meta.Time, End: timestamppb.Now()})
-	buff := core.NewBuffer(20)
-	buff.WriteUInt64(meta.Id)
-	buff.WriteUInt32(meta.State)
-	buff.Flip()
-	k, _ := buff.Read(0)
-	e.Event.Key.Array = k
-	go c.runPublish(e)
-}
 
 func (c *DataServiceProvider) updateTask(t *TaskResource, clear ClearResource) {
 	defer clear()
@@ -99,8 +86,8 @@ func (c *DataServiceProvider) updateTask(t *TaskResource, clear ClearResource) {
 	}
 	t.revision++
 	core.AppLog.Info().Msgf("saved %v", resp)
-	//tx, _ := c.load(t.resource.Meta.Id)
-	//core.AppLog.Debug().Msgf("v %v", tx.resource.Validator.Meta)
-	//core.AppLog.Debug().Msgf("j %v", tx.resource.Job.Meta)
-	//core.AppLog.Debug().Msgf("t %v", tx.resource.Meta)
+	tx, _ := c.load(t.resource.Meta.Id)
+	core.AppLog.Debug().Msgf("v %v", tx.resource.Validator.Meta)
+	core.AppLog.Debug().Msgf("j %v", tx.resource.Job.Meta)
+	core.AppLog.Debug().Msgf("t %v", tx.resource.Meta)
 }
