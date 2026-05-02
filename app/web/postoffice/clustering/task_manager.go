@@ -189,10 +189,12 @@ func (m *TaskManager) timeout(mkey uint64, meta *protocol.Meta) {
 		return
 	}
 	if tm.d > 0 && tm.r > 0 {
-		core.AppLog.Debug().Msgf("retried %d", tm.r)
+		core.AppLog.Debug().Msgf("retried %d %d", tm.r, meta.JobId)
 		j, ok := m.tjs[meta.JobId]
 		if ok {
-			j.joining[meta.Id].retried++
+			tc := j.joining[meta.Id]
+			tc.retried++
+			core.AppLog.Debug().Msgf("retried %d %d", tc.retried, meta.JobId)
 		}
 		// retry
 		tm.t = time.AfterFunc(tm.d, func() {
