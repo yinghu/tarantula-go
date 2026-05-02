@@ -18,6 +18,7 @@ type TransactionResource struct {
 	confirmed int
 	finished  int
 	canceled  bool
+	retried   int
 }
 
 func (j *JobResource) cancel(tc *protocol.Meta) {
