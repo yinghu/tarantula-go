@@ -29,7 +29,7 @@ func (c *DataServiceProvider) AskReserve(ctx context.Context, in *protocol.Trans
 }
 
 func (c *DataServiceProvider) AskFinish(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
-	//down streaming to app
+	//down streaming to app meta state could be canceled or confirmed
 	c.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: in}, Opt: core.TRANS_MAIL}
 	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name}}, nil
 }
