@@ -44,10 +44,10 @@ func (s *AdminService) Start(f core.Env) error {
 	if err != nil {
 		core.AppLog.Debug().Msg("Root already existed")
 	}
-	s.Cluster().Subscribe(event.TRANSACTION_TOPIC_NAME, &protocol.TopicEventListener{C: func() proto.Message {
-		return &protocol.TransactionEvent{}
+	s.Cluster().Subscribe(event.TASK_TOPIC_NAME, &protocol.TopicEventListener{C: func() proto.Message {
+		return &protocol.TaskEvent{}
 	}, M: func(m proto.Message) {
-		ro, ok := m.(*protocol.TransactionEvent)
+		ro, ok := m.(*protocol.TaskEvent)
 		if ok {
 			core.AppLog.Debug().Msgf("transaction event %v  %v", ro.Start.AsTime(), ro.End.AsTime())
 			core.AppLog.Debug().Msgf("transaction event %s %v", ro.Description, ro.Meta)
