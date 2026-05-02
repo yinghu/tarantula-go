@@ -1,6 +1,8 @@
 package event
 
 import (
+	"time"
+
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -10,17 +12,22 @@ type JobEventBuilder struct {
 	tb     *TransactionEventBuilder
 }
 
-func NewJobEventBuilder(meta *protocol.Meta) *JobEventBuilder {
-	return &JobEventBuilder{Target: &protocol.JobEvent{Meta: meta, Transactions: make([]*protocol.TransactionEvent, 0)}}
+func NewJobEventBuilder() *JobEventBuilder{
+	return &JobEventBuilder{Target: &protocol.JobEvent{Transactions: make([]*protocol.TransactionEvent, 0)}}
 }
 
-func (t *JobEventBuilder) Start(ts *timestamppb.Timestamp) *JobEventBuilder {
-	t.Target.Start = ts
+func (t *JobEventBuilder) Meta(meta *protocol.Meta) *JobEventBuilder {
+	t.Target.Meta =  meta
 	return t
 }
 
-func (t *JobEventBuilder) End(ts *timestamppb.Timestamp) *JobEventBuilder {
-	t.Target.End = ts
+func (t *JobEventBuilder) Start(ts time.Time) *JobEventBuilder {
+	t.Target.Start = timestamppb.New(ts)
+	return t
+}
+
+func (t *JobEventBuilder) End(ts time.Time) *JobEventBuilder {
+	t.Target.End = timestamppb.New(ts)
 	return t
 }
 

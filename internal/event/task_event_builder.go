@@ -1,27 +1,29 @@
 package event
 
 import (
+	"time"
+
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type TaskEventBuilder struct {
-	Target *protocol.TaskEvent
-	vb     *JobEventBuilder
-	jb     *JobEventBuilder
+	Target           *protocol.TaskEvent
+	ValidatorBuilder *JobEventBuilder
+	JobBuilder       *JobEventBuilder
 }
 
 func NewTaskEventBuilder(meta *protocol.Meta) *TaskEventBuilder {
-	return &TaskEventBuilder{Target: &protocol.TaskEvent{Meta: meta}}
+	return &TaskEventBuilder{Target: &protocol.TaskEvent{Meta: meta}, JobBuilder: NewJobEventBuilder(), ValidatorBuilder: NewJobEventBuilder()}
 }
 
-func (t *TaskEventBuilder) Start(ts *timestamppb.Timestamp) *TaskEventBuilder {
-	t.Target.Start = ts
+func (t *TaskEventBuilder) Start(ts time.Time) *TaskEventBuilder {
+	t.Target.Start = timestamppb.New(ts)
 	return t
 }
 
-func (t *TaskEventBuilder) End(ts *timestamppb.Timestamp) *TaskEventBuilder {
-	t.Target.End = ts
+func (t *TaskEventBuilder) End(ts time.Time) *TaskEventBuilder {
+	t.Target.End = timestamppb.New(ts)
 	return t
 }
 
@@ -30,17 +32,8 @@ func (t *TaskEventBuilder) Description(desc string) *TaskEventBuilder {
 	return t
 }
 
-func (t *TaskEventBuilder) ValidatorBuilder(meta *protocol.Meta) *JobEventBuilder {
-	t.vb = NewJobEventBuilder(meta)
-	return t.vb
-}
-func (t *TaskEventBuilder) JobBuilder(meta *protocol.Meta) *JobEventBuilder {
-	t.jb = NewJobEventBuilder(meta)
-	return t.jb
-}
-
 func (t *TaskEventBuilder) Build() *protocol.TaskEvent {
-	t.Target.Validator = t.vb.Target
-	t.Target.Job = t.jb.Target
+	t.Target.Validator = t.ValidatorBuilder.Target
+	t.Target.Job = t.JobBuilder.Target
 	return t.Target
 }

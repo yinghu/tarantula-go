@@ -1,6 +1,8 @@
 package event
 
 import (
+	"time"
+
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -19,13 +21,13 @@ func (t *TransactionEventBuilder) New(meta *protocol.Meta) *TransactionEventBuil
 	return t
 }
 
-func (t *TransactionEventBuilder) Start(ts *timestamppb.Timestamp) *TransactionEventBuilder {
-	t.target.Start = ts
+func (t *TransactionEventBuilder) Start(ts time.Time) *TransactionEventBuilder {
+	t.target.Start = timestamppb.New(ts)
 	return t
 }
 
-func (t *TransactionEventBuilder) End(ts *timestamppb.Timestamp) *TransactionEventBuilder {
-	t.target.End = ts
+func (t *TransactionEventBuilder) End(ts time.Time) *TransactionEventBuilder {
+	t.target.End = timestamppb.New(ts)
 	return t
 }
 
