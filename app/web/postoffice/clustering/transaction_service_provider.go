@@ -14,7 +14,7 @@ const (
 	TCC_RETRY_MAX               uint32 = 3
 )
 
-type ClearResource func()
+type ResourceUpdated func()
 
 func (c *DataServiceProvider) Setup(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
 	c.TManager.Set(task)
@@ -69,8 +69,14 @@ func (c *DataServiceProvider) load(taskId uint64) (*TaskResource, error) {
 	return &TaskResource{resource: t, revision: resp.Data.List[0].Header.Revision, pending: make([]*protocol.Job, 0)}, nil
 }
 
-func (c *DataServiceProvider) updateTask(t *TaskResource, clear ClearResource) {
-	defer clear()
+func (c *DataServiceProvider) updateTask(t *TaskResource, updated ResourceUpdated) {
+	suc := false
+	defer func() {
+		if !suc {
+			return
+		}
+		updated()
+	}()
 	tb := persistence.TaskBuilder{Target: t.resource}
 	req, err := tb.Request()
 	if err != nil {
@@ -86,13 +92,14 @@ func (c *DataServiceProvider) updateTask(t *TaskResource, clear ClearResource) {
 		return
 	}
 	t.revision++
+	suc = true 
 	core.AppLog.Info().Msgf("saved %v", resp)
-	tx, err := c.load(t.resource.Meta.Id)
-	if err != nil {
-		core.AppLog.Error().Msgf("no task loaded %s %d", err.Error(), t.resource.Meta.Id)
-		return
-	}
-	core.AppLog.Debug().Msgf("v %v", tx.resource.Validator.Meta)
-	core.AppLog.Debug().Msgf("j %v", tx.resource.Job.Meta)
-	core.AppLog.Debug().Msgf("t %v", tx.resource.Meta)
+	//tx, err := c.load(t.resource.Meta.Id)
+	//if err != nil {
+	//core.AppLog.Error().Msgf("no task loaded %s %d", err.Error(), t.resource.Meta.Id)
+	//return
+	//}
+	//core.AppLog.Debug().Msgf("v %v", tx.resource.Validator.Meta)
+	//core.AppLog.Debug().Msgf("j %v", tx.resource.Job.Meta)
+	//core.AppLog.Debug().Msgf("t %v", tx.resource.Meta)
 }
