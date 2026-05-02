@@ -25,7 +25,13 @@ const (
 	REQUEST_EVENT_CID  uint32 = 5
 	REQUEST_TOPIC_NAME string = "request"
 
-	TRANSACTION_EVENT_CID  uint32 = 6
+	TASK_EVENT_CID  uint32 = 6
+	TASK_TOPIC_NAME string = "task"
+
+	JOB_EVENT_CID  uint32 = 7
+	JOB_TOPIC_NAME string = "job"
+
+	TRANSACTION_EVENT_CID  uint32 = 8
 	TRANSACTION_TOPIC_NAME string = "transaction"
 )
 
