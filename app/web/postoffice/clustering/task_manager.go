@@ -106,7 +106,7 @@ func (m *TaskManager) confirmed(t *JobResource) {
 		tc.Meta.Prefix = t.resource.Meta.Prefix
 		//retry to finish
 		m.tms[tc.Meta.Id] = &Timeout{t: time.AfterFunc(time.Duration(tc.Meta.Timeout)*time.Second, func() {
-			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.TaskId, JobId: t.resource.Meta.JobId, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
+			m.updates <- &protocol.Meta{TaskId: t.resource.Meta.TaskId, JobId: t.resource.Meta.Id, Id: tc.Meta.Id, State: protocol.TCC_TRANSACTION_TIMEOUT}
 		}), p: func() {
 			core.AppLog.Debug().Msgf("retry to finish with confirm/timeout on %d", tc.Meta.Id)
 			go m.s.runAskFinish(m.copy(tc.Meta))
