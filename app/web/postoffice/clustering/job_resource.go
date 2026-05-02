@@ -20,6 +20,11 @@ type TransactionResource struct {
 	canceled  bool
 }
 
+func (j *JobResource) cancel(tc *protocol.Meta) {
+	j.canceled = true
+	j.joining[tc.Id].canceled = true
+}
+
 func (j *JobResource) join(meta *protocol.Meta) bool {
 	t := j.joining[meta.Id]
 	switch meta.State {

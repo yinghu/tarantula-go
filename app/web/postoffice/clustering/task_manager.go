@@ -115,7 +115,7 @@ func (m *TaskManager) confirmed(t *JobResource) {
 
 func (m *TaskManager) canceled(c *protocol.Meta, t *JobResource) {
 	t.confirmed = 0
-	t.canceled = true
+	t.cancel(c)
 	tr := m.trs[t.resource.Meta.TaskId]
 	tr.jobIndex = len(tr.pending)
 	tr.canceled = true
@@ -140,7 +140,6 @@ func (m *TaskManager) finished(t *JobResource) {
 	m.closeTimer(t.resource.Meta.Id)
 	tr := m.trs[t.resource.Meta.TaskId]
 	t.resource.Meta.State = protocol.TCC_FINISHED
-	core.AppLog.Debug().Msgf("JOB CANCELED %v", t.canceled)
 	if tr.jobIndex+1 < len(tr.pending) {
 		tr.jobIndex++
 		next := tr.pending[tr.jobIndex]
@@ -148,6 +147,10 @@ func (m *TaskManager) finished(t *JobResource) {
 		next.Meta.Prefix = tr.resource.Meta.Prefix
 		m.schedule(tr, next)
 		return
+	}
+	core.AppLog.Debug().Msgf("JOB CANCELED %v", t.canceled)
+	for _, tc := range t.joining {
+		core.AppLog.Debug().Msgf("TRANSACTION CANCELED %v", tc.canceled)
 	}
 	m.end(tr)
 }
