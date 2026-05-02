@@ -10,17 +10,18 @@ type JobResource struct {
 	joining     map[uint64]*TransactionResource
 	joinParties int
 	confirmed   int
+	canceled    bool
 }
 
 type TransactionResource struct {
 	resource  *protocol.Transaction
 	confirmed int
 	finished  int
+	canceled  bool
 }
 
 func (j *JobResource) join(meta *protocol.Meta) bool {
 	t := j.joining[meta.Id]
-	core.AppLog.Debug().Msgf("TT %v", t.resource.Meta)
 	switch meta.State {
 	case protocol.TCC_CONFIRMED:
 		if t.confirmed > 0 {

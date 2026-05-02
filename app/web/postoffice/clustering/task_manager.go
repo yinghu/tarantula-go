@@ -16,6 +16,7 @@ type TaskResource struct {
 	revision uint64
 	pending  []*protocol.Job
 	jobIndex int
+	canceled bool
 }
 
 type Retrying func()
@@ -114,8 +115,10 @@ func (m *TaskManager) confirmed(t *JobResource) {
 
 func (m *TaskManager) canceled(c *protocol.Meta, t *JobResource) {
 	t.confirmed = 0
+	t.canceled = true
 	tr := m.trs[t.resource.Meta.TaskId]
 	tr.jobIndex = len(tr.pending)
+	tr.canceled = true
 	for _, tc := range t.resource.Transactions {
 		m.closeTimer(tc.Meta.Id)
 		tc.Meta.State = protocol.TCC_CANCELED
@@ -137,6 +140,7 @@ func (m *TaskManager) finished(t *JobResource) {
 	m.closeTimer(t.resource.Meta.Id)
 	tr := m.trs[t.resource.Meta.TaskId]
 	t.resource.Meta.State = protocol.TCC_FINISHED
+	core.AppLog.Debug().Msgf("JOB CANCELED %v", t.canceled)
 	if tr.jobIndex+1 < len(tr.pending) {
 		tr.jobIndex++
 		next := tr.pending[tr.jobIndex]
@@ -149,8 +153,9 @@ func (m *TaskManager) finished(t *JobResource) {
 }
 
 func (m *TaskManager) end(t *TaskResource) {
-	t.resource.Meta.State = protocol.TCC_FINISHED
+	core.AppLog.Debug().Msgf("TASK CANCELED %v", t.canceled)
 
+	t.resource.Meta.State = protocol.TCC_FINISHED
 	go m.s.updateTask(t, func() {
 		m.updates <- &protocol.Meta{Id: t.resource.Meta.Id, State: protocol.TCC_TASK_CLEAR}
 	})
@@ -225,7 +230,6 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 	m.start(&tj)
 	return tr, nil
 }
-
 
 func (m *TaskManager) Update(meta *protocol.Meta) {
 	m.updates <- meta
