@@ -226,12 +226,6 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 	return tr, nil
 }
 
-func (m *TaskManager) Reserve(transaction *protocol.Transaction) {
-	m.s.DMessager <- &protocol.Mail{Transaction: transaction, Opt: core.TRANS_MAIL}
-}
-func (m *TaskManager) Finish(meta *protocol.Meta) {
-	m.s.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: meta}, Opt: core.TRANS_MAIL}
-}
 
 func (m *TaskManager) Update(meta *protocol.Meta) {
 	m.updates <- meta

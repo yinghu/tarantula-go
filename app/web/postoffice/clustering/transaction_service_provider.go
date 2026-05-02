@@ -23,19 +23,20 @@ func (c *DataServiceProvider) Setup(ctx context.Context, task *protocol.Task) (*
 
 func (c *DataServiceProvider) AskReserve(ctx context.Context, in *protocol.Transaction) (*protocol.Response, error) {
 	in.Meta.State = protocol.TCC_RESERVING
-	c.TManager.Reserve(in)
+	//down streaming to app
+	c.DMessager <- &protocol.Mail{Transaction: in, Opt: core.TRANS_MAIL}
 	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Meta.Name}}, nil
 }
 
 func (c *DataServiceProvider) AskFinish(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
-	c.TManager.Finish(in)
+	//down streaming to app
+	c.DMessager <- &protocol.Mail{Transaction: &protocol.Transaction{Meta: in}, Opt: core.TRANS_MAIL}
 	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name}}, nil
 }
 
 func (c *DataServiceProvider) Confirmed(ctx context.Context, in *protocol.Meta) (*protocol.Response, error) {
 	in.State = protocol.TCC_CONFIRMED
 	c.TManager.Update(in)
-
 	return &protocol.Response{Successful: true, Meta: &protocol.Meta{Name: in.Name}}, nil
 }
 
@@ -92,7 +93,7 @@ func (c *DataServiceProvider) updateTask(t *TaskResource, updated ResourceUpdate
 		return
 	}
 	t.revision++
-	suc = true 
+	suc = true
 	core.AppLog.Info().Msgf("saved %v", resp)
 	//tx, err := c.load(t.resource.Meta.Id)
 	//if err != nil {
