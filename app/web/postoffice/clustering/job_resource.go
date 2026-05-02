@@ -20,7 +20,7 @@ type TransactionResource struct {
 
 func (j *JobResource) join(meta *protocol.Meta) bool {
 	t := j.joining[meta.Id]
-
+	core.AppLog.Debug().Msgf("TT %v", t.resource.Meta)
 	switch meta.State {
 	case protocol.TCC_CONFIRMED:
 		if t.confirmed > 0 {
