@@ -39,10 +39,11 @@ type TransactionResource struct {
 	retried   int
 }
 
-func (j *JobResource) timeout(meta *protocol.Meta) {
+func (j *JobResource) transaction(meta *protocol.Meta) {
 	mt := copy(meta)
 	j.jb.Transaction().New(mt).Start(meta.Time.AsTime()).End(time.Now()).Description(mt.Description).Build()
 }
+
 
 func (j *JobResource) cancel(tc *protocol.Meta) {
 	j.canceled = true
