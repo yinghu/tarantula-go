@@ -136,7 +136,7 @@ func (m *TaskManager) confirmed(t *JobResource) {
 
 		//ask to finish
 		go m.s.runAskFinish(m.copy(tc.Meta))
-
+		
 	}
 }
 
