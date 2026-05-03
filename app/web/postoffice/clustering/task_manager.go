@@ -46,6 +46,7 @@ func copy(meta *protocol.Meta) *protocol.Meta {
 	cp.Retries = meta.Retries
 	cp.Time = meta.Time
 	cp.Prefix = meta.Prefix
+	cp.Description = meta.Description
 	return &cp
 }
 
