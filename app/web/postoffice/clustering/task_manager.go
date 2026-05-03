@@ -171,6 +171,7 @@ func (m *TaskManager) finished(t *JobResource) {
 		core.AppLog.Debug().Msgf("TRANSACTION CANCELED %v", tc.canceled)
 	}
 	t.resource.Meta.State = protocol.TCC_FINISHED
+	t.jb.End(time.Now())
 	if tr.jobIndex+1 < len(tr.pending) {
 		tr.jobIndex++
 		next := tr.pending[tr.jobIndex]

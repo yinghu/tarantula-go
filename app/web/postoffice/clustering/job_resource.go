@@ -12,9 +12,12 @@ func NewJobResource(job *protocol.Job, t *TaskResource) *JobResource {
 	jr := JobResource{resource: job, joining: make(map[uint64]*TransactionResource)}
 	if job.Meta.Id == t.resource.Job.Meta.Id {
 		jr.jb = t.tb.JobBuilder
+		jr.jb.Description("validator job")
 	} else {
 		jr.jb = t.tb.ValidatorBuilder
+		jr.jb.Description("transaction job")
 	}
+	jr.jb.Meta(copy(job.Meta)).Start(time.Now())
 	return &jr
 }
 
@@ -61,7 +64,7 @@ func (j *JobResource) join(meta *protocol.Meta) bool {
 		return false
 	}
 	core.AppLog.Debug().Msgf("meta ID : %d STATE : %d CONFIRMED : %d FINISHED %d PREFIX %d", meta.Id, meta.State, t.confirmed, t.finished, meta.Prefix)
-	j.jb.Transaction().New(meta).Start(meta.Time.AsTime()).End(time.Now()).Description(meta.Description).Build()
+	j.jb.Transaction().New(copy(meta)).Start(meta.Time.AsTime()).End(time.Now()).Description(meta.Description).Build()
 	j.confirmed++
 	return j.joinParties == j.confirmed
 }
