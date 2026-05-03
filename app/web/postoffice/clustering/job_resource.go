@@ -5,12 +5,15 @@ import (
 	"gameclustering.com/internal/protocol"
 )
 
+type TransactionUpdated func(job *JobResource,t *TransactionResource, meta *protocol.Meta)
+
 type JobResource struct {
 	resource    *protocol.Job
 	joining     map[uint64]*TransactionResource
 	joinParties int
 	confirmed   int
 	canceled    bool
+	updated     TransactionUpdated
 }
 
 type TransactionResource struct {
@@ -46,6 +49,9 @@ func (j *JobResource) join(meta *protocol.Meta) bool {
 		return false
 	}
 	core.AppLog.Debug().Msgf("meta ID : %d STATE : %d CONFIRMED : %d FINISHED %d PREFIX %d", meta.Id, meta.State, t.confirmed, t.finished, meta.Prefix)
+	if j.updated!=nil{
+		j.updated(j,t,meta)
+	}
 	j.confirmed++
 	return j.joinParties == j.confirmed
 }

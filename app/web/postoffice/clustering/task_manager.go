@@ -136,7 +136,7 @@ func (m *TaskManager) confirmed(t *JobResource) {
 
 		//ask to finish
 		go m.s.runAskFinish(m.copy(tc.Meta))
-		
+
 	}
 }
 
@@ -260,7 +260,7 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 	go m.s.updateTask(tr, func() {
 		core.AppLog.Debug().Msgf("task updated from reload %d", tr.revision)
 	})
-	tj := JobResource{resource: job, joining: make(map[uint64]*TransactionResource)}
+	tj := JobResource{resource: job, joining: make(map[uint64]*TransactionResource), updated: m.transactionUpdated}
 	m.tjs[job.Meta.Id] = &tj
 	m.start(&tj)
 	return tr, nil
@@ -285,7 +285,7 @@ func (m *TaskManager) Wait() {
 			m.trs[task.Meta.Id] = tr
 			m.set(tr)
 		case job := <-m.jobs:
-			tj := JobResource{resource: job, joining: make(map[uint64]*TransactionResource)}
+			tj := JobResource{resource: job, joining: make(map[uint64]*TransactionResource), updated: m.transactionUpdated}
 			m.tjs[job.Meta.Id] = &tj
 			m.start(&tj)
 		case meta := <-m.updates:
@@ -343,4 +343,8 @@ func (m *TaskManager) Wait() {
 
 func (m *TaskManager) copy(meta *protocol.Meta) *protocol.Meta {
 	return copy(meta)
+}
+
+func (m *TaskManager) transactionUpdated(job *JobResource, t *TransactionResource, meta *protocol.Meta) {
+	core.AppLog.Debug().Msgf("transaction updated %v", meta)
 }
