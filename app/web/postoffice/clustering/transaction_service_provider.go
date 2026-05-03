@@ -67,7 +67,7 @@ func (c *DataServiceProvider) load(taskId uint64) (*TaskResource, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &TaskResource{resource: t, revision: resp.Data.List[0].Header.Revision, pending: make([]*protocol.Job, 0)}, nil
+	return NewTaskResource(t,resp.Data.List[0].Header.Revision), nil
 }
 
 func (c *DataServiceProvider) updateTask(t *TaskResource, updated ResourceUpdated) {

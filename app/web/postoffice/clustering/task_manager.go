@@ -19,6 +19,10 @@ type TaskResource struct {
 	canceled bool
 }
 
+func NewTaskResource(task *protocol.Task, revision uint64) *TaskResource {
+	return &TaskResource{resource: task, revision: revision, pending: make([]*protocol.Job, 0)}
+}
+
 type Retrying func()
 type Timeout struct {
 	t *time.Timer
@@ -260,9 +264,9 @@ func (m *TaskManager) Wait() {
 	for m.s.running {
 		select {
 		case task := <-m.tasks:
-			tr := TaskResource{resource: task, revision: 1, pending: make([]*protocol.Job, 0)}
-			m.trs[task.Meta.Id] = &tr
-			m.set(&tr)
+			tr := NewTaskResource(task, 1)
+			m.trs[task.Meta.Id] = tr
+			m.set(tr)
 		case job := <-m.jobs:
 			tj := JobResource{resource: job, joining: make(map[uint64]*TransactionResource)}
 			m.tjs[job.Meta.Id] = &tj
