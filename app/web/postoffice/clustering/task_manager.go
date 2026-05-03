@@ -17,10 +17,19 @@ type TaskResource struct {
 	pending  []*protocol.Job
 	jobIndex int
 	canceled bool
+
+	tb *event.TaskEventBuilder
 }
 
 func NewTaskResource(task *protocol.Task, revision uint64) *TaskResource {
-	return &TaskResource{resource: task, revision: revision, pending: make([]*protocol.Job, 0)}
+	tr := TaskResource{resource: task, revision: revision, pending: make([]*protocol.Job, 0), tb: event.NewTaskEventBuilder(task.Meta)}
+	tr.tb.Description("task event")
+	tr.tb.Start(time.Now())
+	if task.Validator != nil {
+		tr.tb.ValidatorBuilder.Meta(copy(task.Validator.Meta))
+	}
+	tr.tb.JobBuilder.Meta(copy(task.Job.Meta))
+	return &tr
 }
 
 type Retrying func()
@@ -29,6 +38,15 @@ type Timeout struct {
 	d time.Duration
 	r uint32
 	p Retrying
+}
+
+func copy(meta *protocol.Meta) *protocol.Meta {
+	cp := protocol.Meta{TaskId: meta.TaskId, JobId: meta.JobId, Id: meta.Id, State: meta.State, NodeId: meta.NodeId, Tag: meta.Tag, Name: meta.Name}
+	cp.Timeout = meta.Timeout
+	cp.Retries = meta.Retries
+	cp.Time = meta.Time
+	cp.Prefix = meta.Prefix
+	return &cp
 }
 
 type TaskManager struct {
@@ -171,10 +189,9 @@ func (m *TaskManager) end(t *TaskResource) {
 	go m.s.updateTask(t, func() {
 		m.updates <- &protocol.Meta{Id: t.resource.Meta.Id, State: protocol.TCC_TASK_CLEAR}
 	})
-	tf := event.NewTransactionEventFactory()
-	e, _ := tf.FromTransactionEvent(&protocol.TransactionEvent{Meta: t.resource.Meta, Start: t.resource.Meta.Time, End: timestamppb.Now()})
+	tf := event.NewTaskEventFactory()
+	e, _ := tf.FromTaskEvent(t.tb.Build())
 	e.Event.Key.Array = core.ToBytes(m.s.seq)
-
 	go m.s.runPublish(e)
 }
 
@@ -227,7 +244,7 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 		return nil, fmt.Errorf("task alread finished on %d", meta.Id)
 	}
 	m.trs[meta.TaskId] = tr
-	if tr.resource.Validator.Meta.State != protocol.TCC_FINISHED {
+	if tr.resource.Validator != nil && tr.resource.Validator.Meta.State != protocol.TCC_FINISHED {
 		tr.pending = append(tr.pending, tr.resource.Validator)
 	}
 	if tr.resource.Job.Meta.State != protocol.TCC_FINISHED {
@@ -325,10 +342,5 @@ func (m *TaskManager) Wait() {
 }
 
 func (m *TaskManager) copy(meta *protocol.Meta) *protocol.Meta {
-	cp := protocol.Meta{TaskId: meta.TaskId, JobId: meta.JobId, Id: meta.Id, State: meta.State, NodeId: meta.NodeId, Tag: meta.Tag, Name: meta.Name}
-	cp.Timeout = meta.Timeout
-	cp.Retries = meta.Retries
-	cp.Time = meta.Time
-	cp.Prefix = meta.Prefix
-	return &cp
+	return copy(meta)
 }

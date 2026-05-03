@@ -14,7 +14,7 @@ type TaskEventBuilder struct {
 }
 
 func NewTaskEventBuilder(meta *protocol.Meta) *TaskEventBuilder {
-	return &TaskEventBuilder{Target: &protocol.TaskEvent{Meta: meta}, JobBuilder: NewJobEventBuilder(), ValidatorBuilder: NewJobEventBuilder()}
+	return &TaskEventBuilder{Target: &protocol.TaskEvent{Meta: meta}, ValidatorBuilder: NewJobEventBuilder(),JobBuilder: NewJobEventBuilder()}
 }
 
 func (t *TaskEventBuilder) Start(ts time.Time) *TaskEventBuilder {
