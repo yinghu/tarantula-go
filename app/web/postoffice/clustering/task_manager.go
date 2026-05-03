@@ -113,6 +113,7 @@ func (m *TaskManager) stop(t *JobResource) {
 	for _, tc := range t.joining {
 		core.AppLog.Debug().Msgf("TRANSACTION CANCELED %v %d", tc.canceled, tc.retried)
 	}
+	t.jb.Description("job timeout").End(time.Now())
 	tr := m.trs[t.resource.Meta.TaskId]
 	tr.canceled = true
 	tr.resource.Meta.State = protocol.TCC_FINISHED
@@ -216,6 +217,8 @@ func (m *TaskManager) timeout(mkey uint64, meta *protocol.Meta) {
 		if ok {
 			tc := j.joining[meta.Id]
 			tc.retried++
+			meta.Description = fmt.Sprintf("timeout with retried %d", tc.retried)
+			j.timeout(meta)
 			core.AppLog.Debug().Msgf("retried %d %d", tc.retried, meta.JobId)
 		}
 		// retry
