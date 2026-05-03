@@ -12,10 +12,10 @@ func NewJobResource(job *protocol.Job, t *TaskResource) *JobResource {
 	jr := JobResource{resource: job, joining: make(map[uint64]*TransactionResource)}
 	if job.Meta.Id == t.resource.Job.Meta.Id {
 		jr.jb = t.tb.JobBuilder
-		jr.jb.Description("validator job")
+		jr.jb.Description("transaction job")
 	} else {
 		jr.jb = t.tb.ValidatorBuilder
-		jr.jb.Description("transaction job")
+		jr.jb.Description("validator job")
 	}
 	jr.jb.Meta(copy(job.Meta)).Start(time.Now())
 	return &jr
