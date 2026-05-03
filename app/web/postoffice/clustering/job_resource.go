@@ -1,11 +1,22 @@
 package clustering
 
 import (
+	"time"
+
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
 )
 
-type TransactionUpdated func(job *JobResource,t *TransactionResource, meta *protocol.Meta)
+func NewJobResource(job *protocol.Job, t *TaskResource) *JobResource {
+	jr := JobResource{resource: job, joining: make(map[uint64]*TransactionResource)}
+	if job.Meta.Id == t.resource.Job.Meta.Id {
+		jr.jb = t.tb.JobBuilder
+	} else {
+		jr.jb = t.tb.ValidatorBuilder
+	}
+	return &jr
+}
 
 type JobResource struct {
 	resource    *protocol.Job
@@ -13,7 +24,8 @@ type JobResource struct {
 	joinParties int
 	confirmed   int
 	canceled    bool
-	updated     TransactionUpdated
+
+	jb *event.JobEventBuilder
 }
 
 type TransactionResource struct {
@@ -49,9 +61,7 @@ func (j *JobResource) join(meta *protocol.Meta) bool {
 		return false
 	}
 	core.AppLog.Debug().Msgf("meta ID : %d STATE : %d CONFIRMED : %d FINISHED %d PREFIX %d", meta.Id, meta.State, t.confirmed, t.finished, meta.Prefix)
-	if j.updated!=nil{
-		j.updated(j,t,meta)
-	}
+	j.jb.Transaction().New(meta).Start(meta.Time.AsTime()).End(time.Now()).Description(meta.Description).Build()
 	j.confirmed++
 	return j.joinParties == j.confirmed
 }
