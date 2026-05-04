@@ -10,6 +10,7 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	"github.com/rs/zerolog"
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -18,7 +19,7 @@ import (
 
 type AppManager struct {
 	imse        core.ItemService
-	auth        core.Authenticator
+	Auth        core.Authenticator
 	Sql         persistence.Postgresql
 	F           core.Env
 	seq         core.Sequence
@@ -41,7 +42,7 @@ func (s *AppManager) Pusher() core.Pusher {
 }
 
 func (s *AppManager) Authenticator() core.Authenticator {
-	return s.auth
+	return s.Auth
 }
 func (s *AppManager) Sequence() core.Sequence {
 	return s.seq
@@ -76,14 +77,9 @@ func (s *AppManager) Start(f core.Env) error {
 	s.ManagedApps = f.ManagedApps
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
-	fctx := f.PresenceCtx()
-	au, err := s.LoadAuth(fctx)
-	if err != nil {
-		return nil
-	}
-	s.auth = au
+	//fctx := f.PresenceCtx()
 	dbCreate := persistence.Postgresql{Url: f.Pgs.DatabaseURL + "/postgres"}
-	err = dbCreate.CreateDatabase(fmt.Sprintf("CREATE DATABASE %s_%s_%s", f.Prefix, "tarantula", f.GroupName))
+	err := dbCreate.CreateDatabase(fmt.Sprintf("CREATE DATABASE %s_%s_%s", f.Prefix, "tarantula", f.GroupName))
 	if err != nil {
 		core.AppLog.Warn().Msgf("failed to create database %s", err.Error())
 	}
@@ -107,6 +103,15 @@ func (s *AppManager) Start(f core.Env) error {
 	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.Host)
 	s.cluster = &ClusterManager{App: s}
 	s.RegisterLogForwarder(zerolog.DebugLevel, s.cluster)
+	ak, err := s.cluster.AuthKey()
+	if err != nil {
+		panic(err.Error())
+	}
+	au, err := s.LoadAuth(ak)
+	if err != nil {
+		panic(err.Error())
+	}
+	s.Auth = au
 	return s.cluster.connect(f.Host)
 }
 
@@ -127,48 +132,19 @@ func (s *AppManager) Service() TarantulaService {
 	return s
 }
 
-func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
+func (s *AppManager) LoadAuth(ak *protocol.AuthKey) (core.Authenticator, error) {
 	tkn := util.JwtHMac{Alg: core.JWT_ALG, Ksz: core.JWT_KEY_SIZE}
 	ci := util.Aes{Ksz: core.CIPHER_KEY_SIZE}
-	err := s.Atomic(context, func(ctx core.Ctx) error {
-		jsk, err := ctx.Get(core.JWT_KEY_NAME)
-		core.AppLog.Debug().Msgf("%s", jsk)
-		if err != nil {
-			core.AppLog.Println("Create new jwt key")
-			nkey := util.Key(tkn.Ksz)
-			ctx.Put(core.JWT_KEY_NAME, util.KeyToBase64(nkey))
-			tkn.HMacFromKey(nkey)
-			return nil
-		}
-		jk, err := util.KeyFromBase64(jsk)
-		if err != nil {
-			return err
-		}
-		tkn.HMacFromKey(jk)
-		return nil
-	})
+	jk, err := util.KeyFromBase64(string(ak.Jwt))
 	if err != nil {
 		return nil, err
 	}
-	err = s.Atomic(context, func(ctx core.Ctx) error {
-		csk, err := ctx.Get(core.CIPHER_KEY_NAME)
-		core.AppLog.Debug().Msgf("%s", csk)
-		if err != nil {
-			core.AppLog.Println("Create new cipher key")
-			ckey := util.Key(ci.Ksz)
-			ctx.Put(core.CIPHER_KEY_NAME, util.KeyToBase64(ckey))
-			ci.AesGcmFromKey(ckey)
-		}
-		ck, err := util.KeyFromBase64(csk)
-		if err != nil {
-			return err
-		}
-		ci.AesGcmFromKey(ck)
-		return nil
-	})
+	tkn.HMacFromKey(jk)
+	ck, err := util.KeyFromBase64(string(ak.Cipher))
 	if err != nil {
 		return nil, err
 	}
+	ci.AesGcmFromKey(ck)
 	return &AuthManager{Tkn: &tkn, Cipher: &ci, Kid: "presence"}, nil
 }
 

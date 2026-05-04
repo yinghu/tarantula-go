@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/protocol"
 	"gameclustering.com/postoffice/clustering"
 )
 
@@ -35,6 +37,15 @@ func (s *PostofficeService) Start(env core.Env) error {
 	s.mm = &m
 	s.mm.DWait.Wait()
 	s.started = true
+	ak, err := m.AuthKey(context.Background(), &protocol.Request{Context: s.F.PresenceCtx()})
+	if err != nil {
+		panic(err.Error())
+	}
+	au, err := s.LoadAuth(ak)
+	if err != nil {
+		panic(err.Error())
+	}
+	s.Auth = au
 	core.AppLog.Debug().Msgf("postoffice service started %s %s", env.HttpBinding, env.HomeDir)
 	return nil
 }

@@ -15,7 +15,7 @@ func (s *EventManager) Create(classId uint32, topic string) (core.Event, error) 
 }
 
 func (s *EventManager) VerifyTicket(ticket string) (core.OnSession, error) {
-	session, err := s.App.auth.ValidateTicket(ticket)
+	session, err := s.App.Auth.ValidateTicket(ticket)
 	if err != nil {
 		return session, err
 	}

@@ -13,7 +13,10 @@ import (
 
 func (c *DataServiceProvider) AuthKey(ctx context.Context, request *protocol.Request) (*protocol.AuthKey, error) {
 	core.AppLog.Info().Msgf("load auth key %s", request.Context)
-	return &protocol.AuthKey{Context: request.Context,Size: 32,}, nil
+	ak := protocol.AuthKey{Context: request.Context, Size: 32}
+	ak.Jwt = []byte("M4KExRr9HQbFRmUObhPsFJ2aDC4e/dkayHqwA568czw=")
+	ak.Cipher = []byte("NyXPfuLkqlsZcz//Y7Cm7oQ14MgIv29ouRmia+Vr2NY=")
+	return &ak, nil
 }
 
 func (c *DataServiceProvider) HashRing(ctx context.Context, request *protocol.Request) (*protocol.Response, error) {
