@@ -24,8 +24,7 @@ func (s *PostofficeService) Start(env core.Env) error {
 	env.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	env.IsClusterMember = true
 	s.AppManager.Start(env)
-	s.createSchema()
-
+	
 	m := clustering.MemberlistManager{StoreDir: fmt.Sprintf("%s/%s", env.HomeDir, env.GroupName)}
 	m.Seed = []string{"192.168.1.11", "192.168.1.3"}
 	m.Binding = env.NodeName
