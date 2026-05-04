@@ -1,11 +1,14 @@
 package core
 
 import (
+	"fmt"
 	"time"
+
+	"gameclustering.com/internal/protocol"
 )
 
 type QueryObj struct {
-	Id        uint32    `json:"-"`
+	Id        string    `json:"Id"`
 	FactoryId uint32    `json:"-"`
 	ClassId   uint32    `json:"-"`
 	NodeId    string    `json:"NodeId"`
@@ -16,11 +19,11 @@ type QueryObj struct {
 	StartTime time.Time `json:"StartTime"`
 	EndTime   time.Time `json:"EndTime"`
 
-	Ee Event `json:"-"`
+	Payload *protocol.Response
 }
 
 func (q *QueryObj) QRead(buff DataBuffer) error {
-	id, err := buff.ReadUInt32()
+	id, err := buff.ReadString()
 	if err != nil {
 		return err
 	}
@@ -75,7 +78,7 @@ func (q *QueryObj) QRead(buff DataBuffer) error {
 }
 
 func (q *QueryObj) QWrite(buff DataBuffer) error {
-	if err := buff.WriteUInt32(q.Id); err != nil {
+	if err := buff.WriteString(q.Id); err != nil {
 		return nil
 	}
 	if err := buff.WriteUInt32(q.FactoryId); err != nil {
@@ -108,7 +111,7 @@ func (q *QueryObj) QWrite(buff DataBuffer) error {
 	return nil
 }
 
-func (q *QueryObj) QId() uint32 {
+func (q *QueryObj) QId() string {
 	return q.Id
 }
 func (q *QueryObj) QFactoryId() uint32 {
@@ -142,10 +145,24 @@ func (q *QueryObj) QOffset() int32 {
 	return q.Offset
 }
 
-func (q *QueryObj) QEvent() Event {
-	return q.Ee
-}
-
 func (q *QueryObj) QFilter(k, v []byte) bool {
 	return true
+}
+
+func (q *QueryObj) QList(list List) error {
+	if q.Payload == nil {
+		return fmt.Errorf("no response assigned")
+	}
+	if !q.Payload.Successful {
+		return fmt.Errorf("not found")
+	}
+	return nil
+}
+
+func (q *QueryObj) QResponse(resp *protocol.Response) {
+	q.Payload = resp
+}
+
+func (q *QueryObj) Hash(mh MessageHash) uint32 {
+	return mh.RingToken([]byte(q.Topic))
 }

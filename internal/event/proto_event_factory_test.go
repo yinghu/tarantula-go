@@ -21,7 +21,7 @@ func TestMessageEventFactory(t *testing.T) {
 	tp.NodeId = "nodeId"
 	tp.Tag = "presence"
 	tp.Name = "message"
-	tp.Event.Id = 100
+	tp.Event.Key.Array = []byte("key1")
 	req, err := ptf.Request(tp)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())

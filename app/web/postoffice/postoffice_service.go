@@ -1,25 +1,19 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/postoffice/clustering"
-	"github.com/rs/zerolog"
 )
-
-type LogData struct {
-	level zerolog.Level
-	log   []byte
-}
 
 type PostofficeService struct {
 	bootstrap.AppManager
 	mm      *clustering.MemberlistManager
 	started bool
-	wTopic  chan<- *protocol.Topic
 }
 
 func (s *PostofficeService) Config() string {
@@ -32,10 +26,10 @@ func (s *PostofficeService) Start(env core.Env) error {
 	s.AppManager.Start(env)
 	s.createSchema()
 
-	m := clustering.MemberlistManager{StoreDir: fmt.Sprintf("%s/%s", env.HomeDir, env.GroupName), Seq: s.Sequence()}
-	m.Seed = []string{"192.168.1.11", "192.168.1.6"}
+	m := clustering.MemberlistManager{StoreDir: fmt.Sprintf("%s/%s", env.HomeDir, env.GroupName)}
+	m.Seed = []string{"192.168.1.11", "192.168.1.3"}
 	m.Binding = env.NodeName
-	err := m.Start(fmt.Appendf([]byte{}, "%s:%s", s.Context(), s.NodeId()))
+	err := m.Start(fmt.Appendf([]byte{}, "%s:%s", s.Context(), s.NodeId()), s.Sequence())
 	if err != nil {
 		core.AppLog.Printf("no cluster can join %s", err.Error())
 		return err
@@ -43,6 +37,15 @@ func (s *PostofficeService) Start(env core.Env) error {
 	s.mm = &m
 	s.mm.DWait.Wait()
 	s.started = true
+	ak, err := m.AuthKey(context.Background(), &protocol.Request{Context: s.F.PresenceCtx()})
+	if err != nil {
+		panic(err.Error())
+	}
+	au, err := s.LoadAuth(ak)
+	if err != nil {
+		panic(err.Error())
+	}
+	s.Auth = au
 	core.AppLog.Debug().Msgf("postoffice service started %s %s", env.HttpBinding, env.HomeDir)
 	return nil
 }

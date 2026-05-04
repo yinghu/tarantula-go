@@ -5,7 +5,6 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
-	"gameclustering.com/internal/util"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
@@ -25,39 +24,38 @@ const (
 
 	REQUEST_EVENT_CID  uint32 = 5
 	REQUEST_TOPIC_NAME string = "request"
+
+	TASK_EVENT_CID  uint32 = 6
+	TASK_TOPIC_NAME string = "task"
+
+	JOB_EVENT_CID  uint32 = 7
+	JOB_TOPIC_NAME string = "job"
+
+	TRANSACTION_EVENT_CID  uint32 = 8
+	TRANSACTION_TOPIC_NAME string = "transaction"
 )
+
+type MessageTopic func() proto.Message
 
 type ProtoTopicFactoryObj struct {
 	Target *protocol.Topic
 	core.QueryFactoryObj
-	M proto.Message
+	Mt MessageTopic
 }
 
 func (p *ProtoTopicFactoryObj) Request(topic *protocol.Topic) (*protocol.Request, error) {
 	p.Target = topic
 	req := protocol.Request{Opt: core.CREATE_DATA_REQUEST}
-	if topic.Event.Id <= 0 {
-		return &req, fmt.Errorf("id cannot be less than 0")
+	if len(topic.Event.Key.Array) == 0 {
+		return &req, fmt.Errorf("key must be assigned")
 	}
-	buff := core.NewBuffer(core.COMPOSIT_KEY_MAX)
-	p.WriteKey(buff)
-	buff.Flip()
-	key, err := buff.Read(0)
-	if err != nil {
-		return &req, err
-	}
-	req.Prefix = util.Hash(key)
 	value, err := proto.Marshal(topic)
 	if err != nil {
 		return &req, err
 	}
-	data := protocol.Data{Header: topic.Event.Header, Key: key, Value: value}
+	data := protocol.Data{Header: topic.Event.Key.Header, Key: topic.Event.Key.Array, Value: value}
 	req.Data = &data
 	return &req, nil
-}
-
-func (p *ProtoTopicFactoryObj) WriteKey(key core.DataBuffer) error {
-	return key.WriteUInt64(p.Target.Event.Id)
 }
 
 func (p *ProtoTopicFactoryObj) Topic(data []byte) (*protocol.Topic, error) {
@@ -67,9 +65,14 @@ func (p *ProtoTopicFactoryObj) Topic(data []byte) (*protocol.Topic, error) {
 }
 
 func (p *ProtoTopicFactoryObj) Message(topic *protocol.Topic) (any, error) {
-	err := anypb.UnmarshalTo(topic.Event.Message, p.M, proto.UnmarshalOptions{})
+	m := p.Mt()
+	err := anypb.UnmarshalTo(topic.Event.Message, m, proto.UnmarshalOptions{})
 	if err != nil {
-		return p.M, err
+		return m, err
 	}
-	return p.M, nil
+	return m, nil
+}
+
+func (p *ProtoTopicFactoryObj) Hash(mh core.MessageHash) uint32 {
+	return mh.RingToken(p.Target.Event.Key.Array)
 }

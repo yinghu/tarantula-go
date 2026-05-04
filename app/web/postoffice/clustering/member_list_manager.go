@@ -2,6 +2,7 @@ package clustering
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -21,11 +22,11 @@ type MemberlistManager struct {
 
 	StoreDir string
 	Binding  string
-	Seq      core.Sequence
+	//Seq      core.Sequence
 }
 
-func (m *MemberlistManager) Start(meta []byte) error {
-	m.MemberHashRing = &MemberHashRing{weight: NODE_WEIGHT}
+func (m *MemberlistManager) Start(meta []byte, seq core.Sequence) error {
+	m.MemberHashRing = &MemberHashRing{weight: NODE_WEIGHT, hLock: &sync.Mutex{}}
 	m.nodes = make([]core.Node, 0)
 	cfg := memberlist.DefaultLANConfig()
 	cfg.Name = m.Binding
@@ -56,15 +57,16 @@ func (m *MemberlistManager) Start(meta []byte) error {
 	m.meta = meta
 	m.Memberlist = list
 	go m.Listen()
-	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode, RSync: rwSync}
+	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode, RSync: rwSync, seq: seq}
 	m.DataServiceProvider.rpcEndpoint = fmt.Sprintf("%s:%d", string(m.LocalNode().Addr.String()), core.RPC_PORT)
 	m.Mll = &m.MemberListListener
 	m.Mll.DWait.Add(1)
 	go m.DataServiceProvider.Start(m.StoreDir)
 	m.Mll.DWait.Wait()
-	list.UpdateNode(time.Second * 5)
+	time.Sleep(3 * time.Second)
 	go m.RingUpdated()
 	joined, err := list.Join(m.Seed)
+	list.UpdateNode(time.Second * 5)
 	if err != nil {
 		core.AppLog.Printf("erorr on member join %s", err.Error())
 		return err

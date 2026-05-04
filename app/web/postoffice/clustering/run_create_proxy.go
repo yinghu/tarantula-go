@@ -14,16 +14,19 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request) (*protocol.Respon
 	var rt uint32
 	if set.Prefix > 0 {
 		rt = set.Prefix
-		core.AppLog.Debug().Msgf("using prefix %d", set.Prefix)
-	} else {
+	} else {	
 		rt = c.Mll.RingToken(set.Data.Key)
+		core.AppLog.Debug().Msgf("using key hash %d",rt)
 	}
-	core.AppLog.Debug().Msgf("data header %v", set.Data.Header)
 	for retry.Reties > 0 {
 		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: rt, Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
-		resp, _ := c.clientCreate(&ringNode, set)
+		resp, err := c.clientCreate(&ringNode, set)
+		if err != nil {
+			retry.Reties--
+			continue
+		}
 		if !resp.Successful {
 			retry.Err = resp.Message
 			retry.Reties--
@@ -32,14 +35,13 @@ func (c *DataServiceProvider) runCreate(set *protocol.Request) (*protocol.Respon
 		retry.Suc = true
 		slaves := nodes[1:]
 		for _, slave := range slaves {
-			resp, _ := c.clientCreate(&slave, set)
-			if !resp.Successful {
+			resp, err := c.clientCreate(&slave, set)
+			if err != nil || !resp.Successful {
 				core.AppLog.Debug().Msgf("error on slave %s", resp.Message)
 			}
 		}
 		break
 	}
-	core.AppLog.Debug().Msgf("retry %s, %d %v", retry.Err, retry.Reties, retry.Suc)
 	return &protocol.Response{Successful: retry.Suc, Message: retry.Err}, nil
 }
 

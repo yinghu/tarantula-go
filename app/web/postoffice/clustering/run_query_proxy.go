@@ -12,7 +12,6 @@ import (
 func (c *DataServiceProvider) runQuery(set *protocol.Request, responser grpc.ServerStreamingServer[protocol.Response]) {
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
-	//kh := c.Mll.RingToken(set.Prefix)
 	c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: set.Prefix, Replicas: REPLICA_MAX, Async: rq}
 	nodes := <-rq
 	ringNode := nodes[0]
@@ -34,7 +33,7 @@ func (c *DataServiceProvider) runQuery(set *protocol.Request, responser grpc.Ser
 			break
 		}
 		if err != nil {
-			core.AppLog.Debug().Msgf("run get streaming error %s", err.Error())
+			core.AppLog.Warn().Msgf("run get streaming error %s", err.Error())
 			responser.Send(&protocol.Response{Successful: false, Message: err.Error(), Code: 500000})
 			break
 		}

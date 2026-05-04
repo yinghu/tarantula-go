@@ -40,6 +40,6 @@ func KeyFromBase64(key string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(key)
 }
 
-func Hash(key []byte) uint32 {
+func Hash32(key []byte) uint32 {
 	return murmur3.Sum32(key)
 }

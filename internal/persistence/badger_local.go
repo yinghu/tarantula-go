@@ -51,7 +51,7 @@ func (s *BadgerLocal) Open() error {
 	go func() {
 		for range s.gcTick.C {
 		gc:
-			core.AppLog.Printf("running gc at %v", time.Now())
+			core.AppLog.Warn().Msgf("running gc at %v", time.Now())
 			err := s.Db.RunValueLogGC(0.7)
 			if err == nil {
 				goto gc
@@ -69,7 +69,7 @@ func (s *BadgerLocal) Close() error {
 		return s.Db.Close()
 	}
 	if s.Db.IsClosed() {
-		core.AppLog.Printf("local db already closed")
+		core.AppLog.Warn().Msg("local db already closed")
 		return nil
 	}
 	s.Db.Sync()

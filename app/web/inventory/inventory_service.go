@@ -5,6 +5,9 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/protocol"
+	"google.golang.org/protobuf/proto"
 )
 
 type InventoryService struct {
@@ -19,7 +22,27 @@ func (s *InventoryService) Start(f core.Env) error {
 	s.ItemUpdater = s
 	s.AppManager.Start(f)
 	s.createSchema()
-	//s.Cluster().Subscribe("login", s.Event())
+	s.Cluster().Subscribe(event.MESSAGE_TOPIC_NAME, &protocol.TopicEventListener{C: func() proto.Message {
+		return &protocol.MessageEvent{}
+	}, M: func(m proto.Message) {
+		ro, ok := m.(*protocol.MessageEvent)
+		if ok {
+			core.AppLog.Debug().Msgf("MESSAGE event %s %s", ro.Message, ro.Source)
+		} else {
+			core.AppLog.Debug().Msg("wrong type")
+		}
+	}})
+	s.Cluster().Register("grant", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
+		return nil //fmt.Errorf("no resource")
+	}, Confirm: func(e *protocol.Transaction) error {
+		//core.AppLog.Debug().Msgf("confirm resource %v", e)
+		//time.Sleep(100 * time.Second)
+		return nil
+	}, Cancel: func(e *protocol.Transaction) error {
+		//core.AppLog.Debug().Msgf("cancel resource %v", e)
+		//time.Sleep(100 * time.Second)
+		return nil
+	}})
 	http.Handle("/inventory/grant", bootstrap.Logging(&InventoryGranter{InventoryService: s}))
 	http.Handle("/inventory/load", bootstrap.Logging(&InventoryLoader{InventoryService: s}))
 	http.Handle("/inventory/cluster/update", bootstrap.Logging(&InventoryClusterUpdate{InventoryService: s}))

@@ -2,7 +2,9 @@ package clustering
 
 import (
 	"encoding/json"
+	"fmt"
 	"slices"
+	"strings"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
@@ -18,11 +20,18 @@ const (
 	TOPIC_REGISTER  uint32 = 2
 	RECEIVER_REMOVE uint32 = 3
 	RECEIVER_END    uint32 = 4
+	TASK_REGISTER   uint32 = 5
+
+	TOPIC_LIST uint32 = 6
+	TASK_LIST  uint32 = 7
+
+	TRANS_SUB_PREFIX string = "_t_"
 )
 
 type ReceiverAsync struct {
-	Rev chan *protocol.Topic
-	Q   chan string
+	Rev  chan *protocol.Mail
+	Q    chan string
+	Subs map[string]core.Subscription
 }
 
 type TopicRequest struct {
@@ -30,7 +39,7 @@ type TopicRequest struct {
 	NodeId string
 	Tag    string
 	Name   string
-	//Rev    chan chan *protocol.Topic
+
 	Async chan ReceiverAsync
 	Subs  chan []core.Subscription
 }
@@ -82,11 +91,23 @@ func (m *DataServiceProvider) balanceOnNodeRemoved(removed RingUpdate) {
 }
 
 func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
+	if sub.Type == core.TRANS_MAIL && !strings.HasPrefix(sub.Topic, TRANS_SUB_PREFIX) {
+		sub.Topic = fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, sub.Topic)
+	}
 	core.AppLog.Debug().Msgf("subscription %v", sub)
+	listener, ok := m.listeners[sub.NodeId]
+	if !ok {
+		listener = ReceiverAsync{Rev: make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2), Subs: make(map[string]core.Subscription)}
+		m.listeners[sub.NodeId] = listener
+	}
+	core.AppLog.Debug().Msgf("lis %v", listener)
 	if sub.Deleting {
 		m.subscriptions.del(sub)
+		delete(listener.Subs, sub.Topic)
+
 	} else {
 		m.subscriptions.add(sub)
+		listener.Subs[sub.Topic] = sub
 	}
 }
 
@@ -133,25 +154,48 @@ func (m *DataServiceProvider) RingUpdated() {
 			case RECEIVER_START:
 				rev, ok := m.listeners[req.Name]
 				if !ok {
-					rev = ReceiverAsync{Rev: make(chan *protocol.Topic, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2)}
+					rev = ReceiverAsync{Rev: make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2), Subs: make(map[string]core.Subscription)}
 					m.listeners[req.Name] = rev
 				}
 				req.Async <- rev
-			case RECEIVER_REMOVE:
-				delete(m.listeners, req.Name)
-				core.AppLog.Debug().Msgf("listener removed %s", req.Name)
-			case TOPIC_REGISTER:
-				req.Subs <- m.subscriptions.topic(req)
 			case RECEIVER_END:
 				rev, ok := m.listeners[req.Name]
 				if ok {
 					rev.Q <- req.Name
 				}
+
+			case RECEIVER_REMOVE:
+				delete(m.listeners, req.Name)
+				core.AppLog.Debug().Msgf("listener removed %s", req.Name)
+			case TOPIC_REGISTER:
+				req.Subs <- m.subscriptions.topic(req)
+			case TASK_REGISTER:
+				req.Name = fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, req.Name)
+				req.Subs <- m.subscriptions.topic(req)
+			case TOPIC_LIST:
+				req.Subs <- m.subscriptions.list(false)
+			case TASK_LIST:
+				req.Subs <- m.subscriptions.list(true)
 			}
 		case msg := <-m.DMessager:
 
 			for _, ch := range m.listeners {
-				ch.Rev <- msg
+				switch msg.Opt {
+				case core.TOPIC_MAIL:
+					sub, subed := ch.Subs[msg.Topic.Name]
+					if subed {
+						core.AppLog.Debug().Msgf("topic down streaming to %v", sub)
+						ch.Rev <- msg
+					}
+				case core.TRANS_MAIL:
+					tn := fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, msg.Transaction.Meta.Name)
+					sub, subed := ch.Subs[tn]
+					if subed {
+						core.AppLog.Debug().Msgf("task down streaming to %v", sub)
+						ch.Rev <- msg
+					}
+				}
+
 			}
 
 		}

@@ -7,21 +7,20 @@ import (
 	"os"
 	"sync"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
-	badger "github.com/dgraph-io/badger/v4"
 	"google.golang.org/grpc"
 )
 
 const (
-	PULL_BATCH_SIZE int = 10
+	PULL_BATCH_SIZE int = 100
 )
 
 type DataServiceProvider struct {
 	protocol.UnimplementedDataServiceServer
 	protocol.UnimplementedPostofficeServiceServer
+	protocol.UnimplementedTransactionServiceServer
 	Local       *persistence.BadgerLocal
 	RNode       <-chan RingUpdate
 	RSync       <-chan []byte
@@ -29,17 +28,21 @@ type DataServiceProvider struct {
 	Mll         *MemberListListener
 	backRing    NodeRing
 	rpcEndpoint string
+	seq         core.Sequence
 	//write worker chan
 	DSet    chan SetData
 	DPull   chan core.RingSync
 	DWait   sync.WaitGroup
 	running bool
 
-	//messaging
-	DMessager     chan *protocol.Topic
+	//topic message
+	DMessager     chan *protocol.Mail
 	subscriptions SubscriptionRegistry
 	listeners     map[string]ReceiverAsync //chan *protocol.Topic
 	DRequest      chan TopicRequest
+
+	//task transaction
+	TManager *TaskManager
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
@@ -54,7 +57,7 @@ func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*p
 
 func (c *DataServiceProvider) Query(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
 
-	tf, existed := bootstrap.TopicFactoryRegistry[request.Query.Id]
+	tf, existed := core.QueryFactoryRegistry[request.Query.Id]
 	if !existed {
 		return fmt.Errorf("event factory not registered %s", request.Query.Id)
 	}
@@ -62,55 +65,13 @@ func (c *DataServiceProvider) Query(request *protocol.Request, stream grpc.Serve
 	if err != nil {
 		return err
 	}
-	core.AppLog.Debug().Msgf("query %v", q)
-	buff := core.NewBuffer(16)
-	buff.WriteUInt32(q.QFactoryId())
-	buff.WriteUInt32(q.QClassId())
-	buff.Flip()
-	px, err := buff.Read(0)
-	if err != nil {
-		return err
-	}
-	p := px
-	dset := make([]*protocol.Data, 0)
-	core.AppLog.Debug().Msgf("query : %d %d %d %d", q.QLimit(), q.QOffset(), q.QFactoryId(), q.QClassId())
-
-	limit := q.QLimit()
-	offset := q.QOffset()
-	c.Local.Db.View(func(txn *badger.Txn) error {
-		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
-		it := txn.NewIterator(op)
-		defer it.Close()
-		for it.Seek(p); it.ValidForPrefix(p); it.Next() {
-			if offset > 0 {
-				offset--
-				continue
-			}
-			p = px
-			item := it.Item()
-			k := append([]byte{}, item.Key()[12:]...)
-			item.Value(func(val []byte) error {
-				if q.QFilter(k, val) {
-					v := append([]byte{}, val...)
-					dset = append(dset, &protocol.Data{Key: k, Value: v, Header: &protocol.Header{}})
-					limit--
-				}
-				return nil
-			})
-			if limit == 0 {
-				break
-			}
-		}
-		return nil
-	})
-	resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: dset}}
-	return stream.Send(&resp)
+	return c.query(q, stream)
 }
 
 func (c *DataServiceProvider) Reset(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
 	msg := make(chan *protocol.Response, 1)
 	defer close(msg)
-	setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
+	setData := SetData{Opt: in.Opt, Prefix: in.Prefix, Data: in.Data, Resp: msg}
 	c.DSet <- setData
 	resp := <-msg
 	return resp, nil
@@ -120,6 +81,9 @@ func (c *DataServiceProvider) Create(ctx context.Context, in *protocol.Request) 
 	msg := make(chan *protocol.Response, 1)
 	defer close(msg)
 	setData := SetData{Opt: in.Opt, Prefix: in.Prefix, Data: in.Data, Resp: msg}
+	if setData.Prefix == 0 {
+		setData.Prefix = c.Mll.RingToken(setData.Key)
+	}
 	c.DSet <- setData
 	resp := <-msg
 	return resp, nil
@@ -128,7 +92,10 @@ func (c *DataServiceProvider) Create(ctx context.Context, in *protocol.Request) 
 func (c *DataServiceProvider) Update(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
 	msg := make(chan *protocol.Response, 1)
 	defer close(msg)
-	setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
+	setData := SetData{Opt: in.Opt, Prefix: in.Prefix, Data: in.Data, Resp: msg}
+	if setData.Prefix == 0 {
+		c.Mll.RingToken(setData.Key)
+	}
 	c.DSet <- setData
 	resp := <-msg
 	return resp, nil
@@ -137,28 +104,21 @@ func (c *DataServiceProvider) Update(ctx context.Context, in *protocol.Request) 
 func (c *DataServiceProvider) Delete(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
 	msg := make(chan *protocol.Response, 1)
 	defer close(msg)
-	setData := SetData{Opt: in.Opt, Data: in.Data, Resp: msg}
+	setData := SetData{Opt: in.Opt, Prefix: in.Prefix, Data: in.Data, Resp: msg}
+	if setData.Prefix == 0 {
+		c.Mll.RingToken(setData.Key)
+	}
 	c.DSet <- setData
 	resp := <-msg
 	return resp, nil
 }
 
 func (c *DataServiceProvider) Pull(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
-	ch := make(chan *protocol.Response, 3)
-	go c.pull(request.Prefix, request.Opt, ch)
-	for resp := range ch {
-		if !resp.Successful {
-			break
-		}
-		if err := stream.Send(resp); err != nil {
-			break
-		}
-	}
-	return nil
+	return c.pull(request.Prefix, request.Opt, stream)
 }
 
 func (c *DataServiceProvider) Send(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	c.DMessager <- in
+	c.DMessager <- &protocol.Mail{Topic: in, Opt: core.TOPIC_MAIL}
 	return &protocol.Response{Successful: true, Message: "event published"}, nil
 }
 
@@ -176,7 +136,7 @@ func (c *DataServiceProvider) Start(dir string) {
 	if err != nil {
 		panic(err)
 	}
-	c.DMessager = make(chan *protocol.Topic, NODE_EVENT_BUFFER_SIZE)
+	c.DMessager = make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE)
 	c.DRequest = make(chan TopicRequest, NODE_EVENT_BUFFER_SIZE)
 	c.listeners = make(map[string]ReceiverAsync) //chan *protocol.Topic)
 	c.subscriptions = SubscriptionRegistry{topicEnds: make(map[core.TopicKey]map[string]core.Subscription), cPools: make(map[core.TopicKey]*core.RpcConnPool)}
@@ -186,6 +146,8 @@ func (c *DataServiceProvider) Start(dir string) {
 	for n := range SET_OPERATOR_NUM {
 		go c.runSetData(n)
 	}
+	c.TManager = &TaskManager{trs: make(map[uint64]*TaskResource), tjs: make(map[uint64]*JobResource), tms: make(map[uint64]*Timeout), s: c}
+	go c.TManager.Wait()
 	tcp, err := net.Listen("tcp", fmt.Sprintf(":%d", core.RPC_PORT))
 	if err != nil {
 		panic(err)
@@ -194,6 +156,7 @@ func (c *DataServiceProvider) Start(dir string) {
 	c.server = rpc
 	protocol.RegisterDataServiceServer(rpc, c)
 	protocol.RegisterPostofficeServiceServer(rpc, c)
+	protocol.RegisterTransactionServiceServer(rpc, c)
 	core.AppLog.Debug().Msgf("local data service provider started on : %s", tcp.Addr().String())
 	c.DWait.Done()
 	err = rpc.Serve(tcp)

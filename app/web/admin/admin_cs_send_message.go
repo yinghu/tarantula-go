@@ -36,17 +36,12 @@ func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 		return
 	}
 	core.AppLog.Debug().Msgf("event %v", &me)
-	id, err := s.Sequence().Id()
-	if err != nil {
-		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
-		return
-	}
 	tp, err := mf.FromMessageEvent(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	tp.Event.Id = uint64(id)
+	tp.Event.Key.Array = core.ToBytes(s.Sequence())
 	tp.NodeId = s.NodeId()
 	tp.Tag = s.Context()
 	resp, err := s.Cluster().Publish(tp)

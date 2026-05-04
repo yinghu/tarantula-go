@@ -3,46 +3,54 @@ package clustering
 import (
 	context "context"
 	"fmt"
+	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/grpc"
 )
 
-func (c *DataServiceProvider) HashRing(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.HashNode]) error {
+func (c *DataServiceProvider) AuthKey(ctx context.Context, request *protocol.Request) (*protocol.AuthKey, error) {
+	core.AppLog.Info().Msgf("load auth key %s", request.Context)
+	ak := protocol.AuthKey{Context: request.Context, Size: 32}
+	ak.Jwt = []byte("M4KExRr9HQbFRmUObhPsFJ2aDC4e/dkayHqwA568czw=")
+	ak.Cipher = []byte("NyXPfuLkqlsZcz//Y7Cm7oQ14MgIv29ouRmia+Vr2NY=")
+	return &ak, nil
+}
+
+func (c *DataServiceProvider) HashRing(ctx context.Context, request *protocol.Request) (*protocol.Response, error) {
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
 	c.Mll.rangeRing(core.RingRequest{Async: rq, Opt: ALL_RING_OPT})
 	ring := <-rq
+	nodes := make([]*protocol.HashNode, 0)
 	for _, n := range ring {
 		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name, Address: n.IP, Meta: n.Meta}
-		if err := stream.Send(&hn); err != nil {
-			return err
-		}
+		nodes = append(nodes, &hn)
 	}
-	return nil
+	return &protocol.Response{Nodes: nodes}, nil
 }
 
-func (c *DataServiceProvider) KeyRing(request *protocol.Request, stream grpc.ServerStreamingServer[protocol.HashNode]) error {
+func (c *DataServiceProvider) KeyRing(ctx context.Context, request *protocol.Request) (*protocol.Response, error) {
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
 	c.Mll.rangeRing(core.RingRequest{Async: rq, Opt: REPLICA_RING_OPT, Token: request.Prefix})
 	ring := <-rq
+	nodes := make([]*protocol.HashNode, 0)
 	for _, n := range ring {
 		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name, Address: n.IP}
-		if err := stream.Send(&hn); err != nil {
-			return err
-		}
+		nodes = append(nodes, &hn)
 	}
-	return nil
+	return &protocol.Response{Nodes: nodes}, nil
 }
 
-func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerStreamingServer[protocol.Topic]) error {
+func (c *DataServiceProvider) Receive(topic *protocol.Topic, stream grpc.ServerStreamingServer[protocol.Mail]) error {
 	aq := make(chan ReceiverAsync, 2)
 	c.DRequest <- TopicRequest{Opt: RECEIVER_START, Name: topic.NodeId, Async: aq}
 	ch := <-aq
 	close(aq)
-	core.AppLog.Debug().Msgf("start event receiver on [%s]", topic.NodeId)
+	core.AppLog.Info().Msgf("start event receiver on [%s]", topic.NodeId)
 	defer close(ch.Rev)
 	defer close(ch.Q)
 	receiving := true
@@ -72,12 +80,12 @@ func (c *DataServiceProvider) Publish(ctx context.Context, in *protocol.Topic) (
 	return c.runPublish(in)
 }
 
-func (c *DataServiceProvider) Subscribe(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_SUB_OPT, Source: core.RingSync{Sub: core.Subscription{NodeId: in.NodeId, Tag: in.Tag, Topic: in.Name, Endpoint: c.rpcEndpoint}}}
+func (c *DataServiceProvider) Subscribe(ctx context.Context, in *protocol.Subscription) (*protocol.Response, error) {
+	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_SUB_OPT, Source: core.RingSync{Sub: core.Subscription{Type: in.Opt, NodeId: in.NodeId, Tag: in.Tag, Topic: in.Name, Endpoint: c.rpcEndpoint}}}
 	return &protocol.Response{Successful: true, Message: "topic created"}, nil
 }
-func (c *DataServiceProvider) Unsubscribe(ctx context.Context, in *protocol.Topic) (*protocol.Response, error) {
-	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_SUB_OPT, Source: core.RingSync{Sub: core.Subscription{NodeId: in.NodeId, Tag: in.Tag, Topic: in.Name, Endpoint: c.rpcEndpoint, Deleting: true}}}
+func (c *DataServiceProvider) Unsubscribe(ctx context.Context, in *protocol.Subscription) (*protocol.Response, error) {
+	c.Mll.MRequest <- core.RingRequest{Opt: SYNC_SUB_OPT, Source: core.RingSync{Sub: core.Subscription{Type: in.Opt, NodeId: in.NodeId, Tag: in.Tag, Topic: in.Name, Endpoint: c.rpcEndpoint, Deleting: true}}}
 	return &protocol.Response{Successful: true, Message: "topic removed"}, nil
 }
 
@@ -107,4 +115,104 @@ func (c *DataServiceProvider) Request(ctx context.Context, request *protocol.Req
 func (c *DataServiceProvider) List(in *protocol.Request, stream grpc.ServerStreamingServer[protocol.Response]) error {
 	c.runQuery(in, stream)
 	return nil
+}
+
+func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*protocol.Response, error) {
+	task.Meta.Id = c.tid()
+	if task.Validator != nil {
+		task.Validator.Meta.TaskId = task.Meta.Id
+		task.Validator.Meta.Id = c.tid()
+		task.Validator.Meta.Timeout = JOB_TIMEOUT_SECONDS
+		for _, t := range task.Validator.Transactions {
+			t.Meta.TaskId = task.Meta.Id
+			t.Meta.JobId = task.Validator.Meta.Id
+			t.Meta.Id = c.tid()
+			t.Meta.Timeout = TRANSACTION_TIMEOUT_SECONDS
+			t.Meta.Retries = TCC_RETRY_MAX
+		}
+	}
+	if task.Job == nil || len(task.Job.Transactions) == 0 {
+		return &protocol.Response{Successful: false, Message: ""}, fmt.Errorf("task job reqiured")
+	}
+	task.Job.Meta.TaskId = task.Meta.Id
+	task.Job.Meta.Id = c.tid()
+	task.Job.Meta.Timeout = JOB_TIMEOUT_SECONDS
+	for _, t := range task.Job.Transactions {
+		t.Meta.TaskId = task.Meta.Id
+		t.Meta.JobId = task.Job.Meta.Id
+		t.Meta.Id = c.tid()
+		t.Meta.Timeout = TRANSACTION_TIMEOUT_SECONDS
+		t.Meta.Retries = TCC_RETRY_MAX
+	}
+
+	tb := persistence.TaskBuilder{Target: task}
+	req, err := tb.Request()
+	if err != nil {
+		return &protocol.Response{Successful: false, Message: err.Error()}, err
+	}
+	req.Prefix = tb.Hash(c.Mll)
+	resp, err := c.runCreate(req)
+	if err != nil {
+		return resp, err
+	}
+	return c.runSetup(task)
+}
+
+func (c *DataServiceProvider) Confirm(ctx context.Context, meta *protocol.Meta) (*protocol.Response, error) {
+	//call Confirmed
+	c.runConfirmed(meta)
+	return &protocol.Response{Successful: true}, nil
+}
+
+func (c *DataServiceProvider) Cancel(ctx context.Context, meta *protocol.Meta) (*protocol.Response, error) {
+	//call Canceled
+	c.runCanceled(meta)
+	return &protocol.Response{Successful: true}, nil
+}
+
+func (c *DataServiceProvider) Finish(ctx context.Context, meta *protocol.Meta) (*protocol.Response, error) {
+	//call Canceled
+	c.runFinished(meta)
+	return &protocol.Response{Successful: true}, nil
+}
+
+func (c *DataServiceProvider) TopicList(ctx context.Context, req *protocol.Request) (*protocol.Response, error) {
+	rq := make(chan []core.Subscription, 3)
+	defer close(rq)
+	c.DRequest <- TopicRequest{Opt: TOPIC_LIST, Subs: rq}
+	subs := <-rq
+	tps := make([]*protocol.Subscription, 0)
+	for _, sub := range subs {
+		tps = append(tps, &protocol.Subscription{NodeId: sub.NodeId, Tag: sub.Tag, Name: sub.Topic, Endpoint: sub.Endpoint})
+	}
+	return &protocol.Response{Subscriptions: tps}, nil
+}
+
+func (c *DataServiceProvider) TaskList(ctx context.Context, req *protocol.Request) (*protocol.Response, error) {
+	rq := make(chan []core.Subscription, 3)
+	defer close(rq)
+	c.DRequest <- TopicRequest{Opt: TASK_LIST, Subs: rq}
+	subs := <-rq
+	tks := make([]*protocol.Subscription, 0)
+	for _, sub := range subs {
+		tks = append(tks, &protocol.Subscription{NodeId: sub.NodeId, Tag: sub.Tag, Name: sub.Topic, Endpoint: sub.Endpoint})
+	}
+	return &protocol.Response{Subscriptions: tks}, nil
+}
+
+func (c *DataServiceProvider) tid() uint64 {
+	for {
+		id, err := c.seq.Id()
+		if err == nil {
+			return uint64(id)
+		}
+		time.Sleep(1 * time.Millisecond)
+	}
+}
+func (c *DataServiceProvider) tprefix(id uint64) uint32 {
+	buff := core.NewBuffer(8)
+	buff.WriteUInt64(id)
+	buff.Flip()
+	bt, _ := buff.Read(0)
+	return c.Mll.RingToken(bt)
 }

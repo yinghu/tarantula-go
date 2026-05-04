@@ -6,11 +6,11 @@ import (
 )
 
 type RequestEventQuery struct {
-	core.QueryObj
+	TopicQueryObj
 }
 
 func (q *RequestEventQuery) QFilter(k, v []byte) bool {
-	mf := RequestEventFactory{}
+	mf := NewRequestEventFactory()
 	t, err := mf.Topic(v)
 	if err != nil {
 		core.AppLog.Warn().Msgf("wrong decode format %s", err)

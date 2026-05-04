@@ -10,9 +10,17 @@ import (
 func (c *DataServiceProvider) runUpdate(set *protocol.Request) (*protocol.Response, error) {
 	rq := make(chan []core.Node, 3)
 	defer close(rq)
+	var rt uint32
+	if set.Prefix > 0 {
+		rt = set.Prefix
+	} else {
+		rt = c.Mll.RingToken(set.Data.Key)
+		core.AppLog.Debug().Msgf("using key hash %d", rt)
+	}
 	retry := RetryTrack{Reties: RETRY_MAX}
+	var mresp *protocol.Response
 	for retry.Reties > 0 {
-		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: c.Mll.RingToken(set.Data.Key), Replicas: REPLICA_MAX, Async: rq}
+		c.Mll.MRequest <- core.RingRequest{Opt: REPLICA_RING_OPT, Token: rt, Replicas: REPLICA_MAX, Async: rq}
 		nodes := <-rq
 		ringNode := nodes[0]
 		resp, _ := c.clientUpdate(&ringNode, set)
@@ -21,6 +29,7 @@ func (c *DataServiceProvider) runUpdate(set *protocol.Request) (*protocol.Respon
 			retry.Reties--
 			continue
 		}
+		mresp = resp
 		retry.Suc = true
 		slaves := nodes[1:]
 		for _, slave := range slaves {
@@ -28,8 +37,10 @@ func (c *DataServiceProvider) runUpdate(set *protocol.Request) (*protocol.Respon
 		}
 		break
 	}
-	core.AppLog.Printf("retry %s, %d ,%v", retry.Err, retry.Reties, retry.Suc)
-	return &protocol.Response{Successful: retry.Suc, Message: retry.Err}, nil
+	if retry.Suc {
+		return mresp, nil
+	}
+	return &protocol.Response{Successful: false, Message: retry.Err}, nil
 }
 
 func (m *DataServiceProvider) clientUpdate(target *core.Node, request *protocol.Request) (*protocol.Response, error) {

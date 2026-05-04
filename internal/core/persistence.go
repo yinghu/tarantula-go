@@ -1,5 +1,30 @@
 package core
 
+import "time"
+
+const (
+	EVENT_FACTORY_ID  uint32 = 1
+	OBJECT_FACTORY_ID uint32 = 2
+	TASK_FACTORY_ID   uint32 = 3
+	JOB_FACTORY_ID    uint32 = 4
+)
+
+func ToBytes(seq Sequence) []byte {
+	for {
+		id, err := seq.Id()
+		if err != nil {
+			time.Sleep(1 * time.Millisecond)
+			continue
+		}
+		buff := NewBuffer(8)
+		buff.WriteUInt64(uint64(id))
+		buff.Flip()
+		key, _ := buff.Read(0)
+		return key
+	}
+
+}
+
 func Export(obj Persistentable, buffSize int) ([]byte, []byte, error) {
 	buff := NewBuffer(buffSize)
 	var k []byte

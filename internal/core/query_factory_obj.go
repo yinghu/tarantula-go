@@ -1,11 +1,15 @@
 package core
 
+import (
+	"gameclustering.com/internal/protocol"
+)
+
 type QueryFactoryObj struct {
 	Q Query
 }
 
 func (f *QueryFactoryObj) Import(data []byte) (Query, error) {
-	buff := NewBuffer(COMPOSIT_KEY_MAX)
+	buff := NewBuffer(QUERY_SIZE_MAX)
 	if err := buff.Write(data); err != nil {
 		return f.Q, err
 	}
@@ -17,7 +21,7 @@ func (f *QueryFactoryObj) Import(data []byte) (Query, error) {
 }
 func (f *QueryFactoryObj) Export(query Query) ([]byte, error) {
 	var v []byte
-	buff := NewBuffer(COMPOSIT_KEY_MAX)
+	buff := NewBuffer(QUERY_SIZE_MAX)
 	if err := query.QWrite(buff); err != nil {
 		return v, nil
 	}
@@ -29,10 +33,11 @@ func (f *QueryFactoryObj) Query() Query {
 	return f.Q
 }
 
-func (p *QueryFactoryObj) WriteKey(key DataBuffer) error {
-	return nil
+func (f *QueryFactoryObj) Set(resp *protocol.Response) Query {
+	f.Q.QResponse(resp)
+	return f.Q
 }
 
-func (p *QueryFactoryObj) ReadKey(key DataBuffer) error {
-	return nil
+func (f *QueryFactoryObj) Hash(h MessageHash) uint32{
+	return 0
 }

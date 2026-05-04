@@ -18,10 +18,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-var TopicFactoryRegistry = make(map[string]func() core.QueryFactory)
-
 func Register(name string, fac func() core.QueryFactory) {
-	TopicFactoryRegistry[name] = fac
+	core.QueryFactoryRegistry[name] = fac
 }
 
 func AppBootstrap(tcx TarantulaContext) {
@@ -30,6 +28,8 @@ func AppBootstrap(tcx TarantulaContext) {
 	Register(event.LOG_TOPIC_NAME, func() core.QueryFactory { return event.NewLogEventFactory() })
 	Register(event.LOGIN_TOPIC_NAME, func() core.QueryFactory { return event.NewLoginEventFactory() })
 	Register(event.REQUEST_TOPIC_NAME, func() core.QueryFactory { return event.NewRequestEventFactory() })
+	Register(event.TASK_TOPIC_NAME, func() core.QueryFactory { return event.NewTaskEventFactory() })
+	Register(event.TRANSACTION_TOPIC_NAME, func() core.QueryFactory { return event.NewTransactionEventFactory() })
 	Register(persistence.LOGIN_OBJECT_FACTORY_NAME, func() core.QueryFactory { return persistence.NewLoginObjectFactory() })
 
 	f := core.Env{}
@@ -125,12 +125,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			}
 			t.NodeId = s.NodeId()
 			t.Tag = s.Context()
-			id, err := s.Sequence().Id()
-			if err != nil {
-				fmt.Printf("request event id error %s\n", err.Error())
-				return
-			}
-			t.Event.Id = uint64(id)
+			t.Event.Key.Array = core.ToBytes(s.Sequence())
 			s.Cluster().Publish(t)
 		}()
 		w.Header().Set("Access-Control-Allow-Origin", "*")

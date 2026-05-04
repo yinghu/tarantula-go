@@ -5,7 +5,6 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
-	hash "github.com/spaolacci/murmur3"
 )
 
 type GetData struct {
@@ -14,7 +13,7 @@ type GetData struct {
 
 func (s *GetData) IndexKey() KeyIndex {
 	data := s.Data
-	ki := KeyIndex{Prefix: hash.Sum32(data.Key), Header: data.Header, Key: data.Key}
+	ki := KeyIndex{Prefix: s.Prefix, Header: data.Header, Key: data.Key}
 	return ki
 }
 func (s *GetData) DataKey() ([]byte, error) {

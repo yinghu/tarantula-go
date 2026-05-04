@@ -7,6 +7,7 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 	badger "github.com/dgraph-io/badger/v4"
+	"google.golang.org/grpc"
 )
 
 // internal operations
@@ -134,7 +135,6 @@ func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
 	if err != nil {
 		return &data, err
 	}
-
 	err = m.Local.Db.View(func(txn *badger.Txn) error {
 		item, err := txn.Get(k)
 		if err != nil {
@@ -212,10 +212,11 @@ func (m *DataServiceProvider) reset(sd SetData) (KeyIndex, error) {
 	return ki, err
 }
 
-func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) {
+func (m *DataServiceProvider) pull(from, to uint32, ch grpc.ServerStreamingServer[protocol.Response]) error {
 	index := KeyIndex{}
 	pre, _ := index.lookupPrefix(INDEX_PREFIX)
 	data := make([]*protocol.Data, 0, PULL_BATCH_SIZE)
+	total := 0
 	m.Local.Db.View(func(txn *badger.Txn) error {
 		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
 		it := txn.NewIterator(op)
@@ -241,7 +242,11 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 				data = append(data, &vdata)
 				if len(data) == PULL_BATCH_SIZE {
 					resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
-					ch <- &resp
+					total += PULL_BATCH_SIZE
+					err = ch.Send(&resp)
+					if err != nil {
+						core.AppLog.Warn().Msgf("rpc send error %s", err.Error())
+					}
 					data = make([]*protocol.Data, 0, PULL_BATCH_SIZE)
 				}
 				continue
@@ -262,7 +267,11 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 						data = append(data, &vdata)
 						if len(data) == PULL_BATCH_SIZE {
 							resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
-							ch <- &resp
+							err = ch.Send(&resp)
+							if err != nil {
+								core.AppLog.Warn().Msgf("rpc send error %s", err.Error())
+							}
+							total += PULL_BATCH_SIZE
 							data = make([]*protocol.Data, 0, PULL_BATCH_SIZE)
 						}
 						return nil
@@ -284,7 +293,11 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 						data = append(data, &vdata)
 						if len(data) == PULL_BATCH_SIZE {
 							resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
-							ch <- &resp
+							err = ch.Send(&resp)
+							if err != nil {
+								core.AppLog.Warn().Msgf("rpc send error %s", err.Error())
+							}
+							total += PULL_BATCH_SIZE
 							data = make([]*protocol.Data, 0, PULL_BATCH_SIZE)
 						}
 						return nil
@@ -294,12 +307,17 @@ func (m *DataServiceProvider) pull(from, to uint32, ch chan *protocol.Response) 
 		}
 		return nil
 	})
-	if len(data) > 0 {
-
+	last := len(data)
+	if last > 0 {
+		total += last
 		resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
-		ch <- &resp
+		err := ch.Send(&resp)
+		if err != nil {
+			core.AppLog.Warn().Msgf("rpc send error %s", err.Error())
+		}
 	}
-	ch <- &protocol.Response{Successful: false}
+	core.AppLog.Info().Msgf("local pull data rows %d range from %d to %d", total, from, to)
+	return nil
 }
 
 func (c *DataServiceProvider) set(resp *protocol.Response) {
@@ -349,4 +367,49 @@ func (c *DataServiceProvider) set(resp *protocol.Response) {
 		core.AppLog.Warn().Msgf("set err %s", err.Error())
 		return
 	}
+}
+
+func (c *DataServiceProvider) query(q core.Query, stream grpc.ServerStreamingServer[protocol.Response]) error {
+	//core.AppLog.Debug().Msgf("query %v", q)
+	buff := core.NewBuffer(16)
+	buff.WriteUInt32(q.QFactoryId())
+	buff.WriteUInt32(q.QClassId())
+	buff.Flip()
+	px, err := buff.Read(0)
+	if err != nil {
+		return err
+	}
+	p := px
+	dset := make([]*protocol.Data, 0)
+	//core.AppLog.Debug().Msgf("query : %d %d %d %d", q.QLimit(), q.QOffset(), q.QFactoryId(), q.QClassId())
+	limit := q.QLimit()
+	offset := q.QOffset()
+	c.Local.Db.View(func(txn *badger.Txn) error {
+		op := badger.IteratorOptions{PrefetchSize: 100, PrefetchValues: false, Reverse: false}
+		it := txn.NewIterator(op)
+		defer it.Close()
+		for it.Seek(p); it.ValidForPrefix(p); it.Next() {
+			if offset > 0 {
+				offset--
+				continue
+			}
+			p = px
+			item := it.Item()
+			k := append([]byte{}, item.Key()[12:]...)
+			item.Value(func(val []byte) error {
+				if q.QFilter(k, val) {
+					v := append([]byte{}, val...)
+					dset = append(dset, &protocol.Data{Key: k, Value: v, Header: &protocol.Header{}})
+					limit--
+				}
+				return nil
+			})
+			if limit == 0 {
+				break
+			}
+		}
+		return nil
+	})
+	resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: dset}}
+	return stream.Send(&resp)
 }

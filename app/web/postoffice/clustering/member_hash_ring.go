@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"sync"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
@@ -13,6 +14,7 @@ type MemberHashRing struct {
 	NodeRing
 	weight int
 	WNode  chan<- RingUpdate
+	hLock  *sync.Mutex
 }
 
 func (m *MemberHashRing) vNode(node core.Node, weight int) core.Node {
@@ -84,5 +86,7 @@ func (m *MemberHashRing) OnConflict(nodes []core.Node) {
 
 // hash ring operations
 func (m *MemberHashRing) RingToken(key []byte) uint32 {
-	return util.Hash(key)
+	m.hLock.Lock()
+	defer m.hLock.Unlock()
+	return util.Hash32(key)
 }

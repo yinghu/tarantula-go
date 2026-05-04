@@ -3,7 +3,6 @@ package persistence
 import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
-	"gameclustering.com/internal/util"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 )
@@ -13,14 +12,17 @@ const (
 	LOGIN_OBJECT_FACTORY_NAME        = "obj_login"
 )
 
+type MessageObject func() proto.Message
+
 type ProtoObjectFactoryObj struct {
+	Target *protocol.KeyValue
 	core.QueryFactoryObj
-	M proto.Message
+	Mo MessageObject
 }
 
 func (p *ProtoObjectFactoryObj) Request(obj *protocol.KeyValue) (*protocol.Request, error) {
+	p.Target = obj
 	req := protocol.Request{Opt: core.CREATE_DATA_REQUEST}
-	req.Prefix = util.Hash(obj.Key.Array)
 	value, err := proto.Marshal(obj)
 	if err != nil {
 		return &req, err
@@ -37,9 +39,13 @@ func (p *ProtoObjectFactoryObj) Object(data []byte) (*protocol.KeyValue, error) 
 }
 
 func (p *ProtoObjectFactoryObj) Message(obj *protocol.KeyValue) (any, error) {
-	err := anypb.UnmarshalTo(obj.Message, p.M, proto.UnmarshalOptions{})
+	m := p.Mo()
+	err := anypb.UnmarshalTo(obj.Message, m, proto.UnmarshalOptions{})
 	if err != nil {
-		return p.M, err
+		return m, err
 	}
-	return p.M, nil
+	return m, nil
+}
+func (p *ProtoObjectFactoryObj) Hash(mh core.MessageHash) uint32 {
+	return mh.RingToken(p.Target.Key.Array)
 }

@@ -7,7 +7,9 @@ import (
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
+	"google.golang.org/protobuf/proto"
 )
 
 type AdminService struct {
@@ -42,7 +44,17 @@ func (s *AdminService) Start(f core.Env) error {
 	if err != nil {
 		core.AppLog.Debug().Msg("Root already existed")
 	}
-	//s.Cluster().Subscribe("login", s.Event())
+	s.Cluster().Subscribe(event.TASK_TOPIC_NAME, &protocol.TopicEventListener{C: func() proto.Message {
+		return &protocol.TaskEvent{}
+	}, M: func(m proto.Message) {
+		ro, ok := m.(*protocol.TaskEvent)
+		if ok {
+			core.AppLog.Debug().Msgf("validator event %v", ro.Validator)
+			core.AppLog.Debug().Msgf("transaction event %v", ro.Job)
+		} else {
+			core.AppLog.Debug().Msg("wrong type")
+		}
+	}})
 	http.Handle("/admin/webprotected/{name}", bootstrap.Logging(&AdminWebProtected{AdminService: s}))
 	http.Handle("/admin/web/{name}", bootstrap.Logging(&AdminWebIndex{AdminService: s}))
 	//handle / context from nginx proxy
@@ -66,7 +78,6 @@ func (s *AdminService) Start(f core.Env) error {
 	http.Handle("/admin/category/preview/{id}", bootstrap.Logging(&CategoryPreviewer{AdminService: s}))
 	http.Handle("/admin/item/delete/{type}/{id}", bootstrap.Logging(&ItemDeleter{AdminService: s}))
 
-	http.Handle("/admin/topic/subscribe", bootstrap.Logging(&AdminTopicSubscriber{AdminService: s}))
 	http.Handle("/admin/view/{id}", bootstrap.Logging(&AdminItemViewer{AdminService: s}))
 	http.Handle("/admin/repo/sync", bootstrap.Logging(&AdminPublisher{AdminService: s}))
 	http.Handle("/admin/env", bootstrap.Logging(&AdminEnv{AdminService: s}))
@@ -78,6 +89,8 @@ func (s *AdminService) Start(f core.Env) error {
 
 	http.Handle("/admin/presence/hashring", bootstrap.Logging(&AdminHashRingEndpoint{AdminService: s}))
 	http.Handle("/admin/presence/keyring/{key}", bootstrap.Logging(&AdminKeyRingEndpoint{AdminService: s}))
+	http.Handle("/admin/presence/subscription/task", bootstrap.Logging(&AdminSubscriptionTaskEndpoint{AdminService: s}))
+	http.Handle("/admin/presence/subscription/topic", bootstrap.Logging(&AdminSubscriptionTopicEndpoint{AdminService: s}))
 
 	http.Handle("/admin/cluster/delete/{key}", bootstrap.Logging(&AdminClusterDelete{AdminService: s}))
 	http.Handle("/admin/cluster/reset", bootstrap.Logging(&AdminClusterReset{AdminService: s}))

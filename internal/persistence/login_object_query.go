@@ -6,7 +6,7 @@ import (
 )
 
 type LoginObjectQuery struct {
-	core.QueryObj
+	ObjectQueryObj
 }
 
 func (q *LoginObjectQuery) QFilter(k, v []byte) bool {

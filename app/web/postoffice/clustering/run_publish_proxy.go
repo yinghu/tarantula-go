@@ -3,14 +3,14 @@ package clustering
 import (
 	context "context"
 	"fmt"
+	"time"
 
-	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 )
 
 func (c *DataServiceProvider) runPublish(topic *protocol.Topic) (*protocol.Response, error) {
-	tpf, registered := bootstrap.TopicFactoryRegistry[topic.Name]
+	tpf, registered := core.QueryFactoryRegistry[topic.Name]
 	if !registered {
 		return &protocol.Response{Successful: false}, fmt.Errorf("event factory not registered")
 	}
@@ -19,7 +19,9 @@ func (c *DataServiceProvider) runPublish(topic *protocol.Topic) (*protocol.Respo
 	if !ok {
 		return &protocol.Response{Successful: false}, fmt.Errorf("event factory cannot casted from %s", topic.Name)
 	}
+	topic.Event.Key.Header.Timestamp = uint64(time.Now().UnixMilli())
 	req, err := tp.Request(topic)
+	req.Prefix = tp.Hash(c.Mll)
 	if err != nil {
 		return &protocol.Response{Successful: false}, err
 	}

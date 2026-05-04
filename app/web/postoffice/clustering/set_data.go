@@ -5,7 +5,6 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
-	"gameclustering.com/internal/util"
 )
 
 type SetData struct {
@@ -17,9 +16,6 @@ type SetData struct {
 
 // HELPER METHODS
 func (s *SetData) IndexKey() KeyIndex {
-	if s.Prefix == 0 {
-		s.Prefix = util.Hash(s.Key)
-	}
 	ki := KeyIndex{Prefix: s.Prefix, Header: s.Header, Key: s.Key}
 	return ki
 }
