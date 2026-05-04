@@ -44,6 +44,7 @@ type Env struct {
 	LogTruncated    bool          `json:"LogTruncated"`
 	LogDir          string        `json:"LogDir"`
 	AuthLevel       int32         `json:"AuthLevel"`
+	ClusterSeed     []string      `json:"ClusterSeed"`
 	IsClusterMember bool          `json:"IsClusterMember"`
 }
 
@@ -93,7 +94,7 @@ func (f *Env) Load(fn string) error {
 		f.NodeName = fmt.Sprintf("%s.%d", f.GroupName, f.NodeId)
 
 	}
-	
+
 	c, exists = os.LookupEnv("SQL_ENDPOINT")
 	if exists {
 		f.Pgs.DatabaseURL = c
