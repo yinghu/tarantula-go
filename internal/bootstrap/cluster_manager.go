@@ -420,3 +420,15 @@ func (c *ClusterManager) TaskList() (*protocol.Response, error) {
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
 	return dsp.TaskList(context.Background(), &protocol.Request{Prefix: 0})
 }
+
+func (c *ClusterManager) AuthKey() (*protocol.AuthKey, error) {
+	if !c.running {
+		return nil, fmt.Errorf("cluster not started")
+	}
+	conn, err := c.cPool.Conn()
+	if err != nil {
+		return nil, err
+	}
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	return dsp.AuthKey(context.Background(), &protocol.Request{Context: c.App.F.PresenceCtx()})
+}

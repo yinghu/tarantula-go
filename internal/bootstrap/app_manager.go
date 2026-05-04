@@ -132,6 +132,7 @@ func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
 	ci := util.Aes{Ksz: core.CIPHER_KEY_SIZE}
 	err := s.Atomic(context, func(ctx core.Ctx) error {
 		jsk, err := ctx.Get(core.JWT_KEY_NAME)
+		core.AppLog.Debug().Msgf("%s", jsk)
 		if err != nil {
 			core.AppLog.Println("Create new jwt key")
 			nkey := util.Key(tkn.Ksz)
@@ -151,6 +152,7 @@ func (s *AppManager) LoadAuth(context string) (core.Authenticator, error) {
 	}
 	err = s.Atomic(context, func(ctx core.Ctx) error {
 		csk, err := ctx.Get(core.CIPHER_KEY_NAME)
+		core.AppLog.Debug().Msgf("%s", csk)
 		if err != nil {
 			core.AppLog.Println("Create new cipher key")
 			ckey := util.Key(ci.Ksz)

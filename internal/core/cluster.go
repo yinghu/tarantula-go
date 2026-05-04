@@ -166,4 +166,7 @@ type ClusterService interface {
 	//subscription
 	TopicList() (*protocol.Response, error)
 	TaskList() (*protocol.Response, error)
+
+	//auth key
+	AuthKey() (*protocol.AuthKey, error)
 }

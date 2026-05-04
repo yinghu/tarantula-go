@@ -11,6 +11,11 @@ import (
 	"google.golang.org/grpc"
 )
 
+func (c *DataServiceProvider) AuthKey(ctx context.Context, request *protocol.Request) (*protocol.AuthKey, error) {
+	core.AppLog.Info().Msgf("load auth key %s", request.Context)
+	return &protocol.AuthKey{Context: request.Context,Size: 32,}, nil
+}
+
 func (c *DataServiceProvider) HashRing(ctx context.Context, request *protocol.Request) (*protocol.Response, error) {
 	rq := make(chan []core.Node, 1)
 	defer close(rq)
