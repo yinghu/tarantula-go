@@ -38,7 +38,6 @@ type Env struct {
 	HttpBinding     string        `json:"HttpBinding"`
 	HttpEndpoint    string        `json:"HttpEndpoint"`
 	Evp             EventEndpoint `json:"EventEndpoint"`
-	//EtcdEndpoints   []string      `json:"EtcdEndpoints"`
 	ManagedApps     []string      `json:"ManagedApps"`
 	Pgs             Sql           `json:"Sql"`
 	HomeDir         string        `json:"HomeDir"`
@@ -94,13 +93,7 @@ func (f *Env) Load(fn string) error {
 		f.NodeName = fmt.Sprintf("%s.%d", f.GroupName, f.NodeId)
 
 	}
-	//c, exists = os.LookupEnv("ETCD_ENDPOINTS")
-	//if exists {
-		//f.EtcdEndpoints = f.EtcdEndpoints[:0]
-		//parts := strings.Split(c, ",")
-		//f.EtcdEndpoints = append(f.EtcdEndpoints, parts...)
-	//}
-
+	
 	c, exists = os.LookupEnv("SQL_ENDPOINT")
 	if exists {
 		f.Pgs.DatabaseURL = c

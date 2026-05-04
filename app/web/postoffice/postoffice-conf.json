@@ -5,7 +5,6 @@
 	"NodeId"     :   5,
 	"HttpBinding":  ":8080",
 	"HttpEndpoint":  "192.168.1.6:8080",
-	"EtcdEndpoints": ["192.168.1.6:2379"],
 	"Sql":{
 		"Enabled":true,
 		"DatabaseURL"  : "postgres://postgres:password@192.168.1.6:5432"	
