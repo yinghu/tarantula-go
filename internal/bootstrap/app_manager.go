@@ -103,6 +103,11 @@ func (s *AppManager) Start(f core.Env) error {
 	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.Host)
 	s.cluster = &ClusterManager{App: s}
 	s.RegisterLogForwarder(zerolog.DebugLevel, s.cluster)
+
+	err = s.cluster.connect(f.Host)
+	if err != nil {
+		panic(err.Error())
+	}
 	ak, err := s.cluster.AuthKey()
 	if err != nil {
 		panic(err.Error())
@@ -112,7 +117,7 @@ func (s *AppManager) Start(f core.Env) error {
 		panic(err.Error())
 	}
 	s.Auth = au
-	return s.cluster.connect(f.Host)
+	return nil
 }
 
 func (s *AppManager) Shutdown() {
