@@ -57,8 +57,8 @@ func (s *CSQueryTopic) Request(rs core.OnSession, w http.ResponseWriter, r *http
 			break
 		}
 		mf.Set(resp).QList(func(h *protocol.Header, m proto.Message) bool {
-			r, ok := m.(*anypb.Any)
-			if ok {
+			r, err := anypb.New(m)
+			if err == nil {
 				ms = append(ms, r)
 			}
 			return true
