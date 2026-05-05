@@ -64,7 +64,7 @@ func (p *ProtoTopicFactoryObj) Topic(data []byte) (*protocol.Topic, error) {
 	return &tp, err
 }
 
-func (p *ProtoTopicFactoryObj) Message(topic *protocol.Topic) (any, error) {
+func (p *ProtoTopicFactoryObj) Message(topic *protocol.Topic) (proto.Message, error) {
 	m := p.Mt()
 	err := anypb.UnmarshalTo(topic.Event.Message, m, proto.UnmarshalOptions{})
 	if err != nil {

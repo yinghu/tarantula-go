@@ -23,7 +23,6 @@ require (
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
 	github.com/dgraph-io/badger/v4 v4.7.0
 	github.com/hashicorp/memberlist v0.5.4
-	github.com/jackc/pgx/v5 v5.7.4
 	google.golang.org/grpc v1.79.1
 	google.golang.org/protobuf v1.36.11
 )
@@ -48,6 +47,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
+	github.com/jackc/pgx/v5 v5.7.4 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
