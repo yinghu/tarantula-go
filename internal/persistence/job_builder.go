@@ -20,7 +20,11 @@ func NewJobBuilder() *JobBuilder {
 	return &JobBuilder{Target: &protocol.Job{Transactions: make([]*protocol.Transaction, 0)}}
 }
 
-func (jb *JobBuilder) Add(t *protocol.Transaction) *JobBuilder {
+func (jb *JobBuilder) Transaction() *TransactionBuilder {
+	return NewTransactionBuilder(jb)
+}
+
+func (jb *JobBuilder) add(t *protocol.Transaction) *JobBuilder {
 	jb.Target.Transactions = append(jb.Target.Transactions, t)
 	return jb
 }

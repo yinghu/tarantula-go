@@ -45,8 +45,10 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 			return
 		}
 		tb := persistence.NewTaskBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
-		tb.Validator(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "validator"}).Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "register"}, Object: kv})
-		tb.Job(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "job"}).Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "grant"}, Object: kv}).Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "update"}, Object: kv})
+		vb := tb.Validator(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "validator"})
+		vb.Transaction().Meta(&protocol.Meta{Name: "register"}).Object(kv).Build()
+		jb := tb.Job(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "job"})
+		jb.Transaction().Meta(&protocol.Meta{Name: "grant"}).Object(kv).Build()
 		rp, _ := s.Cluster().Issue(tb.Build())
 		core.AppLog.Debug().Msgf("TASK %v", rp)
 
