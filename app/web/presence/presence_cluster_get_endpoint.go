@@ -7,6 +7,7 @@ import (
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
+	"google.golang.org/protobuf/proto"
 )
 
 type PresenceClusterGet struct {
@@ -39,7 +40,7 @@ func (s *PresenceClusterGet) Request(rs core.OnSession, w http.ResponseWriter, r
 		return
 	}
 
-	if err := mf.Set(resp).QList(func(h *protocol.Header, m any) bool {
+	if err := mf.Set(resp).QList(func(h *protocol.Header, m proto.Message) bool {
 		w.Write(util.ToJson(m))
 		return false
 	}); err != nil {
