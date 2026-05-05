@@ -182,16 +182,16 @@ func (m *DataServiceProvider) RingUpdated() {
 			for _, ch := range m.listeners {
 				switch msg.Opt {
 				case core.TOPIC_MAIL:
-					sub, subed := ch.Subs[msg.Topic.Name]
+					_, subed := ch.Subs[msg.Topic.Name]
 					if subed {
-						core.AppLog.Debug().Msgf("topic down streaming to %v", sub)
+						//core.AppLog.Debug().Msgf("topic down streaming to %v", sub)
 						ch.Rev <- msg
 					}
 				case core.TRANS_MAIL:
 					tn := fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, msg.Transaction.Meta.Name)
-					sub, subed := ch.Subs[tn]
+					_, subed := ch.Subs[tn]
 					if subed {
-						core.AppLog.Debug().Msgf("task down streaming to %v", sub)
+						//core.AppLog.Debug().Msgf("task down streaming to %v", sub)
 						ch.Rev <- msg
 					}
 				}
