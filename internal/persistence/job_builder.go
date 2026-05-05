@@ -16,17 +16,20 @@ type JobBuilder struct {
 	Target *protocol.Job
 }
 
-func NewJobBuilder(meta *protocol.Meta) *JobBuilder {
-	trans := make([]*protocol.Transaction, 0)
-	return &JobBuilder{Target: &protocol.Job{Meta: meta, Transactions: trans}}
+func NewJobBuilder() *JobBuilder {
+	return &JobBuilder{Target: &protocol.Job{Transactions: make([]*protocol.Transaction, 0)}}
 }
 
-func (jb *JobBuilder) Add(t *protocol.Transaction) *JobBuilder {
+func (jb *JobBuilder) Transaction() *TransactionBuilder {
+	return NewTransactionBuilder(jb)
+}
+
+func (jb *JobBuilder) add(t *protocol.Transaction) *JobBuilder {
 	jb.Target.Transactions = append(jb.Target.Transactions, t)
 	return jb
 }
 
-func (jb *JobBuilder) Job() *protocol.Job {
+func (jb *JobBuilder) Build() *protocol.Job {
 	return jb.Target
 }
 

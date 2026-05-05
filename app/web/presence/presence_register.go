@@ -38,42 +38,18 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 	session.Ticket = ticket
 
 	go func() {
-
-		//rf := event.RegisterEventFactory{}
-		//me := protocol.RegisterEvent{SystemId: uint64(login.SystemId), Name: login.Name, Source: "web"}
-		//tp, err := rf.FromRegisterEvent(&me)
-		//if err != nil {
-		//core.AppLog.Warn().Msgf("failed to create topic %s", err.Error())
-		//return
-		//}
-		//tp.Event.Key.Array = core.ToBytes(s.Sequence())
-		//tp.NodeId = s.NodeId()
-		//tp.Tag = s.Context()
-		//_, err = s.Cluster().Publish(tp)
-		//if err != nil {
-		//core.AppLog.Warn().Msgf("failed to publish topic %s", err.Error())
-		//return
-		//}
 		mf := persistence.NewLoginObjectFactory()
 		kv, err := mf.FromLoginObject(login)
 		if err != nil {
 			core.AppLog.Warn().Msgf("failed to request %s", err.Error())
 			return
 		}
-
 		tb := persistence.NewTaskBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
-
-		jb1 := persistence.NewJobBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "validator"})
-
-		jb1.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "register"}, Object: kv})
-
-		jb := persistence.NewJobBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "job"})
-		jb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "grant"}, Object: kv})
-		jb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "update"}, Object: kv})
-		//jb.Add(&protocol.Transaction{Meta: &protocol.Meta{Name: "membership"}, Object: kv})
-		tb.SetValidator(jb1.Target)
-		tb.SetJob(jb.Target)
-		rp, _ := s.Cluster().Issue(tb.Task())
+		vb := tb.Validator(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "validator"})
+		vb.Transaction().Meta(&protocol.Meta{Name: "register"}).Object(kv).Build()
+		jb := tb.Job(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "job"})
+		jb.Transaction().Meta(&protocol.Meta{Name: "grant"}).Object(kv).Build()
+		rp, _ := s.Cluster().Issue(tb.Build())
 		core.AppLog.Debug().Msgf("TASK %v", rp)
 
 	}()

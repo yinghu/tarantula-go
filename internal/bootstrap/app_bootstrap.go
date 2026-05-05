@@ -107,7 +107,7 @@ func metricsHandler(auth core.Authenticator, h http.Handler) http.HandlerFunc {
 func Logging(s TarantulaApp) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
-		//var stub int32 = 0
+	
 		var code int32 = 0
 		defer func() {
 			if s.ClusterMember() {
@@ -153,12 +153,12 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			return
 		}
 		if session.AccessControl < s.AccessControl() {
-			//stub = session.Stub
+			
 			code = int32(ILLEGAL_ACCESS_CODE)
 			illegalAccess(w, r)
 			return
 		}
-		//stub = session.Stub
+		
 		s.Request(session, w, r)
 	}
 }

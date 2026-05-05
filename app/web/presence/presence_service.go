@@ -56,10 +56,8 @@ func (s *PresenceService) Start(env core.Env) error {
 		}
 	}})
 	s.Cluster().Register("register", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
-		core.AppLog.Debug().Msgf("reserve %v", e)
-		return nil //fmt.Errorf("no")
+		return nil
 	}, Confirm: func(e *protocol.Transaction) error {
-		core.AppLog.Debug().Msgf("confirm %v", e)
 		return nil
 	}, Cancel: func(e *protocol.Transaction) error {
 		return nil

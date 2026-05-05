@@ -39,15 +39,10 @@ func (s *AssetService) Start(f core.Env) error {
 		}
 	}})
 	s.Cluster().Register("update", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
-		//core.AppLog.Debug().Msgf("reserve update %v", e)
-
-		return nil //fmt.Errorf("no item")
+		return nil 
 	}, Confirm: func(e *protocol.Transaction) error {
-		//core.AppLog.Debug().Msgf("confirm %v", e)
-
 		return nil
 	}, Cancel: func(e *protocol.Transaction) error {
-		//core.AppLog.Debug().Msgf("cancel %v", e)
 		return nil
 	}})
 	core.AppLog.Printf("Asset service started %s %s\n", f.HttpBinding, s.assetDir)

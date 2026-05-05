@@ -3,7 +3,6 @@ package clustering
 import (
 	"time"
 
-	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/protocol"
 )
@@ -44,7 +43,6 @@ func (j *JobResource) transaction(meta *protocol.Meta) {
 	j.jb.Transaction().New(mt).Start(meta.Time.AsTime()).End(time.Now()).Description(mt.Description).Build()
 }
 
-
 func (j *JobResource) cancel(tc *protocol.Meta) {
 	j.canceled = true
 	j.joining[tc.Id].canceled = true
@@ -69,7 +67,7 @@ func (j *JobResource) join(meta *protocol.Meta) bool {
 	default:
 		return false
 	}
-	core.AppLog.Debug().Msgf("meta ID : %d STATE : %d CONFIRMED : %d FINISHED %d PREFIX %d", meta.Id, meta.State, t.confirmed, t.finished, meta.Prefix)
+	//core.AppLog.Debug().Msgf("meta ID : %d STATE : %d CONFIRMED : %d FINISHED %d PREFIX %d", meta.Id, meta.State, t.confirmed, t.finished, meta.Prefix)
 	j.jb.Transaction().New(copy(meta)).Start(meta.Time.AsTime()).End(time.Now()).Description(meta.Description).Build()
 	j.confirmed++
 	return j.joinParties == j.confirmed

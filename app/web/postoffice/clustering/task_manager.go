@@ -77,7 +77,7 @@ func (m *TaskManager) set(t *TaskResource) {
 
 func (m *TaskManager) schedule(t *TaskResource, job *protocol.Job) {
 	go m.s.updateTask(t, func() {
-		core.AppLog.Debug().Msgf("task updated %d %d", t.revision, t.resource.Meta.Id)
+		//core.AppLog.Debug().Msgf("task updated %d %d", t.revision, t.resource.Meta.Id)
 	})
 	go func() {
 		m.jobs <- job
@@ -111,9 +111,9 @@ func (m *TaskManager) start(j *JobResource) {
 
 func (m *TaskManager) stop(t *JobResource) {
 	t.canceled = true
-	for _, tc := range t.joining {
-		core.AppLog.Debug().Msgf("TRANSACTION CANCELED %v %d", tc.canceled, tc.retried)
-	}
+	//for _, tc := range t.joining {
+	//core.AppLog.Debug().Msgf("TRANSACTION CANCELED %v %d", tc.canceled, tc.retried)
+	//}
 	t.jb.Description("job timeout").End(time.Now())
 	tr := m.trs[t.resource.Meta.TaskId]
 	tr.canceled = true
@@ -169,10 +169,10 @@ func (m *TaskManager) canceled(c *protocol.Meta, t *JobResource) {
 func (m *TaskManager) finished(t *JobResource) {
 	m.closeTimer(t.resource.Meta.Id)
 	tr := m.trs[t.resource.Meta.TaskId]
-	core.AppLog.Debug().Msgf("JOB CANCELED %v", t.canceled)
-	for _, tc := range t.joining {
-		core.AppLog.Debug().Msgf("TRANSACTION CANCELED %v", tc.canceled)
-	}
+	//core.AppLog.Debug().Msgf("JOB CANCELED %v", t.canceled)
+	//for _, tc := range t.joining {
+	//core.AppLog.Debug().Msgf("TRANSACTION CANCELED %v", tc.canceled)
+	//}
 	t.resource.Meta.State = protocol.TCC_FINISHED
 	t.jb.End(time.Now())
 	if tr.jobIndex+1 < len(tr.pending) {
@@ -187,7 +187,7 @@ func (m *TaskManager) finished(t *JobResource) {
 }
 
 func (m *TaskManager) end(t *TaskResource) {
-	core.AppLog.Debug().Msgf("TASK CANCELED %v", t.canceled)
+	//core.AppLog.Debug().Msgf("TASK CANCELED %v", t.canceled)
 
 	t.resource.Meta.State = protocol.TCC_FINISHED
 	go m.s.updateTask(t, func() {
@@ -235,8 +235,17 @@ func (m *TaskManager) timeout(mkey uint64, meta *protocol.Meta) {
 }
 
 func (m *TaskManager) clearResource(rkey uint64) {
+	tr, ok := m.trs[rkey]
+	if !ok {
+		core.AppLog.Debug().Msgf("no resource existed")
+		return
+	}
 	delete(m.trs, rkey)
-	core.AppLog.Debug().Msgf("task removed %d %d %d", rkey, len(m.tms), len(m.trs))
+	delete(m.tjs, tr.resource.Job.Meta.Id)
+	if tr.resource.Validator != nil && tr.resource.Validator.Meta != nil {
+		delete(m.tjs, tr.resource.Validator.Meta.Id)
+	}
+	core.AppLog.Debug().Msgf("task removed %d %d %d %d", rkey, len(m.tms), len(m.trs), len(m.tjs))
 }
 
 func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
