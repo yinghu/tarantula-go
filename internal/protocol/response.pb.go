@@ -9,6 +9,7 @@ package protocol
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	anypb "google.golang.org/protobuf/types/known/anypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -31,6 +32,8 @@ type Response struct {
 	Meta          *Meta                  `protobuf:"bytes,6,opt,name=meta,proto3" json:"meta,omitempty"`
 	Nodes         []*HashNode            `protobuf:"bytes,7,rep,name=nodes,proto3" json:"nodes,omitempty"`
 	Subscriptions []*Subscription        `protobuf:"bytes,8,rep,name=subscriptions,proto3" json:"subscriptions,omitempty"`
+	// used for http response json
+	Messages      []*anypb.Any `protobuf:"bytes,9,rep,name=messages,proto3" json:"messages,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -121,13 +124,20 @@ func (x *Response) GetSubscriptions() []*Subscription {
 	return nil
 }
 
+func (x *Response) GetMessages() []*anypb.Any {
+	if x != nil {
+		return x.Messages
+	}
+	return nil
+}
+
 var File_response_proto protoreflect.FileDescriptor
 
 const file_response_proto_rawDesc = "" +
 	"\n" +
-	"\x0eresponse.proto\x12\bprotocol\x1a\x0edata_set.proto\x1a\n" +
+	"\x0eresponse.proto\x12\bprotocol\x1a\x19google/protobuf/any.proto\x1a\x0edata_set.proto\x1a\n" +
 	"task.proto\x1a\n" +
-	"meta.proto\x1a\x0fhash_node.proto\x1a\x12subscription.proto\"\xaf\x02\n" +
+	"meta.proto\x1a\x0fhash_node.proto\x1a\x12subscription.proto\"\xe1\x02\n" +
 	"\bResponse\x12\x1e\n" +
 	"\n" +
 	"successful\x18\x01 \x01(\bR\n" +
@@ -138,7 +148,8 @@ const file_response_proto_rawDesc = "" +
 	"\x04task\x18\x05 \x01(\v2\x0e.protocol.TaskR\x04task\x12\"\n" +
 	"\x04meta\x18\x06 \x01(\v2\x0e.protocol.MetaR\x04meta\x12(\n" +
 	"\x05nodes\x18\a \x03(\v2\x12.protocol.HashNodeR\x05nodes\x12<\n" +
-	"\rsubscriptions\x18\b \x03(\v2\x16.protocol.SubscriptionR\rsubscriptionsBP\n" +
+	"\rsubscriptions\x18\b \x03(\v2\x16.protocol.SubscriptionR\rsubscriptions\x120\n" +
+	"\bmessages\x18\t \x03(\v2\x14.google.protobuf.AnyR\bmessagesBP\n" +
 	"\x17com.icodesoftware.protoB\x0fResponseFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -161,6 +172,7 @@ var file_response_proto_goTypes = []any{
 	(*Meta)(nil),         // 3: protocol.Meta
 	(*HashNode)(nil),     // 4: protocol.HashNode
 	(*Subscription)(nil), // 5: protocol.Subscription
+	(*anypb.Any)(nil),    // 6: google.protobuf.Any
 }
 var file_response_proto_depIdxs = []int32{
 	1, // 0: protocol.Response.data:type_name -> protocol.DataSet
@@ -168,11 +180,12 @@ var file_response_proto_depIdxs = []int32{
 	3, // 2: protocol.Response.meta:type_name -> protocol.Meta
 	4, // 3: protocol.Response.nodes:type_name -> protocol.HashNode
 	5, // 4: protocol.Response.subscriptions:type_name -> protocol.Subscription
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	6, // 5: protocol.Response.messages:type_name -> google.protobuf.Any
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_response_proto_init() }

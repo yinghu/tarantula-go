@@ -9,7 +9,9 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 type CSQueryTopic struct {
@@ -44,7 +46,7 @@ func (s *CSQueryTopic) Request(rs core.OnSession, w http.ResponseWriter, r *http
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	ms := make([]proto.Message, 0)
+	ms := make([]*anypb.Any, 0)
 	for {
 		resp, err := stream.Recv()
 		if err == io.EOF {
@@ -55,9 +57,17 @@ func (s *CSQueryTopic) Request(rs core.OnSession, w http.ResponseWriter, r *http
 			break
 		}
 		mf.Set(resp).QList(func(h *protocol.Header, m proto.Message) bool {
-			ms = append(ms, m)
+			r, ok := m.(*anypb.Any)
+			if ok {
+				ms = append(ms, r)
+			}
 			return true
 		})
 	}
-	w.Write(util.ToJson(ms))
+	data, err := protojson.Marshal(&protocol.Response{Messages: ms})
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	w.Write(data)
 }
