@@ -67,7 +67,7 @@ func (c *DataServiceProvider) load(taskId uint64) (*TaskResource, error) {
 	if err != nil {
 		return nil, err
 	}
-	return NewTaskResource(t,resp.Data.List[0].Header.Revision), nil
+	return NewTaskResource(t, resp.Data.List[0].Header.Revision), nil
 }
 
 func (c *DataServiceProvider) updateTask(t *TaskResource, updated ResourceUpdated) {
@@ -87,14 +87,14 @@ func (c *DataServiceProvider) updateTask(t *TaskResource, updated ResourceUpdate
 	req.Data.Header.Revision = t.revision
 	req.Prefix = tb.Hash(c.Mll)
 	req.Opt = core.UPDATE_DATA_REQUEST
-	resp, err := c.runUpdate(req)
+	_, err = c.runUpdate(req)
 	if err != nil {
 		core.AppLog.Warn().Msgf("cannot update %s", err.Error())
 		return
 	}
 	t.revision++
 	suc = true
-	core.AppLog.Info().Msgf("saved %v", resp)
+	//core.AppLog.Info().Msgf("saved %v", resp)
 	//tx, err := c.load(t.resource.Meta.Id)
 	//if err != nil {
 	//core.AppLog.Error().Msgf("no task loaded %s %d", err.Error(), t.resource.Meta.Id)
