@@ -38,8 +38,9 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 	session.Ticket = ticket
 
 	go func() {
-		mf := persistence.NewLoginObjectFactory()
-		kv, err := mf.FromMessage(login, &protocol.Header{FactoryId: core.OBJECT_FACTORY_ID, ClassId: persistence.LOGIN_OBJECT_ID})
+		mf := persistence.NewCommodityObjectFactory()
+		commodity := protocol.Commodity{Name: "gold", TypeId: ""}
+		kv, err := mf.FromMessage(&commodity, mf.Header(persistence.COMMODITY_OBJECT_ID))
 		kv.Key.Array = []byte(login.Name)
 		if err != nil {
 			core.AppLog.Warn().Msgf("failed to request %s", err.Error())
