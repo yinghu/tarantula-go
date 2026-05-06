@@ -76,3 +76,4 @@ func (p *ProtoTopicFactoryObj) Message(topic *protocol.Topic) (proto.Message, er
 func (p *ProtoTopicFactoryObj) Hash(mh core.MessageHash) uint32 {
 	return mh.RingToken(p.Target.Event.Key.Array)
 }
+

@@ -49,3 +49,14 @@ func (p *ProtoObjectFactoryObj) Message(obj *protocol.KeyValue) (any, error) {
 func (p *ProtoObjectFactoryObj) Hash(mh core.MessageHash) uint32 {
 	return mh.RingToken(p.Target.Key.Array)
 }
+
+func (p *ProtoObjectFactoryObj) FromMessage(m proto.Message, h *protocol.Header) (*protocol.KeyValue, error) {
+	kv := protocol.KeyValue{}
+	kv.Key = &protocol.Key{Header: h}
+	obj, err := anypb.New(m)
+	if err != nil {
+		return &kv, err
+	}
+	kv.Message = obj
+	return &kv, nil
+}

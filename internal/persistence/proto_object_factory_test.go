@@ -24,7 +24,8 @@ func TestLoginObjectFactory(t *testing.T) {
 		t.Errorf("factory name should be %s %s", q.QTopic(), LOGIN_OBJECT_FACTORY_NAME)
 	}
 	mo := protocol.LoginObject{Name: "n100", Password: "p100", SystemId: 100, ReferenceId: 1, Id: 2, AccessControl: 3}
-	kv, err := mf.FromLoginObject(&mo)
+	kv, err := mf.FromMessage(&mo, &protocol.Header{FactoryId: core.OBJECT_FACTORY_ID, ClassId: LOGIN_OBJECT_ID})
+	kv.Key.Array = []byte(mo.Name)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
