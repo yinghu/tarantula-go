@@ -77,3 +77,20 @@ func (p *ProtoTopicFactoryObj) Hash(mh core.MessageHash) uint32 {
 	return mh.RingToken(p.Target.Event.Key.Array)
 }
 
+func (p *ProtoTopicFactoryObj) FromMessage(m proto.Message, h *protocol.Header) (*protocol.Topic, error) {
+	tpx := protocol.Topic{}
+	msg := protocol.Event{Key: &protocol.Key{Header: h}}
+	obj, err := anypb.New(m)
+	if err != nil {
+		return &tpx, err
+	}
+	msg.Message = obj
+	tpx.Event = &msg
+	return &tpx, nil
+}
+
+func (p *ProtoTopicFactoryObj) Header(cid uint32) *protocol.Header {
+	h := protocol.Header{FactoryId: core.EVENT_FACTORY_ID}
+	h.ClassId = cid
+	return &h
+}

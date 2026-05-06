@@ -11,5 +11,6 @@ type ProtoTopicFactory interface {
 	Hash(h MessageHash) uint32
 	Topic(data []byte) (*protocol.Topic, error)
 	Message(topic *protocol.Topic) (proto.Message, error)
+	FromMessage(m proto.Message, h *protocol.Header) (*protocol.Topic, error)
 	QueryFactory
 }

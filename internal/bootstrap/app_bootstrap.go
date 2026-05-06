@@ -31,6 +31,7 @@ func AppBootstrap(tcx TarantulaContext) {
 	Register(event.TASK_TOPIC_NAME, func() core.QueryFactory { return event.NewTaskEventFactory() })
 	Register(event.TRANSACTION_TOPIC_NAME, func() core.QueryFactory { return event.NewTransactionEventFactory() })
 	Register(persistence.LOGIN_OBJECT_FACTORY_NAME, func() core.QueryFactory { return persistence.NewLoginObjectFactory() })
+	Register(persistence.COMMODITY_OBJECT_FACTORY_NAME, func() core.QueryFactory { return persistence.NewCommodityObjectFactory() })
 
 	f := core.Env{}
 	err := f.Load(tcx.Config())
@@ -107,7 +108,7 @@ func metricsHandler(auth core.Authenticator, h http.Handler) http.HandlerFunc {
 func Logging(s TarantulaApp) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
-	
+
 		var code int32 = 0
 		defer func() {
 			if s.ClusterMember() {
@@ -153,12 +154,12 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			return
 		}
 		if session.AccessControl < s.AccessControl() {
-			
+
 			code = int32(ILLEGAL_ACCESS_CODE)
 			illegalAccess(w, r)
 			return
 		}
-		
+
 		s.Request(session, w, r)
 	}
 }

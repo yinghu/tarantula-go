@@ -14,7 +14,8 @@ func TestMessageEventFactory(t *testing.T) {
 
 	me := protocol.MessageEvent{Title: "tile", Message: "msg", DateTime: timestamppb.New(time.Now()), Source: "admin"}
 	ptf := NewMessageEventFactory()
-	tp, err := ptf.FromMessageEvent(&me)
+	tp, err := ptf.FromMessage(&me,ptf.Header(MESSAGE_EVENT_CID))
+	tp.Name = MESSAGE_TOPIC_NAME
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}

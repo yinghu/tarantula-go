@@ -36,7 +36,8 @@ func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 		return
 	}
 	core.AppLog.Debug().Msgf("event %v", &me)
-	tp, err := mf.FromMessageEvent(&me)
+	tp, err := mf.FromMessage(&me, mf.Header(event.MESSAGE_EVENT_CID))
+	tp.Name = event.MESSAGE_TOPIC_NAME
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return

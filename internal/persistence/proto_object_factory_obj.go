@@ -10,6 +10,10 @@ import (
 const (
 	LOGIN_OBJECT_ID           uint32 = 1
 	LOGIN_OBJECT_FACTORY_NAME        = "obj_login"
+
+	COMMODITY_OBJECT_ID           uint32 = 2
+	COMMODITY_OBJECT_FACTORY_NAME        = "obj_commodity"
+
 )
 
 type MessageObject func() proto.Message
@@ -59,4 +63,10 @@ func (p *ProtoObjectFactoryObj) FromMessage(m proto.Message, h *protocol.Header)
 	}
 	kv.Message = obj
 	return &kv, nil
+}
+
+func (p *ProtoObjectFactoryObj) Header(cid uint32) *protocol.Header {
+	h := protocol.Header{FactoryId: core.EVENT_FACTORY_ID}
+	h.ClassId = cid
+	return &h
 }
