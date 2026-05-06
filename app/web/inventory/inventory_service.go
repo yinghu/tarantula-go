@@ -33,13 +33,13 @@ func (s *InventoryService) Start(f core.Env) error {
 		}
 	}})
 	s.Cluster().Register("grant", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
-		
-		return nil 
+		core.AppLog.Debug().Msgf("%v", e.Object)
+		return nil
 	}, Confirm: func(e *protocol.Transaction) error {
-		
+
 		return nil
 	}, Cancel: func(e *protocol.Transaction) error {
-		
+
 		return nil
 	}})
 	http.Handle("/inventory/grant", bootstrap.Logging(&InventoryGranter{InventoryService: s}))
