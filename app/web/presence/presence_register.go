@@ -39,7 +39,8 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 
 	go func() {
 		mf := persistence.NewLoginObjectFactory()
-		kv, err := mf.FromLoginObject(login)
+		kv, err := mf.FromMessage(login, &protocol.Header{FactoryId: core.OBJECT_FACTORY_ID, ClassId: persistence.LOGIN_OBJECT_ID})
+		kv.Key.Array = []byte(login.Name)
 		if err != nil {
 			core.AppLog.Warn().Msgf("failed to request %s", err.Error())
 			return
@@ -48,6 +49,7 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 		vb := tb.Validator(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "validator"})
 		vb.Transaction().Meta(&protocol.Meta{Name: "register"}).Object(kv).Build()
 		jb := tb.Job(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "job"})
+
 		jb.Transaction().Meta(&protocol.Meta{Name: "grant"}).Object(kv).Build()
 		rp, _ := s.Cluster().Issue(tb.Build())
 		core.AppLog.Debug().Msgf("TASK %v", rp)
