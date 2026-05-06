@@ -39,7 +39,7 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 
 	go func() {
 		mf := persistence.NewCommodityObjectFactory()
-		commodity := protocol.Commodity{Name: "gold", TypeId: ""}
+		commodity := protocol.Commodity{Name: "gold", TypeId: "balance", Amount: 12, Rechargeable: true}
 		kv, err := mf.FromMessage(&commodity, mf.Header(persistence.COMMODITY_OBJECT_ID))
 		kv.Key.Array = []byte(login.Name)
 		if err != nil {
