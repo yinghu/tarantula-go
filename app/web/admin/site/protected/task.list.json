@@ -17,26 +17,21 @@
         {
             "Name":"AdminTool","ScopeSequence":0,"Icon":"admin_panel_settings",
             "Jobs":[
-                {"Name":"ChangePassword","Form":"/admin/webprotected/change.password.json","Path":"/admin/password","Type":5},
-                {"Name":"AddLogin","Form":"/admin/webprotected/add.login.json","Path":"/admin/login/add","Type":5},
-                {"Name":"ParseSnowFlakeId","Form":"/admin/webprotected/parse.snow.flake.id.json","Path":"/admin/snowflake/parse","Type":5},
-                {"Name":"AddTopic","Form":"/admin/webprotected/admin.add.topic.json","Path":"/admin/topic/subscribe","Type":5},
-                {"Name":"CreateAccessKey","Form":"/admin/webprotected/admin.create.access.key.json","Path":"/admin/accesskey","Type":12}
+                {"Name":"CreateAccessKey","Type":200}
             ]        
         },
         {
             "Name":"CSTool","ScopeSequence":0,"Icon":"support",
             "Jobs":[
-                {"Name":"SendTopic","Type":13},
-                {"Name":"QueryTopic","Type":14},
-                {"Name":"QueryObject","Type":15}
+                {"Name":"SendTopic","Type":300},
+                {"Name":"QueryTopic","Type":301},
+                {"Name":"QueryObject","Type":301}
             ]        
         },
         {
             "Name":"APITool","ScopeSequence":0,"Icon":"api","Callback":"on_player_login",
             "Jobs":[
-                {"Name":"Register","Type":16},
-                {"Name":"Login","Form":"/admin/login.json","Path":"/presence/login","Type":5}
+                {"Name":"Register","Type":500}
             ]        
         }
         

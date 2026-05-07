@@ -64,11 +64,7 @@ func (s *AdminService) Start(f core.Env) error {
 
 	http.Handle("/admin/cs/query/topic/{topic}", bootstrap.Logging(&CSQueryTopic{AdminService: s}))
 	http.Handle("/admin/cs/query/object/{topic}", bootstrap.Logging(&CSQueryObject{AdminService: s}))
-	http.Handle("/admin/cs/inventory/grant", bootstrap.Logging(&CSGranter{AdminService: s}))
-	http.Handle("/admin/cs/inventory/load", bootstrap.Logging(&CSInventoryLoader{AdminService: s}))
-
-
-	http.Handle("/admin/view/{id}", bootstrap.Logging(&AdminItemViewer{AdminService: s}))
+	
 	http.Handle("/admin/repo/sync", bootstrap.Logging(&AdminPublisher{AdminService: s}))
 	http.Handle("/admin/env", bootstrap.Logging(&AdminEnv{AdminService: s}))
 	http.Handle("/admin/snowflake/parse", bootstrap.Logging(&AdminParseSnowFlakeId{AdminService: s}))
