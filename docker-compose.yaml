@@ -80,7 +80,6 @@ services:
     depends_on:
       - asset
       - inventory
-      - tournament
       - mahjong
       - presence
     networks:
