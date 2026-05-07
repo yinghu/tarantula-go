@@ -36,11 +36,6 @@ IF %ERRORLEVEL% NEQ 0 (
     @echo "build failed, try again"
     goto Clean
 )
-docker build -f .\docker_application_build --tag tarantula.mahjong:%version% --build-arg app=mahjong .
-IF %ERRORLEVEL% NEQ 0 ( 
-    @echo "build failed, try again"
-    goto Clean
-)
 docker build -f .\docker_prometheus_node_exporter_build --tag tarantula.node:%version% .
 IF %ERRORLEVEL% NEQ 0 ( 
     @echo "build failed, try again"

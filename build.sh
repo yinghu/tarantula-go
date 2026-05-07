@@ -26,7 +26,7 @@ cp ~/.ssh/id_ed25519 .
 cp ~/.ssh/known_hosts .
 cp ~/.gitconfig .
 cp ~/token.txt .
-apps=("admin" "presence" "inventory" "asset" "postoffice" "mahjong")
+apps=("admin" "presence" "inventory" "asset" "postoffice")
 for app in "${apps[@]}"; do
   echo "Current build target : $app"
   sudo docker build -f ./docker_application_build --tag tarantula.$app:$version --build-arg app=$app .
