@@ -12,13 +12,12 @@ const (
 	//query with tag
 	TAG_MESSAGE_QID    uint32 = 0
 	TAG_LOGIN_QID      uint32 = 1
-	TAG_TOURNAMENT_QID uint32 = 2
+
 	TAG_INVENTORY_QID  uint32 = 3
 	TAG_KICKOFF_QID    uint32 = 4
 	TAG_REGISTER_QID   uint32 = 5
 
 	//query criteria
-	Q_TOURNAMENT_QID uint32 = 100
 	QT_SCORE_QID     uint32 = 101
 
 	RING_PULL_QID uint32 = 200

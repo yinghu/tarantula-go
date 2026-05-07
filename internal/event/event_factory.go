@@ -7,9 +7,9 @@ const (
 	STAT_CID             uint32 = 1
 	LOGIN_CID            uint32 = 2
 	MESSAGE_CID          uint32 = 3
-	TOURNAMENT_CID       uint32 = 4
+
 	SUBSCRIPTION_CID     uint32 = 5
-	TOURNAMENT_SCORE_CID uint32 = 6
+	
 	INVENTORY_CID        uint32 = 7
 	JOIN_CID             uint32 = 8
 	KICKOFF_CID          uint32 = 9
@@ -17,7 +17,7 @@ const (
 
 	LOGIN_ETAG        string = "lgn"
 	MESSAGE_ETAG      string = "msg"
-	TOURNAMENT_ETAG   string = "tmt"
+
 	SUBSCRIPTION_ETAG string = "sub"
 	INVENTORY_ETAG    string = "inv"
 	JOIN_ETAG         string = "join"
@@ -31,12 +31,9 @@ const (
 
 func CreateEvent(cid uint32) core.Event {
 	switch cid {
-	case TOURNAMENT_CID:
-		return &TournamentEvent{}
+	
 	case SUBSCRIPTION_CID:
 		return &SubscriptionEvent{}
-	case TOURNAMENT_SCORE_CID:
-		return &TournamentScoreIndex{}
 	case INVENTORY_CID:
 		return &InventoryEvent{}
 	case JOIN_CID:
