@@ -52,21 +52,7 @@ services:
     networks:
       - tarantula-app-net
     env_file:
-      - .env  
-  tournament:
-    stop_grace_period: 20s
-    restart: unless-stopped
-    container_name: tournament
-    hostname: tournament
-    image: tarantula.tournament:${VERSION}
-    volumes:
-      - volume_tournament:/home/tarantula/tournament
-    depends_on:
-      - postoffice    
-    networks:
-      - tarantula-app-net
-    env_file:
-      - .env  
+      - .env   
   mahjong:
     stop_grace_period: 20s
     restart: unless-stopped
@@ -143,7 +129,6 @@ volumes:
   volume_presence:
   volume_asset:
   volume_inventory:
-  volume_tournament:
   volume_admin:
   volume_mahjong:
   volume_prometheus:

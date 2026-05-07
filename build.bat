@@ -31,11 +31,6 @@ IF %ERRORLEVEL% NEQ 0 (
     @echo "build failed, try again"
     goto Clean
 )
-docker build -f .\docker_application_build --tag tarantula.tournament:%version% --build-arg app=tournament . 
-IF %ERRORLEVEL% NEQ 0 ( 
-    @echo "build failed, try again"
-    goto Clean
-)
 docker build -f .\docker_application_build --tag tarantula.postoffice:%version% --build-arg app=postoffice .
 IF %ERRORLEVEL% NEQ 0 ( 
     @echo "build failed, try again"
