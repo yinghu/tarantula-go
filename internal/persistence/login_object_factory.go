@@ -27,7 +27,7 @@ type LoginObjectFactory struct {
 
 func (p *LoginObjectFactory) FromLoginObject(login *protocol.LoginObject) (*protocol.KeyValue, error) {
 	kv := protocol.KeyValue{}
-	kv.Key = &protocol.Key{Array: []byte(login.Name), Header: &protocol.Header{FactoryId: core.OBJECT_FACTORY_ID, ClassId: LOGIN_OBJECT_ID, Mutable: true}}
+	kv.Key = &protocol.Key{Array: []byte(login.Name), Header: &protocol.Header{FactoryId: core.OBJECT_FACTORY_ID, ClassId: LOGIN_OBJECT_ID, Updatable: true}}
 	obj, err := anypb.New(login)
 	if err != nil {
 		return &kv, err

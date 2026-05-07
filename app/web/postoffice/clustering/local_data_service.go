@@ -17,7 +17,7 @@ func (m *DataServiceProvider) create(sd SetData) (KeyIndex, error) {
 	ki.Header.Revision = 1
 	ki.Header.Timestamp = uint64(time.Now().UnixMilli())
 	ki.Header.Size = uint32(len(sd.Value))
-	ki.Header.Mutable = sd.Header.Mutable
+	ki.Header.Updatable = sd.Header.Updatable
 	sd.Header.Revision = ki.Header.Revision
 	k, v, err := ki.Pair()
 	if err != nil {
@@ -62,8 +62,8 @@ func (m *DataServiceProvider) update(sd SetData) (KeyIndex, error) {
 		}); err != nil {
 			return err
 		}
-		if !ki.Header.Mutable {
-			return fmt.Errorf("cannot update on immutable %v", ki.Header.Mutable)
+		if !ki.Header.Updatable {
+			return fmt.Errorf("cannot update on immutable %v", ki.Header.Updatable)
 		}
 		if ki.Header.Revision != rev {
 			return fmt.Errorf("revison not matched %d %d", ki.Header.Revision, rev)
@@ -104,8 +104,8 @@ func (m *DataServiceProvider) delete(sd SetData) (KeyIndex, error) {
 		}); err != nil {
 			return err
 		}
-		if !ki.Header.Mutable {
-			return fmt.Errorf("cannot delete on immutable %v", ki.Header.Mutable)
+		if !ki.Header.Updatable {
+			return fmt.Errorf("cannot delete on immutable %v", ki.Header.Updatable)
 		}
 		if ki.Header.State == core.DATA_STATE_DELETED {
 			return fmt.Errorf("already deleted on %d", ki.Header.State)
@@ -165,7 +165,7 @@ func (m *DataServiceProvider) get(gd GetData) (*protocol.Data, error) {
 			data.Header.Revision = ki.Header.Revision
 			data.Header.Timestamp = ki.Header.Timestamp
 			data.Header.Size = ki.Header.Size
-			data.Header.Mutable = ki.Header.Mutable
+			data.Header.Updatable = ki.Header.Updatable
 			return nil
 		})
 	})
@@ -189,8 +189,8 @@ func (m *DataServiceProvider) reset(sd SetData) (KeyIndex, error) {
 		}); err != nil {
 			return err
 		}
-		if !ki.Header.Mutable {
-			return fmt.Errorf("cannot reset on immutable %v", ki.Header.Mutable)
+		if !ki.Header.Updatable {
+			return fmt.Errorf("cannot reset on immutable %v", ki.Header.Updatable)
 		}
 		ki.Header.Revision = 1
 		ki.Header.Timestamp = uint64(time.Now().UnixMilli())
@@ -238,7 +238,7 @@ func (m *DataServiceProvider) pull(from, to uint32, ch grpc.ServerStreamingServe
 			if ki.Header.State == core.DATA_STATE_DELETED {
 				key, _ := ki.lookupDataKey()
 				kz := len(key)
-				vdata := protocol.Data{Key: key[12 : kz-8], Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Mutable: ki.Header.Mutable, State: ki.Header.State}}
+				vdata := protocol.Data{Key: key[12 : kz-8], Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Updatable: ki.Header.Updatable, State: ki.Header.State}}
 				data = append(data, &vdata)
 				if len(data) == PULL_BATCH_SIZE {
 					resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}
@@ -262,7 +262,7 @@ func (m *DataServiceProvider) pull(from, to uint32, ch grpc.ServerStreamingServe
 					vitem.Value(func(val []byte) error {
 						fv := append([]byte{}, val...)
 						kz := len(key)
-						vdata := protocol.Data{Key: key[12 : kz-8], Value: fv, Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Mutable: ki.Header.Mutable, State: ki.Header.State}}
+						vdata := protocol.Data{Key: key[12 : kz-8], Value: fv, Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Updatable: ki.Header.Updatable, State: ki.Header.State}}
 
 						data = append(data, &vdata)
 						if len(data) == PULL_BATCH_SIZE {
@@ -289,7 +289,7 @@ func (m *DataServiceProvider) pull(from, to uint32, ch grpc.ServerStreamingServe
 					vitem.Value(func(val []byte) error {
 						fv := append([]byte{}, val...)
 						kz := len(key)
-						vdata := protocol.Data{Key: key[12 : kz-8], Value: fv, Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Mutable: ki.Header.Mutable, State: ki.Header.State}}
+						vdata := protocol.Data{Key: key[12 : kz-8], Value: fv, Header: &protocol.Header{FactoryId: ki.Header.FactoryId, ClassId: ki.Header.ClassId, Revision: ki.Header.Revision, Timestamp: ki.Header.Timestamp, Updatable: ki.Header.Updatable, State: ki.Header.State}}
 						data = append(data, &vdata)
 						if len(data) == PULL_BATCH_SIZE {
 							resp := protocol.Response{Successful: true, Data: &protocol.DataSet{List: data}}

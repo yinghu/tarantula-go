@@ -28,7 +28,7 @@ type Header struct {
 	ClassId       uint32                 `protobuf:"fixed32,3,opt,name=classId,proto3" json:"classId,omitempty"`
 	Timestamp     uint64                 `protobuf:"fixed64,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	Size          uint32                 `protobuf:"fixed32,5,opt,name=size,proto3" json:"size,omitempty"`
-	Mutable       bool                   `protobuf:"varint,6,opt,name=mutable,proto3" json:"mutable,omitempty"`
+	Updatable     bool                   `protobuf:"varint,6,opt,name=updatable,proto3" json:"updatable,omitempty"`
 	State         uint32                 `protobuf:"fixed32,7,opt,name=state,proto3" json:"state,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -99,9 +99,9 @@ func (x *Header) GetSize() uint32 {
 	return 0
 }
 
-func (x *Header) GetMutable() bool {
+func (x *Header) GetUpdatable() bool {
 	if x != nil {
-		return x.Mutable
+		return x.Updatable
 	}
 	return false
 }
@@ -117,14 +117,14 @@ var File_header_proto protoreflect.FileDescriptor
 
 const file_header_proto_rawDesc = "" +
 	"\n" +
-	"\fheader.proto\x12\bprotocol\"\xbe\x01\n" +
+	"\fheader.proto\x12\bprotocol\"\xc2\x01\n" +
 	"\x06Header\x12\x1a\n" +
 	"\brevision\x18\x01 \x01(\x06R\brevision\x12\x1c\n" +
 	"\tfactoryId\x18\x02 \x01(\aR\tfactoryId\x12\x18\n" +
 	"\aclassId\x18\x03 \x01(\aR\aclassId\x12\x1c\n" +
 	"\ttimestamp\x18\x04 \x01(\x06R\ttimestamp\x12\x12\n" +
-	"\x04size\x18\x05 \x01(\aR\x04size\x12\x18\n" +
-	"\amutable\x18\x06 \x01(\bR\amutable\x12\x14\n" +
+	"\x04size\x18\x05 \x01(\aR\x04size\x12\x1c\n" +
+	"\tupdatable\x18\x06 \x01(\bR\tupdatable\x12\x14\n" +
 	"\x05state\x18\a \x01(\aR\x05stateBN\n" +
 	"\x17com.icodesoftware.protoB\rHeaderFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 

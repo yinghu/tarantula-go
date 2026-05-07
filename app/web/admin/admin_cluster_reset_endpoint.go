@@ -35,7 +35,7 @@ func (s *AdminClusterReset) Request(rs core.OnSession, w http.ResponseWriter, r 
 	//req.FactoryId = co.FactoryId()
 	//req.ClassId = co.ClassId()
 	//req.Mutable = co.Mutable
-	q := protocol.Request{Opt: core.RESET_DATA_REQUEST, Data: &protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: co.FactoryId(), ClassId: co.ClassId(), Mutable: co.Mutable}}}
+	q := protocol.Request{Opt: core.RESET_DATA_REQUEST, Data: &protocol.Data{Key: k, Value: v, Header: &protocol.Header{FactoryId: co.FactoryId(), ClassId: co.ClassId(), Updatable: co.Mutable}}}
 	resp, err := s.Cluster().Request(&q)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
