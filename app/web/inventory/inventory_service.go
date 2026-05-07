@@ -36,6 +36,7 @@ func (s *InventoryService) Start(f core.Env) error {
 	}})
 	s.Cluster().Register("grant", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
 		mf := persistence.NewCommodityObjectFactory()
+		core.AppLog.Debug().Msgf("SYSTEMID %d", s.ToSystemId(e.Object.Key.Array))
 		obj, err := mf.Message(e.Object)
 		if err != nil {
 			core.AppLog.Warn().Msgf("wrong decode format %s", err)

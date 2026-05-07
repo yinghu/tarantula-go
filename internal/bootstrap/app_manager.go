@@ -75,7 +75,7 @@ func (s *AppManager) Start(f core.Env) error {
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
 	if f.Pgs.Enabled {
-		core.AppLog.Info().Msgf("connecting sql %s",f.Pgs.DatabaseURL)
+		core.AppLog.Info().Msgf("connecting sql %s", f.Pgs.DatabaseURL)
 		dbCreate := persistence.Postgresql{Url: f.Pgs.DatabaseURL + "/postgres"}
 		err := dbCreate.CreateDatabase(fmt.Sprintf("CREATE DATABASE %s_%s_%s", f.Prefix, "tarantula", f.GroupName))
 		if err != nil {
@@ -198,4 +198,20 @@ func (c *AppManager) initLogger(f core.Env) {
 	core.AppLog = zerolog.New(zerolog.MultiLevelWriter(c)).With().Timestamp().Logger().Hook(c)
 	core.AppLog.Info().Msg("Initialized app log")
 
+}
+
+func (c *AppManager) ToBytes(systemId uint64) []byte {
+	buff := core.NewBuffer(8)
+	buff.WriteUInt64(systemId)
+	buff.Flip()
+	key, _ := buff.Read(0)
+	return key
+}
+
+func (c *AppManager) ToSystemId(key []byte) int64 {
+	buff := core.NewBuffer(8)
+	buff.Write(key)
+	buff.Flip()
+	sysId, _ := buff.ReadUInt64()
+	return int64(sysId)
 }

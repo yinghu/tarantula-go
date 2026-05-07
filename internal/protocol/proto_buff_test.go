@@ -51,7 +51,7 @@ func TestEvent(t *testing.T) {
 
 func TestLoginObject(t *testing.T) {
 	login := LoginObject{Name: "p100", Password: "password", SystemId: 100, Id: 2, ReferenceId: 1, AccessControl: 0}
-	k := Key{Array: []byte(login.Name), Header: &Header{FactoryId: 10, ClassId: 2, Mutable: true}}
+	k := Key{Array: []byte(login.Name), Header: &Header{FactoryId: 10, ClassId: 2, Updatable: true}}
 	v, err := anypb.New(&login)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())

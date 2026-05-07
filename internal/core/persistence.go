@@ -22,8 +22,8 @@ func ToBytes(seq Sequence) []byte {
 		key, _ := buff.Read(0)
 		return key
 	}
-
 }
+
 
 func Export(obj Persistentable, buffSize int) ([]byte, []byte, error) {
 	buff := NewBuffer(buffSize)

@@ -41,7 +41,7 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 		mf := persistence.NewCommodityObjectFactory()
 		commodity := protocol.Commodity{Name: "gold", TypeId: "balance", Amount: 12, Rechargeable: true}
 		kv, err := mf.FromMessage(&commodity, mf.Header(persistence.COMMODITY_OBJECT_ID))
-		kv.Key.Array = []byte(login.Name)
+		kv.Key.Array = s.ToBytes(login.SystemId)
 		if err != nil {
 			core.AppLog.Warn().Msgf("failed to request %s", err.Error())
 			return
