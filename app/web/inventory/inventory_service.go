@@ -51,10 +51,10 @@ func (s *InventoryService) Start(f core.Env) error {
 		core.AppLog.Debug().Msgf("%v", m)
 		return nil
 	}, Confirm: func(e *protocol.Transaction) error {
-
+		core.AppLog.Debug().Msgf("C META %v", e.Meta)
 		return nil
 	}, Cancel: func(e *protocol.Transaction) error {
-
+		core.AppLog.Debug().Msgf("N META %v", e.Meta)
 		return nil
 	}})
 	http.Handle("/inventory/grant", bootstrap.Logging(&InventoryGranter{InventoryService: s}))
