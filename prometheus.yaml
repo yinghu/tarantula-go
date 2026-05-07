@@ -34,10 +34,4 @@
           - targets: ['inventory:8080']
         bearer_token_file: '/etc/prometheus/token.txt'
 
-      - job_name: 'tarantula.mahjong'
-        metrics_path: /mahjong/metrics
-        static_configs:
-          - targets: ['mahjong:8080']
-        bearer_token_file: '/etc/prometheus/token.txt'  
-
           
