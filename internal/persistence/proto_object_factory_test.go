@@ -24,7 +24,8 @@ func TestLoginObjectFactory(t *testing.T) {
 		t.Errorf("factory name should be %s %s", q.QTopic(), LOGIN_OBJECT_FACTORY_NAME)
 	}
 	mo := protocol.LoginObject{Name: "n100", Password: "p100", SystemId: 100, ReferenceId: 1, Id: 2, AccessControl: 3}
-	kv, err := mf.FromLoginObject(&mo)
+	kv, err := mf.FromMessage(&mo, &protocol.Header{FactoryId: core.OBJECT_FACTORY_ID, ClassId: LOGIN_OBJECT_ID})
+	kv.Key.Array = []byte(mo.Name)
 	if err != nil {
 		t.Errorf("should not be error %s", err.Error())
 	}
@@ -34,8 +35,8 @@ func TestLoginObjectFactory(t *testing.T) {
 	if kv.Key.Header.ClassId != LOGIN_OBJECT_ID {
 		t.Errorf("class id %d", kv.Key.Header.ClassId)
 	}
-	if !kv.Key.Header.Mutable {
-		t.Errorf("mutable %v", kv.Key.Header.Mutable)
+	if !kv.Key.Header.Updatable {
+		t.Errorf("mutable %v", kv.Key.Header.Updatable)
 	}
 	req, err := mf.Request(kv)
 	if err != nil {

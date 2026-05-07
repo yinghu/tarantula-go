@@ -9,6 +9,7 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
+	"google.golang.org/protobuf/proto"
 )
 
 type CSQueryObject struct {
@@ -44,7 +45,7 @@ func (s *CSQueryObject) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	ms := make([]any, 0)
+	ms := make([]proto.Message, 0)
 	for {
 		resp, err := stream.Recv()
 		if err == io.EOF {
@@ -54,7 +55,7 @@ func (s *CSQueryObject) Request(rs core.OnSession, w http.ResponseWriter, r *htt
 			core.AppLog.Warn().Msgf("streaming error %s", err.Error())
 			break
 		}
-		mf.Set(resp).QList(func(h *protocol.Header, m any) bool {
+		mf.Set(resp).QList(func(h *protocol.Header, m proto.Message) bool {
 			ms = append(ms, m)
 			return true
 		})

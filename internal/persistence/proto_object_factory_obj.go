@@ -10,6 +10,10 @@ import (
 const (
 	LOGIN_OBJECT_ID           uint32 = 1
 	LOGIN_OBJECT_FACTORY_NAME        = "obj_login"
+
+	COMMODITY_OBJECT_ID           uint32 = 2
+	COMMODITY_OBJECT_FACTORY_NAME        = "obj_commodity"
+
 )
 
 type MessageObject func() proto.Message
@@ -48,4 +52,21 @@ func (p *ProtoObjectFactoryObj) Message(obj *protocol.KeyValue) (any, error) {
 }
 func (p *ProtoObjectFactoryObj) Hash(mh core.MessageHash) uint32 {
 	return mh.RingToken(p.Target.Key.Array)
+}
+
+func (p *ProtoObjectFactoryObj) FromMessage(m proto.Message, h *protocol.Header) (*protocol.KeyValue, error) {
+	kv := protocol.KeyValue{}
+	kv.Key = &protocol.Key{Header: h}
+	obj, err := anypb.New(m)
+	if err != nil {
+		return &kv, err
+	}
+	kv.Message = obj
+	return &kv, nil
+}
+
+func (p *ProtoObjectFactoryObj) Header(cid uint32) *protocol.Header {
+	h := protocol.Header{FactoryId: core.EVENT_FACTORY_ID}
+	h.ClassId = cid
+	return &h
 }

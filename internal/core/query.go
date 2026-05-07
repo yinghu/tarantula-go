@@ -4,9 +4,10 @@ import (
 	"time"
 
 	"gameclustering.com/internal/protocol"
+	"google.golang.org/protobuf/proto"
 )
 
-type List func(h *protocol.Header, m any) bool
+type List func(h *protocol.Header, m proto.Message) bool
 
 type Query interface {
 	QId() string

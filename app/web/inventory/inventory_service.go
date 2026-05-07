@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
+	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/protobuf/proto"
 )
@@ -33,13 +35,26 @@ func (s *InventoryService) Start(f core.Env) error {
 		}
 	}})
 	s.Cluster().Register("grant", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
-		
-		return nil 
+		mf := persistence.NewCommodityObjectFactory()
+		core.AppLog.Debug().Msgf("SYSTEMID %d", s.ToSystemId(e.Object.Key.Array))
+		core.AppLog.Debug().Msgf("META %v", e.Meta)
+
+		obj, err := mf.Message(e.Object)
+		if err != nil {
+			core.AppLog.Warn().Msgf("wrong decode format %s", err)
+			return err
+		}
+		m, ok := obj.(*protocol.Commodity)
+		if !ok {
+			return fmt.Errorf("wrong data passed from task")
+		}
+		core.AppLog.Debug().Msgf("%v", m)
+		return nil
 	}, Confirm: func(e *protocol.Transaction) error {
-		
+		core.AppLog.Debug().Msgf("C META %v", e.Meta)
 		return nil
 	}, Cancel: func(e *protocol.Transaction) error {
-		
+		core.AppLog.Debug().Msgf("N META %v", e.Meta)
 		return nil
 	}})
 	http.Handle("/inventory/grant", bootstrap.Logging(&InventoryGranter{InventoryService: s}))
