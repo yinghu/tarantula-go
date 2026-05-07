@@ -1,61 +1,6 @@
 {
     "Tasks":[
         {
-            "Name":"Asset","ScopeSequence":1,"Icon":"videogame_asset",    
-            "Jobs":[
-                {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}         
-            ]
-        },
-        {
-            "Name":"Component","ScopeSequence":2,"Icon":"component_exchange",
-            "Jobs":[
-                {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}          
-            ]    
-        },
-        {
-            "Name":"Commodity","ScopeSequence":3,"Icon":"inventory_2",
-            "Jobs":[
-                {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}        
-            ]        
-        },
-        {
-            "Name":"Item","ScopeSequence":4,"Icon":"package_2",
-            "Jobs":[
-               {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}           
-            ]        
-        },
-        {
-            "Name":"Store","ScopeSequence":5,"Icon":"shopping_cart",
-            "Jobs":[
-                {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}          
-            ]        
-        },
-        {
-            "Name":"Tournament","ScopeSequence":5,"Icon":"trophy",
-            "Jobs":[
-                {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}           
-            ]        
-        },
-        {
-            "Name":"Resource","ScopeSequence":5,"Icon":"extension",
-            "Jobs":[
-                {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3},
-                {"Name":"List Product","Type":5},{"Name":"Save Product","Type":5}          
-            ]        
-        },
-        {
-            "Name":"Achievement","ScopeSequence":5,"Icon":"award_star",
-            "Jobs":[
-                {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}             
-            ]        
-        },
-        {
-            "Name":"DailyLogin","ScopeSequence":5,"Icon":"commute",
-            "Jobs":[
-               {"Name":"New Enum","Type":5},{"Name":"New Category","Type":4},{"Name":"Edit","Type":3}         
-            ]        
-        },
-        {
             "Name":"Cloud","ScopeSequence":5,"Icon":"cloud",
             "Jobs":[
                 {"Name":"TokenRing","Type":100},
@@ -75,7 +20,6 @@
                 {"Name":"ChangePassword","Form":"/admin/webprotected/change.password.json","Path":"/admin/password","Type":5},
                 {"Name":"AddLogin","Form":"/admin/webprotected/add.login.json","Path":"/admin/login/add","Type":5},
                 {"Name":"ParseSnowFlakeId","Form":"/admin/webprotected/parse.snow.flake.id.json","Path":"/admin/snowflake/parse","Type":5},
-                {"Name":"SyncRepo","Form":"/admin/webprotected/sync.repository.json","Path":"/admin/repo/sync","Type":5},
                 {"Name":"AddTopic","Form":"/admin/webprotected/admin.add.topic.json","Path":"/admin/topic/subscribe","Type":5},
                 {"Name":"CreateAccessKey","Form":"/admin/webprotected/admin.create.access.key.json","Path":"/admin/accesskey","Type":12}
             ]        
@@ -85,25 +29,14 @@
             "Jobs":[
                 {"Name":"SendTopic","Type":13},
                 {"Name":"QueryTopic","Type":14},
-                {"Name":"QueryObject","Type":15},
-                {"Name":"QueryTournament","Form":"/admin/webprotected/cs.query.tournament.json","Path":"/admin/cs/query","Query":["Id"],"Type":5},
-                {"Name":"QueryTournamentJoin","Form":"/admin/webprotected/cs.query.tournament.join.json","Path":"/admin/cs/query","Query":["Id"],"Type":5},
-                {"Name":"InventroyGrant","Form":"/admin/webprotected/cs.inventory.grant.json","Path":"/admin/cs/inventory/grant","Type":5},
-                {"Name":"InventroyLoad","Form":"/admin/webprotected/cs.inventory.load.json","Path":"/admin/cs/inventory/load","Type":5}
+                {"Name":"QueryObject","Type":15}
             ]        
         },
         {
             "Name":"APITool","ScopeSequence":0,"Icon":"api","Callback":"on_player_login",
             "Jobs":[
                 {"Name":"Register","Type":16},
-                {"Name":"Login","Form":"/admin/login.json","Path":"/presence/login","Type":5},
-                {"Name":"ViewItem","Form":"/admin/webprotected/view.item.json","Path":"/presence/login","Type":5},
-                {"Name":"TournamentList","Path":"/tournament/list","Type":5},
-                {"Name":"TournamentJoin","Form":"/admin/webprotected/tournament.join.json","Path":"/tournament/join","Type":5},
-                {"Name":"TournamentScore","Form":"/admin/webprotected/tournament.score.json","Path":"/tournament/score","Payload":"TournamentJoin","Type":5},
-                {"Name":"TournamentRaceBoard","Path":"/tournament/raceboard","Payload":"TournamentJoin","Type":5},
-                {"Name":"InventroyLoad","Form":"/admin/webprotected/cs.inventory.load.json","Path":"/inventory/load","Type":5},
-                {"Name":"MahjongTable","Path":"/mahjong/table","Type":5}
+                {"Name":"Login","Form":"/admin/login.json","Path":"/presence/login","Type":5}
             ]        
         }
         
