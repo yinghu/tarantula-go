@@ -21,9 +21,7 @@ func (s *InventoryService) Config() string {
 }
 
 func (s *InventoryService) Start(f core.Env) error {
-	s.ItemUpdater = s
 	s.AppManager.Start(f)
-	s.createSchema()
 	s.Cluster().Subscribe(event.MESSAGE_TOPIC_NAME, &protocol.TopicEventListener{C: func() proto.Message {
 		return &protocol.MessageEvent{}
 	}, M: func(m proto.Message) {
@@ -57,8 +55,6 @@ func (s *InventoryService) Start(f core.Env) error {
 		core.AppLog.Debug().Msgf("N META %v", e.Meta)
 		return nil
 	}})
-	http.Handle("/inventory/grant", bootstrap.Logging(&InventoryGranter{InventoryService: s}))
-	http.Handle("/inventory/load", bootstrap.Logging(&InventoryLoader{InventoryService: s}))
 	http.Handle("/inventory/cluster/update", bootstrap.Logging(&InventoryClusterUpdate{InventoryService: s}))
 	return nil
 }
