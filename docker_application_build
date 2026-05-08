@@ -17,19 +17,19 @@ RUN addgroup -S tarantula && adduser -S tarantula -G tarantula
 RUN mkdir /etc/tarantula 
 COPY app/web/${app}/${app}-conf.json /etc/tarantula/${app}-conf.json
 RUN mkdir /home/tarantula/${app}
-RUN mkdir /home/tarantula/.ssh
-RUN chown -R tarantula /home/tarantula/.ssh
+#RUN mkdir /home/tarantula/.ssh
+#RUN chown -R tarantula /home/tarantula/.ssh
 RUN chown -R tarantula /home/tarantula/${app}   
-COPY --from=builder /build/id_ed25519 /home/tarantula/.ssh
-COPY --from=builder /build/known_hosts /home/tarantula/.ssh
-COPY --from=builder /build/.gitconfig /home/tarantula
-RUN chown tarantula /home/tarantula/.ssh/id_ed25519
-RUN chown tarantula /home/tarantula/.ssh/known_hosts
-RUN chown tarantula /home/tarantula/.gitconfig
+#COPY --from=builder /build/id_ed25519 /home/tarantula/.ssh
+#COPY --from=builder /build/known_hosts /home/tarantula/.ssh
+#COPY --from=builder /build/.gitconfig /home/tarantula
+#RUN chown tarantula /home/tarantula/.ssh/id_ed25519
+#RUN chown tarantula /home/tarantula/.ssh/known_hosts
+#RUN chown tarantula /home/tarantula/.gitconfig
 
 USER tarantula
-WORKDIR /home/tarantula/.ssh
-RUN chmod 700 id_ed25519
+#WORKDIR /home/tarantula/.ssh
+#RUN chmod 700 id_ed25519
 
 # Application Install
 WORKDIR /home/tarantula/bin
