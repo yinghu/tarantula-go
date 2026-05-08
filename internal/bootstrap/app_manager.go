@@ -22,7 +22,6 @@ type AppManager struct {
 	seq         core.Sequence
 	ItemUpdater core.ItemListener
 	tcpPusher   core.Pusher
-	ManagedApps []string
 	cluster     *ClusterManager
 	event       *EventManager
 	log         io.Writer //zerolog.Logger
@@ -71,7 +70,6 @@ func (s *AppManager) Start(f core.Env) error {
 	s.initLogger(f)
 	core.AppLog.Info().Msgf("app manager starting on %s %v\n", f.Prefix, f)
 	s.event = &EventManager{App: s}
-	s.ManagedApps = f.ManagedApps
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
 	if f.Pgs.Enabled {
