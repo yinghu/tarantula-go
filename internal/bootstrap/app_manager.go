@@ -20,20 +20,15 @@ type AppManager struct {
 	Sql         persistence.Postgresql
 	F           core.Env
 	seq         core.Sequence
-	//ItemUpdater core.ItemListener
-	tcpPusher   core.Pusher
+	
 	cluster     *ClusterManager
-	event       *EventManager
+	
 	log         io.Writer //zerolog.Logger
 	forward     LogForwarder
 	threshold   zerolog.Level
 }
 
 
-
-func (s *AppManager) Pusher() core.Pusher {
-	return s.tcpPusher
-}
 
 func (s *AppManager) Authenticator() core.Authenticator {
 	return s.Auth
@@ -45,9 +40,7 @@ func (s *AppManager) Sequence() core.Sequence {
 func (c *AppManager) Cluster() core.ClusterService {
 	return c.cluster
 }
-func (c *AppManager) Event() core.EventService {
-	return c.event
-}
+
 
 func (s *AppManager) NodeId() string {
 	return s.F.NodeName
@@ -64,7 +57,6 @@ func (s *AppManager) Start(f core.Env) error {
 	s.F = f
 	s.initLogger(f)
 	core.AppLog.Info().Msgf("app manager starting on %s %v\n", f.Prefix, f)
-	s.event = &EventManager{App: s}
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
 	if f.Pgs.Enabled {
@@ -80,8 +72,6 @@ func (s *AppManager) Start(f core.Env) error {
 			return err
 		}
 		s.Sql = sql
-		//gitStore := persistence.GitItemStore{RepositoryDir: f.HomeDir + "/bin/tarantula", JsonRequester: s}
-		//gitStore.Start()
 	}
 	if f.IsClusterMember {
 		return nil

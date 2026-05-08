@@ -44,10 +44,7 @@ type TarantulaService interface {
 	
 	Authenticator() core.Authenticator
 	Sequence() core.Sequence
-	
-	Pusher() core.Pusher
 	Cluster() core.ClusterService
-	Event() core.EventService
 	RegisterLogForwarder(threshold zerolog.Level, logf LogForwarder)
 }
 

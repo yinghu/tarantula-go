@@ -58,6 +58,3 @@ func (s *PresenceService) Shutdown() {
 	core.AppLog.Printf("Presence service shut down\n")
 }
 
-func (s *PresenceService) OnEvent(e core.Event) {
-	core.AppLog.Printf("%v\n", e)
-}
