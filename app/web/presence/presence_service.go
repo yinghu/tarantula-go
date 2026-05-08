@@ -12,7 +12,6 @@ import (
 type PresenceService struct {
 	bootstrap.AppManager
 	Started     bool
-	LoginReward core.Configuration
 }
 
 func (s *PresenceService) Config() string {
