@@ -21,7 +21,6 @@ func (s *AssetService) Config() string {
 }
 
 func (s *AssetService) Start(f core.Env) error {
-	s.ItemUpdater = s
 	s.AppManager.Start(f)
 	s.assetDir = fmt.Sprintf("%s/%s", f.HomeDir, f.GroupName)
 	err := s.createSchema()

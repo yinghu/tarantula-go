@@ -41,10 +41,10 @@ type TarantulaContext interface {
 }
 
 type TarantulaService interface {
-	ItemService() core.ItemService
+	
 	Authenticator() core.Authenticator
 	Sequence() core.Sequence
-	ItemListener() core.ItemListener
+	
 	Pusher() core.Pusher
 	Cluster() core.ClusterService
 	Event() core.EventService

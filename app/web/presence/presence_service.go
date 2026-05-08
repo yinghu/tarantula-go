@@ -6,7 +6,6 @@ import (
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/protocol"
-	"gameclustering.com/internal/util"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -21,7 +20,6 @@ func (s *PresenceService) Config() string {
 }
 
 func (s *PresenceService) Start(env core.Env) error {
-	s.ItemUpdater = s
 	err := s.AppManager.Start(env)
 	if err != nil {
 		return err
@@ -30,20 +28,7 @@ func (s *PresenceService) Start(env core.Env) error {
 	if err != nil {
 		return err
 	}
-	brn := util.GitCurBranch()
-	regs, err := s.ItemService().LoadRegistrations(s.Context(), brn.Message)
-	if err == nil {
-		for i := range regs {
-			c, err := s.ItemService().InventoryManager().Load(regs[i].ItemId)
-			if err == nil {
-				s.ItemListener().OnRegister(c)
-			} else {
-				core.AppLog.Printf("Error on load registration %s %s\n", err.Error(), brn.Message)
-			}
-		}
-	} else {
-		core.AppLog.Printf("Error on load registration %s %s\n", err.Error(), brn.Message)
-	}
+
 	s.Started = true
 	s.Cluster().Subscribe("register", &protocol.TopicEventListener{C: func() proto.Message {
 		return &protocol.RegisterEvent{}

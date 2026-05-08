@@ -15,12 +15,12 @@ import (
 )
 
 type AppManager struct {
-	imse        core.ItemService
+	
 	Auth        core.Authenticator
 	Sql         persistence.Postgresql
 	F           core.Env
 	seq         core.Sequence
-	ItemUpdater core.ItemListener
+	//ItemUpdater core.ItemListener
 	tcpPusher   core.Pusher
 	cluster     *ClusterManager
 	event       *EventManager
@@ -29,9 +29,7 @@ type AppManager struct {
 	threshold   zerolog.Level
 }
 
-func (s *AppManager) ItemService() core.ItemService {
-	return s.imse
-}
+
 
 func (s *AppManager) Pusher() core.Pusher {
 	return s.tcpPusher
@@ -42,9 +40,6 @@ func (s *AppManager) Authenticator() core.Authenticator {
 }
 func (s *AppManager) Sequence() core.Sequence {
 	return s.seq
-}
-func (s *AppManager) ItemListener() core.ItemListener {
-	return s.ItemUpdater
 }
 
 func (c *AppManager) Cluster() core.ClusterService {
@@ -85,14 +80,8 @@ func (s *AppManager) Start(f core.Env) error {
 			return err
 		}
 		s.Sql = sql
-		gitStore := persistence.GitItemStore{RepositoryDir: f.HomeDir + "/bin/tarantula", JsonRequester: s}
-		gitStore.Start()
-		is := persistence.ItemDB{Sql: &sql, Gis: &gitStore}
-		err = is.Start()
-		if err != nil {
-			return err
-		}
-		s.imse = &is
+		//gitStore := persistence.GitItemStore{RepositoryDir: f.HomeDir + "/bin/tarantula", JsonRequester: s}
+		//gitStore.Start()
 	}
 	if f.IsClusterMember {
 		return nil
