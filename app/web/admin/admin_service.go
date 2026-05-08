@@ -17,7 +17,7 @@ type AdminService struct {
 	assetDir    string
 	contentDir  string
 	publishDir  string
-	managedApps []string
+	
 }
 
 func (s *AdminService) Config() string {
@@ -27,7 +27,6 @@ func (s *AdminService) Config() string {
 func (s *AdminService) Start(f core.Env) error {
 	f.AuthLevel = core.ADMIN_ACCESS_CONTROL
 	s.AppManager.Start(f)
-	s.managedApps = f.ManagedApps
 	s.contentDir = fmt.Sprintf("%s/%s", f.HomeDir, "bin")
 	s.assetDir = fmt.Sprintf("%s/%s/%s", f.HomeDir, f.GroupName, "asset")
 	os.MkdirAll(s.assetDir, 0755)
@@ -62,9 +61,6 @@ func (s *AdminService) Start(f core.Env) error {
 	http.Handle("/admin/cs/query/topic/{topic}", bootstrap.Logging(&CSQueryTopic{AdminService: s}))
 	http.Handle("/admin/cs/query/object/{topic}", bootstrap.Logging(&CSQueryObject{AdminService: s}))
 	
-	http.Handle("/admin/repo/sync", bootstrap.Logging(&AdminPublisher{AdminService: s}))
-	http.Handle("/admin/env", bootstrap.Logging(&AdminEnv{AdminService: s}))
-	http.Handle("/admin/snowflake/parse", bootstrap.Logging(&AdminParseSnowFlakeId{AdminService: s}))
 	http.Handle("/admin/login/add", bootstrap.Logging(&SudoAddLogin{AdminService: s}))
 	http.Handle("/admin/password", bootstrap.Logging(&AdminChangePwd{AdminService: s}))
 	http.Handle("/admin/accesskey", bootstrap.Logging(&AdminCreateAccessKey{AdminService: s}))

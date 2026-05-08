@@ -17,23 +17,14 @@
         {
             "Name":"AdminTool","ScopeSequence":0,"Icon":"admin_panel_settings",
             "Jobs":[
-                {"Name":"CreateAccessKey","Type":200}
-            ]        
-        },
-        {
-            "Name":"CSTool","ScopeSequence":0,"Icon":"support",
-            "Jobs":[
+                {"Name":"CreateAccessKey","Type":200},
+                {"Name":"ChangePassword","Type":201},
                 {"Name":"SendTopic","Type":300},
                 {"Name":"QueryTopic","Type":301},
-                {"Name":"QueryObject","Type":301}
-            ]        
-        },
-        {
-            "Name":"APITool","ScopeSequence":0,"Icon":"api","Callback":"on_player_login",
-            "Jobs":[
+                {"Name":"QueryObject","Type":301},
                 {"Name":"Register","Type":500}
+
             ]        
         }
-        
     ]
     }

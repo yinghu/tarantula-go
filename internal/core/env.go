@@ -38,7 +38,7 @@ type Env struct {
 	HttpBinding     string        `json:"HttpBinding"`
 	HttpEndpoint    string        `json:"HttpEndpoint"`
 	Evp             EventEndpoint `json:"EventEndpoint"`
-	ManagedApps     []string      `json:"ManagedApps"`
+	//ManagedApps     []string      `json:"ManagedApps"`
 	Pgs             Sql           `json:"Sql"`
 	HomeDir         string        `json:"HomeDir"`
 	LogTruncated    bool          `json:"LogTruncated"`
