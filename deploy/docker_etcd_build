@@ -1,4 +1,4 @@
-FROM alpine:3.21
+FROM alpine:3.23
 
 RUN mkdir -p /var/tarantula/etcd/data
 RUN mkdir -p /etc/tarantula/etcd
