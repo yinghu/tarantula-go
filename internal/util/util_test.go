@@ -2,9 +2,7 @@ package util
 
 import (
 	"encoding/base64"
-	"fmt"
 	"testing"
-	"time"
 )
 
 func TestPassword(t *testing.T) {
@@ -38,16 +36,16 @@ func TestKey(t *testing.T) {
 }
 
 func TestTick(t *testing.T) {
-	tick := time.NewTicker(5 * time.Second)
-	defer tick.Stop()
-	c := 3
-	for range tick.C {
-	rp:
-		c--
-		if c > 0 {
-			fmt.Printf("tick %v\n", time.Now())
-			goto rp
-		}
-		c = 3
+	sh := SshClient{
+		Host:     "192.168.1.11:22",
+		User:     "yinghu",
+		Password: "casino123",
 	}
+	err := sh.Connect()
+	if err != nil {
+		t.Errorf("error %s", err.Error())
+		return
+	}
+	defer sh.Close()
+	sh.Run("cd ~/development/icodesoftware/tarantula-go && git pull && ./build.sh v1.0")
 }
