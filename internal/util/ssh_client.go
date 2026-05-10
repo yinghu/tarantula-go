@@ -3,18 +3,20 @@ package util
 import (
 	"bytes"
 	"fmt"
+	"os"
 
 	"golang.org/x/crypto/ssh"
 )
 
 type SshClient struct {
-	Host     string
-	User     string
-	Password string
-	conn     *ssh.Client
+	Host       string
+	User       string
+	Password   string
+	PrivateKey string
+	conn       *ssh.Client
 }
 
-func (c *SshClient) Connect() error {
+func (c *SshClient) WithPassword() error {
 	conf := ssh.ClientConfig{
 		User: c.User,
 		Auth: []ssh.AuthMethod{
@@ -22,7 +24,31 @@ func (c *SshClient) Connect() error {
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
-	ci, err := ssh.Dial("tcp", c.Host, &conf)
+	ci, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", c.Host, 22), &conf)
+	if err != nil {
+		return err
+	}
+	c.conn = ci
+	return nil
+}
+
+func (c *SshClient) WithKey() error {
+	key, err := os.ReadFile(c.PrivateKey)
+	if err != nil {
+		return err
+	}
+	signer, err := ssh.ParsePrivateKey(key)
+	if err != nil {
+		return err
+	}
+	conf := ssh.ClientConfig{
+		User: c.User,
+		Auth: []ssh.AuthMethod{
+			ssh.PublicKeys(signer),
+		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	}
+	ci, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", c.Host, 22), &conf)
 	if err != nil {
 		return err
 	}

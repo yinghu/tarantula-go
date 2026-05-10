@@ -35,17 +35,54 @@ func TestKey(t *testing.T) {
 	}
 }
 
-func TestTick(t *testing.T) {
+func TestSsh(t *testing.T) {
 	sh := SshClient{
-		Host:     "192.168.1.11:22",
+		Host:     "192.168.1.11",
 		User:     "yinghu",
 		Password: "casino123",
 	}
-	err := sh.Connect()
+	err := sh.WithPassword()
 	if err != nil {
 		t.Errorf("error %s", err.Error())
 		return
 	}
 	defer sh.Close()
-	sh.Run("cd ~/development/icodesoftware/tarantula-go && git pull && ./build.sh v1.0")
+	sh.Run("cd ~/development/icodesoftware/tarantula-go && git pull")
+}
+
+func TestGcpAuth(t *testing.T) {
+	gcp := GcpComputeEngine{
+		ServiceAccount: "C:\\development\\prismatic-grail-206205-bdc198bbb5de.json",
+		ProjectId:      "prismatic-grail-206205",
+		Zone:           "us-east1-c",
+	}
+	err := gcp.Auth()
+	if err != nil {
+		t.Errorf("error %s", err.Error())
+	}
+	defer gcp.Close()
+	gcp.List()
+	ssh := SshClient{Host: "35.211.190.230", User: "yinghu_lu", PrivateKey: "C:\\Users\\yingh\\.ssh\\gx-01.key"}
+	err = ssh.WithKey()
+	if err != nil {
+		t.Errorf("error %s", err.Error())
+	}
+	defer ssh.Close()
+	ssh.Run("pwd && git --version && docker --version")
+	//err = gcp.Insert("tarantula06")
+	//if err != nil {
+	//t.Errorf("error %s", err.Error())
+	//}
+	//err = gcp.Insert("tarantula02")
+	//if err != nil {
+	//t.Errorf("error %s", err.Error())
+	//}
+	//err = gcp.Insert("tarantula03")
+	//if err != nil {
+	//t.Errorf("error %s", err.Error())
+	//}
+	//err = gcp.Insert("tarantula04")
+	//if err != nil {
+	//t.Errorf("error %s", err.Error())
+	//}
 }
