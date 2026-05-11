@@ -29,19 +29,19 @@ cp ~/token.txt .
 apps=("admin" "presence" "inventory" "asset" "postoffice")
 for app in "${apps[@]}"; do
   echo "Current build target : $app"
-  sudo docker build -f ./docker_application_build --tag tarantula.$app:$version --build-arg app=$app .
+  podman build -f ./docker_application_build --tag tarantula.$app:$version --build-arg app=$app .
   Check
   ((seq++))
 done
 
-sudo docker build -f ./docker_prometheus_node_exporter_build --tag tarantula.node:$version .
+podman build -f ./docker_prometheus_node_exporter_build --tag tarantula.node:$version .
 Check
 
-sudo docker build -f ./docker_prometheus_build --tag tarantula.prometheus:$version .
+podman build -f ./docker_prometheus_build --tag tarantula.prometheus:$version .
 Check
 
-sudo docker build -f ./docker_nginx_build --tag tarantula.nginx:$version .
+podman build -f ./docker_nginx_build --tag tarantula.nginx:$version .
 Check
-sudo docker builder prune -af
+podman image prune -af
 
 Clean
