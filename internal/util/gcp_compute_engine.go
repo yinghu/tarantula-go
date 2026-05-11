@@ -12,6 +12,8 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+type OnInstance func(*computepb.Instance)
+
 type GcpComputeEngine struct {
 	ServiceAccount string
 	ProjectId      string
@@ -43,7 +45,7 @@ func (g *GcpComputeEngine) Close() error {
 	return g.client.Close()
 }
 
-func (g *GcpComputeEngine) List() error {
+func (g *GcpComputeEngine) List(ins OnInstance) error {
 	req := &computepb.ListInstancesRequest{
 		Project: g.ProjectId,
 		Zone:    g.Zone,
@@ -52,15 +54,20 @@ func (g *GcpComputeEngine) List() error {
 	for {
 		instance, err := it.Next()
 		if err != nil {
-			//fmt.Printf("iter err %s", err.Error())
 			break
 		}
-		fmt.Printf("Name : %s\n", instance.GetName())
-		fmt.Printf("Status : %s\n", instance.GetStatus())
-		fmt.Printf("Inter IP : %s\n", instance.GetNetworkInterfaces()[0].GetNetworkIP())
-		fmt.Printf("Public IP : %s\n", instance.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP())
+		ins(instance)
 	}
 	return nil
+}
+
+func (g *GcpComputeEngine) Get(name string) (*computepb.Instance, error) {
+	req := &computepb.GetInstanceRequest{
+		Project:  g.ProjectId,
+		Zone:     g.Zone,
+		Instance: name,
+	}
+	return g.client.Get(context.Background(), req)
 }
 
 func (g *GcpComputeEngine) Insert(name string) error {
@@ -69,7 +76,7 @@ func (g *GcpComputeEngine) Insert(name string) error {
 		Zone:    g.Zone,
 		InstanceResource: &computepb.Instance{
 			Name:        proto.String(name),
-			MachineType: proto.String(fmt.Sprintf("zones/%s/machineTypes/e2-micro", g.Zone)),
+			MachineType: proto.String(fmt.Sprintf("zones/%s/machineTypes/n2-standard-4", g.Zone)),
 			NetworkInterfaces: []*computepb.NetworkInterface{
 				{
 					Name: proto.String("global/networks/default"),
@@ -83,7 +90,7 @@ func (g *GcpComputeEngine) Insert(name string) error {
 				},
 			},
 			Tags: &computepb.Tags{
-				Items: []string{"http-server", "https-server"}, // Matching tag for firewall
+				Items: []string{"http-server", "https-server"},
 			},
 			Scheduling: &computepb.Scheduling{
 				ProvisioningModel: proto.String(computepb.Scheduling_SPOT.String()),
@@ -92,7 +99,7 @@ func (g *GcpComputeEngine) Insert(name string) error {
 				{
 					InitializeParams: &computepb.AttachedDiskInitializeParams{
 						SourceImage: proto.String("projects/cos-cloud/global/images/family/cos-113-lts"),
-						DiskSizeGb:  proto.Int64(10),
+						DiskSizeGb:  proto.Int64(20),
 					},
 					AutoDelete: proto.Bool(true),
 					Boot:       proto.Bool(true),

@@ -2,7 +2,10 @@ package util
 
 import (
 	"encoding/base64"
+	"fmt"
 	"testing"
+
+	computepb "cloud.google.com/go/compute/apiv1/computepb"
 )
 
 func TestPassword(t *testing.T) {
@@ -61,18 +64,26 @@ func TestGcpAuth(t *testing.T) {
 		t.Errorf("error %s", err.Error())
 	}
 	defer gcp.Close()
-	gcp.List()
-	ssh := SshClient{Host: "35.211.190.230", User: "yinghu_lu", PrivateKey: "C:\\Users\\yingh\\.ssh\\gx-01.key"}
+	gcp.List(func(instance *computepb.Instance) {
+		fmt.Printf("Name : %s\n", instance.GetName())
+		fmt.Printf("Status : %s\n", instance.GetStatus())
+		fmt.Printf("Inter IP : %s\n", instance.GetNetworkInterfaces()[0].GetNetworkIP())
+		fmt.Printf("Public IP : %s\n", instance.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP())
+
+	})
+	ins, err := gcp.Get("tarantula-build-01")
+	if err != nil {
+		t.Errorf("error %s", err.Error())
+		return
+	}
+	ssh := SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: "C:\\Users\\yingh\\.ssh\\gx-01.key"}
 	err = ssh.WithKey()
 	if err != nil {
 		t.Errorf("error %s", err.Error())
 	}
 	defer ssh.Close()
-	ssh.Run("pwd && git --version && docker --version")
-	//err = gcp.Insert("tarantula06")
-	//if err != nil {
-	//t.Errorf("error %s", err.Error())
-	//}
+	ssh.Run("pwd && git --version && docker --version && df -h")
+
 	//err = gcp.Insert("tarantula02")
 	//if err != nil {
 	//t.Errorf("error %s", err.Error())

@@ -60,6 +60,8 @@ func (c *SshClient) Close() error {
 	return c.conn.Close()
 }
 
+
+
 func (c *SshClient) Run(cmd string) error {
 	session, err := c.conn.NewSession()
 	if err != nil {
@@ -67,7 +69,10 @@ func (c *SshClient) Run(cmd string) error {
 	}
 	var buff bytes.Buffer
 	session.Stdout = &buff
-	session.Run(cmd)
+	err = session.Run(cmd)
+	if err != nil {
+		return err
+	}
 	fmt.Printf("output %s\n", buff.String())
 	return nil
 }
