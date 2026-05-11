@@ -7,15 +7,16 @@ replace gameclustering.com/internal/core => ../core
 replace gameclustering.com/internal/protocol => ../protocol
 
 require (
+	cloud.google.com/go/auth v0.20.0
 	cloud.google.com/go/compute v1.62.0
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
 	github.com/spaolacci/murmur3 v1.1.0
 	golang.org/x/crypto v0.49.0
 	google.golang.org/api v0.274.0
+	google.golang.org/protobuf v1.36.11
 )
 
 require (
-	cloud.google.com/go/auth v0.20.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	gameclustering.com/internal/protocol v0.0.0-00010101000000-000000000000 // indirect
@@ -49,5 +50,4 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20260401024825-9d38bb4040a9 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260401024825-9d38bb4040a9 // indirect
 	google.golang.org/grpc v1.80.0 // indirect
-	google.golang.org/protobuf v1.36.11 // indirect
 )
