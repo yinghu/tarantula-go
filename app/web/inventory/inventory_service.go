@@ -17,7 +17,7 @@ type InventoryService struct {
 }
 
 func (s *InventoryService) Config() string {
-	return "/etc/tarantula/inventory-conf.json"
+	return "./inventory-conf.json"
 }
 
 func (s *InventoryService) Start(f core.Env) error {

@@ -11,11 +11,11 @@ import (
 
 type PresenceService struct {
 	bootstrap.AppManager
-	Started     bool
+	Started bool
 }
 
 func (s *PresenceService) Config() string {
-	return "/etc/tarantula/presence-conf.json"
+	return "./presence-conf.json"
 }
 
 func (s *PresenceService) Start(env core.Env) error {
@@ -57,4 +57,3 @@ func (s *PresenceService) Shutdown() {
 	s.AppManager.Shutdown()
 	core.AppLog.Printf("Presence service shut down\n")
 }
-

@@ -14,14 +14,13 @@ import (
 
 type AdminService struct {
 	bootstrap.AppManager
-	assetDir    string
-	contentDir  string
-	publishDir  string
-	
+	assetDir   string
+	contentDir string
+	publishDir string
 }
 
 func (s *AdminService) Config() string {
-	return "/etc/tarantula/admin-conf.json"
+	return "./admin-conf.json"
 }
 
 func (s *AdminService) Start(f core.Env) error {
@@ -55,12 +54,12 @@ func (s *AdminService) Start(f core.Env) error {
 		}
 	}})
 	http.Handle("/admin/webprotected/{name}", bootstrap.Logging(&AdminWebProtected{AdminService: s}))
-	
+
 	http.Handle("/admin/cs/message/send", bootstrap.Logging(&CSMessager{AdminService: s}))
 
 	http.Handle("/admin/cs/query/topic/{topic}", bootstrap.Logging(&CSQueryTopic{AdminService: s}))
 	http.Handle("/admin/cs/query/object/{topic}", bootstrap.Logging(&CSQueryObject{AdminService: s}))
-	
+
 	http.Handle("/admin/login/add", bootstrap.Logging(&SudoAddLogin{AdminService: s}))
 	http.Handle("/admin/password", bootstrap.Logging(&AdminChangePwd{AdminService: s}))
 	http.Handle("/admin/accesskey", bootstrap.Logging(&AdminCreateAccessKey{AdminService: s}))

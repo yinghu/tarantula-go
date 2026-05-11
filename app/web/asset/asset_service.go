@@ -17,7 +17,7 @@ type AssetService struct {
 }
 
 func (s *AssetService) Config() string {
-	return "/etc/tarantula/asset-conf.json"
+	return "./asset-conf.json"
 }
 
 func (s *AssetService) Start(f core.Env) error {
