@@ -42,6 +42,6 @@ Check
 
 podman build --no-cache  -f ./docker_nginx_build --tag tarantula.nginx:$version .
 Check
-podman builder prune -af
+podman image prune -af
 
 Clean
