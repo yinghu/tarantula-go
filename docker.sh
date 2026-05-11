@@ -42,6 +42,6 @@ Check
 
 sudo docker build --no-cache  -f ./docker_nginx_build --tag tarantula.nginx:$version .
 Check
-#sudo docker image prune -af
+sudo docker builder prune -af
 
 Clean
