@@ -29,7 +29,7 @@ cp ~/token.txt .
 apps=("admin" "presence" "inventory" "asset" "postoffice")
 for app in "${apps[@]}"; do
   echo "Current build target : $app"
-  podman build --no-cache -f ./docker_application_build --tag tarantula.$app:$version --build-arg app=$app .
+  podman build --no-cache -f ./docker_application_build --build-arg app=$app --tag tarantula.$app:$version .
   Check
   ((seq++))
 done
