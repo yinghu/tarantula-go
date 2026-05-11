@@ -23,9 +23,10 @@ USER tarantula
 
 # Application Install
 WORKDIR /home/tarantula/bin
-#ARG g
+
 RUN mkdir site
+RUN echo installing app : ${app}
 COPY --from=builder /build/app/web/${app}/main .
-COPY --from=builder /build/site/* site
+RUN if [ ${app} = "admin" ]; then COPY --from=builder /build/site/* site fi
 
 ENTRYPOINT ["./main"]
