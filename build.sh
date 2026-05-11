@@ -29,18 +29,18 @@ cp ~/token.txt .
 apps=("admin" "presence" "inventory" "asset" "postoffice")
 for app in "${apps[@]}"; do
   echo "Current build target : $app"
-  podman build --no-cache --cap-add all -f ./docker_application_build --build-arg app=$app --tag tarantula.$app:$version .
+  podman build --no-cache -f ./docker_application_build --build-arg app=$app --tag tarantula.$app:$version .
   Check
   ((seq++))
 done
 
-podman build --no-cache --cap-add all -f ./docker_prometheus_node_exporter_build --tag tarantula.node:$version .
+podman build --no-cache -f ./docker_prometheus_node_exporter_build --tag tarantula.node:$version .
 Check
 
-podman build --no-cache --cap-add all -f ./docker_prometheus_build --tag tarantula.prometheus:$version .
+podman build --no-cache -f ./docker_prometheus_build --tag tarantula.prometheus:$version .
 Check
 
-podman build --no-cache --cap-add all -f ./docker_nginx_build --tag tarantula.nginx:$version .
+podman build --no-cache  -f ./docker_nginx_build --tag tarantula.nginx:$version .
 Check
 podman image prune -af
 

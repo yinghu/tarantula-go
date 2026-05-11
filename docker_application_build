@@ -23,7 +23,7 @@ USER tarantula
 
 # Application Install
 WORKDIR /home/tarantula/bin
-ARG g
+#ARG g
 RUN mkdir site
 COPY --from=builder /build/app/web/${app}/main .
 COPY --from=builder /build/site/* site
