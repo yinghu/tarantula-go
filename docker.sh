@@ -34,12 +34,6 @@ for app in "${apps[@]}"; do
   ((seq++))
 done
 
-sudo docker build --no-cache -f ./docker_prometheus_node_exporter_build --tag tarantula.node:$version .
-Check
-
-sudo docker build --no-cache -f ./docker_prometheus_build --tag tarantula.prometheus:$version .
-Check
-
 sudo docker build --no-cache  -f ./docker_nginx_build --tag tarantula.nginx:$version .
 Check
 sudo docker builder prune -af

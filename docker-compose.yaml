@@ -70,28 +70,6 @@ services:
       - tarantula-app-net
     env_file:
       - .env  
-  node:
-    stop_grace_period: 20s
-    restart: unless-stopped
-    container_name: node
-    hostname: node
-    image: tarantula.node:${VERSION}
-    ports:
-      - "9100:9100"
-    networks:
-      - tarantula-app-net     
-  prometheus:
-    stop_grace_period: 20s
-    restart: unless-stopped
-    container_name: prometheus
-    hostname: prometheus
-    image: tarantula.prometheus:${VERSION}
-    volumes:
-      - volume_prometheus:/var/tarantula/prometheus
-    ports:
-      - "9090:9090"
-    networks:
-      - tarantula-app-net  
   web:
     restart: unless-stopped
     container_name: web
@@ -113,4 +91,3 @@ volumes:
   volume_asset:
   volume_inventory:
   volume_admin:
-  volume_prometheus:

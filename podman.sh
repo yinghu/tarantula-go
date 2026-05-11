@@ -34,12 +34,6 @@ for app in "${apps[@]}"; do
   ((seq++))
 done
 
-podman build --no-cache -f ./docker_prometheus_node_exporter_build --tag tarantula.node:$version .
-Check
-
-podman build --no-cache -f ./docker_prometheus_build --tag tarantula.prometheus:$version .
-Check
-
 podman build --no-cache  -f ./docker_nginx_build --tag tarantula.nginx:$version .
 Check
 podman image prune --filter "label=stage=builder"
