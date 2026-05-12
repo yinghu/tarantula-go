@@ -18,7 +18,7 @@ RUN mkdir /home/tarantula/${app}
 
 USER tarantula
 WORKDIR /home/tarantula
-RUN chown -R tarantula /home/tarantula  
+#RUN chown -R tarantula /home/tarantula  
 
 RUN mkdir /home/tarantula/.ssh
 RUN chown -R tarantula /home/tarantula/.ssh  
