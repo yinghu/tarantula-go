@@ -2,9 +2,11 @@ package util
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"os"
 
+	scp "github.com/bramvdbogaerde/go-scp"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -60,8 +62,6 @@ func (c *SshClient) Close() error {
 	return c.conn.Close()
 }
 
-
-
 func (c *SshClient) Run(cmd string) error {
 	session, err := c.conn.NewSession()
 	if err != nil {
@@ -75,4 +75,20 @@ func (c *SshClient) Run(cmd string) error {
 	}
 	fmt.Printf("output %s\n", buff.String())
 	return nil
+}
+
+func (c *SshClient) Upload(f os.File, p string, m string) error {
+	cp, err := scp.NewClientBySSH(c.conn)
+	if err != nil {
+		return err
+	}
+	return cp.CopyFromFile(context.Background(), f, p, m)
+}
+
+func (c *SshClient) Download(f *os.File, p string, m string) error {
+	cp, err := scp.NewClientBySSH(c.conn)
+	if err != nil {
+		return err
+	}
+	return cp.CopyFromRemote(context.Background(), f, p)
 }

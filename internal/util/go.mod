@@ -10,6 +10,7 @@ require (
 	cloud.google.com/go/auth v0.20.0
 	cloud.google.com/go/compute v1.62.0
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
+	github.com/bramvdbogaerde/go-scp v1.6.0
 	github.com/spaolacci/murmur3 v1.1.0
 	golang.org/x/crypto v0.49.0
 	google.golang.org/api v0.274.0
