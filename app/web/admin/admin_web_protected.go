@@ -4,7 +4,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strings"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/util"
@@ -26,17 +25,7 @@ func (s *AdminWebProtected) Request(rs core.OnSession, w http.ResponseWriter, r 
 		w.Write(util.ToJson(session))
 		return
 	}
-	if strings.HasSuffix(fn, ".js") {
-		w.Header().Set("Content-Type", "text/javascript")
-	} else if strings.HasSuffix(fn, ".css") {
-		w.Header().Set("Content-Type", "text/css")
-	} else if strings.HasSuffix(fn, ".json") {
-		w.Header().Set("Content-Type", "application/json")
-	} else if strings.HasSuffix(fn, ".ico") {
-		w.Header().Set("Content-Type", "image/x-icon")
-	} else {
-		w.Header().Set("Content-Type", "text/html")
-	}
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	defer dest.Close()
 	io.Copy(w, dest)
