@@ -5,7 +5,9 @@ Clean(){
     rm id_ed25519
     rm known_hosts
     rm .gitconfig
-    rm token.txt
+    rm gx-01.key
+    rm gx-01.key.pub
+    rm gx-01.json
 }
 Check(){
     if [[ $? -ne 0 ]]; then
@@ -24,17 +26,20 @@ fi
 echo "Build params : ${version}"
 cp ~/.ssh/id_ed25519 .
 cp ~/.ssh/known_hosts .
+cp ~/.ssh/gx-01.key .
+cp ~/.ssh/gx-01.key.pub .
+cp ~/.ssh/gx-01.json .
 cp ~/.gitconfig .
-cp ~/token.txt .
+
 apps=("admin" "presence" "inventory" "asset" "postoffice")
 for app in "${apps[@]}"; do
   echo "Current build target : $app"
-  sudo docker build --no-cache -f ./docker_application_build --build-arg app=$app --tag tarantula.$app:$version .
+  sudo docker build -f ./docker_application_build --build-arg app=$app --tag tarantula.$app:$version .
   Check
   ((seq++))
 done
 
-sudo docker build --no-cache  -f ./docker_nginx_build --tag tarantula.nginx:$version .
+sudo docker build -f ./docker_nginx_build --tag tarantula.nginx:$version .
 Check
 sudo docker builder prune -af
 
