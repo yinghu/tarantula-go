@@ -14,25 +14,31 @@ ARG app
 RUN addgroup -S tarantula && adduser -S tarantula -G tarantula
 
 RUN mkdir /home/tarantula/${app}
-
-RUN chown -R tarantula /home/tarantula/${app}   
+ 
 
 USER tarantula
 WORKDIR /home/tarantula
 
 RUN mkdir /home/tarantula/.ssh
-WORKDIR /home/tarantula/.ssh
-COPY --from=builder /build/id_ed25519 .
-COPY --from=builder /build/known_hosts .
+
+COPY --from=builder /build/id_ed25519 ./.ssh
+COPY --from=builder /build/known_hosts ./.ssh
 COPY --from=builder /build/.gitconfig .
-COPY --from=builder /build/gx-01.json .
-COPY --from=builder /build/gx-01.key .
-COPY --from=builder /build/gx-01.key.pub .
+COPY --from=builder /build/gx-01.json ./.ssh
+COPY --from=builder /build/gx-01.key ./.ssh
+COPY --from=builder /build/gx-01.key.pub ./.ssh
+
+#RUN chown tarantula /home/tarantula/.ssh/id_ed25519
+#RUN chown tarantula /home/tarantula/.ssh/known_hosts
+#RUN chown tarantula /home/tarantula/.gitconfig
+
 
 # Application Install
 WORKDIR /home/tarantula/bin
 RUN echo installing app : ${app}
 COPY --from=builder /build/app/web/${app}/main .
 COPY --from=builder /build/app/web/${app}/*.json .
+
+RUN chown -R tarantula /home/tarantula  
 
 ENTRYPOINT ["./main"]
