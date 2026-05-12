@@ -23,7 +23,7 @@ WORKDIR /home/tarantula
 RUN mkdir /home/tarantula/.ssh
 RUN chown -R tarantula /home/tarantula/.ssh  
 COPY --from=builder /build/.gitconfig .
-RUN chown tarantula /home/tarantula/.gitconfig
+RUN chown -R tarantula /home/tarantula/.gitconfig
 
 COPY --from=builder /build/id_ed25519 ./.ssh
 COPY --from=builder /build/known_hosts ./.ssh
@@ -31,8 +31,8 @@ COPY --from=builder /build/gx-01.json ./.ssh
 COPY --from=builder /build/gx-01.key ./.ssh
 COPY --from=builder /build/gx-01.key.pub ./.ssh
 
-RUN chown tarantula ./.ssh/id_ed25519
-RUN chown tarantula ./.ssh/known_hosts
+RUN chown -R tarantula ./.ssh/id_ed25519
+RUN chown -R tarantula ./.ssh/known_hosts
 
 # Application Install
 WORKDIR /home/tarantula/bin
@@ -40,7 +40,7 @@ RUN echo installing app : ${app}
 COPY --from=builder /build/app/web/${app}/main .
 COPY --from=builder /build/app/web/${app}/*.json .
 
-RUN chown tarantula ./main
-RUN chown tarantula ./*.json
+RUN chown -R tarantula ./main
+RUN chown -R tarantula ./*.json
 
 ENTRYPOINT ["./main"]
