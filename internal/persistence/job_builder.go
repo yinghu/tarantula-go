@@ -13,10 +13,14 @@ const (
 )
 
 type JobBuilder struct {
+	tb     *TaskBuilder
 	Target *protocol.Job
 }
 
-func NewJobBuilder() *JobBuilder {
+func NewJobBuilder(tb *TaskBuilder) *JobBuilder {
+	return &JobBuilder{tb: tb, Target: &protocol.Job{Transactions: make([]*protocol.Transaction, 0)}}
+}
+func NewValidatorBuilder() *JobBuilder {
 	return &JobBuilder{Target: &protocol.Job{Transactions: make([]*protocol.Transaction, 0)}}
 }
 
@@ -30,6 +34,10 @@ func (jb *JobBuilder) add(t *protocol.Transaction) *JobBuilder {
 }
 
 func (jb *JobBuilder) Build() *protocol.Job {
+	if jb.tb == nil {
+		return jb.Target
+	}
+	jb.tb.addJob(jb)
 	return jb.Target
 }
 

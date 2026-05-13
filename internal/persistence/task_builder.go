@@ -15,17 +15,15 @@ const (
 type TaskBuilder struct {
 	Target *protocol.Task
 	key    []byte
-	jb     *JobBuilder
 	vb     *JobBuilder
 }
 
 func NewTaskBuilder(meta *protocol.Meta) *TaskBuilder {
-	return &TaskBuilder{Target: &protocol.Task{Meta: meta}, jb: NewJobBuilder(), vb: NewJobBuilder()}
+	return &TaskBuilder{Target: &protocol.Task{Meta: meta, Jobs: make([]*protocol.Job, 0)}, vb: NewValidatorBuilder()}
 }
 
 func (b *TaskBuilder) Job(meta *protocol.Meta) *JobBuilder {
-	b.jb.Target.Meta = meta
-	return b.jb
+	return NewJobBuilder(b)
 }
 
 func (b *TaskBuilder) Validator(meta *protocol.Meta) *JobBuilder {
@@ -33,9 +31,12 @@ func (b *TaskBuilder) Validator(meta *protocol.Meta) *JobBuilder {
 	return b.vb
 }
 
+func (b *TaskBuilder) addJob(jb *JobBuilder) {
+	b.Target.Jobs = append(b.Target.Jobs, jb.Target)
+}
+
 // query task
 func (b *TaskBuilder) Build() *protocol.Task {
-	b.Target.Job = b.jb.Build()
 	b.Target.Validator = b.vb.Build()
 	return b.Target
 }

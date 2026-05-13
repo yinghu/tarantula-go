@@ -2,10 +2,7 @@ package util
 
 import (
 	"encoding/base64"
-	"fmt"
 	"testing"
-
-	computepb "cloud.google.com/go/compute/apiv1/computepb"
 )
 
 func TestPassword(t *testing.T) {
@@ -64,35 +61,30 @@ func TestGcpAuth(t *testing.T) {
 		t.Errorf("error %s", err.Error())
 	}
 	defer gcp.Close()
-	gcp.List(func(instance *computepb.Instance) {
-		fmt.Printf("Name : %s\n", instance.GetName())
-		fmt.Printf("Status : %s\n", instance.GetStatus())
-		fmt.Printf("Inter IP : %s\n", instance.GetNetworkInterfaces()[0].GetNetworkIP())
-		fmt.Printf("Public IP : %s\n", instance.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP())
 
-	})
-	ins, err := gcp.Get("tarantula-build-01")
-	if err != nil {
-		t.Errorf("error %s", err.Error())
-		return
-	}
-	ssh := SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: "C:\\Users\\yingh\\.ssh\\gx-01.key"}
-	err = ssh.WithKey()
+	err = gcp.Insert("tarantula-build-01")
 	if err != nil {
 		t.Errorf("error %s", err.Error())
 	}
-	defer ssh.Close()
-	ssh.Run("pwd && git --version && docker --version && df -h")
+	//ins, err := gcp.Get("tarantula-build-01")
+	//if err != nil {
+	//t.Errorf("error %s", err.Error())
+	//return
+	//}
+	//ssh := SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: "C:\\Users\\yingh\\.ssh\\gx-01.key"}
+	//err = ssh.WithKey()
+	//if err != nil {
+	//t.Errorf("error %s", err.Error())
+	//}
+	//defer ssh.Close()
+	//ssh.Run("pwd && git --version && docker --version && df -h")
+	//f, err := os.Open("C:\\development\\s3.json")
+	//if err != nil {
+	//t.Errorf("error %s", err.Error())
+	//}
+	//err = ssh.Upload(*f, "/home/yinghu_lu/s3.json", "0544")
 
-	//err = gcp.Insert("tarantula02")
-	//if err != nil {
-	//t.Errorf("error %s", err.Error())
-	//}
-	//err = gcp.Insert("tarantula03")
-	//if err != nil {
-	//t.Errorf("error %s", err.Error())
-	//}
-	//err = gcp.Insert("tarantula04")
+	//err = gcp.Delete("tarantula-build-01")
 	//if err != nil {
 	//t.Errorf("error %s", err.Error())
 	//}

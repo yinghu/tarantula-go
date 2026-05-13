@@ -131,20 +131,22 @@ func (c *DataServiceProvider) Issue(ctx context.Context, task *protocol.Task) (*
 			t.Meta.Retries = TCC_RETRY_MAX
 		}
 	}
-	if task.Job == nil || len(task.Job.Transactions) == 0 {
-		return &protocol.Response{Successful: false, Message: ""}, fmt.Errorf("task job reqiured")
+	jz := len(task.Jobs)
+	if jz == 0 {
+		return &protocol.Response{Successful: false, Message: ""}, fmt.Errorf("one more task jobs reqiured")
 	}
-	task.Job.Meta.TaskId = task.Meta.Id
-	task.Job.Meta.Id = c.tid()
-	task.Job.Meta.Timeout = JOB_TIMEOUT_SECONDS
-	for _, t := range task.Job.Transactions {
-		t.Meta.TaskId = task.Meta.Id
-		t.Meta.JobId = task.Job.Meta.Id
-		t.Meta.Id = c.tid()
-		t.Meta.Timeout = TRANSACTION_TIMEOUT_SECONDS
-		t.Meta.Retries = TCC_RETRY_MAX
+	for _,job := range task.Jobs {
+		job.Meta.TaskId = task.Meta.Id
+		job.Meta.Id = c.tid()
+		job.Meta.Timeout = JOB_TIMEOUT_SECONDS
+		for _, t := range job.Transactions {
+			t.Meta.TaskId = task.Meta.Id
+			t.Meta.JobId = job.Meta.Id
+			t.Meta.Id = c.tid()
+			t.Meta.Timeout = TRANSACTION_TIMEOUT_SECONDS
+			t.Meta.Retries = TCC_RETRY_MAX
+		}
 	}
-
 	tb := persistence.TaskBuilder{Target: task}
 	req, err := tb.Request()
 	if err != nil {

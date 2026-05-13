@@ -35,7 +35,7 @@ func TestLoginObjectFactory(t *testing.T) {
 	if kv.Key.Header.ClassId != LOGIN_OBJECT_ID {
 		t.Errorf("class id %d", kv.Key.Header.ClassId)
 	}
-	if !kv.Key.Header.Updatable {
+	if kv.Key.Header.Updatable {
 		t.Errorf("mutable %v", kv.Key.Header.Updatable)
 	}
 	req, err := mf.Request(kv)

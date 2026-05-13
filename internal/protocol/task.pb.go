@@ -25,7 +25,7 @@ type Task struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Meta          *Meta                  `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
 	Validator     *Job                   `protobuf:"bytes,2,opt,name=validator,proto3" json:"validator,omitempty"`
-	Job           *Job                   `protobuf:"bytes,3,opt,name=job,proto3" json:"job,omitempty"`
+	Jobs          []*Job                 `protobuf:"bytes,3,rep,name=jobs,proto3" json:"jobs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -74,9 +74,9 @@ func (x *Task) GetValidator() *Job {
 	return nil
 }
 
-func (x *Task) GetJob() *Job {
+func (x *Task) GetJobs() []*Job {
 	if x != nil {
-		return x.Job
+		return x.Jobs
 	}
 	return nil
 }
@@ -87,11 +87,11 @@ const file_task_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
 	"task.proto\x12\bprotocol\x1a\tjob.proto\x1a\n" +
-	"meta.proto\"x\n" +
+	"meta.proto\"z\n" +
 	"\x04Task\x12\"\n" +
 	"\x04meta\x18\x01 \x01(\v2\x0e.protocol.MetaR\x04meta\x12+\n" +
-	"\tvalidator\x18\x02 \x01(\v2\r.protocol.JobR\tvalidator\x12\x1f\n" +
-	"\x03job\x18\x03 \x01(\v2\r.protocol.JobR\x03jobBL\n" +
+	"\tvalidator\x18\x02 \x01(\v2\r.protocol.JobR\tvalidator\x12!\n" +
+	"\x04jobs\x18\x03 \x03(\v2\r.protocol.JobR\x04jobsBL\n" +
 	"\x17com.icodesoftware.protoB\vTaskFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -115,7 +115,7 @@ var file_task_proto_goTypes = []any{
 var file_task_proto_depIdxs = []int32{
 	1, // 0: protocol.Task.meta:type_name -> protocol.Meta
 	2, // 1: protocol.Task.validator:type_name -> protocol.Job
-	2, // 2: protocol.Task.job:type_name -> protocol.Job
+	2, // 2: protocol.Task.jobs:type_name -> protocol.Job
 	3, // [3:3] is the sub-list for method output_type
 	3, // [3:3] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name

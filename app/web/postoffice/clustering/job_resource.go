@@ -9,10 +9,16 @@ import (
 
 func NewJobResource(job *protocol.Job, t *TaskResource) *JobResource {
 	jr := JobResource{resource: job, joining: make(map[uint64]*TransactionResource)}
-	if job.Meta.Id == t.resource.Job.Meta.Id {
-		jr.jb = t.tb.JobBuilder
-		jr.jb.Description("transaction job")
-	} else {
+	matched := false
+	for _, j := range t.resource.Jobs {
+		if job.Meta.Id == j.Meta.Id {
+			jr.jb = t.tb.JobBuilder
+			jr.jb.Description("transaction job")
+			matched = true
+			break
+		}
+	}
+	if !matched {
 		jr.jb = t.tb.ValidatorBuilder
 		jr.jb.Description("validator job")
 	}

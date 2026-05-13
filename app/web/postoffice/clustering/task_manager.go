@@ -28,7 +28,7 @@ func NewTaskResource(task *protocol.Task, revision uint64) *TaskResource {
 	if task.Validator != nil {
 		tr.tb.ValidatorBuilder.Meta(copy(task.Validator.Meta))
 	}
-	tr.tb.JobBuilder.Meta(copy(task.Job.Meta))
+	tr.tb.JobBuilder.Meta(copy(task.Jobs[0].Meta))
 	return &tr
 }
 
@@ -67,7 +67,7 @@ func (m *TaskManager) set(t *TaskResource) {
 	if t.resource.Validator != nil {
 		t.pending = append(t.pending, t.resource.Validator)
 	}
-	t.pending = append(t.pending, t.resource.Job)
+	t.pending = append(t.pending, t.resource.Jobs...)
 	t.jobIndex = 0
 	job := t.pending[t.jobIndex]
 	job.Meta.State = protocol.TCC_JOB_TIMEOUT
@@ -119,7 +119,7 @@ func (m *TaskManager) stop(t *JobResource) {
 	tr.canceled = true
 	tr.resource.Meta.State = protocol.TCC_FINISHED
 	tr.resource.Validator.Meta.State = protocol.TCC_FINISHED
-	tr.resource.Job.Meta.State = protocol.TCC_FINISHED
+	//tr.resource.Job.Meta.State = protocol.TCC_FINISHED
 	m.end(tr)
 }
 
@@ -241,7 +241,7 @@ func (m *TaskManager) clearResource(rkey uint64) {
 		return
 	}
 	delete(m.trs, rkey)
-	delete(m.tjs, tr.resource.Job.Meta.Id)
+	//delete(m.tjs, tr.resource.Job.Meta.Id)
 	if tr.resource.Validator != nil && tr.resource.Validator.Meta != nil {
 		delete(m.tjs, tr.resource.Validator.Meta.Id)
 	}
@@ -262,8 +262,10 @@ func (m *TaskManager) reload(meta *protocol.Meta) (*TaskResource, error) {
 	if tr.resource.Validator != nil && tr.resource.Validator.Meta.State != protocol.TCC_FINISHED {
 		tr.pending = append(tr.pending, tr.resource.Validator)
 	}
-	if tr.resource.Job.Meta.State != protocol.TCC_FINISHED {
-		tr.pending = append(tr.pending, tr.resource.Job)
+	for _, job := range tr.resource.Jobs {
+		if job.Meta.State != protocol.TCC_FINISHED {
+			tr.pending = append(tr.pending, job)
+		}
 	}
 	if len(tr.pending) == 0 {
 		return tr, fmt.Errorf("no job available")
