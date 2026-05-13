@@ -30,8 +30,6 @@ services:
     volumes:
       - volume_vault:/vault/config
       - volume_vault:/vault/file
-    cap_add:
-      - IPC_LOCK
     command: server
       
 networks:
