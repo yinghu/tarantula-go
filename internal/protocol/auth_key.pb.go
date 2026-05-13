@@ -27,6 +27,7 @@ type AuthKey struct {
 	Size          uint32                 `protobuf:"fixed32,2,opt,name=size,proto3" json:"size,omitempty"`
 	Jwt           []byte                 `protobuf:"bytes,3,opt,name=jwt,proto3" json:"jwt,omitempty"`
 	Cipher        []byte                 `protobuf:"bytes,4,opt,name=cipher,proto3" json:"cipher,omitempty"`
+	Key           []byte                 `protobuf:"bytes,5,opt,name=key,proto3" json:"key,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -89,16 +90,24 @@ func (x *AuthKey) GetCipher() []byte {
 	return nil
 }
 
+func (x *AuthKey) GetKey() []byte {
+	if x != nil {
+		return x.Key
+	}
+	return nil
+}
+
 var File_auth_key_proto protoreflect.FileDescriptor
 
 const file_auth_key_proto_rawDesc = "" +
 	"\n" +
-	"\x0eauth_key.proto\x12\bprotocol\"a\n" +
+	"\x0eauth_key.proto\x12\bprotocol\"s\n" +
 	"\aAuthKey\x12\x18\n" +
 	"\acontext\x18\x01 \x01(\tR\acontext\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\aR\x04size\x12\x10\n" +
 	"\x03jwt\x18\x03 \x01(\fR\x03jwt\x12\x16\n" +
-	"\x06cipher\x18\x04 \x01(\fR\x06cipherBO\n" +
+	"\x06cipher\x18\x04 \x01(\fR\x06cipher\x12\x10\n" +
+	"\x03key\x18\x05 \x01(\fR\x03keyBO\n" +
 	"\x17com.icodesoftware.protoB\x0eAuthKeyFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (

@@ -169,4 +169,5 @@ type ClusterService interface {
 
 	//auth key
 	AuthKey() (*protocol.AuthKey, error)
+	IamKey(name string) (*protocol.AuthKey, error)
 }

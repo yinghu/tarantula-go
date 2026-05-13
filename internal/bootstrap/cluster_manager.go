@@ -432,3 +432,15 @@ func (c *ClusterManager) AuthKey() (*protocol.AuthKey, error) {
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
 	return dsp.AuthKey(context.Background(), &protocol.Request{Context: c.App.F.PresenceCtx()})
 }
+
+func (c *ClusterManager) IamKey(name string) (*protocol.AuthKey, error) {
+	if !c.running {
+		return nil, fmt.Errorf("cluster not started")
+	}
+	conn, err := c.cPool.Conn()
+	if err != nil {
+		return nil, err
+	}
+	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	return dsp.IamKey(context.Background(), &protocol.Request{Context: fmt.Sprintf("%s/%s", c.App.F.PresenceCtx(), name)})
+}
