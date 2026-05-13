@@ -39,7 +39,7 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 
 	go func() {
 		mf := persistence.NewCommodityObjectFactory()
-		commodity := protocol.Commodity{Name: "gold", Type:"currency",TypeId: "hard currency", Amount: 12, Rechargeable: true}
+		commodity := protocol.Commodity{Name: "gold", Type: "currency", TypeId: "hard currency", Amount: 12, Rechargeable: true}
 		kv, err := mf.FromMessage(&commodity, mf.Header(persistence.COMMODITY_OBJECT_ID))
 		kv.Key.Array = s.ToBytes(login.SystemId)
 		if err != nil {
@@ -51,10 +51,11 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 		vb.Transaction().Meta(&protocol.Meta{Name: "register"}).Object(kv).Build()
 		jb := tb.Job(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "job"})
 		jb.Transaction().Meta(&protocol.Meta{Name: "grant"}).Object(kv).Build()
+		jb.Build()
 		rp, err := s.Cluster().Issue(tb.Build())
-		if err!=nil{
+		if err != nil {
 			core.AppLog.Debug().Msgf("TASK ERR %s", err.Error())
-			return 	
+			return
 		}
 		core.AppLog.Debug().Msgf("TASK %v", rp)
 
