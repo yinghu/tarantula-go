@@ -20,7 +20,7 @@ services:
     image: hashicorp/vault:latest
     container_name: vault
     environment:
-      VAULT_ADDR_ADDRESS: "http:/.192.168.1.11:8200"
+      VAULT_ADDR_ADDRESS: "http:/192.168.1.11:8200"
       VAULT_LOCAL_CONFIG: '{"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h","disable_mlock":"true"}'
       SKIP_SETCAP: true
       SKIP_CHOWN: true
