@@ -17,8 +17,8 @@ type JobBuilder struct {
 	Target *protocol.Job
 }
 
-func NewJobBuilder(tb *TaskBuilder) *JobBuilder {
-	return &JobBuilder{tb: tb, Target: &protocol.Job{Transactions: make([]*protocol.Transaction, 0)}}
+func NewJobBuilder(tb *TaskBuilder, meta *protocol.Meta) *JobBuilder {
+	return &JobBuilder{tb: tb, Target: &protocol.Job{Meta: meta, Transactions: make([]*protocol.Transaction, 0)}}
 }
 func NewValidatorBuilder() *JobBuilder {
 	return &JobBuilder{Target: &protocol.Job{Transactions: make([]*protocol.Transaction, 0)}}

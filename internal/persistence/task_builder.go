@@ -23,7 +23,7 @@ func NewTaskBuilder(meta *protocol.Meta) *TaskBuilder {
 }
 
 func (b *TaskBuilder) Job(meta *protocol.Meta) *JobBuilder {
-	return NewJobBuilder(b)
+	return NewJobBuilder(b, meta)
 }
 
 func (b *TaskBuilder) Validator(meta *protocol.Meta) *JobBuilder {
