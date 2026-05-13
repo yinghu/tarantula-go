@@ -15,9 +15,26 @@ services:
       - tarantula-service-net      
     volumes:
       - volume_postgres:/var/lib/postgresql/data
+
+  vault:
+    image: hashicorp/vault:latest
+    container_name: vault
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+    ports:
+      - "8200:8200" 
+    volumes:
+      - volume_vault:/vault/config
+      - volume_vault:/vault/file
+    cap_add:
+      - IPC_LOCK
+    command: server
+      
 networks:
   tarantula-service-net:
     external: true
 
 volumes:
   volume_postgres:
+  volume_vault:
