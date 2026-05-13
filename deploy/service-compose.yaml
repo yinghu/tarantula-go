@@ -21,6 +21,8 @@ services:
     container_name: vault
     environment:
       VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+      VAULT_DEV_ROOT_TOKEN_ID: "root"
+      VAULT_LOCAL_CONFIG: '{"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h"}'
       SKIP_SETCAP: true
       SKIP_CHOWN: true
     ports:
