@@ -51,7 +51,11 @@ func (s *PresenceRegister) Register(login *protocol.LoginObject) (core.OnSession
 		vb.Transaction().Meta(&protocol.Meta{Name: "register"}).Object(kv).Build()
 		jb := tb.Job(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "job"})
 		jb.Transaction().Meta(&protocol.Meta{Name: "grant"}).Object(kv).Build()
-		rp, _ := s.Cluster().Issue(tb.Build())
+		rp, err := s.Cluster().Issue(tb.Build())
+		if err!=nil{
+			core.AppLog.Debug().Msgf("TASK ERR %s", err.Error())
+			return 	
+		}
 		core.AppLog.Debug().Msgf("TASK %v", rp)
 
 	}()
