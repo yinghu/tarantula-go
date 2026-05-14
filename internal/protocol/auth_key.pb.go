@@ -24,10 +24,12 @@ const (
 type AuthKey struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Context       string                 `protobuf:"bytes,1,opt,name=context,proto3" json:"context,omitempty"`
-	Size          uint32                 `protobuf:"fixed32,2,opt,name=size,proto3" json:"size,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Jwt           []byte                 `protobuf:"bytes,3,opt,name=jwt,proto3" json:"jwt,omitempty"`
 	Cipher        []byte                 `protobuf:"bytes,4,opt,name=cipher,proto3" json:"cipher,omitempty"`
-	Key           []byte                 `protobuf:"bytes,5,opt,name=key,proto3" json:"key,omitempty"`
+	Gcp           *GcpAccess             `protobuf:"bytes,5,opt,name=gcp,proto3" json:"gcp,omitempty"`
+	Git           *GitAccess             `protobuf:"bytes,6,opt,name=git,proto3" json:"git,omitempty"`
+	Sql           *SqlAccess             `protobuf:"bytes,7,opt,name=sql,proto3" json:"sql,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -69,11 +71,11 @@ func (x *AuthKey) GetContext() string {
 	return ""
 }
 
-func (x *AuthKey) GetSize() uint32 {
+func (x *AuthKey) GetName() string {
 	if x != nil {
-		return x.Size
+		return x.Name
 	}
-	return 0
+	return ""
 }
 
 func (x *AuthKey) GetJwt() []byte {
@@ -90,9 +92,23 @@ func (x *AuthKey) GetCipher() []byte {
 	return nil
 }
 
-func (x *AuthKey) GetKey() []byte {
+func (x *AuthKey) GetGcp() *GcpAccess {
 	if x != nil {
-		return x.Key
+		return x.Gcp
+	}
+	return nil
+}
+
+func (x *AuthKey) GetGit() *GitAccess {
+	if x != nil {
+		return x.Git
+	}
+	return nil
+}
+
+func (x *AuthKey) GetSql() *SqlAccess {
+	if x != nil {
+		return x.Sql
 	}
 	return nil
 }
@@ -101,13 +117,15 @@ var File_auth_key_proto protoreflect.FileDescriptor
 
 const file_auth_key_proto_rawDesc = "" +
 	"\n" +
-	"\x0eauth_key.proto\x12\bprotocol\"s\n" +
+	"\x0eauth_key.proto\x12\bprotocol\x1a\x10gcp_access.proto\x1a\x10git_access.proto\x1a\x10sql_access.proto\"\xd6\x01\n" +
 	"\aAuthKey\x12\x18\n" +
 	"\acontext\x18\x01 \x01(\tR\acontext\x12\x12\n" +
-	"\x04size\x18\x02 \x01(\aR\x04size\x12\x10\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x10\n" +
 	"\x03jwt\x18\x03 \x01(\fR\x03jwt\x12\x16\n" +
-	"\x06cipher\x18\x04 \x01(\fR\x06cipher\x12\x10\n" +
-	"\x03key\x18\x05 \x01(\fR\x03keyBO\n" +
+	"\x06cipher\x18\x04 \x01(\fR\x06cipher\x12%\n" +
+	"\x03gcp\x18\x05 \x01(\v2\x13.protocol.GcpAccessR\x03gcp\x12%\n" +
+	"\x03git\x18\x06 \x01(\v2\x13.protocol.GitAccessR\x03git\x12%\n" +
+	"\x03sql\x18\a \x01(\v2\x13.protocol.SqlAccessR\x03sqlBO\n" +
 	"\x17com.icodesoftware.protoB\x0eAuthKeyFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -124,14 +142,20 @@ func file_auth_key_proto_rawDescGZIP() []byte {
 
 var file_auth_key_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_auth_key_proto_goTypes = []any{
-	(*AuthKey)(nil), // 0: protocol.AuthKey
+	(*AuthKey)(nil),   // 0: protocol.AuthKey
+	(*GcpAccess)(nil), // 1: protocol.GcpAccess
+	(*GitAccess)(nil), // 2: protocol.GitAccess
+	(*SqlAccess)(nil), // 3: protocol.SqlAccess
 }
 var file_auth_key_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: protocol.AuthKey.gcp:type_name -> protocol.GcpAccess
+	2, // 1: protocol.AuthKey.git:type_name -> protocol.GitAccess
+	3, // 2: protocol.AuthKey.sql:type_name -> protocol.SqlAccess
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_auth_key_proto_init() }
@@ -139,6 +163,9 @@ func file_auth_key_proto_init() {
 	if File_auth_key_proto != nil {
 		return
 	}
+	file_gcp_access_proto_init()
+	file_git_access_proto_init()
+	file_sql_access_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

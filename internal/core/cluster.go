@@ -168,6 +168,5 @@ type ClusterService interface {
 	TaskList() (*protocol.Response, error)
 
 	//auth key
-	AuthKey() (*protocol.AuthKey, error)
-	IamKey(name string) (*protocol.AuthKey, error)
+	AuthKey(name string) (*protocol.AuthKey, error)
 }

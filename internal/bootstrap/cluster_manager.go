@@ -421,7 +421,7 @@ func (c *ClusterManager) TaskList() (*protocol.Response, error) {
 	return dsp.TaskList(context.Background(), &protocol.Request{Prefix: 0})
 }
 
-func (c *ClusterManager) AuthKey() (*protocol.AuthKey, error) {
+func (c *ClusterManager) AuthKey(name string) (*protocol.AuthKey, error) {
 	if !c.running {
 		return nil, fmt.Errorf("cluster not started")
 	}
@@ -430,17 +430,5 @@ func (c *ClusterManager) AuthKey() (*protocol.AuthKey, error) {
 		return nil, err
 	}
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
-	return dsp.AuthKey(context.Background(), &protocol.Request{Context: c.App.F.PresenceCtx()})
-}
-
-func (c *ClusterManager) IamKey(name string) (*protocol.AuthKey, error) {
-	if !c.running {
-		return nil, fmt.Errorf("cluster not started")
-	}
-	conn, err := c.cPool.Conn()
-	if err != nil {
-		return nil, err
-	}
-	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
-	return dsp.IamKey(context.Background(), &protocol.Request{Context: fmt.Sprintf("%s/%s", c.App.F.PresenceCtx(), name)})
+	return dsp.AuthKey(context.Background(), &protocol.Request{Context: fmt.Sprintf("%s#%s", c.App.F.PresenceCtx(), name)})
 }

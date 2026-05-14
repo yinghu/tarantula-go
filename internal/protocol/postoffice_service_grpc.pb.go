@@ -20,7 +20,6 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	PostofficeService_AuthKey_FullMethodName     = "/protocol.PostofficeService/authKey"
-	PostofficeService_IamKey_FullMethodName      = "/protocol.PostofficeService/iamKey"
 	PostofficeService_HashRing_FullMethodName    = "/protocol.PostofficeService/hashRing"
 	PostofficeService_KeyRing_FullMethodName     = "/protocol.PostofficeService/keyRing"
 	PostofficeService_Request_FullMethodName     = "/protocol.PostofficeService/request"
@@ -44,7 +43,6 @@ const (
 type PostofficeServiceClient interface {
 	// auth key load
 	AuthKey(ctx context.Context, in *Request, opts ...grpc.CallOption) (*AuthKey, error)
-	IamKey(ctx context.Context, in *Request, opts ...grpc.CallOption) (*AuthKey, error)
 	// data delegate API
 	HashRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 	KeyRing(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
@@ -79,16 +77,6 @@ func (c *postofficeServiceClient) AuthKey(ctx context.Context, in *Request, opts
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(AuthKey)
 	err := c.cc.Invoke(ctx, PostofficeService_AuthKey_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *postofficeServiceClient) IamKey(ctx context.Context, in *Request, opts ...grpc.CallOption) (*AuthKey, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AuthKey)
-	err := c.cc.Invoke(ctx, PostofficeService_IamKey_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +257,6 @@ func (c *postofficeServiceClient) Finish(ctx context.Context, in *Meta, opts ...
 type PostofficeServiceServer interface {
 	// auth key load
 	AuthKey(context.Context, *Request) (*AuthKey, error)
-	IamKey(context.Context, *Request) (*AuthKey, error)
 	// data delegate API
 	HashRing(context.Context, *Request) (*Response, error)
 	KeyRing(context.Context, *Request) (*Response, error)
@@ -302,9 +289,6 @@ type UnimplementedPostofficeServiceServer struct{}
 
 func (UnimplementedPostofficeServiceServer) AuthKey(context.Context, *Request) (*AuthKey, error) {
 	return nil, status.Error(codes.Unimplemented, "method AuthKey not implemented")
-}
-func (UnimplementedPostofficeServiceServer) IamKey(context.Context, *Request) (*AuthKey, error) {
-	return nil, status.Error(codes.Unimplemented, "method IamKey not implemented")
 }
 func (UnimplementedPostofficeServiceServer) HashRing(context.Context, *Request) (*Response, error) {
 	return nil, status.Error(codes.Unimplemented, "method HashRing not implemented")
@@ -386,24 +370,6 @@ func _PostofficeService_AuthKey_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PostofficeServiceServer).AuthKey(ctx, req.(*Request))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PostofficeService_IamKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PostofficeServiceServer).IamKey(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PostofficeService_IamKey_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostofficeServiceServer).IamKey(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -674,10 +640,6 @@ var PostofficeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "authKey",
 			Handler:    _PostofficeService_AuthKey_Handler,
-		},
-		{
-			MethodName: "iamKey",
-			Handler:    _PostofficeService_IamKey_Handler,
 		},
 		{
 			MethodName: "hashRing",

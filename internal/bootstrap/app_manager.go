@@ -80,7 +80,7 @@ func (s *AppManager) Start(f core.Env) error {
 	if err != nil {
 		panic(err.Error())
 	}
-	ak, err := s.cluster.AuthKey()
+	ak, err := s.cluster.AuthKey("auth")
 	if err != nil {
 		panic(err.Error())
 	}
