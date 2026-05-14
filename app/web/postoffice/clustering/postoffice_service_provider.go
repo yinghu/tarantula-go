@@ -15,22 +15,11 @@ import (
 func (c *DataServiceProvider) AuthKey(ctx context.Context, request *protocol.Request) (*protocol.AuthKey, error) {
 	core.AppLog.Info().Msgf("load auth key %s", request.Context)
 	mp := strings.Split(request.Context, "#")
-	ak := protocol.AuthKey{Context: request.Context}
 	if len(mp) != 2 {
 		core.AppLog.Fatal().Msgf("wrong context format %s", request.Context)
-		return &ak, fmt.Errorf("wrong context format %s", request.Context)
+		return &protocol.AuthKey{Context: request.Context}, fmt.Errorf("wrong context format %s", request.Context)
 	}
-	kv, err := c.Vault.GetSecret(mp[0], mp[1])
-	if err != nil {
-		core.AppLog.Warn().Msgf("load auth key error %s", err.Error())
-		return &ak, err
-	}
-	jwt, _ := kv.Data["jwt"].(string)
-	cipher, _ := kv.Data["cipher"].(string)
-
-	ak.Jwt = []byte(jwt)       //[]byte("M4KExRr9HQbFRmUObhPsFJ2aDC4e/dkayHqwA568czw=")
-	ak.Cipher = []byte(cipher) //("NyXPfuLkqlsZcz//Y7Cm7oQ14MgIv29ouRmia+Vr2NY=")
-	return &ak, nil
+	return c.kloader.load(mp[0], mp[1])
 }
 
 func (c *DataServiceProvider) HashRing(ctx context.Context, request *protocol.Request) (*protocol.Response, error) {

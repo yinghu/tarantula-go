@@ -10,7 +10,6 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
-	"gameclustering.com/internal/util"
 	"google.golang.org/grpc"
 )
 
@@ -44,7 +43,7 @@ type DataServiceProvider struct {
 
 	//task transaction
 	TManager *TaskManager
-	Vault    util.VaultClient
+	kloader  KeyLoader
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
@@ -133,7 +132,7 @@ func (c *DataServiceProvider) Start(dir string) {
 	if err != nil {
 		panic(err)
 	}
-	err = c.Vault.Auth()
+	err = c.kloader.auth()
 	if err != nil {
 		panic(err)
 	}

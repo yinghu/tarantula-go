@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/util"
 	"github.com/hashicorp/memberlist"
 )
 
@@ -58,7 +57,8 @@ func (m *MemberlistManager) Start(meta []byte, seq core.Sequence, vt core.Vault)
 	m.meta = meta
 	m.Memberlist = list
 	go m.Listen()
-	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode, RSync: rwSync, seq: seq, Vault: util.VaultClient{Host: vt.Host, Token: vt.Token}}
+
+	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode, RSync: rwSync, seq: seq, kloader: KeyLoader{config: vt}}
 	m.DataServiceProvider.rpcEndpoint = fmt.Sprintf("%s:%d", string(m.LocalNode().Addr.String()), core.RPC_PORT)
 	m.Mll = &m.MemberListListener
 	m.Mll.DWait.Add(1)
