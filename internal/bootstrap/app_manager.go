@@ -52,7 +52,6 @@ func (s *AppManager) RegisterLogForwarder(threshold zerolog.Level, logf LogForwa
 func (s *AppManager) Start(f core.Env) error {
 	s.F = f
 	s.initLogger(f)
-	core.AppLog.Info().Msgf("vault %v", f.Vlt)
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
 	if f.IsClusterMember {

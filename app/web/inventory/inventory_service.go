@@ -36,7 +36,11 @@ func (s *InventoryService) Start(f core.Env) error {
 		mf := persistence.NewCommodityObjectFactory()
 		core.AppLog.Debug().Msgf("SYSTEMID %d", s.ToSystemId(e.Object.Key.Array))
 		core.AppLog.Debug().Msgf("META %v", e.Meta)
-
+		key, err := s.Cluster().AuthKey("gcp")
+		if err != nil {
+			return err
+		}
+		core.AppLog.Debug().Msgf("gcp %v", key.Gcp)
 		obj, err := mf.Message(e.Object)
 		if err != nil {
 			core.AppLog.Warn().Msgf("wrong decode format %s", err)
