@@ -41,12 +41,13 @@ func (s *InventoryService) Start(f core.Env) error {
 		if err != nil {
 			return err
 		}
-		core.AppLog.Debug().Msgf("gcp %v", key.Gcp)
+		//core.AppLog.Debug().Msgf("gcp %v", key.Gcp)
 		gcp := util.GcpComputeEngine{ServiceAccount: key.Gcp.Iam, ProjectId: "prismatic-grail-206205", Zone: "us-east1-c"}
 		err = gcp.Auth()
 		if err != nil {
 			core.AppLog.Debug().Msgf("gcp auth error %s", err)
 		} else {
+			
 			err = gcp.Insert("tarantula-build-01")
 			if err != nil {
 				core.AppLog.Debug().Msgf("gcp insert error %s", err)

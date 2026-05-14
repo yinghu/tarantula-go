@@ -3,7 +3,6 @@ package util
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"cloud.google.com/go/auth/credentials"
 	compute "cloud.google.com/go/compute/apiv1"
@@ -22,13 +21,9 @@ type GcpComputeEngine struct {
 }
 
 func (g *GcpComputeEngine) Auth() error {
-	data, err := os.ReadFile(g.ServiceAccount)
-	if err != nil {
-		return err
-	}
 	creds, err := credentials.DetectDefault(&credentials.DetectOptions{
 		Scopes:          []string{"https://www.googleapis.com/auth/compute"},
-		CredentialsJSON: data,
+		CredentialsJSON: []byte(g.ServiceAccount),
 	})
 	if err != nil {
 		return err
