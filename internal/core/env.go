@@ -23,9 +23,8 @@ type Sql struct {
 }
 
 type Vault struct {
-	Host      string
-	MountPath string
-	Token     string
+	Host  string
+	Token string
 }
 
 type EventEndpoint struct {
@@ -110,10 +109,6 @@ func (f *Env) Load(fn string) error {
 	c, exists = os.LookupEnv("VAULT_HOST")
 	if exists {
 		f.Vlt.Host = c
-	}
-	c, exists = os.LookupEnv("VAULT_MOUNT_PATH")
-	if exists {
-		f.Vlt.MountPath = c
 	}
 	c, exists = os.LookupEnv("VAULT_TOKEN")
 	if exists {

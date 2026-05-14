@@ -55,20 +55,6 @@ func (s *AppManager) Start(f core.Env) error {
 	core.AppLog.Info().Msgf("vault %v", f.Vlt)
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
-	if f.Pgs.Enabled {
-		core.AppLog.Info().Msgf("connecting sql %s", f.Pgs.DatabaseURL)
-		dbCreate := persistence.Postgresql{Url: f.Pgs.DatabaseURL + "/postgres"}
-		err := dbCreate.CreateDatabase(fmt.Sprintf("CREATE DATABASE %s_%s_%s", f.Prefix, "tarantula", f.GroupName))
-		if err != nil {
-			core.AppLog.Warn().Msgf("failed to create database %s", err.Error())
-		}
-		sql := persistence.Postgresql{Url: f.Pgs.DatabaseURL + "/" + f.Prefix + "_tarantula_" + f.GroupName}
-		err = sql.Create()
-		if err != nil {
-			return err
-		}
-		s.Sql = sql
-	}
 	if f.IsClusterMember {
 		return nil
 	}
@@ -89,6 +75,25 @@ func (s *AppManager) Start(f core.Env) error {
 		panic(err.Error())
 	}
 	s.Auth = au
+	if f.Pgs.Enabled {
+		key, err := s.cluster.AuthKey("sql")
+		if err != nil {
+			panic(err)
+		}
+		f.Pgs.DatabaseURL = key.Sql.Url
+		core.AppLog.Info().Msgf("connecting sql %s", f.Pgs.DatabaseURL)
+		dbCreate := persistence.Postgresql{Url: f.Pgs.DatabaseURL + "/postgres"}
+		err = dbCreate.CreateDatabase(fmt.Sprintf("CREATE DATABASE %s_%s_%s", f.Prefix, "tarantula", f.GroupName))
+		if err != nil {
+			core.AppLog.Warn().Msgf("failed to create database %s", err.Error())
+		}
+		sql := persistence.Postgresql{Url: f.Pgs.DatabaseURL + "/" + f.Prefix + "_tarantula_" + f.GroupName}
+		err = sql.Create()
+		if err != nil {
+			return err
+		}
+		s.Sql = sql
+	}
 	return nil
 }
 
