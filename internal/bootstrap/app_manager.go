@@ -53,7 +53,6 @@ func (s *AppManager) Start(f core.Env) error {
 	s.F = f
 	s.initLogger(f)
 	core.AppLog.Info().Msgf("vault %v", f.Vlt)
-	core.AppLog.Info().Msgf("app manager starting on %s %v\n", f.Prefix, f)
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk
 	if f.Pgs.Enabled {

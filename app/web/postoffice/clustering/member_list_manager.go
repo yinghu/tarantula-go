@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/util"
 	"github.com/hashicorp/memberlist"
 )
 
@@ -25,7 +26,7 @@ type MemberlistManager struct {
 	//Seq      core.Sequence
 }
 
-func (m *MemberlistManager) Start(meta []byte, seq core.Sequence) error {
+func (m *MemberlistManager) Start(meta []byte, seq core.Sequence, vt core.Vault) error {
 	m.MemberHashRing = &MemberHashRing{weight: NODE_WEIGHT, hLock: &sync.Mutex{}}
 	m.nodes = make([]core.Node, 0)
 	cfg := memberlist.DefaultLANConfig()
@@ -57,7 +58,7 @@ func (m *MemberlistManager) Start(meta []byte, seq core.Sequence) error {
 	m.meta = meta
 	m.Memberlist = list
 	go m.Listen()
-	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode, RSync: rwSync, seq: seq}
+	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode, RSync: rwSync, seq: seq, Vault: util.VaultClient{Host: vt.Host, MountPath: vt.MountPath, Token: vt.Token}}
 	m.DataServiceProvider.rpcEndpoint = fmt.Sprintf("%s:%d", string(m.LocalNode().Addr.String()), core.RPC_PORT)
 	m.Mll = &m.MemberListListener
 	m.Mll.DWait.Add(1)

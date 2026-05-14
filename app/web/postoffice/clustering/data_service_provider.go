@@ -10,6 +10,7 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
+	"gameclustering.com/internal/util"
 	"google.golang.org/grpc"
 )
 
@@ -43,6 +44,7 @@ type DataServiceProvider struct {
 
 	//task transaction
 	TManager *TaskManager
+	Vault    util.VaultClient
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
@@ -130,6 +132,14 @@ func (c *DataServiceProvider) Start(dir string) {
 	err := os.MkdirAll(path, 0755)
 	if err != nil {
 		panic(err)
+	}
+	err = c.Vault.Auth()
+	if err != nil {
+		kv, err := c.Vault.GetSecret("auth")
+		if err != nil {
+			core.AppLog.Debug().Msgf("Auth %s", kv.Data["jwt"])
+			core.AppLog.Debug().Msgf("Auth %s", kv.Data["cipher"])
+		}
 	}
 	c.Local = &persistence.BadgerLocal{Path: path, InMemory: false, LogDisabled: false, GcEnabled: true}
 	err = c.Local.Open()
