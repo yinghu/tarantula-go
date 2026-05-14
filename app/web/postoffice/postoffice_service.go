@@ -36,7 +36,7 @@ func (s *PostofficeService) Start(env core.Env) error {
 	s.mm = &m
 	s.mm.DWait.Wait()
 	s.started = true
-	ak, err := m.AuthKey(context.Background(), &protocol.Request{Context: s.F.PresenceCtx()})
+	ak, err := m.AuthKey(context.Background(), &protocol.Request{Context: fmt.Sprintf("%s#%s", s.F.PresenceCtx(), "auth")})
 	if err != nil {
 		panic(err.Error())
 	}

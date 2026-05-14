@@ -16,8 +16,11 @@ func (c *DataServiceProvider) AuthKey(ctx context.Context, request *protocol.Req
 	core.AppLog.Info().Msgf("load auth key %s", request.Context)
 	mp := strings.Split(request.Context, "#")
 	ak := protocol.AuthKey{Context: request.Context}
-	core.AppLog.Warn().Msgf("context %d %v", len(mp), mp)
-	kv, err := c.Vault.GetSecret("dev/presence", "auth")
+	if len(mp) != 2 {
+		core.AppLog.Fatal().Msgf("wrong context format %s", request.Context)
+		return &ak, fmt.Errorf("wrong context format %s", request.Context)
+	}
+	kv, err := c.Vault.GetSecret(mp[0], mp[1])
 	if err != nil {
 		core.AppLog.Warn().Msgf("load auth key error %s", err.Error())
 		return &ak, err
