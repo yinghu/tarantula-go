@@ -92,15 +92,15 @@ func TestGcpAuth(t *testing.T) {
 }
 
 func TestVaultClient(t *testing.T) {
-	vclient := VaultClient{Host: "http://127.0.0.1:8200",Token: "root"}
+	vclient := VaultClient{Host: "http://192.168.1.11:8200", Token: "", MountPath: "tarantula"}
 	err := vclient.Auth()
 	if err != nil {
 		t.Errorf("error %s", err.Error())
 	}
-	sk,err := vclient.GetSecret("dev/gcp") 
+	sk, err := vclient.GetSecret("gcp")
 	if err != nil {
 		t.Errorf("error %s", err.Error())
 		return
 	}
-	fmt.Printf("Key %v",sk.Data)
+	fmt.Printf("Key %v", sk.Data)
 }
