@@ -3,6 +3,7 @@ package clustering
 import (
 	context "context"
 	"fmt"
+	"strings"
 	"time"
 
 	"gameclustering.com/internal/core"
@@ -13,10 +14,11 @@ import (
 
 func (c *DataServiceProvider) AuthKey(ctx context.Context, request *protocol.Request) (*protocol.AuthKey, error) {
 	core.AppLog.Info().Msgf("load auth key %s", request.Context)
-	kv, err := c.Vault.GetSecret("auth")
+	mp := strings.Split(request.Context, "#")
+	kv, err := c.Vault.GetSecret(mp[0], mp[1])
 	ak := protocol.AuthKey{Context: request.Context}
 	if err != nil {
-		core.AppLog.Warn().Msgf("load auth key error %s", err.Error())	
+		core.AppLog.Warn().Msgf("load auth key error %s", err.Error())
 		return &ak, err
 	}
 	jwt, _ := kv.Data["jwt"].(string)
@@ -26,7 +28,6 @@ func (c *DataServiceProvider) AuthKey(ctx context.Context, request *protocol.Req
 	ak.Cipher = []byte(cipher) //("NyXPfuLkqlsZcz//Y7Cm7oQ14MgIv29ouRmia+Vr2NY=")
 	return &ak, nil
 }
-
 
 func (c *DataServiceProvider) HashRing(ctx context.Context, request *protocol.Request) (*protocol.Response, error) {
 	rq := make(chan []core.Node, 1)

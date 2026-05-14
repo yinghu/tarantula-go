@@ -9,7 +9,6 @@ import (
 type VaultClient struct {
 	Host      string
 	Token     string
-	MountPath string
 	client    *vault.Client
 }
 
@@ -25,6 +24,6 @@ func (v *VaultClient) Auth() error {
 	return nil
 }
 
-func (v *VaultClient) GetSecret(path string) (*vault.KVSecret, error) {
-	return v.client.KVv2(v.MountPath).Get(context.Background(), path)
+func (v *VaultClient) GetSecret(mountPath string,path string) (*vault.KVSecret, error) {
+	return v.client.KVv2(mountPath).Get(context.Background(), path)
 }
