@@ -21,7 +21,7 @@ services:
     container_name: vault
     environment:
       VAULT_ROOT_TOKEN_ID: tarantula
-      VAULT_LOCAL_CONFIG: '{"ui":"true",{"tcp": {"address": "0.0.0.0:8200", "tls_disable": 1}},"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h","disable_mlock":"true"}'
+      VAULT_LOCAL_CONFIG: '{"ui":"true","listener":{"tcp": {"address": "0.0.0.0:8200", "tls_disable": 1}},"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h","disable_mlock":"true"}'
       SKIP_SETCAP: true
       SKIP_CHOWN: true
     ports:
