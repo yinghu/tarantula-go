@@ -3,6 +3,7 @@ package util
 import (
 	"encoding/base64"
 	"fmt"
+	"os"
 	"testing"
 )
 
@@ -52,8 +53,9 @@ func TestSsh(t *testing.T) {
 }
 
 func TestGcpAuth(t *testing.T) {
+	data, _ := os.ReadFile("C:\\development\\prismatic-grail-206205-bdc198bbb5de.json")
 	gcp := GcpComputeEngine{
-		ServiceAccount: "C:\\development\\prismatic-grail-206205-bdc198bbb5de.json",
+		ServiceAccount: string(data),
 		ProjectId:      "prismatic-grail-206205",
 		Zone:           "us-east1-c",
 	}
