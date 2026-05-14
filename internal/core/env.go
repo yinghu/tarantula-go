@@ -22,6 +22,12 @@ type Sql struct {
 	DatabaseURL string `json:"DatabaseURL"`
 }
 
+type Vault struct {
+	Host      string
+	MountPath string
+	Token     string
+}
+
 type EventEndpoint struct {
 	Enabled         bool   `json:"Enabled"`
 	OutboundEnabled bool   `json:"OutboundEnabled"`
@@ -38,7 +44,6 @@ type Env struct {
 	HttpBinding     string        `json:"HttpBinding"`
 	HttpEndpoint    string        `json:"HttpEndpoint"`
 	Evp             EventEndpoint `json:"EventEndpoint"`
-	//ManagedApps     []string      `json:"ManagedApps"`
 	Pgs             Sql           `json:"Sql"`
 	HomeDir         string        `json:"HomeDir"`
 	LogTruncated    bool          `json:"LogTruncated"`
