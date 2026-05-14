@@ -4,10 +4,7 @@ IF "%version%" == "" (
     SET version=latest
 )
 @echo "Build params : %version%"
-xcopy "%HOMEDRIVE%/%HOMEPATH%"\.ssh\id_ed25519 . /s
-xcopy "%HOMEDRIVE%/%HOMEPATH%"\.ssh\known_hosts . /s
-xcopy "%HOMEDRIVE%/%HOMEPATH%"\.gitconfig . /s
-xcopy "%HOMEDRIVE%/%HOMEPATH%"\token.txt . /s
+
 docker build -f .\docker_application_build --tag tarantula.admin:%version% --build-arg app=admin .
 IF %ERRORLEVEL% NEQ 0 ( 
    @echo "build failed, try again"
@@ -55,7 +52,3 @@ IF %ERRORLEVEL% NEQ 0 (
 :Clean
 docker builder prune -af
 @echo "deleting build files"
-del id_ed25519
-del known_hosts
-del .gitconfig
-del token.txt

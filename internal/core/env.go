@@ -106,5 +106,7 @@ func (f *Env) Load(fn string) error {
 	if exists {
 		f.Pgs.DatabaseURL = c
 	}
+
+	
 	return nil
 }
