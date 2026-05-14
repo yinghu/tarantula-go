@@ -35,11 +35,8 @@ func (c *SshClient) WithPassword() error {
 }
 
 func (c *SshClient) WithKey() error {
-	key, err := os.ReadFile(c.PrivateKey)
-	if err != nil {
-		return err
-	}
-	signer, err := ssh.ParsePrivateKey(key)
+
+	signer, err := ssh.ParsePrivateKey([]byte(c.PrivateKey))
 	if err != nil {
 		return err
 	}

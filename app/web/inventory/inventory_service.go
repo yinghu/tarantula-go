@@ -41,18 +41,31 @@ func (s *InventoryService) Start(f core.Env) error {
 		if err != nil {
 			return err
 		}
-		//core.AppLog.Debug().Msgf("gcp %v", key.Gcp)
 		gcp := util.GcpComputeEngine{ServiceAccount: key.Gcp.Iam, ProjectId: "prismatic-grail-206205", Zone: "us-east1-c"}
 		err = gcp.Auth()
 		if err != nil {
 			core.AppLog.Debug().Msgf("gcp auth error %s", err)
-		} else {
-			
-			err = gcp.Insert("tarantula-build-01")
-			if err != nil {
-				core.AppLog.Debug().Msgf("gcp insert error %s", err)
-			}
+			return err
 		}
+		err = gcp.Insert("tarantula-build-01")
+		if err != nil {
+			core.AppLog.Debug().Msgf("gcp insert error %s", err)
+			return err
+		}
+		ins, err := gcp.Get("tarantula-build-01")
+		if err != nil {
+			core.AppLog.Debug().Msgf("gcp get error %s", err)
+			return err
+		}
+		ssh := util.SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: key.Gcp.Ssh}
+		err = ssh.WithKey()
+		if err != nil {
+			core.AppLog.Debug().Msgf("gcp ssh error %s", err)
+			return err
+		}
+		ssh.Run("pwd")
+		gcp.Close()
+		ssh.Close()
 		obj, err := mf.Message(e.Object)
 		if err != nil {
 			core.AppLog.Warn().Msgf("wrong decode format %s", err)
