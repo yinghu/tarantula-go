@@ -13,9 +13,17 @@ import (
 
 func (c *DataServiceProvider) AuthKey(ctx context.Context, request *protocol.Request) (*protocol.AuthKey, error) {
 	core.AppLog.Info().Msgf("load auth key %s", request.Context)
+	kv, err := c.Vault.GetSecret("auth")
 	ak := protocol.AuthKey{Context: request.Context, Size: 32}
-	ak.Jwt = []byte("M4KExRr9HQbFRmUObhPsFJ2aDC4e/dkayHqwA568czw=")
-	ak.Cipher = []byte("NyXPfuLkqlsZcz//Y7Cm7oQ14MgIv29ouRmia+Vr2NY=")
+	if err != nil {
+		core.AppLog.Warn().Msgf("load auth key error %s", err.Error())	
+		return &ak, err
+	}
+	jwt, _ := kv.Data["jwt"].(string)
+	cipher, _ := kv.Data["cipher"].(string)
+
+	ak.Jwt = []byte(jwt)       //[]byte("M4KExRr9HQbFRmUObhPsFJ2aDC4e/dkayHqwA568czw=")
+	ak.Cipher = []byte(cipher) //("NyXPfuLkqlsZcz//Y7Cm7oQ14MgIv29ouRmia+Vr2NY=")
 	return &ak, nil
 }
 

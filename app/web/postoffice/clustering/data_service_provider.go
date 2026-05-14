@@ -134,12 +134,8 @@ func (c *DataServiceProvider) Start(dir string) {
 		panic(err)
 	}
 	err = c.Vault.Auth()
-	if err == nil {
-		kv, err := c.Vault.GetSecret("auth")
-		if err == nil {
-			core.AppLog.Debug().Msgf("Auth %s", kv.Data["jwt"])
-			core.AppLog.Debug().Msgf("Auth %s", kv.Data["cipher"])
-		}
+	if err != nil {
+		panic(err)
 	}
 	c.Local = &persistence.BadgerLocal{Path: path, InMemory: false, LogDisabled: false, GcEnabled: true}
 	err = c.Local.Open()
