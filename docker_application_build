@@ -17,16 +17,6 @@ RUN mkdir /home/tarantula/${app}
  
 WORKDIR /home/tarantula
 
-RUN mkdir /home/tarantula/.ssh
-
-COPY --from=builder /build/.gitconfig .
-
-COPY --from=builder /build/id_ed25519 ./.ssh
-COPY --from=builder /build/known_hosts ./.ssh
-COPY --from=builder /build/gx-01.json ./.ssh
-COPY --from=builder /build/gx-01.key ./.ssh
-COPY --from=builder /build/gx-01.key.pub ./.ssh
-
 # Application Install
 WORKDIR /home/tarantula/bin
 RUN echo installing app : ${app}

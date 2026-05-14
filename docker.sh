@@ -2,12 +2,6 @@
 
 Clean(){
     echo "deleting build files"
-    rm id_ed25519
-    rm known_hosts
-    rm .gitconfig
-    rm gx-01.key
-    rm gx-01.key.pub
-    rm gx-01.json
 }
 Check(){
     if [[ $? -ne 0 ]]; then
@@ -24,12 +18,7 @@ else
 fi
 
 echo "Build params : ${version}"
-cp ~/.ssh/id_ed25519 .
-cp ~/.ssh/known_hosts .
-cp ~/.ssh/gx-01.key .
-cp ~/.ssh/gx-01.key.pub .
-cp ~/.ssh/gx-01.json .
-cp ~/.gitconfig .
+
 
 apps=("admin" "presence" "inventory" "asset" "postoffice")
 for app in "${apps[@]}"; do

@@ -51,6 +51,8 @@ type Env struct {
 	AuthLevel       int32         `json:"AuthLevel"`
 	ClusterSeed     []string      `json:"ClusterSeed"`
 	IsClusterMember bool          `json:"IsClusterMember"`
+
+	Vlt Vault `json:"-"`
 }
 
 func (f *Env) PresenceCtx() string {
