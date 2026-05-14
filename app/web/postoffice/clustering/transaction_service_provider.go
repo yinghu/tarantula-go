@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	JOB_TIMEOUT_SECONDS         uint32 = 60
-	TRANSACTION_TIMEOUT_SECONDS uint32 = 10
+	JOB_TIMEOUT_SECONDS         uint32 = 600
+	TRANSACTION_TIMEOUT_SECONDS uint32 = 120
 	TCC_RETRY_MAX               uint32 = 3
 )
 

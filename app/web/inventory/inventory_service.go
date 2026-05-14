@@ -9,6 +9,7 @@ import (
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
+	"gameclustering.com/internal/util"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -41,6 +42,16 @@ func (s *InventoryService) Start(f core.Env) error {
 			return err
 		}
 		core.AppLog.Debug().Msgf("gcp %v", key.Gcp)
+		gcp := util.GcpComputeEngine{ServiceAccount: key.Gcp.Iam, ProjectId: "prismatic-grail-206205", Zone: "us-east1-c"}
+		err = gcp.Auth()
+		if err != nil {
+			core.AppLog.Debug().Msgf("gcp auth error %s", err)
+		} else {
+			err = gcp.Insert("tarantula-build-01")
+			if err != nil {
+				core.AppLog.Debug().Msgf("gcp insert error %s", err)
+			}
+		}
 		obj, err := mf.Message(e.Object)
 		if err != nil {
 			core.AppLog.Warn().Msgf("wrong decode format %s", err)
