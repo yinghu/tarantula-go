@@ -15,7 +15,10 @@ import (
 func (c *DataServiceProvider) AuthKey(ctx context.Context, request *protocol.Request) (*protocol.AuthKey, error) {
 	core.AppLog.Info().Msgf("load auth key %s", request.Context)
 	mp := strings.Split(request.Context, "#")
-	kv, err := c.Vault.GetSecret(mp[0], mp[1])
+	for _, f := range mp{
+		core.AppLog.Debug().Msgf("m %s",f)
+	}
+	kv, err := c.Vault.GetSecret("dev/presence","auth")
 	ak := protocol.AuthKey{Context: request.Context}
 	if err != nil {
 		core.AppLog.Warn().Msgf("load auth key error %s", err.Error())
