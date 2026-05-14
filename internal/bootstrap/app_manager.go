@@ -15,20 +15,17 @@ import (
 )
 
 type AppManager struct {
-	
-	Auth        core.Authenticator
-	Sql         persistence.Postgresql
-	F           core.Env
-	seq         core.Sequence
-	
-	cluster     *ClusterManager
-	
-	log         io.Writer //zerolog.Logger
-	forward     LogForwarder
-	threshold   zerolog.Level
+	Auth core.Authenticator
+	Sql  persistence.Postgresql
+	F    core.Env
+	seq  core.Sequence
+
+	cluster *ClusterManager
+
+	log       io.Writer //zerolog.Logger
+	forward   LogForwarder
+	threshold zerolog.Level
 }
-
-
 
 func (s *AppManager) Authenticator() core.Authenticator {
 	return s.Auth
@@ -40,7 +37,6 @@ func (s *AppManager) Sequence() core.Sequence {
 func (c *AppManager) Cluster() core.ClusterService {
 	return c.cluster
 }
-
 
 func (s *AppManager) NodeId() string {
 	return s.F.NodeName
@@ -56,6 +52,7 @@ func (s *AppManager) RegisterLogForwarder(threshold zerolog.Level, logf LogForwa
 func (s *AppManager) Start(f core.Env) error {
 	s.F = f
 	s.initLogger(f)
+	core.AppLog.Info().Msgf("vault %v", f.Vlt)
 	core.AppLog.Info().Msgf("app manager starting on %s %v\n", f.Prefix, f)
 	sfk := util.NewSnowflake(f.NodeId, util.EpochMillisecondsFromMidnight(2020, 1, 1))
 	s.seq = &sfk

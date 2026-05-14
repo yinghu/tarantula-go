@@ -106,7 +106,18 @@ func (f *Env) Load(fn string) error {
 	if exists {
 		f.Pgs.DatabaseURL = c
 	}
-
-	
+	f.Vlt = Vault{}
+	c, exists = os.LookupEnv("VAULT_HOST")
+	if exists {
+		f.Vlt.Host = c
+	}
+	c, exists = os.LookupEnv("VAULT_MOUNT_PATH")
+	if exists {
+		f.Vlt.MountPath = c
+	}
+	c, exists = os.LookupEnv("VAULT_TOKEN")
+	if exists {
+		f.Vlt.Token = c
+	}
 	return nil
 }
