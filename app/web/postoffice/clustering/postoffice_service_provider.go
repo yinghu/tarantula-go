@@ -17,6 +17,7 @@ func (c *DataServiceProvider) AuthKey(ctx context.Context, request *protocol.Req
 	mp := strings.Split(request.Context, "#")
 	ak := protocol.AuthKey{Context: request.Context}
 	if len(mp) != 2 {
+		core.AppLog.Warn().Msgf("wrong context error %s", request.Context)
 		return &ak, fmt.Errorf("context wrong format")
 	}
 	kv, err := c.Vault.GetSecret(mp[0], mp[1])
