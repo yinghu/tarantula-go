@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	scp "github.com/bramvdbogaerde/go-scp"
 	"golang.org/x/crypto/ssh"
@@ -41,7 +42,11 @@ func (c *SshClient) WithKey() error {
 	if err != nil {
 		return err
 	}
-	pk, err := ssh.ParsePublicKey([]byte(c.PublicKey))
+	pk, _, _, _, err := ssh.ParseAuthorizedKey([]byte(strings.TrimSpace(c.PublicKey)))
+	if err != nil {
+		fmt.Printf("%s\n", c.PublicKey)
+		return err
+	}
 	conf := ssh.ClientConfig{
 		User: c.User,
 		Auth: []ssh.AuthMethod{

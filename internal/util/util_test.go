@@ -35,7 +35,6 @@ func TestKey(t *testing.T) {
 	}
 }
 
-
 func TestVaultClient(t *testing.T) {
 	vclient := VaultClient{Host: "http://192.168.1.11:8200", Token: ""}
 	err := vclient.Auth()
@@ -69,7 +68,8 @@ func TestVaultClient(t *testing.T) {
 		return
 	}
 	pk, _ := sk.Data["ssh"].(string)
-	ssh := SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: pk}
+	pb, _ := sk.Data["pub"].(string)
+	ssh := SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: pk, PublicKey: pb}
 	err = ssh.WithKey()
 	if err != nil {
 		t.Errorf("error %s", err.Error())
