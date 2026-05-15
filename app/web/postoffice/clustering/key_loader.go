@@ -60,9 +60,11 @@ func (a *KeyLoader) toSqlKey(kv *vault.KVSecret) *protocol.AuthKey {
 func (a *KeyLoader) toGcpKey(kv *vault.KVSecret) *protocol.AuthKey {
 	iam, _ := kv.Data["iam"].(string)
 	ssh, _ := kv.Data["ssh"].(string)
+	pub, _ := kv.Data["pub"].(string)
 	ak := protocol.AuthKey{Gcp: &protocol.GcpAccess{}}
 	ak.Gcp.Iam = iam
 	ak.Gcp.Ssh = ssh
+	ak.Gcp.Pub = pub
 	return &ak
 }
 

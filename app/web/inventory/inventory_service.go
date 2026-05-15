@@ -47,23 +47,23 @@ func (s *InventoryService) Start(f core.Env) error {
 			core.AppLog.Debug().Msgf("gcp auth error %s", err)
 			return err
 		}
-		err = gcp.Insert("tarantula-build-01")
+		err = gcp.Insert("tarantula-build-02")
 		if err != nil {
 			core.AppLog.Debug().Msgf("gcp insert error %s", err)
 			return err
 		}
-		ins, err := gcp.Get("tarantula-build-01")
+		ins, err := gcp.Get("tarantula-build-02")
 		if err != nil {
 			core.AppLog.Debug().Msgf("gcp get error %s", err)
 			return err
 		}
-		ssh := util.SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: key.Gcp.Ssh}
+		ssh := util.SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: key.Gcp.Ssh, PublicKey: key.Gcp.Pub}
 		err = ssh.WithKey()
 		if err != nil {
 			core.AppLog.Debug().Msgf("gcp ssh error %s", err)
 			return err
 		}
-	
+		core.AppLog.Debug().Msgf("gcp ssh ok %s", err)
 		ssh.Run("pwd")
 		gcp.Close()
 		ssh.Close()

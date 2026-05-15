@@ -25,6 +25,7 @@ type GcpAccess struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Iam           string                 `protobuf:"bytes,1,opt,name=iam,proto3" json:"iam,omitempty"`
 	Ssh           string                 `protobuf:"bytes,2,opt,name=ssh,proto3" json:"ssh,omitempty"`
+	Pub           string                 `protobuf:"bytes,3,opt,name=pub,proto3" json:"pub,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -73,14 +74,22 @@ func (x *GcpAccess) GetSsh() string {
 	return ""
 }
 
+func (x *GcpAccess) GetPub() string {
+	if x != nil {
+		return x.Pub
+	}
+	return ""
+}
+
 var File_gcp_access_proto protoreflect.FileDescriptor
 
 const file_gcp_access_proto_rawDesc = "" +
 	"\n" +
-	"\x10gcp_access.proto\x12\bprotocol\"/\n" +
+	"\x10gcp_access.proto\x12\bprotocol\"A\n" +
 	"\tGcpAccess\x12\x10\n" +
 	"\x03iam\x18\x01 \x01(\tR\x03iam\x12\x10\n" +
-	"\x03ssh\x18\x02 \x01(\tR\x03sshBQ\n" +
+	"\x03ssh\x18\x02 \x01(\tR\x03ssh\x12\x10\n" +
+	"\x03pub\x18\x03 \x01(\tR\x03pubBQ\n" +
 	"\x17com.icodesoftware.protoB\x10GcpAccessFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (

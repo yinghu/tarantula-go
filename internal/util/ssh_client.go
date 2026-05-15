@@ -15,6 +15,7 @@ type SshClient struct {
 	User       string
 	Password   string
 	PrivateKey string
+	PublicKey  string
 	conn       *ssh.Client
 }
 
@@ -40,12 +41,13 @@ func (c *SshClient) WithKey() error {
 	if err != nil {
 		return err
 	}
+	pk, err := ssh.ParsePublicKey([]byte(c.PublicKey))
 	conf := ssh.ClientConfig{
 		User: c.User,
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(signer),
 		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		HostKeyCallback: ssh.FixedHostKey(pk),
 	}
 	ci, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", c.Host, 22), &conf)
 	if err != nil {
