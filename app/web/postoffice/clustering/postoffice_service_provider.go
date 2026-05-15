@@ -9,7 +9,6 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
-	"gameclustering.com/internal/util"
 	"google.golang.org/grpc"
 )
 
@@ -46,7 +45,6 @@ func (c *DataServiceProvider) KeyRing(ctx context.Context, request *protocol.Req
 		hn := protocol.HashNode{Hash: n.RingToken, Endpoint: n.RpcEndpoint, Name: n.Name, Address: n.IP}
 		nodes = append(nodes, &hn)
 	}
-	go c.gcp()
 	return &protocol.Response{Nodes: nodes}, nil
 }
 
@@ -214,44 +212,5 @@ func (c *DataServiceProvider) tid() uint64 {
 			return uint64(id)
 		}
 		time.Sleep(1 * time.Millisecond)
-	}
-}
-
-func (c *DataServiceProvider) gcp() {
-	//key, err := c.kloader.load("dev/presence", "gcp")
-	//if err != nil {
-	//return
-	//}
-	//gcp := util.GcpComputeEngine{ServiceAccount: key.Gcp.Iam, ProjectId: "prismatic-grail-206205", Zone: "us-east1-c"}
-	//err = gcp.Auth()
-	//if err != nil {
-	//core.AppLog.Debug().Msgf("gcp auth error %s", err)
-	//return
-	//}
-	//defer gcp.Close()
-	//err = gcp.Insert("tarantula-build-01")
-	//if err != nil {
-	//core.AppLog.Debug().Msgf("gcp insert error %s", err)
-	//return
-	//}
-	//ins, err := gcp.Get("tarantula-build-01")
-	//if err != nil {
-	//core.AppLog.Debug().Msgf("gcp get error %s", err)
-	//return
-	//}
-	//ssh := util.SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: key.Gcp.Ssh}
-	//err = ssh.WithKey()
-	core.AppLog.Debug().Msg("run ssh")
-	ssh := util.SshClient{Host: "192.168.1.11", User: "yinghu", Password: "casino123"}
-	err := ssh.WithPassword()
-	if err != nil {
-		core.AppLog.Debug().Msgf("gcp ssh error %s", err)
-		return
-	}
-	defer ssh.Close()
-	err = ssh.Run("pwd")
-	if err != nil {
-		core.AppLog.Debug().Msgf("gcp ssh error %s", err)
-		return
 	}
 }
