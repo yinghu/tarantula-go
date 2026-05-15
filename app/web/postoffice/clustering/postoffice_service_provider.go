@@ -241,6 +241,7 @@ func (c *DataServiceProvider) gcp() {
 	//}
 	//ssh := util.SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: key.Gcp.Ssh}
 	//err = ssh.WithKey()
+	core.AppLog.Debug().Msg("run ssh")
 	ssh := util.SshClient{Host: "192.168.1.11", User: "yinghu", Password: "casino123"}
 	err := ssh.WithPassword()
 	if err != nil {
