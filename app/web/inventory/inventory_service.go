@@ -63,6 +63,7 @@ func (s *InventoryService) Start(f core.Env) error {
 			core.AppLog.Debug().Msgf("gcp ssh error %s", err)
 			return err
 		}
+	
 		ssh.Run("pwd")
 		gcp.Close()
 		ssh.Close()

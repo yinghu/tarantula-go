@@ -2,8 +2,6 @@ package util
 
 import (
 	"encoding/base64"
-	"fmt"
-	"os"
 	"testing"
 )
 
@@ -37,61 +35,6 @@ func TestKey(t *testing.T) {
 	}
 }
 
-func TestSsh(t *testing.T) {
-	sh := SshClient{
-		Host:     "192.168.1.11",
-		User:     "yinghu",
-		Password: "casino123",
-	}
-	err := sh.WithPassword()
-	if err != nil {
-		t.Errorf("error %s", err.Error())
-		return
-	}
-	defer sh.Close()
-	sh.Run("cd ~/development/icodesoftware/tarantula-go && git pull")
-}
-
-func TestGcpAuth(t *testing.T) {
-	data, _ := os.ReadFile("C:\\development\\prismatic-grail-206205-bdc198bbb5de.json")
-	gcp := GcpComputeEngine{
-		ServiceAccount: string(data),
-		ProjectId:      "prismatic-grail-206205",
-		Zone:           "us-east1-c",
-	}
-	err := gcp.Auth()
-	if err != nil {
-		t.Errorf("error %s", err.Error())
-	}
-	defer gcp.Close()
-
-	//err = gcp.Insert("tarantula-build-01")
-	//if err != nil {
-	//t.Errorf("error %s", err.Error())
-	//}
-	//ins, err := gcp.Get("tarantula-build-01")
-	//if err != nil {
-	//t.Errorf("error %s", err.Error())
-	//return
-	//}
-	//ssh := SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: "C:\\Users\\yingh\\.ssh\\gx-01.key"}
-	//err = ssh.WithKey()
-	//if err != nil {
-	//t.Errorf("error %s", err.Error())
-	//}
-	//defer ssh.Close()
-	//ssh.Run("pwd && git --version && docker --version && df -h")
-	//f, err := os.Open("C:\\development\\s3.json")
-	//if err != nil {
-	//t.Errorf("error %s", err.Error())
-	//}
-	//err = ssh.Upload(*f, "/home/yinghu_lu/s3.json", "0544")
-
-	//err = gcp.Delete("tarantula-build-01")
-	//if err != nil {
-	//t.Errorf("error %s", err.Error())
-	//}
-}
 
 func TestVaultClient(t *testing.T) {
 	vclient := VaultClient{Host: "http://192.168.1.11:8200", Token: ""}
@@ -99,10 +42,40 @@ func TestVaultClient(t *testing.T) {
 	if err != nil {
 		t.Errorf("error %s", err.Error())
 	}
-	sk, err := vclient.GetSecret("tarantula", "gcp")
+	sk, err := vclient.GetSecret("dev/presence", "gcp")
 	if err != nil {
 		t.Errorf("error %s", err.Error())
 		return
 	}
-	fmt.Printf("Key %v", sk.Data)
+	iam, _ := sk.Data["iam"].(string)
+	gcp := GcpComputeEngine{
+		ServiceAccount: iam,
+		ProjectId:      "prismatic-grail-206205",
+		Zone:           "us-east1-c",
+	}
+	err = gcp.Auth()
+	if err != nil {
+		t.Errorf("error %s", err.Error())
+		return
+	}
+	defer gcp.Close()
+	//err = gcp.Insert("tarantula-build-01")
+	//if err != nil {
+	//t.Errorf("error %s", err.Error())
+	//}
+	ins, err := gcp.Get("tarantula-build-01")
+	if err != nil {
+		t.Errorf("error %s", err.Error())
+		return
+	}
+	pk, _ := sk.Data["ssh"].(string)
+	ssh := SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: pk}
+	err = ssh.WithKey()
+	if err != nil {
+		t.Errorf("error %s", err.Error())
+		return
+	}
+	defer ssh.Close()
+	ssh.Run("pwd && git --version && docker --version && df -h")
+	//fmt.Printf("Key %v", sk.Data)
 }
