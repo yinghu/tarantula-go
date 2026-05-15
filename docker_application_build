@@ -14,6 +14,7 @@ ARG app
 RUN addgroup -S tarantula && adduser -S tarantula -G tarantula
 
 RUN mkdir /home/tarantula/${app}
+RUN mkdir /home/tarantula/.ssh
  
 WORKDIR /home/tarantula
 
