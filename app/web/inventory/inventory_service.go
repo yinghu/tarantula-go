@@ -55,15 +55,16 @@ func (s *InventoryService) Start(f core.Env) error {
 			core.AppLog.Debug().Msgf("gcp read error %s", err.Error())
 			return err
 		}
-		f, err := os.OpenFile("../.ssh/known_hosts", os.O_APPEND, 0644)
+
+		cmd := exec.Command("ssh-keyscan", "-H", ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP())
+		out, err := cmd.Output()
 		if err != nil {
-			core.AppLog.Debug().Msgf("open file error %s", err.Error())
+			core.AppLog.Debug().Msgf("ssh-kenscann error %s", err.Error())
 			return err
 		}
-		cmd := exec.Command("ssh-keyscan", "-H", ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP())
-		cmd.Stdout = f
-		if err := cmd.Run(); err != nil {
-			core.AppLog.Debug().Msgf("ssh-kenscann error %s", err.Error())
+		err = os.WriteFile("../.ssh/known_host", out, 0644)
+		if err != nil {
+			core.AppLog.Debug().Msgf("write file error %s", err.Error())
 			return err
 		}
 		ssh := util.SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: key.Gcp.Ssh}
