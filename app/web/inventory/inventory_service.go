@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -52,21 +53,22 @@ func (s *InventoryService) Start(f core.Env) error {
 			core.AppLog.Debug().Msgf("gcp insert error %s", err)
 			return err
 		}
-		ins, err := gcp.Get("tarantula-build-02")
+		err = os.WriteFile("./tem.key", []byte(key.Gcp.Ssh), os.FileMode.Perm(0755))
+		//ins, err := gcp.Get("tarantula-build-02")
 		if err != nil {
-			core.AppLog.Debug().Msgf("gcp get error %s", err)
-			return err
+			core.AppLog.Debug().Msgf("write key error %s", err.Error())
+			//return err
 		}
-		ssh := util.SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: key.Gcp.Ssh, PublicKey: key.Gcp.Pub}
-		err = ssh.WithKey()
-		if err != nil {
-			core.AppLog.Debug().Msgf("gcp ssh error %s", err)
-			return err
-		}
-		core.AppLog.Debug().Msgf("gcp ssh ok %s", err)
-		ssh.Run("pwd")
+		//ssh := util.SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: key.Gcp.Ssh, PublicKey: key.Gcp.Pub}
+		//err = ssh.WithKey()
+		//if err != nil {
+		//core.AppLog.Debug().Msgf("gcp ssh error %s", err)
+		//return err
+		//}
+		//core.AppLog.Debug().Msgf("gcp ssh ok %s", err)
+		//ssh.Run("pwd")
 		gcp.Close()
-		ssh.Close()
+		//ssh.Close()
 		obj, err := mf.Message(e.Object)
 		if err != nil {
 			core.AppLog.Warn().Msgf("wrong decode format %s", err)
