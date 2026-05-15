@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"os/exec"
 
 	"gameclustering.com/internal/bootstrap"
@@ -54,7 +55,17 @@ func (s *InventoryService) Start(f core.Env) error {
 			core.AppLog.Debug().Msgf("gcp read error %s", err.Error())
 			return err
 		}
-		exec.Command("ssh-keyscan", fmt.Sprintf("-H %s >> ../.ssh/known_hosts", ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP()))
+		f, err := os.OpenFile("../.ssh/known_hosts", os.O_APPEND, 0644)
+		if err != nil {
+			core.AppLog.Debug().Msgf("open file error %s", err.Error())
+			return err
+		}
+		cmd := exec.Command("ssh-keyscan", "-H", ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP())
+		cmd.Stdout = f
+		if err := cmd.Run(); err != nil {
+			core.AppLog.Debug().Msgf("ssh-kenscann error %s", err.Error())
+			return err
+		}
 		ssh := util.SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: key.Gcp.Ssh}
 		err = ssh.WithKey()
 		if err != nil {

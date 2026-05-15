@@ -16,6 +16,7 @@ RUN addgroup -S tarantula && adduser -S tarantula -G tarantula
 
 RUN mkdir /home/tarantula/${app}
 RUN mkdir /home/tarantula/.ssh
+RUN touch /home/tarantula/.ssh/known_hosts
  
 WORKDIR /home/tarantula
 
