@@ -8,6 +8,7 @@ import (
 
 	scp "github.com/bramvdbogaerde/go-scp"
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/knownhosts"
 )
 
 type SshClient struct {
@@ -15,7 +16,6 @@ type SshClient struct {
 	User       string
 	Password   string
 	PrivateKey string
-	PublicKey  string
 	conn       *ssh.Client
 }
 
@@ -41,17 +41,18 @@ func (c *SshClient) WithKey() error {
 	if err != nil {
 		return err
 	}
-	//pk, _, _, _, err := ssh.ParseAuthorizedKey([]byte(strings.TrimSpace(c.PublicKey)))
-	//if err != nil {
-	//fmt.Printf("%s\n", c.PublicKey)
-	//return err
-	//}
+
+	hc, err := knownhosts.New("../.ssh/known_hosts")
+	if err != nil {
+		fmt.Printf("%s\n", err.Error())
+		return err
+	}
 	conf := ssh.ClientConfig{
 		User: c.User,
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(signer),
 		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(), //ssh.FixedHostKey(pk),
+		HostKeyCallback: hc,
 	}
 	ci, err := ssh.Dial("tcp", fmt.Sprintf("%s:%d", c.Host, 22), &conf)
 	if err != nil {

@@ -62,14 +62,13 @@ func TestVaultClient(t *testing.T) {
 	//if err != nil {
 	//t.Errorf("error %s", err.Error())
 	//}
-	ins, err := gcp.Get("tarantula-build-01")
+	ins, err := gcp.Get("tarantula-build-02")
 	if err != nil {
 		t.Errorf("error %s", err.Error())
 		return
 	}
 	pk, _ := sk.Data["ssh"].(string)
-	pb, _ := sk.Data["pub"].(string)
-	ssh := SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: pk, PublicKey: pb}
+	ssh := SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: pk}
 	err = ssh.WithKey()
 	if err != nil {
 		t.Errorf("error %s", err.Error())

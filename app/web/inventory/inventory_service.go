@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os/exec"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
+	"gameclustering.com/internal/util"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -36,6 +38,33 @@ func (s *InventoryService) Start(f core.Env) error {
 		mf := persistence.NewCommodityObjectFactory()
 		core.AppLog.Debug().Msgf("SYSTEMID %d", s.ToSystemId(e.Object.Key.Array))
 		core.AppLog.Debug().Msgf("META %v", e.Meta)
+		key, err := s.Cluster().AuthKey("gcp")
+		if err != nil {
+			return err
+		}
+		gcp := util.GcpComputeEngine{ServiceAccount: key.Gcp.Iam, ProjectId: "prismatic-grail-206205", Zone: "us-east1-c"}
+		err = gcp.Auth()
+		if err != nil {
+			core.AppLog.Debug().Msgf("gcp auth error %s", err)
+			return err
+		}
+
+		ins, err := gcp.Get("tarantula-build-02")
+		if err != nil {
+			core.AppLog.Debug().Msgf("gcp read error %s", err.Error())
+			return err
+		}
+		exec.Command("ssh-keyscan", fmt.Sprintf("-H %s >> ../.ssh/known_hosts", ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP()))
+		ssh := util.SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: key.Gcp.Ssh}
+		err = ssh.WithKey()
+		if err != nil {
+			core.AppLog.Debug().Msgf("gcp ssh error %s", err)
+			return err
+		}
+		core.AppLog.Debug().Msgf("gcp ssh ok %s", err)
+		ssh.Run("pwd")
+		gcp.Close()
+		ssh.Close()
 		obj, err := mf.Message(e.Object)
 		if err != nil {
 			core.AppLog.Warn().Msgf("wrong decode format %s", err)
