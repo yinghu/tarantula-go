@@ -249,5 +249,9 @@ func (c *DataServiceProvider) gcp() {
 		return
 	}
 	defer ssh.Close()
-	ssh.Run("pwd")
+	err = ssh.Run("pwd")
+	if err != nil {
+		core.AppLog.Debug().Msgf("gcp ssh error %s", err)
+		return
+	}
 }
