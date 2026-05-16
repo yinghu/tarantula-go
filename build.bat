@@ -11,21 +11,12 @@ IF %ERRORLEVEL% NEQ 0 (
    goto Clean 
 )
 
-docker build -f .\docker_application_build --tag tarantula.gcp:%version% --build-arg app=gcp .
+docker build -f .\docker_application_build --tag tarantula.cloud:%version% --build-arg app=cloud .
 IF %ERRORLEVEL% NEQ 0 ( 
     @echo "build failed, try again"
     goto Clean
 )
-docker build -f .\docker_application_build --tag tarantula.aws:%version% --build-arg app=aws .
-IF %ERRORLEVEL% NEQ 0 ( 
-    @echo "build failed, try again"
-    goto Clean
-)
-docker build -f .\docker_application_build --tag tarantula.azure:%version% --build-arg app=azure .
-IF %ERRORLEVEL% NEQ 0 ( 
-    @echo "build failed, try again"
-    goto Clean
-)
+
 docker build -f .\docker_application_build --tag tarantula.postoffice:%version% --build-arg app=postoffice .
 IF %ERRORLEVEL% NEQ 0 ( 
     @echo "build failed, try again"

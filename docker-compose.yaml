@@ -11,50 +11,20 @@ services:
       - volume_postoffice:/home/tarantula/postoffice
     env_file:
       - .env  
-  gcp:
+  cloud:
     stop_grace_period: 20s
     restart: unless-stopped
-    container_name: gcp
-    hostname: gcp
-    image: tarantula.gcp:${VERSION}
+    container_name: cloud
+    hostname: cloud
+    image: tarantula.cloud:${VERSION}
     volumes:
-      - volume_gcp:/home/tarantula/gcp
+      - volume_cloud:/home/tarantula/cloud
     depends_on:
       - postoffice     
     networks:
       - tarantula-app-net
     env_file:
       - .env 
-  aws:
-    stop_grace_period: 20s
-    restart: unless-stopped
-    container_name: aws
-    hostname: aws
-    image: tarantula.aws:${VERSION}
-    volumes:
-      - volume_aws:/home/tarantula/aws
-    depends_on:
-      - postoffice     
-    networks:
-      - tarantula-app-net
-    env_file:
-      - .env 
-
-  azure:
-    stop_grace_period: 20s
-    restart: unless-stopped
-    container_name: azure
-    hostname: azure
-    image: tarantula.azure:${VERSION}
-    volumes:
-      - volume_azure:/home/tarantula/azure
-    depends_on:
-      - postoffice     
-    networks:
-      - tarantula-app-net
-    env_file:
-      - .env 
-
   admin:
     stop_grace_period: 20s
     restart: unless-stopped
@@ -64,9 +34,7 @@ services:
     volumes:
       - volume_admin:/home/tarantula/admin  
     depends_on:
-      - gcp
-      - azure
-      - aws
+      - cloud
     networks:
       - tarantula-app-net
     env_file:
@@ -88,7 +56,5 @@ networks:
     external: true
 volumes:
   volume_postoffice:
-  volume_gcp:
-  volume_aws:
-  volume_azure:
+  volume_cloud:
   volume_admin:

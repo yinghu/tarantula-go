@@ -19,7 +19,7 @@ fi
 
 echo "Build params : ${version}"
 
-apps=("admin" "postoffice" "gcp" "aws" "azure")
+apps=("admin" "postoffice" "cloud")
 for app in "${apps[@]}"; do
   echo "Current build target : $app"
   podman build  -f ./docker_application_build --build-arg app=$app --tag tarantula.$app:$version .
