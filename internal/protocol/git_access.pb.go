@@ -24,8 +24,8 @@ const (
 type GitAccess struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Key           string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	Hosts         string                 `protobuf:"bytes,2,opt,name=hosts,proto3" json:"hosts,omitempty"`
-	Config        string                 `protobuf:"bytes,3,opt,name=config,proto3" json:"config,omitempty"`
+	User          string                 `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -67,16 +67,16 @@ func (x *GitAccess) GetKey() string {
 	return ""
 }
 
-func (x *GitAccess) GetHosts() string {
+func (x *GitAccess) GetUser() string {
 	if x != nil {
-		return x.Hosts
+		return x.User
 	}
 	return ""
 }
 
-func (x *GitAccess) GetConfig() string {
+func (x *GitAccess) GetEmail() string {
 	if x != nil {
-		return x.Config
+		return x.Email
 	}
 	return ""
 }
@@ -85,11 +85,11 @@ var File_git_access_proto protoreflect.FileDescriptor
 
 const file_git_access_proto_rawDesc = "" +
 	"\n" +
-	"\x10git_access.proto\x12\bprotocol\"K\n" +
+	"\x10git_access.proto\x12\bprotocol\"G\n" +
 	"\tGitAccess\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05hosts\x18\x02 \x01(\tR\x05hosts\x12\x16\n" +
-	"\x06config\x18\x03 \x01(\tR\x06configBQ\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x12\n" +
+	"\x04user\x18\x02 \x01(\tR\x04user\x12\x14\n" +
+	"\x05email\x18\x03 \x01(\tR\x05emailBQ\n" +
 	"\x17com.icodesoftware.protoB\x10GitAccessFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (

@@ -43,8 +43,8 @@ func (a *KeyLoader) toAuthKey(kv *vault.KVSecret) *protocol.AuthKey {
 	jwt, _ := kv.Data["jwt"].(string)
 	cipher, _ := kv.Data["cipher"].(string)
 	ak := protocol.AuthKey{}
-	ak.Jwt = []byte(jwt)       //[]byte("M4KExRr9HQbFRmUObhPsFJ2aDC4e/dkayHqwA568czw=")
-	ak.Cipher = []byte(cipher) //("NyXPfuLkqlsZcz//Y7Cm7oQ14MgIv29ouRmia+Vr2NY=")
+	ak.Jwt = []byte(jwt)    
+	ak.Cipher = []byte(cipher)
 	return &ak
 }
 
@@ -60,21 +60,19 @@ func (a *KeyLoader) toSqlKey(kv *vault.KVSecret) *protocol.AuthKey {
 func (a *KeyLoader) toGcpKey(kv *vault.KVSecret) *protocol.AuthKey {
 	iam, _ := kv.Data["iam"].(string)
 	ssh, _ := kv.Data["ssh"].(string)
-	pub, _ := kv.Data["pub"].(string)
 	ak := protocol.AuthKey{Gcp: &protocol.GcpAccess{}}
 	ak.Gcp.Iam = iam
 	ak.Gcp.Ssh = ssh
-	ak.Gcp.Pub = pub
 	return &ak
 }
 
 func (a *KeyLoader) toGitKey(kv *vault.KVSecret) *protocol.AuthKey {
 	key, _ := kv.Data["key"].(string)
-	config, _ := kv.Data["config"].(string)
-	hosts, _ := kv.Data["hosts"].(string)
+	user, _ := kv.Data["user"].(string)
+	email, _ := kv.Data["email"].(string)
 	ak := protocol.AuthKey{Git: &protocol.GitAccess{}}
 	ak.Git.Key = key
-	ak.Git.Config = config
-	ak.Git.Hosts = hosts
+	ak.Git.User = user
+	ak.Git.Email = email
 	return &ak
 }
