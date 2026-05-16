@@ -67,16 +67,16 @@ func (s *InventoryService) Start(f core.Env) error {
 		if err != nil {
 			return err
 		}
-		f, err := os.OpenFile("id_ed25519", os.O_CREATE, 0600)
+		err = os.WriteFile("id_ed25519", []byte(gkey.Git.Key), 0700)
 		if err != nil {
 			return err
 		}
-		f.Write([]byte(gkey.Git.Key))
+		f, err := os.Open("./id_ed25519")
 		//err = ssh.Run("ssh-keyscan -t ed25519 github.com >> .ssh/known_hosts", &w)
-		//if err != nil {
-		//return err
-		//}
-		err = ssh.Upload(f, "/home/yinghu_lu/.ssh/id_ed25519", "0600") //perm 0600
+		if err != nil {
+			return err
+		}
+		err = ssh.Upload(f, "/home/yinghu_lu/.ssh/id_ed25519", "0700") //perm 0600
 		if err != nil {
 			core.AppLog.Debug().Msgf("scp ssh error %s", err)
 			return err
