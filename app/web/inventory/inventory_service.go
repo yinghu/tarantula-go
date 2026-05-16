@@ -63,8 +63,17 @@ func (s *InventoryService) Start(f core.Env) error {
 		}
 		core.AppLog.Debug().Msgf("gcp ssh ok %s", err)
 		var w bytes.Buffer
-		ssh.Run("pwd", &w)
+		err = ssh.Run("pwd", &w)
+		if err != nil {
+			return err
+		}
 		core.AppLog.Debug().Msgf("pwd :%s", w.String())
+		w.Reset()
+		err = ssh.Run("git https://github.com/yinghu/tarantula-go.git", &w)
+		if err != nil {
+			return err
+		}
+		core.AppLog.Debug().Msgf("git :%s", w.String())
 		gcp.Close()
 		ssh.Close()
 		obj, err := mf.Message(e.Object)
