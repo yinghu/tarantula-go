@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
-	"os/exec"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -56,18 +54,18 @@ func (s *InventoryService) Start(f core.Env) error {
 			return err
 		}
 
-		cmd := exec.Command("ssh-keyscan", "-H", ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP())
-		out, err := cmd.Output()
-		if err != nil {
-			core.AppLog.Debug().Msgf("ssh-kenscann error %s", err.Error())
-			return err
-		}
-		err = os.WriteFile("../.ssh/known_host", out, 0644)
-		if err != nil {
-			core.AppLog.Debug().Msgf("write file error %s", err.Error())
-			return err
-		}
-		ssh := util.SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: key.Gcp.Ssh}
+		//cmd := exec.Command("ssh-keyscan", "-H", ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP())
+		//out, err := cmd.Output()
+		//if err != nil {
+		//core.AppLog.Debug().Msgf("ssh-kenscann error %s", err.Error())
+		//return err
+		//}
+		//err = os.WriteFile("../.ssh/known_host", out, 0644)
+		//if err != nil {
+		//core.AppLog.Debug().Msgf("write file error %s", err.Error())
+		//return err
+		//}
+		ssh := util.SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: key.Gcp.Ssh, KHFile: "../.ssh/known_hosts"}
 		err = ssh.WithKey()
 		if err != nil {
 			core.AppLog.Debug().Msgf("gcp ssh error %s", err)
