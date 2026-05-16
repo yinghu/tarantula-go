@@ -11,15 +11,15 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-type GcpService struct {
+type AzureService struct {
 	bootstrap.AppManager
 }
 
-func (s *GcpService) Config() string {
-	return "./gcp-conf.json"
+func (s *AzureService) Config() string {
+	return "./azure-conf.json"
 }
 
-func (s *GcpService) Start(f core.Env) error {
+func (s *AzureService) Start(f core.Env) error {
 	s.AppManager.Start(f)
 	s.Cluster().Subscribe(event.MESSAGE_TOPIC_NAME, &protocol.TopicEventListener{C: func() proto.Message {
 		return &protocol.MessageEvent{}

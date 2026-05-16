@@ -11,15 +11,15 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-type GcpService struct {
+type AwsService struct {
 	bootstrap.AppManager
 }
 
-func (s *GcpService) Config() string {
-	return "./gcp-conf.json"
+func (s *AwsService) Config() string {
+	return "./aws-conf.json"
 }
 
-func (s *GcpService) Start(f core.Env) error {
+func (s *AwsService) Start(f core.Env) error {
 	s.AppManager.Start(f)
 	s.Cluster().Subscribe(event.MESSAGE_TOPIC_NAME, &protocol.TopicEventListener{C: func() proto.Message {
 		return &protocol.MessageEvent{}
@@ -85,6 +85,6 @@ func (s *GcpService) Start(f core.Env) error {
 	}, Cancel: func(e *protocol.Transaction) error {
 		return nil
 	}})
-	core.AppLog.Printf("Gcp service started %s\n", f.HttpBinding)
+	core.AppLog.Printf("Aws service started %s\n", f.HttpBinding)
 	return nil
 }

@@ -20,7 +20,7 @@ fi
 echo "Build params : ${version}"
 
 
-apps=("admin" "postoffice" "gcp")
+apps=("admin" "postoffice" "gcp" "aws" "azure")
 for app in "${apps[@]}"; do
   echo "Current build target : $app"
   sudo docker build -f ./docker_application_build --build-arg app=$app --tag tarantula.$app:$version .
