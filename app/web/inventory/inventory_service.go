@@ -1,9 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
+	"os"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -61,13 +61,27 @@ func (s *InventoryService) Start(f core.Env) error {
 			core.AppLog.Debug().Msgf("gcp ssh error %s", err)
 			return err
 		}
-		var w bytes.Buffer
+		//var w bytes.Buffer
 
-		err = ssh.Run("ssh-keyscan -t ed25519 github.com >> .ssh/known_hosts", &w)
+		gkey, err := s.Cluster().AuthKey("git")
+		if err != nil {
+			return err
+		}
+		f, err := os.OpenFile("id_ed25519", os.O_CREATE, 600)
+		if err != nil {
+			return err
+		}
+		f.Write([]byte(gkey.Git.Key))
+		//err = ssh.Run("ssh-keyscan -t ed25519 github.com >> .ssh/known_hosts", &w)
+		//if err != nil {
+		//return err
+		//}
+		err = ssh.Upload(f, "home/yinghu_lu/.ssh", "600") //perm 600
 		if err != nil {
 			return err
 		}
 		core.AppLog.Debug().Msgf("git known host added :%s", w.String())
+		f.Close()
 		gcp.Close()
 		ssh.Close()
 		obj, err := mf.Message(e.Object)
