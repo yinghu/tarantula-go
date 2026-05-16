@@ -11,9 +11,8 @@ const (
 	LOGIN_OBJECT_ID           uint32 = 1
 	LOGIN_OBJECT_FACTORY_NAME        = "obj_login"
 
-	COMMODITY_OBJECT_ID           uint32 = 2
-	COMMODITY_OBJECT_FACTORY_NAME        = "obj_commodity"
-
+	VM_OBJECT_ID           uint32 = 2
+	VM_OBJECT_FACTORY_NAME        = "obj_vm"
 )
 
 type MessageObject func() proto.Message

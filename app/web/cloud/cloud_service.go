@@ -31,6 +31,9 @@ func (s *CloudService) Start(f core.Env) error {
 			core.AppLog.Debug().Msg("wrong type")
 		}
 	}})
+	s.Cluster().Register("check", NewVMObejctCheck(s))
+	s.Cluster().Register("create", NewVMObejctCreate(s))
+
 	s.Cluster().Register("update", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
 		key, err := s.Cluster().AuthKey("gcp")
 		if err != nil {

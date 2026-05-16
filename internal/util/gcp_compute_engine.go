@@ -93,7 +93,7 @@ func (g *GcpComputeEngine) Insert(name string) error {
 			Disks: []*computepb.AttachedDisk{
 				{
 					InitializeParams: &computepb.AttachedDiskInitializeParams{
-						SourceImage: proto.String("projects/cos-cloud/global/images/family/cos-117-lts"),
+						SourceImage: proto.String("projects/cos-cloud/global/images/family/cos-121-lts"),
 						DiskSizeGb:  proto.Int64(20),
 					},
 					AutoDelete: proto.Bool(true),

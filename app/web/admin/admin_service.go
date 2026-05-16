@@ -70,7 +70,7 @@ func (s *AdminService) Start(f core.Env) error {
 	http.Handle("/admin/presence/subscription/task", bootstrap.Logging(&AdminSubscriptionTaskEndpoint{AdminService: s}))
 	http.Handle("/admin/presence/subscription/topic", bootstrap.Logging(&AdminSubscriptionTopicEndpoint{AdminService: s}))
 
-	http.Handle("/admin/cluster/upload/{provider}", bootstrap.Logging(&AdminClusterUpload{AdminService: s}))
+	http.Handle("/admin/cluster/create", bootstrap.Logging(&AdminClusterCreate{AdminService: s}))
 
 	core.AppLog.Info().Msgf("Admin service started %s\n", f.HttpBinding)
 	return nil
