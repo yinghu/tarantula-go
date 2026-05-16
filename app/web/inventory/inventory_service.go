@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 
 	"gameclustering.com/internal/bootstrap"
@@ -103,6 +102,5 @@ func (s *InventoryService) Start(f core.Env) error {
 		core.AppLog.Debug().Msgf("N META %v", e.Meta)
 		return nil
 	}})
-	http.Handle("/inventory/cluster/update", bootstrap.Logging(&InventoryClusterUpdate{InventoryService: s}))
 	return nil
 }
