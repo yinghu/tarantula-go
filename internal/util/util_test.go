@@ -1,6 +1,7 @@
 package util
 
 import (
+	"bytes"
 	"encoding/base64"
 	"testing"
 )
@@ -75,6 +76,7 @@ func TestVaultClient(t *testing.T) {
 		return
 	}
 	defer ssh.Close()
-	ssh.Run("pwd && git --version && docker --version && df -h")
+	var w bytes.Buffer
+	ssh.Run("pwd && git --version && docker --version && df -h",&w)
 	//fmt.Printf("Key %v", sk.Data)
 }
