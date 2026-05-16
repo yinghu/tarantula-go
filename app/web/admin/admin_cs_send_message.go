@@ -9,7 +9,6 @@ import (
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
-	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 )
@@ -53,26 +52,26 @@ func (s *CSMessager) Request(rs core.OnSession, w http.ResponseWriter, r *http.R
 	}
 	w.Write(util.ToJson(core.OnSession{Successful: true, Message: resp.Message}))
 	go func() {
-		mf := persistence.NewCommodityObjectFactory()
-		commodity := protocol.Commodity{Name: "gold", Type: "currency", TypeId: "hard currency", Amount: 12, Rechargeable: true}
-		kv, err := mf.FromMessage(&commodity, mf.Header(persistence.COMMODITY_OBJECT_ID))
-		kv.Key.Array = s.ToBytes(100)
-		if err != nil {
-			core.AppLog.Warn().Msgf("failed to request %s", err.Error())
-			return
-		}
-		tb := persistence.NewTaskBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
-		vb := tb.Validator(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "validator"})
-		vb.Transaction().Meta(&protocol.Meta{Name: "register"}).Object(kv).Build()
-		jb := tb.Job(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "job"})
-		jb.Transaction().Meta(&protocol.Meta{Name: "grant"}).Object(kv).Build()
-		jb.Build()
-		rp, err := s.Cluster().Issue(tb.Build())
-		if err != nil {
-			core.AppLog.Debug().Msgf("TASK ERR %s", err.Error())
-			return
-		}
-		core.AppLog.Debug().Msgf("TASK %v", rp)
+		//mf := persistence.NewCommodityObjectFactory()
+		//commodity := protocol.Commodity{Name: "gold", Type: "currency", TypeId: "hard currency", Amount: 12, Rechargeable: true}
+		//kv, err := mf.FromMessage(&commodity, mf.Header(persistence.COMMODITY_OBJECT_ID))
+		//kv.Key.Array = s.ToBytes(100)
+		//if err != nil {
+		//core.AppLog.Warn().Msgf("failed to request %s", err.Error())
+		//return
+		//}
+		//tb := persistence.NewTaskBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
+		//vb := tb.Validator(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "validator"})
+		//vb.Transaction().Meta(&protocol.Meta{Name: "register"}).Object(kv).Build()
+		//jb := tb.Job(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "job"})
+		//jb.Transaction().Meta(&protocol.Meta{Name: "grant"}).Object(kv).Build()
+		//jb.Build()
+		//rp, err := s.Cluster().Issue(tb.Build())
+		//if err != nil {
+		//core.AppLog.Debug().Msgf("TASK ERR %s", err.Error())
+		//return
+		//}
+		//core.AppLog.Debug().Msgf("TASK %v", rp)
 
 	}()
 }
