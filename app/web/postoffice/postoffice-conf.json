@@ -9,9 +9,5 @@
 	"Sql":{
 		"Enabled":false,
 		"DatabaseURL"  : "postgres://postgres:password@192.168.1.6:5432"	
-	},
-	"EventEndpoint":{
-		"Enabled":false,
-		"TcpEndpoint"  : "tcp://192.168.1.6:5000"
 	}
 }

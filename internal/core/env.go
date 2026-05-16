@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/rs/zerolog"
 )
@@ -27,29 +26,23 @@ type Vault struct {
 	Token string
 }
 
-type EventEndpoint struct {
-	Enabled         bool   `json:"Enabled"`
-	OutboundEnabled bool   `json:"OutboundEnabled"`
-	TcpEndpoint     string `json:"TcpEndpoint"`
-}
-
 type Env struct {
-	Prefix          string        `json:"Prefix"`
-	Standalone      bool          `json:"Standalone"`
-	GroupName       string        `json:"GroupName"`
-	NodeName        string        `json:"NodeName"`
-	NodeId          int64         `json:"NodeId"`
-	Host            string        `json:"Host"`
-	HttpBinding     string        `json:"HttpBinding"`
-	HttpEndpoint    string        `json:"HttpEndpoint"`
-	Evp             EventEndpoint `json:"EventEndpoint"`
-	Pgs             Sql           `json:"Sql"`
-	HomeDir         string        `json:"HomeDir"`
-	LogTruncated    bool          `json:"LogTruncated"`
-	LogDir          string        `json:"LogDir"`
-	AuthLevel       int32         `json:"AuthLevel"`
-	ClusterSeed     []string      `json:"ClusterSeed"`
-	IsClusterMember bool          `json:"IsClusterMember"`
+	Prefix       string `json:"Prefix"`
+	Standalone   bool   `json:"Standalone"`
+	GroupName    string `json:"GroupName"`
+	NodeName     string `json:"NodeName"`
+	NodeId       int64  `json:"NodeId"`
+	Host         string `json:"Host"`
+	HttpBinding  string `json:"HttpBinding"`
+	HttpEndpoint string `json:"HttpEndpoint"`
+
+	Pgs             Sql      `json:"Sql"`
+	HomeDir         string   `json:"HomeDir"`
+	LogTruncated    bool     `json:"LogTruncated"`
+	LogDir          string   `json:"LogDir"`
+	AuthLevel       int32    `json:"AuthLevel"`
+	ClusterSeed     []string `json:"ClusterSeed"`
+	IsClusterMember bool     `json:"IsClusterMember"`
 
 	Vlt Vault `json:"-"`
 }
@@ -81,8 +74,6 @@ func (f *Env) Load(fn string) error {
 	if exists {
 		f.Host = c
 		f.HttpEndpoint = c
-		parts := strings.Split(f.Evp.TcpEndpoint, ":")
-		f.Evp.TcpEndpoint = parts[0] + "://" + c + ":" + parts[2]
 	}
 
 	c, exists = os.LookupEnv("ENV")

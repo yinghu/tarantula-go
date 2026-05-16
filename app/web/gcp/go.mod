@@ -1,6 +1,6 @@
-module gameclustering.com/asset
+module gameclustering.com/gcp
 
-go 1.25.0
+go 1.26.3
 
 replace gameclustering.com/internal/persistence => ../../../internal/persistence
 
@@ -20,8 +20,6 @@ require (
 	gameclustering.com/internal/event v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/protocol v0.0.0-00010101000000-000000000000
 	gameclustering.com/internal/util v0.0.0-00010101000000-000000000000
-	github.com/google/uuid v1.6.0
-	github.com/jackc/pgx/v5 v5.7.4
 	google.golang.org/protobuf v1.36.11
 )
 
@@ -59,6 +57,7 @@ require (
 	github.com/hashicorp/vault/api v1.23.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
+	github.com/jackc/pgx/v5 v5.7.4 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect

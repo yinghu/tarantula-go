@@ -1,27 +1,26 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/event"
-	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	"google.golang.org/protobuf/proto"
 )
 
-type InventoryService struct {
+type GcpService struct {
 	bootstrap.AppManager
+	assetDir string
 }
 
-func (s *InventoryService) Config() string {
-	return "./inventory-conf.json"
+func (s *GcpService) Config() string {
+	return "./gcp-conf.json"
 }
 
-func (s *InventoryService) Start(f core.Env) error {
+func (s *GcpService) Start(f core.Env) error {
 	s.AppManager.Start(f)
 	s.Cluster().Subscribe(event.MESSAGE_TOPIC_NAME, &protocol.TopicEventListener{C: func() proto.Message {
 		return &protocol.MessageEvent{}
@@ -33,10 +32,7 @@ func (s *InventoryService) Start(f core.Env) error {
 			core.AppLog.Debug().Msg("wrong type")
 		}
 	}})
-	s.Cluster().Register("grant", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
-		mf := persistence.NewCommodityObjectFactory()
-		core.AppLog.Debug().Msgf("SYSTEMID %d", s.ToSystemId(e.Object.Key.Array))
-		core.AppLog.Debug().Msgf("META %v", e.Meta)
+	s.Cluster().Register("update", &protocol.TccTransationListener{Reserve: func(e *protocol.Transaction) error {
 		key, err := s.Cluster().AuthKey("gcp")
 		if err != nil {
 			return err
@@ -84,23 +80,12 @@ func (s *InventoryService) Start(f core.Env) error {
 		f.Close()
 		gcp.Close()
 		ssh.Close()
-		obj, err := mf.Message(e.Object)
-		if err != nil {
-			core.AppLog.Warn().Msgf("wrong decode format %s", err)
-			return err
-		}
-		m, ok := obj.(*protocol.Commodity)
-		if !ok {
-			return fmt.Errorf("wrong data passed from task")
-		}
-		core.AppLog.Debug().Msgf("%v", m)
 		return nil
 	}, Confirm: func(e *protocol.Transaction) error {
-		core.AppLog.Debug().Msgf("C META %v", e.Meta)
 		return nil
 	}, Cancel: func(e *protocol.Transaction) error {
-		core.AppLog.Debug().Msgf("N META %v", e.Meta)
 		return nil
 	}})
+	core.AppLog.Printf("Asset service started %s %s\n", f.HttpBinding, s.assetDir)
 	return nil
 }

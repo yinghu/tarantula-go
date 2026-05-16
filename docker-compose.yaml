@@ -11,48 +11,20 @@ services:
       - volume_postoffice:/home/tarantula/postoffice
     env_file:
       - .env  
-  presence:
+  gcp:
     stop_grace_period: 20s
     restart: unless-stopped
-    container_name: presence
-    hostname: presence
-    image: tarantula.presence:${VERSION}
+    container_name: gcp
+    hostname: gcp
+    image: tarantula.gcp:${VERSION}
     volumes:
-      - volume_presence:/home/tarantula/presence
+      - volume_gcp:/home/tarantula/gcp
     depends_on:
       - postoffice     
     networks:
       - tarantula-app-net
     env_file:
       - .env 
-  asset:
-    stop_grace_period: 20s
-    restart: unless-stopped
-    container_name: asset
-    hostname: asset
-    image: tarantula.asset:${VERSION}
-    volumes:
-      - volume_asset:/home/tarantula/asset  
-    depends_on:
-      - postoffice  
-    networks:
-      - tarantula-app-net
-    env_file:
-      - .env  
-  inventory:
-    stop_grace_period: 20s
-    restart: unless-stopped
-    container_name: inventory
-    hostname: inventory
-    image: tarantula.inventory:${VERSION}
-    volumes:
-      - volume_inventory:/home/tarantula/inventory  
-    depends_on:
-      - postoffice  
-    networks:
-      - tarantula-app-net
-    env_file:
-      - .env   
                     
   admin:
     stop_grace_period: 20s
@@ -63,9 +35,7 @@ services:
     volumes:
       - volume_admin:/home/tarantula/admin  
     depends_on:
-      - asset
-      - inventory
-      - presence
+      - gcp
     networks:
       - tarantula-app-net
     env_file:
@@ -87,7 +57,5 @@ networks:
     external: true
 volumes:
   volume_postoffice:
-  volume_presence:
-  volume_asset:
-  volume_inventory:
+  volume_gcp:
   volume_admin:

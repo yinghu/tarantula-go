@@ -11,19 +11,7 @@ IF %ERRORLEVEL% NEQ 0 (
    goto Clean 
 )
 
-docker build -f .\docker_application_build --tag tarantula.presence:%version% --build-arg app=presence . 
-IF %ERRORLEVEL% NEQ 0 ( 
-   @echo "build failed, try again"
-   goto Clean
-)
-
-docker build -f .\docker_application_build --tag tarantula.inventory:%version% --build-arg app=inventory . 
-IF %ERRORLEVEL% NEQ 0 (
-   @echo "build failed, try again"  
-   goto Clean
-)
-
-docker build -f .\docker_application_build --tag tarantula.asset:%version% --build-arg app=asset .
+docker build -f .\docker_application_build --tag tarantula.gcp:%version% --build-arg app=gcp .
 IF %ERRORLEVEL% NEQ 0 ( 
     @echo "build failed, try again"
     goto Clean
@@ -33,16 +21,7 @@ IF %ERRORLEVEL% NEQ 0 (
     @echo "build failed, try again"
     goto Clean
 )
-docker build -f .\docker_prometheus_node_exporter_build --tag tarantula.node:%version% .
-IF %ERRORLEVEL% NEQ 0 ( 
-    @echo "build failed, try again"
-    goto Clean
-)
-docker build -f .\docker_prometheus_build --tag tarantula.prometheus:%version% .
-IF %ERRORLEVEL% NEQ 0 ( 
-    @echo "build failed, try again"
-    goto Clean
-)
+
 docker build -f .\docker_nginx_build --tag tarantula.nginx:%version% .
 IF %ERRORLEVEL% NEQ 0 ( 
     @echo "build failed, try again"
