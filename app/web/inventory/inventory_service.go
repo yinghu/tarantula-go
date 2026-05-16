@@ -80,7 +80,7 @@ func (s *InventoryService) Start(f core.Env) error {
 		if err != nil {
 			return err
 		}
-		core.AppLog.Debug().Msgf("git known host added :%s", w.String())
+		//core.AppLog.Debug().Msgf("git known host added :%s", w.String())
 		f.Close()
 		gcp.Close()
 		ssh.Close()
