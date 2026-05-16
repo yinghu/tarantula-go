@@ -90,7 +90,9 @@ func (c *SshClient) Run(cmd string, w io.Writer) error {
 	if err != nil {
 		return err
 	}
+	defer session.Close()
 	session.Stdout = w
+	session.Stderr = w
 	err = session.Run(cmd)
 	if err != nil {
 		return err
@@ -103,6 +105,7 @@ func (c *SshClient) Upload(f os.File, p string, m string) error {
 	if err != nil {
 		return err
 	}
+	defer cp.Close()
 	return cp.CopyFromFile(context.Background(), f, p, m)
 }
 
@@ -111,5 +114,6 @@ func (c *SshClient) Download(f *os.File, p string, m string) error {
 	if err != nil {
 		return err
 	}
+	defer cp.Close()
 	return cp.CopyFromRemote(context.Background(), f, p)
 }
