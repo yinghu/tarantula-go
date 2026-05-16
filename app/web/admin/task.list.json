@@ -7,7 +7,6 @@
                 {"Name":"KeyRing","Type":101},
                 {"Name":"Subscription(topic)","Type":102},
                 {"Name":"Subscription(task)","Type":103},
-                {"Name":"UploadGcpKey","Type":104},
                 {"Name":"Reset","Type":105}, 
                 {"Name":"Create","Type":106},
                 {"Name":"Update","Type":107},
@@ -21,9 +20,7 @@
                 {"Name":"ChangePassword","Type":201},
                 {"Name":"SendTopic","Type":300},
                 {"Name":"QueryTopic","Type":301},
-                {"Name":"QueryObject","Type":301},
-                {"Name":"Register","Type":500}
-
+                {"Name":"QueryObject","Type":301}
             ]        
         }
     ]
