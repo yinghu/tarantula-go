@@ -62,11 +62,12 @@ func (s *InventoryService) Start(f core.Env) error {
 			return err
 		}
 		var w bytes.Buffer
-		err = ssh.Run("git clone https://github.com/yinghu/react-ai.git", &w)
+
+		err = ssh.Run("ssh-keyscan -t ed25519 github.com >> .ssh/known_hosts", &w)
 		if err != nil {
 			return err
 		}
-		core.AppLog.Debug().Msgf("git :%s", w.String())
+		core.AppLog.Debug().Msgf("git known host added :%s", w.String())
 		gcp.Close()
 		ssh.Close()
 		obj, err := mf.Message(e.Object)
