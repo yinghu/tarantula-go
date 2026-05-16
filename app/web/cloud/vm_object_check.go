@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
+
 	"gameclustering.com/internal/core"
+	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 )
 
@@ -20,6 +23,16 @@ type VMObjectCheck struct {
 
 func (v *VMObjectCheck) reserse(t *protocol.Transaction) error {
 	core.AppLog.Debug().Msgf("check reserve %v", t.Meta)
+	tf := persistence.NewVMObjectFactory()
+	obj, err := tf.Message(t.Object)
+	if err != nil {
+		return err
+	}
+	vm, ok := obj.(*protocol.VMObject)
+	if !ok {
+		return fmt.Errorf("wrong message type")
+	}
+	core.AppLog.Debug().Msgf("vm object %v", vm)
 	return nil
 }
 
