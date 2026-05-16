@@ -67,7 +67,7 @@ func (s *InventoryService) Start(f core.Env) error {
 		if err != nil {
 			return err
 		}
-		f, err := os.OpenFile("id_ed25519", os.O_CREATE, 600)
+		f, err := os.OpenFile("id_ed25519", os.O_CREATE, 0600)
 		if err != nil {
 			return err
 		}
@@ -78,6 +78,7 @@ func (s *InventoryService) Start(f core.Env) error {
 		//}
 		err = ssh.Upload(f, "home/yinghu_lu/.ssh", "600") //perm 600
 		if err != nil {
+			core.AppLog.Debug().Msgf("scp ssh error %s", err)
 			return err
 		}
 		//core.AppLog.Debug().Msgf("git known host added :%s", w.String())
