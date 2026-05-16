@@ -76,7 +76,7 @@ func (s *InventoryService) Start(f core.Env) error {
 		//if err != nil {
 		//return err
 		//}
-		err = ssh.Upload(f, "home/yinghu_lu/.ssh", "600") //perm 600
+		err = ssh.Upload(f, "home/yinghu_lu/.ssh", "0600") //perm 0600
 		if err != nil {
 			core.AppLog.Debug().Msgf("scp ssh error %s", err)
 			return err
