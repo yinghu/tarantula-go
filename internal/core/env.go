@@ -44,7 +44,7 @@ type Env struct {
 	ClusterSeed     []string `json:"ClusterSeed"`
 	IsClusterMember bool     `json:"IsClusterMember"`
 
-	Vlt Vault `json:"-"`
+	Vlt Vault `json:"Vlt"`
 }
 
 func (f *Env) PresenceCtx() string {
@@ -96,7 +96,7 @@ func (f *Env) Load(fn string) error {
 	if exists {
 		f.Pgs.DatabaseURL = c
 	}
-	f.Vlt = Vault{}
+	//f.Vlt = Vault{}
 	c, exists = os.LookupEnv("VAULT_HOST")
 	if exists {
 		f.Vlt.Host = c
