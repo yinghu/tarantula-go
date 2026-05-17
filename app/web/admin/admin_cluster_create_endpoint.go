@@ -40,12 +40,19 @@ func (s *AdminClusterCreate) Request(rs core.OnSession, w http.ResponseWriter, r
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
+	rf := persistence.NewRepositoryObjectFactory()
+	ro, err := rf.FromRepositoryObject(&protocol.RepositoryObject{Vendor: "git", Name: "react-ai", Tag: "v1.0", Branch: "dev"})
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
+	ro.Key.Array = s.ToBytes(200)
 	kv.Key.Array = s.ToBytes(100)
 	tb := persistence.NewTaskBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
 
 	vb := tb.Validator(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "validator"})
 	vb.Transaction().Meta(&protocol.Meta{Name: "check"}).Object(kv).Build()
-
+	vb.Transaction().Meta(&protocol.Meta{Name: "update"}).Object(ro).Build()
 	jb := tb.Job(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "job"})
 	jb.Transaction().Meta(&protocol.Meta{Name: "create"}).Object(kv).Build()
 	jb.Build()

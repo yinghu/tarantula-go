@@ -13,6 +13,9 @@ const (
 
 	VM_OBJECT_ID           uint32 = 2
 	VM_OBJECT_FACTORY_NAME        = "obj_vm"
+
+	REPOSITORY_OBJECT_ID           uint32 = 3
+	REPOSITORY_OBJECT_FACTORY_NAME        = "obj_repository"
 )
 
 type MessageObject func() proto.Message
