@@ -187,8 +187,7 @@ func (m *TaskManager) finished(t *JobResource) {
 }
 
 func (m *TaskManager) end(t *TaskResource) {
-	//core.AppLog.Debug().Msgf("TASK CANCELED %v", t.canceled)
-
+	
 	t.resource.Meta.State = protocol.TCC_FINISHED
 	go m.s.updateTask(t, func() {
 		m.updates <- &protocol.Meta{Id: t.resource.Meta.Id, State: protocol.TCC_TASK_CLEAR}

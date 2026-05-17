@@ -99,6 +99,7 @@ func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
 	if !ok {
 		listener = ReceiverAsync{Rev: make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2), Subs: make(map[string]core.Subscription)}
 		m.listeners[sub.NodeId] = listener
+		m.listenerPool = append(m.listenerPool, sub.NodeId)
 	}
 	core.AppLog.Debug().Msgf("lis %v", listener)
 	if sub.Deleting {
@@ -156,6 +157,7 @@ func (m *DataServiceProvider) RingUpdated() {
 				if !ok {
 					rev = ReceiverAsync{Rev: make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2), Subs: make(map[string]core.Subscription)}
 					m.listeners[req.Name] = rev
+					m.listenerPool = append(m.listenerPool, req.Name)
 				}
 				req.Async <- rev
 			case RECEIVER_END:
@@ -188,14 +190,21 @@ func (m *DataServiceProvider) RingUpdated() {
 					}
 				}
 			case core.TRANS_MAIL:
-				for _, ch := range m.listeners {
-					tn := fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, msg.Transaction.Meta.Name)
-					sub, subed := ch.Subs[tn]
-					if subed {
-						core.AppLog.Debug().Msgf("task down streaming to %v", sub)
-						ch.Rev <- msg
-						break
+				if len(m.listenerPool) > 0 {
+					nk := m.listenerPool[0]
+					core.AppLog.Debug().Msgf("round key %s",nk)
+					m.listenerPool = append(m.listenerPool[1:], nk)
+					for k, ch := range m.listeners {
+						tn := fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, msg.Transaction.Meta.Name)
+						sub, subed := ch.Subs[tn]
+						if subed {
+							core.AppLog.Debug().Msgf("task down streaming to %s %v",k, sub)
+							ch.Rev <- msg
+							break
+						}
 					}
+				}else{
+					core.AppLog.Warn().Msgf("no listener has registered")
 				}
 			}
 		}
