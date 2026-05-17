@@ -190,21 +190,32 @@ func (m *DataServiceProvider) RingUpdated() {
 					}
 				}
 			case core.TRANS_MAIL:
-				if len(m.listenerPool) > 0 {
-					nk := m.listenerPool[0]
-					core.AppLog.Debug().Msgf("round key %s",nk)
-					m.listenerPool = append(m.listenerPool[1:], nk)
-					for k, ch := range m.listeners {
-						tn := fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, msg.Transaction.Meta.Name)
-						sub, subed := ch.Subs[tn]
-						if subed {
-							core.AppLog.Debug().Msgf("task down streaming to %s %v",k, sub)
-							ch.Rev <- msg
-							break
-						}
+				tn := fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, msg.Transaction.Meta.Name)
+				lk := ""
+				for {
+					if len(m.listenerPool) == 0 {
+						break
 					}
-				}else{
-					core.AppLog.Warn().Msgf("no listener has registered")
+					nk := m.listenerPool[0]
+					if lk == nk {
+						break
+					}
+					core.AppLog.Debug().Msgf("round key %s", nk)
+					nc, exists := m.listeners[nk]
+					if !exists {
+						m.listenerPool = m.listenerPool[1:] //remove key if disconnected
+						continue
+					}
+					sub, subed := nc.Subs[tn]
+					if subed {
+						core.AppLog.Debug().Msgf("task down streaming to %s %v", nk, sub)
+						nc.Rev <- msg
+						m.listenerPool = append(m.listenerPool[1:], nk) //add to tail
+						break
+					}
+					//mark last one to break loop if fullly iterated
+					lk = nk
+					m.listenerPool = append(m.listenerPool[1:], nk) //add to tail
 				}
 			}
 		}
