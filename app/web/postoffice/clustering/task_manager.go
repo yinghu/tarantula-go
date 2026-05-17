@@ -241,9 +241,11 @@ func (m *TaskManager) clearResource(rkey uint64) {
 		return
 	}
 	delete(m.trs, rkey)
-	//delete(m.tjs, tr.resource.Job.Meta.Id)
 	if tr.resource.Validator != nil && tr.resource.Validator.Meta != nil {
 		delete(m.tjs, tr.resource.Validator.Meta.Id)
+	}
+	for _, j := range tr.resource.Jobs {
+		delete(m.tjs, j.Meta.Id)
 	}
 	core.AppLog.Debug().Msgf("task removed %d %d %d %d", rkey, len(m.tms), len(m.trs), len(m.tjs))
 }
