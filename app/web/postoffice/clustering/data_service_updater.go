@@ -200,6 +200,7 @@ func (m *DataServiceProvider) RingUpdated() {
 					if lk == nk {
 						break
 					}
+					core.AppLog.Debug().Msgf("pending round key %s", nk)
 					nc, exists := m.listeners[nk]
 					if !exists {
 						core.AppLog.Debug().Msgf("removed round key %s", nk)
