@@ -200,9 +200,9 @@ func (m *DataServiceProvider) RingUpdated() {
 					if lk == nk {
 						break
 					}
-					core.AppLog.Debug().Msgf("round key %s", nk)
 					nc, exists := m.listeners[nk]
 					if !exists {
+						core.AppLog.Debug().Msgf("removed round key %s", nk)
 						m.listenerPool = m.listenerPool[1:] //remove key if disconnected
 						continue
 					}
@@ -214,6 +214,7 @@ func (m *DataServiceProvider) RingUpdated() {
 						break
 					}
 					//mark last one to break loop if fullly iterated
+					core.AppLog.Debug().Msgf("next round key %s", nk)
 					lk = nk
 					m.listenerPool = append(m.listenerPool[1:], nk) //add to tail
 				}
