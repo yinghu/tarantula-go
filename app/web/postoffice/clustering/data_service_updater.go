@@ -189,9 +189,9 @@ func (m *DataServiceProvider) RingUpdated() {
 					}
 				case core.TRANS_MAIL:
 					tn := fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, msg.Transaction.Meta.Name)
-					_, subed := ch.Subs[tn]
+					sub, subed := ch.Subs[tn]
 					if subed {
-						//core.AppLog.Debug().Msgf("task down streaming to %v", sub)
+						core.AppLog.Debug().Msgf("task down streaming to %v", sub)
 						ch.Rev <- msg
 					}
 				}
