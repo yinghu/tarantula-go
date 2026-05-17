@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"time"
 
 	"gameclustering.com/internal/bootstrap"
 	"gameclustering.com/internal/core"
@@ -91,4 +92,13 @@ func (s *CloudService) Start(f core.Env) error {
 	}})
 	core.AppLog.Printf("Cloud service started %s\n", f.HttpBinding)
 	return nil
+}
+
+func (s *CloudService) Shutdown() {
+	s.Cluster().Unregister("check")
+	s.Cluster().Unregister("create")
+	s.Cluster().Unregister("update")
+	s.Cluster().Unregister("updatex")
+	time.Sleep(1 * time.Second)
+	s.AppManager.Shutdown()
 }
