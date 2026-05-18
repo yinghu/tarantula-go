@@ -18,6 +18,7 @@ type CloudService struct {
 
 func (s *CloudService) Config() string {
 	return "./cloud-conf.json"
+	//return "/etc/tarantula/cloud-conf.json"
 }
 
 func (s *CloudService) Start(f core.Env) error {

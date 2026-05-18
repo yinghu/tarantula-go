@@ -168,7 +168,7 @@ func (m *DataServiceProvider) RingUpdated() {
 
 			case RECEIVER_REMOVE:
 				delete(m.listeners, req.Name)
-				core.AppLog.Debug().Msgf("listener removed %s", req.Name)
+				core.AppLog.Debug().Msgf("listener removed %s %d", req.Name, len(m.listeners))
 			case TOPIC_REGISTER:
 				req.Subs <- m.subscriptions.topic(req)
 			case TASK_REGISTER:
