@@ -33,15 +33,15 @@ func (v *RepositoryObejctUpdate) reserse(t *protocol.Transaction) error {
 		return fmt.Errorf("wrong message type")
 	}
 	core.AppLog.Debug().Msgf("repository object %v", vm)
-	return nil
+	return v.insert(t.Meta)
 }
 
 func (v *RepositoryObejctUpdate) confirm(t *protocol.Transaction) error {
 	core.AppLog.Debug().Msgf("check confirm %v", t.Meta)
-	return nil
+	return v.insert(t.Meta)
 }
 
 func (v *RepositoryObejctUpdate) cancel(t *protocol.Transaction) error {
 	core.AppLog.Debug().Msgf("check cancel %v", t.Meta)
-	return nil
+	return v.insert(t.Meta)
 }

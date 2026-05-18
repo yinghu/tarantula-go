@@ -33,16 +33,16 @@ func (v *VMObjectCreate) reserse(t *protocol.Transaction) error {
 		return fmt.Errorf("wrong message type")
 	}
 	core.AppLog.Debug().Msgf("vm object %v", vm)
-	return nil
+	return v.insert(t.Meta)
 }
 
 func (v *VMObjectCreate) confirm(t *protocol.Transaction) error {
 	core.AppLog.Debug().Msgf("create confirm %v", t.Meta)
-	return nil
+	return v.insert(t.Meta)
 }
 
 func (v *VMObjectCreate) cancel(t *protocol.Transaction) error {
 	core.AppLog.Debug().Msgf("create cancel %v", t.Meta)
 
-	return nil
+	return v.insert(t.Meta)
 }
