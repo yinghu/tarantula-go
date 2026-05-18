@@ -95,6 +95,15 @@ func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
 		sub.Topic = fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, sub.Topic)
 	}
 	core.AppLog.Debug().Msgf("subscription %v", sub)
+	if sub.Deleting {
+		m.subscriptions.del(sub)
+		listener, ok := m.listeners[sub.NodeId]
+		if !ok {
+			return
+		}
+		delete(listener.Subs, sub.Topic)
+		return
+	}
 	listener, ok := m.listeners[sub.NodeId]
 	if !ok {
 		listener = ReceiverAsync{Rev: make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2), Subs: make(map[string]core.Subscription)}
@@ -104,14 +113,8 @@ func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
 
 	}
 	core.AppLog.Debug().Msgf("lis %v", len(listener.Subs))
-	if sub.Deleting {
-		m.subscriptions.del(sub)
-		delete(listener.Subs, sub.Topic)
-
-	} else {
-		m.subscriptions.add(sub)
-		listener.Subs[sub.Topic] = sub
-	}
+	m.subscriptions.add(sub)
+	listener.Subs[sub.Topic] = sub
 }
 
 func (m *DataServiceProvider) RingUpdated() {
