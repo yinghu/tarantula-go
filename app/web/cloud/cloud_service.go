@@ -91,7 +91,7 @@ func (s *CloudService) Start(f core.Env) error {
 	}, Cancel: func(e *protocol.Transaction) error {
 		return nil
 	}})
-	core.AppLog.Printf("Cloud service started %s\n", f.HttpBinding)
+	core.AppLog.Info().Msgf("Cloud service started %s", f.HttpBinding)
 	return nil
 }
 

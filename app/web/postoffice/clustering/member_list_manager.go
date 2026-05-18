@@ -22,7 +22,6 @@ type MemberlistManager struct {
 
 	StoreDir string
 	Binding  string
-	//Seq      core.Sequence
 }
 
 func (m *MemberlistManager) Start(meta []byte, seq core.Sequence, vt core.Vault) error {
@@ -51,8 +50,7 @@ func (m *MemberlistManager) Start(meta []byte, seq core.Sequence, vt core.Vault)
 	cfg.LogOutput = core.AppLog
 	list, err := memberlist.Create(cfg)
 	if err != nil {
-		core.AppLog.Printf("erorr on member create %s", err.Error())
-		return err
+		panic(err)
 	}
 	m.meta = meta
 	m.Memberlist = list
@@ -69,10 +67,9 @@ func (m *MemberlistManager) Start(meta []byte, seq core.Sequence, vt core.Vault)
 	joined, err := list.Join(m.Seed)
 	list.UpdateNode(time.Second * 5)
 	if err != nil {
-		core.AppLog.Printf("erorr on member join %s", err.Error())
-		return err
+		panic(err)
 	}
-	core.AppLog.Printf("total nodes have joined %d on local node  %s", joined, m.DataServiceProvider.rpcEndpoint)
+	core.AppLog.Info().Msgf("total nodes have joined %d on local node  %s", joined, m.DataServiceProvider.rpcEndpoint)
 	return nil
 }
 

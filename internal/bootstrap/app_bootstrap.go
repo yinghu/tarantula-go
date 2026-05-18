@@ -37,7 +37,6 @@ func AppBootstrap(tcx TarantulaContext) {
 	f := core.Env{}
 	err := f.Load(tcx.Config())
 	if err != nil {
-		fmt.Printf("Config not existed %s\n", err.Error())
 		panic(err)
 	}
 	mountDir := fmt.Sprintf("%s/%s", f.HomeDir, f.GroupName)
@@ -49,7 +48,6 @@ func AppBootstrap(tcx TarantulaContext) {
 	go func() {
 		err := tcx.Start(f)
 		if err != nil {
-			core.AppLog.Printf("Error %s\n", err.Error())
 			panic(err)
 		}
 		http.Handle("/"+tcx.Context()+"/metrics", metricsHandler(tcx.Service().Authenticator(), promhttp.Handler()))
@@ -57,11 +55,11 @@ func AppBootstrap(tcx TarantulaContext) {
 		core.AppLog.Fatal().Err(http.ListenAndServe(f.HttpBinding, nil))
 
 	}()
-	core.AppLog.Println("Wating for signal to exit ...")
+	core.AppLog.Info().Msg("Wating for signal to exit ...")
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	<-sigs
-	core.AppLog.Println("Signal to exit")
+	core.AppLog.Info().Msg("Signal to exit")
 	tcx.Shutdown()
 	signal.Stop(sigs)
 	close(sigs)
@@ -84,7 +82,6 @@ func illegalAccess(w http.ResponseWriter, r *http.Request) {
 	w.Write(util.ToJson(session))
 }
 func preflight(w http.ResponseWriter, r *http.Request) {
-	//core.AppLog.Debug().Msg("checking options header here")
 	defer r.Body.Close()
 	w.WriteHeader(http.StatusNoContent)
 }
@@ -99,7 +96,7 @@ func metricsHandler(auth core.Authenticator, h http.Handler) http.HandlerFunc {
 		}
 		_, err := auth.ValidateTicket(parts[1])
 		if err != nil {
-			core.AppLog.Printf("metrics validation failed %s\n", err.Error())
+			core.AppLog.Warn().Msgf("metrics validation failed %s\n", err.Error())
 			invalidToken(w, r)
 			return
 		}
@@ -123,7 +120,7 @@ func Logging(s TarantulaApp) http.HandlerFunc {
 			rf := event.RequestEventFactory{}
 			t, err := rf.FromRequestEvent(&re)
 			if err != nil {
-				fmt.Printf("request event error %s\n", err.Error())
+				core.AppLog.Warn().Msgf("request event error %s\n", err.Error())
 				return
 			}
 			t.NodeId = s.NodeId()
