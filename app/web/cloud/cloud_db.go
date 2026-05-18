@@ -17,7 +17,7 @@ const (
 															name VARCHAR(50) NOT NULL,
 															state INT NOT NULL,
 															time_commited TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`
-	INSERT_TASK_META              string = `INSERT INTO task_meta (task_id,job_id,transaction_id,nide_id,tag,name,state) VALUES($1,$2,$3,$4,$5,$6,$7)`
+	INSERT_TASK_META              string = `INSERT INTO task_meta (task_id,job_id,transaction_id,node_id,tag,name,state) VALUES($1,$2,$3,$4,$5,$6,$7)`
 	SELECT_TASK_META_WITH_TASK_ID string = `SELECT * FROM task_meta WHERE task_id =$1`
 )
 
