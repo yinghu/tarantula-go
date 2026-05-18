@@ -72,7 +72,6 @@ func (m *DataServiceProvider) balanceOnNodeAdded(added RingUpdate) {
 	}
 	m.Mll.MRequest <- core.RingRequest{Source: ringSync, Opt: SYNC_NODE_OPT, Address: added.Nodes[0].IP}
 	m.subscriptions.lookup(func(sub core.Subscription) {
-		core.AppLog.Debug().Msgf("sub %v > %s", sub, m.rpcEndpoint)
 		if sub.Endpoint == m.rpcEndpoint {
 			m.Mll.MRequest <- core.RingRequest{Opt: SYNC_SUB_OPT, Address: added.Nodes[0].IP, Source: core.RingSync{Sub: sub}}
 		}
@@ -94,7 +93,6 @@ func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
 	if sub.Type == core.TRANS_MAIL && !strings.HasPrefix(sub.Topic, TRANS_SUB_PREFIX) {
 		sub.Topic = fmt.Sprintf("%s%s", TRANS_SUB_PREFIX, sub.Topic)
 	}
-	core.AppLog.Debug().Msgf("subscription %v", sub)
 	if sub.Deleting {
 		m.subscriptions.del(sub)
 		listener, ok := m.listeners[sub.NodeId]
@@ -109,10 +107,7 @@ func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
 		listener = ReceiverAsync{Rev: make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2), Subs: make(map[string]core.Subscription)}
 		m.listeners[sub.NodeId] = listener
 		m.listenerPool = append(m.listenerPool, sub.NodeId)
-		core.AppLog.Debug().Msgf("listener added %s %d", sub.NodeId, len(m.listeners))
-
 	}
-	core.AppLog.Debug().Msgf("lis %v", len(listener.Subs))
 	m.subscriptions.add(sub)
 	listener.Subs[sub.Topic] = sub
 }
@@ -160,7 +155,6 @@ func (m *DataServiceProvider) RingUpdated() {
 			case RECEIVER_START:
 				rev, ok := m.listeners[req.Name]
 				if !ok {
-					core.AppLog.Debug().Msgf("receiver start listener added %s %d", req.Name, len(m.listeners))
 					rev = ReceiverAsync{Rev: make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2), Subs: make(map[string]core.Subscription)}
 					m.listeners[req.Name] = rev
 					m.listenerPool = append(m.listenerPool, req.Name)
@@ -174,7 +168,6 @@ func (m *DataServiceProvider) RingUpdated() {
 
 			case RECEIVER_REMOVE:
 				delete(m.listeners, req.Name)
-				core.AppLog.Debug().Msgf("receiver stop listener removed %s %d", req.Name, len(m.listeners))
 			case TOPIC_REGISTER:
 				req.Subs <- m.subscriptions.topic(req)
 			case TASK_REGISTER:
@@ -191,7 +184,6 @@ func (m *DataServiceProvider) RingUpdated() {
 				for _, ch := range m.listeners {
 					_, subed := ch.Subs[msg.Topic.Name]
 					if subed {
-						//core.AppLog.Debug().Msgf("topic down streaming to %v", sub)
 						ch.Rev <- msg
 					}
 				}
@@ -206,22 +198,18 @@ func (m *DataServiceProvider) RingUpdated() {
 					if lk == nk {
 						break
 					}
-					core.AppLog.Debug().Msgf("pending round key %s", nk)
 					nc, exists := m.listeners[nk]
 					if !exists {
-						core.AppLog.Debug().Msgf("removed round key %s", nk)
 						m.listenerPool = m.listenerPool[1:] //remove key if disconnected
 						continue
 					}
-					sub, subed := nc.Subs[tn]
+					_, subed := nc.Subs[tn]
 					if subed {
-						core.AppLog.Debug().Msgf("task down streaming to %s %v", nk, sub)
 						nc.Rev <- msg
 						m.listenerPool = append(m.listenerPool[1:], nk) //add to tail
 						break
 					}
 					//mark last one to break loop if fullly iterated
-					core.AppLog.Debug().Msgf("next round key %s", nk)
 					lk = nk
 					m.listenerPool = append(m.listenerPool[1:], nk) //add to tail
 				}
