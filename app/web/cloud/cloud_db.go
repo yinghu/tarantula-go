@@ -1,5 +1,11 @@
 package main
 
+import (
+	"fmt"
+
+	"gameclustering.com/internal/protocol"
+)
+
 const (
 	CREATE_TASK_META_SCHEMA string = `CREATE TABLE IF NOT EXISTS task_meta (
 															id SERIAL PRIMARY KEY,
@@ -19,6 +25,17 @@ func (s *CloudService) createSchema() error {
 	_, err := s.Sql.Exec(CREATE_TASK_META_SCHEMA)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (s *CloudService) insert(meta *protocol.Meta) error {
+	inserted, err := s.Sql.Exec(INSERT_TASK_META, meta.TaskId, meta.JobId, meta.Id, meta.NodeId, meta.Tag, meta.Name, meta.State)
+	if err != nil {
+		return err
+	}
+	if inserted != 1 {
+		return fmt.Errorf("no meta inserted %d", inserted)
 	}
 	return nil
 }
