@@ -24,7 +24,8 @@ const (
 type SqlAccess struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	User          string                 `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
-	Url           string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	Host          string                 `protobuf:"bytes,3,opt,name=host,proto3" json:"host,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -66,9 +67,16 @@ func (x *SqlAccess) GetUser() string {
 	return ""
 }
 
-func (x *SqlAccess) GetUrl() string {
+func (x *SqlAccess) GetPassword() string {
 	if x != nil {
-		return x.Url
+		return x.Password
+	}
+	return ""
+}
+
+func (x *SqlAccess) GetHost() string {
+	if x != nil {
+		return x.Host
 	}
 	return ""
 }
@@ -77,10 +85,11 @@ var File_sql_access_proto protoreflect.FileDescriptor
 
 const file_sql_access_proto_rawDesc = "" +
 	"\n" +
-	"\x10sql_access.proto\x12\bprotocol\"1\n" +
+	"\x10sql_access.proto\x12\bprotocol\"O\n" +
 	"\tSqlAccess\x12\x12\n" +
-	"\x04user\x18\x01 \x01(\tR\x04user\x12\x10\n" +
-	"\x03url\x18\x02 \x01(\tR\x03urlBQ\n" +
+	"\x04user\x18\x01 \x01(\tR\x04user\x12\x1a\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x12\n" +
+	"\x04host\x18\x03 \x01(\tR\x04hostBQ\n" +
 	"\x17com.icodesoftware.protoB\x10SqlAccessFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (

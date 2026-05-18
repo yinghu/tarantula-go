@@ -43,17 +43,19 @@ func (a *KeyLoader) toAuthKey(kv *vault.KVSecret) *protocol.AuthKey {
 	jwt, _ := kv.Data["jwt"].(string)
 	cipher, _ := kv.Data["cipher"].(string)
 	ak := protocol.AuthKey{}
-	ak.Jwt = []byte(jwt)    
+	ak.Jwt = []byte(jwt)
 	ak.Cipher = []byte(cipher)
 	return &ak
 }
 
 func (a *KeyLoader) toSqlKey(kv *vault.KVSecret) *protocol.AuthKey {
 	user, _ := kv.Data["user"].(string)
-	url, _ := kv.Data["url"].(string)
+	pwd, _ := kv.Data["password"].(string)
+	host, _ := kv.Data["host"].(string)
 	ak := protocol.AuthKey{Sql: &protocol.SqlAccess{}}
 	ak.Sql.User = user
-	ak.Sql.Url = url
+	ak.Sql.Password = pwd
+	ak.Sql.Host = host
 	return &ak
 }
 

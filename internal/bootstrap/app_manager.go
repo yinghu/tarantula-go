@@ -79,8 +79,12 @@ func (s *AppManager) Start(f core.Env) error {
 		if err != nil {
 			panic(err)
 		}
-		pgs := key.Sql.Url
-		core.AppLog.Info().Msgf("connecting sql %s", pgs)
+		//postgres://[user]:[password]@[host]:5432
+		user := key.Sql.User
+		pwd := key.Sql.Password
+		hst := key.Sql.Host
+		pgs := fmt.Sprintf("postgres://%s:%s@%s:5432", user, pwd, hst)
+		core.AppLog.Info().Msgf("connecting sql %s", hst)
 		dbCreate := persistence.Postgresql{Url: pgs + "/postgres"}
 		err = dbCreate.CreateDatabase(fmt.Sprintf("CREATE DATABASE %s_%s_%s", f.Prefix, "tarantula", f.GroupName))
 		if err != nil {
