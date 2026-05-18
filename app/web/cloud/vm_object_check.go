@@ -33,18 +33,15 @@ func (v *VMObjectCheck) reserse(t *protocol.Transaction) error {
 		return fmt.Errorf("wrong message type")
 	}
 	core.AppLog.Debug().Msgf("vm object %v", vm)
-	v.insert(t.Meta)
-	return nil
+	return v.insert(t.Meta)
 }
 
 func (v *VMObjectCheck) confirm(t *protocol.Transaction) error {
 	core.AppLog.Debug().Msgf("check confirm %v", t.Meta)
-	v.insert(t.Meta)
-	return nil
+	return v.insert(t.Meta)
 }
 
 func (v *VMObjectCheck) cancel(t *protocol.Transaction) error {
 	core.AppLog.Debug().Msgf("check cancel %v", t.Meta)
-	v.insert(t.Meta)
-	return nil
+	return v.insert(t.Meta)
 }
