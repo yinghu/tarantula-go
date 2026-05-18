@@ -100,6 +100,8 @@ func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
 		listener = ReceiverAsync{Rev: make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2), Subs: make(map[string]core.Subscription)}
 		m.listeners[sub.NodeId] = listener
 		m.listenerPool = append(m.listenerPool, sub.NodeId)
+		core.AppLog.Debug().Msgf("listener added %s %d", sub.NodeId, len(m.listeners))
+
 	}
 	core.AppLog.Debug().Msgf("lis %v", listener)
 	if sub.Deleting {
@@ -155,6 +157,7 @@ func (m *DataServiceProvider) RingUpdated() {
 			case RECEIVER_START:
 				rev, ok := m.listeners[req.Name]
 				if !ok {
+					core.AppLog.Debug().Msgf("listener added %s %d", req.Name, len(m.listeners))
 					rev = ReceiverAsync{Rev: make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2), Subs: make(map[string]core.Subscription)}
 					m.listeners[req.Name] = rev
 					m.listenerPool = append(m.listenerPool, req.Name)
