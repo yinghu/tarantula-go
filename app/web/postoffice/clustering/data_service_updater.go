@@ -103,7 +103,7 @@ func (m *DataServiceProvider) registerSubscription(sub core.Subscription) {
 		core.AppLog.Debug().Msgf("listener added %s %d", sub.NodeId, len(m.listeners))
 
 	}
-	core.AppLog.Debug().Msgf("lis %v", listener)
+	core.AppLog.Debug().Msgf("lis %v", len(listener.Subs))
 	if sub.Deleting {
 		m.subscriptions.del(sub)
 		delete(listener.Subs, sub.Topic)
@@ -157,7 +157,7 @@ func (m *DataServiceProvider) RingUpdated() {
 			case RECEIVER_START:
 				rev, ok := m.listeners[req.Name]
 				if !ok {
-					core.AppLog.Debug().Msgf("listener added %s %d", req.Name, len(m.listeners))
+					core.AppLog.Debug().Msgf("receiver start listener added %s %d", req.Name, len(m.listeners))
 					rev = ReceiverAsync{Rev: make(chan *protocol.Mail, NODE_EVENT_BUFFER_SIZE), Q: make(chan string, 2), Subs: make(map[string]core.Subscription)}
 					m.listeners[req.Name] = rev
 					m.listenerPool = append(m.listenerPool, req.Name)
@@ -171,7 +171,7 @@ func (m *DataServiceProvider) RingUpdated() {
 
 			case RECEIVER_REMOVE:
 				delete(m.listeners, req.Name)
-				core.AppLog.Debug().Msgf("listener removed %s %d", req.Name, len(m.listeners))
+				core.AppLog.Debug().Msgf("receiver stop listener removed %s %d", req.Name, len(m.listeners))
 			case TOPIC_REGISTER:
 				req.Subs <- m.subscriptions.topic(req)
 			case TASK_REGISTER:
