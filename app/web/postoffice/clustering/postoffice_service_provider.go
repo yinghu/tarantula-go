@@ -4,7 +4,6 @@ import (
 	context "context"
 	"fmt"
 	"strings"
-	"time"
 
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
@@ -206,11 +205,5 @@ func (c *DataServiceProvider) TaskList(ctx context.Context, req *protocol.Reques
 }
 
 func (c *DataServiceProvider) tid() uint64 {
-	for {
-		id, err := c.seq.Id()
-		if err == nil {
-			return uint64(id)
-		}
-		time.Sleep(1 * time.Millisecond)
-	}
+	return c.seq.UId()
 }

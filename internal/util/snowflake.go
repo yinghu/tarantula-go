@@ -59,3 +59,13 @@ func (s *Snowflake) Parse(snowflakeId int64) (int64, int64, int64) {
 	sequence := snowflakeId & int64(sequenceMask)
 	return timestamp + s.EpochStart, nodeId, sequence
 }
+
+func (c *Snowflake) UId() uint64 {
+	for {
+		id, err := c.Id()
+		if err == nil {
+			return uint64(id)
+		}
+		time.Sleep(1 * time.Millisecond)
+	}
+}

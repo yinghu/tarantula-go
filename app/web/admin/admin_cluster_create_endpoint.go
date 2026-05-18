@@ -46,8 +46,9 @@ func (s *AdminClusterCreate) Request(rs core.OnSession, w http.ResponseWriter, r
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	ro.Key.Array = s.ToBytes(200)
-	kv.Key.Array = s.ToBytes(100)
+	ro.Key.Array = s.ToBytes(s.Sequence().UId())
+	kv.Key.Array = s.ToBytes(s.Sequence().UId())
+	
 	tb := persistence.NewTaskBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
 
 	vb := tb.Validator(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "validator"})

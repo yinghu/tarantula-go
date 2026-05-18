@@ -23,6 +23,7 @@ func (s *CloudService) Config() string {
 
 func (s *CloudService) Start(f core.Env) error {
 	s.AppManager.Start(f)
+	s.createSchema()
 	s.Cluster().Subscribe(event.MESSAGE_TOPIC_NAME, &protocol.TopicEventListener{C: func() proto.Message {
 		return &protocol.MessageEvent{}
 	}, M: func(m proto.Message) {
