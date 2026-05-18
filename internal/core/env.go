@@ -16,27 +16,21 @@ var (
 	QueryFactoryRegistry = make(map[string]func() QueryFactory)
 )
 
-type Sql struct {
-	Enabled     bool   `json:"Enabled"`
-	DatabaseURL string `json:"DatabaseURL"`
-}
-
 type Vault struct {
 	Host  string
 	Token string
 }
 
 type Env struct {
-	Prefix       string `json:"Prefix"`
-	Standalone   bool   `json:"Standalone"`
-	GroupName    string `json:"GroupName"`
-	NodeName     string `json:"NodeName"`
-	NodeId       int64  `json:"NodeId"`
-	Host         string `json:"Host"`
-	HttpBinding  string `json:"HttpBinding"`
-	HttpEndpoint string `json:"HttpEndpoint"`
+	Prefix         string `json:"Prefix"`
+	Standalone     bool   `json:"Standalone"`
+	GroupName      string `json:"GroupName"`
+	NodeName       string `json:"NodeName"`
+	NodeId         int64  `json:"NodeId"`
+	PostOfficeHost string `json:"PostOfficeHost"`
+	HttpBinding    string `json:"HttpBinding"`
 
-	Pgs             Sql      `json:"Sql"`
+	SqlEnabled      bool     `json:"Sql"`
 	HomeDir         string   `json:"HomeDir"`
 	LogTruncated    bool     `json:"LogTruncated"`
 	LogDir          string   `json:"LogDir"`
@@ -70,10 +64,9 @@ func (f *Env) Load(fn string) error {
 	f.HomeDir = homeDir
 	f.Prefix = "dev"
 
-	c, exists := os.LookupEnv("HOST")
+	c, exists := os.LookupEnv("POST_OFFICE_HOST")
 	if exists {
-		f.Host = c
-		f.HttpEndpoint = c
+		f.PostOfficeHost = c
 	}
 
 	c, exists = os.LookupEnv("ENV")
@@ -92,10 +85,6 @@ func (f *Env) Load(fn string) error {
 
 	}
 
-	c, exists = os.LookupEnv("SQL_ENDPOINT")
-	if exists {
-		f.Pgs.DatabaseURL = c
-	}
 	//f.Vlt = Vault{}
 	c, exists = os.LookupEnv("VAULT_HOST")
 	if exists {

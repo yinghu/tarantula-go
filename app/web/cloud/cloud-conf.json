@@ -3,10 +3,5 @@
 	"GroupName" :"cloud",
 	"NodeName" :   "cloud.2",
 	"NodeId"     :   2,
-	"HttpBinding":  ":8080",
-	"HttpEndpoint":  "192.168.1.3:8080",
-	"Sql":{
-		"Enabled":true,
-		"DatabaseURL"  : "postgres://postgres:password@postgresql:5432"	
-	}
+	"SqlEnabled":true
 }

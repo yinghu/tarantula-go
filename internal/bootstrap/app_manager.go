@@ -57,11 +57,11 @@ func (s *AppManager) Start(f core.Env) error {
 	if f.IsClusterMember {
 		return nil
 	}
-	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.Host)
+	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.PostOfficeHost)
 	s.cluster = &ClusterManager{App: s}
 	s.RegisterLogForwarder(zerolog.DebugLevel, s.cluster)
 
-	err := s.cluster.connect(f.Host)
+	err := s.cluster.connect(f.PostOfficeHost)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -74,22 +74,22 @@ func (s *AppManager) Start(f core.Env) error {
 		panic(err.Error())
 	}
 	s.Auth = au
-	if f.Pgs.Enabled {
+	if f.SqlEnabled {
 		key, err := s.cluster.AuthKey("sql")
 		if err != nil {
 			panic(err)
 		}
-		f.Pgs.DatabaseURL = key.Sql.Url
-		core.AppLog.Info().Msgf("connecting sql %s", f.Pgs.DatabaseURL)
-		dbCreate := persistence.Postgresql{Url: f.Pgs.DatabaseURL + "/postgres"}
+		pgs := key.Sql.Url
+		core.AppLog.Info().Msgf("connecting sql %s", pgs)
+		dbCreate := persistence.Postgresql{Url: pgs + "/postgres"}
 		err = dbCreate.CreateDatabase(fmt.Sprintf("CREATE DATABASE %s_%s_%s", f.Prefix, "tarantula", f.GroupName))
 		if err != nil {
 			core.AppLog.Warn().Msgf("failed to create database %s", err.Error())
 		}
-		sql := persistence.Postgresql{Url: f.Pgs.DatabaseURL + "/" + f.Prefix + "_tarantula_" + f.GroupName}
+		sql := persistence.Postgresql{Url: pgs + "/" + f.Prefix + "_tarantula_" + f.GroupName}
 		err = sql.Create()
 		if err != nil {
-			return err
+			panic(err)
 		}
 		s.Sql = sql
 	}
