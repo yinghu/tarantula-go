@@ -38,18 +38,19 @@ func AppBootstrap(tcx TarantulaContext) {
 	err := f.Load(tcx.Config())
 	if err != nil {
 		fmt.Printf("Config not existed %s\n", err.Error())
-		return
+		panic(err)
 	}
 	mountDir := fmt.Sprintf("%s/%s", f.HomeDir, f.GroupName)
 	err = os.MkdirAll(mountDir, 0755)
 	if err != nil {
-		return
+		panic(err)
 	}
 	f.LogDir = mountDir
 	go func() {
 		err := tcx.Start(f)
 		if err != nil {
 			core.AppLog.Printf("Error %s\n", err.Error())
+			panic(err)
 		}
 		http.Handle("/"+tcx.Context()+"/metrics", metricsHandler(tcx.Service().Authenticator(), promhttp.Handler()))
 		http.Handle("/", http.HandlerFunc(badRequest))
