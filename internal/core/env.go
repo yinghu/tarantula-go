@@ -30,7 +30,7 @@ type Env struct {
 	PostOfficeHost string `json:"PostOfficeHost"`
 	HttpBinding    string `json:"HttpBinding"`
 
-	SqlEnabled      bool     `json:"Sql"`
+	SqlEnabled      bool     `json:"SqlEnabled"`
 	HomeDir         string   `json:"HomeDir"`
 	LogTruncated    bool     `json:"LogTruncated"`
 	LogDir          string   `json:"LogDir"`
