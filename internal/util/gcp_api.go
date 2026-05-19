@@ -13,14 +13,14 @@ import (
 
 type OnInstance func(*computepb.Instance)
 
-type GcpComputeEngine struct {
+type GcpApi struct {
 	ServiceAccount string
 	ProjectId      string
 	Zone           string
 	client         *compute.InstancesClient
 }
 
-func (g *GcpComputeEngine) Auth() error {
+func (g *GcpApi) Auth() error {
 	creds, err := credentials.DetectDefault(&credentials.DetectOptions{
 		Scopes:          []string{"https://www.googleapis.com/auth/compute"},
 		CredentialsJSON: []byte(g.ServiceAccount),
@@ -36,11 +36,11 @@ func (g *GcpComputeEngine) Auth() error {
 	return nil
 }
 
-func (g *GcpComputeEngine) Close() error {
+func (g *GcpApi) Close() error {
 	return g.client.Close()
 }
 
-func (g *GcpComputeEngine) List(ins OnInstance) error {
+func (g *GcpApi) List(ins OnInstance) error {
 	req := &computepb.ListInstancesRequest{
 		Project: g.ProjectId,
 		Zone:    g.Zone,
@@ -56,7 +56,7 @@ func (g *GcpComputeEngine) List(ins OnInstance) error {
 	return nil
 }
 
-func (g *GcpComputeEngine) Get(name string) (*computepb.Instance, error) {
+func (g *GcpApi) Get(name string) (*computepb.Instance, error) {
 	req := &computepb.GetInstanceRequest{
 		Project:  g.ProjectId,
 		Zone:     g.Zone,
@@ -65,7 +65,7 @@ func (g *GcpComputeEngine) Get(name string) (*computepb.Instance, error) {
 	return g.client.Get(context.Background(), req)
 }
 
-func (g *GcpComputeEngine) Insert(name string) error {
+func (g *GcpApi) Insert(name string) error {
 	req := &computepb.InsertInstanceRequest{
 		Project: g.ProjectId,
 		Zone:    g.Zone,
@@ -110,7 +110,7 @@ func (g *GcpComputeEngine) Insert(name string) error {
 	return opt.Wait(context.Background())
 }
 
-func (g *GcpComputeEngine) Delete(name string) error {
+func (g *GcpApi) Delete(name string) error {
 	req := &computepb.DeleteInstanceRequest{
 		Project:  g.ProjectId,
 		Zone:     g.Zone,

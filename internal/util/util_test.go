@@ -48,7 +48,7 @@ func TestVaultClient(t *testing.T) {
 		return
 	}
 	iam, _ := sk.Data["iam"].(string)
-	gcp := GcpComputeEngine{
+	gcp := GcpApi{
 		ServiceAccount: iam,
 		ProjectId:      "prismatic-grail-206205",
 		Zone:           "us-east1-c",

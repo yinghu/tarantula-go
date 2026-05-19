@@ -26,6 +26,8 @@ type GitAccess struct {
 	Key           string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	User          string                 `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
 	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	Token         string                 `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
+	Org           string                 `protobuf:"bytes,5,opt,name=org,proto3" json:"org,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -81,15 +83,31 @@ func (x *GitAccess) GetEmail() string {
 	return ""
 }
 
+func (x *GitAccess) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *GitAccess) GetOrg() string {
+	if x != nil {
+		return x.Org
+	}
+	return ""
+}
+
 var File_git_access_proto protoreflect.FileDescriptor
 
 const file_git_access_proto_rawDesc = "" +
 	"\n" +
-	"\x10git_access.proto\x12\bprotocol\"G\n" +
+	"\x10git_access.proto\x12\bprotocol\"o\n" +
 	"\tGitAccess\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x12\n" +
 	"\x04user\x18\x02 \x01(\tR\x04user\x12\x14\n" +
-	"\x05email\x18\x03 \x01(\tR\x05emailBQ\n" +
+	"\x05email\x18\x03 \x01(\tR\x05email\x12\x14\n" +
+	"\x05token\x18\x04 \x01(\tR\x05token\x12\x10\n" +
+	"\x03org\x18\x05 \x01(\tR\x03orgBQ\n" +
 	"\x17com.icodesoftware.protoB\x10GitAccessFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (

@@ -6,6 +6,7 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
+	"gameclustering.com/internal/util"
 )
 
 func NewRepositoryObejctUpdate(s *CloudService) *protocol.TccTransationListener {
@@ -33,6 +34,14 @@ func (v *RepositoryObejctUpdate) reserse(t *protocol.Transaction) error {
 		return fmt.Errorf("wrong message type")
 	}
 	core.AppLog.Debug().Msgf("repository object %v", vm)
+	github, err := v.AppManager.Cluster().AuthKey("git")
+	if err != nil {
+		core.AppLog.Debug().Msgf("no git key %s", err.Error())
+		return v.insert(t.Meta)
+	}
+	gapi := util.GitHubApi{Token: github.Git.Token, Org: github.Git.Org}
+	repos, _ := gapi.ListRepos()
+	core.AppLog.Debug().Msgf("repos %v", repos)
 	return v.insert(t.Meta)
 }
 

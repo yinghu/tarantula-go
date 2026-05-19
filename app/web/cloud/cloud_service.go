@@ -43,7 +43,7 @@ func (s *CloudService) Start(f core.Env) error {
 		if err != nil {
 			return err
 		}
-		gcp := util.GcpComputeEngine{ServiceAccount: key.Gcp.Iam, ProjectId: "prismatic-grail-206205", Zone: "us-east1-c"}
+		gcp := util.GcpApi{ServiceAccount: key.Gcp.Iam, ProjectId: "prismatic-grail-206205", Zone: "us-east1-c"}
 		err = gcp.Auth()
 		if err != nil {
 			core.AppLog.Debug().Msgf("gcp auth error %s", err)
