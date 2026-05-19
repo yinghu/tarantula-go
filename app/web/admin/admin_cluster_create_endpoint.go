@@ -10,6 +10,7 @@ import (
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 type AdminClusterCreate struct {
@@ -34,22 +35,25 @@ func (s *AdminClusterCreate) Request(rs core.OnSession, w http.ResponseWriter, r
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	mf := persistence.NewRepositoryObjectFactory()
-	repo, err := mf.FromRepositoryObject(&me)
+	repo, err := anypb.New(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	repo.Key.Array = s.ToBytes(s.Sequence().UId())
+	vm, err := anypb.New(&protocol.VMObject{ProjectId: "test", Zone: "zone1"})
+	if err != nil {
+		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
+		return
+	}
 	tb := persistence.NewTaskBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
-
 	vb := tb.Validator(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "validator"})
-	vb.Transaction().Meta(&protocol.Meta{Name: "check"}).Object(repo).Build()
-	vb.Transaction().Meta(&protocol.Meta{Name: "update"}).Object(repo).Build()
+	vb.Transaction().Meta(&protocol.Meta{Name: "check"}).Message(repo).Build()
+	vb.Transaction().Meta(&protocol.Meta{Name: "update"}).Message(vm).Build()
+	vb.Transaction().Meta(&protocol.Meta{Name: "create"}).Message(vm).Build()
 	jb := tb.Job(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "job"})
-	
-	
-	jb.Transaction().Meta(&protocol.Meta{Name: "create"}).Object(repo).Build()
+	jb.Transaction().Meta(&protocol.Meta{Name: "update"}).Message(vm).Build()
+	jb.Transaction().Meta(&protocol.Meta{Name: "create"}).Message(vm).Build()
+	jb.Transaction().Meta(&protocol.Meta{Name: "create"}).Message(vm).Build()
 	jb.Build()
 	rp, err := s.Cluster().Issue(tb.Build())
 	if err != nil {

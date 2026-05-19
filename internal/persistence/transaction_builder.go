@@ -1,6 +1,9 @@
 package persistence
 
-import "gameclustering.com/internal/protocol"
+import (
+	"gameclustering.com/internal/protocol"
+	"google.golang.org/protobuf/types/known/anypb"
+)
 
 type TransactionBuilder struct {
 	target *protocol.Transaction
@@ -23,6 +26,11 @@ func (t *TransactionBuilder) Object(obj *protocol.KeyValue) *TransactionBuilder 
 
 func (t *TransactionBuilder) Data(data *protocol.Data) *TransactionBuilder {
 	t.target.Data = data
+	return t
+}
+
+func (t *TransactionBuilder) Message(message *anypb.Any) *TransactionBuilder {
+	t.target.Message = message
 	return t
 }
 

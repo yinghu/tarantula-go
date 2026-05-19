@@ -1,16 +1,15 @@
 package main
 
 import (
-	"fmt"
-
 	"gameclustering.com/internal/core"
-	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
-func NewRepositoryObejctUpdate(s *CloudService) *protocol.TccTransationListener {
-	vm := RepositoryObejctUpdate{s}
+func NewRepositoryObejctCheck(s *CloudService) *protocol.TccTransationListener {
+	vm := RepositoryObejctCheck{s}
 	tcc := protocol.TccTransationListener{}
 	tcc.Reserve = vm.reserse
 	tcc.Confirm = vm.confirm
@@ -18,22 +17,19 @@ func NewRepositoryObejctUpdate(s *CloudService) *protocol.TccTransationListener 
 	return &tcc
 }
 
-type RepositoryObejctUpdate struct {
+type RepositoryObejctCheck struct {
 	*CloudService
 }
 
-func (v *RepositoryObejctUpdate) reserse(t *protocol.Transaction) error {
+func (v *RepositoryObejctCheck) reserse(t *protocol.Transaction) error {
 	core.AppLog.Debug().Msgf("update reserve %v", t.Meta)
-	tf := persistence.NewRepositoryObjectFactory()
-	obj, err := tf.Message(t.Object)
+	var repo protocol.RepositoryObject
+	err := anypb.UnmarshalTo(t.Message, &repo, proto.UnmarshalOptions{})
 	if err != nil {
 		return err
 	}
-	vm, ok := obj.(*protocol.RepositoryObject)
-	if !ok {
-		return fmt.Errorf("wrong message type")
-	}
-	core.AppLog.Debug().Msgf("repository object %v", vm)
+
+	core.AppLog.Debug().Msgf("repository object %v", &repo)
 	github, err := v.AppManager.Cluster().AuthKey("git")
 	if err != nil {
 		core.AppLog.Debug().Msgf("no git key %s", err.Error())
@@ -48,12 +44,12 @@ func (v *RepositoryObejctUpdate) reserse(t *protocol.Transaction) error {
 	return v.insert(t.Meta)
 }
 
-func (v *RepositoryObejctUpdate) confirm(t *protocol.Transaction) error {
+func (v *RepositoryObejctCheck) confirm(t *protocol.Transaction) error {
 	core.AppLog.Debug().Msgf("check confirm %v", t.Meta)
 	return v.insert(t.Meta)
 }
 
-func (v *RepositoryObejctUpdate) cancel(t *protocol.Transaction) error {
+func (v *RepositoryObejctCheck) cancel(t *protocol.Transaction) error {
 	core.AppLog.Debug().Msgf("check cancel %v", t.Meta)
 	return v.insert(t.Meta)
 }

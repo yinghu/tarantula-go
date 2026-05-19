@@ -9,6 +9,7 @@ package protocol
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	anypb "google.golang.org/protobuf/types/known/anypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -26,6 +27,7 @@ type Transaction struct {
 	Meta          *Meta                  `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
 	Object        *KeyValue              `protobuf:"bytes,2,opt,name=object,proto3" json:"object,omitempty"`
 	Data          *Data                  `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	Message       *anypb.Any             `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -81,17 +83,25 @@ func (x *Transaction) GetData() *Data {
 	return nil
 }
 
+func (x *Transaction) GetMessage() *anypb.Any {
+	if x != nil {
+		return x.Message
+	}
+	return nil
+}
+
 var File_transaction_proto protoreflect.FileDescriptor
 
 const file_transaction_proto_rawDesc = "" +
 	"\n" +
-	"\x11transaction.proto\x12\bprotocol\x1a\x0fkey_value.proto\x1a\n" +
+	"\x11transaction.proto\x12\bprotocol\x1a\x19google/protobuf/any.proto\x1a\x0fkey_value.proto\x1a\n" +
 	"meta.proto\x1a\n" +
-	"data.proto\"\x81\x01\n" +
+	"data.proto\"\xb1\x01\n" +
 	"\vTransaction\x12\"\n" +
 	"\x04meta\x18\x01 \x01(\v2\x0e.protocol.MetaR\x04meta\x12*\n" +
 	"\x06object\x18\x02 \x01(\v2\x12.protocol.KeyValueR\x06object\x12\"\n" +
-	"\x04data\x18\x03 \x01(\v2\x0e.protocol.DataR\x04dataBS\n" +
+	"\x04data\x18\x03 \x01(\v2\x0e.protocol.DataR\x04data\x12.\n" +
+	"\amessage\x18\x04 \x01(\v2\x14.google.protobuf.AnyR\amessageBS\n" +
 	"\x17com.icodesoftware.protoB\x12TransactionFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (
@@ -112,16 +122,18 @@ var file_transaction_proto_goTypes = []any{
 	(*Meta)(nil),        // 1: protocol.Meta
 	(*KeyValue)(nil),    // 2: protocol.KeyValue
 	(*Data)(nil),        // 3: protocol.Data
+	(*anypb.Any)(nil),   // 4: google.protobuf.Any
 }
 var file_transaction_proto_depIdxs = []int32{
 	1, // 0: protocol.Transaction.meta:type_name -> protocol.Meta
 	2, // 1: protocol.Transaction.object:type_name -> protocol.KeyValue
 	3, // 2: protocol.Transaction.data:type_name -> protocol.Data
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	4, // 3: protocol.Transaction.message:type_name -> google.protobuf.Any
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_transaction_proto_init() }

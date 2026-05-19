@@ -7,8 +7,8 @@ import (
 	"google.golang.org/protobuf/types/known/anypb"
 )
 
-func NewVMObejctCreate(s *CloudService) *protocol.TccTransationListener {
-	vm := VMObjectCreate{s}
+func NewVMObejctUpdate(s *CloudService) *protocol.TccTransationListener {
+	vm := VMObjectUpdate{s}
 	tcc := protocol.TccTransationListener{}
 	tcc.Reserve = vm.reserse
 	tcc.Confirm = vm.confirm
@@ -16,12 +16,12 @@ func NewVMObejctCreate(s *CloudService) *protocol.TccTransationListener {
 	return &tcc
 }
 
-type VMObjectCreate struct {
+type VMObjectUpdate struct {
 	*CloudService
 }
 
-func (v *VMObjectCreate) reserse(t *protocol.Transaction) error {
-	core.AppLog.Debug().Msgf("create reserve %v", t.Meta)
+func (v *VMObjectUpdate) reserse(t *protocol.Transaction) error {
+	core.AppLog.Debug().Msgf("update reserve %v", t.Meta)
 	var vm protocol.VMObject
 	err := anypb.UnmarshalTo(t.Message, &vm, proto.UnmarshalOptions{})
 	if err != nil {
@@ -31,13 +31,12 @@ func (v *VMObjectCreate) reserse(t *protocol.Transaction) error {
 	return v.insert(t.Meta)
 }
 
-func (v *VMObjectCreate) confirm(t *protocol.Transaction) error {
-	core.AppLog.Debug().Msgf("create confirm %v", t.Meta)
+func (v *VMObjectUpdate) confirm(t *protocol.Transaction) error {
+	core.AppLog.Debug().Msgf("update confirm %v", t.Meta)
 	return v.insert(t.Meta)
 }
 
-func (v *VMObjectCreate) cancel(t *protocol.Transaction) error {
-	core.AppLog.Debug().Msgf("create cancel %v", t.Meta)
-
+func (v *VMObjectUpdate) cancel(t *protocol.Transaction) error {
+	core.AppLog.Debug().Msgf("update cancel %v", t.Meta)
 	return v.insert(t.Meta)
 }
