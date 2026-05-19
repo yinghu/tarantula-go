@@ -1,8 +1,8 @@
 package util
 
 import (
-	"bytes"
 	"encoding/base64"
+	"fmt"
 	"testing"
 )
 
@@ -42,41 +42,18 @@ func TestVaultClient(t *testing.T) {
 	if err != nil {
 		t.Errorf("error %s", err.Error())
 	}
-	sk, err := vclient.GetSecret("dev/presence", "gcp")
+	sk, err := vclient.GetSecret("dev/presence", "git")
 	if err != nil {
 		t.Errorf("error %s", err.Error())
 		return
 	}
-	iam, _ := sk.Data["iam"].(string)
-	gcp := GcpApi{
-		ServiceAccount: iam,
-		ProjectId:      "prismatic-grail-206205",
-		Zone:           "us-east1-c",
-	}
-	err = gcp.Auth()
+	tok, _ := sk.Data["token"].(string)
+	org, _ := sk.Data["org"].(string)
+	gh := GitHubApi{Token: tok, Org: org}
+	repos, err := gh.ListRepos()
 	if err != nil {
-		t.Errorf("error %s", err.Error())
+		t.Errorf("err %s", err.Error())
 		return
 	}
-	defer gcp.Close()
-	//err = gcp.Insert("tarantula-build-01")
-	//if err != nil {
-	//t.Errorf("error %s", err.Error())
-	//}
-	ins, err := gcp.Get("tarantula-build-02")
-	if err != nil {
-		t.Errorf("error %s", err.Error())
-		return
-	}
-	pk, _ := sk.Data["ssh"].(string)
-	ssh := SshClient{Host: ins.GetNetworkInterfaces()[0].AccessConfigs[0].GetNatIP(), User: "yinghu_lu", PrivateKey: pk}
-	err = ssh.WithKey()
-	if err != nil {
-		t.Errorf("error %s", err.Error())
-		return
-	}
-	defer ssh.Close()
-	var w bytes.Buffer
-	ssh.Run("pwd && git --version && docker --version && df -h",&w)
-	//fmt.Printf("Key %v", sk.Data)
+	fmt.Printf("REPO %v", repos)
 }
