@@ -44,7 +44,7 @@ func (h *GitHubApi) getJson(path string, cb Callback) error {
 	}
 	req.Header.Set("Accept", "application/vnd.github+json")
 	req.Header.Set("X-GitHub-Api-Version", "2026-03-10")
-	req.Header.Set("User-Agent", "yinghu")
+	req.Header.Set("User-Agent", h.Org)
 	req.Header.Set("Authorization", "Bearer "+h.Token)
 	resp, err := client.Do(req)
 	if err != nil {
