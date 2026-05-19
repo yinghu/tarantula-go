@@ -111,9 +111,7 @@ func (m *TaskManager) start(j *JobResource) {
 
 func (m *TaskManager) stop(t *JobResource) {
 	t.canceled = true
-	//for _, tc := range t.joining {
-	//core.AppLog.Debug().Msgf("TRANSACTION CANCELED %v %d", tc.canceled, tc.retried)
-	//}
+	
 	t.jb.Description("job timeout").End(time.Now())
 	tr := m.trs[t.resource.Meta.TaskId]
 	tr.canceled = true
@@ -169,10 +167,6 @@ func (m *TaskManager) canceled(c *protocol.Meta, t *JobResource) {
 func (m *TaskManager) finished(t *JobResource) {
 	m.closeTimer(t.resource.Meta.Id)
 	tr := m.trs[t.resource.Meta.TaskId]
-	//core.AppLog.Debug().Msgf("JOB CANCELED %v", t.canceled)
-	//for _, tc := range t.joining {
-	//core.AppLog.Debug().Msgf("TRANSACTION CANCELED %v", tc.canceled)
-	//}
 	t.resource.Meta.State = protocol.TCC_FINISHED
 	t.jb.End(time.Now())
 	if tr.jobIndex+1 < len(tr.pending) {

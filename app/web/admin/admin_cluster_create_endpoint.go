@@ -22,8 +22,7 @@ func (s *AdminClusterCreate) AccessControl() int32 {
 
 func (s *AdminClusterCreate) Request(rs core.OnSession, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	mf := persistence.NewVMObjectFactory()
-	var me protocol.VMObject
+	var me protocol.RepositoryObject
 	var buf bytes.Buffer
 	_, err := io.Copy(&buf, r.Body)
 	if err != nil {
@@ -35,27 +34,22 @@ func (s *AdminClusterCreate) Request(rs core.OnSession, w http.ResponseWriter, r
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	kv, err := mf.FromVMObject(&me)
+	mf := persistence.NewRepositoryObjectFactory()
+	repo, err := mf.FromRepositoryObject(&me)
 	if err != nil {
 		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
 		return
 	}
-	rf := persistence.NewRepositoryObjectFactory()
-	ro, err := rf.FromRepositoryObject(&protocol.RepositoryObject{Vendor: "git", Name: "react-ai", Tag: "v1.0", Branch: "dev"})
-	if err != nil {
-		w.Write(util.ToJson(core.OnSession{Successful: false, Message: err.Error()}))
-		return
-	}
-	ro.Key.Array = s.ToBytes(s.Sequence().UId())
-	kv.Key.Array = s.ToBytes(s.Sequence().UId())
-	
+	repo.Key.Array = s.ToBytes(s.Sequence().UId())
 	tb := persistence.NewTaskBuilder(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "register"})
 
 	vb := tb.Validator(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "validator"})
-	vb.Transaction().Meta(&protocol.Meta{Name: "check"}).Object(kv).Build()
-	vb.Transaction().Meta(&protocol.Meta{Name: "update"}).Object(ro).Build()
+	vb.Transaction().Meta(&protocol.Meta{Name: "check"}).Object(repo).Build()
+	vb.Transaction().Meta(&protocol.Meta{Name: "update"}).Object(repo).Build()
 	jb := tb.Job(&protocol.Meta{NodeId: s.NodeId(), Tag: s.Context(), Name: "job"})
-	jb.Transaction().Meta(&protocol.Meta{Name: "create"}).Object(kv).Build()
+	
+	
+	jb.Transaction().Meta(&protocol.Meta{Name: "create"}).Object(repo).Build()
 	jb.Build()
 	rp, err := s.Cluster().Issue(tb.Build())
 	if err != nil {

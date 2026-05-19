@@ -25,10 +25,10 @@ type RepositoryObjectFactory struct {
 	ProtoObjectFactoryObj
 }
 
-func (p *RepositoryObjectFactory) FromRepositoryObject(vmo *protocol.RepositoryObject) (*protocol.KeyValue, error) {
+func (p *RepositoryObjectFactory) FromRepositoryObject(repo *protocol.RepositoryObject) (*protocol.KeyValue, error) {
 	kv := protocol.KeyValue{}
-	kv.Key = &protocol.Key{Header: &protocol.Header{FactoryId: core.OBJECT_FACTORY_ID, ClassId: VM_OBJECT_ID, Updatable: true}}
-	obj, err := anypb.New(vmo)
+	kv.Key = &protocol.Key{Header: &protocol.Header{FactoryId: core.OBJECT_FACTORY_ID, ClassId: REPOSITORY_OBJECT_ID, Updatable: true}}
+	obj, err := anypb.New(repo)
 	if err != nil {
 		return &kv, err
 	}
