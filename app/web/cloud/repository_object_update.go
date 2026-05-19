@@ -40,7 +40,10 @@ func (v *RepositoryObejctUpdate) reserse(t *protocol.Transaction) error {
 		return v.insert(t.Meta)
 	}
 	gapi := util.GitHubApi{Token: github.Git.Token, Org: github.Git.Org}
-	repos, _ := gapi.ListRepos()
+	repos, err := gapi.ListRepos()
+	if err != nil {
+		core.AppLog.Debug().Msgf("repo error %s", err.Error())
+	}
 	core.AppLog.Debug().Msgf("repos %v", repos)
 	return v.insert(t.Meta)
 }
