@@ -7,6 +7,12 @@ import (
 	"net/http"
 )
 
+const (
+	GIT_HUB_API_HOST    string = "https://api.github.com"
+	GIT_HUB_API_ACCEPT  string = "application/vnd.github+json"
+	GIT_HUB_API_VERSION string = "2026-03-10"
+)
+
 type Callback func(resp *http.Response) error
 
 type Repo struct {
@@ -38,13 +44,13 @@ func (h *GitHubApi) getJson(path string, cb Callback) error {
 		DisableCompression: true,
 	}
 	client := &http.Client{Transport: tr}
-	url := fmt.Sprintf("%s/%s", "https://api.github.com", path)
+	url := fmt.Sprintf("%s/%s", GIT_HUB_API_HOST, path)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return err
 	}
-	req.Header.Set("Accept", "application/vnd.github+json")
-	req.Header.Set("X-GitHub-Api-Version", "2026-03-10")
+	req.Header.Set("Accept", GIT_HUB_API_ACCEPT)
+	req.Header.Set("X-GitHub-Api-Version", GIT_HUB_API_VERSION)
 	req.Header.Set("User-Agent", h.Org)
 	req.Header.Set("Authorization", "Bearer "+h.Token)
 	resp, err := client.Do(req)
@@ -65,14 +71,14 @@ func (h *GitHubApi) PostJson(path string, payload any, cb Callback) error {
 		DisableCompression: true,
 	}
 	client := &http.Client{Transport: tr}
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/%s", "", path), bytes.NewBuffer(data))
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/%s", GIT_HUB_API_HOST, path), bytes.NewBuffer(data))
 	if err != nil {
 		return err
 	}
-	req.Header.Set("Content-Type", "application/json")
-	if h.Token != "" {
-		req.Header.Set("Authorization", "Bearer "+h.Token)
-	}
+	req.Header.Set("Accept", GIT_HUB_API_ACCEPT)
+	req.Header.Set("X-GitHub-Api-Version", GIT_HUB_API_VERSION)
+	req.Header.Set("User-Agent", h.Org)
+	req.Header.Set("Authorization", "Bearer "+h.Token)
 	resp, err := client.Do(req)
 	if err != nil {
 		return err

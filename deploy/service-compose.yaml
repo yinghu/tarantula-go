@@ -27,6 +27,8 @@ services:
       SKIP_CHOWN: true
     ports:
       - "8200:8200" 
+    networks:
+      - tarantula-service-net  
     volumes:
       - volume_vault:/vault/config
       - volume_vault:/vault/file

@@ -73,10 +73,12 @@ func (a *KeyLoader) toGitKey(kv *vault.KVSecret) *protocol.AuthKey {
 	user, _ := kv.Data["user"].(string)
 	email, _ := kv.Data["email"].(string)
 	token, _ := kv.Data["token"].(string)
+	org, _ := kv.Data["org"].(string)
 	ak := protocol.AuthKey{Git: &protocol.GitAccess{}}
 	ak.Git.Key = key
 	ak.Git.User = user
 	ak.Git.Email = email
 	ak.Git.Token = token
+	ak.Git.Org = org
 	return &ak
 }
