@@ -37,7 +37,7 @@ func TestKey(t *testing.T) {
 }
 
 func TestVaultClient(t *testing.T) {
-	vclient := VaultClient{Host: "http://192.168.1.11:8200", Token: ""}
+	vclient := VaultClient{Host: "https://gameclustering.com", Token: ""}
 	err := vclient.Auth()
 	if err != nil {
 		t.Errorf("error %s", err.Error())
