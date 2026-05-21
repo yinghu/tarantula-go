@@ -20,6 +20,8 @@ services:
     image: hashicorp/vault:latest
     container_name: vault
     restart: unless-stopped
+    cap_add:
+          - IPC_LOCK
     environment:
       VAULT_ROOT_TOKEN_ID: tarantula
       VAULT_LOCAL_CONFIG: '{"ui":"true","listener":{"tcp": {"address": "0.0.0.0:8200", "tls_disable": 1}},"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h","disable_mlock":"true"}'
@@ -33,6 +35,22 @@ services:
       - volume_vault:/vault/config
       - volume_vault:/vault/file
     command: server
+
+  web:
+    restart: unless-stopped
+    container_name: web
+    hostname: web
+    image: tarantula.caddy:v1.0
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - vault
+    networks:
+      - tarantula-service-net
+    volumes:
+      - volume_caddy_config:/config
+      - volume_caddy_data:/data    
       
 networks:
   tarantula-service-net:
@@ -41,3 +59,5 @@ networks:
 volumes:
   volume_postgres:
   volume_vault:
+  volume_caddy_data: 
+  volume_caddy_config:
