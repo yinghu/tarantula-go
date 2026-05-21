@@ -11,6 +11,7 @@ import (
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 const (
@@ -141,13 +142,15 @@ func (c *DataServiceProvider) Start(dir string, ctx string) {
 	ak, err := c.AuthKey(context.Background(), &protocol.Request{Context: fmt.Sprintf("%s#%s", ctx, "auth")})
 	err = os.WriteFile("./key", ak.Key, 0600)
 	if err != nil {
-		core.AppLog.Warn().Msgf("error to write key %s", err.Error())
-		//panic(err.Error())
+		panic(err.Error())
 	}
 	err = os.WriteFile("./cert", ak.Cert, 0600)
 	if err != nil {
-		core.AppLog.Warn().Msgf("error to write cert %s", err.Error())
-		//panic(err.Error())
+		panic(err.Error())
+	}
+	creds, err :=credentials.NewServerTLSFromFile("./cert", "./key")
+	if err != nil {
+		panic(err.Error())
 	}
 	c.Local = &persistence.BadgerLocal{Path: path, InMemory: false, LogDisabled: false, GcEnabled: true}
 	err = c.Local.Open()
@@ -171,8 +174,7 @@ func (c *DataServiceProvider) Start(dir string, ctx string) {
 	if err != nil {
 		panic(err)
 	}
-	//credentials.NewServerTLSFromFile("","")
-	rpc := grpc.NewServer()
+	rpc := grpc.NewServer(grpc.Creds(creds))
 	c.server = rpc
 	protocol.RegisterDataServiceServer(rpc, c)
 	protocol.RegisterPostofficeServiceServer(rpc, c)

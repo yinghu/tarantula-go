@@ -8,7 +8,7 @@ import (
 
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 )
 
 const (
@@ -35,8 +35,12 @@ type RpcConnPool struct {
 
 func (p *RpcConnPool) connect(target string) (*grpc.ClientConn, error) {
 	retries := RPC_CONNECT_RETRIES
+	creds, err := credentials.NewClientTLSFromFile("./domain.crt", "")
+	if err != nil {
+		panic(err.Error())
+	}
 	for {
-		tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(creds))
 		if err != nil {
 			retries--
 			if retries > 0 {
