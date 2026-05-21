@@ -21,6 +21,7 @@ type MemberlistManager struct {
 	MemberListListener
 
 	StoreDir string
+	Ctx string
 	Binding  string
 }
 
@@ -60,7 +61,7 @@ func (m *MemberlistManager) Start(meta []byte, seq core.Sequence, vt core.Vault)
 	m.DataServiceProvider.rpcEndpoint = fmt.Sprintf("%s:%d", string(m.LocalNode().Addr.String()), core.RPC_PORT)
 	m.Mll = &m.MemberListListener
 	m.Mll.DWait.Add(1)
-	go m.DataServiceProvider.Start(m.StoreDir)
+	go m.DataServiceProvider.Start(m.StoreDir,m.Ctx)
 	m.Mll.DWait.Wait()
 	time.Sleep(3 * time.Second)
 	go m.RingUpdated()

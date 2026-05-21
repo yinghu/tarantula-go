@@ -30,6 +30,8 @@ type AuthKey struct {
 	Gcp           *GcpAccess             `protobuf:"bytes,5,opt,name=gcp,proto3" json:"gcp,omitempty"`
 	Git           *GitAccess             `protobuf:"bytes,6,opt,name=git,proto3" json:"git,omitempty"`
 	Sql           *SqlAccess             `protobuf:"bytes,7,opt,name=sql,proto3" json:"sql,omitempty"`
+	Key           []byte                 `protobuf:"bytes,8,opt,name=key,proto3" json:"key,omitempty"`
+	Cert          []byte                 `protobuf:"bytes,9,opt,name=cert,proto3" json:"cert,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -113,11 +115,25 @@ func (x *AuthKey) GetSql() *SqlAccess {
 	return nil
 }
 
+func (x *AuthKey) GetKey() []byte {
+	if x != nil {
+		return x.Key
+	}
+	return nil
+}
+
+func (x *AuthKey) GetCert() []byte {
+	if x != nil {
+		return x.Cert
+	}
+	return nil
+}
+
 var File_auth_key_proto protoreflect.FileDescriptor
 
 const file_auth_key_proto_rawDesc = "" +
 	"\n" +
-	"\x0eauth_key.proto\x12\bprotocol\x1a\x10gcp_access.proto\x1a\x10git_access.proto\x1a\x10sql_access.proto\"\xd6\x01\n" +
+	"\x0eauth_key.proto\x12\bprotocol\x1a\x10gcp_access.proto\x1a\x10git_access.proto\x1a\x10sql_access.proto\"\xfc\x01\n" +
 	"\aAuthKey\x12\x18\n" +
 	"\acontext\x18\x01 \x01(\tR\acontext\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x10\n" +
@@ -125,7 +141,9 @@ const file_auth_key_proto_rawDesc = "" +
 	"\x06cipher\x18\x04 \x01(\fR\x06cipher\x12%\n" +
 	"\x03gcp\x18\x05 \x01(\v2\x13.protocol.GcpAccessR\x03gcp\x12%\n" +
 	"\x03git\x18\x06 \x01(\v2\x13.protocol.GitAccessR\x03git\x12%\n" +
-	"\x03sql\x18\a \x01(\v2\x13.protocol.SqlAccessR\x03sqlBO\n" +
+	"\x03sql\x18\a \x01(\v2\x13.protocol.SqlAccessR\x03sql\x12\x10\n" +
+	"\x03key\x18\b \x01(\fR\x03key\x12\x12\n" +
+	"\x04cert\x18\t \x01(\fR\x04certBO\n" +
 	"\x17com.icodesoftware.protoB\x0eAuthKeyFactoryZ$gameclustering.com/internal/protocolb\x06proto3"
 
 var (

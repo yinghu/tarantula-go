@@ -125,11 +125,11 @@ func (c *DataServiceProvider) Send(ctx context.Context, in *protocol.Topic) (*pr
 	return &protocol.Response{Successful: true, Message: "event published"}, nil
 }
 
-func (c *DataServiceProvider) Start(dir string) {
+func (c *DataServiceProvider) Start(dir string, ctx string) {
 	c.running = true
 	c.backRing = NodeRing{nodes: make([]core.Node, 0)}
 	path := fmt.Sprintf("%s/%s", dir, "store")
-	core.AppLog.Printf("creating path %s if not existed", path)
+	core.AppLog.Warn().Msgf("creating path %s if not existed", path)
 	err := os.MkdirAll(path, 0755)
 	if err != nil {
 		panic(err)
@@ -137,6 +137,17 @@ func (c *DataServiceProvider) Start(dir string) {
 	err = c.kloader.auth()
 	if err != nil {
 		panic(err)
+	}
+	ak, err := c.AuthKey(context.Background(), &protocol.Request{Context: fmt.Sprintf("%s#%s", ctx, "auth")})
+	err = os.WriteFile("./key", ak.Key, 0600)
+	if err != nil {
+		core.AppLog.Warn().Msgf("error to write key %s", err.Error())
+		//panic(err.Error())
+	}
+	err = os.WriteFile("./cert", ak.Cert, 0600)
+	if err != nil {
+		core.AppLog.Warn().Msgf("error to write cert %s", err.Error())
+		//panic(err.Error())
 	}
 	c.Local = &persistence.BadgerLocal{Path: path, InMemory: false, LogDisabled: false, GcEnabled: true}
 	err = c.Local.Open()
@@ -160,6 +171,7 @@ func (c *DataServiceProvider) Start(dir string) {
 	if err != nil {
 		panic(err)
 	}
+	//credentials.NewServerTLSFromFile("","")
 	rpc := grpc.NewServer()
 	c.server = rpc
 	protocol.RegisterDataServiceServer(rpc, c)

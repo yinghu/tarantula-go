@@ -42,9 +42,14 @@ func (a *KeyLoader) load(mount string, path string) (*protocol.AuthKey, error) {
 func (a *KeyLoader) toAuthKey(kv *vault.KVSecret) *protocol.AuthKey {
 	jwt, _ := kv.Data["jwt"].(string)
 	cipher, _ := kv.Data["cipher"].(string)
+	key, _ := kv.Data["key"].(string)
+	cert, _ := kv.Data["cert"].(string)
+
 	ak := protocol.AuthKey{}
 	ak.Jwt = []byte(jwt)
 	ak.Cipher = []byte(cipher)
+	ak.Key = []byte(key)
+	ak.Cert = []byte(cert)
 	return &ak
 }
 
