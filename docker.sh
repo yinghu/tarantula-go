@@ -2,6 +2,7 @@
 
 Clean(){
     echo "deleting build files"
+    rm domain.crt
 }
 Check(){
     if [[ $? -ne 0 ]]; then
@@ -19,7 +20,7 @@ fi
 
 echo "Build params : ${version}"
 
-
+cp ~/bin/domain.crt .
 apps=("admin" "postoffice" "cloud")
 for app in "${apps[@]}"; do
   echo "Current build target : $app"
