@@ -25,7 +25,7 @@ WORKDIR /home/tarantula/bin
 RUN echo installing app : ${app}
 COPY --from=builder /build/app/web/${app}/main .
 COPY --from=builder /build/app/web/${app}/*.json .
-COPY --from=builder /build/app/web/${app}/domain.crt .
+COPY --from=builder /build/domain.crt .
 
 RUN chown -R tarantula:tarantula /home/tarantula 
 
