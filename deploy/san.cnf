@@ -18,4 +18,4 @@ subjectAltName = @alt_names
 [alt_names]
 DNS.1 = gameclustering.com
 DNS.2 = www.gameclustering.com
-IP.1  = 0.0.0.0
+IP.1  = 192.168.1.11
