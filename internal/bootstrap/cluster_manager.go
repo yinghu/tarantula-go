@@ -407,7 +407,11 @@ func (c *ClusterManager) TopicList() (*protocol.Response, error) {
 		return nil, err
 	}
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
-	ctx := metadata.NewOutgoingContext(context.Background(),metadata.Pairs("token","jwt token"))
+	ticket, err := c.App.Authenticator().CreateTicket(100, 100, core.ADMIN_ACCESS_CONTROL, 10)
+	if err != nil {
+		return &protocol.Response{Successful: false, Message: err.Error()}, err
+	}
+	ctx := metadata.NewOutgoingContext(context.Background(), metadata.Pairs("token", ticket))
 	return dsp.TopicList(ctx, &protocol.Request{Prefix: 0})
 }
 
