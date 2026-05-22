@@ -35,7 +35,7 @@ type RpcConnPool struct {
 
 func (p *RpcConnPool) connect(target string) (*grpc.ClientConn, error) {
 	retries := RPC_CONNECT_RETRIES
-	creds, err := credentials.NewClientTLSFromFile("./domain.crt", "")
+	creds, err := credentials.NewClientTLSFromFile(CERT_NAME, "")
 	if err != nil {
 		panic(err.Error())
 	}

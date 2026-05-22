@@ -144,11 +144,11 @@ func (c *DataServiceProvider) Start(dir string, ctx string) {
 	if err != nil {
 		panic(err.Error())
 	}
-	err = os.WriteFile("./cert", []byte(ak.Cert), 0600)
+	err = os.WriteFile(core.CERT_NAME, []byte(ak.Cert), 0600)
 	if err != nil {
 		panic(err.Error())
 	}
-	creds, err :=credentials.NewServerTLSFromFile("./cert", "./key")
+	creds, err := credentials.NewServerTLSFromFile(core.CERT_NAME, "./key")
 	if err != nil {
 		panic(err.Error())
 	}

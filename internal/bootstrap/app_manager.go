@@ -224,5 +224,5 @@ func (c *AppManager) loadCert() error {
 	if !existed {
 		return fmt.Errorf("cert not existed")
 	}
-	return os.WriteFile("./domain.crt", []byte(cert), 0600)
+	return os.WriteFile(core.CERT_NAME, []byte(cert), 0600)
 }
