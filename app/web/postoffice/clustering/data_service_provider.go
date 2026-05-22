@@ -178,7 +178,7 @@ func (c *DataServiceProvider) Start(dir string, ctx string) {
 	}
 }
 
-func (c *DataServiceProvider) audit(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func (c *DataServiceProvider) audit(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 	//hd, ok := metadata.FromIncomingContext(ctx)
 	core.AppLog.Debug().Msg("server audit first")
 	return handler(ctx, req)
