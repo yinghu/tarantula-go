@@ -59,11 +59,11 @@ func (s *AppManager) Start(f core.Env) error {
 	}
 	for {
 		err := s.loadCert()
-		if err == nil{
+		if err == nil {
 			break
 		}
-		time.Sleep(1*time.Second)
-		core.AppLog.Warn().Msgf("load client cert from %s", f.PostOfficeHost)	
+		time.Sleep(1 * time.Second)
+		core.AppLog.Warn().Msgf("load client cert from %s", f.PostOfficeHost)
 	}
 	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.PostOfficeHost)
 	s.cluster = &ClusterManager{App: s}
@@ -205,7 +205,18 @@ func (c *AppManager) ToSystemId(key []byte) int64 {
 	return int64(sysId)
 }
 
-func (c *AppManager) loadCert() error{
-	
+func (c *AppManager) loadCert() error {
+	vault := util.VaultClient{Host: c.F.Vlt.Host, Token: c.F.Vlt.Token}
+	err := vault.Auth()
+	if err != nil {
+		core.AppLog.Warn().Msgf("go to panic %s", err)
+		return nil
+	}
+	ak, err := vault.GetSecret(c.F.PresenceCtx(), "auth")
+	if err != nil {
+		core.AppLog.Warn().Msgf("go to panic %s", err)
+		return nil
+	}
+	core.AppLog.Warn().Msgf("auth keys loaded %v", ak)
 	return nil
-} 
+}
