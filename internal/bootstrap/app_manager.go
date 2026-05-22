@@ -57,6 +57,14 @@ func (s *AppManager) Start(f core.Env) error {
 	if f.IsClusterMember {
 		return nil
 	}
+	for {
+		err := s.loadCert()
+		if err == nil{
+			break
+		}
+		time.Sleep(1*time.Second)
+		core.AppLog.Warn().Msgf("load client cert from %s", f.PostOfficeHost)	
+	}
 	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.PostOfficeHost)
 	s.cluster = &ClusterManager{App: s}
 	s.RegisterLogForwarder(zerolog.DebugLevel, s.cluster)
@@ -196,3 +204,8 @@ func (c *AppManager) ToSystemId(key []byte) int64 {
 	sysId, _ := buff.ReadUInt64()
 	return int64(sysId)
 }
+
+func (c *AppManager) loadCert() error{
+	
+	return nil
+} 

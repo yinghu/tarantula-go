@@ -46,10 +46,10 @@ func (a *KeyLoader) toAuthKey(kv *vault.KVSecret) *protocol.AuthKey {
 	cert, _ := kv.Data["cert"].(string)
 
 	ak := protocol.AuthKey{}
-	ak.Jwt = []byte(jwt)
-	ak.Cipher = []byte(cipher)
-	ak.Key = []byte(key)
-	ak.Cert = []byte(cert)
+	ak.Jwt = jwt
+	ak.Cipher = cipher
+	ak.Key = key
+	ak.Cert = cert
 	return &ak
 }
 

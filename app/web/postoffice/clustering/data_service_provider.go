@@ -140,11 +140,11 @@ func (c *DataServiceProvider) Start(dir string, ctx string) {
 		panic(err)
 	}
 	ak, err := c.AuthKey(context.Background(), &protocol.Request{Context: fmt.Sprintf("%s#%s", ctx, "auth")})
-	err = os.WriteFile("./key", ak.Key, 0600)
+	err = os.WriteFile("./key", []byte(ak.Key), 0600)
 	if err != nil {
 		panic(err.Error())
 	}
-	err = os.WriteFile("./cert", ak.Cert, 0600)
+	err = os.WriteFile("./cert", []byte(ak.Cert), 0600)
 	if err != nil {
 		panic(err.Error())
 	}
