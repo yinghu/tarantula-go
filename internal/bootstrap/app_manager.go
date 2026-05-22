@@ -57,13 +57,18 @@ func (s *AppManager) Start(f core.Env) error {
 	if f.IsClusterMember {
 		return nil
 	}
+	retries := 10
 	for {
 		err := s.loadCert()
 		if err == nil {
 			break
 		}
-		time.Sleep(1 * time.Second)
-		core.AppLog.Warn().Msgf("load client cert from %s", f.PostOfficeHost)
+		retries--
+		if retries == 0 {
+			panic(err)
+		}
+		time.Sleep(3 * time.Second)
+		core.AppLog.Warn().Msgf("load client cert from %s retries remaining %d", f.PostOfficeHost, retries)
 	}
 	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.PostOfficeHost)
 	s.cluster = &ClusterManager{App: s}
@@ -209,14 +214,15 @@ func (c *AppManager) loadCert() error {
 	vault := util.VaultClient{Host: c.F.Vlt.Host, Token: c.F.Vlt.Token}
 	err := vault.Auth()
 	if err != nil {
-		core.AppLog.Warn().Msgf("go to panic %s", err)
-		return nil
+		return err
 	}
-	ak, err := vault.GetSecret(c.F.PresenceCtx(), "auth")
+	kv, err := vault.GetSecret(c.F.PresenceCtx(), "auth")
 	if err != nil {
-		core.AppLog.Warn().Msgf("go to panic %s", err)
-		return nil
+		return err
 	}
-	core.AppLog.Warn().Msgf("auth keys loaded %v", ak)
-	return nil
+	cert, existed := kv.Data["cert"].(string)
+	if !existed {
+		return fmt.Errorf("cert not existed")
+	}
+	return os.WriteFile("./domain.crt", []byte(cert), 0600)
 }
