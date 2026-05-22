@@ -9,6 +9,7 @@ import (
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 func (c *DataServiceProvider) AuthKey(ctx context.Context, request *protocol.Request) (*protocol.AuthKey, error) {
@@ -181,6 +182,11 @@ func (c *DataServiceProvider) Finish(ctx context.Context, meta *protocol.Meta) (
 }
 
 func (c *DataServiceProvider) TopicList(ctx context.Context, req *protocol.Request) (*protocol.Response, error) {
+	hd, ok := metadata.FromIncomingContext(ctx)
+	if ok {
+		token := hd.Get("token")
+		core.AppLog.Debug().Msgf("token %v", token)
+	}
 	rq := make(chan []core.Subscription, 3)
 	defer close(rq)
 	c.DRequest <- TopicRequest{Opt: TOPIC_LIST, Subs: rq}

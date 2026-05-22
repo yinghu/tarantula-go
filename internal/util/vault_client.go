@@ -7,9 +7,9 @@ import (
 )
 
 type VaultClient struct {
-	Host      string
-	Token     string
-	client    *vault.Client
+	Host   string
+	Token  string
+	client *vault.Client
 }
 
 func (v *VaultClient) Auth() error {
@@ -24,6 +24,18 @@ func (v *VaultClient) Auth() error {
 	return nil
 }
 
-func (v *VaultClient) GetSecret(mountPath string,path string) (*vault.KVSecret, error) {
+func (v *VaultClient) GetSecret(mountPath string, path string) (*vault.KVSecret, error) {
 	return v.client.KVv2(mountPath).Get(context.Background(), path)
+}
+
+func (v *VaultClient) SetSecret(mountPath string, path string, value string) (*vault.KVSecret, error) {
+	kv := make(map[string]any)
+	kv[path] = value
+	return v.client.KVv2(mountPath).Put(context.Background(), mountPath, kv)
+}
+
+func (v *VaultClient) CreateStore(){
+	mount := vault.MountInput{Type: "kv",Options:map[string]string{},Description: ""}
+	v.client.Sys().Mount("",&mount)
+	
 }

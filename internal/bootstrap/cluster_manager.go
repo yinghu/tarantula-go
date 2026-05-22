@@ -13,6 +13,7 @@ import (
 	"gameclustering.com/internal/util"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -406,7 +407,8 @@ func (c *ClusterManager) TopicList() (*protocol.Response, error) {
 		return nil, err
 	}
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
-	return dsp.TopicList(context.Background(), &protocol.Request{Prefix: 0})
+	ctx := metadata.NewOutgoingContext(context.Background(),metadata.Pairs("token","jwt token"))
+	return dsp.TopicList(ctx, &protocol.Request{Prefix: 0})
 }
 
 func (c *ClusterManager) TaskList() (*protocol.Response, error) {
