@@ -40,7 +40,7 @@ func (p *RpcConnPool) connect(target string) (*grpc.ClientConn, error) {
 		panic(err.Error())
 	}
 	for {
-		tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(creds), grpc.WithUnaryInterceptor(p.audit))
+		tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(creds))
 		if err != nil {
 			retries--
 			if retries > 0 {
