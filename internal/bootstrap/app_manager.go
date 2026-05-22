@@ -59,7 +59,7 @@ func (s *AppManager) Start(f core.Env) error {
 	}
 	retries := 10
 	for {
-		err := s.loadCert()
+		err := s.loadAuthContext()
 		if err == nil {
 			break
 		}
@@ -68,7 +68,7 @@ func (s *AppManager) Start(f core.Env) error {
 			panic(err)
 		}
 		time.Sleep(3 * time.Second)
-		core.AppLog.Warn().Msgf("load client cert from %s retries remaining %d", f.PostOfficeHost, retries)
+		core.AppLog.Warn().Msgf("load client credentials from %s retries remaining %d",f.Vlt.Host, retries)
 	}
 	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.PostOfficeHost)
 	s.cluster = &ClusterManager{App: s}
@@ -78,15 +78,6 @@ func (s *AppManager) Start(f core.Env) error {
 	if err != nil {
 		panic(err.Error())
 	}
-	ak, err := s.cluster.AuthKey("auth")
-	if err != nil {
-		panic(err.Error())
-	}
-	au, err := s.LoadAuth(ak)
-	if err != nil {
-		panic(err.Error())
-	}
-	s.Auth = au
 	if f.SqlEnabled {
 		key, err := s.cluster.AuthKey("sql")
 		if err != nil {
@@ -210,19 +201,20 @@ func (c *AppManager) ToSystemId(key []byte) int64 {
 	return int64(sysId)
 }
 
-func (c *AppManager) loadCert() error {
+func (c *AppManager) loadAuthContext() error {
 	vault := util.VaultClient{Host: c.F.Vlt.Host, Token: c.F.Vlt.Token}
 	err := vault.Auth()
 	if err != nil {
 		return err
 	}
-	kv, err := vault.GetSecret(c.F.PresenceCtx(), "auth")
+	auth, err := vault.Load(c.F.PresenceCtx(), "auth")
 	if err != nil {
 		return err
 	}
-	cert, existed := kv.Data["cert"].(string)
-	if !existed {
-		return fmt.Errorf("cert not existed")
+	au, err := c.LoadAuth(auth)
+	if err != nil {
+		return err
 	}
-	return os.WriteFile(core.CERT_NAME, []byte(cert), 0600)
+	c.Auth = au
+	return os.WriteFile(core.CERT_NAME, []byte(auth.Cert), 0600)
 }

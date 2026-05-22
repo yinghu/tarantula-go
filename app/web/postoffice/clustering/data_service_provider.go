@@ -10,12 +10,15 @@ import (
 	"gameclustering.com/internal/core"
 	"gameclustering.com/internal/persistence"
 	"gameclustering.com/internal/protocol"
+	"gameclustering.com/internal/util"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
 
 const (
 	PULL_BATCH_SIZE int = 100
+
+	KEY_NAME string = "./key"
 )
 
 type DataServiceProvider struct {
@@ -30,6 +33,7 @@ type DataServiceProvider struct {
 	backRing    NodeRing
 	rpcEndpoint string
 	seq         core.Sequence
+	auth        core.Authenticator
 	//write worker chan
 	DSet    chan SetData
 	DPull   chan core.RingSync
@@ -46,7 +50,7 @@ type DataServiceProvider struct {
 
 	//task transaction
 	TManager *TaskManager
-	kloader  KeyLoader
+	vault    *util.VaultClient
 }
 
 func (c *DataServiceProvider) Get(ctx context.Context, in *protocol.Request) (*protocol.Response, error) {
@@ -135,20 +139,7 @@ func (c *DataServiceProvider) Start(dir string, ctx string) {
 	if err != nil {
 		panic(err)
 	}
-	err = c.kloader.auth()
-	if err != nil {
-		panic(err)
-	}
-	ak, err := c.AuthKey(context.Background(), &protocol.Request{Context: fmt.Sprintf("%s#%s", ctx, "auth")})
-	err = os.WriteFile("./key", []byte(ak.Key), 0600)
-	if err != nil {
-		panic(err.Error())
-	}
-	err = os.WriteFile(core.CERT_NAME, []byte(ak.Cert), 0600)
-	if err != nil {
-		panic(err.Error())
-	}
-	creds, err := credentials.NewServerTLSFromFile(core.CERT_NAME, "./key")
+	creds, err := credentials.NewServerTLSFromFile(core.CERT_NAME, KEY_NAME)
 	if err != nil {
 		panic(err.Error())
 	}

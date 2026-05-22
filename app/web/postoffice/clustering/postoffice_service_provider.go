@@ -19,7 +19,7 @@ func (c *DataServiceProvider) AuthKey(ctx context.Context, request *protocol.Req
 		core.AppLog.Fatal().Msgf("wrong context format %s", request.Context)
 		return &protocol.AuthKey{Context: request.Context}, fmt.Errorf("wrong context format %s", request.Context)
 	}
-	return c.kloader.load(mp[0], mp[1])
+	return c.vault.Load(mp[0], mp[1])
 }
 
 func (c *DataServiceProvider) HashRing(ctx context.Context, request *protocol.Request) (*protocol.Response, error) {
@@ -185,7 +185,13 @@ func (c *DataServiceProvider) TopicList(ctx context.Context, req *protocol.Reque
 	hd, ok := metadata.FromIncomingContext(ctx)
 	if ok {
 		token := hd.Get("token")
-		core.AppLog.Debug().Msgf("token %v", token)
+		session, err := c.auth.ValidateTicket(token[0])
+		if err != nil {
+			core.AppLog.Debug().Msgf("error %s", err.Error())
+		} else {
+			core.AppLog.Debug().Msgf("session %d", session.SystemId)
+		}
+		core.AppLog.Debug().Msgf("token %v", token[0])
 	}
 	rq := make(chan []core.Subscription, 3)
 	defer close(rq)

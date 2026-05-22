@@ -10,6 +10,7 @@ require (
 	cloud.google.com/go/auth v0.20.0
 	cloud.google.com/go/compute v1.62.0
 	gameclustering.com/internal/core v0.0.0-00010101000000-000000000000
+	gameclustering.com/internal/protocol v0.0.0-00010101000000-000000000000
 	github.com/bramvdbogaerde/go-scp v1.6.0
 	github.com/hashicorp/vault/api v1.23.0
 	github.com/skeema/knownhosts v1.3.2
@@ -22,7 +23,6 @@ require (
 require (
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
-	gameclustering.com/internal/protocol v0.0.0-00010101000000-000000000000 // indirect
 	github.com/0xc0d/encoding v0.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
