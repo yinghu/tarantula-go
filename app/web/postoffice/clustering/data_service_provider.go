@@ -165,7 +165,7 @@ func (c *DataServiceProvider) Start(dir string, ctx string) {
 	if err != nil {
 		panic(err)
 	}
-	rpc := grpc.NewServer(grpc.Creds(creds))
+	rpc := grpc.NewServer(grpc.Creds(creds), grpc.UnaryInterceptor(c.audit))
 	c.server = rpc
 	protocol.RegisterDataServiceServer(rpc, c)
 	protocol.RegisterPostofficeServiceServer(rpc, c)
@@ -176,4 +176,10 @@ func (c *DataServiceProvider) Start(dir string, ctx string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (c *DataServiceProvider) audit(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	//hd, ok := metadata.FromIncomingContext(ctx)
+	core.AppLog.Debug().Msg("server audit first")
+	return handler(ctx, req)
 }
