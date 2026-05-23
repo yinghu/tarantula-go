@@ -125,6 +125,7 @@ func (c *ClusterManager) Publish(e *protocol.Topic) (*protocol.Response, error) 
 		return &protocol.Response{Successful: false}, err
 	}
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
+	fmt.Println("pusblising")
 	return dsp.Publish(context.Background(), e)
 }
 
