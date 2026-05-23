@@ -98,6 +98,6 @@ func (p *RpcConnPool) Release() {
 }
 
 func (p *RpcConnPool) audit(ctx context.Context, method string, req, replay any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-	AppLog.Debug().Msg("call before")
+	AppLog.Debug().Msgf("call before :%s",method)
 	return invoker(ctx, method, req, replay, cc, opts...)
 }
