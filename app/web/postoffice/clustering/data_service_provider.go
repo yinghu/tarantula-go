@@ -166,7 +166,7 @@ func (c *DataServiceProvider) Start(dir string, ctx string) {
 	if err != nil {
 		panic(err)
 	}
-	rpc := grpc.NewServer(grpc.Creds(creds), grpc.UnaryInterceptor(c.audit))
+	rpc := grpc.NewServer(grpc.Creds(creds), grpc.UnaryInterceptor(c.auditCall), grpc.StreamInterceptor(c.auditStreaming))
 	c.server = rpc
 	protocol.RegisterDataServiceServer(rpc, c)
 	protocol.RegisterPostofficeServiceServer(rpc, c)
@@ -179,7 +179,7 @@ func (c *DataServiceProvider) Start(dir string, ctx string) {
 	}
 }
 
-func (c *DataServiceProvider) audit(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+func (c *DataServiceProvider) auditCall(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 	hd, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		core.AppLog.Warn().Msgf("no auth call header %s", info.FullMethod)
@@ -197,4 +197,9 @@ func (c *DataServiceProvider) audit(ctx context.Context, req any, info *grpc.Una
 	}
 	core.AppLog.Debug().Msgf("valid call %s", info.FullMethod)
 	return handler(ctx, req)
+}
+
+func (c *DataServiceProvider) auditStreaming(req any, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	core.AppLog.Debug().Msgf("streaming call %s", info.FullMethod)
+	return handler(req, ss)
 }
