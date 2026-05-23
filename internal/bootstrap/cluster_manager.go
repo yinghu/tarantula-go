@@ -13,7 +13,6 @@ import (
 	"gameclustering.com/internal/util"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -364,7 +363,7 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 	t.NodeId = c.App.NodeId()
 	t.Tag = c.App.Context()
 	t.Event.Key.Array = core.ToBytes(c.App.seq)
-	//go c.Publish(t)
+	go c.Publish(t)
 }
 
 func (c *ClusterManager) handleTranstion(l core.TransactionListener, t *protocol.Transaction) {
@@ -407,7 +406,7 @@ func (c *ClusterManager) TopicList() (*protocol.Response, error) {
 		return nil, err
 	}
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
-	return dsp.TopicList(c.setup(), &protocol.Request{Prefix: 0})
+	return dsp.TopicList(context.Background(), &protocol.Request{Prefix: 0})
 }
 
 func (c *ClusterManager) TaskList() (*protocol.Response, error) {
@@ -432,9 +431,4 @@ func (c *ClusterManager) AuthKey(name string) (*protocol.AuthKey, error) {
 	}
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
 	return dsp.AuthKey(context.Background(), &protocol.Request{Context: fmt.Sprintf("%s#%s", c.App.F.PresenceCtx(), name)})
-}
-
-func (c *ClusterManager) setup() context.Context {
-	ticket, _ := c.App.Authenticator().CreateTicket(100, 100, core.ADMIN_ACCESS_CONTROL, 10)
-	return metadata.NewOutgoingContext(context.Background(), metadata.Pairs("token", ticket))
 }

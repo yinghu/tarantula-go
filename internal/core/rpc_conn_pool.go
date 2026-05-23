@@ -9,6 +9,7 @@ import (
 	"gameclustering.com/internal/protocol"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/metadata"
 )
 
 const (
@@ -111,16 +112,25 @@ func (p *RpcConnPool) Release() {
 
 func (p *RpcConnPool) onCall(ctx context.Context, method string, req, replay any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 	if p.Auth == nil {
-		AppLog.Debug().Msgf("no auth setup call before :%s", method)
+		AppLog.Warn().Msgf("no auth setup streaming before :%s", method)
+		return invoker(ctx, method, req, replay, cc, opts...)
 	}
-	err := invoker(ctx, method, req, replay, cc, opts...)
+
+	err := invoker(p.setup(ctx), method, req, replay, cc, opts...)
 	return err
 }
 
 func (p *RpcConnPool) onStreaming(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 	if p.Auth == nil {
-		AppLog.Debug().Msgf("no auth setup streaming before :%s", method)
+		AppLog.Warn().Msgf("no auth setup streaming before :%s", method)
+		s, err := streamer(ctx, desc, cc, method, opts...)
+		return &StreamProxy{s}, err
 	}
-	s, err := streamer(ctx, desc, cc, method, opts...)
+	s, err := streamer(p.setup(ctx), desc, cc, method, opts...)
 	return &StreamProxy{s}, err
+}
+
+func (p *RpcConnPool) setup(ctx context.Context) context.Context {
+	ticket, _ := p.Auth.CreateTicket(100, 100, ADMIN_ACCESS_CONTROL, 10)
+	return metadata.NewOutgoingContext(ctx, metadata.Pairs(RPC_TICKET_HEADER, ticket))
 }

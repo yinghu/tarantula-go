@@ -47,6 +47,7 @@ func (s *AppManager) ClusterMember() bool {
 }
 
 func (s *AppManager) RegisterLogForwarder(threshold zerolog.Level, logf LogForwarder) {
+	s.threshold = threshold
 	s.forward = logf
 }
 func (s *AppManager) Start(f core.Env) error {
@@ -68,11 +69,11 @@ func (s *AppManager) Start(f core.Env) error {
 			panic(err)
 		}
 		time.Sleep(3 * time.Second)
-		core.AppLog.Warn().Msgf("load client credentials from %s retries remaining %d",f.Vlt.Host, retries)
+		core.AppLog.Warn().Msgf("load client credentials from %s retries remaining %d", f.Vlt.Host, retries)
 	}
 	core.AppLog.Warn().Msgf("Starting cluster client to %s", f.PostOfficeHost)
 	s.cluster = &ClusterManager{App: s}
-	s.RegisterLogForwarder(zerolog.DebugLevel, s.cluster)
+	s.RegisterLogForwarder(zerolog.ErrorLevel, s.cluster)
 
 	err := s.cluster.connect(f.PostOfficeHost)
 	if err != nil {

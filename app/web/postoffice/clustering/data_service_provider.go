@@ -13,6 +13,7 @@ import (
 	"gameclustering.com/internal/util"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/metadata"
 )
 
 const (
@@ -179,7 +180,21 @@ func (c *DataServiceProvider) Start(dir string, ctx string) {
 }
 
 func (c *DataServiceProvider) audit(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
-	//hd, ok := metadata.FromIncomingContext(ctx)
-	core.AppLog.Debug().Msg("server audit first")
+	hd, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		core.AppLog.Warn().Msgf("no auth call header %s", info.FullMethod)
+		return handler(ctx, req)
+	}
+	ticks := hd.Get(core.RPC_TICKET_HEADER)
+	if len(ticks) == 0 {
+		core.AppLog.Warn().Msgf("no auth header %s", core.RPC_TICKET_HEADER)
+		return handler(ctx, req)
+	}
+	_, err := c.auth.ValidateTicket(ticks[0])
+	if err != nil {
+		core.AppLog.Debug().Msgf("invalid ticket %s", err.Error())
+		return handler(ctx, req)
+	}
+	core.AppLog.Debug().Msgf("valid call %s", info.FullMethod)
 	return handler(ctx, req)
 }

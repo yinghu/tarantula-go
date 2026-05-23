@@ -32,7 +32,8 @@ const (
 	TRANSACTION_MODE_CONCURRENT uint32 = 0
 	TRANSACTION_MODE_SEQUENCE   uint32 = 1
 
-	CERT_NAME string = "./domain.crt"
+	CERT_NAME         string = "./domain.crt"
+	RPC_TICKET_HEADER string = "ticket"
 )
 
 type Chunk struct {
