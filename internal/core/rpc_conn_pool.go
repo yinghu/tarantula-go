@@ -98,9 +98,9 @@ func (p *RpcConnPool) Release() {
 }
 
 func (p *RpcConnPool) audit(ctx context.Context, method string, req, replay any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-	//AppLog.Debug().Msgf("call before :%s",method)
-	fmt.Printf("ssmethod 111>%s", method)
+	AppLog.Debug().Msgf("call before :%s", method)
+	//fmt.Printf("ssmethod 111>%s", method)
 	err := invoker(ctx, method, req, replay, cc, opts...)
-	fmt.Printf("ssmethod 222>%s", method)
+	//fmt.Printf("ssmethod 222>%s", method)
 	return err
 }
