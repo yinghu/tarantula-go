@@ -11,6 +11,7 @@ type sub func(sub core.Subscription)
 type SubscriptionRegistry struct {
 	topicEnds map[core.TopicKey]map[string]core.Subscription
 	cPools    map[core.TopicKey]*core.RpcConnPool
+	auth core.Authenticator
 }
 
 func (s *SubscriptionRegistry) add(sub core.Subscription) {
@@ -18,7 +19,7 @@ func (s *SubscriptionRegistry) add(sub core.Subscription) {
 	if !exists {
 		subs = make(map[string]core.Subscription)
 		s.topicEnds[sub.TopicKey()] = subs
-		cp := core.RpcConnPool{Target: sub.Endpoint, Tag: sub.Tag, NodeId: sub.NodeId}
+		cp := core.RpcConnPool{Target: sub.Endpoint, Tag: sub.Tag, NodeId: sub.NodeId,Auth: s.auth}
 		cp.Start()
 		s.cPools[sub.TopicKey()] = &cp
 	}

@@ -15,6 +15,7 @@ type MemberHashRing struct {
 	weight int
 	WNode  chan<- RingUpdate
 	hLock  *sync.Mutex
+	auth   core.Authenticator
 }
 
 func (m *MemberHashRing) vNode(node core.Node, weight int) core.Node {
@@ -24,7 +25,7 @@ func (m *MemberHashRing) vNode(node core.Node, weight int) core.Node {
 }
 
 func (m *MemberHashRing) OnAdd(node core.Node) {
-	pool := core.RpcConnPool{Target: node.RpcEndpoint}
+	pool := core.RpcConnPool{Target: node.RpcEndpoint, Auth: m.auth}
 	pool.Start()
 	added := make([]core.Node, 0, m.weight)
 	for w := range m.weight {

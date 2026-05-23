@@ -22,12 +22,12 @@ type MemberlistManager struct {
 	MemberListListener
 
 	StoreDir string
-	Ctx string
+	Ctx      string
 	Binding  string
 }
 
-func (m *MemberlistManager) Start(meta []byte,auth core.Authenticator, seq core.Sequence, vt *util.VaultClient) error {
-	m.MemberHashRing = &MemberHashRing{weight: NODE_WEIGHT, hLock: &sync.Mutex{}}
+func (m *MemberlistManager) Start(meta []byte, auth core.Authenticator, seq core.Sequence, vt *util.VaultClient) error {
+	m.MemberHashRing = &MemberHashRing{weight: NODE_WEIGHT, hLock: &sync.Mutex{}, auth: auth}
 	m.nodes = make([]core.Node, 0)
 	cfg := memberlist.DefaultLANConfig()
 	cfg.Name = m.Binding
@@ -58,11 +58,11 @@ func (m *MemberlistManager) Start(meta []byte,auth core.Authenticator, seq core.
 	m.Memberlist = list
 	go m.Listen()
 
-	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode, RSync: rwSync, seq: seq, vault:vt,auth: auth}
+	m.DataServiceProvider = &DataServiceProvider{RNode: rwNode, RSync: rwSync, seq: seq, vault: vt, auth: auth}
 	m.DataServiceProvider.rpcEndpoint = fmt.Sprintf("%s:%d", string(m.LocalNode().Addr.String()), core.RPC_PORT)
 	m.Mll = &m.MemberListListener
 	m.Mll.DWait.Add(1)
-	go m.DataServiceProvider.Start(m.StoreDir,m.Ctx)
+	go m.DataServiceProvider.Start(m.StoreDir, m.Ctx)
 	m.Mll.DWait.Wait()
 	time.Sleep(3 * time.Second)
 	go m.RingUpdated()

@@ -22,6 +22,17 @@ type RpcConn struct {
 	Seq  int
 }
 
+type StreamProxy struct {
+	grpc.ClientStream
+}
+
+func (r *StreamProxy) SendMsg(m any) error {
+	return r.ClientStream.SendMsg(m)
+}
+func (r *StreamProxy) RecvMsg(m any) error {
+	return r.ClientStream.RecvMsg(m)
+}
+
 type RpcConnPool struct {
 	Target  string
 	Tag     string
@@ -31,6 +42,7 @@ type RpcConnPool struct {
 	index   int
 	pool    map[string]*RpcConn
 	sync.RWMutex
+	Auth Authenticator
 }
 
 func (p *RpcConnPool) connect(target string) (*grpc.ClientConn, error) {
@@ -40,7 +52,7 @@ func (p *RpcConnPool) connect(target string) (*grpc.ClientConn, error) {
 		panic(err.Error())
 	}
 	for {
-		tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(creds), grpc.WithUnaryInterceptor(p.audit),grpc.WithStreamInterceptor(p.streaming))
+		tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(creds), grpc.WithUnaryInterceptor(p.onCall), grpc.WithStreamInterceptor(p.onStreaming))
 		if err != nil {
 			retries--
 			if retries > 0 {
@@ -97,17 +109,18 @@ func (p *RpcConnPool) Release() {
 	clear(p.pool)
 }
 
-func (p *RpcConnPool) audit(ctx context.Context, method string, req, replay any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-	AppLog.Debug().Msgf("call before :%s", method)
-	//fmt.Printf("ssmethod 111>%s", method)
+func (p *RpcConnPool) onCall(ctx context.Context, method string, req, replay any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
+	if p.Auth == nil {
+		AppLog.Debug().Msgf("no auth setup call before :%s", method)
+	}
 	err := invoker(ctx, method, req, replay, cc, opts...)
-	//fmt.Printf("ssmethod 222>%s", method)
-	AppLog.Debug().Msgf("call after :%s", method)
 	return err
 }
 
-func (p *RpcConnPool) streaming(ctx context.Context,desc *grpc.StreamDesc,cc *grpc.ClientConn,method string,streamer grpc.Streamer,opts ...grpc.CallOption)(grpc.ClientStream,error){
-	AppLog.Debug().Msgf("streaming before :%s", method)
-	s,err := streamer(ctx,desc,cc,method,opts...)			
-	return s,err
+func (p *RpcConnPool) onStreaming(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
+	if p.Auth == nil {
+		AppLog.Debug().Msgf("no auth setup streaming before :%s", method)
+	}
+	s, err := streamer(ctx, desc, cc, method, opts...)
+	return &StreamProxy{s}, err
 }
