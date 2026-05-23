@@ -102,5 +102,6 @@ func (p *RpcConnPool) audit(ctx context.Context, method string, req, replay any,
 	//fmt.Printf("ssmethod 111>%s", method)
 	err := invoker(ctx, method, req, replay, cc, opts...)
 	//fmt.Printf("ssmethod 222>%s", method)
+	AppLog.Debug().Msgf("call after :%s", method)
 	return err
 }

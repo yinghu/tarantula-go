@@ -125,7 +125,7 @@ func (c *ClusterManager) Publish(e *protocol.Topic) (*protocol.Response, error) 
 		return &protocol.Response{Successful: false}, err
 	}
 	dsp := protocol.NewPostofficeServiceClient(conn.Conn)
-	fmt.Printf("pusblising>>%s",e.Name)
+	fmt.Printf("pusblising>>%s", e.Name)
 	return dsp.Publish(context.Background(), e)
 }
 
@@ -365,7 +365,7 @@ func (c *ClusterManager) Forward(level zerolog.Level, log []byte) {
 	t.NodeId = c.App.NodeId()
 	t.Tag = c.App.Context()
 	t.Event.Key.Array = core.ToBytes(c.App.seq)
-	go c.Publish(t)
+	//go c.Publish(t)
 }
 
 func (c *ClusterManager) handleTranstion(l core.TransactionListener, t *protocol.Transaction) {
