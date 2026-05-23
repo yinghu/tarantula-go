@@ -40,7 +40,7 @@ func (p *RpcConnPool) connect(target string) (*grpc.ClientConn, error) {
 		panic(err.Error())
 	}
 	for {
-		tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(creds), grpc.WithUnaryInterceptor(p.audit))
+		tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(creds), grpc.WithUnaryInterceptor(p.audit),grpc.WithStreamInterceptor(p.streaming))
 		if err != nil {
 			retries--
 			if retries > 0 {
@@ -104,4 +104,10 @@ func (p *RpcConnPool) audit(ctx context.Context, method string, req, replay any,
 	//fmt.Printf("ssmethod 222>%s", method)
 	AppLog.Debug().Msgf("call after :%s", method)
 	return err
+}
+
+func (p *RpcConnPool) streaming(ctx context.Context,desc *grpc.StreamDesc,cc *grpc.ClientConn,method string,streamer grpc.Streamer,opts ...grpc.CallOption)(grpc.ClientStream,error){
+	AppLog.Debug().Msgf("streaming before :%s", method)
+	s,err := streamer(ctx,desc,cc,method,opts...)			
+	return s,err
 }
