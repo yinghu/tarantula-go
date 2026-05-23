@@ -40,7 +40,7 @@ func (p *RpcConnPool) connect(target string) (*grpc.ClientConn, error) {
 		panic(err.Error())
 	}
 	for {
-		tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(creds))
+		tcp, err := grpc.NewClient(target, grpc.WithTransportCredentials(creds), grpc.WithUnaryInterceptor(p.audit))
 		if err != nil {
 			retries--
 			if retries > 0 {
@@ -99,5 +99,8 @@ func (p *RpcConnPool) Release() {
 
 func (p *RpcConnPool) audit(ctx context.Context, method string, req, replay any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 	//AppLog.Debug().Msgf("call before :%s",method)
-	return invoker(ctx, method, req, replay, cc, opts...)
+	fmt.Printf("method 111>%s", method)
+	err := invoker(ctx, method, req, replay, cc, opts...)
+	fmt.Printf("method 222>%s", method)
+	return err
 }
