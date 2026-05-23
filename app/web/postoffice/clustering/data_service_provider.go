@@ -200,6 +200,22 @@ func (c *DataServiceProvider) auditCall(ctx context.Context, req any, info *grpc
 }
 
 func (c *DataServiceProvider) auditStreaming(req any, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
-	core.AppLog.Debug().Msgf("streaming call %s", info.FullMethod)
+	ctx := ss.Context()
+	hd, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		core.AppLog.Warn().Msgf("no auth call header %s", info.FullMethod)
+		return handler(req, ss)
+	}
+	ticks := hd.Get(core.RPC_TICKET_HEADER)
+	if len(ticks) == 0 {
+		core.AppLog.Warn().Msgf("no auth header %s", core.RPC_TICKET_HEADER)
+		return handler(req, ss)
+	}
+	_, err := c.auth.ValidateTicket(ticks[0])
+	if err != nil {
+		core.AppLog.Debug().Msgf("invalid ticket %s", err.Error())
+		return handler(req, ss)
+	}
+	core.AppLog.Debug().Msgf("valid streaming call %s", info.FullMethod)
 	return handler(req, ss)
 }
