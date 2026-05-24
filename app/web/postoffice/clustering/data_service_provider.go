@@ -12,8 +12,10 @@ import (
 	"gameclustering.com/internal/protocol"
 	"gameclustering.com/internal/util"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
 
 const (
@@ -182,18 +184,15 @@ func (c *DataServiceProvider) Start(dir string, ctx string) {
 func (c *DataServiceProvider) auditCall(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 	hd, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		core.AppLog.Warn().Msgf("no auth call header %s", info.FullMethod)
-		return handler(ctx, req)
+		return nil, status.Error(codes.Unauthenticated, "no ticket header")
 	}
 	ticks := hd.Get(core.RPC_TICKET_HEADER)
 	if len(ticks) == 0 {
-		core.AppLog.Warn().Msgf("no auth header %s", core.RPC_TICKET_HEADER)
-		return handler(ctx, req)
+		return nil, status.Error(codes.Unauthenticated, "no ticket header")
 	}
 	_, err := c.auth.ValidateTicket(ticks[0])
 	if err != nil {
-		core.AppLog.Debug().Msgf("invalid ticket %s", err.Error())
-		return handler(ctx, req)
+		return nil, status.Error(codes.Unauthenticated, "invalid ticket")
 	}
 	core.AppLog.Debug().Msgf("valid call %s", info.FullMethod)
 	return handler(ctx, req)
@@ -203,18 +202,15 @@ func (c *DataServiceProvider) auditStreaming(req any, ss grpc.ServerStream, info
 	ctx := ss.Context()
 	hd, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		core.AppLog.Warn().Msgf("no auth call header %s", info.FullMethod)
-		return handler(req, &ServerStreamPorxy{ss})
+		return status.Error(codes.Unauthenticated, "no ticket header")
 	}
 	ticks := hd.Get(core.RPC_TICKET_HEADER)
 	if len(ticks) == 0 {
-		core.AppLog.Warn().Msgf("no auth header %s", core.RPC_TICKET_HEADER)
-		return handler(req, &ServerStreamPorxy{ss})
+		return status.Error(codes.Unauthenticated, "no ticket header")
 	}
 	_, err := c.auth.ValidateTicket(ticks[0])
 	if err != nil {
-		core.AppLog.Debug().Msgf("invalid ticket %s", err.Error())
-		return handler(req, &ServerStreamPorxy{ss})
+		return status.Errorf(codes.Unauthenticated, "invalid ticket %s", err.Error())
 	}
 	core.AppLog.Debug().Msgf("valid streaming call %s", info.FullMethod)
 	err = handler(req, &ServerStreamPorxy{ss})
