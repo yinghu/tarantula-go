@@ -116,8 +116,7 @@ func (p *RpcConnPool) onCall(ctx context.Context, method string, req, replay any
 	if p.Auth == nil {
 		AppLog.Warn().Msgf("no auth setup streaming before :%s", method)
 		return invoker(ctx, method, req, replay, cc, opts...)
-	}
-
+	} 
 	err := invoker(p.setup(ctx), method, req, replay, cc, opts...)
 	return err
 }
