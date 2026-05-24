@@ -42,18 +42,16 @@ func TestVaultClient(t *testing.T) {
 	if err != nil {
 		t.Errorf("error %s", err.Error())
 	}
-	sk, err := vclient.GetSecret("dev/presence", "git")
+	ak, err := vclient.Load("dev/presence", "git")
 	if err != nil {
 		t.Errorf("error %s", err.Error())
 		return
 	}
-	tok, _ := sk.Data["token"].(string)
-	org, _ := sk.Data["org"].(string)
-	gh := GitHubApi{Token: tok, Org: org}
-	repos, err := gh.ListRepos()
+	fmt.Printf("ak %s\n", ak.Git.Email)
+	//err = vclient.CreateKvStore("test/presence","test env keys")
+	err = vclient.PutSecret("test/presence", "git", "key1", "value1")
 	if err != nil {
-		t.Errorf("err %s", err.Error())
+		t.Errorf("error %s", err.Error())
 		return
 	}
-	fmt.Printf("REPO %v", repos)
 }

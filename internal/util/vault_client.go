@@ -30,6 +30,19 @@ func (v *VaultClient) GetSecret(mountPath string, path string) (*vault.KVSecret,
 	return v.client.KVv2(mountPath).Get(context.Background(), path)
 }
 
+func (v *VaultClient) CreateKvStore(mountPath, description string) error {
+	input := vault.MountInput{
+		Type: "kv", Options: map[string]string{"version": "2"}, Description: description,
+	}
+	return v.client.Sys().Mount(mountPath, &input)
+}
+
+func (v *VaultClient) PutSecret(mountPath, path, key, value string) error {
+	data := map[string]any{key: value}
+	_, err := v.client.KVv2(mountPath).Put(context.Background(), path, data)
+	return err
+}
+
 func (v *VaultClient) Load(mountPath string, path string) (*protocol.AuthKey, error) {
 	ak := protocol.AuthKey{}
 	kv, err := v.GetSecret(mountPath, path)
@@ -97,4 +110,3 @@ func (a *VaultClient) toGitKey(kv *vault.KVSecret) *protocol.AuthKey {
 	ak.Git.Org = org
 	return &ak
 }
-
