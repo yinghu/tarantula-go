@@ -16,6 +16,8 @@ const (
 	MIN_POOL_SIZE       int = 1
 	MAX_POOL_SIZE       int = 1
 	RPC_CONNECT_RETRIES int = 3
+
+	RPC_TICKET_TIMEOUT_SECONDS int = 10
 )
 
 type RpcConn struct {
@@ -131,6 +133,6 @@ func (p *RpcConnPool) onStreaming(ctx context.Context, desc *grpc.StreamDesc, cc
 }
 
 func (p *RpcConnPool) setup(ctx context.Context) context.Context {
-	ticket, _ := p.Auth.CreateTicket(100, 100, ADMIN_ACCESS_CONTROL, 10)
+	ticket, _ := p.Auth.CreateTicket(100, 100, ADMIN_ACCESS_CONTROL, RPC_TICKET_TIMEOUT_SECONDS)
 	return metadata.NewOutgoingContext(ctx, metadata.Pairs(RPC_TICKET_HEADER, ticket))
 }
