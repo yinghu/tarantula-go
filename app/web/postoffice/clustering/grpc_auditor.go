@@ -35,7 +35,6 @@ func (c *DataServiceProvider) auditCall(ctx context.Context, req any, info *grpc
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, "invalid ticket")
 	}
-	//core.AppLog.Debug().Msgf("valid call %s", info.FullMethod)
 	return handler(ctx, req)
 }
 
@@ -53,8 +52,6 @@ func (c *DataServiceProvider) auditStreaming(req any, ss grpc.ServerStream, info
 	if err != nil {
 		return status.Errorf(codes.Unauthenticated, "invalid ticket %s", err.Error())
 	}
-	//core.AppLog.Debug().Msgf("valid streaming call %s", info.FullMethod)
 	err = handler(req, &ServerStreamPorxy{ss})
-	//core.AppLog.Debug().Msgf("finished streaming call %s", info.FullMethod)
 	return err
 }
